@@ -28,6 +28,7 @@ phases:
       - printf '[{"name":"mica-prod-accounting","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > productionimagedefinition.json
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
+      - aws s3 sync imagedefinitions.json s3://codepipeline-ap-south-1-296688833593/Github-Accounting/SourceArti
 artifacts:
     files: 
     - imagedefinitions.json
