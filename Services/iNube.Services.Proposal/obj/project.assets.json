@@ -14673,11 +14673,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\AWS{January}\\iNubeProducts\\Services\\iNube.Services.Proposal\\iNube.Services.Proposal.csproj",
+      "projectUniqueName": "E:\\Github\\iNubeProducts\\Services\\iNube.Services.Proposal\\iNube.Services.Proposal.csproj",
       "projectName": "iNube.Services.Proposal",
-      "projectPath": "E:\\AWS{January}\\iNubeProducts\\Services\\iNube.Services.Proposal\\iNube.Services.Proposal.csproj",
+      "projectPath": "E:\\Github\\iNubeProducts\\Services\\iNube.Services.Proposal\\iNube.Services.Proposal.csproj",
       "packagesPath": "C:\\Users\\bhavuk.bhardwaj\\.nuget\\packages\\",
-      "outputPath": "E:\\AWS{January}\\iNubeProducts\\Services\\iNube.Services.Proposal\\obj\\",
+      "outputPath": "E:\\Github\\iNubeProducts\\Services\\iNube.Services.Proposal\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

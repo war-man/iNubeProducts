@@ -14735,11 +14735,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\AWS{January}\\iNubeProducts\\Services\\iNube.Services.Accounting\\iNube.Services.Accounting.csproj",
+      "projectUniqueName": "E:\\Github\\iNubeProducts\\Services\\iNube.Services.Accounting\\iNube.Services.Accounting.csproj",
       "projectName": "iNube.Services.Accounting",
-      "projectPath": "E:\\AWS{January}\\iNubeProducts\\Services\\iNube.Services.Accounting\\iNube.Services.Accounting.csproj",
+      "projectPath": "E:\\Github\\iNubeProducts\\Services\\iNube.Services.Accounting\\iNube.Services.Accounting.csproj",
       "packagesPath": "C:\\Users\\bhavuk.bhardwaj\\.nuget\\packages\\",
-      "outputPath": "E:\\AWS{January}\\iNubeProducts\\Services\\iNube.Services.Accounting\\obj\\",
+      "outputPath": "E:\\Github\\iNubeProducts\\Services\\iNube.Services.Accounting\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
