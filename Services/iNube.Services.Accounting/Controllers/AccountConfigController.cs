@@ -282,13 +282,13 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
 
         
         ////Excel Upload For COAMapping
-        [HttpPost]
-        public async Task<IActionResult> ImportExcelCOAMapping(IFormFile formFile, CancellationToken cancellationToken)
-        {
-            await _accountService.Import(formFile, cancellationToken,Context);
-            return Ok();
+        //[HttpPost]
+        //public async Task<IActionResult> ImportExcelCOAMapping(IFormFile formFile, CancellationToken cancellationToken)
+        //{
+        //    await _accountService.Import(formFile, cancellationToken,Context);
+        //    return Ok();
 
-        }
+        //}
 		
 		 [HttpGet]
         [AllowAnonymous]
