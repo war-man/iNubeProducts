@@ -27,7 +27,7 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"mica-inube-accounting-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - printf '[{"name":"mica-prod-accounting","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > productionimagedefinition.json
-      - printf '{"imageUri":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
+      - printf '{"ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
@@ -38,6 +38,9 @@ artifacts:
     - Services/iNube.Services.Accounting/appspec.yml
     - Services/iNube.Services.Accounting/taskdef.json
     - imagedefinitions.json
-    - imageDetail.json
     - productionimagedefinition.json
-     
+
+    secondary-artifacts:
+        ImageArtifact:
+            files:
+            - imageDetail.json 
