@@ -31,10 +31,11 @@ phases:
       - cat productionimagedefinition.json
       - cat imageDetail.json
 artifacts:
-    files: 
+    files:
+    - appspec.yml
+    - taskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json
-    - appspec.yaml
-    - taskdef.json
+
      
