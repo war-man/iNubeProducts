@@ -31,6 +31,10 @@ phases:
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
+      - echo  $CODEBUILD_SRC_DIR
+      - cd $CODEBUILD_SRC_DIR
+      - cd Services/iNube.Services.Accounting
+ 
 artifacts:
     files:
     - appspec.yml
