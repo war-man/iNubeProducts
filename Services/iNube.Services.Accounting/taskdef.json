@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "dev-mica-accounting",
-      "image": "<IMAGE1_NAME>",
+      "image": "\"820227512150.dkr.ecr.ap-south-1.amazonaws.com/micacontainerregistry:accountinglatest",
       "essential": true,
       "portMappings": [
         {
