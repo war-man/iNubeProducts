@@ -3,7 +3,7 @@ Resources:
   - TargetService: 
       Type: AWS::ECS::Service 
       Properties: 
-        TaskDefinition: <TASK_DEFINITION> 
+        TaskDefinition: "dev-mica-accounting" 
         LoadBalancerInfo: 
-          ContainerName: "mica-inube-accounting-service" 
-          ContainerPort: 9011 
+          ContainerName: "dev-mica-accounting" 
+          ContainerPort: 9011
