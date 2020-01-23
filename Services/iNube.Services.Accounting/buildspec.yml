@@ -26,7 +26,7 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"mica-inube-accounting-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - printf '[{"name":"mica-prod-accounting","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > productionimagedefinition.json
-      - printf '[{"name":"dev-mica-accounting","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imageDeatil.json
+      - printf '[{"name":"dev-mica-accounting","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDeatil.json
