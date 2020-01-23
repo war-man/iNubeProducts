@@ -39,8 +39,4 @@ artifacts:
     - Services/iNube.Services.Accounting/taskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
-
-    secondary-artifacts:
-        ImageArtifact:
-            files:
-            - imageDetail.json 
+    - imageDetail.json 
