@@ -1,46 +1,24 @@
 {
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
+      "name": "dev-mica-accounting",
+      "image": "<IMAGE1_NAME>",
+      "essential": true,
       "portMappings": [
         {
           "hostPort": 9011,
           "protocol": "tcp",
           "containerPort": 9011
         }
-      ],
-      "cpu": 128,
-      "memory": 128,
-      "image": "820227512150.dkr.ecr.ap-south-1.amazonaws.com/micacontainerregistr:accountinglatest",
-      "essential": true,
-      "name": "dev-mica-accounting"
+      ]
     }
   ],
-  "placementConstraints": [],
-  "memory": "128",
-  "compatibilities": [
+  "requiresCompatibilities": [
     "EC2"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:ap-south-1:820227512150:task-definition/dev-mica-accounting:7",
-  "family": "dev-mica-accounting",
-  "requiresAttributes": [
-    {
-      "name": "com.amazonaws.ecs.capability.ecr-auth"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-    },
-    {
-      "name": "ecs.capability.task-eni"
-    }
-  ],
-  "requiresCompatibilities": [],
   "networkMode": "bridge",
   "cpu": "128",
-  "taskRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
-  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
-  "status": "ACTIVE",
-  "volumes": []
+  "memory": "128",
+  "family": "dev-mica-accounting"
 }

@@ -1,9 +1,10 @@
 version: 1.0 
-Resources: 
-  - TargetService: 
-      Type: AWS::ECS::Service 
-      Properties: 
-        TaskDefinition: "dev-mica-accounting" 
-        LoadBalancerInfo: 
-          ContainerName: "dev-mica-accounting" 
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: <TASK_DEFINITION>
+        LoadBalancerInfo:
+          ContainerName: "dev-mica-accounting"
           ContainerPort: 9011
+          PlatformVersion: "LATEST"
