@@ -34,12 +34,10 @@ phases:
     
  
 artifacts:
-    commands:
-        - echo  $CODEBUILD_SRC_DIR
-        - cd $CODEBUILD_SRC_DIR
-        - cd Services/iNube.Services.Accounting
     files:
-    - appspec.yml
-    - taskdef.json
-
+    - Services/iNube.Services.Accounting/appspec.yml
+    - Services/iNube.Services.Accounting/taskdef.json
+    - imagedefinitions.json
+    - imageDetail.json
+    - productionimagedefinition.json
      
