@@ -29,7 +29,7 @@ phases:
       - printf '[{"name":"dev-mica-accounting","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
-      - cat imageDeatil.json
+      - cat imageDetail.json
 artifacts:
     files: 
     - imagedefinitions.json
