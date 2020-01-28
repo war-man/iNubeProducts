@@ -7,4 +7,3 @@ Resources:
         LoadBalancerInfo:
           ContainerName: "dev-mica-accounting"
           ContainerPort: 9011
-        PlatformVersion: "LATEST"
