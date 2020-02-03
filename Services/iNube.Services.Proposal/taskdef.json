@@ -1,45 +1,24 @@
 {
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "portMappings": [
-        {
-          "hostPort": 9002,
-          "protocol": "tcp",
-          "containerPort": 9002
-        }
-      ],
-      "cpu": 256,
-      "memory": 512,
+      "name": "dev2-mica-proposal",
       "image": "<IMAGE1_NAME>",
       "essential": true,
-      "name": "mica-inube-claim-service"
+      "portMappings": [
+        {
+          "hostPort": 9008,
+          "protocol": "tcp",
+          "containerPort": 9008
+        }
+      ]
     }
   ],
-  "placementConstraints": [],
-  "memory": "512",
- "compatibilities": [
+  "requiresCompatibilities": [
     "EC2"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:ap-south-1:820227512150:task-definition/mica-inube-claim-service:1",
-  "family": "mica-inube-claim-service",
-  "requiresAttributes": [
-    {
-       "name": "com.amazonaws.ecs.capability.ecr-auth"
-    },
-    {
-       "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
-    },
-    {
-       "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-    },
-    {
-      "name": "ecs.capability.task-eni"
-    }
-  ],
-   "requiresCompatibilities": [],
   "networkMode": "awsvpc",
-  "cpu": "256",
-  "revision": 1,
-  "status": "ACTIVE",
-   "volumes": []
+  "cpu": "128",
+  "memory": "128",
+  "family": "dev2-mica-proposal"
 }
