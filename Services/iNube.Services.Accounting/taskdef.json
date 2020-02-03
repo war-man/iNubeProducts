@@ -2,7 +2,7 @@
   "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "dev-mica-accounting",
+      "name": "dev2-mica-accounting",
       "image": "<IMAGE1_NAME>",
       "essential": true,
       "portMappings": [
@@ -20,5 +20,5 @@
   "networkMode": "bridge",
   "cpu": "128",
   "memory": "128",
-  "family": "dev-mica-accounting"
+  "family": "dev2-mica-accounting"
 }
