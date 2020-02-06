@@ -6,4 +6,4 @@ Resources:
         TaskDefinition: <TASK_DEFINITION>
         LoadBalancerInfo:
           ContainerName: "dev2-mica-notification"
-          ContainerPort: 9005
+          ContainerPort: 9004
