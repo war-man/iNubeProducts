@@ -24,4 +24,4 @@ RUN wget https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.stretc
 RUN dpkg -i wkhtmltox_0.12.5-1.stretch_amd64.deb; exit 0
 RUN apt -f -y install
 RUN cp /usr/local/bin/wkhtmltopdf /app/wwwroot/Rotativa
-ENTRYPOINT ["dotnet", "inube.Services.Notification.dll"]
+ENTRYPOINT ["dotnet", "iNube.Services.Notification.dll"]
