@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Claims", "iN
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Billing", "iNube.Services.Billing\iNube.Services.Billing.csproj", "{8029228D-8269-4103-A538-65FD2BD1F256}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "inube.Services.Notification", "inube.Services.Notification\inube.Services.Notification.csproj", "{86AAEE86-43E7-4BA5-B7CF-9FC57CED79DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Notification", "inube.Services.Notification\iNube.Services.Notification.csproj", "{86AAEE86-43E7-4BA5-B7CF-9FC57CED79DE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{7BC54E3B-EA54-475D-9C0A-926C17BADD54}"
 EndProject
