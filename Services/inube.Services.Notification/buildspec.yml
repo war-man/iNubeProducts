@@ -39,4 +39,4 @@ artifacts:
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json      
-    discard-paths: yes
+    discard-paths: yes 
