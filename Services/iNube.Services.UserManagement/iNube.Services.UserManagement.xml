@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>iNube.Services.UserManagement</name>
+    </assembly>
+    <members>
+        <member name="M:iNube.Services.UserManagement.Controllers.Login.LoginController.Authenticate(iNube.Services.UserManagement.Models.LoginDTO)">
+            <summary>
+            
+            </summary>
+            <param name="loginDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="T:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService">
+            <summary>
+            
+            </summary>
+            <seealso cref="T:iNube.Services.UserManagement.Controllers.Permission.PermissionService.IPermissionProductService" />
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.#ctor(AutoMapper.IMapper)">
+            <summary>
+            Initializes a new instance of the <see cref="T:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService"/> class.
+            </summary>
+            <param name="mapper">The mapper.</param>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.GetMasPermissions(System.String,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Gets the mas permissions.
+            </summary>
+            <param name="perType">Type of the per.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.GetUserPermissions(System.String,System.String,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Gets the user permissions.
+            </summary>
+            <param name="perType">Type of the per.</param>
+            <param name="userId">The user identifier.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.GetPermissions(System.String,System.String,System.String,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Gets the permissions.
+            </summary>
+            <param name="perType">Type of the per.</param>
+            <param name="userId">The user identifier.</param>
+            <param name="roleId">The role identifier.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.AssignPermission(iNube.Services.UserManagement.Models.UserPermissionDTO,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Assigns the permission.
+            </summary>
+            <param name="permissionIds">The permission ids.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.SaveAssignPermission(iNube.Services.UserManagement.Models.UserRolesPermissionDTO,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Saves the assign permission.
+            </summary>
+            <param name="permissionIds">The permission ids.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.GetRolePermissions(iNube.Services.UserManagement.Models.UserRoleMapDTO,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Gets the role permissions.
+            </summary>
+            <param name="userPermissionDTO">The user permission dto.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.GetUserRolePermissions(iNube.Services.UserManagement.Models.UserRoleMapDTO,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Gets the user role permissions.
+            </summary>
+            <param name="userPermissionDTO">The user permission dto.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.GetMenuChildren(System.Collections.Generic.IEnumerable{iNube.Services.UserManagement.Models.MasPermissionDTO},System.Int32,System.String)">
+            <summary>
+            Gets the menu children.
+            </summary>
+            <param name="permissions">The permissions.</param>
+            <param name="parentId">The parent identifier.</param>
+            <param name="roleId">The role identifier.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.AvoPermissionService.GetChildren(System.Collections.Generic.IEnumerable{iNube.Services.UserManagement.Entities.AVO.TblMasPermission},System.Int32)">
+            <summary>
+            Gets the children.
+            </summary>
+            <param name="permissions">The permissions.</param>
+            <param name="parentId">The parent identifier.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.MicaPermissionService.AssignPermission(iNube.Services.UserManagement.Models.UserPermissionDTO,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Assigns the permission.
+            </summary>
+            <param name="permissionIds">The permission ids.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Controllers.Controllers.Permission.PermissionService.MicaPermission.MicaPermissionService.SaveAssignPermission(iNube.Services.UserManagement.Models.UserRolesPermissionDTO,iNube.Utility.Framework.Model.ApiContext)">
+            <summary>
+            Saves the assign permission.
+            </summary>
+            <param name="permissionIds">The permission ids.</param>
+            <param name="apiContext">The API context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Validations.AssignRoleRequestValidator.RuleFor">
+            <summary>
+            Derived method from virtual method base for Rules implementation
+            </summary>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Validations.CreateProfileUserRequestValidator.RuleFor">
+            <summary>
+            Derived method from virtual method base for Rules implementation
+            </summary>
+        </member>
+        <member name="M:iNube.Services.UserManagement.Validations.UserDetailValidator.RuleFor">
+            <summary>
+            Derived method from virtual method base for Rules implementation
+            </summary>
+        </member>
+    </members>
+</doc>

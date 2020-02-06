@@ -1,0 +1,26 @@
+
+{
+    "region" : "us-east-1",
+    "profile" : "ashish.sinha@inubesolutions.com",
+    "configuration" : "Release",
+    "tag"           : "inubeservicesbilling:latest",
+    "docker-build-working-dir" : "",
+    "cluster"                  : "Billing",
+    "launch-type"              : "FARGATE",
+    "launch-subnets"           : "subnet-a7b08589,subnet-e60cf2ab,subnet-2cd5fe70,subnet-233c1244,subnet-74d4a64a,subnet-a905e5a7",
+    "launch-security-groups"   : "sg-92bba6cd",
+    "assign-public-ip"         : true,
+    "task-definition-name"     : "iNubeServicesBilling",
+    "task-cpu"                 : "256",
+    "task-memory"              : "512",
+    "task-execution-role"      : "ecsTaskExecutionRole",
+    "container-name"           : "iNubeServicesBilling",
+    "container-port-mapping"   : "80:80",
+    "container-environment-variables" : "\"ASPNETCORE_ENVIRONMENT\"=\"Production\"",
+    "skip-image-push"                 : false,
+    "cluster-service"                 : "iNubeServicesBilling",
+    "desired-count"                   : 1,
+    "deployment-minimum-healthy-percent" : 50,
+    "deployment-maximum-percent"         : 200,
+    "vstoolkit-deployment-mode"          : "DeployService"
+}

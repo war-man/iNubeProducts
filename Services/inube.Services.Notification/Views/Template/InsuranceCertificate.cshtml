@@ -1,0 +1,558 @@
+﻿@model TemplateDemo.Models.InsuranceCertificateModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 5px;
+        }
+
+        .benefitamttbl {
+            padding: 0px;
+        }
+
+            .benefitamttbl table {
+                width: 100%;
+            }
+
+        .leftcol, .rightcol {
+            width: 50%;
+        }
+
+        table, tr, td, th, tbody, thead, tfoot {
+            page-break-inside: avoid !important;
+            /*page-break-after:always;*/
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+
+
+    @*<img src="~/images/logo.png" width="200" height="50" style="margin-left:146px" />*@
+    @*<img src="~/images/iNubeLogo.png" width="200" height="50" style="margin-left:146px" />*@
+    @*<h4 style="margin-right: 152px; text-align:right;">@Html.DisplayFor(model => model.Date)</h4>*@
+
+    <table style="width:100%;border: 1px solid #000;padding: 5px;">
+        <tbody>
+            <tr>
+                <th>
+                    <img src="~/images/iNubeLogo.png" style="margin-bottom: -57px;" />
+                </th>
+
+                <th style="text-align:center">
+
+                    <h3>@Html.DisplayFor(model => model.officeAddress.CompanyName)</h3>
+                    <small>
+                        @Html.DisplayFor(model => model.officeAddress.AddressLine1)
+
+                        @Html.DisplayFor(model => model.officeAddress.AddressLine2)
+
+                        @Html.DisplayFor(model => model.officeAddress.City)
+                        @Html.DisplayFor(model => model.officeAddress.State)
+                        @Html.DisplayFor(model => model.officeAddress.PinCode)
+
+                    </small>
+                    <br /><br />
+
+                    <small style="text-align:center">CERTIFICATE OF INSURANCE</small>
+                </th>
+                <th style="text-align:right">
+                    <img src="~/images/iNubeLogo.png" style=" margin-bottom: -57px;" />
+                    @Html.DisplayFor(model => model.Date)
+                </th>
+            </tr>
+            <tr>
+                <th style="padding: 5px;border: 1px solid #000; text-align:center; width: 100%" colspan="3">
+                    <small>
+                        <font size="0" style="text-align:center">
+                            THE CERTIFICATE IS ISSUED AS A MATTER OF INFORMATION ONLY
+                            AND CONFERS NO RIGHTS UPON THE CERTIFICATE HOLDER.
+                            THIS CERTIFICATE DOES NOT AFFIRMATIVELY AMEND, EXTEND OR
+                            ALTER THE COVERAGE AFFORDLY BY THE POLICY BELOW
+                            THIS CERTIFICATE OF INSURANCE CONSTITUTE A CONTRACT BETWEEN
+                            THE ISSUING INSURER(S), AUTHORIZED  REPRESENTATIVE OR PRODUCER,
+                            AND THE CERTIFICATE HOLDER
+                        </font>
+                    </small>
+
+                </th>
+
+
+            </tr>
+
+
+        </tbody>
+
+    </table>
+
+    <table width="100%">
+        <tbody>
+            <tr>
+                <th colspan="2" style="width:50%">INSURER/PRODUCER DETAILS </th>
+                <th colspan="2" style="width:50%">INSURED DETAILS </th>
+            </tr>
+            <tr>
+                <td style="text-align: left; border: 1px solid #000;">CONTACT NAME</td>
+
+                <td style="text-align: left; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.InsurerDetails.ContactName)
+                </td>
+
+                <td>CONTACT NAME</td>
+                <td>@Html.DisplayFor(model => model.insuredDetails.InsuredContactName)</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; border: 1px solid #000;">PHONE NUMBER</td>
+
+                <td style="text-align: left; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.InsurerDetails.PhoneNumber)
+                </td>
+
+                <td>PHONE NUMBER</td>
+                <td>@Html.DisplayFor(model => model.insuredDetails.InsuredPhoneNumber)</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; border: 1px solid #000;">EMAIL ADDRESS</td>
+
+                <td style="text-align: left; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.InsurerDetails.EmailAddress)
+                </td>
+
+                <td>EMAIL ADDRESS</td>
+                <td>@Html.DisplayFor(model => model.insuredDetails.InsuredEmailAddress)</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; border: 1px solid #000;">ADDRESS</td>
+
+                <td style="text-align: left; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.insurerAddress.AddressLine1)
+                    @Html.DisplayFor(model => model.insurerAddress.AddressLine2)
+                    @Html.DisplayFor(model => model.insurerAddress.City)
+                    @Html.DisplayFor(model => model.insurerAddress.State)
+                    @Html.DisplayFor(model => model.insurerAddress.PinCode)
+                </td>
+
+                <td>ADDRESS</td>
+                <td>
+                    @Html.DisplayFor(model => model.insuredAddress.AddressLine1)
+                    @Html.DisplayFor(model => model.insuredAddress.AddressLine2)
+                    @Html.DisplayFor(model => model.insuredAddress.City)
+                    @Html.DisplayFor(model => model.insuredAddress.State)
+                    @Html.DisplayFor(model => model.insuredAddress.PinCode)
+
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+
+    <table align="center" cellspacing="10" width="100%">
+        <tr>
+            <th colspan="2" style="text-align:center">
+                <small>
+                    <font size="0" style="text-align:center">
+                        THIS IS TO CERTIFY THAT THE POICY OF INSURANCE MENTIONED BELOW HAS BEEN ISSUED TO THE INSURED NAMED ABOVE IS FOR
+                        THE POLICY PERIOD INDICTAED. NOTWITHSTANDING ANY REQUIREMENT ,TERM OR COCNDITION OF ANY CONTRACT  OR OTHER
+                        DOCUMENT WITH RESPECT TO HICH THIS CERTIFICATE MAY BE I SSUED OR MAY PERTAIN,THEI NSURANCE AFFORDED BY
+                        POLICY DESCRIBED HEREIN IS SUBJECT TO ALL THE TERMS, EXCLUSIONS AND CONDITIONS OF SUCH POLICY.
+
+                    </font>
+                </small>
+
+
+            </th>
+
+        </tr>
+    </table>
+
+
+    <table width="100%">
+        <tbody>
+            <tr>
+                <th colspan="4" style="width:50%">POLICY DETAILS </th>
+
+            </tr>
+            <tr>
+                <td style="text-align: left; border: 1px solid #000;">POLICY NUMBER</td>
+
+                <td style="text-align: center; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.policyDeatils.PolicyNumber)
+                </td>
+
+                <td style="text-align: left; border: 1px solid #000;">PRODUCT NAME</td>
+
+                <td style="text-align: center; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.policyDeatils.ProductName)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align: left; border: 1px solid #000;">POLICY START DATE</td>
+
+                <td style="text-align: center; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.policyDeatils.PolicyStartDate)
+                </td>
+
+                <td style="text-align: left; border: 1px solid #000;">POLICY END DATE</td>
+
+                <td style="text-align: center; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.policyDeatils.PolicyEndDate)
+                </td>
+
+            </tr>
+
+            <tr>
+                <td style="text-align: left; border: 1px solid #000;">PARTNER NAME</td>
+
+                <td style="text-align: center; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.policyDeatils.PartnerName)
+                </td>
+
+                <td style="text-align: left; border: 1px solid #000;">COVER EVENT</td>
+
+                <td style="text-align: center; border: 1px solid #000;">
+                    @Html.DisplayFor(model => model.policyDeatils.CoverEvent)
+                </td>
+
+            </tr>
+
+
+
+
+        </tbody>
+    </table>
+
+
+    <table style="width: 100%">
+        <thead>
+            <tr>
+                <th colspan="100" style="width:50%">INSURABLE ITEMS DETAILS </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.insurableItemsdetails)
+            {
+                <tr>
+                    <th style="text-align: center; border: 1px solid #000;">INSURABLE ITEM- @Html.DisplayFor(model => item.InsurableItem)</th>
+                    <th style="text-align: center; border: 1px solid #000;">NO OF ITEMS-  @Html.DisplayFor(model => item.NumberOfItems)</th>
+                    @*<th  style="text-align: center; border: 1px solid #000;">NAME</th>
+
+                        <th  style="text-align: center; border: 1px solid #000;">IdentificationNo</th>*@
+                    <td colspan="2">
+                        <table>
+                            @if (item.NumberOfItems > 0)
+                            {
+                                <tr>
+                                    <td style="text-align: center; border: 1px solid #000;">
+                                        Name<br />
+
+                                    </td>
+                                    <td style="text-align: center; border: 1px solid #000;">
+                                        IdentificationNumber<br />
+
+                                    </td>
+                                </tr>
+                                @foreach (var insuredItem in item.lstInsurableItemsDetails)
+                                {
+                                    <tr>
+                                        <td style="text-align: center; border: 1px solid #000;">
+                                            @Html.DisplayFor(model => insuredItem.Name)<br />
+
+                                        </td>
+                                        <td style="text-align: center; border: 1px solid #000;">
+                                            @Html.DisplayFor(model => insuredItem.IdentificationNumber)<br />
+
+                                        </td>
+                                    </tr>
+
+                                }
+                            }
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="100" style="width:50%">
+                        <table align="center" cellspacing="10" width="100%">
+                            <thead>
+                                <tr>
+                                    <th colspan="6" style="text-align:center">COVERAGE DETAILS</th>
+                                </tr>
+                            </thead>
+                            @foreach (var cover in item.coverages)
+                            {
+                                <tr>
+                                    <th style="text-align: center; border: 1px solid #000;">COVER</th>
+                                    <th style="text-align: center; border: 1px solid #000;">COVER EVENT FACTOR</th>
+                                    <th style="text-align: center; border: 1px solid #000;">BENIFIT CRITERIA</th>
+                                    @if (cover.IsMaxBenefitAmount)
+                                    {
+                                        <th style="text-align: center; border: 1px solid #000;">MAX BENIFIT CRITERIA AMOUNT</th>
+                                    }
+                                    else
+                                    {
+                                        <th style="text-align: center; border: 1px solid #000;">MAX BENIFIT CRITERIA VALUE</th>
+                                    }
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center; border: 1px solid #000;">@cover.CoverName</td>
+                                    <td style="text-align: center; border: 1px solid #000;">@cover.CoverEventFactor</td>
+                                    <td style="text-align: center; border: 1px solid #000;">@cover.BenifitCriteria</td>
+                                    <td style="text-align: center; border: 1px solid #000;">@cover.MaxBenifitCriteriaAmount</td>
+
+                                </tr>
+                                @if (cover.IsBenefitRange)
+                                {
+                                    <tr>
+                                        <td style="text-align: center; border: 1px solid #000;">COVER EVENT FACTOR VALUE</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="benefitamttbl rightcol">
+                                            <table>
+                                                <tr><td>FROM</td><td>TO</td><td>AMOUNT</td></tr>
+                                                @foreach (var benefitItem in cover.BenifitRangeDetails)
+                                                {
+                                                    <tr><td>@benefitItem.FromValue</td><td>@benefitItem.ToValue</td><td>@benefitItem.BenefitAmount</td></tr>
+                                                }
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </table>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <table align="center" cellspacing="10" width="100%">
+        <thead>
+            <tr>
+                <th colspan="4">PREMIUM DETAILS</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th rowspan="3">
+                    PREMIUM SUMMARY
+                </th>
+                <th style="text-align:left"><small>BASE PREMIUM</small></th>
+                <td>@Html.DisplayFor(model => model.premiumdetails.BasePremium)</td>
+            </tr>
+            <tr>
+                <th style="text-align:left"><small>GST</small></th>
+                <td>@Html.DisplayFor(model => model.premiumdetails.GST)</td>
+            </tr>
+            <tr>
+                <th style="text-align:left"><small>TOTAL PREMIUM</small></th>
+                <td>@Html.DisplayFor(model => model.premiumdetails.TotalPremium)</td>
+            </tr>
+
+    </table>
+
+    <table align="center" cellspacing="10" width="100%">
+        <thead>
+            <tr>
+                <th>CLAUSES WARRENTIES & EXCLUSIONS</th>
+            </tr>
+
+        </thead>
+        <tbody>
+
+            @if (Model.cweDetails.cweProductDetails.Count > 0)
+            {
+                <tr>
+                    <th align="center">GENERALS</th>
+                </tr>
+                //@{
+                var prodoldType = "";
+                // }
+                @for (int i = 0; i < Model.cweDetails.cweProductDetails.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @if (prodoldType != Model.cweDetails.cweProductDetails[i].Type)
+                            {
+                                prodoldType = Model.cweDetails.cweProductDetails[i].Type;
+                                <b>@Html.DisplayFor(model => model.cweDetails.cweProductDetails[i].Type)</b>
+                            }
+                            <br />
+                            @Html.DisplayFor(model => model.cweDetails.cweProductDetails[i].Description)
+
+                        </td>
+                    </tr>
+                }
+
+
+            }
+            <tr></tr>
+            @if (Model.cweDetails.cweinsurableItems.Count > 0)
+            {
+                @foreach (var cweInsurableItem in Model.cweDetails.cweinsurableItems)
+                {
+                    <tr>
+                        <th align="center">INSURABLE ITEMS - @Html.DisplayFor(model => cweInsurableItem.InsurableItemName)</th>
+                    </tr>
+                    var insoldType = "";
+                    @foreach (var insurableItem in cweInsurableItem.cweInsurableDetails)
+                    {
+                        <tr>
+                            <td>
+                                @if (insoldType != insurableItem.Type)
+                                {
+                                    insoldType = insurableItem.Type;
+                                    <b>@insurableItem.Type</b>
+                                }
+                                <br />
+                                @insurableItem.Description
+                            </td>
+                        </tr>
+                    }
+                    @if (cweInsurableItem.cwecoverListDetails.Count > 0)
+                    {
+                        @foreach (var cweCover in cweInsurableItem.cwecoverListDetails)
+                        {
+                            <tr>
+                                <th>Cover - @Html.DisplayFor(model => cweCover.CoverName)</th>
+                            </tr>
+                            var coveroldType = "";
+                            @foreach (var coverItem in cweCover.cweCoverDetails)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (coveroldType != coverItem.Type)
+                                        {
+                                            coveroldType = coverItem.Type;
+                                            <b> @coverItem.Type</b>
+                                        }
+                                        <br />
+                                        @coverItem.Description
+                                    </td>
+                                </tr>
+                            }
+                            @if (cweCover.cwebenfitDetails.Count > 0)
+                            {
+                                @foreach (var cweBenefits in cweCover.cwebenfitDetails)
+                                {
+                                    <tr>
+                                        <th>Benefit </th>
+                                    </tr>
+                                    var bnfoldType = "";
+                                    @foreach (var cweBenefit in cweBenefits.cweBenefitDetails)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (bnfoldType != cweBenefit.Type)
+                                                {
+                                                    bnfoldType = cweBenefit.Type;
+                                                    <b> @cweBenefit.Type</b>
+                                                }
+                                                <br />
+                                                @cweBenefit.Description
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+        </tbody>
+    </table>
+    <br />
+    <table align="right" cellspacing="10" height="100" width="40%" style="margin-left:146px">
+        <tr>
+            <th colspan="2" align="center" valign="top">AUTHORIZED SIGNATURE</th>
+
+        </tr>
+    </table><br /><br /><br /><br /><br /><br /><br />
+    <table align="right" cellspacing="10" height="100" width="100%" style="margin-left:146px">
+        <tr>
+            <td colspan="2">
+                <h3 style="text-align:center">Annexure</h3>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:center" colspan="2">
+                Premium Details
+            </td>
+        </tr>
+        <tr>
+
+            <td>
+                Particulars
+            </td>
+            <td>
+                Premium in @Model.PremiumDetail.Currency
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td colspan="2">
+                @Model.PremiumDetail.PremiumLevel
+            </td>
+        </tr>
+        @foreach (var data in Model.PremiumDetail.lstPremiumAmount)
+        {
+            if (!string.IsNullOrEmpty(data.ParticularName))
+            {
+
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => data.ParticularName)
+                    </td>
+                </tr>
+            }
+            @foreach (var premiumdetails in data.lstPremiumAmount)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => premiumdetails.Name)
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => premiumdetails.Amount)
+                    </td>
+                </tr>
+            }
+        }
+
+
+    </table>
+
+</body>
+</html>
+

@@ -1,0 +1,24 @@
+{
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "dev2-mica-partner",
+      "image": "<IMAGE1_NAME>",
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": 9005,
+          "protocol": "tcp",
+          "containerPort": 9005
+        }
+      ]
+    }
+  ],
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "networkMode": "awsvpc",
+  "cpu": "128",
+  "memory": "128",
+  "family": "dev2-mica-partner"
+}

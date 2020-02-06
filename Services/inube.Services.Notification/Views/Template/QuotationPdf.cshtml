@@ -1,0 +1,60 @@
+﻿@model TemplateDemo.Models.QuotationModel
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <style>
+        .center {
+            display: block;
+            margin-left: -348px;
+            margin-right: 800px;
+            width: 50%;
+        }
+
+
+        .container {
+            page-break-before: always
+        }
+
+        table, tr, td, th, tbody, thead, tfoot {
+            page-break-inside: avoid !important;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <table align="center" style="width:80%;border: 1px solid #000; padding: 5px;">
+
+        <tr>
+          
+            <th style="text-align:center;">
+                <img src="~/images/iNubeLogo.png" style="margin-left:-782px; margin-bottom: -57px;" />
+                <h3><b>AVO LIFE</b></h3>
+               
+            </th>
+        </tr>
+       
+    </table>
+    <table  align="center" style="width:80%; height:100%; align-content:center; border: 1px solid #000;padding: 5px;">
+        <tr>
+             <td height="100"><font size="5">Proposer Name:@Html.DisplayFor(model => model.ProposerName)</font></td>
+        </tr>
+        <tr>
+            <td height="100"><font size="5">Quotation No:@Html.DisplayFor(model => model.QuotationNo)</font></td>
+        </tr>
+        <tr>
+            <td height="100"><font size="5">Type:@Html.DisplayFor(model => model.Type)</font></td>
+        </tr>
+        <tr>
+            <td height="100"><font size="5">Date:@Html.DisplayFor(model => model.Date)</font></td>
+        </tr>
+    </table>
+</div>
+</body>
+
+

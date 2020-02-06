@@ -1,0 +1,20 @@
+﻿@model inube.Services.Notification.Models.PartnerEmail
+@{
+    Layout = "~/Views/Shared/_EmailLayout.cshtml";
+}
+
+
+
+<div>
+    <p class="prara">
+        Dear Customer,<br />
+        Your Insurance Policy transaction has been successful.<br />
+        Your Policy No <strong> @Html.DisplayFor(model => model.PolicyNo) </strong>  is generated for <strong>  @Html.DisplayFor(model => model.ProductCode) </strong> -<strong>@Html.DisplayFor(model => model.ProductName) </strong> ,  <br />
+    find the Policy schedule document attached.<br /><br />
+    Assuring you the best of services always.<br /><br />
+    
+</p>
+</div>
+
+
+

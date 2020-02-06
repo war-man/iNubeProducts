@@ -1,0 +1,148 @@
+﻿@model inube.Services.Notification.Models.PartnerEmail
+
+@{
+    ViewData["Title"] = "TestEmail";
+    Layout = "~/Views/Shared/_EmailLayout.cshtml";
+}
+
+
+<div class="">
+    <p class="prara">
+        Dear <strong>@Html.DisplayFor(model => model.PartnerName),</strong>
+<p class="prara">
+        We are so excited that you are now part of the MICA family!
+        We take great pride in our Partner, community and clients. 
+        As your Independent Partner-platform  we offer a variety
+        of choices and aim to provide exceptional service with every
+        encounter. we offer a choice of multiple insurance carriers,
+        coverages, price, and more
+        <br>
+        &nbsp;
+    <p class="heading">
+        Please note your Partner Details as below
+    </p>
+    </p>
+    </p>
+</div>
+<div class="">
+    <table class="rtable">
+        <thead>
+            <tr>
+
+                <th>Partner Name </th>
+                <th>@Html.DisplayFor(model => model.PartnerName)</th>
+            </tr>
+            <tr>
+                <th>MICA Partner ID</th>
+                <th> @Html.DisplayFor(model => model.PartnerId)</th>
+            </tr>
+        </thead>
+    </table>
+    <p class="prara">
+        You may login to our website using your MICA User ID created
+        under this Partner ID you may access our product and service
+        offerings, Insurance carrier information and more.
+    </p> <br>
+    <p class="heading">
+        For any queries you may reach to us over chat,phone or Email.
+    </p>
+    <table class="rtable">
+        <thead>
+            <tr>
+                <th> Partner Support on call(Mobile No)</th>
+                <th>
+                    @Html.DisplayFor(model => model.MobileNo)
+            </th>
+        </tr>
+        <tr>
+            <th> Website</th>
+            <th>@Html.DisplayFor(model => model.Website)</th>
+        </tr>
+    </thead>
+</table>
+<br />
+<p class="heading">
+    Esculaion Matrix
+</p>
+<div class="matrixTb">
+    <table class="matrixtb">
+        <tr>
+
+            <th> Esculation Level</th>
+            <th>Name</th>
+            <th>Designation</th>
+            <th>Contact No</th>
+        </tr>
+
+        <tr>
+            <td> Esculation Level1</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+        <tr>
+            <td> Esculation Level2</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+        <tr>
+            <td> Esculation Leve3</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+        <tr>
+            <td> Esculation Level1</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+        <tr>
+            <td> Esculation Level2</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+        <tr>
+            <td> Esculation Leve3</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+        <tr>
+            <td> Esculation Level1</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+        <tr>
+            <td> Esculation Level2</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+        <tr>
+            <td> Esculation Leve3</td>
+            <td>@Html.DisplayFor(model => model.PartnerName)</td>
+            <td>@Html.DisplayFor(model => model.Designation)</td>
+            <td>@Html.DisplayFor(model => model.MobileNo)</td>
+
+        </tr>
+    </table>
+</div>
+<p class="prara">
+    Looking forward for a fruitfull partnership.
+</p>
+</div>
+
+
+

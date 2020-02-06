@@ -1,0 +1,555 @@
+﻿@model TemplateDemo.Models.InvoiceModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+
+
+<html>
+<head>
+    <style>
+        .center {
+            display: block;
+            margin-left: -348px;
+            margin-right: 800px;
+            width: 50%;
+        }
+
+
+        .container {
+            page-break-before: always
+        }
+
+        table, tr, td, th, tbody, thead, tfoot {
+            page-break-inside: avoid !important;
+            /*page-break-after:always;*/
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        /*.tbl {
+            page-break-inside: avoid !important;
+            page-break-after:always;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }*/
+        img {
+            float: left;
+            border: 1px solid black;
+            padding: 5px;
+        }
+
+
+    </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MICA PDF</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <!--style="background-image:url(/images/background.png); background-repeat:repeat;background-attachment:fixed;background-size:cover;background-position:center;"-->
+    <div class="container" style="padding: 20px;">
+        <h2 style="text-align: center">Tax Invoice</h2>
+        <table class="table table-condensed" style="width:100%;border: 1px solid #000;padding: 5px; background-image:url(/images/watermark.jpg);background-repeat:repeat">
+            <tbody>
+                <tr style="width: 100%">
+                    <td style="width: 50%; vertical-align: top; padding: 5px;border: 1px solid #000;">
+                        <img src="~/images/iNubeLogo.png" style="float: left;">
+                        <p style="float: left; margin-left: 20px; line-height:25px;">
+
+                            <b> @Html.DisplayFor(model => model.Address.OfficeName)</b><br />
+                            @Html.DisplayFor(model => model.Address.AddressLine1)<br />
+                            @Html.DisplayFor(model => model.Address.AddressLine2)<br>
+                            @Html.DisplayFor(model => model.Address.City) 560078
+                            @Html.DisplayFor(model => model.Address.State)
+                            StateCode:@Html.DisplayFor(model => model.Address.Code)<br>
+                            GSTIN/UIN:@Html.DisplayFor(model => model.Address.UIN)<br />
+                            <!--State Name :  @Html.DisplayFor(model => model.Address.State),
+                            Code:@Html.DisplayFor(model => model.Address.Code)<br>-->
+                            CIN:@Html.DisplayFor(model => model.Address.CIN)
+                        </p>
+                    </td>
+
+                    <td rowspan="2" style="width: 50%; border: 1px solid #000;">
+                        <table style="width: 100%">
+                            <tbody>
+
+                                <tr>
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;">
+                                        <span>Invoice No.</span>
+                                        <span style="float: right;">e-Way Bill No.</span><br>
+                                        <strong> @Html.DisplayFor(model => model.InvoiceItemsModel.InvoiceNo)</strong>
+                                    </td>
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;">
+                                        <span>
+                                            Dated<span>
+                                                <br>
+                                                <strong>@Html.DisplayFor(model => model.InvoiceItemsModel.InvoiceDate)</strong>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;"></td>
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;">
+                                        <span>
+                                            Mode/Terms of Payment<span>
+                                                <br>
+                                                <strong>  @Html.DisplayFor(model => model.InvoiceItemsModel.Days) Days</strong>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;">
+                                        <span>Supplier’s Ref.</span><br>
+                                        <strong> @Html.DisplayFor(model => model.InvoiceItemsModel.SuppliesrsRef)</strong>
+                                    </td>
+
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;">
+                                        <span>
+                                            Other Reference(s)<span>
+                                                <br>
+                                                <Strong> @Html.DisplayFor(model => model.BuyersAddress.OthersRef) </Strong>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;">
+                                        <span>Buyer’s Order No.</span><br>
+                                        <strong>  @Html.DisplayFor(model => model.InvoiceItemsModel.OrderNo)</strong>
+                                    </td>
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;">
+                                        <span>
+                                            Dated<span>
+                                                <br>
+                                                <strong> @Html.DisplayFor(model => model.InvoiceItemsModel.PODate)</strong>
+                                    </td>
+                                </tr>
+
+                                <tr style="width: 100%">
+                                    <td colspan="2" style="padding: 5px;border: 1px solid #000;height: 120px;vertical-align: baseline;">
+                                        <span>Terms of Delivery</span><br>
+                                        <strong>@Html.DisplayFor(model => model.InvoiceItemsModel.TermsofDelivery)</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="width: 50%; vertical-align: top; padding: 5px;border: 1px solid #000;line-height:25px;">
+                        <span>Buyer</span><br>
+                        <Strong>@Html.DisplayFor(model => model.BuyersAddress.Buyer)</Strong><br>
+                        <p>
+                            @Html.DisplayFor(model => model.BuyersAddress.AddressLine1),<br>
+                            @Html.DisplayFor(model => model.BuyersAddress.AddressLine2)<br>GSTIN/UIN : 27AABCF0191R2Z8<br>
+                            PAN/IT No:@Html.DisplayFor(model => model.BuyersAddress.PAN)<br>
+                            State Name : @Html.DisplayFor(model => model.BuyersAddress.State),
+                            Code :@Html.DisplayFor(model => model.BuyersAddress.Code)
+                        </p>
+                    </td>
+                </tr>
+                @if (Model.Invoices.Count > 0)
+                {
+
+                    <tr>
+                        <td colspan="2" style="border: 1px solid #000;">
+                            <table style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid #000;padding: 5px;">Sl. No</th>
+                                        <th style="border: 1px solid #000;padding: 5px;">No & Kind of Packages</th>
+                                        <th style="border: 1px solid #000;padding: 5px;">Particulars</th>
+                                        <th style="border: 1px solid #000;padding: 5px;">HSN/SAC</th>
+                                        <th style="border: 1px solid #000;padding: 5px;">GST Rate</th>
+                                        <th style="border: 1px solid #000;padding: 5px;">Amount(@Html.DisplayFor(model => model.InvoiceSecondPageDetails.Currency))</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @for (int j = 0; j < Model.Invoices.Count; j++)
+                                    {
+                                        <tr>
+                                            <td style="border: 1px solid #000;padding: 5px;"> @Html.DisplayFor(model => model.Invoices[j].SlNo)</td>
+                                            <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.Invoices[j].EventCount)</td>
+                                            <td style="border: 1px solid #000;padding: 5px;">
+                                                <strong>@Html.DisplayFor(model => model.Invoices[j].ItemDescription1)</strong><br>
+                                                <!-- <span>
+                                                 @Html.DisplayFor(model => model.Invoices[j].ItemDescription2)<br>
+                                                 @Html.DisplayFor(model => model.Invoices[j].ItemDescription3)<br>
+                                                 @Html.DisplayFor(model => model.Invoices[j].ItemDescription4)
+                                                </span>-->
+                                            </td>
+                                            <td style="border: 1px solid #000;padding: 5px;"></td>
+                                            <td style="border: 1px solid #000;padding: 5px;">  @Html.DisplayFor(model => model.Invoices[j].GST)</td>
+                                            <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.Invoices[j].Amount)</strong></td>
+                                        </tr>
+                                    }
+
+
+                                    <tr>
+                                        <td style="border: 1px solid #000;padding: 5px;"></td>
+                                        <td style="border: 1px solid #000;padding: 5px;"></td>
+                                        <td style="border: 1px solid #000;padding: 5px;text-align: right;">
+                                            <strong>Total</strong>
+                                        </td>
+                                        <td style="border: 1px solid #000;padding: 5px;"></td>
+                                        <td style="border: 1px solid #000;padding: 5px;"></td>
+                                        <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.InvoiceItemsModel.TotalTaxAmount) </strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="2" style="padding: 5px;border: 1px solid #000;">
+                        <p style="text-align:left;">Amount Chargeable (in words) <span style="float:right;">  E. & O.E </span></p><br>
+                        <strong>@Html.DisplayFor(model => model.InvoiceSecondPageDetails.Currency) @Html.DisplayFor(model => model.InvoiceItemsModel.AmountInWords) Only</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <table style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="text-align: center; border: 1px solid #000;">HSN/SAC</th>
+                                    <th rowspan="2" style="text-align: center; border: 1px solid #000;">Taxable Value</th>
+                                    <th colspan="2" style="text-align: center; border: 1px solid #000;">Integrated Tax</th>
+                                    <th rowspan="2" style="text-align: center; border: 1px solid #000;">Total Tax Amount</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center; border: 1px solid #000;width: 10%;">Rate</th>
+                                    <th style="text-align: center; border: 1px solid #000;width: 10%;">Amount(@Html.DisplayFor(model => model.InvoiceSecondPageDetails.Currency))</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center; border: 1px solid #000;"></td>
+                                    <td style="text-align: right; border: 1px solid #000;"></td>
+                                    <td style="text-align: right; border: 1px solid #000;"></td>
+                                    <td style="text-align: right; border: 1px solid #000;"> </td>
+                                    <td style="text-align: right; border: 1px solid #000;"></td>
+                                </tr>
+
+                                <tr>
+                                    <td style="text-align: right; border: 1px solid #000;"><strong>Total</strong></td>
+                                    <td style="text-align: right; border: 1px solid #000;"><strong></strong> </td>
+                                    <td style="text-align: right; border: 1px solid #000;"><strong></strong></td>
+                                    <td style="text-align: right; border: 1px solid #000;"><strong></strong> </td>
+                                    <td style="text-align: right; border: 1px solid #000;"><strong></strong> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="padding: 5px;">
+                        <span>Tax Amount (in words):</span><br>
+                        <strong> </strong>
+                    </td>
+                </tr>
+
+
+
+                <tr>
+                    <td style="padding: 5px;line-height:25px;">
+                        <span>Remarks</span><br>
+                                            <p>
+                                                <strong style="width: 75%">@Html.DisplayFor(model => model.BankDetails.Remarks)</strong><br>
+                                                <strong style="width:75%">@Html.DisplayFor(model => model.BankDetails.Remarks1)</strong>
+                                            </p>
+                    </td>
+                    <td style="padding: 5px;line-height:25px;">
+                        <span>Company’s Bank Details</span><br>
+                        <ul style="list-style-type: none; padding: 0;">
+                            <ol style="padding: 0"><span>Bank Name :</span> <strong>@Html.DisplayFor(model => model.BankDetails.BankName)</strong></ol>
+                            <ol style="padding: 0"><span>A/C No :</span> <strong>   A/C No:@Html.DisplayFor(model => model.BankDetails.AccNo)</strong></ol>
+                            <ol style="padding: 0">
+                                <span>Branch & IFS Code :</span>
+                                <strong>
+                                    @Html.DisplayFor(model => model.BankDetails.Branch)
+                                    @Html.DisplayFor(model => model.BankDetails.IFSC)
+                                </strong>
+                            </ol>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="vertical-align: top;padding: 5px;">
+                        <span>Company’s PAN:</span>
+                        <strong>@Html.DisplayFor(model => model.BankDetails.CompanysPAN)</strong>
+                    </td>
+                    <td style="border: 1px solid #000; height: 70px;vertical-align: top; padding: 5px;">
+                        <span style="width: 100%; display: block; text-align:right;"><strong>for INUBE SOFTWARE SOLUTIONS PVT LTD</strong></span>
+                        <img src="~/images/temp.png" style="float: right;">
+                        <span style="width: 100%; display: block;text-align: right;margin-top: 60px;">Authorised Signatory</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table> <h4 style="text-align: center">Computer Generated Invoice. RCM Not Applicable</h4></table>
+
+
+    </div>
+
+    <!--2nd page Invoice Itemised List-->
+    <!--
+    <div class="container" style="padding: 20px; page-break-after:always">
+        <h2 style="text-align: center">Details for Invoice</h2>
+        <table class="table table-condensed" style="width:100%;border: 1px solid #000;padding: 5px; background-image:url(/images/watermark.jpg);background-repeat:repeat">
+            <tbody>
+
+                <tr style="width:100%">
+                    <th>Buyer</th>
+                    <td>
+                        <Strong>@Html.DisplayFor(model => model.BuyersAddress.Buyer)</Strong><br>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Invoice Period</th>
+                    <td>From:   <strong> @Html.DisplayFor(model => model.InvoiceSecondPageDetails.FromDate)</strong>  &nbsp; &nbsp; &nbsp; To: <strong>@Html.DisplayFor(model => model.InvoiceSecondPageDetails.ToDate) </strong>  </td>
+                </tr>
+                <tr>
+                    <th>Invoice Number</th>
+                    <td><strong> @Html.DisplayFor(model => model.InvoiceItemsModel.InvoiceNo)</strong></td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <td><strong>@Html.DisplayFor(model => model.InvoiceItemsModel.InvoiceDate) </strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br />
+
+
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2" style="border: 1px solid #000;">
+                    <br />
+                    <table class="table table-condensed" style="width:100%;border: 1px solid #000;padding: 5px; background-image:url(/images/watermark.jpg);background-repeat:repeat"> <b>OneTime License Cost</b></table>
+                    <br />
+                    <table style="width: 100%; border-collapse:collapse">
+
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid #000;padding: 5px;">Sl. No</th>
+                                <th style="border: 1px solid #000;padding: 5px;">Application Name</th>
+                                <th style="border: 1px solid #000;padding: 5px;">Date</th>
+                                <th style="border: 1px solid #000;padding: 5px;">Amount(@Html.DisplayFor(model => model.InvoiceSecondPageDetails.Currency))</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+
+                            <tr>
+
+                                <td style="border: 1px solid #000;padding: 5px;"> @Html.DisplayFor(model => model.OneTimeLicenseCost.SlNo)</td>
+                                <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.OneTimeLicenseCost.ApplicationName)</td>
+                                <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.OneTimeLicenseCost.Date)</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.OneTimeLicenseCost.Amount)</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: 1px solid #000;padding: 5px;text-align: right;">
+                                    <strong>Sub Total</strong>
+                                </td>
+                                <td style="border: 1px solid #000;padding: 5px;"></td>
+                                <td style="border: 1px solid #000;padding: 5px;"></td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.OneTimeLicenseCost.SubTotal)</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+
+        @if (Model.ProductCreation.Count > 0)
+        {
+            <table class="table table-condensed" style="width:100%;border: 1px solid #000;padding: 5px; background-image:url(/images/watermark.jpg);background-repeat:repeat">
+                <tr>
+                    <td colspan="2" style="border: 1px solid #000;">
+                        <br />
+                        <table> <b>Product Creation</b></table>
+                        <br />
+                        <table style="width: 100%; border-collapse:collapse">
+
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #000;padding: 5px;">Sl. No</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Product Code</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Product Name</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Created Date</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Amount(@Html.DisplayFor(model => model.InvoiceSecondPageDetails.Currency))</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int a = 0; a < Model.ProductCreation.Count; a++)
+                                {
+                                    <tr>
+                                        <td style="border: 1px solid #000;padding: 5px;"> @Html.DisplayFor(model => model.ProductCreation[a].SlNo)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ProductCreation[a].ProductCode)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ProductCreation[a].ProductName)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ProductCreation[a].CreatedDate)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong>@Html.DisplayFor(model => model.ProductCreation[a].Amount)</strong></td>
+                                    </tr>
+                                }
+
+                                <tr>
+                                    <td style="border: 1px solid #000;padding: 5px;text-align: right;">
+                                        <strong>Sub Total</strong>
+                                    </td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.ProductCreation[0].SubTotal)</strong></td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </td>
+                </tr>
+
+            </table>
+        }
+
+        @if (Model.PolicyCreation.Count > 0)
+        {
+            <table class="table table-condensed" style="width:100%;border: 1px solid #000;padding: 5px; background-image:url(/images/watermark.jpg);background-repeat:repeat">
+                <tr>
+                    <td colspan="2" style="border: 1px solid #000;">
+                        <br />
+                        <table> <b>Policy Creation</b></table>
+                        <br />
+                        <table style="width: 100%; border-collapse:collapse">
+
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #000;padding: 5px;">Sl. No</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Policy No </th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Product Name</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Insured Name</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Insured Ref No</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Created Date</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Amount(@Html.DisplayFor(model => model.InvoiceSecondPageDetails.Currency))</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int b = 0; b < Model.PolicyCreation.Count; b++)
+                                {
+
+                                    <tr>
+                                        <td style="border: 1px solid #000;padding: 5px;"> @Html.DisplayFor(model => model.PolicyCreation[b].SlNo)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.PolicyCreation[b].PolicyNo)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.PolicyCreation[b].ProductName)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.PolicyCreation[b].InsuredName)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.PolicyCreation[b].InsuredRefNo)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.PolicyCreation[b].CreatedDate)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.PolicyCreation[b].Amount)</strong></td>
+                                    </tr>
+                                }
+
+                                <tr>
+                                    <td style="border: 1px solid #000;padding: 5px;text-align: right;">
+                                        <strong>Sub Total</strong>
+                                    </td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.PolicyCreation[0].SubTotal)</strong></td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        }
+
+        @if (Model.ClaimIntimation.Count > 0)
+        {
+            <table class="table table-condensed" style="width:100%;border: 1px solid #000;padding: 5px; background-image:url(/images/watermark.jpg);background-repeat:repeat">
+                <tr>
+                    <td colspan="2" style="border: 1px solid #000;">
+                        <br />
+                        <table> <b>Claim Intimation </b></table>
+                        <br />
+                        <table style="width: 100%; border-collapse:collapse">
+
+                            <thead>
+                                <tr>
+                                    <th style="border: 1px solid #000;padding: 5px;">Sl. No</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Claim No </th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Policy No </th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Product Name</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Loss Date</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Insured Name</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Insured Ref No</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Created Date</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Amount(@Html.DisplayFor(model => model.InvoiceSecondPageDetails.Currency))</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @for (int c = 0; c < Model.ClaimIntimation.Count; c++)
+                                {
+
+                                    <tr>
+                                        <td style="border: 1px solid #000;padding: 5px;"> @Html.DisplayFor(model => model.ClaimIntimation[c].SlNo)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ClaimIntimation[c].ClaimNo)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ClaimIntimation[c].PolicyNo)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ClaimIntimation[c].ProductName)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ClaimIntimation[c].LossDate)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ClaimIntimation[c].InsuredName)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ClaimIntimation[c].InsuredRefNo)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;">@Html.DisplayFor(model => model.ClaimIntimation[c].CreatedDate)</td>
+                                        <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.ClaimIntimation[c].Amount)</strong></td>
+                                    </tr>
+                                }
+
+                                <tr>
+                                    <td style="border: 1px solid #000;padding: 5px;text-align: right;">
+                                        <strong>Sub Total</strong>
+                                    </td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;"></td>
+                                    <td style="border: 1px solid #000;padding: 5px;text-align: right;"><strong> @Html.DisplayFor(model => model.ClaimIntimation[0].SubTotal)</strong></td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        }
+        <table style="width:100%">
+            <tr>
+                <td colspan="2" style="padding: 5px;text-align:right;">
+                    <br /><span><b>Total Amount</b> </span><br />
+                    <strong>@Html.DisplayFor(model => model.InvoiceSecondPageDetails.Currency) @Html.DisplayFor(model => model.InvoiceItemsModel.TotalTaxAmount)</strong>
+                </td>
+            </tr>
+        </table>
+    </div>
+        -->
+</body>
+
+</html>

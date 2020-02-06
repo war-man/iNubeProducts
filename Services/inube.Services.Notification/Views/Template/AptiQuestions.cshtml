@@ -1,0 +1,128 @@
+﻿@model TemplateDemo.Models.QuestionsDetails
+@{
+    //ViewData["Title"] = "AptiQuestions";
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <style>
+        .center {
+            display: block;
+            margin-left: -348px;
+            margin-right: 800px;
+            width: 50%;
+        }
+
+
+        .container {
+            page-break-before: always
+        }
+
+        table, tr, td, th, tbody, thead, tfoot {
+            page-break-inside: avoid !important;
+        }
+    </style>
+</head>
+<body>
+
+    @*<div class="container" style="margin-top: 30px; margin-bottom: 10px;">
+            <div class="col-lg-12">
+
+                <div class="col-lg-3">
+                    <img src="~/images/iNubeLogo.png" width="200" height="50" />
+                </div>
+
+                <div class="col-lg-6">
+                    <h3 style="text-align:center;  font-weight: bold">Aptitude Test&nbsp;@Model.AllQuestions[0].QBText</h3>
+                </div>
+
+            </div>
+        </div>*@
+    <div class="container" style="margin-top: 30px; margin-bottom: 10px;">
+
+
+
+        <div style="margin-left: 20px; margin-top: 24px; margin-right:10px">
+            <div class="col-lg-3">
+                <img src="~/images/iNubeLogo.png" width="200" height="50" />
+            </div>
+
+            <div class="col-lg-6">
+                <h3 style="text-align:center;  font-weight: bold">Test&nbsp;Code&nbsp;@Model.AllQuestions[0].QBText</h3>
+            </div>
+
+            <table>
+                @if (Model.AllQuestions.Count > 0)
+                {
+
+
+                    @for (int i = 0; i < Model.AllQuestions.Count; i++)
+                    {
+                        <tr>
+                            <td colspan="4" style=" font-weight : bold">
+                                @(i + 1).
+                                &nbsp;  @Html.DisplayFor(model => model.AllQuestions[i].QText)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                A. &nbsp;@Html.DisplayFor(model => model.AllQuestions[i].A)
+                            </td>
+                            <td>
+                                B. &nbsp;@Html.DisplayFor(model => model.AllQuestions[i].B)
+                            </td>
+                            <td>
+                                C. &nbsp;@Html.DisplayFor(model => model.AllQuestions[i].C)
+                            </td>
+                            <td>
+                                D. &nbsp;@Html.DisplayFor(model => model.AllQuestions[i].D)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">&nbsp;</td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+
+
+
+    </div>
+
+    <div class="container" style="margin-left: 20px; margin-top: 24px; margin-right:10px ;page-break-inside: avoid !important;">
+        <table align="center" style=" font-size :larger;font-weight:900">
+            <tr>
+                <td>Code&nbsp;@Model.AllQuestions[0].QBText</td>
+            </tr>
+        </table>
+        <table border="1" align="left">
+
+            @if (Model.AllQuestions.Count > 0)
+            {
+                @for (int j = 0; j < Model.AllQuestions.Count; j++)
+                {
+                    <tr>
+                        <td style=" font-weight : bold">
+                            @(j + 1).
+                            &nbsp;  @Html.DisplayFor(model => model.AllQuestions[j].Answer)
+</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+
+                }
+            }
+        </table>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,356 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <title>EmailPatner</title>
+    <style type="text/css">
+        body {
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            font-family: Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 300;
+            line-height: 1.5em;
+        }
+
+        .main {
+            width: 1024px;
+            height: auto;
+        }
+
+        .header {
+            background-color: #f5f5f5;
+            height: 20%;
+            margin-left: 24%;
+            width: 50%;
+            margin-top: 2%
+        }
+
+        .footer {
+            background-color: #f5f5f5;
+            height: 20%;
+            margin-left: 24%;
+            width: 50%;
+            margin-bottom: 2%
+        }
+
+        .fotter-content {
+            font-weight: 500;
+            text-align: center;
+            padding-top: 2%;
+            font-size: 14px;
+        }
+
+        .svg {
+            height: 10%;
+            width: 20%;
+            margin-left: 2%;
+        }
+
+        .container {
+            margin-left: 24%;
+            max-width: 50%;
+        }
+
+            h1 {
+                bottom: 39px;
+                left: 6%;
+       
+                position: relative;
+                font-size: 14px;
+            }
+
+        .heading {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .prara {
+            font-size: 16px;
+            font-weight: 400;
+            margin: 15px 0px 0px 0px;
+        
+        }
+
+        .right {
+            float: right;
+            position: relative;
+            bottom: 12px;
+        }
+
+
+        ul {
+            list-style: none
+        }
+
+        li {
+            background: transparent;
+            display: inline-block;
+            /* inline block hack for IE 6&7 */
+            zoom: 1;
+            *display: inline;
+            padding: 4px;
+            color: white
+        }
+
+
+
+        .light {
+            color: rgb(211, 211, 211);
+        }
+
+
+        a {
+            font-weight: 500;
+            text-align: center;
+            padding-top: 2%;
+            font-size: 14px;
+            color: #333;
+        }
+
+            a:hover {
+                color: rgb(80, 77, 241);
+            }
+
+
+
+        /*//////////////////////////////////////////////////////////////////////////*/
+
+        /*          Tabel  Stye            */
+
+        /*!
+// CSS only Responsive Tables
+// http://dbushell.com/2016/03/04/css-only-responsive-tables/
+// by David Bushell
+*/
+
+        .rtable {
+            /*!
+  // IE needs inline-block to position scrolling shadows otherwise use:
+  // display: block;
+  // max-width: min-content;
+  */
+            display: inline-block;
+            vertical-align: top;
+            max-width: 100%;
+            overflow-x: auto;
+            /* optional - looks better for small cell values*/
+            white-space: nowrap;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .rtable,
+        .rtable--flip tbody {
+            /* optional - enable iOS momentum scrolling*/
+            -webkit-overflow-scrolling: touch;
+            /* scrolling shadows*/
+            background: radial-gradient(left, ellipse, rgba(0,0,0, .2) 0%, rgba(0,0,0, 0) 75%) 0 center, radial-gradient(right, ellipse, rgba(0,0,0, .2) 0%, rgba(0,0,0, 0) 75%) 100% center;
+            background-size: 10px 100%, 10px 100%;
+            background-attachment: scroll, scroll;
+            background-repeat: no-repeat;
+        }
+
+            .rtable th {
+                font-size: 11px;
+                text-align: left;
+                text-transform: uppercase;
+                background: #053f6c;
+                color: white;
+                font-weight: 500;
+                text-transform: inherit;
+            }
+
+            .rtable th,
+            .rtable td {
+                padding: 6px 12px;
+                border: 0.1px solid white;
+            }
+
+        .rtable--flip {
+            display: flex;
+            overflow: hidden;
+            background: none;
+        }
+
+            .rtable--flip thead {
+                display: flex;
+                flex-shrink: 0;
+                min-width: min-content;
+            }
+
+            .rtable--flip tbody {
+                display: flex;
+                position: relative;
+                overflow-x: auto;
+                overflow-y: hidden;
+            }
+
+            .rtable--flip tr {
+                display: flex;
+                flex-direction: column;
+                min-width: min-content;
+                flex-shrink: 0;
+            }
+
+            .rtable--flip td,
+            .rtable--flip th {
+                display: block;
+            }
+
+            .rtable--flip td {
+                background-image: none !important;
+                /* border-collapse is no longer active*/
+                border-left: 0;
+            }
+
+                /* border-collapse is no longer active*/
+                .rtable--flip th:not(:last-child),
+                .rtable--flip td:not(:last-child) {
+                    border-bottom: 0;
+                }
+
+        table {
+            margin-bottom: 30px;
+        }
+
+        .transparent {
+            background-color: white !important;
+        }
+
+
+
+        /*          Matrix                                   */
+
+        .matrixtb {
+            /*!
+  // IE needs inline-block to position scrolling shadows otherwise use:
+  // display: block;
+  // max-width: min-content;
+  */
+            display: inline-block;
+            vertical-align: top;
+            max-width: 100%;
+            overflow-x: auto;
+            /* optional - looks better for small cell values*/
+            white-space: nowrap;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .matrixtb,
+        .matrixtb--flip tbody {
+            /* optional - enable iOS momentum scrolling*/
+            -webkit-overflow-scrolling: touch;
+            /* scrolling shadows*/
+            background: radial-gradient(left, ellipse, rgba(0,0,0, .2) 0%, rgba(0,0,0, 0) 75%) 0 center, radial-gradient(right, ellipse, rgba(0,0,0, .2) 0%, rgba(0,0,0, 0) 75%) 100% center;
+            background-size: 10px 100%, 10px 100%;
+            background-attachment: scroll, scroll;
+            background-repeat: no-repeat;
+        }
+
+
+            .matrixtb th {
+                font-size: 18px;
+                text-align: left;
+                text-transform: uppercase;
+                background: #ffffff;
+                color: #2878b6;
+                font-weight: 500;
+                padding: 5%;
+                width: 200px;
+                text-transform: capitalize
+            }
+
+            .matrixtb td {
+                color: #333;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            .matrixtb th,
+            .matrixtb td {
+                padding: 6px 12px;
+                border: 0.1px solid rgb(207, 207, 207);
+                border-top-style: none;
+                border-right-style: none;
+                border-left-style: none;
+            }
+
+        .matrixtb--flip {
+            display: flex;
+            overflow: hidden;
+            background: none;
+        }
+
+            .matrixtb--flip thead {
+                display: flex;
+                flex-shrink: 0;
+                min-width: min-content;
+            }
+
+            .matrixtb--flip tbody {
+                display: flex;
+                position: relative;
+                overflow-x: auto;
+                overflow-y: hidden;
+            }
+
+            .matrixtb--flip tr {
+                display: flex;
+                flex-direction: column;
+                min-width: min-content;
+                flex-shrink: 0;
+            }
+
+            .matrixtb--flip td,
+            .matrixtb--flip th {
+                display: block;
+            }
+
+            .matrixtb--flip td {
+                background-image: none !important;
+                /* border-collapse is no longer active*/
+                border-left: 0;
+            }
+
+                /* border-collapse is no longer active*/
+                .matrixtb--flip th:not(:last-child),
+                .matrixtb--flip td:not(:last-child) {
+                    border-bottom: 0;
+                }
+
+
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        @*<img src="https://brandmark.io/logo-rank/random/mcdonalds.png"  class="svg"/>*@
+        @*<embed class="svg" src="~/images/logo.svg" alt="Logo" />
+        <img src="~/images/logo.png" alt="logo" />*@
+    </div>
+    <div class="container">
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+        <p class="heading">
+            Regards,<br>
+            Team MICA
+        </p>
+    </div>
+    <div class="footer">
+
+       
+    </div>
+
+</body>
+</html>

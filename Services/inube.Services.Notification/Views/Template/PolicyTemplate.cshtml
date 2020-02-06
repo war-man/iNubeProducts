@@ -1,0 +1,290 @@
+﻿@model TemplateDemo.Models.PolicyModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 5px;
+        }
+
+        .benefitamttbl {
+            padding: 0px;
+        }
+
+            .benefitamttbl table {
+                width: 100%;
+            }
+
+        .leftcol, .rightcol {
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="margin-top: 30px; margin-bottom: 10px;">
+        <div class="col-lg-12">
+
+            <div class="col-lg-3">
+                <img src="~/images/logo.png" width="200" height="50" />
+            </div>
+
+            <div class="col-lg-6">
+                <h3 style="text-align:center;  font-weight: bold">CERTIFICATE OF INSURANCE</h3>
+            </div>
+
+            <div class="col-lg-3">
+                <h4 style="text-align:right; ">@Html.DisplayFor(model => model.Date)</h4>
+            </div>
+        </div>
+    </div>
+    <table align="center" cellspacing="10" width="78%">
+
+        <tr>
+            <th colspan="2" text-align:center">
+
+                THE CERTIFICATE IS ISSUED AS A MATTER OF INFORMATION ONLY
+                AND CONFERS NO RIGHTS UPON THE CERTIFICATE HOLDER.
+                THIS CERTIFICATE DOES NOT AFFIRMATIVELY AMEND, EXTEND OR
+                ALTER THE COVERAGE AFFORDLY BY THE POLICY BELOW
+                THIS CERTIFICATE OF INSURANCE CONSTITUTE A CONTRACT BETWEEN
+                THE ISSUING INSURER(S), AUTHORIZED REPRESENTATIVE OR PRODUCER,
+                AND THE CERTIFICATE HOLDER
+
+
+            </th>
+
+        </tr>
+
+        <tr>
+
+            <td rowspan="4">INSURER/PRODUCER DETAILS</td>
+            <td>CONTACT NAME:&nbsp;&nbsp;@Html.DisplayFor(model => model.organization.ContactName)</td>
+
+        </tr>
+
+        <tr>
+            <td>PHONE NUMBER:&nbsp;&nbsp;@Html.DisplayFor(model => model.organization.PhoneNumber)</td>
+        </tr>
+        <tr>
+            <td>EMAIL ADDRESS:&nbsp;&nbsp;@Html.DisplayFor(model => model.organization.EmailAddress)</td>
+        </tr>
+        <tr>
+            <td>ADDRESS:&nbsp;&nbsp;@Html.DisplayFor(model => model.organization.Address)</td>
+        </tr>
+        <tr>
+
+            <td rowspan="4">INSURED DETAILS</td>
+            <td>CONTACT NAME:&nbsp;&nbsp;@Html.DisplayFor(model => model.customer.ContactName)</td>
+
+        </tr>
+
+        <tr>
+            <td>PHONE NUMBER:&nbsp;&nbsp;@Html.DisplayFor(model => model.customer.PhoneNumber)</td>
+        </tr>
+        <tr>
+            <td>EMAIL ADDRESS:&nbsp;&nbsp;@Html.DisplayFor(model => model.customer.EmailAddress)</td>
+        </tr>
+        <tr>
+            <td>ADDRESS:&nbsp;&nbsp;@Html.DisplayFor(model => model.customer.Address)</td>
+        </tr>
+    </table>
+
+
+    <br />
+    <table align="center" cellspacing="10" width="78%">
+        <tr>
+            <th colspan="2" text-align:center">
+                THIS IS TO CERTIFY THAT THE POICY OF INSURANCE MENTIONED BELOW HAS BEEN ISSUED TO THE INSURED NAMED ABOVE IS FOR
+                THE POLICY PERIOD INDICTAED. NOTWITHSTANDING ANY REQUIREMENT ,TERM OR COCNDITION OF ANY CONTRACT   OR OTHER
+                DOCUMENT WITH RESPECT TO HICH THIS CERTIFICATE MAY BE I SSUED OR MAY PERTAIN,THEI NSURANCE AFFORDED BY THE
+                POLICY DESCRIBED HEREIN IS SUBJECT TO ALL THE TERMS, EXCLUSIONS AND CONDITIONS OF SUCH POLICY.
+            </th>
+
+        </tr>
+    </table>
+
+    <h2 style="text-align:center"> POLICY DETAILS</h2>
+    <table align="center" cellpadding="10" width="78%">
+
+        <tr>
+            <td colspan="2" style="text-align:left">
+
+                POLICY NUMBER:&nbsp;&nbsp;@Html.DisplayFor(model => model.policyDetails.PolicyNumber)
+
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td rowspan="1">POLICY START DATE:&nbsp;&nbsp;@Html.DisplayFor(model => model.policyDetails.PolicyStartDate)</td>
+            <td>POLICY END DATE:&nbsp;&nbsp;@Html.DisplayFor(model => model.policyDetails.PolicyEndDate)</td>
+
+        </tr>
+
+
+        <tr>
+
+            <td rowspan="1">PARTNER NAME:&nbsp;&nbsp;@Html.DisplayFor(model => model.policyDetails.PartnerName)</td>
+            <td>PRODUCT NAME:&nbsp;&nbsp;@Html.DisplayFor(model => model.policyDetails.ProductName)</td>
+
+        </tr>
+
+
+    </table>
+
+    <h2 style="text-align:center"> COVERAGE DETAILS</h2>
+
+    <table align="center" cellpadding="10" width="78%">
+
+        <tr>
+            <td colspan="2" style="text-align:left">
+
+                COVER NAME:&nbsp;&nbsp;@Html.DisplayFor(model => model.productsModel.coverages[0].CoverName)
+
+
+            </td>
+
+        </tr>
+
+        <tr>
+
+            <td class="leftcol">
+                COVER EVENT:&nbsp;&nbsp;@Html.DisplayFor(Model => Model.productsModel.coverages[0].CoverEvent)
+            </td>
+            <td class="rightcol">COVER EVENT FACTOR(@Html.DisplayFor(Model => Model.productsModel.coverages[0].CoverEventFactorValue))</td>
+        </tr>
+        <tr>
+            <td class="leftcol" style="padding: 0;">
+                COVER EVENT FACTOR VALUE:
+            </td>
+            @if (!string.IsNullOrEmpty(Model.productsModel.coverages[0].From))
+            {
+
+                <td class="rightcol" style="padding: 0">
+                    <table style="width: 100%">
+                        <tr>
+                            <td class="leftcol">FROM:&nbsp;&nbsp;@Html.DisplayFor(model => model.productsModel.coverages[0].From)</td>
+                            <td class="rightcol">TO:&nbsp;&nbsp;@Html.DisplayFor(model => model.productsModel.coverages[0].To)</td>
+                        </tr>
+                    </table>
+                </td>
+            }
+            else
+            {
+                <td class="rightcol">
+                    @Html.DisplayFor(model => model.productsModel.coverages[0].To)
+                </td>
+            }
+
+        </tr>
+
+
+
+        <tr>
+    </table>
+
+    <h2 style="text-align:center"> BENIFIT DETAILS</h2>
+
+    <table align="center" cellpadding="10" width="78%">
+        <tr>
+
+            <td class="leftcol" rowspan="1">BENIFIT CRITERIA: @Html.DisplayFor(model => model.productsModel.benifits[0].From)</td>
+
+            <td class="rightcol">BENIFIT CRITERIA VALUE: @Html.DisplayFor(model => model.productsModel.benifits[0].From)</td>
+        </tr>
+
+        <tr>
+
+            <td class="leftcol">BENIFIT AMOUNT</td>
+            @if (Model.productsModel.benifits[0].BenifitRangeDetails.Count > 0)
+            {
+                <td class="benefitamttbl rightcol">
+                    <table>
+                        <tr><td>FROM</td><td>TO</td><td>AMOUNT</td></tr>
+                        @foreach (var item in Model.productsModel.benifits[0].BenifitRangeDetails)
+                        {
+                            <tr><td>@item.FromValue</td><td>@item.ToValue</td><td>@item.BenefitAmount</td></tr>
+                        }
+                    </table>
+                </td>
+
+            }
+            else
+            {
+                <td> @Html.DisplayFor(model => model.productsModel.benifits[0].Amount) </td>
+            }
+
+        </tr>
+
+
+
+    </table>
+
+    <h2 style="text-align:center"> PREMIUM DETAILS</h2>
+    <table align="center" cellpadding="10" width="78%">
+        <tr>
+
+            <td rowspan="4">BENIFIT AMOUNT</td>
+            <td>
+
+                BASE PREMIUM:@Html.DisplayFor(model => model.productsModel.premium[0].BasePremium)
+                @*<br /> <br />
+                    GST:@Html.DisplayFor(model => model.productsModel.premium[0].GST)*@
+
+
+
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                TOTAL PREMIUM:@Html.DisplayFor(model => model.productsModel.premium[0].TotalPremium)
+            </td>
+        </tr>
+        <tr>
+            <td>* Total premium is inclusive of all applicable taxes and levies.</td>
+        </tr>
+    </table>
+
+    @if (Model.productsModel.CWEdetails.Count > 0)
+    {
+        <h2 style="text-align:center"> CLAUSES, WARRENTIES & EXCLUSIONS</h2>
+        <table align="center" cellpadding="10" width="78%">
+
+            @for (int i = 0; i < Model.productsModel.CWEdetails.Count; i++)
+            {
+                <tr>
+                    <td colspan="2" text-align:center>
+                        @Model.productsModel.CWEdetails[i]
+                    </td>
+
+                </tr>
+            }
+        </table>
+    }
+    <br />
+
+    @*<table cellpadding="10" width="30%" height="100" width: auto; align="center" style="margin-left:146px">*@
+    <table align="center" cellspacing="10" height="100" width="30%" style="margin-left:146px">
+        <tr>
+            <th colspan="2" align="center" valign="top">AUTHORIZED SIGNATURE</th>
+
+        </tr>
+    </table>
+
+</body>
+</html>
+

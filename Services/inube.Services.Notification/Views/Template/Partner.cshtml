@@ -1,0 +1,30 @@
+﻿@model inube.Services.Notification.Models.PartnerEmail
+@{
+    Layout = "~/Views/Shared/_EmailLayout.cshtml";
+}
+
+
+
+
+
+    <div class="">
+        <p class="prara">
+            Dear Partner,
+            </p>
+        <p class="prara">
+            Payment CD account No <strong>@Html.DisplayFor(model => model.AccountNo)</strong>  is successfully created for the Product <strong>  @Html.DisplayFor(model => model.ProductCode)</strong> ,
+            <br />
+            <strong>@Html.DisplayFor(model => model.ProductName)</strong> ,
+            for Partner <strong> @Html.DisplayFor(model => model.PartnerCode)</strong> ,
+            <strong> @Html.DisplayFor(model => model.PartnerName)</strong>
+            You may now transact business through this Account.
+            <br />
+            Assuring you the best of services always.
+            <br />
+        </p>
+      
+    </div>
+
+
+
+

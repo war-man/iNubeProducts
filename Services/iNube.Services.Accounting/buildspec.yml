@@ -13,7 +13,6 @@ phases:
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
     commands:
-      - echo  $CODEBUILD_SRC_DIR
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:accountinglatest Services/iNube.Services.Accounting
@@ -39,4 +38,4 @@ artifacts:
     - Services/iNube.Services.Accounting/taskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
-    - imageDetail.json 
+    - imageDetail.json      

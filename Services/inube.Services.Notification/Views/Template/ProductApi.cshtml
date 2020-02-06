@@ -1,0 +1,180 @@
+﻿
+@model TemplateDemo.Models.ProductApiModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+
+
+<html>
+<head>
+    <style>
+        .center {
+            display: block;
+            margin-left: -348px;
+            margin-right: 800px;
+            width: 50%;
+        }
+
+
+        .container {
+            page-break-before: always
+        }
+
+        table, tr, td, th, tbody, thead, tfoot {
+            /*page-break-inside: avoid !important;
+            page-break-after:always;*/
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        /*.tbl {
+            page-break-inside: avoid !important;
+            page-break-after:always;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }*/
+        img {
+            float: left;
+        }
+    </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+
+
+<body>
+    <div class="container" style="padding: 20px;">
+       
+        <table align="center" style="width:60%;border: 1px solid #000; padding: 5px;">
+            <tr>
+
+                <th style="text-align:center;">
+
+                    <h1 style="text-align: center">Product Catalog for MICA</h1>
+
+                </th>
+            </tr>
+            <tr>
+
+                <th style="text-align:center;">
+
+                    <h2 style="text-align: center">@Html.DisplayFor(model => model.PName)</h2>
+
+                </th>
+            </tr>
+
+
+            <tbody>
+                <tr style="width: 50%">
+                    <td style="width: 50%; vertical-align: top; padding: 5px;border: 1px solid #000;">
+
+
+                        <br />
+                        <h3>There are @Html.DisplayFor(model => model.numberOfApi.Count) API's to be called</h3>
+                        @if (Model.numberOfApi.Count > 0)
+                        {
+                            @for (int i = 0; i < Model.numberOfApi.Count; i++)
+                            {
+                                <b>@Html.DisplayFor(model => model.numberOfApi[i].SLNo)</b> <b>.</b>
+                                <b>  @Html.DisplayFor(model => model.numberOfApi[i].methodName)</b><br />
+
+
+                            }
+
+                            @if (Model.methodsCalls.Count > 0)
+                            {
+                                <h3>The details for calling are mentioned below: </h3>
+                                @for (int j = 0; j < Model.methodsCalls.Count; j++)
+                                {
+
+                                    @for (int k = 0; k < Model.methodsCalls[j].uRLLinkModels.Count; k++)
+                                    {
+                                        <h3>
+                                            <b>@Html.DisplayFor(model => model.methodsCalls[j].Name)</b>
+                                        </h3><br />
+                                        <table width="730">
+                                            <tr>
+                                                <td>
+                                                    <h4>URL</h4>
+                                                    <b>Test:</b>@Html.DisplayFor(model => model.methodsCalls[j].uRLLinkModels[k].TestLink)<br />
+                                                    <b>Prodution:</b> @Html.DisplayFor(model => model.methodsCalls[j].uRLLinkModels[k].ProductionLink)<br />
+                                                </td>
+                                            </tr>
+                                            <tr><td><br /><h4>Parameters Details</h4></td></tr>
+                                        </table>
+
+
+                                        //  <h2>Http  Method</h2>
+                                        //  @Html.DisplayFor(model => model.methodsCalls[j].methodTypeModels[k].Type)<br />
+
+                                        // <h2>Url Params</h2>
+                                        //@Html.DisplayFor(model => model.methodsCalls[j].urlParams[k].ParamsType)<br />
+
+                                        <table width="730">
+
+                                            <tr>
+                                                <th>Parameter Name</th>
+                                                <th>Data Type</th>
+                                                <th>Is Required</th>
+                                                <th>Description</th>
+                                            </tr>
+                                            @foreach (var ditem in Model.methodsCalls[j].dataParams)
+                                            {
+                                                <tr>
+                                                    <td>@ditem.Field</td>
+                                                    <td>@ditem.DataType</td>
+                                                    <td>@ditem.IsRequired</td>
+                                                    <td> @ditem.Description</td>
+                                                </tr>
+                                            }
+
+
+                                        </table>
+
+
+
+                                        <h3>Sample Call</h3>
+                                        <h4>@Html.DisplayFor(model => model.methodsCalls[j].PolicyType)</h4>
+                                        @Html.DisplayFor(model => model.methodsCalls[j].PolicyRequest)<br />
+
+                                        <h3>$.ajax({</h3>
+                                        <b>url:</b>@Html.DisplayFor(model => model.methodsCalls[j].uRLLinkModels[k].ProductionLink)<br />
+                                        <b>datatype:"json",</b><br />
+                                        <b>type: "POST",</b><br />
+                                        <b>data: @Html.DisplayFor(model => model.methodsCalls[j].Name)Request,</b><br />
+                                        <b>Sucess: function(msg) {</b><br />
+                                        <b> //Do required action</b><br />
+                                        <b>}</b><br />
+                                        <b>});</b><br />
+
+                                     
+                                                    <h4>Response</h4>
+                                                    @Html.DisplayFor(model => model.methodsCalls[j].Response[k].ResponseType)<br />
+                                                    <b>Code:</b>@Html.DisplayFor(model => model.methodsCalls[j].Response[k].code)<br />
+                                                    @Html.DisplayFor(model => model.methodsCalls[j].Response[k].Content)<br />
+                                                                                                                        <hr>
+                                               
+                                    }
+
+
+                                }
+
+                            }
+                        }
+
+                    </td>
+                </tr>
+                
+            </tbody>
+        </table>
+        </div>
+</body>
+
+</html>
