@@ -5,5 +5,5 @@ Resources:
       Properties:
         TaskDefinition: <TASK_DEFINITION>
         LoadBalancerInfo:
-          ContainerName: "dev2-mica-accounting"
+          ContainerName: "dev2-mica-partner"
           ContainerPort: 9011
