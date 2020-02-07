@@ -160,13 +160,20 @@ namespace iNube.Services.Partners.Controllers.Partner
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetPartnerDetailsData(decimal OrgId)
+        {
+            var response = await _partnerService.GetPartnerDetails(OrgId,Context);
+            return Ok(response);
+        }
+
         [HttpPost("[action]")]
         public async Task<IActionResult> UploadLogo(decimal PartnerId)
         {
             var Response = new ResponseStatus() { Status = BusinessStatus.Created };
             //var response=new UserDetailsDTO();
             try
-            {
+            {   
                 long size = 0;
                 var files = Request.Form.Files;
                 var filename = "";
@@ -238,8 +245,15 @@ namespace iNube.Services.Partners.Controllers.Partner
             _partnerService.DeletePartner(PartnerId, Context);
             return Ok();
         }
-		
-		 [HttpGet]
+
+        [HttpGet]
+        public async Task<IActionResult> GetPartnerNameById(decimal PartnerId)
+        {
+            var response = await _partnerService.GetPartnerNameById(PartnerId, Context);
+            return Ok(response);
+        }
+
+         [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
         {

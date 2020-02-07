@@ -39,7 +39,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
 
         public AspNetUsersDTO Authenticate(LoginDTO loginDTO)
         {
-            var dbConnection = GetEnvironmentConnection(loginDTO.ProductType,loginDTO.EnvId).Dbconnection;
+            var dbConnection = GetEnvironmentConnection(loginDTO.ProductType, loginDTO.EnvId).Dbconnection;
             _context = (MICAUMContext)DbManager.GetContextByConnection(loginDTO.ProductType, dbConnection);
             var user = _context.AspNetUsers.SingleOrDefault(x => x.UserName == loginDTO.Username);
 
@@ -62,7 +62,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
 
         public AspNetUsersDTO RefreshTokenAuthenticate(LoginDTO loginDTO)
         {
-            var dbConnection = GetEnvironmentConnection(loginDTO.ProductType,loginDTO.EnvId).Dbconnection;
+            var dbConnection = GetEnvironmentConnection(loginDTO.ProductType, loginDTO.EnvId).Dbconnection;
             _context = (MICAUMContext)DbManager.GetContextByConnection(loginDTO.ProductType, dbConnection);
             var user = _context.AspNetUsers.SingleOrDefault(x => x.UserName == loginDTO.Username);
 
@@ -140,18 +140,19 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             return true;
         }
 
-        public UserLoginResponse GetUserType(string username, string productType, string serverType)
+        public UserLoginResponse GetUserType(string username, string productType)
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(productType);
 
             var userdetails = (from cu in _cpcontext.TblCustomerUsers
                                join ce in _cpcontext.TblCustomerEnvironment on cu.CustomerId equals ce.CustomerId
-                               where cu.UserName == username && ce.Product== productType
+                               where cu.UserName == username && ce.Product == productType /*&& cu.IsActive==true*/
                                select new UserLoginType
                                {
                                    UserType = cu.UserType,
                                    LoginProvider = cu.LoginProvider,
                                    UserName = cu.UserName,
+                                   IsActive = cu.IsActive,
                                    //IsFirstTimeLogin = cu.IsFirstTimeLogin,
                                    IsFirstTimeLogin = 1,
                                    UserId = cu.UserId,
@@ -159,28 +160,34 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                                    //CustomerId =cu.CustomerId,
                                    EnvName = ce.EnvName,
                                    //Name = ce.Name,
-                                   Id= ce.Id,
+                                   Id = ce.Id,
                                }).ToList();
             List<ddDTO> environment = new List<ddDTO>();
-            
+
             ddDTO env = null;
             foreach (var item in userdetails)
             {
                 env = new ddDTO();
                 env.mValue = item.EnvName;
                 env.mID = Convert.ToInt32(item.Id);
-               // env.mType = "Environment";
+                // env.mType = "Environment";
                 environment.Add(env);
             }
-            var userdetail = userdetails.FirstOrDefault();
-            userdetail.EnvName = "";
-            userdetail.EnvironmentDTOs.AddRange(environment);
-
-            if (userdetails != null)
+            if (userdetails.Count() != 0)
             {
-                return new UserLoginResponse { Status = BusinessStatus.Ok, userLogin = userdetail, ResponseMessage = $"UserName Exist" };
+                var userdetail = userdetails.FirstOrDefault();
+                userdetail.EnvName = "";
+                userdetail.EnvironmentDTOs.AddRange(environment);
+                if (userdetail.IsActive != false)
+                {
+                    return new UserLoginResponse { Status = BusinessStatus.Ok, userLogin = userdetail, ResponseMessage = $"UserName Exist" };
+                }
+                else
+                {
+                    return new UserLoginResponse { Status = BusinessStatus.Error, userLogin = userdetail, ResponseMessage = $"UserName is inactive" };
+                }
+
             }
-            else
             {
                 return new UserLoginResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"UserName does not Exist" };
             }
@@ -189,7 +196,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
         public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire)
         {
             LoginResponse loginResponse = new LoginResponse();
-            var dbConnection = GetEnvironmentConnection(productType,envId).Dbconnection;
+            var dbConnection = GetEnvironmentConnection(productType, envId).Dbconnection;
             _context = (MICAUMContext)DbManager.GetContextByConnection(productType, dbConnection);
             var userDetails = _context.TblUserDetails.FirstOrDefault(u => u.UserName == user.UserName);
             //var roleDetails = from ro in _context.AspNetRoles
@@ -199,7 +206,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             var roleName = _context.AspNetRoles.FirstOrDefault(u => u.Id == userDetails.RoleId).Name;
             var issuer = _config["Jwt:Issuer"];
             var audience = _config["Jwt:Audience"];
-            var expiry = isTokenExpire ? DateTime.Now.AddMinutes(120): DateTime.Now.AddYears(3);
+            var expiry = isTokenExpire ? DateTime.Now.AddMinutes(120) : DateTime.Now.AddYears(3);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             // Add standard claims
@@ -237,11 +244,11 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             return loginResponse;
         }
 
-        public EnvironmentResponse GetEnvironmentConnection(string product ,decimal EnvId)
+        public EnvironmentResponse GetEnvironmentConnection(string product, decimal EnvId)
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(product);
             EnvironmentResponse environment = new EnvironmentResponse();
-            environment.Dbconnection= _cpcontext.TblCustomerEnvironment.FirstOrDefault(ce => ce.Id == EnvId).Dbconnection;
+            environment.Dbconnection = _cpcontext.TblCustomerEnvironment.FirstOrDefault(ce => ce.Id == EnvId).Dbconnection;
             environment.Status = BusinessStatus.Ok;
             return environment;
         }

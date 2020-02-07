@@ -15,6 +15,7 @@ namespace iNube.Services.Accounting.Entities
         public DateTime? CreatedDate { get; set; }
         public string IsActive { get; set; }
         public decimal TransactionRuleMappingId { get; set; }
+        public string AccountName { get; set; }
 
         public virtual TblTransactionRuleMapping TransactionRuleMapping { get; set; }
     }

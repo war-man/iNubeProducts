@@ -64,7 +64,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MotorBillingService
             throw new NotImplementedException();
         }
 
-        public async Task<CustomersDTO> SaveCustomerAsync(CustomersDTO Customerdto, ApiContext context)
+        public async Task<CustomerResponse> SaveCustomerAsync(CustomersDTO Customerdto, ApiContext context)
         {
             throw new NotImplementedException();
         }
@@ -151,6 +151,15 @@ namespace iNube.Services.Billing.Controllers.Billing.MotorBillingService
             throw new NotImplementedException();
         }
 
+        public async Task<IEnumerable<ddDTO>> GetMasterForLocation(string lMasterlist, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        
+ public async Task<IEnumerable<ddDTO>> GetLocation(string locationType, int parentID, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
         public async Task<BillingEventResponseDTO> GetBillingItemizedDetailsAsync(int EventMappingId, InvoiceRequest invoiceRequest, ApiContext context)
         {
             throw new NotImplementedException();
@@ -182,6 +191,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MotorBillingService
             throw new NotImplementedException();
         }
         public async Task<IEnumerable<InvoiceSearchHistory>> GetSearchInvoiceHistory(InvoiceContractSearch invoiceContractSearch, ApiContext context)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<IEnumerable<InvoiceSearchHistory>> GetSearchInvoiceForCustomer(InvoiceCustSearch invoiceCustSearch, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -220,6 +233,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MotorBillingService
         }
 
         public Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<IEnumerable<ObjectsDTO>> GetObjectParameter(ApiContext context)
         {
             throw new NotImplementedException();
         }

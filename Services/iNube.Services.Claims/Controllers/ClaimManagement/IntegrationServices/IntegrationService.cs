@@ -32,30 +32,65 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<String> GetEnvironmentConnectionforDoc(string product, decimal EnvId);
         Task<ProductDTO> GetProductNameAsync(decimal productId, ApiContext apiContext);
         // Task<IEnumerable<PolicyDTO>> GetPolicyNoByPolicyIds(decimal?[] policyId, ApiContext apiContext);
+        //Accounting
+        Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext);
+        Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext);
+        Task<decimal> UpdatePolicySumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
 
        // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
         //readonly string partnerUrl = "https://localhost:44315";
-		readonly string partnerUrl = "http://dev2-mica-partner.aws.vpc.:9005";
+		readonly string partnerUrl = "http://dev2-mica-user.aws.vpc.:9005";
 
-        //readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
-       // readonly string policyUrl = "https://localhost:44351";
+       // readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
+        //readonly string policyUrl = "https://localhost:44351";
 	   readonly string policyUrl = "http://dev2-mica-policy.aws.vpc.:9006";
 
-       // readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
+        //readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
         //readonly string productUrl = "https://localhost:44347";
 		readonly string productUrl = "http://dev2-mica-product.aws.vpc.:9007";
 
        // readonly string UsermanangementUrl = "https://localhost:44367";
-          //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-		  readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+//          readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+        readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+
+        //CHECKING FOR ACCOUNTING
+        //readonly string accountApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionMappingDetails";
+        //readonly string accountApiUrl = "http://localhost:52166/api/AccountConfig/GetTransactionMappingDetails";
+        readonly string accountApiUrl = "http://dev2-mica-user.aws.vpc.:9011/api/AccountConfig/GetTransactionMappingDetails";
+        //readonly string accountRuleApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionConditionDetails";
+
+
+     //   readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
+        //readonly string createTransactionApi = "http://localhost:52166/api/AccountConfig/CreateTransaction";
+         readonly string createTransactionApi = "http://dev2-mica-user.aws.vpc.:9011/api/AccountConfig/CreateTransaction";
+
+
+        //ACCOUNTING
+        public async Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext)
+        {
+            var uri = accountRuleApiUrl;
+            var accountMapListDetails = await GetListApiInvoke<TransactionRuleMappingDto>(uri, apiContext);
+            return accountMapListDetails;
+        }
+        //Accounting CreateTransaction
+        public async Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext)
+        {
+            var uri = createTransactionApi;
+            return await PostApiInvoke<TransactionHeaderDto, TransactionsResponse>(uri, transaction,apiContext);
+        }
 
         public async Task<PartnersDTO> GetPartnerDetailAsync(string partnerId)
         {
             var uri = partnerUrl + "/api/Partner/GetPartnerDetails?partnerId=" + partnerId;
             return await GetApiInvoke<PartnersDTO>(uri);
+        }
+        public async Task<decimal> UpdatePolicySumInsuredAsync(string PolicyNumber,decimal amount,ApiContext apiContext)
+        {
+            var uri = policyUrl + "/api/Policy/UpdateSumInsured?PolicyNumber="+ PolicyNumber+"&amount="+ amount;
+            return await GetApiInvoke<decimal>(uri, apiContext);
         }
 
         private Task<T> GetApiInvoke<T>(string uri)

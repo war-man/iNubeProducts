@@ -107,7 +107,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             {
                 var accountMapDTOS = from tblobjectEventParam in _context.TblObjectEventParameter
                                      join tblObject in _context.TblObjects on tblobjectEventParam.ObjectId equals tblObject.ObjectId
-                                     
+
                                      select new EventObjParamMapping
                                      {
                                          ObjectId = tblObject.ObjectId,
@@ -184,6 +184,77 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         }
 
+        public async Task<IEnumerable<ddDTO>> GetMasterForLocation(string lMasterlist, ApiContext apiContext)
+        {
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            IEnumerable<ddDTO> ddDTOs;
+            ddDTOs = _context.TblMasCountry
+             .Select(c => new ddDTO
+             {
+                 mID = c.CountryId,
+                 mValue = c.CountryName,
+                 mType = lMasterlist,
+             });
+            return ddDTOs;
+        }
+
+        public async Task<IEnumerable<ddDTO>> GetLocation(string locationType, int parentID, ApiContext apiContext)
+        {
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            IEnumerable<ddDTO> ddDTOs;
+
+            switch (locationType)
+            {
+                case "State":
+                    ddDTOs = _context.TblMasState.Where(location => location.CountryId == parentID)
+                        .Select(c => new ddDTO
+                        {
+                            mID = c.StateId,
+                            mValue = c.StateName,
+                            mType = "State"
+                        });
+                    break;
+                case "District":
+                    ddDTOs = _context.TblMasDistrict.Where(location => location.StateId == parentID)
+                        .Select(c => new ddDTO
+                        {
+                            mID = c.DistrictId,
+                            mValue = c.DistrictName,
+                            mType = "District"
+                        });
+                    break;
+                case "City":
+                    ddDTOs = _context.TblMasCity.Where(location => location.DistrictId == parentID)
+                    .Select(c => new ddDTO
+                    {
+                        mID = c.CityId,
+                        mValue = c.CityName,
+                        mType = "City"
+                    });
+                    break;
+                case "Pincode":
+                    ddDTOs = _context.TblMasPinCode.Where(location => location.CityId == parentID)
+                    .Select(c => new ddDTO
+                    {
+                        mID = c.PincodeId,
+                        mValue = c.Pincode,
+                        mType = "Pincode"
+                    });
+                    break;
+                default:
+                    ddDTOs = _context.TblMasCountry.Select(location => location)
+                    .Select(c => new ddDTO
+                    {
+                        mID = c.CountryId,
+                        mValue = c.CountryName,
+                        mType = "Country"
+                    });
+                    break;
+            }
+            return ddDTOs;
+        }
+
         public async Task<BillingConfigDTO> SaveBillingDetails(BillingConfigDTO billingitem, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
@@ -221,7 +292,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var tbl_bill = _mapper.Map<TblBillingConfig>(objBilling);
-             var tbl_Billing = _context.TblBillingConfig.Find(tbl_bill.BillingConfigId);
+            var tbl_Billing = _context.TblBillingConfig.Find(tbl_bill.BillingConfigId);
 
             if (tbl_Billing == null)
                 throw new AppException("Record not found");
@@ -252,7 +323,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                                       EfficitiveDate = s.BillingStartDate,
                                       EndDate = s.BillingEndDate,
                                       EventMappingId = cs.EventMappingId,
-                                      
+
                                   }).ToList();
 
 
@@ -305,7 +376,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             //    }
             //}
 
-                foreach (var item in BillingHistory)
+            foreach (var item in BillingHistory)
             {
 
                 if (item.BillingFrequencyId != 0)
@@ -480,40 +551,41 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         }
 
-        public async Task<CustomersDTO> SaveCustomerAsync(CustomersDTO Customerdto, ApiContext apiContext)
+        public async Task<CustomerResponse> SaveCustomerAsync(CustomersDTO Customerdto, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            try
-            {
-                //var dtomap = _mapper.Map<CustomersDTO>(Customerdto);
-                var _tblCustomer = _mapper.Map<TblCustomers>(Customerdto);
+            //try
+            //{
+            //var dtomap = _mapper.Map<CustomersDTO>(Customerdto);
+            var _tblCustomer = _mapper.Map<TblCustomers>(Customerdto);
 
-                _tblCustomer.CategoryId = 1;
-                _tblCustomer.TypeId = 6;
-                _tblCustomer.ConfigurationTypeId = 3;
-                _tblCustomer.CorpAddressSameAs = "R";
-                _tblCustomer.MailingAddressSameAs = "C";
-                // EventRequest.Logo = ;
-                //EventRequest.Levels = ;
+            _tblCustomer.CategoryId = 1;
+            _tblCustomer.TypeId = 6;
+            _tblCustomer.ConfigurationTypeId = 3;
+            _tblCustomer.CorpAddressSameAs = "R";
+            _tblCustomer.MailingAddressSameAs = "C";
+            // EventRequest.Logo = ;
+            //EventRequest.Levels = ;
 
-                //InvoiceConfigDTO invoice = new InvoiceConfigDTO();
-                //invoice = Customerdto.Contract.TblInvoiceConfig;
+            //InvoiceConfigDTO invoice = new InvoiceConfigDTO();
+            //invoice = Customerdto.Contract.TblInvoiceConfig;
 
-                _context.TblCustomers.Add(_tblCustomer);
+            _context.TblCustomers.Add(_tblCustomer);
 
-                _context.SaveChanges();
-                var Customer = _mapper.Map<CustomersDTO>(_tblCustomer);
-                //return Customer;
+            _context.SaveChanges();
+            var Customer = _mapper.Map<CustomersDTO>(_tblCustomer);
+            //return Customer;
 
-                var orgdto = _mapper.Map<OrganizationDTO>(Customer);
-                var ps = await _integrationService.SaveCustomerAsync(orgdto, apiContext);
-                //var cust = _mapper.Map<CustomersDTO>(ps);
-                return Customer;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            var orgdto = _mapper.Map<OrganizationDTO>(Customer);
+            var ps = await _integrationService.SaveCustomerAsync(orgdto, apiContext);
+            //var cust = _mapper.Map<CustomersDTO>(ps);
+            //return Customer;
+            return new CustomerResponse() { Status = BusinessStatus.Created, Id = Customerdto.CustomerId.ToString(), customer = Customerdto, ResponseMessage = $"Customer : {Customerdto.CustomerName} created successfully" };
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw ex;
+            //}
 
         }
 
@@ -551,7 +623,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 throw ex;
             }
         }
-        
+
         public async Task<InvoiceConfigDTO> ModifyInvoice(InvoiceConfigDTO invoiceData, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
@@ -570,8 +642,14 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 throw ex;
             }
         }
+        public async Task<IEnumerable<ObjectsDTO>> GetObjectParameter(ApiContext context)
+        {
+            _context = (MICABIContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType));
+            var data = _context.TblObjects;
+            var dtoObject = _mapper.Map<IList<ObjectsDTO>>(data);
+            return dtoObject;
+        }
 
-       
 
         public async Task<BillingConfigDTO> GetBillingById(decimal billingconfigid, ApiContext apiContext)
         {
@@ -585,8 +663,8 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             return contractdata;
         }
 
-      //Payment
-      public async Task<List<PaymentDTO>> CreatePayment(PaymentListDTO paymentDto, ApiContext apiContext)
+        //Payment
+        public async Task<List<PaymentDTO>> CreatePayment(PaymentListDTO paymentDto, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             try
@@ -624,7 +702,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                                 StatusId = p.StatusId,
                             }).ToList();
 
-             var CommonTypeData = _context.TblmasBicommonTypes.Select(x => x);
+            var CommonTypeData = _context.TblmasBicommonTypes.Select(x => x);
 
             Dictionary<int?, string> CommonTypeStatus = new Dictionary<int?, string>();
             Dictionary<int?, string> CommonPaymentType = new Dictionary<int?, string>();
@@ -666,33 +744,34 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             }
 
             var paymentData = _mapper.Map<IEnumerable<PaymentHistoryDTO>>(_Payment);
-            
+
             return paymentData;
         }
         public async Task<IEnumerable<CustomerSearchDTO>> CustomerSearch(CustomerSearchDTO customersDTO, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-           
+
             var _cust = (from cust in _context.TblCustomers.OrderByDescending(x => x.CreatedDate)
                          join cont in _context.TblContract on cust.CustomerId equals cont.CustomerId
-                         select new CustomerSearchDTO {
+                         select new CustomerSearchDTO
+                         {
                              CustomerName = cust.CustomerName,
                              CustomerId = cust.CustomerId,
                              ContractName = cont.ContractName,
                              ContractId = cont.ContractId
-                           
+
                          });
 
             if (customersDTO.CustomerId != 0)
             {
-                _cust = _cust.Where(x=>x.CustomerId == customersDTO.CustomerId);
+                _cust = _cust.Where(x => x.CustomerId == customersDTO.CustomerId);
             }
             if (!string.IsNullOrEmpty(customersDTO.CustomerName))
             {
                 _cust = _cust.Where(x => x.CustomerName == customersDTO.CustomerName);
             }
-            
-            if(!string.IsNullOrEmpty(customersDTO.ContractName))
+
+            if (!string.IsNullOrEmpty(customersDTO.ContractName))
             {
                 _cust = _cust.Where(x => x.ContractName == customersDTO.ContractName);
             }
@@ -704,7 +783,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var data = _context.TblCustomers.Any(e => e.CustomerName == Name);
-          
+
             if (data == true)
             {
                 return new CustomerResponse() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Customer Name {Name} already taken" };
@@ -751,7 +830,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 // update user billing
 
                 tbl_payment.StatusId = pay.StatusId;
-                if(pay.StatusId == 22)
+                if (pay.StatusId == 22)
                 {
                     var invoice = _context.TblInvoice.Find(tbl_payment.InvoiceId);
                     invoice.PaymentRecd = invoice.PaymentRecd + tbl_payment.Paymentamount;
@@ -773,8 +852,9 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         public async Task<CustomerConfigDTO> UploadCustConfigImage(CustomerConfigDTO contractimg, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            try {
-                
+            try
+            {
+
                 var tbl_pay = _mapper.Map<TblCustomerConfig>(contractimg);
                 var tbl_payment = _context.TblCustomerConfig.Find(tbl_pay.CustConfigId);
 
@@ -827,7 +907,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
             }
         }
-        
+
         // Save Invoice config(Create Invoice)
         public async Task<InvoiceConfigDTO> CreateInvoice(InvoiceConfigDTO invoiceConfig, ApiContext apiContext)
         {
@@ -846,7 +926,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 throw ex;
             }
         }
-        
+
         // Save Create Contract to database(Create Contract)
         public async Task<ContractDTO> CreateContract(ContractDTO contract, ApiContext apiContext)
         {
@@ -867,9 +947,9 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 throw ex;
             }
         }
-        
+
         // To get data from data base and show in grid
-        public async Task<IEnumerable<ContractHistoryDetails>> GetContractHistory(decimal customerId,ApiContext apiContext)
+        public async Task<IEnumerable<ContractHistoryDetails>> GetContractHistory(decimal customerId, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             try
@@ -881,7 +961,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                               join customers in _context.TblCustomers on contract.CustomerId equals customers.CustomerId
                               select new ContractHistoryDetails
                               {
-                                  CustomerId=customers.CustomerId,
+                                  CustomerId = customers.CustomerId,
                                   ContractId = contract.ContractId,
                                   DocumentName = contractDoc.DocumentName,
                                   CustomerName = customers.CustomerName,
@@ -930,10 +1010,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
 
         //view the uploaded document
-        public async Task<IEnumerable<ContractDocDTO>> DocumentView(decimal ContractId,ApiContext apiContext) 
+        public async Task<IEnumerable<ContractDocDTO>> DocumentView(decimal ContractId, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            var tblContractDoc = _context.TblContractDoc.Where(s=>s.ContractId== ContractId).ToList();
+            var tblContractDoc = _context.TblContractDoc.Where(s => s.ContractId == ContractId).ToList();
             if (tblContractDoc != null)
             {
                 var contractDocDTO = _mapper.Map<IEnumerable<ContractDocDTO>>(tblContractDoc);
@@ -1013,7 +1093,9 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             InvoiceSearchHistory invoiceSearchHistory = new InvoiceSearchHistory();
 
-           
+            string[] lstStatus = new string[] { "InvoiceStatus" };
+            var masterList = _context.TblmasBicommonTypes.Where(p => lstStatus.Contains(p.MasterType))
+                              .ToDictionary(m => m.CommonTypeId, n => n.Value);
             try
             {
                 //int defaultValue = 0;
@@ -1029,6 +1111,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                               select new InvoiceSearchHistory
                               {
                                   ContractName = tblcontract.ContractName,
+                                  CreatedDate = tblinvoice.InvoiceDate,
                                   InvoiceNo = tblinvoice.InvoiceNo,
                                   InvoiceEffectiveDate = tblinvoiceConfig.InvoiceStartDate,
                                   InvoiceEndDate = tblinvoiceConfig.InvoiceEndDate,
@@ -1040,6 +1123,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                                   InvAmount = (decimal)tblinvoice.InvAmount,
                                   Balance = tblinvoice.Balance,
                                   Status = tblmasBicommonTypes.Value,
+                                  StatusId = tblmasBicommonTypes.CommonTypeId,
                                   Paid = tblinvoice.InvAmount - tblinvoice.Balance,
                                   OrgName = tblcustomers.CustomerName,
                                   DueDate = tblinvoice.DueDate,
@@ -1055,44 +1139,54 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                                   RevisedInvoiceAmountGrid = pd.RevisedInvAmount,
                                   UserName = ""
                               };
-                
+
                 //foreach (var ht in history)
                 //{
                 //    var UserData = await _integrationService.GetUserNameById(ht.UserId, apiContext);
                 //    ht.UserName = UserData.UserName;
                 //    //invoiceSearchHistory.UserName = UserData.UserName;
                 //}
-                
+
                 if (invoiceContractSearch.InvoiceId > 0)
                 {
                     history = history.Where(s => s.InvoiceId == invoiceContractSearch.InvoiceId);
                 }
 
-                else if (!string.IsNullOrEmpty(invoiceContractSearch.CustomerName))
+                if (!string.IsNullOrEmpty(invoiceContractSearch.CustomerName))
                 {
                     history = history.Where(s => s.OrgName.Contains(invoiceContractSearch.CustomerName));
                 }
 
-                else if (invoiceContractSearch.InvoiceNo != "")
+                if (invoiceContractSearch.InvoiceNo != "")
                 {
                     history = history.Where(s => s.InvoiceNo == invoiceContractSearch.InvoiceNo);
                 }
 
+                if (invoiceContractSearch.StatusId > 0)
+                {
+                    history = history.Where(s => s.StatusId == invoiceContractSearch.StatusId);
+                }
+
+                if (invoiceContractSearch.InvoiceEffectiveDate.HasValue && invoiceContractSearch.InvoiceEndDate.HasValue)
+                {
+                    history = history.Where(s => (s.CreatedDate >= invoiceContractSearch.InvoiceEffectiveDate && s.CreatedDate <= invoiceContractSearch.InvoiceEndDate));
+                }
                 else if (invoiceContractSearch.InvoiceEffectiveDate.HasValue)
                 {
-                    history = history.Where(s => s.InvoiceEffectiveDate.ToString() == invoiceContractSearch.InvoiceEffectiveDate.ToString());
+                    history = history.Where(s => s.CreatedDate >= invoiceContractSearch.InvoiceEffectiveDate);
                 }
 
                 else if (invoiceContractSearch.InvoiceEndDate.HasValue)
                 {
-                    history = history.Where(s => s.InvoiceEndDate.ToString() == invoiceContractSearch.InvoiceEndDate.ToString());
+                    history = history.Where(s => s.CreatedDate <= invoiceContractSearch.InvoiceEndDate);
                 }
 
                 var _history = _mapper.Map<List<InvoiceSearchHistory>>(history);
-                foreach(var item in _history)
+                foreach (var item in _history)
                 {
                     item.InvoiceId = item.InvoiceId;
                     item.InvoiceNo = item.InvoiceNo;
+                    item.Status = masterList.FirstOrDefault(p => p.Key == item.StatusId).Value;
                     item.OrgName = item.OrgName;
                     item.InvoiceEffectiveDate = item.InvoiceEffectiveDate;
                     item.InvoiceEndDate = item.InvoiceEndDate;
@@ -1105,6 +1199,135 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             }
         }
 
+        //To get data from data base and show in grid for Search Invoice table--for inube Customer
+        public async Task<IEnumerable<InvoiceSearchHistory>> GetSearchInvoiceForCustomer(InvoiceCustSearch invoiceCustSearch, ApiContext apiContext)
+        {
+            //if (invoiceCustSearch.EnvId > 0)
+            //{
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            //}
+            //else
+            //{
+            //    _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            //}
+
+            InvoiceSearchHistory invoiceSearchHistory = new InvoiceSearchHistory();
+
+            string[] lstStatus = new string[] { "InvoiceStatus" };
+            var masterList = _context.TblmasBicommonTypes.Where(p => lstStatus.Contains(p.MasterType))
+                              .ToDictionary(m => m.CommonTypeId, n => n.Value);
+            try
+            {
+                //int defaultValue = 0;
+                var history = from tblinvoice in _context.TblInvoice
+                              join tblcontract in _context.TblContract on tblinvoice.ContractId equals tblcontract.ContractId
+                              join tblcustomers in _context.TblCustomers on tblcontract.CustomerId equals tblcustomers.CustomerId
+                              join tblinvoiceConfig in _context.TblInvoiceConfig on tblinvoice.InvoiceConfigId equals tblinvoiceConfig.InvoiceConfigId
+                              join tblmasBicommonTypes in _context.TblmasBicommonTypes on tblinvoice.StatusId equals tblmasBicommonTypes.CommonTypeId
+                              join tblbillingconfig in _context.TblBillingConfig on tblinvoice.ContractId equals tblbillingconfig.ContractId
+                              join tblmasBicommonTypess in _context.TblmasBicommonTypes on tblbillingconfig.CurrencyId equals tblmasBicommonTypess.CommonTypeId
+                              join tblinvoicePenalty in _context.TblInvoicePenalty on tblinvoice.InvoiceId equals tblinvoicePenalty.InvoiceId into penaltyData
+                              from pd in penaltyData.DefaultIfEmpty()
+                                  // where (invoiceCustSearch.OrgId == apiContext.OrgId)
+                              select new InvoiceSearchHistory
+                              {
+                                  ContractName = tblcontract.ContractName,
+                                  CreatedDate = tblinvoice.InvoiceDate,
+                                  InvoiceNo = tblinvoice.InvoiceNo,
+                                  InvoiceEffectiveDate = tblinvoiceConfig.InvoiceStartDate,
+                                  InvoiceEndDate = tblinvoiceConfig.InvoiceEndDate,
+                                  InvoiceId = tblinvoice.InvoiceId,
+                                  ContractId = tblinvoice.ContractId,
+                                  InvoiceDate = tblinvoice.InvoiceDate,
+                                  CreditDaysRemaining = tblinvoiceConfig.InvoiceGracePeriod + tblinvoiceConfig.InvoiceCreditPeriod,
+                                  Currency = tblmasBicommonTypess.Value,
+                                  InvAmount = (decimal)tblinvoice.InvAmount,
+                                  Balance = tblinvoice.Balance,
+                                  Status = tblmasBicommonTypes.Value,
+                                  StatusId = tblmasBicommonTypes.CommonTypeId,
+                                  Paid = tblinvoice.InvAmount - tblinvoice.Balance,
+                                  OrgName = tblcustomers.CustomerName,
+                                  DueDate = tblinvoice.DueDate,
+                                  DefaultDays = tblinvoice.DefaultDays,
+                                  PenaltyRate = tblinvoiceConfig.PenaltyPercentage,
+                                  PenaltyCalculation = tblinvoice.InvAmount - tblinvoice.Balance,
+                                  PenaltyAmount = (invoiceSearchHistory.PenaltyCalculation == 0) ? 0 : tblinvoice.Balance * tblinvoiceConfig.PenaltyPercentage / 100,
+                                  RevisedInvoiceAmount = tblinvoice.InvAmount + tblinvoice.PenaltyAmount,
+                                  UserId = tblinvoice.CreatedUserId,
+                                  ModifiedDate = DateTime.Now,
+                                  RevisedPenaltyRate = pd.PenaltyRate,
+                                  RevisedPenaltyAmount = pd.PenaltyAmount,
+                                  RevisedInvoiceAmountGrid = pd.RevisedInvAmount,
+                                  UserName = "",
+                                  CustId = tblcustomers.CustomerId
+                              };
+
+                //foreach (var ht in history)
+                //{
+                //    var UserData = await _integrationService.GetUserNameById(ht.UserId, apiContext);
+                //    ht.UserName = UserData.UserName;
+                //    //invoiceSearchHistory.UserName = UserData.UserName;
+                //}
+                if (apiContext.OrgId > 0)
+                {
+                    history = history.Where(pr => pr.CustId == apiContext.OrgId);
+                }
+
+                //if (invoiceCustSearch.InvoiceId > 0)
+                //{
+                //    history = history.Where(s => s.InvoiceId == invoiceCustSearch.InvoiceId);
+                //}
+                if (apiContext.OrgId > 0 && invoiceCustSearch.InvoiceId > 0)
+                {
+                    history = history.Where(pr => pr.CustId == apiContext.OrgId && pr.InvoiceId == invoiceCustSearch.InvoiceId);
+                }
+
+                if (apiContext.OrgId > 0 && !string.IsNullOrEmpty(invoiceCustSearch.CustomerName))
+                {
+                    history = history.Where(pr => pr.CustId == apiContext.OrgId && pr.OrgName.Contains(invoiceCustSearch.CustomerName));
+                }
+
+                if (apiContext.OrgId > 0 && invoiceCustSearch.InvoiceNo != "")
+                {
+                    history = history.Where(pr => pr.CustId == apiContext.OrgId && pr.InvoiceNo == invoiceCustSearch.InvoiceNo);
+                }
+
+                if (apiContext.OrgId > 0 && invoiceCustSearch.StatusId > 0)
+                {
+                    history = history.Where(pr => pr.CustId == apiContext.OrgId && pr.StatusId == invoiceCustSearch.StatusId);
+                }
+
+                if (apiContext.OrgId > 0 && invoiceCustSearch.InvoiceEffectiveDate.HasValue && invoiceCustSearch.InvoiceEndDate.HasValue)
+                {
+                    history = history.Where(pr => pr.CustId == apiContext.OrgId && (pr.CreatedDate >= invoiceCustSearch.InvoiceEffectiveDate && pr.CreatedDate <= invoiceCustSearch.InvoiceEndDate));
+                }
+                else if (apiContext.OrgId > 0 && invoiceCustSearch.InvoiceEffectiveDate.HasValue)
+                {
+                    history = history.Where(pr => pr.CustId == apiContext.OrgId && pr.CreatedDate >= invoiceCustSearch.InvoiceEffectiveDate);
+                }
+
+                else if (apiContext.OrgId > 0 && invoiceCustSearch.InvoiceEndDate.HasValue)
+                {
+                    history = history.Where(pr => pr.CustId == apiContext.OrgId && pr.CreatedDate <= invoiceCustSearch.InvoiceEndDate);
+                }
+
+                var _history = _mapper.Map<List<InvoiceSearchHistory>>(history);
+                foreach (var item in _history)
+                {
+                    item.InvoiceId = item.InvoiceId;
+                    item.InvoiceNo = item.InvoiceNo;
+                    item.Status = masterList.FirstOrDefault(p => p.Key == item.StatusId).Value;
+                    item.OrgName = item.OrgName;
+                    item.InvoiceEffectiveDate = item.InvoiceEffectiveDate;
+                    item.InvoiceEndDate = item.InvoiceEndDate;
+                }
+                return _history;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         //Save the regenerated invoice in InvoicePenalty table
         public async Task<InvoicePenaltyDTO> CreateRegenerateInvoice(InvoicePenaltyDTO invoicePenalty, ApiContext apiContext)
         {
@@ -1113,7 +1336,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             {
 
                 var invoice = _mapper.Map<TblInvoicePenalty>(invoicePenalty);
-                
+
                 _context.TblInvoicePenalty.Add(invoice);
                 _context.SaveChanges();
 
@@ -1130,7 +1353,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
 
         //Search customer based on customer Id
-        public async Task<IEnumerable<CustomersDTO>> SearchCustomer(decimal customerId,ApiContext apiContext)
+        public async Task<IEnumerable<CustomersDTO>> SearchCustomer(decimal customerId, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             IEnumerable<CustomersDTO> scustomer = _context.TblCustomers.Where(a => a.CustomerId == customerId)
@@ -1150,36 +1373,70 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         public async Task<InvoiceResponse> GenerateInvoiceAsync(InvoiceRequest invoiceRequest, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            if (invoiceRequest.InvoiceStartDate != null && invoiceRequest.InvoiceEndDate != null)
+            try
             {
-                // Get the list of ContractId
-                var invoiceSearch = _context.TblInvoiceConfig
-                    //.Where(i => i.InvoiceStartDate >= invoiceRequest.InvoiceStartDate && i.InvoiceEndDate <= invoiceRequest.InvoiceEndDate && i.FrequencyId==invoiceRequest.FrequencyId).
-                    .Where(i => i.InvoiceStartDate >= invoiceRequest.InvoiceStartDate && i.InvoiceEndDate <= invoiceRequest.InvoiceEndDate).
-                    Select(i => new InvoiceConfigDTO
-                    {
-                        ContractId = i.ContractId,
-                        InvoiceConfigId = i.InvoiceConfigId
-                    });
-                // Get the Billing list based on  ContractId
-                if (invoiceSearch.ToList().Count > 0)
+                if (invoiceRequest.InvoiceStartDate != null && invoiceRequest.InvoiceEndDate != null)
                 {
-                    var invoice = await GetInvoiceBillingDetailsAsync(invoiceRequest, invoiceSearch.ToList(), apiContext);
-                    if (invoice != null)
+                    // Get the list of ContractId
+                    var invoiceSearch = _context.TblInvoiceConfig
+                        //.Where(i => i.InvoiceStartDate >= invoiceRequest.InvoiceStartDate && i.InvoiceEndDate <= invoiceRequest.InvoiceEndDate && i.FrequencyId==invoiceRequest.FrequencyId).
+                        .Where(i => i.InvoiceStartDate >= invoiceRequest.InvoiceStartDate && i.InvoiceEndDate <= invoiceRequest.InvoiceEndDate).
+                        Select(i => new InvoiceConfigDTO
+                        {
+                            ContractId = i.ContractId,
+                            InvoiceConfigId = i.InvoiceConfigId,
+                        });
+                    // Get the Billing list based on  ContractId
+                    if (invoiceSearch.ToList().Count > 0)
                     {
-                        return new InvoiceResponse() { Status = BusinessStatus.Created, invoice = invoice, ResponseMessage = $"{invoice.TblInvoice.Count} number of Invoive Generated successfully " };
+                        var contractId = _context.TblContract.SingleOrDefault(s => s.CustomerId == invoiceRequest.CustomerId).ContractId;//To get particular contract ( matching for invoice config & billing config dates) for the inputed customer
+                        var validInvoice = _context.TblInvoiceConfig.SingleOrDefault(p => p.ContractId == contractId);
+                        var validInvoiceDTO = _mapper.Map<InvoiceConfigDTO>(validInvoice);
+
+                        //If invoice is getting generated for 1st time
+                        if (validInvoice.LastCycleExecDate == null)
+                        {
+                            var invoice = await GetInvoiceBillingDetailsAsync(invoiceRequest, validInvoiceDTO, apiContext);
+                            if (invoice != null)
+                            {
+                                return new InvoiceResponse() { Status = BusinessStatus.Created, invoice = invoice, ResponseMessage = $"{invoice.TblInvoice.Count} number of Invoive Generated successfully " };
+                            }
+                            return new InvoiceResponse { Status = BusinessStatus.Error, ResponseMessage = "Some Error Occured" };
+                        }
+
+                        //If invoice is generated in middle of start date and end date
+                        else if (validInvoice.LastCycleExecDate > invoiceRequest.InvoiceStartDate && validInvoice.LastCycleExecDate < invoiceRequest.InvoiceEndDate)
+                        {
+                            invoiceRequest.InvoiceStartDate = validInvoice.LastCycleExecDate;
+                            var invoice = await GetInvoiceBillingDetailsAsync(invoiceRequest, validInvoiceDTO, apiContext);
+                            if (invoice != null)
+                            {
+                                return new InvoiceResponse() { Status = BusinessStatus.Created, invoice = invoice, ResponseMessage = $"{invoice.TblInvoice.Count} number of Invoive Generated successfully " };
+                            }
+                            return new InvoiceResponse { Status = BusinessStatus.Error, ResponseMessage = "Some Error Occured" };
+                        }
+
+                        //If invoice is already generated
+                        else
+                        {
+                            return new InvoiceResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Invoice already generated for {invoiceRequest.InvoiceStartDate} and {invoiceRequest.InvoiceEndDate} " };
+                        }
                     }
-                    return new InvoiceResponse { Status = BusinessStatus.Error, ResponseMessage = "Some Error Occured" };
+
+                    return new InvoiceResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = "No records exist for invoice." };
                 }
-                return new InvoiceResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = "No records exist for invoice." };
+                else
+                {
+                    return new InvoiceResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = "Date field cannot be null" };
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return new InvoiceResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = "Date field cannot be null" };
+                throw ex;
             }
         }
 
-        public async Task<InvoiceConfigDTO> GetInvoiceBillingDetailsAsync(InvoiceRequest invoiceRequest, List<InvoiceConfigDTO> lstInvoiceConfig, ApiContext apiContext)
+        public async Task<InvoiceConfigDTO> GetInvoiceBillingDetailsAsync(InvoiceRequest invoiceRequest, InvoiceConfigDTO lstInvoiceConfig, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
 
@@ -1190,19 +1447,20 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
             try
             {
-                //foreach (var item in lstInvoiceConfig)
-                //{
-                //    var billingSearch = _context.TblBillingConfig.Where(b => b.ContractId == item.ContractId);
-                    var billingSearch = _context.TblBillingConfig.Where(b => b.BillingConfigId == 169);
-                    foreach (var bItem in billingSearch)
-                    {
-                        //var invoice = await SaveBillingInvoiceAsync(bItem.BillingConfigId, invoiceRequest, item, apiContext);
-                        invoiceDto = await SaveBillingInvoiceAsync(bItem.BillingConfigId, invoiceRequest, lstInvoiceConfig[0], apiContext);
-                        invoiceConfigDto.TblInvoice.Add(invoiceDto);
-                    }
 
-               // }
+                // //foreach (var item in lstInvoiceConfig)
+                // //{
+                var billingSearch = _context.TblBillingConfig.Where(b => b.ContractId == lstInvoiceConfig.ContractId);
+                // var billingSearch = _context.TblBillingConfig.Where(b => b.BillingConfigId == 228);
+
+                foreach (var bItem in billingSearch)
+                {
+                    //var invoice = await SaveBillingInvoiceAsync(bItem.BillingConfigId, invoiceRequest, item, apiContext);
+                    invoiceDto = await SaveBillingInvoiceAsync(bItem.BillingConfigId, invoiceRequest, lstInvoiceConfig, apiContext);
+                    invoiceConfigDto.TblInvoice.Add(invoiceDto);
+                }
                 return invoiceConfigDto;
+                //}
             }
             catch (Exception ex)
             {
@@ -1223,7 +1481,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                                 join tblbillingItem in _context.TblBillingItem on tblbillingConfig.BillingConfigId equals tblbillingItem.BillingConfigId
                                 join tblmascommon in _context.TblmasBicommonTypes on tblbillingConfig.CurrencyId equals tblmascommon.CommonTypeId
                                 where tblbillingItem.BillingConfigId == BillingConfigId
-                                select new { tblbillingItem, tblmascommon.Value }                       ;
+                                select new { tblbillingItem, tblmascommon.Value };
 
                 InvoiceDetailDTO invoiceDetailDTO = null;
                 BillingItemDetailDTO billingItemDetilsDTO = null;
@@ -1248,20 +1506,20 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
                     if (invoiceDetailDTO.EventMappingId == ModuleConstants.ProductCreation || invoiceDetailDTO.EventMappingId == ModuleConstants.PolicyCreation || invoiceDetailDTO.EventMappingId == ModuleConstants.ClaimIntimation)
                     {
-                        invoiceDetailDTO.Eventcount = billingEventDetail.Sum(e=> e.Count);
+                        invoiceDetailDTO.Eventcount = billingEventDetail.Sum(e => e.Count);
                     }
                     else
                         invoiceDetailDTO.Eventcount = 0;
 
                     //If single, Directly return a Value
-                   
+
                     if (bill.tblbillingItem.RateCategoryId == ModuleConstants.Single)
                     {
                         if (invoiceDetailDTO.EventMappingId == ModuleConstants.ProductCreation && billingEventDetail.FirstOrDefault().Count == 0)
                         {
                             invoiceDetailDTO.Value = 0;
                         }
-                        else if(invoiceDetailDTO.EventMappingId == ModuleConstants.PolicyCreation && billingEventDetail.FirstOrDefault().Count == 0)
+                        else if (invoiceDetailDTO.EventMappingId == ModuleConstants.PolicyCreation && billingEventDetail.FirstOrDefault().Count == 0)
                         {
                             invoiceDetailDTO.Value = 0;
                         }
@@ -1270,7 +1528,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                             invoiceDetailDTO.Value = 0;
                         }
                         else
-                        invoiceDetailDTO.Value = bill.tblbillingItem.Rate;
+                            invoiceDetailDTO.Value = bill.tblbillingItem.Rate;
                     }
                     //Else calculate for range and slab
                     else
@@ -1279,7 +1537,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                         //This method return InvoiceItemAmount and its value is stored in InvocieDetails(Value)
                     }
                     invoiceDto.InvoiceDetails.Add(invoiceDetailDTO); //Save in Invoice Details Table
-                                                                    
+
                     totalInvoiceAmount = totalInvoiceAmount + (decimal)invoiceDetailDTO.Value; //Get the Total InvAmount
 
                 }
@@ -1306,12 +1564,12 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 invoiceDto.InvAmount = totalInvoiceAmount;
                 invoiceDto.TotalAmount = invoiceDto.InvAmount - invoiceDto.Discount + invoiceDto.TaxAmount + invoiceDto.PenaltyAmount;
 
-                await InvoicePdfGeneration(invoiceModel,invoiceDto,invoiceRequest, apiContext);//Save in PDF
+                await InvoicePdfGeneration(invoiceModel, invoiceDto, invoiceRequest, apiContext);//Save in PDF
 
                 var invoice = _mapper.Map<TblInvoice>(invoiceDto);
                 _context.TblInvoice.Add(invoice);
                 _context.SaveChanges();//Save changes in Invoice Table
-                
+
                 var ExecDate = _context.TblInvoiceConfig.Where(a => a.InvoiceConfigId == invoiceDto.InvoiceConfigId).First();
                 ExecDate.LastCycleExecDate = invoiceDto.InvoiceDate;
                 _context.TblInvoiceConfig.Update(ExecDate);//update last execution date in InvoiceConfig table
@@ -1356,8 +1614,8 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             }
 
         }
-        public async Task<BillingEventResponseDTO> GetBillingItemizedDetailsAsync(int EventMappingId,InvoiceRequest invoiceRequest, ApiContext apiContext)
-         {
+        public async Task<BillingEventResponseDTO> GetBillingItemizedDetailsAsync(int EventMappingId, InvoiceRequest invoiceRequest, ApiContext apiContext)
+        {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             //int EventMappingId = 2;
             BillingEventRequest EventRequet = new BillingEventRequest();
@@ -1383,56 +1641,47 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //For PDF
         public string InvoiceItemDescription(InvoiceDetailDTO invoiceDetailDTO)
         {
-           // _context = (MICABIContext)DbManager.GetContext(context.ProductType, context.ServerType);
+            // _context = (MICABIContext)DbManager.GetContext(context.ProductType, context.ServerType);
             string BillingDetailsType = "";
 
-                if (invoiceDetailDTO.EventMappingId == ModuleConstants.ProductCreation)
-                {
-                    BillingDetailsType = "Product Creation";
-                }
-                else if (invoiceDetailDTO.EventMappingId == ModuleConstants.PolicyCreation)
-                {
-                    BillingDetailsType = "Policy Creation";
-                }
-                else if (invoiceDetailDTO.EventMappingId == ModuleConstants.ClaimIntimation)
-                {
-                    BillingDetailsType = "Claim Intimation";
-                }
-                else if (invoiceDetailDTO.EventMappingId == ModuleConstants.OneTimeLicenseCost)
-                {
-                    BillingDetailsType = "Onetime License Cost";
-                }
-                else if (invoiceDetailDTO.EventMappingId == ModuleConstants.RecurringInstallment)
-                {
-                    BillingDetailsType = "Recurring Installment";
-                }
-                else if (invoiceDetailDTO.EventMappingId == ModuleConstants.RecurringFlatAmount)
-                {
-                    BillingDetailsType = "Recurring Flat Amount";
-                }
+            if (invoiceDetailDTO.EventMappingId == ModuleConstants.ProductCreation)
+            {
+                BillingDetailsType = "Product Creation";
+            }
+            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.PolicyCreation)
+            {
+                BillingDetailsType = "Policy Creation";
+            }
+            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.ClaimIntimation)
+            {
+                BillingDetailsType = "Claim Intimation";
+            }
+            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.OneTimeLicenseCost)
+            {
+                BillingDetailsType = "Onetime License Cost";
+            }
+            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.RecurringInstallment)
+            {
+                BillingDetailsType = "Recurring Installment";
+            }
+            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.RecurringFlatAmount)
+            {
+                BillingDetailsType = "Recurring Flat Amount";
+            }
             return BillingDetailsType;
         }
 
         //Saving In PDF
-        public async Task<InvoiceModel> InvoicePdfGeneration(InvoiceModel invoiceModel,InvoiceDTO invoiceDto, InvoiceRequest invoiceRequest,ApiContext apiContext)
+        public async Task<InvoiceModel> InvoicePdfGeneration(InvoiceModel invoiceModel, InvoiceDTO invoiceDto, InvoiceRequest invoiceRequest, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             int count = 0;
-           // InvoiceModel invoiceModel = new InvoiceModel();
+            // InvoiceModel invoiceModel = new InvoiceModel();
             NotificationRequest notificationRequest = new NotificationRequest();
 
-            EmailRequest emailTest = new EmailRequest()
-            {
-                IsAttachment = true,
-                Message = $"Dear Customer, Your Insurance Policy transaction has been successful.find the Policy schedule document attached.Assuring you the best of services always.<br/> Regards,<br/>Team MICA",
-                Subject = $" Test Email from MICA",
-                To = "nadira.khanum@inubesolutions.com"
-            };
 
-            invoiceModel.EmailTest = emailTest;
+            var _contract = _context.TblContract.Where(a => a.ContractId == invoiceDto.ContractId).First();
 
-            var _contract =  _context.TblContract.Where(a => a.ContractId == invoiceDto.ContractId).First();
-                            
             invoiceModel.InvoiceItemsModel.InvoiceNo = invoiceDto.InvoiceNo;
             invoiceModel.InvoiceItemsModel.InvoiceDate = DateTime.Now.ToShortDateString(); //DateTime.Now.ToString("dd'-'MMM'-'YYYY'");
             //invoiceModel.InvoiceItemsModel.InvoiceDate = DateTime(string.Format("{ 0:yyyy - MM - dd hh: mm} ", DateTime.Now));
@@ -1452,7 +1701,8 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             invoiceModel.InvoiceItemsModel.GST = invoiceDto.GstPercent.ToString();
 
             //ContractDTO contract = new ContractDTO();
-            var address = (from customers in _context.TblCustomers where customers.CustomerId == invoiceRequest.CustomerId
+            var address = (from customers in _context.TblCustomers
+                           where customers.CustomerId == invoiceRequest.CustomerId
                            join spoc in _context.TblCustSpocDetails on customers.CustomerId equals spoc.CustomerId
                            join custAdd in _context.TblCustAddress on customers.CustomerId equals custAdd.CustomerId
                            join masCountry in _context.TblMasCountry on custAdd.CountryId equals masCountry.CountryId
@@ -1466,7 +1716,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
                            select new
                            {
-                               customerId=customers.CustomerId,
+                               customerId = customers.CustomerId,
                                countryName = masCountry.CountryName,
                                stateName = masState.StateName,
                                districtId = masDistrict.DistrictName,
@@ -1477,8 +1727,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                                address3 = custAdd.AddressLine3,
                                buyer = customers.CustomerName,
                                code = masState.StateCode,
-                               otherRef=spoc.FirstName +" "+ spoc.LastName,
-                               pan=customers.Panno,
+                               otherRef = spoc.FirstName + " " + spoc.LastName,
+                               pan = customers.Panno,
+                               custEmail = spoc.EmailId
+
                            });
 
             ++count;
@@ -1494,6 +1746,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 invoiceModel.BuyersAddress.CIN = ""; //To know 
                 invoiceModel.BuyersAddress.PAN = ad.pan; //To know
                 invoiceModel.BuyersAddress.OthersRef = ad.otherRef;
+                invoiceModel.BuyersAddress.CustEmail = ad.custEmail;
             }
 
             invoiceModel.Address.AddressId = count;//ask
@@ -1513,7 +1766,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
             InvoiceItemsDetails invoiceItemsDetailsModel = null;
 
-             int NumbIncrement = 0;
+            int NumbIncrement = 0;
             foreach (var item in invoiceDto.InvoiceDetails)
             {
                 invoiceItemsDetailsModel = new InvoiceItemsDetails();
@@ -1556,8 +1809,8 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             invoiceModel.BankDetails.AccNo = " 919030017289373 ";
             invoiceModel.BankDetails.Branch = "  JP Nagar  ";
             invoiceModel.BankDetails.IFSC = "   UTIB0000333  ";
-            invoiceModel.BankDetails.Remarks = "MICA Services fee for the period"; 
-            invoiceModel.BankDetails.Remarks1 = "From " + invoiceRequest.InvoiceStartDate.Value.ToShortDateString() + "  To  " + invoiceRequest.InvoiceEndDate.Value.ToShortDateString(); 
+            invoiceModel.BankDetails.Remarks = "MICA Services fee for the period";
+            invoiceModel.BankDetails.Remarks1 = "From " + invoiceRequest.InvoiceStartDate.Value.ToShortDateString() + "  To  " + invoiceRequest.InvoiceEndDate.Value.ToShortDateString();
             invoiceModel.BankDetails.Remarks2 = "";
             invoiceModel.BankDetails.CompanysPAN = "AACCI3916L ";
 
@@ -1570,19 +1823,31 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             invoiceModel.InvoiceSecondPageDetails.Buyer = invoiceModel.BuyersAddress.Buyer;
             invoiceModel.InvoiceSecondPageDetails.FromDate = invoiceRequest.InvoiceStartDate.Value.ToShortDateString();
             invoiceModel.InvoiceSecondPageDetails.ToDate = invoiceRequest.InvoiceEndDate.Value.ToShortDateString();
-            invoiceModel.InvoiceSecondPageDetails.InvoiceNo = GetInvoiceNumber(); 
+            invoiceModel.InvoiceSecondPageDetails.InvoiceNo = GetInvoiceNumber();
             invoiceModel.InvoiceSecondPageDetails.Total = 0;//to do
-           
+
             //Onetime licenseCost
             invoiceModel.OneTimeLicenseCost.SlNo = count;
-            invoiceModel.OneTimeLicenseCost.ApplicationName="MICA Services";
+            invoiceModel.OneTimeLicenseCost.ApplicationName = "MICA Services";
             invoiceModel.OneTimeLicenseCost.Date = DateTime.Now.ToShortDateString();//to ask
             invoiceModel.OneTimeLicenseCost.OneTimeAmount = 0;//to do
             invoiceModel.OneTimeLicenseCost.OneTimeSubTotal = 0;//to do
 
+
+            EmailRequest emailTest = new EmailRequest()
+            {
+                IsAttachment = true,
+                Message = $"Dear Customer,\n The Invoice No." + " " + invoiceModel.InvoiceSecondPageDetails.InvoiceNo + " " + "Dated" + " " + invoiceModel.InvoiceItemsModel.InvoiceDate + " " + "for the period from " + " " + invoiceModel.InvoiceSecondPageDetails.FromDate + " " + "to" + " " + invoiceModel.InvoiceSecondPageDetails.ToDate + " " + "is attached for your reference.   Kindly arrange for the payment as per the terms agreed. Also, please inform once payment is made.\n \n Regards,\n \n Finance Manager – MICA \n iNube Software Solutions Pvt Ltd \n",
+                Subject = $" Test Email from MICA",
+                To = invoiceModel.BuyersAddress.CustEmail,
+                //To = "nadira.khanum@inubesolutions.com",
+                PartnerEmail = "nadira.khanum@inubesolutions.com"
+            };
+
+            invoiceModel.EmailTest = emailTest;
+
             try
             {
-
                 NotificationRequest request = new NotificationRequest();
                 request.TemplateKey = "Invoice";
                 request.AttachPDF = true;
@@ -1590,11 +1855,9 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 request.SendEmail = true;
                 request.IsAwsS3Save = true;
                 var notificationResponse = await _integrationService.SendNotificationAsync(request, apiContext);
-
             }
             catch (Exception ex)
             {
-
                 var msgr = ex.ToString();
             }
             return invoiceModel;
@@ -1638,8 +1901,6 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
 
 
-
-
         //RangeValue includes From, To and Rate
         private decimal GetBillingInvoiceAmount(TblBillingItem bill, IEnumerable<BilingEventDataDTO> billingEventDetail)
         {
@@ -1656,7 +1917,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                     RangeValue rangeItem = new RangeValue();
                     rangeItem.From = (int)billItem.From;
                     rangeItem.To = (int)billItem.To;
-                    rangeItem.Rate = (decimal)((decimal)billItem.Amount > 0 ? billItem.Amount : billItem.RatePercent);
+                    rangeItem.Rate = (decimal)((billItem.Amount > 0 || billItem.Amount != null) ? billItem.Amount : billItem.RatePercent);
                     rangeValue.Add(rangeItem);
                 }
             }

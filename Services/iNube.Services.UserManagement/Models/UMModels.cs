@@ -126,6 +126,8 @@ namespace iNube.Services.UserManagement.Models
     {
         public string Otp { get; set; }
         public string UserId { get; set; }
+        public decimal EnvId { get; set; }
+        public string ProductType { get; set; }
     }
 
     public partial class SendOtp
@@ -135,6 +137,8 @@ namespace iNube.Services.UserManagement.Models
         public string Otp { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
+        public decimal EnvId { get; set; }
+        public string ProductType { get; set; }
     }
 
     public class PasswordResponse : ResponseStatus
@@ -149,6 +153,8 @@ namespace iNube.Services.UserManagement.Models
         public string NewPassword { get; set; }
         public string ConfirmPassword { get; set; }
         public bool IsChangePassword { get; set; }
+        public string ProductType { get; set; }
+        public decimal EnvId { get; set; }
     }
 
     public class UserDTO
@@ -176,6 +182,7 @@ namespace iNube.Services.UserManagement.Models
         public int? FirstTimeLogin { get; set; }
         public decimal CustomerID { get; set; }
         public decimal EnvId { get; set; }
+        public bool? IsActive { get; set; }
 
         public virtual ICollection<UserDetailsDTO> UserDetails { get; set; }
         public virtual ICollection<UserAddressDTO> UserAddress { get; set; }
@@ -204,6 +211,7 @@ namespace iNube.Services.UserManagement.Models
         public string UserName { get; set; }
         public string UserId { get; set; }
         public string Product { get; set; }
+        public bool? IsActive { get; set; }
 
         public List<ddDTO> EnvironmentDTOs { get; set; }
     }
@@ -255,6 +263,7 @@ namespace iNube.Services.UserManagement.Models
         public string PanNo { get; set; }
         public string EmailId { get; set; }
         public int? PartnerId { get; set; }
+        public int? Status { get; set; }
     }
 
     public partial class UserDetailsDTO
@@ -304,6 +313,7 @@ namespace iNube.Services.UserManagement.Models
         public string PartnerName { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public bool? IsActive { get; set; }
     }
 
     public partial class ImageDTO
@@ -438,7 +448,7 @@ namespace iNube.Services.UserManagement.Models
     {
         public string UserId { get; set; }
         public string[] RoleId { get; set; }
-
+        public decimal EnvId { get; set; }
     }
 
     public class UserRoleResponse : ResponseStatus
@@ -620,7 +630,7 @@ namespace iNube.Services.UserManagement.Models
     }
 
 
-    public class EnvironmentResponse: ResponseStatus
+    public class EnvironmentResponse : ResponseStatus
     {
         public string Dbconnection { get; set; }
     }

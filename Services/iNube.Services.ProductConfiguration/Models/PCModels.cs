@@ -1,9 +1,40 @@
-﻿using iNube.Utility.Framework.Model;
+﻿using System.Collections.Generic;
+using iNube.Utility.Framework.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace iNube.Services.ProductConfiguration.Models
 {
+    //public partial class ddDTO
+    //{
+    //    public int mID { get; set; }
+    //    public string mValue { get; set; }
+    //    public string mType { get; set; }
+    //}
+    public partial class MasDTO
+    {
+        public decimal mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+    }
+    public partial class MappingDto
+    {
+        public int MappingId { get; set; }
+        public string RateName { get; set; }
+        public string RiskName { get; set; }
+        public bool? IsActive { get; set; }
+    }
+    public partial class MappingListDto
+    {
+        public MappingListDto()
+        {
+            mapping = new List<MappingDto>();
+
+        }
+        public virtual List<MappingDto> mapping { get; set; }
+    }
 
     public partial class MapQuoteDTO
     {
@@ -143,6 +174,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public string EmailId { get; set; }
         public int? ProductId { get; set; }
         public int? PartnerId { get; set; }
+        public bool? IsPayment { get; set; }
     }
     public class QuoteMemberDetailsDTO
     {
@@ -448,9 +480,9 @@ namespace iNube.Services.ProductConfiguration.Models
         public string Label { get; set; }
         public int? LevelId { get; set; }
         public int? SubLevelId { get; set; }
-        public int? lobid { get; set; }
-        public int? cobid { get; set; }
         public string productCode { get; set; }
+        public int? Lobid { get; set; }
+        public int? Cobid { get; set; }
     }
 
     public partial class EntityDTOs
@@ -506,8 +538,10 @@ namespace iNube.Services.ProductConfiguration.Models
         public ProductDTO()
         {
             InsurableRcbdetails = new List<InsurableRcbdetailsDTO>();
+            ProductSwitchOnDetails = new List<ProductSwitchOnDetailsDTO>();
         }
         public int ProductId { get; set; }
+        public decimal RateingId { get; set;}
         public int? Lobid { get; set; }
         public int? Cobid { get; set; }
         public int? ProductStatusId { get; set; }
@@ -529,7 +563,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public int mID { get; set; }
         public string mValue { get; set; }
         public bool? IsSingleCover { get; set; }
-
+        public bool? IsMasterPolicy { get; set; }
 
         public virtual List<InsurableRcbdetailsDTO> InsurableRcbdetails { get; set; }
         //public virtual ICollection<ProductBenefitsDTO> ProductBenefits { get; set; }
@@ -542,7 +576,23 @@ namespace iNube.Services.ProductConfiguration.Models
         public virtual ICollection<ProductPremiumDTO> ProductPremium { get; set; }
         public virtual ICollection<ddDTOs> RiskDetails { get; set; }
         public virtual ICollection<ddDTOs> ClaimDetails { get; set; }
+        public virtual ICollection<ddDTOs> ProductSwitchOnProperty { get; set; }
+        public virtual ICollection<ProductSwitchOnDetailsDTO> ProductSwitchOnDetails { get; set; }
+        public virtual ICollection<ProductRatingMapping> CalculateConfig { get; set; }
     }
+
+    public partial class ProductRatingMapping
+    {
+        public int MappingId { get; set; }
+        public string RateParameterName { get; set; }
+        public string RiskParameterName { get; set; }
+        public bool? IsActive { get; set; }
+        public int? ProductId { get; set; }
+        public decimal? RatingConfigId { get; set; }
+
+    
+    }
+
 
     public class ProductResponse : ResponseStatus
     {
@@ -570,13 +620,25 @@ namespace iNube.Services.ProductConfiguration.Models
         public string Cover { get; set; }
         public string CoverEvent { get; set; }
         public string CoverEventFactorUnit { get; set; }
+        public decimal? InsurableItemId { get; set; }
         public string CoverEventFactor { get; set; }
         public virtual ICollection<ProductBenefitsDTO> ProductBenefits { get; set; }
 
 
 
     }
-
+    public partial class ProductSwitchOnDetailsDTO
+    {
+        public int mID { get; set; }
+        public decimal SwitchOnId { get; set; }
+        public int? ProductId { get; set; }
+        public string InputType { get; set; }
+        public bool? IsReqired { get; set; }
+        public int InputId { get; set; }
+        public bool? mIsRequired { get; set; }
+        public string mValue { get; set; }
+        public bool? disable { get; set; }
+    }
 
     public partial class ProductChannelsDTO
     {
@@ -777,6 +839,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public string SortOn { get; set; }
         public string SortDirection { get; set; }
         public Decimal? PartnerId { get; set; }
+        public decimal EnvId { get; set; }
 
     }
     public partial class masClausesWarrentiesExclusionsDTO
@@ -811,6 +874,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public double FromValue { get; set; }
         public double ToValue { get; set; }
         public double BenefitAmount { get; set; }
+        public decimal? PremiumAmount { get; set; }
     }
     public partial class ProductPremiumDTO
     {
@@ -824,6 +888,9 @@ namespace iNube.Services.ProductConfiguration.Models
         public string LevelName { get; set; }
         public string SubLevelName { get; set; }
         public string CurrencyName { get; set; }
+        public string Description { get; set; }
+        public int? RefId { get; set; }
+
     }
 
     /// <summary>
@@ -846,7 +913,7 @@ namespace iNube.Services.ProductConfiguration.Models
             billingEventDataDTOs = new List<BillingEventDataDTO>();
             productEventDTOs = new List<ProductEventDTO>();
         }
-        public List<BillingEventDataDTO> billingEventDataDTOs  { get; set; }
+        public List<BillingEventDataDTO> billingEventDataDTOs { get; set; }
         public List<ProductEventDTO> productEventDTOs { get; set; }
     }
     public class ProductEventDTO
@@ -889,6 +956,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public int? PartnerId { get; set; }
         public bool? Smsstatus { get; set; }
         public bool? Emailstatus { get; set; }
+        public bool? IsPayment { get; set; }
     }
 
     public class SMSRequest
@@ -907,4 +975,63 @@ namespace iNube.Services.ProductConfiguration.Models
         public string Message { get; set; }
     }
 
-}
+    public partial class AssignProductList
+    {
+        public string mValue { get; set; }
+        public List<ddDTO> mData { get; set; }
+
+    }
+
+
+    public partial class ddDTO
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+        public bool mIsRequired { get; set; }
+        public string lob { get; set; }
+        public string cob { get; set; }
+        public bool disable { get; set; }
+        public string Value { get; set; }
+        public string Label { get; set; }
+    }
+
+    public partial class LGIList
+    {
+        public string RefrenceNumber { get; set; }
+        public string CoverName { get; set; }
+        public decimal CoverID { get; set; }
+        public string ProductCode { get; set; }
+        public string CoverRange { get; set; }
+        public decimal? PremiumAmount { get; set; }
+        public double FromValue { get; set; }
+        public double ToValue { get; set; }
+      
+    }
+    public partial class LGIDTO
+    {
+        public LGIDTO()
+        {
+            CoverListValue=new  List<CoverListValue>();
+        }
+        public string RefrenceNumber { get; set; }
+        public string CoverName { get; set; }
+        public decimal CoverID { get; set; }
+        public string ProductCode { get; set; }
+        public string CoverRange { get; set; }
+        public List<CoverListValue> CoverListValue { get; set; }
+    }
+    public partial class CoverListValue
+    {
+        public string CoverName { get; set; }
+        public double CoverValue { get; set; }
+        public decimal? BenefitValue { get; set; }
+
+    }
+
+    public partial class PromoDTO
+    {
+        public string PromoCode1 { get; set; }
+        public string PromoCode2 { get; set; }
+    }
+    }

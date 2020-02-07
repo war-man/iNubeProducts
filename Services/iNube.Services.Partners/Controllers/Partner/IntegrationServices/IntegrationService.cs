@@ -17,54 +17,54 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<UserResponse> CreateUserAsync(UserDTO userDTO, ApiContext apiContext);
         Task<ProductDTO> GetProductNameAsync(decimal productId, ApiContext apiContext);
         //Transaction Mapping
-        Task<IEnumerable<AccountMapDetailsDto>> GetAccountMapAsync(ApiContext apiContext);
-        Task<TransactionsResponse> CreateTranasactionAsync(SendTransactionDto transaction, ApiContext apiContext);
+        Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext);
+        Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext);
         Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal productId, ApiContext apiContext);
+        Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
         //readonly string productUrl = "https://localhost:44347";
-        //readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-		readonly string productUrl = "http://mica-Publi-11QA3L637DQW3-293834673.ap-south-1.elb.amazonaws.com:9007";
+        readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
+        //readonly string productUrl = "http://dev2-mica-product.aws.vpc.:9007";
 
-        //readonly string userApiUrl = "https://inubeservicesusermgmt.azurewebsites.net";
+       // readonly string userApiUrl = "https://inubeservicesusermgmt.azurewebsites.net";
         //readonly string userApiUrl = "https://localhost:44367";
-		 readonly string userApiUrl = "http://mica-Publi-11QA3L637DQW3-293834673.ap-south-1.elb.amazonaws.com:9009";
+		 readonly string userApiUrl = "http://dev2-mica-user.aws.vpc.:9009";
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
         //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-		readonly string UsermanangementUrl = "http://mica-Publi-11QA3L637DQW3-293834673.ap-south-1.elb.amazonaws.com:9009";
+        readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
 
         //Url For Accesing Transacttion Acces
         //readonly string accountApiUrl = "http://localhost:52166/api/AccountConfig/GetTransactionMappingDetails";
-        //readonly string accountApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionMappingDetails";
-		 readonly string accountApiUrl = "http://mica-Publi-11QA3L637DQW3-293834673.ap-south-1.elb.amazonaws.com:9011/api/AccountConfig/GetTransactionMappingDetails";
+        //readonly string accountRuleApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionConditionDetails";
+        readonly string accountRuleApiUrl = "https://dev2-mica-accounting.aws.vpc.:9011/api/AccountConfig/GetTransactionConditionDetails";
 
-
-
-        //readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
+       // readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
         //readonly string createTransactionApi = "http://localhost:52166/api/AccountConfig/CreateTransaction";
-		readonly string createTransactionApi = "http://mica-Publi-11QA3L637DQW3-293834673.ap-south-1.elb.amazonaws.com:9011/api/AccountConfig/CreateTransaction";
-       
+         readonly string createTransactionApi = "http://dev2-mica-accounting.aws.vpc.:9011/api/AccountConfig/CreateTransaction";
+
 
         //readonly string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-		readonly string notificationUrl = "http://mica-Publi-11QA3L637DQW3-293834673.ap-south-1.elb.amazonaws.com:9004";
-       
+        readonly string notificationUrl = "http://dev2-mica-notification.aws.vpc.:9004";
 
-        //Acccounting Module
-        public async Task<IEnumerable<AccountMapDetailsDto>> GetAccountMapAsync(ApiContext apiContext)
+        readonly string ratingUrl = "https://inubeservicesrating.azurewebsites.net";
+        //readonly string ratingUrl = "http://mica-inube-notification-service.mica-internal.:9004";
+
+        public async Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext)
         {
-            var uri = accountApiUrl;
-            var accountMapList = await GetListApiInvoke<AccountMapDetailsDto>(uri, apiContext);
-            return accountMapList;
+            var uri = accountRuleApiUrl;
+            var accountMapListDetails = await GetListApiInvoke<TransactionRuleMappingDto>(uri, apiContext);
+            return accountMapListDetails;
         }
         //Accounting CreateTransaction
-        public async Task<TransactionsResponse> CreateTranasactionAsync(SendTransactionDto transaction, ApiContext apiContext)
+        public async Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext)
         {
             var uri = createTransactionApi;
-            return await PostApiInvoke<SendTransactionDto, TransactionsResponse>(uri, apiContext, transaction);
+            return await PostApiInvoke<TransactionHeaderDto, TransactionsResponse>(uri, apiContext, transaction);
         }
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
@@ -103,6 +103,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             var uri = productUrl + "/api/Product/GetInsurableRiskDetails?ProductId=" + productId;
             return await GetApiInvoke<ProductRiskDetailsDTO>(uri, apiContext);
 
+        }
+        public async Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext)
+        {
+            var uri = ratingUrl + "/api/RatingConfig/GetHandleEvents?EventId=" + rateId;
+            return await GetApiInvoke<dynamic>(uri, apiContext);
         }
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {

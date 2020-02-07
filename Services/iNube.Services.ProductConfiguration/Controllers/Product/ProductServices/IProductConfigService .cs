@@ -39,7 +39,17 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<ProductDTO> GetProductByCode(string ProductCode, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<DocumentResponse> Docupload(string productcode,string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<DocumentResponse> PromoDocupload(string productcode, string productId,HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<List<LeadInfoDTO>> BulkSMS(ApiContext apiContext);
         Task<LeadInfoDTO> GetLeadInfo(int LeadID, ApiContext apiContext);
+        Task<ProductResponse> ProductNamevalidation(string name, ApiContext apiContext);
+        Task<List<CoverListValue>> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext);
+        Task<ProductResponse> PromoApply(PromoDTO promo, ApiContext apiContext);
+        Task<dynamic> GetProductRateConfig(int productid, ApiContext apiContext);
+        Task<List<ProductRatingMapping>> GetProductRateMapping(int productid, ApiContext apiContext);
+        //Task<LGIDTO> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext);
+        Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext);
     }
 }

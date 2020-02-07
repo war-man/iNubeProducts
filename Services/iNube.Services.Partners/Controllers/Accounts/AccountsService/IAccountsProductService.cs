@@ -20,6 +20,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         Task<List<object>> GetAccountFilter(int Cdid, ApiContext apiContext);
         Task<Dictionary<int, string>> GetProductNameAsync(int partnerid, ApiContext apiContext);
         Task<List<ddDTO>> GetCdAccountMasterAsync(bool isProduct, ApiContext apiContext);
+        Task<MasterCDDTO> MasterPolicyCD(MasterCDDTO masterCDDTO, ApiContext apiContext);
         //Task<List<ddDTO>> GetProductName();
 
     }

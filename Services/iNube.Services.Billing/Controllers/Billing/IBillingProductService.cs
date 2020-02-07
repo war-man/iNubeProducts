@@ -23,7 +23,7 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         Task<IEnumerable<ContractDTO>> SearchContract(ContractDTO contractdto, ApiContext context);
         Task<IEnumerable<ContractDTO>> SearchContractById(int contractid, ApiContext context);
         Task<String> GetObjectEvent(int obj, int eve, ApiContext context);
-        Task<CustomersDTO> SaveCustomerAsync(CustomersDTO Customerdto, ApiContext apiContext);
+        Task<CustomerResponse> SaveCustomerAsync(CustomersDTO Customerdto, ApiContext apiContext);
         Task<List<string>> GetObjectEventMapping(int obj, int eve, ApiContext context);
         Task<IEnumerable<objParamDTO>> GetValueFactor(string lMasterlist, int objectid, ApiContext context);
         Task<BillingConfigDTO> GetBillingById(decimal billingconfigid, ApiContext context);
@@ -42,6 +42,8 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         Task<CustomerConfigDTO> UploadCustConfigImage(CustomerConfigDTO contractimg, ApiContext apiContext);
         Task<PaymentDTO> UpdatePaymentStatus(PaymentDTO pay, ApiContext Context);
         Task<IEnumerable<objParamDTO>> GetAllEventMapping(ApiContext context);
+        Task<IEnumerable<ddDTO>> GetMasterForLocation(string lMasterlist, ApiContext apiContext);
+        Task<IEnumerable<ddDTO>> GetLocation(string locationType, int parentID, ApiContext apiContext);
         Task<BillingEventResponseDTO> GetBillingItemizedDetailsAsync(int EventMappingId, InvoiceRequest invoiceRequest, ApiContext apiContext);
         Task<CustomersDTO> UploadCustLogo(CustomersDTO CustomerLogo, ApiContext apiContext);
         Task<InvoiceConfigDTO> CreateInvoice(InvoiceConfigDTO invoiceConfig, ApiContext apiContext);
@@ -50,6 +52,7 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         Task<IEnumerable<ContractHistoryDetails>> GetContractHistory(decimal customerId, ApiContext apiContext);
         Task<ContractDocDTO> UploadFiles(ContractDocDTO contractDoc, ApiContext apiContext);
         Task<IEnumerable<InvoiceSearchHistory>> GetSearchInvoiceHistory(InvoiceContractSearch invoiceContractSearch, ApiContext apiContext);
+        Task<IEnumerable<InvoiceSearchHistory>> GetSearchInvoiceForCustomer(InvoiceCustSearch invoiceCustSearch, ApiContext apiContext);
         Task<InvoiceConfigDTO> CreateInvoiceConfig(InvoiceConfigDTO invoiceConfig, ApiContext apiContext);
         Task<InvoicePenaltyDTO> CreateRegenerateInvoice(InvoicePenaltyDTO invoicePenalty, ApiContext apiContext);
         Task<InvoiceDTO> SearchInvoice(InvoiceDTO invoiceDto, ApiContext apiContext);
@@ -60,6 +63,7 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         Task<IEnumerable<CustomersDTOS>> GetCustomerDetails(ApiContext context);
         Task<IEnumerable<EventMappingModel>> GetEventMapDetails(ApiContext context);
         Task<IEnumerable<EventObjParamMapping>> GetEventObjectParameter(ApiContext context);
+        Task<IEnumerable<ObjectsDTO>> GetObjectParameter(ApiContext context);
 
         //For CP
         Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext);

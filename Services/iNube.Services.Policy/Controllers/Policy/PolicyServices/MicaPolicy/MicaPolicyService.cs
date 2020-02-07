@@ -52,19 +52,20 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             try
             {
                 var Responce = "";
-                var accountMapList = await _integrationService.GetAccountMapAsync(apiContext);
+                //var accountMapList = await _integrationService.GetAccountMapAsync(apiContext);
+                var accountMapDetailsList = await _integrationService.GetAccountMapDetailsAsync(apiContext);
                 TransactionHeaderDto transactionHeaderObj = new TransactionHeaderDto();
                 List<TransactionDto> transactiondtObj = new List<TransactionDto>();
                 List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
 
                 string dateTime = DateTime.Now.ToString();
-                string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
-                DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
+                string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd hh:mm tt");
+                DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture);
                 //Storing All Transaction Header Value
-                foreach (var accountMap in accountMapList)
+                foreach (var accountMap in accountMapDetailsList)
                 {
                     var accountproperties = GetProperties(policyDetail);
-                    if (accountMap.RuleName == "PolicyCreationCheck")
+                    if (accountMap.Object == "Policy" && accountMap.Event == "Creation")
                     {
                         if (transactionHeaderObj.TransactionRuleMappingId != accountMap.TransactionRuleMappingId)
                         {
@@ -76,96 +77,162 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
                 }
                 //Storing all TransactionConditions Value
-                foreach (var accountMap in accountMapList)
+                foreach (var accountMapCd in accountMapDetailsList)
                 {
-                    var accountproperties = GetProperties(policyDetail);
-                    if (accountMap.RuleName == "PolicyCreationCheck")
+                    foreach (var accountMap in accountMapCd.TransactionConditions)
                     {
-                        TransactionDto transactionDto = new TransactionDto();
-                        foreach (var actnProp in accountproperties)
+                        var accountproperties = GetProperties(policyDetail);
+                        if (accountMapCd.Object == "Policy" && accountMapCd.Event == "Creation")
                         {
-                            var currency = policyDetail.GetType().GetProperty("Currency").GetValue(policyDetail, null);
-                            var sumInsured = policyDetail.GetType().GetProperty("SumInsured").GetValue(policyDetail, null);
-                            transactionDto.TypeOfTransaction = accountMap.TypeofTransaction;
-
-                            transactionDto.Amount = (decimal)sumInsured;
-                            transactionDto.Description = accountMap.Description;
-                            transactionDto.IsActive = "Y";
-                            if (currency == null)
+                            TransactionDto transactionDto = new TransactionDto();
+                            foreach (var actnProp in accountproperties)
                             {
-                                transactionDto.Currency = "INR";
+                                var currency = policyDetail.GetType().GetProperty("Currency").GetValue(policyDetail, null);
+                                var sumInsured = policyDetail.GetType().GetProperty("PremiumAmount").GetValue(policyDetail, null);
+                                transactionDto.TypeOfTransaction = accountMap.TypeofTransaction;
+                                if (accountMap.TypeofTransaction == "Credit")
+                                {
+                                    if (accountMap.AccountName == "PremiumHoldingAccount" || accountMap.AccountName == "Premium Holding Account")
+                                    {
+                                        transactionDto.Amount = Convert.ToDecimal(sumInsured);
+                                    }
+                                    else
+                                    {
+                                        transactionDto.Amount = Convert.ToDecimal(sumInsured);
+                                    }
+                                }
+                                if (accountMap.TypeofTransaction == "Debit")
+                                {
+                                    if (accountMap.AccountName == "CashDepositAccount" || accountMap.AccountName == "Cash Deposit Account")
+                                    {
+                                        transactionDto.Amount = Convert.ToDecimal(sumInsured);
+                                    }
+                                    else
+                                    {
+                                        transactionDto.Amount = Convert.ToDecimal(sumInsured);
+                                    }
+                                }
+                                //transactionDto.Amount = (decimal)sumInsured;
+                                transactionDto.Description = accountMap.Description;
+                                transactionDto.IsActive = "Y";
+                                if (currency == null)
+                                {
+                                    transactionDto.Currency = "INR";
+                                }
+                                else
+                                {
+                                    transactionDto.Currency = Convert.ToString(currency);
+                                }
+                                transactionDto.CreatedDate = accountMap.CreatedDate;
+                                transactionDto.RuleName = accountMapCd.RuleName;
+                                transactionDto.Object = accountMapCd.Object;
+                                transactionDto.Event = accountMapCd.Event;
+                                transactionDto.AccountType = accountMap.AccountType;
+                                transactionDto.Value = accountMap.Value;
+                                transactionDto.AccountCode = accountMap.AccountCode;
+                                //Addition of Partner Id and Product Id
+                                if (productDetails.GetType().GetProperty("PartnerId") != null && partnerDetails != null)
+                                {
+                                    var partnerId = partnerDetails.GetType().GetProperty("PartnerId").GetValue(partnerDetails, null);
+                                    transactionDto.PartnerId = Convert.ToDecimal(partnerId);
+                                }
+                                else
+                                {
+                                    transactionDto.PartnerId = apiContext.PartnerId;
+                                }
+                                if (productDetails.GetType().GetProperty("OrganizationId") != null)
+                                {
+                                    var orgId = productDetails.GetType().GetProperty("OrganizationId").GetValue(productDetails, null);
+                                    transactionDto.OrganizationId = Convert.ToDecimal(orgId);
+                                }
+                                else
+                                {
+                                    transactionDto.OrganizationId = apiContext.OrgId;
+                                }
+                                if (productDetails.GetType().GetProperty("ProductId") != null)
+                                {
+                                    var productId = productDetails.GetType().GetProperty("ProductId").GetValue(productDetails, null);
+                                    transactionDto.ProductId = Convert.ToDecimal(productId);
+                                }
+                                else
+                                {
+                                    transactionDto.ProductId = 0;
+                                }
                             }
-                            else
-                            {
-                                transactionDto.Currency = currency.ToString();
-                            }
-                            transactionDto.CreatedDate = accountMap.CreatedDate;
-                            transactionDto.RuleName = accountMap.RuleName;
-                            transactionDto.Object = accountMap.Object;
-                            transactionDto.Event = accountMap.Event;
-                            transactionDto.AccountType = accountMap.AccountType;
-                            transactionDto.Value = accountMap.Value;
-                            transactionDto.AccountCode = accountMap.AccountCode;
-                            //Addition of Partner Id and Product Id
-                            transactionDto.PartnerId = apiContext.PartnerId;
-                            transactionDto.OrganizationId = apiContext.OrgId;
+                            transactiondtObj.Add(transactionDto);
                         }
-                        transactiondtObj.Add(transactionDto);
                     }
                 }
                 transactionHeaderObj.Transaction.AddRange(transactiondtObj);
                 //Storing Ledger Value 
-                foreach (var accountMap in accountMapList)
+                foreach (var accountMapSl in accountMapDetailsList)
                 {
-                    TransactionSubLedgerDto transSubLedger = new TransactionSubLedgerDto();
-                    var accountproperties = GetProperties(policyDetail);
-                    if (accountMap.RuleName == "PolicyCreationCheck")
+                    foreach (var accountMap in accountMapSl.SubLedgerReferences)
                     {
-                        foreach (var actnProp in accountproperties)
+                        TransactionSubLedgerDto transSubLedger = new TransactionSubLedgerDto();
+                        var accountproperties = GetProperties(policyDetail);
+                        if (accountMapSl.Object == "Policy" && accountMapSl.Event == "Creation")
                         {
-                            transSubLedger.SubLedgerReferencesId = accountMap.SubLedgerReferencesId;
-                            if (accountMap.LedgerObject == "Policy")
+                            foreach (var actnProp in accountproperties)
                             {
-                                var ledgerColName = accountMap.LedgerColName;
-                                if (ledgerColName == "Amount")
+                                transSubLedger.SubLedgerReferencesId = accountMap.SubLedgerReferencesId;
+                                if (accountMap.LedgerObject == "Policy")
                                 {
-                                    ledgerColName = "SumInsured";
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "Amount")
+                                    {
+                                        ledgerColName = "PremiumAmount";
+                                    }
+                                    if (ledgerColName == "PolicyNumber")
+                                    {
+                                        ledgerColName = "PolicyNo";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductCode";
+                                        if (productDetails.GetType().GetProperty(ledgerColName) != null)
+                                        {
+                                            var ledgerColValue = productDetails.GetType().GetProperty(ledgerColName).GetValue(productDetails, null);
+                                            transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                        }
+                                    }
+                                    if (ledgerColName == "LOB")
+                                    {
+                                        ledgerColName = "LOB1";
+                                        if (productDetails.GetType().GetProperty(ledgerColName) != null)
+                                        {
+                                            var ledgerColValue = productDetails.GetType().GetProperty(ledgerColName).GetValue(productDetails, null);
+                                            transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                        }
+                                    }
+                                    if (policyDetail.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = policyDetail.GetType().GetProperty(ledgerColName).GetValue(policyDetail, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
                                 }
-                                if (ledgerColName == "PolicyNumber")
+                                if (accountMap.LedgerObject == "Product")
                                 {
-                                    ledgerColName = "PolicyNo";
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (productDetails.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = productDetails.GetType().GetProperty(ledgerColName).GetValue(productDetails, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
                                 }
-                                if (ledgerColName == "ProductCode")
+                                if (accountMap.LedgerObject == "Claim")
                                 {
-                                    ledgerColName = "ProductIdPk";
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (policyDetail.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = policyDetail.GetType().GetProperty(ledgerColName).GetValue(policyDetail, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
                                 }
-                                if (policyDetail.GetType().GetProperty(ledgerColName) != null)
-                                {
-                                    var ledgerColValue = policyDetail.GetType().GetProperty(ledgerColName).GetValue(policyDetail, null);
-                                    transSubLedger.Value = ledgerColValue.ToString();
-                                }
+                                transSubLedger.IsActive = "Y";
                             }
-                            if (accountMap.LedgerObject == "Product")
-                            {
-                                var ledgerColName = accountMap.LedgerColName;
-                                if (productDetails.GetType().GetProperty(ledgerColName) != null)
-                                {
-                                    var ledgerColValue = productDetails.GetType().GetProperty(ledgerColName).GetValue(productDetails, null);
-                                    transSubLedger.Value = ledgerColValue.ToString();
-                                }
-                            }
-                            if (accountMap.LedgerObject == "Claim")
-                            {
-                                var ledgerColName = accountMap.LedgerColName;
-                                if (policyDetail.GetType().GetProperty(ledgerColName) != null)
-                                {
-                                    var ledgerColValue = policyDetail.GetType().GetProperty(ledgerColName).GetValue(policyDetail, null);
-                                    transSubLedger.Value = ledgerColValue.ToString();
-                                }
-                            }
-                            transSubLedger.IsActive = "Y";
+                            transactionLedgerObj.Add(transSubLedger);
                         }
-                        transactionLedgerObj.Add(transSubLedger);
                     }
                 }
                 transactionHeaderObj.TransactionSubLedger.AddRange(transactionLedgerObj);
@@ -173,84 +240,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var Sendtransaction = await _integrationService.CreateTranasactionAsync(transactionHeaderObj, apiContext);
                 Responce = Sendtransaction.Status.ToString();
 
-                //// Previous One
-                //foreach (var accountMap in accountMapList)
-                //{
-                //    var accountproperties = GetProperties(policyDetail);
-                //    if (accountMap.RuleName == "PolicyCreationChecked")
-                //    {
-                //        foreach (var actnProp in accountproperties)
-                //        {
 
-                //            var currency = policyDetail.GetType().GetProperty("Currency").GetValue(policyDetail, null);
-                //            var sumInsured = policyDetail.GetType().GetProperty("SumInsured").GetValue(policyDetail, null);
-
-                //            transactionHeaderObj.TransactionRuleMappingId = accountMap.TransactionRuleMappingId;
-                //            transactionHeaderObj.RuleName = accountMap.RuleName;
-                //            transactionHeaderObj.IsActive = "Y";
-
-
-
-                //            transactionHeaderObj.Amount = (decimal)sumInsured;
-                //            if (currency == null)
-                //            {
-                //                transactionHeaderObj.Currency = "INR";
-                //            }
-                //            else
-                //            {
-                //                transactionHeaderObj.Currency = currency.ToString();
-                //            }
-                //            transactionHeaderObj.Description = null;
-                //            transactionHeaderObj.CreatedDate = accountMap.CreatedDate;
-                //            transactionHeaderObj.IsActive = "Y";
-                //            transactionHeaderObj.RuleName = accountMap.RuleName;
-                //            transactionHeaderObj.Object = accountMap.Object;
-                //            transactionHeaderObj.Event = accountMap.Event;
-                //            transactionHeaderObj.AccountType = accountMap.AccountType;
-                //            transactionHeaderObj.Value = accountMap.Value;
-                //            transactionHeaderObj.AccountCode = accountMap.AccountCode;
-                //        }
-                //        if (transactionHeaderObj.Description == null)
-                //        {
-                //            if (accountMap.LedgerObject == "Policy")
-                //            {
-                //                var ledgerColName = accountMap.LedgerColName;
-                //                if(ledgerColName == "Amount")
-                //                {
-                //                    ledgerColName = "SumInsured";
-                //                }
-                //                if (policyDetail.GetType().GetProperty(ledgerColName) != null)
-                //                {
-                //                    var ledgerColValue = policyDetail.GetType().GetProperty(ledgerColName).GetValue(policyDetail, null);
-                //                    var description = accountMap.LedgerColName + "=" + ledgerColValue;
-                //                    transactionHeaderObj.Description = description;
-                //                }
-                //            }
-                //            if(accountMap.LedgerObject == "Product")
-                //            {
-                //                var ledgerColName = accountMap.LedgerColName;
-                //                if (productDetails.GetType().GetProperty(ledgerColName) != null)
-                //                {
-                //                    var ledgerColValue = productDetails.GetType().GetProperty(ledgerColName).GetValue(productDetails, null);
-                //                    var description = accountMap.LedgerColName + "=" + ledgerColValue;
-                //                    transactionHeaderObj.Description = description;
-                //                }
-                //            }
-                //            if(accountMap.LedgerObject == "Claim")
-                //            {
-                //                var ledgerColName = accountMap.LedgerColName;
-                //                if (policyDetail.GetType().GetProperty(ledgerColName) != null)
-                //                {
-                //                    var ledgerColValue = policyDetail.GetType().GetProperty(ledgerColName).GetValue(policyDetail, null);
-                //                    var description = accountMap.LedgerColName + "=" + ledgerColValue;
-                //                    transactionHeaderObj.Description = description;
-                //                }
-                //            }
-                //        }
-                //        var Sendtransaction = await _integrationService.CreateTranasactionAsync(transactionHeaderObj, apiContext);
-                //        Responce = Sendtransaction.Status.ToString();
-                //    }
-                //}
                 return Responce;
             }
             catch (Exception ex)
@@ -483,7 +473,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             policyDTO.CreatedDate = DateTime.Now;
             policyDTO.PolicyIssueDate = DateTime.Now;
             policyDTO.IsUploadedToIcm = 0;
-            policyDTO.SumInsured = productDTO.PremiumAmount;
+            policyDTO.PremiumAmount = productDTO.PremiumAmount;
             // policyDTO.MasterPolicyNo = "ABC";//ToDo service req
             policyDTO.PolicyVersion = 1;
             policyDTO.PolicyNo = GetPolicyNumber(partnersDTO.PartnerId, productDTO.ProductId);
@@ -508,7 +498,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             Dictionary<string, string> dicColumns = new Dictionary<string, string>();
             dicColumns.Add("Partner ID", "AgentId");
-            dicColumns.Add("Identification Number", "CustomerId");
+            //dicColumns.Add("Identification Number", "CustomerId");
             dicColumns.Add("Event ID", "PolicyTypeId");
             dicColumns.Add("ProductID", "ProductIdPk");
             dicColumns.Add("Policy Start Date", "PolicyStartDate");
@@ -566,11 +556,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "Product Code", PropertyName = "Product Code", ErrorMessage = "Product Code cannot be null" };
                 Errors.Add(errorInfo);
             }
-            if (policyDetail["PartnerID"] == null)
-            {
-                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PartnerID", PropertyName = "PartnerID", ErrorMessage = "PartnerID cannot be null" };
-                Errors.Add(errorInfo);
-            }
+            //if (policyDetail["Partner ID"] == null)
+            //{
+            //    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "Partner ID", PropertyName = "Partner ID", ErrorMessage = "Partner ID cannot be null" };
+            //    Errors.Add(errorInfo);
+            //}
             return Errors;
         }
         private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail)
@@ -770,12 +760,20 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<IEnumerable<PolicyDTO>> PolicySearch(PolicysearchDTO policysearch, ApiContext apiContext)
         {
-            
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-             var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate)
-                            select P;
 
-           // var _policy = _context.TblPolicy.OrderByDescending(x => x.CreatedDate).Select(x => x);
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate)
+                          select P;
+            if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
+            {
+                _policy = _policy.Where(pr => pr.AgentId == apiContext.PartnerId && pr.CustomerId == apiContext.OrgId.ToString());
+            }
+            else if (apiContext.OrgId > 0)
+            {
+                _policy = _policy.Where(pr => pr.CustomerId == apiContext.OrgId.ToString());
+            }
+
+            // var _policy = _context.TblPolicy.OrderByDescending(x => x.CreatedDate).Select(x => x);
 
             if (!string.IsNullOrEmpty(policysearch.Policynumber))
             {
@@ -814,7 +812,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 _policy = _policy.Where(P => P.CreatedDate.Date == policysearch.EventDate);
             }
             var _policySearchDTOs = _mapper.Map<IEnumerable<PolicyDTO>>(_policy);
-           
+
             return _policySearchDTOs;
 
         }
@@ -892,9 +890,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             List<ddDTOs> FinalPolicyData = new List<ddDTOs>();
 
-            ddDTOs PolicyData = new ddDTOs();
+
             foreach (var item in PolicyYear)
             {
+                ddDTOs PolicyData = new ddDTOs();
                 PolicyData.mID = item;
                 PolicyData.mValue = item.ToString();
 
@@ -1075,7 +1074,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                               select new
                               {
                                   Month = g.Select(n => n.CreatedDate.Month).First(),
-                                  TotalAmount = g.Sum(n => (Decimal)n.SumInsured),
+                                  TotalAmount = g.Sum(n => n.PremiumAmount),
                                   Policycount = g.Count()
                               };
                 foreach (var item in BarData)
@@ -1101,6 +1100,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             return ReturnData;
         }
+
+
+        //Get CDBalanceBYPolicyNO
+        //public async Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(int txnid, ApiContext apiContext)
+        //{
+
+           
+        //}
 
 
 
@@ -1308,7 +1315,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             if (EventRequet.FromDate != null && EventRequet.ToDate != null)
             {
                 var ProductData = await GetProductName(apiContext);
-                var data = from tblPolicy in _context.TblPolicy.Where(tblPolicy =>tblPolicy.CustomerId==EventRequet.CustomerId.ToString() && tblPolicy.CreatedDate.Date >= EventRequet.FromDate.Date && tblPolicy.CreatedDate.Date <= EventRequet.ToDate.Date)
+                var data = from tblPolicy in _context.TblPolicy.Where(tblPolicy => tblPolicy.CustomerId == EventRequet.CustomerId.ToString() && tblPolicy.CreatedDate.Date >= EventRequet.FromDate.Date && tblPolicy.CreatedDate.Date <= EventRequet.ToDate.Date)
                            select new PolicyDataForClaims
                            {
                                PolicyId = tblPolicy.PolicyId,
@@ -1356,14 +1363,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             try
             {
                 ProductSearchDTO productSearchDTO = new ProductSearchDTO();
+                productSearchDTO.EnvId = pDTO.EvtId;
                 var productDetailsearch = await _integrationService.GetProductIdAsync(productSearchDTO, apiContext);
 
                 List<BillingEventDataDTO> PolicyBilingDTO = new List<BillingEventDataDTO>();
 
 
-                var policydatacount = from p in _context.TblPolicy.Where(ac =>ac.CustomerId==pDTO.CustomerId.ToString() && ac.CreatedDate.Date >= pDTO.FromDate.Date && ac.CreatedDate.Date <= pDTO.ToDate.Date)
+                var policydatacount = from p in _context.TblPolicy.Where(ac => ac.CustomerId == Convert.ToInt32(pDTO.CustomerId).ToString() && ac.CreatedDate.Date >= pDTO.FromDate.Date && ac.CreatedDate.Date <= pDTO.ToDate.Date)
                                       group p by p.ProductIdPk into g
-                                      select new BillingEventDataDTO { Count = g.Count(), SumInsured = (decimal)g.Max(s => (s.SumInsured != null) ? s.SumInsured : 0), ProductId = g.Key };
+                                      select new BillingEventDataDTO { Count = g.Count(), SumInsured = (decimal)g.Max(s => (s.PremiumAmount != null) ? s.PremiumAmount : 0), ProductId = g.Key };
 
 
                 List<ProductDTO> list = new List<ProductDTO>();
@@ -1481,8 +1489,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-          //  var id = 18;
-           // var ps = await _integrationService.GetCustomerById(id, apiContext);
+            //  var id = 18;
+            // var ps = await _integrationService.GetCustomerById(id, apiContext);
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             SingleCover singleCover = new SingleCover();
@@ -1490,17 +1498,21 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             string logMsg = "";
             try
             {
-                // Errors = GetPolicyRequestValidation(policyDetail);
+                Errors = GetPolicyRequestValidation(policyDetail);
                 if (Errors.Count > 0)
                 {
                     return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
                 }
                 var productCode = policyDetail["Product Code"].ToString();
-                var partnerId = policyDetail["Partner ID"].ToString();
+                var partnerId = "";
+                if (policyDetail["Partner ID"] != null)
+                {
+                    partnerId = policyDetail["Partner ID"].ToString();
+                }
                 var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
                 if (productDetails.ProductId <= 0)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProdcutId : {productCode} Not Found" };
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProdcutCode : {productCode} Not Found" };
                     Errors.Add(errorInfo);
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
@@ -1514,12 +1526,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 //}
                 //cover=coverDetail.Cover; coverEvent = coverDetail.CoverEvent;
                 logMsg = "1";
-                var partnerDetails = await _integrationService.GetPartnerDetailAsync(partnerId, apiContext);
-                if (partnerDetails.PartnerId <= 0)
+                PartnersDTO partnerDetails = null;
+                if (partnerId.Length > 0)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PartnerID", PropertyName = "PartnerID", ErrorMessage = $"PartnerID : {productCode} Not Found" };
-                    Errors.Add(errorInfo);
-                    return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+                    partnerDetails = await _integrationService.GetPartnerDetailAsync(partnerId, apiContext);
+                    if (partnerDetails.PartnerId <= 0)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PartnerID", PropertyName = "PartnerID", ErrorMessage = $"PartnerID : {productCode} Not Found" };
+                        Errors.Add(errorInfo);
+                        return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+                    }
                 }
                 logMsg = logMsg + ",2";
                 var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
@@ -1531,30 +1547,80 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 }
                 logMsg = logMsg + ",3";
                 var mappedPolicy = MapAndValidateInsurablePolicy(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover);
-
                 if (Errors.Count == 0)
                 {
-                  
 
-                    if (partnerDetails.OrganizationId > 0)
+                    if (partnerDetails != null)
                     {
-                        mappedPolicy.CustomerId = Convert.ToInt32(partnerDetails.OrganizationId).ToString();
+                        if (partnerDetails.OrganizationId > 0)
+                        {
+                            mappedPolicy.CustomerId = Convert.ToInt32(partnerDetails.OrganizationId).ToString();
+                        }
+                    }
+                    else
+                    {
+                        mappedPolicy.CustomerId = Convert.ToInt32(productDetails.OrganizationId).ToString();
                     }
                     PolicyId = SavePolicyDetails(mappedPolicy, policyDetail);
                     logMsg = logMsg + ",4";
-                    var Amount = productDetails.PremiumAmount;
+                    var Amount = mappedPolicy.PremiumAmount;
                     policyNumber = mappedPolicy.PolicyNo;
                     var cdAccount = string.Concat(productId.ToString().PadLeft(5, '0'), "/" + partnerId.ToString().PadLeft(5, '0'));
-                    PolicyBookingTransaction policyBookingTransaction = new PolicyBookingTransaction() { PartnerId = Convert.ToDecimal(partnerId), ProductId = Convert.ToDecimal(productId), AccountNo = cdAccount, PolicyNo = policyNumber, TxnAmount = Amount };
-                    var transaction = await _integrationService.DoTransaction(policyBookingTransaction, apiContext);
-                    logMsg = logMsg + ",5";
-                    if (transaction.Status == BusinessStatus.Created)
+                    //Adding Properties OrgId for Accounting Transaction 
+                    var pID = apiContext.PartnerId;
+                    if (partnerDetails != null && partnerDetails.GetType().GetProperty("OrganizationId") != null)
                     {
-                        TblPolicy policyUpdate = _context.TblPolicy.Find(PolicyId);
+                        pID = (decimal)partnerDetails.GetType().GetProperty("OrganizationId").GetValue(partnerDetails, null);
+                    }
+                    TblPolicy policyUpdate = _context.TblPolicy.Find(PolicyId);
+                    BusinessStatus businessStatus = 0;
+                    if (partnerDetails == null)
+                    {
+                        MasterCDDTO master = new MasterCDDTO();
+                        MasterCdTransactionsDTO transactionsDTO = new MasterCdTransactionsDTO();
+
+                        transactionsDTO.ProductId = Convert.ToDecimal(productId);
+                        transactionsDTO.Amount = Amount;
+                        transactionsDTO.TxnType = "Credit";
+
+                        master.AccountNo = policyUpdate.PolicyNo;
+                        master.CdTransactionsDTO.Add(transactionsDTO);
+
+                        transactionsDTO = new MasterCdTransactionsDTO();
+
+                        transactionsDTO.ProductId = Convert.ToDecimal(productId);
+                        transactionsDTO.Amount = Amount - 1;
+                        transactionsDTO.TxnType = "Debit";
+                        master.CdTransactionsDTO.Add(transactionsDTO);
+
+
+                        var transaction = await _integrationService.CreateMasterCD(master, apiContext);
+                        businessStatus = transaction.Status;
+                    }
+                    else
+                    {
+                        PolicyBookingTransaction policyBookingTransaction = new PolicyBookingTransaction() { PartnerId = Convert.ToDecimal(partnerId), ProductId = Convert.ToDecimal(productId), AccountNo = cdAccount, PolicyNo = policyNumber, TxnAmount = Amount, OrgId = pID };
+                        var transaction = await _integrationService.DoTransaction(policyBookingTransaction, apiContext);
+                        policyUpdate.BundleTxnId = transaction.cdTransactions.TxnId.ToString();
+                        businessStatus = transaction.Status;
+                        if (transaction.Status == BusinessStatus.PreConditionFailed)
+                        {
+                            return new PolicyResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Account number {cdAccount} is locked" };
+                        }
+                        else if (transaction.Status == BusinessStatus.NotFound)
+                        {
+                            return new PolicyResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"Account number {cdAccount} does not exist" };
+                        }
+                        Errors.AddRange(transaction.Errors);
+                    }
+                    logMsg = logMsg + ",5";
+                    if (businessStatus == BusinessStatus.Created)
+                    {
+
                         policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
                         policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
                         policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
-                        policyUpdate.BundleTxnId = transaction.cdTransactions.TxnId.ToString();
+
                         policyUpdate.IsActive = true;
                         // Add payment table 
                         TblPolicyPayment policyPayment = new TblPolicyPayment()
@@ -1569,14 +1635,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         //Get Policymodel
                         try
                         {
-                            var policyEmailModel = await GetInsuranceCertificateModel(policyDetail, productDetails, policyUpdate, mappedPolicy, partnerDetails, singleCover,apiContext);
+                            var policyEmailModel = await GetInsuranceCertificateModel(policyDetail, productDetails, policyUpdate, mappedPolicy, partnerDetails, singleCover, apiContext);
                             NotificationRequest request = new NotificationRequest();
                             request.SendSms = true;
                             request.smsRequest = new SMSRequest()
                             {
                                 PolicyNumber = policyNumber,
                                 RecipientNumber = policyUpdate.MobileNumber,
-                                SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/"+ policyNumber,
+                                SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/" + policyNumber,
                             };
                             request.TemplateKey = "InsuranceCertificate";
                             request.AttachPDF = true;
@@ -1597,15 +1663,161 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         // await SendNotificationAsync(policyNumber, partnerDetails.Email, policyUpdate.Email, policyUpdate.MobileNumber,cover,coverEvent,productName);
                         return new PolicyResponse { Status = BusinessStatus.Created, Id = policyNumber, ResponseMessage = $"Policy created with policy number {policyNumber}" };
                     }
-                    else if (transaction.Status == BusinessStatus.PreConditionFailed)
+
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = ex.Message, ErrorCode = logMsg };
+                Errors.Add(errorInfo);
+            }
+            return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors };
+        }
+        public async Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            //  var id = 18;
+            // var ps = await _integrationService.GetCustomerById(id, apiContext);
+
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            SingleCover singleCover = new SingleCover();
+            decimal PolicyId = 0; string policyNumber = ""; decimal premiumAmount = 0;
+            string logMsg = "";
+            try
+            {
+                //Errors = GetPolicyRequestValidation(policyDetail);
+                //if (Errors.Count > 0)
+                //{
+                //    return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
+                //}
+                var productCode = policyDetail["Product Code"].ToString();
+                var partnerId = policyDetail["Partner ID"].ToString();
+                var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
+                if (productDetails.ProductId <= 0)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProdcutId : {productCode} Not Found" };
+                    Errors.Add(errorInfo);
+                    return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+                }
+                var productId = productDetails.ProductId.ToString();
+                string cover = "", coverEvent = "", productName = "";
+                productName = productDetails.ProductName;
+                //foreach (var item in productDetails.ProductInsurableItems[0].ProductCovers)
+                //{
+                //    cover = item.Cover;
+                //    coverEvent = item.CoverEvent;
+                //}
+                //cover=coverDetail.Cover; coverEvent = coverDetail.CoverEvent;
+                logMsg = "1";
+                PartnersDTO partnerDetails = null;
+                if (Convert.ToInt64(partnerId) > 0)
+                {
+                    partnerDetails = await _integrationService.GetPartnerDetailAsync(partnerId, apiContext);
+                    if (partnerDetails.PartnerId <= 0)
                     {
-                        return new PolicyResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Account number {cdAccount} is locked" };
+                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PartnerID", PropertyName = "PartnerID", ErrorMessage = $"PartnerID : {partnerId} Not Found" };
+                        Errors.Add(errorInfo);
+                        return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                     }
-                    else if (transaction.Status == BusinessStatus.NotFound)
+                }
+                logMsg = logMsg + ",2";
+                var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
+                if (policyRiskDetails.ProductRcbDetails.Count <= 0)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "RiskDetail", PropertyName = "RiskDetail", ErrorMessage = $"RiskDetail for product : {partnerId} Not Found" };
+                    Errors.Add(errorInfo);
+                    return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+                }
+                logMsg = logMsg + ",3";
+                var mappedPolicy = MapAndValidateInsurablePolicy(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover);
+                if (Errors.Count == 0)
+                {
+
+                    if (partnerDetails != null && partnerDetails.OrganizationId > 0)
                     {
-                        return new PolicyResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"Account number {cdAccount} does not exist" };
+                        mappedPolicy.CustomerId = Convert.ToInt32(partnerDetails.OrganizationId).ToString();
                     }
-                    Errors.AddRange(transaction.Errors);
+                    else
+                    {
+                        mappedPolicy.CustomerId = Convert.ToInt32(productDetails.OrganizationId).ToString();
+                    }
+                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail);
+                    logMsg = logMsg + ",4";
+                    var Amount = mappedPolicy.PremiumAmount;
+                    policyNumber = mappedPolicy.PolicyNo;
+
+                    //paytm implementation
+                    var paytmtransactionResponce = await _integrationService.DoTransactionByPayment(PolicyId, Amount, mappedPolicy.MobileNumber, apiContext);
+                    //var cdAccount = string.Concat(productId.ToString().PadLeft(5, '0'), "/" + partnerId.ToString().PadLeft(5, '0'));
+                    //Adding Properties OrgId for Accounting Transaction 
+                    //var pID = apiContext.PartnerId;
+                    //if (partnerDetails.GetType().GetProperty("OrganizationId") != null)
+                    //{
+                    //    pID = partnerDetails.GetType().GetProperty("OrganizationId").GetValue(partnerDetails, null);
+                    //}
+                    // PolicyBookingTransaction policyBookingTransaction = new PolicyBookingTransaction() { PartnerId = Convert.ToDecimal(partnerId), ProductId = Convert.ToDecimal(productId), AccountNo = cdAccount, PolicyNo = policyNumber, TxnAmount = Amount, OrgId = pID };
+                    //var transaction = await _integrationService.DoTransaction(policyBookingTransaction, apiContext);
+                    logMsg = logMsg + ",5";
+                    //if (transaction.Status == BusinessStatus.Created)
+                    //{
+                    TblPolicy policyUpdate = _context.TblPolicy.Find(PolicyId);
+                    policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
+                    policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
+                    policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
+                    // policyUpdate.BundleTxnId = transaction.cdTransactions.TxnId.ToString();
+                    policyUpdate.IsActive = true;
+                    // Add payment table 
+                    TblPolicyPayment policyPayment = new TblPolicyPayment()
+                    {
+                        PaidAmount = Amount,
+                        CreatedDate = DateTime.Now,
+                        PolicyId = PolicyId
+                    };
+                    _context.TblPolicyPayment.Add(policyPayment);
+                    _context.SaveChanges();
+                    logMsg = logMsg + ",6";
+                    //Get Policymodel
+                    try
+                    {
+                        var policyEmailModel = await GetInsuranceCertificateModel(policyDetail, productDetails, policyUpdate, mappedPolicy, partnerDetails, singleCover, apiContext);
+                        NotificationRequest request = new NotificationRequest();
+                        request.SendSms = true;
+                        request.smsRequest = new SMSRequest()
+                        {
+                            PolicyNumber = policyNumber,
+                            RecipientNumber = policyUpdate.MobileNumber,
+                            SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/" + policyNumber,
+                        };
+                        request.TemplateKey = "InsuranceCertificate";
+                        request.AttachPDF = true;
+                        request.NotificationPayload = JsonConvert.SerializeObject(policyEmailModel);
+                        request.SendEmail = true;
+                        //ACCOUNTING TRANSACTION CALLING
+                        //var account = AccountMap(apiContext, policyUpdate);
+                        var notificationResponse = await _integrationService.SendMultiCoverNotificationAsync(request, apiContext);
+                    }
+
+                    catch (Exception ex)
+                    {
+
+                        var msgr = ex.ToString();
+                    }
+                    //Adding of Accounting Transaction Part
+                    var account = AccountMap(apiContext, policyUpdate, productDetails, partnerDetails);
+                    // await SendNotificationAsync(policyNumber, partnerDetails.Email, policyUpdate.Email, policyUpdate.MobileNumber,cover,coverEvent,productName);
+                    return new PolicyResponse { Status = BusinessStatus.Created, Id = policyNumber, policy = paytmtransactionResponce, ResponseMessage = $"Policy created with policy number {policyNumber}" };
+
+
+                    // }
+                    //else if (transaction.Status == BusinessStatus.PreConditionFailed)
+                    //{
+                    //    return new PolicyResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Account number {cdAccount} is locked" };
+                    //}
+                    //else if (transaction.Status == BusinessStatus.NotFound)
+                    //{
+                    //    return new PolicyResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"Account number {cdAccount} does not exist" };
+                    //}
+                    //Errors.AddRange(transaction.Errors);
                 }
             }
             catch (Exception ex)
@@ -1622,7 +1834,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<PolicyInsurableDetailsDTO> lstPolicyInsurableDetailsDto = new List<PolicyInsurableDetailsDTO>();
             PolicyInsurableDetailsDTO policyInsurableDetailsDto = null;
 
-         
+
             var InsurableItemName = "";
             var CoverName = "";
             var BenefitAmount = 0;
@@ -1636,7 +1848,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                     InsurableItemName = InsurableItem.InsurableItem;
                     singleCover.InsurableItem = InsurableItem.InsurableItem;
-                    singleCover.IdentificationNumber = policyDTO.CustomerId;
+                    singleCover.IdentificationNumber = policyDetail["Identification Number"];
                     singleCover.Name = policyDTO.CoverNoteNo;
                     var CoverItem = InsurableItem.ProductCovers.FirstOrDefault();
                     if (CoverItem != null)
@@ -1702,11 +1914,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
                             policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
                             policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
+                            policyInsurableDetailsDto.IsActive = true;
                             lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
                             insItemCount++;
                         }
                     }
-                    if((bool)productInsurable.IsSingle && insItemCount> 1)
+                    if ((bool)productInsurable.IsSingle && insItemCount > 1)
                     {
                         ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = $"Error it is single Cover" };
                         Errors.Add(errorInfo);
@@ -1723,13 +1936,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 policyInsurableDetailsDto.IdentificationNo = policyDTO.CustomerId;
                 policyInsurableDetailsDto.Name = policyDTO.CoverNoteNo;
                 policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
+                policyInsurableDetailsDto.IsActive = true;
                 lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
             }
-            if (premiumLevel == 51)
+            if (premiumLevel == 51 && productDTO.ProductPremium.FirstOrDefault().PremiumAmount != null)
             {
                 totalPremiumAmount = (decimal)productDTO.ProductPremium.FirstOrDefault().PremiumAmount;
             }
-            policyDTO.SumInsured = totalPremiumAmount;
+            policyDTO.PremiumAmount = totalPremiumAmount;
             return lstPolicyInsurableDetailsDto;
         }
         private PolicyDTO MapAndValidateInsurablePolicy(dynamic policyDetail, ProductDTO productDTO, PartnersDTO partnersDTO, ProductRiskDetailsDTO riskDetails, List<ErrorInfo> Errors, SingleCover singleCover)
@@ -1789,7 +2003,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //policyDTO.SumInsured = productDTO.PremiumAmount;
             // policyDTO.MasterPolicyNo = "ABC";//ToDo service req
             policyDTO.PolicyVersion = 1;
-            policyDTO.PolicyNo = GetPolicyNumber(partnersDTO.PartnerId, productDTO.ProductId);
+            if (partnersDTO != null)
+            {
+                policyDTO.PolicyNo = GetPolicyNumber(partnersDTO.PartnerId, productDTO.ProductId);
+            }
+            else
+            {
+                policyDTO.PolicyNo = GetPolicyNumber(0, productDTO.ProductId);
+            }
             policyDTO.PolicyInsurableDetails.AddRange(GetMultiCover(policyDetail, productDTO, policyDTO, singleCover, Errors));
             if (productDTO.ProductInsurableItems.FirstOrDefault().ProductCovers.Count > 0)
             {
@@ -1797,11 +2018,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             // policyDTO.CoverName = productDTO.ProductInsurableItems.FirstOrDefault().ProductCovers.FirstOrDefault().Cover;
             policyDTO.ProductIdPk = productDTO.ProductId;
+            if (productDTO.IsMasterPolicy == true)
+            {
+                policyDTO.MasterPolicyNo = policyDTO.PolicyNo;
+            }
+            policyDTO.MasterPremium = policyDTO.PremiumAmount;//needs to fetch through rating
+            policyDTO.SumInsured = policyDTO.PremiumAmount;
             return policyDTO;
         }
         private async Task<InsuranceCertificateModel> GetInsuranceCertificateModel(dynamic policyDetail, ProductDTO productDTO, TblPolicy tblpolicyDTO, PolicyDTO policyDTO, PartnersDTO partnersDTO, SingleCover singleCover, ApiContext apiContext)
         {
-            
+
             InsuranceCertificateModel model = new InsuranceCertificateModel();
             var ps = await _integrationService.GetCustomerById(Convert.ToDecimal(tblpolicyDTO.CustomerId), apiContext);
             //model.cweDetails = new System.Collections.Generic.List<CweDetails>();
@@ -1810,9 +2037,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //INSURER DETAILS
             model.InsurerDetails = new InsurerDetails();
             model.InsurerDetails.ContactName = ps.CustomerName;
-            model.InsurerDetails.EmailAddress = ps.CustSpocDetails.FirstOrDefault().EmailId;
+            model.InsurerDetails.EmailAddress = ps.CustSpocDetails.FirstOrDefault()?.EmailId;
             model.InsurerDetails.PhoneNumber = ps.PhoneNo;
-         
+
             model.insurerAddress = new InsurerAddress() { AddressLine1 = ps.CustAddress.FirstOrDefault().AddressLine1, AddressLine2 = ps.CustAddress.FirstOrDefault().AddressLine2, City = "BANGLORE", State = "KARNATAKA", PinCode = "560012" };
 
 
@@ -1820,8 +2047,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-        //OFFICE ADDRESS
-        model.officeAddress = new OfficeAddress();
+            //OFFICE ADDRESS
+            model.officeAddress = new OfficeAddress();
             model.officeAddress.CompanyName = "iNube Software Solutions Pvt Ltd.";
             model.officeAddress.AddressLine1 = "JP NAGAR";
             model.officeAddress.AddressLine2 = "ABOVE AXIS BANK";
@@ -1831,7 +2058,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
             //INSURER ADDRESS
-           
+
 
             //INSURED DETAILS
             model.insuredDetails = new InsuredDetails();
@@ -1882,7 +2109,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         premiumLevelDetail.ParticularName = item.LevelName;
                     }
-                   
+
 
                     premiumAmount = new PremiumAmount();
                     //  PremiumAmount premiumAmount = new PremiumAmount();
@@ -1971,7 +2198,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             //policy details
             model.policyDeatils = new Policydetails();
-            model.policyDeatils.PartnerName = partnersDTO.PartnerName;
+            if (partnersDTO != null)
+            {
+                model.policyDeatils.PartnerName = partnersDTO.PartnerName;
+            }
             model.policyDeatils.PolicyStartDate = policyDTO.PolicyStartDate.ToString();
             model.policyDeatils.PolicyEndDate = policyDTO.PolicyEndDate.ToString();
             model.policyDeatils.ProductName = productDTO.ProductName;
@@ -2058,10 +2288,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             //PREMIUM DETAILS
             model.premiumdetails = new Premiumdetails();
-            model.premiumdetails.BasePremium = tblpolicyDTO.SumInsured.ToString();
+            model.premiumdetails.BasePremium = tblpolicyDTO.PremiumAmount.ToString();
             var GST = 0;
             model.premiumdetails.GST = GST + "%";
-            model.premiumdetails.TotalPremium = (tblpolicyDTO.SumInsured + (tblpolicyDTO.SumInsured * GST / 100)).ToString();
+            model.premiumdetails.TotalPremium = (tblpolicyDTO.PremiumAmount + (tblpolicyDTO.PremiumAmount * GST / 100)).ToString();
 
             //CWE
             CweDetails cweDetails = new CweDetails();
@@ -2102,7 +2332,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             // coverListDetails.cwebenfitDetails.Add(cWEBenfitDetails);
             model.cweDetails = cweDetails;
-            EmailRequest emailTest = new EmailRequest() { Message = $"Dear Customer,\n\n Insurance Certificate  has been sent successfully\n\n , find the document attached.\n Assuring you the best of services always.\n\n Regards,\n Team MICA ", Subject = $"Insurance Certificate", To = policyDTO.Email, PartnerEmail = partnersDTO.Email, IsAttachment = true };
+            EmailRequest emailTest = new EmailRequest() { Message = $"Dear Customer,\n\n Insurance Certificate  has been sent successfully\n\n , find the document attached.\n Assuring you the best of services always.\n\n Regards,\n Team MICA ", Subject = $"Insurance Certificate", To = policyDTO.Email, PartnerEmail = partnersDTO != null ? partnersDTO.Email : "", IsAttachment = true };
             model.EmailTest = emailTest;
 
             return model;
@@ -2114,9 +2344,387 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
 
             var leadInfoDetails = await _integrationService.GetLeadInfo(customerId, apiContext);
-           
+
             return leadInfoDetails;
         }
 
+        public async Task<IEnumerable<PolicyCountDTO>> PolicySearchDashboard(PolicySearchDashboardDTO policysearch, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            try
+            {
+                ProductSearchDTO productSearchDTO = new ProductSearchDTO();
+                var ProductData = await GetProductName(apiContext);
+                var PartnerData = await _integrationService.GetPartnerDetails(apiContext);
+                //var productDetailsearch = await _integrationService.GetProductIdAsync(productSearchDTO, apiContext);
+
+                if (policysearch.PartnerId > 0 && policysearch.ProductId > 0)
+                {
+                    var prodData = from tblPolicy in _context.TblPolicy.Where(tblPolicy => tblPolicy.AgentId == policysearch.PartnerId && tblPolicy.ProductIdPk == policysearch.ProductId)
+
+                                   group tblPolicy by new
+                                   {
+                                       tblPolicy.ProductIdPk,
+                                       tblPolicy.AgentId
+                                   } into g
+                                   select new PolicyCountDTO { Count = g.Count(), PartnerId = g.Key.AgentId, ProductId = g.Key.ProductIdPk };
+
+                    List<PartnerDetailsDTO> partners = new List<PartnerDetailsDTO>();
+                    // List<ProductDTO> products = new List<ProductDTO>();
+                    List<PolicyCountDTO> policyCounts = new List<PolicyCountDTO>();
+
+                    policyCounts.AddRange(prodData.ToList());
+
+                    foreach (var i in policyCounts)
+                    {
+                        partners = PartnerData.Where(p => p.PartnerId == (decimal)i.PartnerId).ToList();
+                        var productname = ProductData.SingleOrDefault(P => P.Key == i.ProductId).Value;
+                        if (partners != null && productname != null)
+                        {
+                            i.PartnerName = partners[0].PartnerName;
+                            i.ProductName = productname;
+                        }
+                    }
+                    return policyCounts;
+                }
+
+                else if (policysearch.PartnerId > 0)
+                { //Search only with partner
+                    var partData = from tblPolicy in _context.TblPolicy.Where(tblPolicy => tblPolicy.AgentId == policysearch.PartnerId)
+
+                                   group tblPolicy by new
+                                   {
+                                       tblPolicy.AgentId,
+                                   } into g
+                                   select new PolicyCountDTO { Count = g.Count(), PartnerId = g.Key.AgentId };
+
+                    List<PartnerDetailsDTO> partners = new List<PartnerDetailsDTO>();
+                    List<PolicyCountDTO> policyCounts = new List<PolicyCountDTO>();
+
+                    policyCounts.AddRange(partData.ToList());
+
+                    foreach (var i in policyCounts)
+                    {
+                        partners = PartnerData.Where(p => p.PartnerId == (decimal)i.PartnerId).ToList();
+                        if (partners != null)
+                        {
+                            i.PartnerName = partners[0].PartnerName;
+                        }
+                    }
+                    return policyCounts;
+                }
+
+                else if (policysearch.ProductId > 0)
+                {//Product search
+                    var prodData = from tblPolicy in _context.TblPolicy.Where(tblPolicy => tblPolicy.ProductIdPk == policysearch.ProductId)
+
+                                   group tblPolicy by new
+                                   {
+                                       tblPolicy.ProductIdPk,
+                                   } into g
+                                   select new PolicyCountDTO { Count = g.Count(), ProductId = g.Key.ProductIdPk };
+
+                    List<PolicyCountDTO> policyCounts = new List<PolicyCountDTO>();
+                    policyCounts.AddRange(prodData.ToList());
+
+                    foreach (var i in policyCounts)
+                    {
+                        var productname = ProductData.SingleOrDefault(P => P.Key == i.ProductId).Value;
+                        if (productname != null)
+                        {
+                            i.ProductName = productname;
+                        }
+                    }
+                    return policyCounts;
+                }
+
+                else//Search without parameters
+                {
+                    var prodData = from tblPolicy in _context.TblPolicy.Where(tblPolicy => tblPolicy.AgentId == apiContext.PartnerId)
+
+                                   group tblPolicy by new
+                                   {
+                                       tblPolicy.ProductIdPk,
+                                   } into g
+                                   select new PolicyCountDTO { Count = g.Count(), ProductId = g.Key.ProductIdPk };
+
+                    List<PolicyCountDTO> policyCounts = new List<PolicyCountDTO>();
+                    policyCounts.AddRange(prodData.ToList());
+
+                    foreach (var i in policyCounts)
+                    {
+                        var productname = ProductData.SingleOrDefault(P => P.Key == i.ProductId).Value;
+                        if (productname != null)
+                        {
+                            i.ProductName = productname;
+                        }
+                    }
+                    return policyCounts;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
+
+        public async Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
+
+            var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
+            if (policy != null)
+            {
+                if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
+                {
+                    List<TblPolicyInsurableDetails> lstPolicyInsurableDetailsDto = new List<TblPolicyInsurableDetails>();
+
+                    foreach (var item in insurableItemRequest.InsurableItem)
+                    {
+                        var InsurableItemName = item.InsurableName;
+
+                        TblPolicyInsurableDetails policyInsurableDetailsDto = null;
+
+
+
+                        foreach (var insurableInsurablefields in item.InsurableFields)
+                        {
+                            policyInsurableDetailsDto = new TblPolicyInsurableDetails();
+                            policyInsurableDetailsDto.PolicyId = policy.PolicyId;
+                            policyInsurableDetailsDto.InsurableItem = InsurableItemName;
+                            policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
+                            policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
+                            policyInsurableDetailsDto.BenefitAmount = 0;
+                            policyInsurableDetailsDto.IsActive = true;
+                            lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
+
+                        }
+
+                    }
+
+                    _context.TblPolicyInsurableDetails.AddRange(lstPolicyInsurableDetailsDto);
+                }
+            }
+
+            _context.SaveChanges();
+
+            return new EndorsmentDTO() { Status = BusinessStatus.Created };
+
+        }
+
+
+        public async Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
+        {
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
+
+            var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
+            if (policy != null)
+            {
+                if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
+                {
+
+                    foreach (var item in insurableItemRequest.InsurableItem)
+                    {
+
+
+                        foreach (var insurableInsurablefields in item.InsurableFields)
+                        {
+
+                            string IdentificationNo = insurableInsurablefields["Identification Number"].ToString();
+
+                            var verify = _context.TblPolicyInsurableDetails.Where(x => x.IdentificationNo == IdentificationNo && x.PolicyId == policy.PolicyId);
+
+                            foreach (var insureditem in verify)
+                            {
+                                insureditem.IsActive = false;
+
+                            }
+
+                        }
+
+                    }
+
+                    _context.SaveChanges();
+                }
+            }
+
+
+            return new EndorsmentDTO();
+
+
+        }
+
+
+        public async Task<EndorsmentDTO> SwitchOnOff(dynamic switchOnOffRequest, ApiContext apiContext)
+        {
+            return new EndorsmentDTO();
+        }
+
+        //
+        public async Task<decimal> GetPolicyDetailsByPolicyNo(string PolicyNO, ApiContext apiContext)
+        {
+            var tblpolicydata = _context.TblPolicy.FirstOrDefault(x=>x.PolicyNo== PolicyNO);
+            if (tblpolicydata != null)
+            {
+                var tblpolicy = _mapper.Map<PolicyDTO>(tblpolicydata);
+              
+                var decima = Decimal.Parse(tblpolicy.BundleTxnId);
+                int val1 = Decimal.ToInt32(decima);
+                var CDBalanceData = await _integrationService.GetcddataAsync(val1, apiContext);
+                return (decimal)CDBalanceData.AvailableAmount;
+            }
+            return 0;
+        }
+
+        //GetMasterPolicy
+
+        public async Task<List<PolicyDetails>> GetAllPolicy(string productCode,ApiContext apiContext)
+        {
+            var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
+            if (productDetails != null)
+            {
+                var policydata = _context.TblPolicy.Where(x => (x.IsActive == true && x.AgentId == 0 && x.ProductIdPk == productDetails.ProductId)).
+                    Select(s=>new PolicyDetails {
+
+                       PolicyNumber=s.PolicyNo,
+                       SumInsured=s.SumInsured,
+                       PolicyStartDate=s.PolicyStartDate.ToString(),
+                       PolicyEndDate=s.PolicyEndDate.ToString(),
+                       PremiumAmount=s.PremiumAmount
+
+                    }
+                    )
+                    .ToList();
+               
+                    return policydata;
+
+
+
+            }
+            return null;
+        }
+
+        //UpdateInsurableItem
+
+        public async Task<PolicyDTO> ModifyInsurabableItem(dynamic modifydata, ApiContext apiContext)
+        {
+           
+            var policyNo = (string)modifydata["PolicyNumber"];
+            var tbl_particiant = _context.TblPolicy.FirstOrDefault(x=>x.PolicyNo== policyNo);
+            var policyId = tbl_particiant.PolicyId;
+            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+            foreach (var item in modifydata.InsurableItem)
+            {
+                foreach(var insurableName in json.InsurableItem)
+                {
+                    if(item.InsurableName== insurableName.InsurableName)
+                    {
+                        foreach(var fields in item.InsurableFields)
+                        {
+                            foreach(var jsoninsurableFields in insurableName.InsurableFields)
+                            {
+                                var InputidentificationNumber = (string)fields["Identification Number"];
+                                var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                                if (InputidentificationNumber == TblIdentificationNo)
+                                {
+                                    insurableName.InsurableFields = item.InsurableFields;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+             tblPolicyDetailsdata.PolicyRequest = json.ToString();
+            _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+            _context.SaveChanges();
+            return null;
+        }
+
+        //GetInsurableItemDetails
+        public async Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext)
+        {
+            var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
+            var policyId = tbl_particiant.PolicyId;
+            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+            if (tbl_particiant != null)
+            {
+                foreach (var insurableName in json.InsurableItem)
+                {
+                    if (insurableName.InsurableName == insurableItemName)
+                    {
+
+                        //foreach (var jsoninsurableFields in insurableName.InsurableFields)
+                        //{
+                        //    var InputidentificationNumber = (string)fields["Identification Number"];
+                        //    var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                        //    if (InputidentificationNumber == TblIdentificationNo)
+                        //    {
+                        //        insurableName.InsurableFields = item.InsurableFields;
+                        //    }
+                        //}
+                        return insurableName.InsurableFields;
+
+
+                    }
+                    else
+                    {
+                        return null;
+                    }
+
+                }
+            }
+
+            
+            //tblPolicyDetailsdata.PolicyRequest = json.ToString();
+            //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+            //_context.SaveChanges();
+            return null;
+        }
+
+
+        /*CalCulate Premium*/
+
+        public async Task<object> CalCulatePremium(DynamicData premiumParameter,ApiContext apiContext)
+        {
+            
+
+           var Data= await _integrationService.CalCulateRatingPremium(premiumParameter, apiContext);
+
+
+            return Data;
+        }
+
+        public async Task<decimal> UpdateSumInsured(string PolicyNumber,decimal amount,ApiContext apiContext)
+        {
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            var policydetails =_context.TblPolicy.FirstOrDefault(s => s.PolicyNo == PolicyNumber);
+            if (policydetails != null)
+            {
+                policydetails.SumInsured = policydetails.SumInsured - amount;
+                _context.Update(policydetails);
+                _context.SaveChanges();
+                return (decimal)policydetails.SumInsured;
+            }
+            return 0;
+
+        }
+
+        
     }
+}
+

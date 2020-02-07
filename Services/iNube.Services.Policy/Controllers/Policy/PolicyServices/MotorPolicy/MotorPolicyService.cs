@@ -98,6 +98,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+        public Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<PolicyInsurableResponse> PolicyInsurableDetails(string PolicyNumber, ApiContext apiContext)
         {
@@ -120,6 +124,67 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
 
         public Task<LeadInfoDTO> CustomerPolicy(int CustomerId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<PolicyCountDTO>> PolicySearchDashboard(PolicySearchDashboardDTO policysearch, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<EndorsmentDTO> SwitchOnOff(dynamic switchOnOffRequest, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string PolicNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PolicyDTO> GetPolicyDetailsByPolicyNo(string PolicyNO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<decimal> IPolicyProductService.GetPolicyDetailsByPolicyNo(string PolicyNO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+     
+        public Task<object> CalCulatePremium(DynamicData premiumParameter, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PolicyDTO> ModifyInsurabableItem(dynamic modifydata, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

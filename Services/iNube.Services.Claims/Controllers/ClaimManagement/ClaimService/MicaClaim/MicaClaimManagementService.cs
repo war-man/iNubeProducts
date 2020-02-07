@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -38,6 +39,596 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             _configuration = configuration;
             _emailService = emailService;
         }
+
+        //Accountig Transaction
+        //Fetching Properties
+        private static PropertyInfo[] GetProperties(object obj)
+        {
+            return obj.GetType().GetProperties();
+        }
+        public async Task<String> AccountMapPayment(ApiContext apiContext, object claimData)
+        {
+            // FOR ACCOUNT MAPPING TRANSACTION
+            //var status = AccountingTransactionResponse(apiContext);
+            //TO Get the Details of PolicyUpdate as Status
+            
+            try
+            {
+                var Responce = "";
+                //var accountMapList = await _integrationService.GetAccountMapAsync(apiContext);
+                var accountMapDetailsList = await _integrationService.GetAccountMapDetailsAsync(apiContext);
+                TransactionHeaderDto transactionHeaderObj = new TransactionHeaderDto();
+                List<TransactionDto> transactiondtObj = new List<TransactionDto>();
+                List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
+
+                string dateTime = DateTime.Now.ToString();
+                string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
+                DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
+                //Storing All Transaction Header Value
+                foreach (var accountMap in accountMapDetailsList)
+                {
+                    var accountproperties = GetProperties(claimData);
+                    if (accountMap.Object == "Claim" && accountMap.Event == "Payment")
+                    {
+                        if (transactionHeaderObj.TransactionRuleMappingId != accountMap.TransactionRuleMappingId)
+                        {
+                            transactionHeaderObj.TransactionRuleMappingId = accountMap.TransactionRuleMappingId;
+                            transactionHeaderObj.RuleName = accountMap.RuleName;
+                            transactionHeaderObj.IsActive = "Y";
+                            transactionHeaderObj.CreatedDate = date;
+                        }
+                    }
+                }
+                //Storing all TransactionConditions Value
+                foreach (var accountMapCd in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapCd.TransactionConditions)
+                    {
+                        var accountproperties = GetProperties(claimData);
+                        if (accountMapCd.Object == "Claim" && accountMapCd.Event == "Payment")
+                        {
+                            TransactionDto transactionDto = new TransactionDto();
+                            foreach (var actnProp in accountproperties)
+                            {
+                                if (claimData.GetType().GetProperty("Currency") != null)
+                                {
+                                    var currency = claimData.GetType().GetProperty("Currency").GetValue(claimData, null);
+                                    transactionDto.Currency = Convert.ToString(currency);
+                                }
+                                else
+                                {
+                                    transactionDto.Currency = "INR";
+                                }
+                                var Amount = claimData.GetType().GetProperty("Amount").GetValue(claimData, null);
+                                transactionDto.TypeOfTransaction = accountMap.TypeofTransaction;
+                                if (accountMap.TypeofTransaction == "Credit")
+                                {
+                                    
+                                       transactionDto.Amount = Convert.ToDecimal(Amount);
+                                    
+                                }
+                                if (accountMap.TypeofTransaction == "Debit")
+                                {
+                                    
+                                       transactionDto.Amount = Convert.ToDecimal(Amount);
+
+                                }
+                                //transactionDto.Amount = (decimal)sumInsured;
+                                transactionDto.Description = accountMap.Description;
+                                transactionDto.IsActive = "Y";
+                                
+                                transactionDto.CreatedDate = accountMap.CreatedDate;
+                                transactionDto.RuleName = accountMapCd.RuleName;
+                                transactionDto.Object = accountMapCd.Object;
+                                transactionDto.Event = accountMapCd.Event;
+                                transactionDto.AccountType = accountMap.AccountType;
+                                transactionDto.Value = accountMap.Value;
+                                transactionDto.AccountCode = accountMap.AccountCode;
+                                //Addition of Partner Id and Product Id
+                                //Addition of Partner Id and Product Id
+                                if (claimData.GetType().GetProperty("PartnerId") != null)
+                                {
+                                    var partnerId = claimData.GetType().GetProperty("PartnerId").GetValue(claimData, null);
+                                    transactionDto.PartnerId = Convert.ToDecimal(partnerId);
+                                }
+                                else
+                                {
+                                    transactionDto.PartnerId = apiContext.PartnerId;
+                                }
+
+                                if (claimData.GetType().GetProperty("OrgId") != null)
+                                {
+                                    var partnerId = claimData.GetType().GetProperty("OrgId").GetValue(claimData, null);
+                                    transactionDto.OrganizationId = Convert.ToDecimal(partnerId);
+                                }
+                                else
+                                {
+                                    transactionDto.OrganizationId = apiContext.OrgId;
+                                }
+                                if (claimData.GetType().GetProperty("ProductId") != null)
+                                {
+                                    var productId = claimData.GetType().GetProperty("ProductId").GetValue(claimData, null);
+                                    transactionDto.ProductId = Convert.ToDecimal(productId);
+                                }
+                                else
+                                {
+                                    transactionDto.ProductId = 0;
+                                }
+                            }
+                            transactiondtObj.Add(transactionDto);
+                        }
+                    }
+                }
+                transactionHeaderObj.Transaction.AddRange(transactiondtObj);
+                //Storing Ledger Value 
+                foreach (var accountMapSl in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapSl.SubLedgerReferences)
+                    {
+                        TransactionSubLedgerDto transSubLedger = new TransactionSubLedgerDto();
+                        var accountproperties = GetProperties(claimData);
+                        if (accountMapSl.Object == "Claim" && accountMapSl.Event == "Payment")
+                        {
+                            foreach (var actnProp in accountproperties)
+                            {
+                                transSubLedger.SubLedgerReferencesId = accountMap.SubLedgerReferencesId;
+                                if (accountMap.LedgerObject == "Policy")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "Amount")
+                                    {
+                                        ledgerColName = "Amount";
+                                    }
+                                    if (ledgerColName == "Policy Number")
+                                    {
+                                        ledgerColName = "PolicyNo";
+                                    }
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Product")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Claim")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "Policy Number")
+                                    {
+                                        ledgerColName = "PolicyNo";
+                                    }
+                                    if (ledgerColName == "Claim Number") 
+                                    {
+                                        ledgerColName = "ClaimNo";
+                                    }
+                                    if (ledgerColName == "Insured Ref")
+                                    {
+                                        ledgerColName = "InsuredRefNo";
+                                    }
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                transSubLedger.IsActive = "Y";
+                            }
+                            transactionLedgerObj.Add(transSubLedger);
+                        }
+                    }
+                }
+                transactionHeaderObj.TransactionSubLedger.AddRange(transactionLedgerObj);
+
+                var Sendtransaction = await _integrationService.CreateTranasactionAsync(transactionHeaderObj, apiContext);
+                Responce = Sendtransaction.Status.ToString();
+
+
+                return Responce;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public async Task<String> AccountMapIntimation(ApiContext apiContext, object claimData)
+        {
+            // FOR ACCOUNT MAPPING TRANSACTION
+            //var status = AccountingTransactionResponse(apiContext);
+            //TO Get the Details of PolicyUpdate as Status
+            try
+            {
+                var Responce = "";
+                //var accountMapList = await _integrationService.GetAccountMapAsync(apiContext);
+                var accountMapDetailsList = await _integrationService.GetAccountMapDetailsAsync(apiContext);
+                TransactionHeaderDto transactionHeaderObj = new TransactionHeaderDto();
+                List<TransactionDto> transactiondtObj = new List<TransactionDto>();
+                List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
+
+                string dateTime = DateTime.Now.ToString();
+                string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
+                DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
+                //Storing All Transaction Header Value
+                foreach (var accountMap in accountMapDetailsList)
+                {
+                    var accountproperties = GetProperties(claimData);
+                    if (accountMap.Object == "Claim" && accountMap.Event == "Intimation")
+                    {
+                        if (transactionHeaderObj.TransactionRuleMappingId != accountMap.TransactionRuleMappingId)
+                        {
+                            transactionHeaderObj.TransactionRuleMappingId = accountMap.TransactionRuleMappingId;
+                            transactionHeaderObj.RuleName = accountMap.RuleName;
+                            transactionHeaderObj.IsActive = "Y";
+                            transactionHeaderObj.CreatedDate = date;
+                        }
+                    }
+                }
+                //Storing all TransactionConditions Value
+                foreach (var accountMapCd in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapCd.TransactionConditions)
+                    {
+                        var accountproperties = GetProperties(claimData);
+                        if (accountMapCd.Object == "Claim" && accountMapCd.Event == "Intimation")
+                        {
+                            TransactionDto transactionDto = new TransactionDto();
+                            foreach (var actnProp in accountproperties)
+                            {
+                                if (claimData.GetType().GetProperty("Currency") != null)
+                                {
+                                    var currency = claimData.GetType().GetProperty("Currency").GetValue(claimData, null);
+                                    transactionDto.Currency = Convert.ToString(currency);
+                                }
+                                else
+                                {
+                                    transactionDto.Currency = "INR";
+                                }
+                                var Amount = claimData.GetType().GetProperty("ClaimAmount").GetValue(claimData, null);
+                                transactionDto.TypeOfTransaction = accountMap.TypeofTransaction;
+                                if (accountMap.TypeofTransaction == "Credit")
+                                {
+
+                                    transactionDto.Amount = Convert.ToDecimal(Amount);
+
+                                }
+                                if (accountMap.TypeofTransaction == "Debit")
+                                {
+
+                                    transactionDto.Amount = Convert.ToDecimal(Amount);
+
+                                }
+                                //transactionDto.Amount = (decimal)sumInsured;
+                                transactionDto.Description = accountMap.Description;
+                                transactionDto.IsActive = "Y";
+
+                                transactionDto.CreatedDate = accountMap.CreatedDate;
+                                transactionDto.RuleName = accountMapCd.RuleName;
+                                transactionDto.Object = accountMapCd.Object;
+                                transactionDto.Event = accountMapCd.Event;
+                                transactionDto.AccountType = accountMap.AccountType;
+                                transactionDto.Value = accountMap.Value;
+                                transactionDto.AccountCode = accountMap.AccountCode;
+                                //Addition of Partner Id and Product Id
+                                //Addition of Partner Id and Product Id
+                                if (claimData.GetType().GetProperty("PartnerId") != null)
+                                {
+                                    var partnerId = claimData.GetType().GetProperty("PartnerId").GetValue(claimData, null);
+                                    transactionDto.PartnerId = Convert.ToDecimal(partnerId);
+                                }
+                                else
+                                {
+                                    transactionDto.PartnerId = apiContext.PartnerId;
+                                }
+
+                                if (claimData.GetType().GetProperty("OrganizationId") != null)
+                                {
+                                    var orgId = claimData.GetType().GetProperty("OrganizationId").GetValue(claimData, null);
+                                    transactionDto.OrganizationId = Convert.ToDecimal(orgId);
+                                }
+                                else
+                                {
+                                    transactionDto.OrganizationId = apiContext.OrgId;
+                                }
+                                if (claimData.GetType().GetProperty("ProductId") != null)
+                                {
+                                    var productId = claimData.GetType().GetProperty("ProductId").GetValue(claimData, null);
+                                    transactionDto.ProductId = Convert.ToDecimal(productId);
+                                }
+                                else
+                                {
+                                    transactionDto.ProductId = 0;
+                                }
+                            }
+                            transactiondtObj.Add(transactionDto);
+                        }
+                    }
+                }
+                transactionHeaderObj.Transaction.AddRange(transactiondtObj);
+                //Storing Ledger Value 
+                foreach (var accountMapSl in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapSl.SubLedgerReferences)
+                    {
+                        TransactionSubLedgerDto transSubLedger = new TransactionSubLedgerDto();
+                        var accountproperties = GetProperties(claimData);
+                        if (accountMapSl.Object == "Claim" && accountMapSl.Event == "Intimation")
+                        {
+                            foreach (var actnProp in accountproperties)
+                            {
+                                transSubLedger.SubLedgerReferencesId = accountMap.SubLedgerReferencesId;
+                                if (accountMap.LedgerObject == "Policy")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "Amount")
+                                    {
+                                        ledgerColName = "ClaimAmount";
+                                    }
+                                    if (ledgerColName == "Policy Number")
+                                    {
+                                        ledgerColName = "PolicyNumber";
+                                    }
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Product")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Claim")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "Policy Number")
+                                    {
+                                        ledgerColName = "PolicyNumber";
+                                    }
+                                    if (ledgerColName == "Claim Number")
+                                    {
+                                        ledgerColName = "ClaimNumber";
+                                    }
+                                    if (ledgerColName == "Insured Ref")
+                                    {
+                                        ledgerColName = "IdentificationNo";
+                                    }
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                transSubLedger.IsActive = "Y";
+                            }
+                            transactionLedgerObj.Add(transSubLedger);
+                        }
+                    }
+                }
+                transactionHeaderObj.TransactionSubLedger.AddRange(transactionLedgerObj);
+
+                var Sendtransaction = await _integrationService.CreateTranasactionAsync(transactionHeaderObj, apiContext);
+                Responce = Sendtransaction.Status.ToString();
+
+
+                return Responce;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public async Task<String> AccountMapApproval(ApiContext apiContext, object claimData)
+        {
+            // FOR ACCOUNT MAPPING TRANSACTION
+            //var status = AccountingTransactionResponse(apiContext);
+            //TO Get the Details of PolicyUpdate as Status
+            try
+            {
+                var Responce = "";
+                //var accountMapList = await _integrationService.GetAccountMapAsync(apiContext);
+                var accountMapDetailsList = await _integrationService.GetAccountMapDetailsAsync(apiContext);
+                TransactionHeaderDto transactionHeaderObj = new TransactionHeaderDto();
+                List<TransactionDto> transactiondtObj = new List<TransactionDto>();
+                List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
+
+                string dateTime = DateTime.Now.ToString();
+                string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
+                DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
+                //Storing All Transaction Header Value
+                foreach (var accountMap in accountMapDetailsList)
+                {
+                    var accountproperties = GetProperties(claimData);
+                    if (accountMap.Object == "Claim" && accountMap.Event == "Approval")
+                    {
+                        if (transactionHeaderObj.TransactionRuleMappingId != accountMap.TransactionRuleMappingId)
+                        {
+                            transactionHeaderObj.TransactionRuleMappingId = accountMap.TransactionRuleMappingId;
+                            transactionHeaderObj.RuleName = accountMap.RuleName;
+                            transactionHeaderObj.IsActive = "Y";
+                            transactionHeaderObj.CreatedDate = date;
+                        }
+                    }
+                }
+                //Storing all TransactionConditions Value
+                foreach (var accountMapCd in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapCd.TransactionConditions)
+                    {
+                        var accountproperties = GetProperties(claimData);
+                        if (accountMapCd.Object == "Claim" && accountMapCd.Event == "Approval")
+                        {
+                            TransactionDto transactionDto = new TransactionDto();
+                            foreach (var actnProp in accountproperties)
+                            {
+                                if (claimData.GetType().GetProperty("Currency") != null)
+                                {
+                                    var currency = claimData.GetType().GetProperty("Currency").GetValue(claimData, null);
+                                    transactionDto.Currency = Convert.ToString(currency);
+                                }
+                                else
+                                {
+                                    transactionDto.Currency = "INR";
+                                }
+                                var Amount = claimData.GetType().GetProperty("ApprovedClaimAmount").GetValue(claimData, null);
+                                transactionDto.TypeOfTransaction = accountMap.TypeofTransaction;
+                                if (accountMap.TypeofTransaction == "Credit")
+                                {
+
+                                    transactionDto.Amount = Convert.ToDecimal(Amount);
+
+                                }
+                                if (accountMap.TypeofTransaction == "Debit")
+                                {
+
+                                    transactionDto.Amount = Convert.ToDecimal(Amount);
+
+                                }
+                                //transactionDto.Amount = (decimal)sumInsured;
+                                transactionDto.Description = accountMap.Description;
+                                transactionDto.IsActive = "Y";
+
+                                transactionDto.CreatedDate = accountMap.CreatedDate;
+                                transactionDto.RuleName = accountMapCd.RuleName;
+                                transactionDto.Object = accountMapCd.Object;
+                                transactionDto.Event = accountMapCd.Event;
+                                transactionDto.AccountType = accountMap.AccountType;
+                                transactionDto.Value = accountMap.Value;
+                                transactionDto.AccountCode = accountMap.AccountCode;
+                                //Addition of Partner Id and Product Id
+                                //Addition of Partner Id and Product Id
+                                if (claimData.GetType().GetProperty("PartnerId") != null)
+                                {
+                                    var partnerId = claimData.GetType().GetProperty("PartnerId").GetValue(claimData, null);
+                                    transactionDto.PartnerId = Convert.ToDecimal(partnerId);
+                                }
+                                else
+                                {
+                                    transactionDto.PartnerId = apiContext.PartnerId;
+                                }
+
+                                if (claimData.GetType().GetProperty("OrganizationId") != null)
+                                {
+                                    var partnerId = claimData.GetType().GetProperty("OrganizationId").GetValue(claimData, null);
+                                    transactionDto.OrganizationId = Convert.ToDecimal(partnerId);
+                                }
+                                else
+                                {
+                                    transactionDto.OrganizationId = apiContext.OrgId;
+                                }
+                                if (claimData.GetType().GetProperty("ProductId") != null)
+                                {
+                                    var productId = claimData.GetType().GetProperty("ProductId").GetValue(claimData, null);
+                                    transactionDto.ProductId = Convert.ToDecimal(productId);
+                                }
+                                else
+                                {
+                                    transactionDto.ProductId = 0;
+                                }
+                            }
+                            transactiondtObj.Add(transactionDto);
+                        }
+                    }
+                }
+                transactionHeaderObj.Transaction.AddRange(transactiondtObj);
+                //Storing Ledger Value 
+                foreach (var accountMapSl in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapSl.SubLedgerReferences)
+                    {
+                        TransactionSubLedgerDto transSubLedger = new TransactionSubLedgerDto();
+                        var accountproperties = GetProperties(claimData);
+                        if (accountMapSl.Object == "Claim" && accountMapSl.Event == "Approval")
+                        {
+                            foreach (var actnProp in accountproperties)
+                            {
+                                transSubLedger.SubLedgerReferencesId = accountMap.SubLedgerReferencesId;
+                                if (accountMap.LedgerObject == "Policy")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "Amount")
+                                    {
+                                        ledgerColName = "ApprovedClaimAmount";
+                                    }
+                                    if (ledgerColName == "Policy Number")
+                                    {
+                                        ledgerColName = "PolicyNumber";
+                                    }
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Product")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Claim")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "Policy Number")
+                                    {
+                                        ledgerColName = "PolicyNumber";
+                                    }
+                                    if (ledgerColName == "Claim Number")
+                                    {
+                                        ledgerColName = "ClaimNumber";
+                                    }
+                                    if (ledgerColName == "Insured Ref")
+                                    {
+                                        ledgerColName = "InsuredName";
+                                    }
+                                    if (claimData.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = claimData.GetType().GetProperty(ledgerColName).GetValue(claimData, null);
+                                        transSubLedger.Value = Convert.ToString(ledgerColValue);
+                                    }
+                                }
+                                transSubLedger.IsActive = "Y";
+                            }
+                            transactionLedgerObj.Add(transSubLedger);
+                        }
+                    }
+                }
+                transactionHeaderObj.TransactionSubLedger.AddRange(transactionLedgerObj);
+
+                var Sendtransaction = await _integrationService.CreateTranasactionAsync(transactionHeaderObj, apiContext);
+                Responce = Sendtransaction.Status.ToString();
+
+
+                return Responce;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+
+
+
 
         public async Task<ClaimResponse> CreateClaimAsync(dynamic claimDetail, ApiContext apiContext)
         {
@@ -322,6 +913,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
         public async Task<ClaimsDTO> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext)
         {
+
             List<ClaimInsurableDTO> claimInsurableDTO = new List<ClaimInsurableDTO>();
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
 
@@ -339,11 +931,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             UpdateClaimData(claims, apiContext);
 
             claims.OrganizationId = Convert.ToDecimal(policyDetails.CustomerId);
-
+            claims.ProductIdPk = policyDetails.ProductIdPk;
+       
             var _tblclaims = _mapper.Map<TblClaims>(claims);
             _context.TblClaims.Add(_tblclaims);
             _context.SaveChanges();
 
+
+           
             var _claimsDTOs = _mapper.Map<ClaimsDTO>(_tblclaims);
             _claimsDTOs.Status = BusinessStatus.Created;
             _claimsDTOs.ResponseMessage = "record created..";
@@ -356,8 +951,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             // New changes 
             SendEmailAsync(emailTest);
+            //Accouting Transaction 
+            var account = AccountMapIntimation(apiContext, claims);
 
             return _claimsDTOs;
+
         }
 
         private async Task<ClaimDataDTO> UpdateClaimData(ClaimDataDTO claims, ApiContext apiContext)
@@ -379,10 +977,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             _claims.LocationOfEvent = claims.locationOfLoss;
             _claims.LossOfDescription = claims.lossDescription;
             _claims.PolicyNo = claims.PolicyNumber;
+            _claims.ProductIdPk = claims.ProductIdPk;
 
             BankAccountsDTO _bankAccounts = new BankAccountsDTO();
-            TblClaimdoc _claimdoc = new TblClaimdoc();
+            List<ClaimdocDTO> _claimdoc = new List<ClaimdocDTO>();
             ClaimsHistoryDTO _claimsHistory = new ClaimsHistoryDTO();
+
 
             // ClaimsDTO _claims = new ClaimsDTO();
 
@@ -394,6 +994,19 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             _bankAccounts.BankName = claims.BankName;
             _bankAccounts.Ifsccode = claims.IfscCode;
             _bankAccounts.CreatedDate = DateTime.Now;
+
+            //inserting data to tblclaimdoc
+            //foreach (var item in claims.Alldoc)
+            //{
+            //    TblClaimdoc doc = new TblClaimdoc();
+            //    doc.DmsdocId = item.DmsdocId;
+            //    doc.DocumentName = item.DocumentName;
+            //    _claimdoc.Add(doc);
+            //}
+
+           // var tblclaimdoc = _mapper.Map<List<TblClaimdoc>>(claims.Alldoc);
+           // _context.TblClaimdoc.AddRange(tblclaimdoc);
+           //_context.SaveChanges();
 
             //inserting data to tblclaimhistory
             // _claimsHistory.ClaimId = Claimid;
@@ -411,6 +1024,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             // claims.TblBankAccounts.
 
             claims.TblBankAccounts.Add(_bankAccounts);
+            
 
             // claims.ClaimsHistory.Add(_claimsHistory);
             return claims;
@@ -513,7 +1127,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     var check = ClaimPolicyNumber.Where(x => x.Key == i.ToString()).Any();
                     if (!check)
                     {
-                        ClaimPolicyNumber.Add(i.ToString(), Policyno.First().Value);
+                        ClaimPolicyNumber.Add(i.ToString(), Policyno.FirstOrDefault().Value);
                     }
                 }
 
@@ -567,8 +1181,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     foreach (var itemi in ApprovedFinanceData)
                     {
                         var policyno = ClaimPolicyNumber.Values;
-
-                        finance.PolicyNo = ClaimPolicyNumber[item.PolicyId.ToString()];
+                        var policy = policyDetails.FirstOrDefault(p => p.PolicyId == item.PolicyId);
+                        finance.PolicyNo = policy.PolicyNo;
+                        finance.InsuredName = policy.CoverNoteNo;
+                        finance.InsuredRefNo = policy.CustomerId;
                         finance.ClaimNo = ClaimStatus[item.ClaimId];
                         finance.ClaimStatus = claimstatusvalue;
                         finance.BankAccountHolderName = itemi.AccountHolderName;
@@ -669,7 +1285,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     var check = ClaimPolicyNumber.Where(x => x.Key == i.ToString()).Any();
                     if (!check)
                     {
-                        ClaimPolicyNumber.Add(i.ToString(), Policyno.First().Value);
+                        ClaimPolicyNumber.Add(i.ToString(), Policyno.FirstOrDefault().Value);
                     }
                 }
 
@@ -725,8 +1341,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     foreach (var itemi in ApprovedFinanceData)
                     {
                         var policyno = ClaimPolicyNumber.Values;
-
-                        finance.PolicyNo = ClaimPolicyNumber[item.PolicyId.ToString()];
+                        var policy = policyDetails.FirstOrDefault(p => p.PolicyId == item.PolicyId);
+                        finance.PolicyNo = policy.PolicyNo;
+                        finance.InsuredName = policy.CoverNoteNo;
+                        finance.InsuredRefNo = policy.CustomerId;
                         finance.ClaimNo = ClaimStatus[item.ClaimId];
                         finance.ClaimStatus = claimstatusvalue;
                         finance.BankAccountHolderName = itemi.AccountHolderName;
@@ -831,7 +1449,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     var check = ClaimPolicyNumber.Where(x => x.Key == i.ToString()).Any();
                     if (!check)
                     {
-                        ClaimPolicyNumber.Add(i.ToString(), Policyno.First().Value);
+                        ClaimPolicyNumber.Add(i.ToString(), Policyno.FirstOrDefault().Value);
                     }
                 }
 
@@ -877,8 +1495,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     foreach (var itemi in ApprovedFinanceData)
                     {
                         var policyno = ClaimPolicyNumber.Values;
-
-                        finance.PolicyNo = ClaimPolicyNumber[item.PolicyId.ToString()];
+                        var policy = policyDetails.FirstOrDefault(p => p.PolicyId == item.PolicyId);
+                        finance.PolicyNo = policy.PolicyNo;
+                        finance.InsuredName = policy.CoverNoteNo;
+                        finance.InsuredRefNo = policy.CustomerId;
                         finance.ClaimNo = ClaimStatus[item.ClaimId];
                         finance.ClaimStatus = claimstatusvalue;
                         finance.BankAccountHolderName = itemi.AccountHolderName;
@@ -979,6 +1599,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var Insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == claimsDTO.ClaimId).ToList();
             EmailTest emailTest = new EmailTest();
             TblClaimHistory claimsHistory = new TblClaimHistory();
+            TblClaimdoc claimdoc = new TblClaimdoc();
+
+            var oldstatusId = ClaimApproval.ClaimStatusId;
             // Get Clone 
             //  var hisClaimApproval= Clone.ClaimApproval.
 
@@ -992,14 +1615,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 emailTest.To = claimsDTO.EmailId;
                 emailTest.Subject = "Claim successfully approved";
-                emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " successfully approved against policy No: " + claimsDTO.PolicyNumber + "Insured:" + claimsDTO.InsuredName + " \n Your Claim has been approved, by the Claims Manager. \n The Approved Claims will be settled as per the policy terms and conditions.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
+                emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " successfully approved. \n Your Claim has been approved, by the Claims Manager. \n The Approved Claims will be settled as per the policy terms and conditions.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
 
             }
             else if (claimsprocess.ClaimStatusId == 11)
             {
                 emailTest.To = claimsDTO.EmailId;
                 emailTest.Subject = "Claim Rejected";
-                emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " has been rejected against policy No: " + claimsDTO.PolicyNumber + "Insured:" + claimsDTO.InsuredName + " \n Your Claim has been rejected, by the Claims Manager. \n We regret to inform you that your claim has been Rejected by the claims manager.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
+                emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " has been rejected. \n Your Claim has been rejected, by the Claims Manager. \n We regret to inform you that your claim has been Rejected by the claims manager.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
             }
 
             _context.TblClaims.Update(claimsprocess);
@@ -1013,7 +1636,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             //adding new record to tblhistory on updating claimstatus of existing claim from tblclaims
             claimsHistory.ClaimId = ClaimApproval.ClaimId;
-            claimsHistory.ClaimStatusId = claimsDTO.ClaimStatusId;
+            //claimsHistory.ClaimStatusId = claimsDTO.ClaimStatusId;
+            claimsHistory.ClaimStatusId = oldstatusId;
             claimsHistory.ClaimAmount = ClaimApproval.ClaimAmount;
             claimsHistory.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
             claimsHistory.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
@@ -1033,10 +1657,19 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             claimsHistory.Active = true;
 
+            //updating doc details in tblclaimdoc 
+            //claimdoc.ClaimId = ClaimApproval.ClaimId;
+            //claimdoc.DmsdocId = claimsDTO.DmsdocId;
+            //claimdoc.DocumentName = claimsDTO.DocumentName;
+
+
             _context.TblClaimHistory.Add(claimsHistory);
+           // _context.TblClaimdoc.Update(claimdoc);
             _context.SaveChanges();
 
             var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
+            //Accouting Transaction 
+            var account = AccountMapApproval(apiContext, claimsDTO);
             return _claimprocess;
 
         }
@@ -1055,6 +1688,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 claimdocDTO.ClaimId = claimdoc.ClaimId;
                 claimdocDTO.CreatedDate = claimdoc.CreatedDate;
                 claimdocDTO.CreatedBy = apiContext.UserId;
+                claimdocDTO.DmsdocId = claimdoc.DmsdocId;
                 var _claimDoc = _mapper.Map<TblClaimdoc>(claimdocDTO);
                 _context.TblClaimdoc.Add(_claimDoc);
             }
@@ -1066,6 +1700,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 claimdocDTO.ModifiedBy = apiContext.UserId;
                 claimdocDTO.ModifiedDate = DateTime.Now;
                 //claimdetails.ProfileImage = fileBytes;
+                claimdocDTO.DmsdocId = claimdoc.DmsdocId;
                 var _claimDoc = _mapper.Map<TblClaimdoc>(claimdocDTO);
                 _context.TblClaimdoc.Update(_claimDoc);
             }
@@ -1138,13 +1773,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, cDTO.EvtId.ToString()));
 
+            List<BillingEventDataDTO> Claimlist = new List<BillingEventDataDTO>();
             BillingEventDataDTO ClaimEvent = new BillingEventDataDTO();
 
-            ClaimEvent.Count = _context.TblClaims.Where(ac => ac.OrganizationId == cDTO.CustomerId && ac.CreatedDate.Value.Date <= cDTO.FromDate.Date && ac.CreatedDate.Value.Date <= cDTO.ToDate.Date).Count();
-
-            List<BillingEventDataDTO> Claimlist = new List<BillingEventDataDTO>();
-            Claimlist.Add(ClaimEvent);
-
+            if(cDTO.FromDate!=null && cDTO.ToDate != null)
+            {
+                ClaimEvent.Count = _context.TblClaims.Where(ac => ac.OrganizationId == cDTO.CustomerId && ac.CreatedDate.Value.Date >= cDTO.FromDate.Date && ac.CreatedDate.Value.Date <= cDTO.ToDate.Date).Count();
+                Claimlist.Add(ClaimEvent);
+            }
             return Claimlist;
         }
 
@@ -1374,6 +2010,15 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             var _claims = _context.TblClaims.OrderByDescending(p => p.CreatedDate).Select(x => x);
             var _policydata = await _integrationService.GetPolicyByNumber(searchclaim.PolicyNo, apiContext);
+
+            if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
+            {
+                _claims = _claims.Where(pr => pr.PartnerId == apiContext.PartnerId && pr.OrganizationId == apiContext.OrgId);
+            }
+            else if (apiContext.OrgId > 0)
+            {
+                _claims = _claims.Where(pr => pr.OrganizationId == apiContext.OrgId);
+            }
 
             SearchDTO policyId = new SearchDTO();
 
@@ -1819,13 +2464,15 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 claimResponseDTO.CreatedDate = item.CreatedDate;
                 claimResponseDTO.PolicyNo = item.PolicyNo;
                 claimResponseDTO.ClaimcurrStatus = claimStaus.FirstOrDefault(x => x.CommonTypeId == item.ClaimStatusId).Value;
+                var statusId = _context.TblmasCmcommonTypes.SingleOrDefault(x => x.CommonTypeId == item.ClaimStatusId);
+                claimResponseDTO.ClaimprevStatus = statusId.Value;
                 claimResponseDTO.AccountHolderName = _context.TblBankAccounts.FirstOrDefault(x => x.ClaimId == item.ClaimId).AccountHolderName;
 
                 ListReport.Add(claimResponseDTO);
             }
             foreach (var item in _historydata)
             {
-                // var statusId = _context.TblmasCmcommonTypes.SingleOrDefault(x => x.CommonTypeId == itemh.ClaimStatusId);
+                var statusId = _context.TblmasCmcommonTypes.SingleOrDefault(x => x.CommonTypeId == item.ClaimStatusId);
                 //claimResponseDTO.ClaimId = itemh.ClaimId;
                 //claimResponseDTO.ClaimcurrStatus = statusId.Value;
                 claimResponseDTO = new ClaimResponseDTO();
@@ -1834,10 +2481,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 claimResponseDTO.lossDateTime = item.LossDateTime;
                 claimResponseDTO.CreatedDate = item.CreatedDate;
                 claimResponseDTO.PolicyNo = item.PolicyNo;
-                //var statusId = _context.TblClaims.FirstOrDefault(x => x.ClaimId == item.ClaimId).ClaimStatusId;
-                claimResponseDTO.ClaimcurrStatus = claimStaus.FirstOrDefault(x => x.CommonTypeId == item.ClaimStatusId).Value;
-                //claimResponseDTO.AccountHolderName = _context.TblBankAccounts.FirstOrDefault(x => x.ClaimId == item.ClaimId).AccountHolderName;
-                //  ListReport.Add(claimResponseDTO);
+                var statusid = _context.TblClaims.SingleOrDefault(x => x.ClaimId == item.ClaimId).ClaimStatusId;
+                claimResponseDTO.ClaimcurrStatus = claimStaus.FirstOrDefault(x => x.CommonTypeId == statusid).Value;
+                claimResponseDTO.ClaimprevStatus = statusId.Value;
+                //claimStaus.FirstOrDefault(x => x.CommonTypeId == item.ClaimStatusId).Value;
+                claimResponseDTO.AccountHolderName = _context.TblBankAccounts.FirstOrDefault(x => x.ClaimId == item.ClaimId).AccountHolderName;
+                ListReport.Add(claimResponseDTO);
             }
 
 
@@ -1892,10 +2541,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var files = httpRequest.Form.Files;
             //var docId = GetActiveResult(file.Name); HttpRequest
             DataTable dt = new DataTable();
+            decimal bankDocId = 0;
             foreach (var file in files)
             {
                 var filename = file.Name;
                 var tblbankdoc = await GetDocumentId(file.Name, apiContext);
+                bankDocId = tblbankdoc.BankDocId;
 
                 if (file == null || file.Length <= 0)
                 {
@@ -1964,7 +2615,19 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                                     {
                                         //DateTime date = DateTime.FromOADate(Convert.ToDouble(worksheet.Cells[row, 15].Value));
                                         //DateTime date = Convert.ToDateTime(Convert.ToDouble(worksheet.Cells[row, 15].Value.ToString()));
-                                        dr["PaymentDate"] = worksheet.Cells[row, 15].Value;
+                                        if (worksheet.Cells[row, 15].Value.ToString().Contains("/"))
+                                        {
+                                            dr["PaymentDate"] = worksheet.Cells[row, 15].Value.ToString();
+                                        }
+                                        else
+                                        {
+                                            long dateNum = long.Parse(worksheet.Cells[row, 15].Value.ToString());
+                                            DateTime result = DateTime.FromOADate(dateNum);
+                                            var CultInfo = CultureInfo.CreateSpecificCulture("en-US");
+                                            var st = result.ToString("dd/MM/yyyy", CultInfo);
+                                            dr["PaymentDate"] = st;
+                                        }
+
                                     }
                                     dr["Active"] = worksheet.Cells[row, 16].Value;
                                     dr["CreatedBy"] = worksheet.Cells[row, 17].Value.ToString().Trim();
@@ -1978,12 +2641,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     catch (Exception ex)
                     {
                         var error = ex.ToString();
-                        return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                        return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please check the values and re-enter" };
                     }
                 }
             }
             try
             {
+              
+
                 // add list to db ..
                 // here just read and return
                 string connetionString = await _integrationService.GetEnvironmentConnectionforDoc(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
@@ -1997,21 +2662,45 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     bulkCopy.BulkCopyTimeout = 600;
                     bulkCopy.DestinationTableName = "[CM].[tblBankFile]";
                     bulkCopy.WriteToServer(dt);
+                    
                     await UpdateBankfileAsync(apiContext);
+                    object claimData = await TransactionData(bankDocId,apiContext);
+                    var account = AccountMapPayment(apiContext, claimData);
                 }
             }
             catch (Exception ex)
             {
                 var error = ex.ToString();
-                return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please check the values and re-enter" };
                 //return DemoResponse<List<BankFileDTO>>.GetResult(-1, error);
             }
-            return new DocumentResponse { Status = BusinessStatus.Ok, ResponseMessage = $"Document uploaded succefully!" };
+            return new DocumentResponse { Status = BusinessStatus.Ok, ResponseMessage = $"Document uploaded successfully!" };
             //return DemoResponse<List<BankFileDTO>>.GetResult(0, "OK", list);
             //}
             //return DemoResponse<List<BankFileDTO>>.GetResult(2, "Data still processing");
         }
 
+        private async Task<Object> TransactionData(decimal docId,ApiContext apiContext)
+        {
+            _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            var data = _context.TblBankFile.Where(a => a.PaymentStatus == "Settled" && a.BankDocId== docId).ToList();
+            AccountCheckDTO objCheck = new AccountCheckDTO();
+            var resultdata = _mapper.Map<List<AccountDTO>>(data);
+            foreach(var item in resultdata)
+            {
+                objCheck.PolicyNo = item.PolicyNo;
+                objCheck.ClaimNo = item.ClaimNo;
+                objCheck.ClaimStatus = item.ClaimStatus;
+                objCheck.InsuredName = item.InsuredName;
+                objCheck.InsuredRefNo = item.InsuredRefNo;
+                objCheck.Amount = item.Amount;
+                objCheck.Utrno = item.Utrno;
+                objCheck.PaymentStatus = item.PaymentStatus;
+                objCheck.PaymentDate = item.PaymentDate;
+            }
+            return objCheck;
+        }
+        
         private async Task<int> UpdateBankfileAsync(ApiContext apiContext)
         {
             //  _context = (MICAPOContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
@@ -2028,5 +2717,18 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             return res;
         }
-    }
+        public async Task<decimal> GetBalanceSumInsured(string policyNo,ApiContext apiContext)
+        {
+
+            _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            // var policyDetails = await _integrationService.GetPolicyByNumber(policyNo, apiContext);
+
+            var TotalAmount=_context.TblClaims.Where(s => s.PolicyNo == policyNo && s.ClaimStatusId==22).Sum(p=>p.ApprovedClaimAmount);
+            var amount = (decimal)TotalAmount;
+           var PolicySumInsured= await _integrationService.UpdatePolicySumInsuredAsync(policyNo, amount, apiContext);
+
+            return PolicySumInsured;
+        }
+        }
 }

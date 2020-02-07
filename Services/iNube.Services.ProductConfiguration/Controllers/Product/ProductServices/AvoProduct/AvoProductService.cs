@@ -889,6 +889,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             throw new NotImplementedException();
         }
+        public Task<DocumentResponse> PromoDocupload(string productcode, string productId,HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<List<LeadInfoDTO>> BulkSMS(ApiContext apiContext)
         {
@@ -896,6 +900,49 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         }
 
         public Task<LeadInfoDTO> GetLeadInfo(int LeadID, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<List<CoverListValue>> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<ProductResponse> ProductNamevalidation(string name, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        //public Task<List<CoverListValue>> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public Task<ProductResponse> PromoApply(PromoDTO promo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<dynamic> GetProductRateConfig(int productid, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<ProductRatingMapping>> GetProductRateMapping(int productid, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public async Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public async Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

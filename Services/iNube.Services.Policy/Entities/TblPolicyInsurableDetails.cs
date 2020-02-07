@@ -13,6 +13,7 @@ namespace iNube.Services.Policy.Entities
         public string CoverValue { get; set; }
         public decimal PolicyId { get; set; }
         public decimal? BenefitAmount { get; set; }
+        public bool? IsActive { get; set; }
 
         public virtual TblPolicy Policy { get; set; }
     }

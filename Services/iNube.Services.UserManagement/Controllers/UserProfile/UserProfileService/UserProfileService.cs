@@ -31,7 +31,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         Task<SendOtpResponse> SendOTP(SendOtp sendOtp, ApiContext apiContext);
         Task<SendOtpResponse> ResetOTP(SendOtp sendOtp, ApiContext apiContext);
         UserEmailResponse UserEmailValidations(string emailid, ApiContext apiContext);
-        String DeleteUserById(string Id, ApiContext apiContext);
+        UserDTO DeleteUserById(string Id, ApiContext apiContext);
         UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext context);
         UserNameById GetUserNameById(string Id, ApiContext apiContext);
     }
@@ -164,7 +164,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         {
             return _userproductService(apiContext.ProductType).UserEmailValidations(emailid, apiContext);
         }
-        public String DeleteUserById(string Id, ApiContext apiContext)
+        public UserDTO DeleteUserById(string Id, ApiContext apiContext)
         {
             return _userproductService(apiContext.ProductType).DeleteUserById(Id, apiContext);
         }

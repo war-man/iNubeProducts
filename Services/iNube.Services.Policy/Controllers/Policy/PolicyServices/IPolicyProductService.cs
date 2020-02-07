@@ -10,6 +10,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<PolicyResponse> CreatePolicy(dynamic policyDetail, ApiContext apiContext);
 
         Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext);
+        Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext);
 
         Task<PolicyDTO> ModifyPolicy(string policyNumber, PolicyDTO policyDetail, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetMaster(string sMasterlist, ApiContext apiContext);
@@ -31,5 +32,21 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequest, ApiContext apiContext);
         Task<List<ddDTOs>> PolicyDashboardMaster(ApiContext apiContext);
         Task<LeadInfoDTO> CustomerPolicy(int CustomerId, ApiContext apiContext);
+        Task<IEnumerable<PolicyCountDTO>> PolicySearchDashboard(PolicySearchDashboardDTO policysearch, ApiContext apiContext);
+        Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext);
+        Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext);
+        Task<EndorsmentDTO> SwitchOnOff(dynamic switchOnOffRequest, ApiContext apiContext);
+
+        //GetCDBalanceByPolicyNO
+        //Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string PolicNo, ApiContext apiContext);
+
+        Task<decimal> GetPolicyDetailsByPolicyNo(string PolicyNO, ApiContext apiContext);
+        Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext);
+        Task<object> CalCulatePremium(DynamicData premiumParameter, ApiContext apiContext);
+        Task<PolicyDTO> ModifyInsurabableItem(object modifydata, ApiContext apiContext);
+        Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
+        Task<decimal> UpdateSumInsured (string PolicyNumber, decimal amount,ApiContext apiContext);
+
+
     }
 }

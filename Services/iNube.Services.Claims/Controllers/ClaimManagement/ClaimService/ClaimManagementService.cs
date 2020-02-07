@@ -42,6 +42,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest cDTO, ApiContext apiContext);
         Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext);
     }
     public class ClaimManagementService : IClaimManagementService
     {
@@ -192,6 +193,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         public async Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).Documentupload(httpRequest, cancellationToken, apiContext);
+        }
+
+        public async Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).GetBalanceSumInsured(policyNo,apiContext);
         }
     }
 }

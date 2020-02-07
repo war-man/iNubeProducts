@@ -10,6 +10,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public double BenefitAmount { get; set; }
         public double FromValue { get; set; }
         public double ToValue { get; set; }
+        public decimal? PremiumAmount { get; set; }
 
         public virtual TblProductBenefits Benifit { get; set; }
     }

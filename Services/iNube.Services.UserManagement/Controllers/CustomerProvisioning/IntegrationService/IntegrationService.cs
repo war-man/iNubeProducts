@@ -21,7 +21,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
     public class IntegrationService : IIntegrationService
     {
         //readonly string BillingConfigUrl = "https://localhost:44362";
-        //readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
+     //   readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
 		readonly string BillingConfigUrl = "http://dev2-mica-billing.aws.vpc.:9001";
 
 

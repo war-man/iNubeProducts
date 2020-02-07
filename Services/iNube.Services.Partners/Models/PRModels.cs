@@ -279,6 +279,14 @@ namespace iNube.Services.Partners.Models
         public virtual ICollection<PartnerAddressDTO> PartnerAddress { get; set; }
     }
 
+    public partial class PartnerDetailsDTO
+    {
+        public decimal PartnerId { get; set; }
+        public string PartnerName { get; set; }
+        public string Email { get; set; }
+        public decimal? OrgId { get; set; }
+    }
+
     public partial class PartnerAddressDTO
     {
         public decimal PartnerAddressId { get; set; }
@@ -303,6 +311,7 @@ namespace iNube.Services.Partners.Models
         public string Pan { get; set; }
         public string partnerCode { get; set; }
         public string partnerName { get; set; }
+        public int? Status { get; set; }
     }
     #endregion
 
@@ -404,7 +413,7 @@ namespace iNube.Services.Partners.Models
         }
 
         public decimal Cdid { get; set; }
-        public decimal PartnerId { get; set; }
+        public decimal? PartnerId { get; set; }
         public decimal ProductId { get; set; }
         public string AccountNo { get; set; }
         public decimal? InitialAmount { get; set; }
@@ -443,7 +452,7 @@ namespace iNube.Services.Partners.Models
         public int? CreditAccountNo { get; set; }
         public int? PaymentModeId { get; set; }
         public string PaymentRefernceId { get; set; }
-        public decimal PartnerId { get; set; }
+        public decimal? PartnerId { get; set; }
         public decimal ProductId { get; set; }
         public string PaymentType { get; set; }
         public DateTime? CreatedDate { get; set; }
@@ -515,6 +524,8 @@ namespace iNube.Services.Partners.Models
         public decimal PaymentId { get; set; }
         public bool IsRefund { get; set; }
         public decimal TxnId { get; set; }
+        public decimal OrgId { get; set; }
+        public string Description { get; set; }
     }
 
     public class CDAccountResponse : ResponseStatus
@@ -636,7 +647,7 @@ namespace iNube.Services.Partners.Models
         public string Message { get; set; }
     }
 
-    public partial class ProductDTO
+    public class ProductDTO
     {
         public int ProductId { get; set; }
         public int? Lobid { get; set; }
@@ -666,28 +677,72 @@ namespace iNube.Services.Partners.Models
         public DateTime? EffectiveTo { get; set; }
     }
 
-    // Accounting Transaction Response
-    public class AccountMapDetailsDto
+    //Transaction 
+    public class TransactionRuleMappingDto
     {
+        public TransactionRuleMappingDto()
+        {
+            TransactionConditions = new HashSet<TransactionConditionsDto>();
+            SubLedgerReferences = new HashSet<SubLedgerReferencesDto>();
+        }
+
         public decimal TransactionRuleMappingId { get; set; }
         public string RuleName { get; set; }
         public string Object { get; set; }
         public string Event { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+
+        public virtual ICollection<TransactionConditionsDto> TransactionConditions { get; set; }
+        public virtual ICollection<SubLedgerReferencesDto> SubLedgerReferences { get; set; }
+    }
+    public class TransactionConditionsDto
+    {
+        public decimal TransactionConditionsId { get; set; }
         public string TypeofTransaction { get; set; }
         public int? AccountCode { get; set; }
+        public string AccountName { get; set; }
         public string AccountType { get; set; }
         public string Value { get; set; }
         public string Description { get; set; }
         public string SubLedgerReference { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string IsActive { get; set; }
+        public decimal TransactionRuleMappingId { get; set; }
+    }
+
+    public class SubLedgerReferencesDto
+    {
+        public decimal SubLedgerReferencesId { get; set; }
         public string LedgerObject { get; set; }
         public string LedgerColName { get; set; }
+        public decimal TransactionRuleMappingId { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
         public string TableName { get; set; }
+
     }
 
     //Accounting Transaction Response
-    public class SendTransactionDto
+    // Sending Transaction Data to One Shot In Accouting Transaction 
+    public class TransactionHeaderDto
+    {
+        public TransactionHeaderDto()
+        {
+            Transaction = new List<TransactionDto>();
+            TransactionSubLedger = new List<TransactionSubLedgerDto>();
+        }
+
+        public decimal TransactionHeaderId { get; set; }
+        public decimal TransactionRuleMappingId { get; set; }
+        public string RuleName { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+
+        public virtual List<TransactionDto> Transaction { get; set; }
+        public virtual List<TransactionSubLedgerDto> TransactionSubLedger { get; set; }
+    }
+    public class TransactionDto
     {
         public decimal TransactionId { get; set; }
         public string TypeOfTransaction { get; set; }
@@ -702,6 +757,24 @@ namespace iNube.Services.Partners.Models
         public string Value { get; set; }
         public int? AccountCode { get; set; }
         public string Currency { get; set; }
+        public decimal? PartnerId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public decimal? ContractId { get; set; }
+        public decimal? TransactionHeaderId { get; set; }
+        public decimal? ProductId { get; set; }
+    }
+    public class TransactionSubLedgerDto
+    {
+        public decimal TransactionSubLedgerId { get; set; }
+        public decimal TransactionHeaderId { get; set; }
+        public decimal SubLedgerReferencesId { get; set; }
+        public string Value { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+    }
+    public class TransactionsResponse : ResponseStatus
+    {
+        public TransactionHeaderDto Transactions { get; set; }
     }
     public class ProductRiskDetailsDTO
     {
@@ -807,11 +880,7 @@ namespace iNube.Services.Partners.Models
         //  public virtual CoverRcbdetailsDTO CoverRcbdetails { get; set; }
 
     }
-    // For Accounting Transaction Responce
-    public class TransactionsResponse : ResponseStatus
-    {
-        public SendTransactionDto Transactions { get; set; }
-    }
+    
 
     #region ProductKit
     public class PolicycancelDTO
@@ -822,6 +891,75 @@ namespace iNube.Services.Partners.Models
         public string Remarks;
 
     }
+    #region ProductKit-CI
+
+    public class ClaimDataDTO
+    {
+        public ClaimDataDTO()
+        {
+            ClaimInsurable = new List<ClaimInsurableDTO>();
+            TblBankAccounts = new List<BankAccountsDTO>();
+        }
+        public string PolicyNumber;
+        public DateTime? lossDateTime;
+        public string locationOfLoss;
+        public int lossIntimatedBy;
+        public string lossDescription;
+        public int? ClaimAmount;
+        public string AccHolderName;
+        public string AccNumber;
+        public string BankName;
+        public string BankBranchAdd;
+        public string IfscCode;
+        public string EmailId;
+        public string DocumentType;
+        public string DocumentName;
+        public int ClaimStatusId;
+        public bool? Active;
+        public decimal? PolicyId;
+        public int ClaimInsurableId;
+        public string InsurableItem;
+        public string Name;
+        public string IdentificationNo;
+        public string TypeOfLoss;
+        public decimal? BenefitAmount;
+        public int? ClaimAmounts;
+        public DateTime? CreatedDate;
+        public string CreatedBy;
+        public decimal? PartnerId;
+        public decimal? OrganizationId;
+        public string ClaimNumber;
+        public List<BankAccountsDTO> TblBankAccounts;
+        public List<ClaimInsurableDTO> ClaimInsurable;
+    }
+    public class ClaimInsurableDTO
+    {
+        public int ClaimInsurableId;
+        public string InsurableItem;
+        public string Name;
+        public string IdentificationNo;
+        public string CoverName;
+        public decimal? BenefitAmount;
+        public decimal? ClaimAmounts;
+        public decimal? ApprovedClaimAmounts;
+        public int ClaimId;
+    }
+    public class BankAccountsDTO
+    {
+        public int BankId;
+        public string AccountHolderName;
+        public string AccountNumber;
+        public string BankName;
+        public string BankBranchAddress;
+        public string Ifsccode;
+        public DateTime? CreatedDate;
+        public int ClaimId;
+        public string AccountType;
+        public string CreatedBy;
+        public string ModifiedBy;
+        public DateTime? ModifiedDate;
+    }
+    #endregion
     public class NotificationRequest
     {
         public string TemplateKey { get; set; }
@@ -996,6 +1134,35 @@ namespace iNube.Services.Partners.Models
         public Decimal? PartnerId { get; set; }
 
     }
+
+    public class PartnerNameById
+    {
+        public string PartnerName { get; set; }
+    }
+
+    public class MasterCDDTO 
+    {
+
+        public MasterCDDTO()
+        {
+            CdTransactionsDTO = new List<MasterCdTransactionsDTO>();
+           
+        }
+        public string AccountNo { get; set; }
+        public List<MasterCdTransactionsDTO> CdTransactionsDTO { get; set; }
+        public BusinessStatus Status { get; set; }
+              
+    }
+    public class MasterCdTransactionsDTO
+    {
+        public decimal ProductId { get; set; }
+        public string TxnType { get; set; }
+        public decimal Amount { get; set; }
+        public string PaymentReferenceNo { get; set; }
+            
+    }
+  
+
 }
 
 

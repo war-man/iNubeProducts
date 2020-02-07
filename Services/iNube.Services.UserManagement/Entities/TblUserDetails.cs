@@ -55,6 +55,7 @@ namespace iNube.Services.UserManagement.Entities
         public string PartnerName { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public bool? IsActive { get; set; }
 
         public virtual TblmasUmcommonTypes Gender { get; set; }
         public virtual AspNetRoles Role { get; set; }

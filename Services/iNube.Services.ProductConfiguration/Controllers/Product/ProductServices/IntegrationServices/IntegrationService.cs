@@ -13,31 +13,30 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
     public interface IIntegrationService
     {
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
+        Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID,ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
 
         //readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-        ////readonly string partnerUrl = "https://localhost:44315";
-        
-        //readonly string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-       // readonly string notificationUrl = "http://localhost:53000";
-
-        //CHECKING FOR ACCOUNTING
-        //readonly string accountApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionMappingDetails";
-        //readonly string accountApiUrl = "http://localhost:52166/api/AccountConfig/GetTransactionMappingDetails";
-
-        //readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
-        //readonly string createTransactionApi = "http://localhost:52166/api/AccountConfig/CreateTransaction";
+        //readonly string partnerUrl = "https://localhost:44315";
+        readonly string partnerUrl = "http://dev2-mica-user.aws.vpc.:9005";
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
-        //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-		readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+        readonly string UsermanangementUrl = "https://dev2-mica-user.aws.vpc.:9009";
+        //readonly string RatingUrl = "http://localhost:58593";
+        readonly string RatingUrl = "https://inubeservicesrating.azurewebsites.net";
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
             var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+        }
+        public async Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID,ApiContext apiContext)
+        {
+            var uri = partnerUrl + "/api/Partner/GetMasterDataAsync?sMasterlist=Product&partnerId=" + pID;
+            return await GetListApiInvoke<AssignProductList>(uri, apiContext);
         }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url,ApiContext apiContext) where TResponse : new()
@@ -160,10 +159,17 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         //public async Task<BillingEventDataDTO> GetProductBillingDetailAsync(policy pDTO, ApiContext apiContext)
         //{
         //    var uri = productUrl + "/api/Product/GetProductBillingData";
-          
+
         //    //return await PostApiInvoke<ProductDTO>(uri, apiContext);
         //    return await PostApiInvoke<PolicyBilingDataDTO,ProductBilingDataDTO>(uri, apiContext, pDTO);
         //}
+        
+        
+        public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext)
+        {
+            var uri = RatingUrl + "/api/RatingConfig/GetHandleEventsMaster?lMasterlist=" + lMasterlist;
 
+            return await GetListApiInvoke<MasDTO>(uri, apiContext);
+        }
     }
 }

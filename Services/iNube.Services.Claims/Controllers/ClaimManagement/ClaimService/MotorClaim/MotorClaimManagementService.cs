@@ -161,5 +161,15 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         {
             throw new NotImplementedException();
         }
+
+        public Task<decimal> GetBalanceSumInsured(string policyNo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

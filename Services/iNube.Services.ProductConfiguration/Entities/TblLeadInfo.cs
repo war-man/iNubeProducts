@@ -14,5 +14,6 @@ namespace iNube.Services.ProductConfiguration.Entities
         public bool? Emailstatus { get; set; }
         public string ProductCode { get; set; }
         public int? ProductId { get; set; }
+        public bool? IsPayment { get; set; }
     }
 }

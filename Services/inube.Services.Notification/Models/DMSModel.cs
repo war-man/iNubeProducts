@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using iNube.Utility.Framework.Model;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace inube.Services.Notification.Models
 {
     [BsonIgnoreExtraElements]
-    public class DMSDTO
+    public class DMSDTO 
     {
         public DMSDTO()
         {
@@ -28,5 +29,16 @@ namespace inube.Services.Notification.Models
         public string tagName { get; set; }
         public string tagValue { get; set; }
     }
-   
+    public class DMSResponse : ResponseStatus
+    {
+        public DMSResponse()
+        {
+            dMSDTOs = new List<DMSDTO>();
+        }
+        public string Docid { get; set; }
+        public string fileName { get; set; }
+        public List<DMSDTO> dMSDTOs { get; set; }
+
+    }
+
 }

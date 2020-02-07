@@ -20,7 +20,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
     public interface ICustomerProvisioningService
     {
         IEnumerable<ddDTOs> GetMaster(string lMasterlist);
-        Task<List<CustomerSettingsDTO>> createProvision(CustomerProvisioningDTO customerProvisioningDTO, ApiContext apiContext);
+        Task<CustomerResponse> createProvision(CustomerProvisioningDTO customerProvisioningDTO, ApiContext apiContext);
 
     }
     public class CustomerProvisioningService : ICustomerProvisioningService
@@ -37,12 +37,13 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
         //private IMapper mapper;
         //private IOptions<AppSettings> appSettings;
 
-        public CustomerProvisioningService(MICACPContext context, IMapper mapper, IIntegrationService integrationService, IOptions<AppSettings> appSettings, IUserProfileService userService)
+        public CustomerProvisioningService(MICACPContext context, IMapper mapper, IIntegrationService integrationService, IOptions<AppSettings> appSettings, IUserProfileService userService, IRoleService roleService)
         {
             _mapper = mapper;
             _integrationService = integrationService;
             _appSettings = appSettings.Value;
             _userService = userService;
+            _roleService = roleService;
             _cpcontext = context;
         }
 
@@ -60,12 +61,12 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             return ddDtos;
         }
 
-        public async Task<List<CustomerSettingsDTO>> createProvision(CustomerProvisioningDTO customerProvisioningDTO, ApiContext apiContext)
+        public async Task<CustomerResponse> createProvision(CustomerProvisioningDTO customerProvisioningDTO, ApiContext apiContext)
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
             // _cpcontext = (MICACPContext)(DbManager.GetContext(apiContext.ProductType, apiContext.ServerType));
             CustomerSettingsDTO customerSettings = new CustomerSettingsDTO();
-
+            var count = 0;
             foreach (var item in customerProvisioningDTO.customerSettings)
             {
                 item.CreatedDate = DateTime.Now;
@@ -73,13 +74,17 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
 
                 if (item.Type == "Database")
                 {
-                    foreach (var i in customerProvisioningDTO.customerEnvironmentDTOs)
+                    if (count == 0)
                     {
-                        i.Product = apiContext.ProductType;
-                        i.CustomerId = customerProvisioningDTO.CustomerId;
-                        i.CreatedDate = DateTime.Now;
-                        i.IsActive = true;
-                        i.Dbconnection = "inubepeg.database.windows.net; Initial Catalog =" + item.KeyValue + "; User Id =MICAUSER; Password = MICA * user123"; ;
+                        foreach (var i in customerProvisioningDTO.customerEnvironmentDTOs)
+                        {
+                            i.Product = apiContext.ProductType;
+                            i.CustomerId = customerProvisioningDTO.CustomerId;
+                            i.CreatedDate = DateTime.Now;
+                            i.IsActive = true;
+                            i.Dbconnection = "Data Source=inubepeg.database.windows.net; Initial Catalog =" + item.KeyValue + "; User Id=MICAUSER; Password=MICA*user123";
+                        }
+                        count++;
                     }
                 }
 
@@ -103,21 +108,32 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             var _spocdetails = await _integrationService.GetCustProvisioningDetailsAsync(customerProvisioningDTO.CustomerId, apiContext);
             var userdetails = _spocdetails.CustSpocDetails.FirstOrDefault();
             var useradress = _spocdetails.CustAddress.FirstOrDefault();
+            var envid = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).FirstOrDefault();
+            
+
+
             UserDTO userDTO = new UserDTO();
+            userDTO.EnvId = envid.Id;
+            //userDTO.EnvId = cpdata;
             UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
             userDetailsDTO.FirstName = userdetails.FirstName;
             userDetailsDTO.LastName = userdetails.LastName;
-            userDetailsDTO.MaritalStatusId = userdetails.MaritalStatusId;
+            //userDetailsDTO.MaritalStatusId = userdetails.MaritalStatusId;
             //userDetailsDTO.GenderId = userdetails.GenderId;
+            userDetailsDTO.MaritalStatusId = 1005;
+            userDetailsDTO.GenderId = 1001;
+            userDetailsDTO.UserTypeId = 1004; //Internal User type 
             userDetailsDTO.Dob = userdetails.Dob;
             userDetailsDTO.Doj = userdetails.Doj;
             userDetailsDTO.ContactNumber = userdetails.Mobileno;
             userDetailsDTO.Email = userdetails.EmailId;
             userDetailsDTO.PanNo = userdetails.PanNo;
             userDetailsDTO.BranchName = userdetails.BranchName;
-            userDetailsDTO.Email = userdetails.EmailId;
-            userDetailsDTO.RoleId = "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020";
+            userDetailsDTO.RoleId = "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020"; //Role Admin
+            userDetailsDTO.PartnerId = 0;
+            userDetailsDTO.OrganizationId = customerProvisioningDTO.CustomerId;
             userDTO.UserDetails.Add(userDetailsDTO);
+
 
             UserAddressDTO userAddressDTO = new UserAddressDTO();
             userAddressDTO.UserAddressLine1 = useradress.AddressLine1;
@@ -132,13 +148,23 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
 
             try
             {
-                var result = _userService.CreateProfileUser(userDTO, apiContext);
 
-                UserRoleMapDTO userRoles = new UserRoleMapDTO();
-                userRoles.UserId = result.users.Id;
-                string[] roleid = { "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020" };
-                userRoles.RoleId = roleid;
-                var roles = _roleService.AssignRole(userRoles, apiContext);
+                var result = _userService.CreateProfileUser(userDTO, apiContext);
+                //var envids = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).Select(x=>x);
+                if (Convert.ToInt32(result.Status) == 7)
+                {
+                    return new CustomerResponse { Status = BusinessStatus.Error, ResponseMessage = $"Customer user already exists" };
+                }
+                else
+                {
+                    UserRoleMapDTO userRoles = new UserRoleMapDTO();
+                    //userRoles.UserId = result.users.Id;
+                    userRoles.EnvId = envid.Id;
+                    userRoles.UserId = result.users.Id;
+                    string[] roleid = { "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020" };
+                    userRoles.RoleId = roleid;
+                    var roles = _roleService.AssignRole(userRoles, apiContext);
+                }
             }
             catch (Exception ex)
             {
@@ -146,7 +172,9 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             }
 
             var responsedata = _mapper.Map<List<CustomerSettingsDTO>>(customers);
-            return responsedata;
+            //return responsedata;
+            return new CustomerResponse { Status = BusinessStatus.Created, ResponseMessage = $"Customer user created successfully!" };
+
         }
     }
 }

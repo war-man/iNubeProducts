@@ -18,6 +18,8 @@ using iNube.Services.ProductConfiguration.Validations;
 using iNube.Services.ProductConfiguration.Controllers.Product.AvoProductServices;
 using iNube.Services.ProductConfiguration.Entities.AvoEntities;
 using iNube.Services.ProductConfiguration.Controllers.Product.IntegrationServices;
+using Microsoft.Extensions.Options;
+using iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service;
 
 namespace iNube.Services.ProductConfiguration
 {
@@ -60,6 +62,20 @@ namespace iNube.Services.ProductConfiguration
            {
                options.RegisterValidatorsFromAssemblyContaining<Startup>();
            });
+
+            services.Configure<PSDDataBaseSetting>(
+              Configuration.GetSection(nameof(PSDDataBaseSetting)));
+
+            services.AddSingleton<IPSDDataBaseSetting>(sp =>
+                sp.GetRequiredService<IOptions<PSDDataBaseSetting>>().Value);
+
+            services.AddTransient<IPSDService, PSDService>();
+            services.AddAutoMapper();
+            services.AddHealthChecks();
+
+            var appSettings = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettings);
+
 
             services.AddHealthChecks().AddSqlServer(connectionstring);
             services.AddAutoMapper(typeof(Startup));

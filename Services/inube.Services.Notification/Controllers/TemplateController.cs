@@ -1,4 +1,5 @@
 ﻿using inube.Services.Notification.Controllers;
+using inube.Services.Notification.Controllers.DMS.DMSService;
 using inube.Services.Notification.Helpers;
 using inube.Services.Notification.Models;
 using iNube.Utility.Framework.Model;
@@ -30,13 +31,15 @@ namespace inube.Services.Notification.Template
         private readonly IConfiguration _configuration;
         private ICompositeViewEngine _viewEngine;
         private string number;
+        private readonly IDMSService _iDMSService;
 
-        public TemplateController(IHostingEnvironment host, IEmailService emailService, IConfiguration configuration, ICompositeViewEngine viewEngine)
+        public TemplateController(IDMSService idMSService,IHostingEnvironment host, IEmailService emailService, IConfiguration configuration, ICompositeViewEngine viewEngine)
         {
             _viewEngine = viewEngine;
             _host = host;
             _emailService = emailService;
             _configuration = configuration;
+            _iDMSService = idMSService;
         }
         public IActionResult Index()
         {
@@ -451,6 +454,8 @@ namespace inube.Services.Notification.Template
                 if (templateModel.ActionType == "InsuranceCertificate")
                 {
                     await templateHelper.ProcessNotificationEmailAsync(templateModel.FileName, binary, model.EmailTest);
+                    FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
+                     _iDMSService.DocumentSimpleupload(fileUploadDTO);
                 }
                 return new ResponseStatus() { Status = BusinessStatus.Created, MessageKey = content.FileName };
             }

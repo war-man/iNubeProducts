@@ -18,6 +18,8 @@ using OfficeOpenXml;
 using iNube.Services.ProductConfiguration.Controllers.Product.IntegrationServices;
 using System.Data.SqlClient;
 using System.Net;
+using System.Dynamic;
+
 
 namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductServices.MicaProduct
 {
@@ -29,29 +31,30 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         private readonly IServiceProvider _serviceProvider;
         private ILoggerManager _logger;
         private readonly IEmailService _emailService;
-        public MicaProductService(MICAPCContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService)
+        public MicaProductService(MICAPCContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IIntegrationService integrationService)
         {
 
             _mapper = mapper;
             _serviceProvider = serviceProvider;
             _logger = logger;
             _emailService = emailService;
+            _integrationService = integrationService;
         }
 
         public async Task<ProductResponse> Create(ProductDTO productDTO, ApiContext apiContext)
         {
-                _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             try
             {
-                productDTO =await UpdateProductModel(productDTO, apiContext);
+                productDTO = await UpdateProductModel(productDTO, apiContext);
                 var product = _mapper.Map<TblProducts>(productDTO);
                 product.PartnerId = apiContext.PartnerId;
                 _context.TblProducts.Add(product);
                 _context.SaveChanges();
-               // productDTO = _mapper.Map<ProductDTO>(product);
-                var products= await ReUpdateProductModel(product, apiContext);
+                // productDTO = _mapper.Map<ProductDTO>(product);
+                var products = await ReUpdateProductModel(product, apiContext);
                 productDTO = _mapper.Map<ProductDTO>(products);
-                return new ProductResponse { Status = BusinessStatus.Created, product = productDTO, ResponseMessage = $"Product successfully created! \n Product Name: {productDTO.ProductName} & Product ID: {productDTO.ProductId}" };
+                return new ProductResponse { Status = BusinessStatus.Created, product = productDTO, ResponseMessage = $"Product successfully created! \n Product Name: {productDTO.ProductName} & Product Code: {productDTO.ProductCode}" };
             }
 
             catch (Exception ex)
@@ -61,11 +64,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             }
 
         }
-        public async Task<TblProducts>ReUpdateProductModel(TblProducts objProductmodel,ApiContext apiContext)
+        public async Task<TblProducts> ReUpdateProductModel(TblProducts objProductmodel, ApiContext apiContext)
         {
 
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            foreach (var item in objProductmodel.TblProductClausesWarrentiesExclusions) {
+            foreach (var item in objProductmodel.TblProductClausesWarrentiesExclusions)
+            {
 
                 if (item.LevelId == 51)
                 {
@@ -78,15 +82,46 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 }
                 else if (item.LevelId == 53)
                 {
-                    item.RefId = Convert.ToInt32(objProductmodel.TblProductInsurableItems.SelectMany(p=>p.TblProductCovers).FirstOrDefault(s=>s.CoverTypeId==item.SubLevelId).CoverId);
+                    item.RefId = Convert.ToInt32(objProductmodel.TblProductInsurableItems.SelectMany(p => p.TblProductCovers).FirstOrDefault(s => s.CoverTypeId == item.SubLevelId).CoverId);
 
                 }
-                else if  (item.LevelId == 62){
+                else if (item.LevelId == 62)
+                {
                     item.RefId = Convert.ToInt32(objProductmodel.TblProductInsurableItems.SelectMany(p => p.TblProductCovers).FirstOrDefault(s => s.CoverTypeId == item.SubLevelId).CoverId);
                 }
             }
             //var res = _mapper.Map<TblProductClausesWarrentiesExclusions>(objProductmodel.TblProductClausesWarrentiesExclusions);
             _context.TblProductClausesWarrentiesExclusions.UpdateRange(objProductmodel.TblProductClausesWarrentiesExclusions);
+          //  _context.SaveChanges();
+            foreach (var item in objProductmodel.TblProductPremium)
+            {
+                if (item.LevelId == 51)
+                {
+                    item.RefId = objProductmodel.ProductId;
+
+                }
+                else if (item.LevelId == 52)
+                {
+                    item.RefId = Convert.ToInt32(objProductmodel.TblProductInsurableItems.FirstOrDefault(s => s.InsurableItemTypeId == item.SubLevelId).InsurableItemId);
+                }
+                else if (item.LevelId == 53)
+                {
+                    item.RefId = Convert.ToInt32(objProductmodel.TblProductInsurableItems.SelectMany(p => p.TblProductCovers).FirstOrDefault(s => s.CoverTypeId == item.SubLevelId).CoverId);
+
+                }
+                //else if (item.LevelId == 62)
+                //{
+                //    item.RefId = Convert.ToInt32(objProductmodel.TblProductInsurableItems.SelectMany(p => p.TblProductCovers).FirstOrDefault(s => s.CoverTypeId == item.SubLevelId).CoverId);
+                //}
+            }
+            _context.TblProductPremium.UpdateRange(objProductmodel.TblProductPremium);
+          //  _context.SaveChanges();
+
+            foreach (var item in objProductmodel.TblProductRatingMapping) {
+                item.ProductId = objProductmodel.ProductId;
+               
+            }
+            _context.TblProductRatingMapping.UpdateRange(objProductmodel.TblProductRatingMapping);
             _context.SaveChanges();
             return objProductmodel;
 
@@ -100,13 +135,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             BillingEventResponseDTO BillingData = new BillingEventResponseDTO();
             if (pDTO.FromDate != null && pDTO.ToDate != null)
             {
-                var Billingresult = (from tblProducts in _context.TblProducts.Where(tblProducts => tblProducts.OrganizationId==pDTO.CustomerId && tblProducts.CreatedDate.Value.Date >= pDTO.FromDate.Date && tblProducts.CreatedDate.Value.Date <= pDTO.ToDate.Date)
-                select new ProductEventDTO
-                               {
-                                   ProductCode = tblProducts.ProductCode,
-                                   ProductName = tblProducts.ProductName,
-                                   CreatedDate=tblProducts.CreatedDate
-                               });
+                var Billingresult = (from tblProducts in _context.TblProducts.Where(tblProducts => tblProducts.OrganizationId == pDTO.CustomerId && tblProducts.CreatedDate.Value.Date >= pDTO.FromDate.Date && tblProducts.CreatedDate.Value.Date <= pDTO.ToDate.Date)
+                                     select new ProductEventDTO
+                                     {
+                                         ProductCode = tblProducts.ProductCode,
+                                         ProductName = tblProducts.ProductName,
+                                         CreatedDate = tblProducts.CreatedDate
+                                     });
                 List<BillingEventDataDTO> BillingResult = new List<BillingEventDataDTO>();
                 BillingData.productEventDTOs.AddRange(Billingresult);
             }
@@ -133,7 +168,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             if (pDTO.FromDate != null && pDTO.ToDate != null)
             {
 
-                Bilingresult.Count = _context.TblProducts.Where(ac => ac.OrganizationId== pDTO.CustomerId && ac.CreatedDate.Value.Date >= pDTO.FromDate.Date && ac.CreatedDate.Value.Date <= pDTO.ToDate.Date).Count();
+                Bilingresult.Count = _context.TblProducts.Where(ac => ac.OrganizationId == pDTO.CustomerId && ac.CreatedDate.Value.Date >= pDTO.FromDate.Date && ac.CreatedDate.Value.Date <= pDTO.ToDate.Date).Count();
                 BilingData.Add(Bilingresult);
             }
             return BilingData;
@@ -162,7 +197,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //    _context.SaveChanges();
             //}
         }
-        
+
         //update for products
         public async Task<ProductDTO> ModifyProducts(ProductDTO objProduct, ApiContext apiContext)
         {
@@ -196,7 +231,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             var productDTO = _mapper.Map<ProductDTO>(tbl_product);
             return productDTO;
         }
-        
+
         //get for master
         public async Task<IEnumerable<ddDTOs>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
@@ -216,10 +251,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                              lob = p2.Value,
                              cob = p1.Value,
                              Label = pr.ProductName,
-                            lobid= pr.Lobid,
-                            cobid=pr.Cobid,
-                            productCode=pr.ProductCode,
-                             Value = pr.ProductId.ToString()
+                             Value = pr.ProductId.ToString(),
+                             productCode = pr.ProductCode,
+                             Lobid = pr.Lobid,
+                             Cobid = pr.Cobid
                          };
             }
             else if (lMasterlist == "Currency")
@@ -245,7 +280,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                      mType = c.MasterType
                  });
             }
-            else if(lMasterlist=="LOB")
+            else if (lMasterlist == "LOB")
             {
                 ddDTOs = _context.TblmasProductMaster
                  .Select(c => new ddDTOs
@@ -268,7 +303,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             }
             return ddDTOs;
         }
-        
+
         //get for products
         public async Task<IEnumerable<ProductDTO>> GetProducts(string lProductlist, ApiContext apiContext)
         {
@@ -289,7 +324,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             foreach (var file in files)
             {
                 var filename = file.Name;
-               //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
+                //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
 
                 if (file == null || file.Length <= 0)
                 {
@@ -304,7 +339,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 bool email = true;
 
                 //dt.Columns.Add("BankFileId", typeof(int));
-               // dt.Columns.Add("Id", typeof(string));
+                // dt.Columns.Add("Id", typeof(string));
                 dt.Columns.Add("FirstName", typeof(string));
                 dt.Columns.Add("MobileNumber", typeof(string));
                 dt.Columns.Add("EmailID", typeof(string));
@@ -312,6 +347,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 dt.Columns.Add("PartnerId", typeof(string));
                 dt.Columns.Add("SMSstatus", typeof(string));
                 dt.Columns.Add("Emailstatus", typeof(string));
+                dt.Columns.Add("IsPayment", typeof(bool));
 
                 using (var stream = new MemoryStream())
                 {
@@ -337,6 +373,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                     dr["PartnerId"] = worksheet.Cells[row, 6].Value.ToString().Trim();
                                     dr["SMSstatus"] = sms;
                                     dr["Emailstatus"] = email;
+                                    dr["IsPayment"] = worksheet.Cells[row, 7].Value;
                                     dt.Rows.Add(dr);
                                 }
                             }
@@ -379,7 +416,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //return DemoResponse<List<BankFileDTO>>.GetResult(2, "Data still processing");
         }
 
-        public async Task<DocumentResponse> Docupload(string productcode,string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        public async Task<DocumentResponse> Docupload(string productcode, string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             //int result = GetActiveResult();
             //if (result == 1)
@@ -411,6 +448,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 dt.Columns.Add("PartnerId", typeof(string));
                 dt.Columns.Add("SMSstatus", typeof(string));
                 dt.Columns.Add("Emailstatus", typeof(string));
+                dt.Columns.Add("IsPayment", typeof(bool));
                 using (var stream = new MemoryStream())
                 {
                     await file.CopyToAsync(stream, cancellationToken);
@@ -427,14 +465,28 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                     DataRow dr = dt.NewRow();
                                     //dr["BankFileId"] = int.Parse(worksheet.Cells[row, 1].Value.ToString().Trim());
                                     //dr["Id"] = worksheet.Cells[row, 2].Value.ToString().Trim();
-                                    dr["FirstName"] = worksheet.Cells[row, 2].Value.ToString().Trim();
-                                    dr["MobileNumber"] = worksheet.Cells[row, 3].Value.ToString().Trim();
-                                    dr["EmailID"] = worksheet.Cells[row, 4].Value.ToString().Trim();
+                                    if (worksheet.Cells[row, 2].Value != null)
+                                    {
+                                        dr["FirstName"] = worksheet.Cells[row, 2].Value.ToString().Trim();
+                                    }
+                                    if (worksheet.Cells[row, 3].Value != null)
+                                    {
+                                        dr["MobileNumber"] = worksheet.Cells[row, 3].Value.ToString().Trim();
+                                    }
+                                    if (worksheet.Cells[row, 4].Value != null)
+                                    {
+                                        dr["EmailID"] = worksheet.Cells[row, 4].Value.ToString().Trim();
+                                    }
+
                                     dr["ProductCode"] = productcode;
                                     dr["ProductId"] = productId;
                                     dr["PartnerId"] = apiContext.PartnerId;
                                     dr["SMSstatus"] = sms;
                                     dr["Emailstatus"] = email;
+                                    if (worksheet.Cells[row, 5].Value != null)
+                                    {
+                                        dr["IsPayment"] = (bool)worksheet.Cells[row, 5].Value;
+                                    }
                                     dt.Rows.Add(dr);
                                 }
                             }
@@ -476,13 +528,23 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //}
             //return DemoResponse<List<BankFileDTO>>.GetResult(2, "Data still processing");
         }
-
+        //
 
         //search for products
         public async Task<IEnumerable<ProductDTO>> SearchProduct(ProductSearchDTO productSearchDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-          
+            if (productSearchDTO.EnvId > 0)
+            {
+                _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, productSearchDTO.EnvId.ToString()));
+            }
+            else
+            {
+                _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            }
+
+
+            // _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
             string[] lobCob = new string[] { "LOB", "COB" };
             var masterList = _context.TblmasProductMaster.Where(p => lobCob.Contains(p.MasterType))
                               .ToDictionary(m => m.ProductMasterId, n => n.Value);
@@ -490,12 +552,31 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                             select pr;
             var _products1 = _context.TblProducts
                        .Include(add => add.TblInsurableRcbdetails);
-            
-            if (apiContext.PartnerId > 0 && apiContext.OrgId>0)
+
+
+
+            if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
             {
-                _products = _products.Where(pr => pr.PartnerId == apiContext.PartnerId && pr.OrganizationId == apiContext.OrgId);
+                var productList = await _integrationService.GetAssignProductByPartnerId(apiContext.PartnerId.ToString(), apiContext);
+                var mdataList = productList.ToList();
+                if (mdataList.Count > 0)
+                {
+                    var DataList = mdataList[0].mData;
+                    var mIDList = DataList.Select(s => s.mID).ToList();
+                    _products = _products.Where(pr => (pr.PartnerId == apiContext.PartnerId && pr.OrganizationId == apiContext.OrgId) || mIDList.Contains(pr.ProductId));
+                    _products.Distinct();
+
+                }
+                else
+                {
+                    _products = _products.Where(pr => (pr.PartnerId == apiContext.PartnerId && pr.OrganizationId == apiContext.OrgId));
+
+                }
+
+
+
             }
-            else if(apiContext.OrgId > 0)
+            else if (apiContext.OrgId > 0)
             {
                 _products = _products.Where(pr => pr.OrganizationId == apiContext.OrgId);
             }
@@ -520,6 +601,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             {
                 _products = _products.Where(pr => pr.Cobid == productSearchDTO.Cobid);
             }
+
             var _productSearchDTOs = _mapper.Map<IEnumerable<ProductDTO>>(_products);
             foreach (var item in _productSearchDTOs)
             {
@@ -527,7 +609,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 item.Value = item.ProductId.ToString();
                 item.LOB1 = masterList.FirstOrDefault(p => p.Key == item.Lobid).Value;
                 item.COB1 = masterList.FirstOrDefault(p => p.Key == item.Cobid).Value;
-               }
+            }
             return _productSearchDTOs;
         }
 
@@ -565,7 +647,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 item.Value = item.ProductId.ToString();
                 item.LOB1 = masterList.FirstOrDefault(p => p.Key == item.Lobid).Value;
                 item.COB1 = masterList.FirstOrDefault(p => p.Key == item.Cobid).Value;
-                
+
 
             }
 
@@ -577,34 +659,37 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         public async Task<ProductDTO> GetProductById(int ProductId, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-          
-                var tblProduct = _context.TblProducts.Where(item => item.ProductId == ProductId)
-                       .Include(add => add.TblProductInsurableItems)
-                       .Include("TblProductInsurableItems.TblProductCovers")
-                           .Include("TblProductInsurableItems.TblProductCovers.TblProductBenefits")
-                            .Include("TblProductInsurableItems.TblProductCovers.TblProductBenefits.TblBenifitRangeDetails")
-                            .Include(ad => ad.TblProductChannels)
-                            .Include(ads => ads.TblProductClausesWarrentiesExclusions)
-                            .Include(add => add.TblProductPremium)
-                            .Include(add => add.TblProductRcbdetails)
-                         .Include(add => add.TblInsurableRcbdetails)
+
+            var tblProduct = _context.TblProducts.Where(item => item.ProductId == ProductId)
+                   .Include(add => add.TblProductInsurableItems)
+                   .Include("TblProductInsurableItems.TblProductCovers")
+                       .Include("TblProductInsurableItems.TblProductCovers.TblProductBenefits")
+                        .Include("TblProductInsurableItems.TblProductCovers.TblProductBenefits.TblBenifitRangeDetails")
+                        .Include(ad => ad.TblProductChannels)
+                        .Include(ads => ads.TblProductClausesWarrentiesExclusions)
+                        .Include(add => add.TblProductPremium)
+                        .Include(add => add.TblProductRcbdetails)
+                        .Include(add => add.TblProductSwitchOnDetails)
+                         .Include(add => add.TblProductRatingMapping)
+                        .Include(add => add.TblInsurableRcbdetails)
                         .Include("TblInsurableRcbdetails.TblInsurableChildRcbdetails")
-                        .Include("TblInsurableRcbdetails.TblCoverRcbdetails")
-                        .Include("TblInsurableRcbdetails.TblCoverRcbdetails.TblCoverChildRcbdetails")
+                       .Include("TblInsurableRcbdetails.TblCoverRcbdetails")
 
-                            .FirstOrDefault();
+                    .Include("TblInsurableRcbdetails.TblCoverRcbdetails.TblCoverChildRcbdetails")
 
+                        .FirstOrDefault();
+
+            if (tblProduct != null)
+            {
                 if (tblProduct != null)
                 {
-                    if (tblProduct != null)
-                    {
-                        return GetProductMasterUpdate(tblProduct);
-                    }
+                    return GetProductMasterUpdate(tblProduct);
                 }
-           
+            }
+
             return null;
         }
-        
+
         //Get product by Id
         public async Task<ProductDTO> GetProductByCode(string ProductCode, ApiContext apiContext)
         {
@@ -619,6 +704,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                         .Include(add => add.TblProductPremium)
                         .Include(add => add.TblProductRcbdetails)
                         .Include(add => add.TblInsurableRcbdetails)
+                        .Include(add => add.TblProductSwitchOnDetails)
+                        .Include(add => add.TblProductRatingMapping)
                         .Include("TblInsurableRcbdetails.TblInsurableChildRcbdetails")
                         .Include("TblInsurableRcbdetails.TblCoverRcbdetails")
                         .Include("TblInsurableRcbdetails.TblCoverRcbdetails.TblCoverChildRcbdetails")
@@ -629,16 +716,16 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 return GetProductMasterUpdate(tblProduct);
             }
             return null;
-        }
+            }
 
         private ProductDTO GetProductMasterUpdate(TblProducts tblProduct)
         {
             var productDTO = _mapper.Map<ProductDTO>(tblProduct);
-            string[] masterFilter = new string[] { "CWEType", "Channels", "Type","Currency" };
+            string[] masterFilter = new string[] { "CWEType", "Channels", "Type", "Currency" };
             var masterList = _context.TblmasPccommonTypes.Where(p => masterFilter.Contains(p.MasterType))
                               .ToDictionary(m => m.CommonTypeId, n => n.Value);
 
-            string[] masProductMasterFilter = new string[] { "Risk", "Claim", "InsurableCategory", "BenefitCriteria", "InsuranceType", "Cover", "CoverEvent", "CoverEventFactor", "CoverEventFactorValue", "LOB", "COB" };
+            string[] masProductMasterFilter = new string[] { "Risk", "Claim", "InsurableCategory", "BenefitCriteria", "InsuranceType", "Cover", "CoverEvent", "CoverEventFactor", "CoverEventFactorValue", "LOB", "COB", "Switchon" };
             var masProductMaster = _context.TblmasProductMaster.Where(p => masProductMasterFilter.Contains(p.MasterType))
                               .ToDictionary(m => m.ProductMasterId, n => n.Value);
 
@@ -690,6 +777,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             foreach (var item in productDTO.ProductRcbdetails)
             {
+                item.disable = item.IsReqired;
+                item.mIsRequired = item.IsReqired;
+                item.mValue = masProductMaster.FirstOrDefault(p => p.Key == item.InputId).Value;
+
+            }
+            foreach (var item in productDTO.ProductSwitchOnDetails)
+            {
+                item.mID = item.InputId;
                 item.disable = item.IsReqired;
                 item.mIsRequired = item.IsReqired;
                 item.mValue = masProductMaster.FirstOrDefault(p => p.Key == item.InputId).Value;
@@ -752,7 +847,35 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 {
                     item.CurrencyName = masterList.FirstOrDefault(p => p.Key == item.CurrencyId).Value;
                 }
+
+                if (item.LevelId != null)
+                {
+                    //if (item.LevelId == 52)
+                    //{
+                    //    var InsurableTypeId = Convert.ToInt32(productDTO.ProductInsurableItems.FirstOrDefault(s => s.InsurableItemId == item.RefId).InsurableItemTypeId);
+                    //    item.Description = masProductMaster.FirstOrDefault(p => p.Key == InsurableTypeId).Value;
+                    //}
+                    if (item.LevelId == 53)
+                    {
+                        var InsurableId = Convert.ToInt32(productDTO.ProductInsurableItems.SelectMany(p => p.ProductCovers).FirstOrDefault(s => s.CoverTypeId == item.SubLevelId).InsurableItemId);
+                        var InsurableTypeId = _context.TblProductInsurableItems.FirstOrDefault(s => s.InsurableItemId == InsurableId).InsurableItemTypeId;
+                        item.Description = masProductMaster.FirstOrDefault(p => p.Key == InsurableTypeId).Value;
+                    }
+
+                }
             }
+
+
+            //Calculate Premium
+
+            if (tblProduct.TblProductRatingMapping.Count()>0)
+            {
+                productDTO.RateingId = tblProduct.TblProductRatingMapping.FirstOrDefault(s => s.ProductId == productDTO.ProductId).MappingId;
+
+
+            }
+
+
             return productDTO;
         }
 
@@ -762,7 +885,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             return _context.TblProductChannels.Find(ChannelId);
         }
-        
+
         //SearchClaimDetails
         public async Task<TblProductClausesWarrentiesExclusions> ClaimsDetails(decimal Cweid, ApiContext apiContext)
         {
@@ -832,7 +955,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             List<int> lstParentId = new List<int> { 0, parentID };
-            var productMasters_list = _context.TblmasProductMaster.Where(x =>mList.Contains(x.MasterType) && x.IsActive)
+            var productMasters_list = _context.TblmasProductMaster.Where(x => mList.Contains(x.MasterType) && x.IsActive)
                 .OrderByDescending(p => p.IsDisable).ThenBy(p => p.SortOrder);
             IEnumerable<ddDTOs> ddDTOs;
             ddDTOs = productMasters_list
@@ -899,10 +1022,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             ProductRcbdetailsDTO rcbDetail = null;
             InsurableChildRcbdetailsDTO InsChildrcbDetail = null;
             CoverChildRcbdetailsDTO CoverChildrcbDetail = null;
+            ProductSwitchOnDetailsDTO switchdetails = null;
             objProduct.CreatedDate = DateTime.Now;
             objProduct.OrganizationId = apiContext.OrgId;
             objProduct.PartnerId = apiContext.PartnerId;
-            
+
 
             foreach (var item in objProduct.RiskDetails)
             {
@@ -923,6 +1047,19 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 rcbDetail.LevelId = item.LevelId;
                 objProduct.ProductRcbdetails.Add(rcbDetail);
             }
+
+            foreach (var item in objProduct.ProductSwitchOnProperty)
+            {
+                switchdetails = new ProductSwitchOnDetailsDTO();
+                switchdetails.InputType = item.mType;
+                switchdetails.IsReqired = item.mIsRequired;
+                switchdetails.InputId = item.mID;
+
+
+                objProduct.ProductSwitchOnDetails.Add(switchdetails);
+            }
+
+
             //   objProduct.TblProductClausesWarrentiesExclusions.Select(t => { t.Cweid =0; return t; }).ToList();
             foreach (var item in objProduct.ProductClausesWarrentiesExclusions)
             {
@@ -933,7 +1070,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             // insurableRcbdetails update
             foreach (var item in objProduct.InsurableRcbdetails)
             {
-                
+
 
                 foreach (var i in item.InsurableChildRcbdetails)
                 {
@@ -958,7 +1095,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 }
 
             }
-         
+
             //for (var index = 0; index < objProduct.InsurableRcbdetails.Count(); index++)
             //{
 
@@ -994,6 +1131,21 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 return new ProductResponse() { Status = BusinessStatus.Ok, ResponseMessage = $"ok " };
             }
         }
+
+        public async Task<ProductResponse> ProductNamevalidation(string name, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            var data = _context.TblProducts.Any(e => e.ProductName == name);
+            if (data == true)
+            {
+                return new ProductResponse() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Product Name {name} already exist, do u want to proceed " };
+            }
+            else
+            {
+                return new ProductResponse() { Status = BusinessStatus.Ok, ResponseMessage = $"ok " };
+            }
+        }
+
 
         public async Task<ProductResponse> GetProductGWP(ProductDTO productDTO, ApiContext apiContext)
         {
@@ -1040,7 +1192,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             return ddDTOs;
         }
-        
+
         public async Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal ProductId, string type, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
@@ -1181,7 +1333,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
 
 
-            var LeadInfo = _context.TblLeadInfo.Where(x => x.Smsstatus==true && x.Emailstatus==true).ToList();
+            var LeadInfo = _context.TblLeadInfo.Where(x => x.Smsstatus == true && x.Emailstatus == true).ToList();
 
             foreach (var item in LeadInfo)
             {
@@ -1234,7 +1386,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
 
-            var LeadData = _context.TblLeadInfo.FirstOrDefault(x=>x.Id == LeadID);
+            var LeadData = _context.TblLeadInfo.FirstOrDefault(x => x.Id == LeadID);
 
             var FinalLeadInfo = _mapper.Map<LeadInfoDTO>(LeadData);
 
@@ -1242,5 +1394,289 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         }
 
+        public async Task<List<CoverListValue>> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext)
+        {
+
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            //    var tblProduct = _context.TblProducts.FirstOrDefault(item => item.ProductCode == productCode);
+
+            var value = "";
+            //string connectionString = "Server=inubepeg.database.windows.net;Database=MICAProd;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+            //using (SqlConnection connection = new SqlConnection(connectionString))
+            //{
+            //    // string queryForCol = "select * from[PC].[tblBenifitRangeDetails] where BenifitID IN(select BenefitID from[PC].[tblProductBenefits] where CoverID IN(select CoverID from[PC].[tblProductCovers] where insurableitemId IN(select InsurableItemId from[PC].[tblProductInsurableItems]where productid ="+ tblProduct.ProductId + ")))";
+
+
+            //    connection.Open();
+
+            //    using (SqlCommand command = new SqlCommand(queryForCol, connection))
+            //    {
+            //        SqlDataReader reader = command.ExecuteReader();
+            //        while (reader.Read())
+            //        {
+
+            //            var fromValue=(double)reader[3];
+            //            var toValue=(double)reader[4];
+            //            var PremiumAmount = reader[5].ToString();
+            //            if ((fromValue <= coverEventFactorValue) && (toValue >= coverEventFactorValue))
+            //            {
+
+            //                value = PremiumAmount.ToString();
+            //            }
+            //            else {
+            //                value = "Please Give Valid Range";
+            //            }
+
+            //        }
+            //    }
+            //    connection.Close();
+            //}
+            var Data = (from p in _context.TblProducts
+                        where p.ProductCode == product.ProductCode
+                        //  join m in _context.TblmasProductMaster on product.CoverName equals m.Value
+                        join i in _context.TblProductInsurableItems on p.ProductId equals i.ProductId
+                        join c in _context.TblProductCovers on i.InsurableItemId equals c.InsurableItemId //where (c.CoverTypeId==m.ProductMasterId)
+                        join b in _context.TblProductBenefits on c.CoverId equals b.CoverId
+                        join br in _context.TblBenifitRangeDetails on b.BenefitId equals br.BenifitId
+                        select new LGIList
+                        {
+                            CoverName = _context.TblmasProductMaster.SingleOrDefault(s => s.ProductMasterId == c.CoverTypeId).Value,
+                            CoverID = c.CoverTypeId,
+                            PremiumAmount = br.PremiumAmount,
+                            FromValue = br.FromValue,
+                            ToValue = br.ToValue
+
+                        }
+                    ).ToList();
+            LGIDTO LGIobj = new LGIDTO();
+            List<CoverListValue> CoverListValue = null;
+            CoverListValue listValue = null;
+            foreach (var item in product.CoverListValue)
+            {
+                listValue = new CoverListValue();
+
+                var final = Data.SingleOrDefault(x => x.CoverName == item.CoverName);
+
+                if (item.CoverValue >= final.FromValue && item.CoverValue <= final.ToValue)
+                {
+                    listValue.CoverName = item.CoverName;
+                    listValue.BenefitValue = final.PremiumAmount;
+                }
+
+
+                CoverListValue.Add(listValue);
+
+            }
+
+            return CoverListValue;
+
+            //foreach (var item in Data) {
+
+            //    CoverListValue = new CoverListValue();
+
+            //    CoverListValue.BenefitValue = item.BenefitValue;
+            //    CoverListValue.CoverName = item.CoverName;
+            //    LGIobj.CoverValue.Add(CoverListValue);
+            //}
+
+            //if (Data != null)
+            //{
+            //   value= "";
+            //}
+            //else {
+            //    value = "Please Give Valid Range";
+            //}
+            //return value;
+
+        }
+        /* Promo Document Upload */
+        public async Task<DocumentResponse> PromoDocupload(string productcode, string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            //int result = GetActiveResult();
+            //if (result == 1)
+            //{
+            var files = httpRequest.Form.Files;
+            //var docId = GetActiveResult(file.Name); HttpRequest
+            DataTable dt = new DataTable();
+            foreach (var file in files)
+            {
+                var filename = file.Name;
+                //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
+                if (file == null || file.Length <= 0)
+                {
+                    return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
+                }
+                if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx file" };
+                }
+                bool sms = true;
+                bool email = true;
+                dt.Columns.Add("PromoCode1", typeof(string));
+                dt.Columns.Add("PromoCode2", typeof(string));
+                //dt.Columns.Add("PolicyNumber", typeof(string));
+                dt.Columns.Add("IsActive", typeof(bool));
+                dt.Columns.Add("IsApply", typeof(bool));
+                dt.Columns.Add("ProductCode", typeof(string));
+                dt.Columns.Add("ProductId", typeof(string));
+
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream, cancellationToken);
+                    try
+                    {
+                        using (var package = new ExcelPackage(stream))
+                        {
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets["PromoCode Details"];
+                            if (worksheet != null)
+                            {
+                                var rowCount = worksheet.Dimension.Rows;
+                                for (int row = 2; row <= rowCount; row++)
+                                {
+                                    DataRow dr = dt.NewRow();
+                                    //dr["BankFileId"] = int.Parse(worksheet.Cells[row, 1].Value.ToString().Trim());
+                                    //dr["Id"] = worksheet.Cells[row, 2].Value.ToString().Trim();
+                                    dr["PromoCode1"] = worksheet.Cells[row, 2].Value.ToString().Trim();
+                                    dr["PromoCode2"] = worksheet.Cells[row, 3].Value.ToString().Trim();
+                                    dr["IsActive"] = true;
+                                    dr["IsApply"] = false;
+                                    dr["ProductCode"] = worksheet.Cells[row, 4].Value.ToString().Trim();
+                                    dr["ProductId"] = worksheet.Cells[row, 5].Value.ToString().Trim();
+
+                                    dt.Rows.Add(dr);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var error = ex.ToString();
+                        return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                    }
+                }
+            }
+            try
+            {
+                // add list to db ..
+                // here just read and return
+                //string connetionString = await _integrationService.GetEnvironmentConnectionforDoc(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+                string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
+                using (var bulkCopy = new SqlBulkCopy(connetionString, SqlBulkCopyOptions.KeepIdentity))
+                {
+                    // my DataTable column names match my SQL Column names, so I simply made this loop. However if your column names don't match, just pass in which datatable name matches the SQL column name in Column Mappings
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        bulkCopy.ColumnMappings.Add(col.ColumnName, col.ColumnName);
+                    }
+                    bulkCopy.BulkCopyTimeout = 600;
+                    bulkCopy.DestinationTableName = "[PC].[TblPromo]";
+                    bulkCopy.WriteToServer(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var error = ex.ToString();
+                return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                //return DemoResponse<List<BankFileDTO>>.GetResult(-1, error);
+            }
+            return new DocumentResponse { Status = BusinessStatus.Ok, ResponseMessage = $"Document uploaded succefully!" };
+            //return DemoResponse<List<BankFileDTO>>.GetResult(0, "OK", list);
+            //}
+            //return DemoResponse<List<BankFileDTO>>.GetResult(2, "Data still processing");
+        }
+
+        public async Task<ProductResponse> PromoApply(PromoDTO promo, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            var data = _context.TblPromo.Any(e => e.PromoCode1 == promo.PromoCode1 && e.PromoCode2 == promo.PromoCode2);
+            if (data == true)
+            {
+                return new ProductResponse() { Status = BusinessStatus.Ok, ResponseMessage = $"PromoCode1:{promo.PromoCode1} and PromoCode2:{promo.PromoCode2} is Valid" };
+            }
+            else
+            {
+                return new ProductResponse() { Status = BusinessStatus.NotFound, ResponseMessage = $"PromoCode is not valid" };
+            }
+        }
+        public async Task<dynamic> GetProductRateConfig(int productid,ApiContext apiContext) {
+            //_context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            //var mapData=_context.TblProductRatingMapping.Where(s => s.ProductId == productid).ToList();
+
+            //dynamic mapcalc = new ExpandoObject();
+            //foreach (var item in mapData) {
+            //    AddProperty(mapcalc, item.RiskParameterName, "string");
+
+            //}
+            //return mapcalc;
+            return null;
+        }
+
+        public void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
+        {
+            // ExpandoObject supports IDictionary so we can extend it like this
+            var expandoDict = expando as IDictionary<string, object>;
+            if (expandoDict.ContainsKey(propertyName))
+                expandoDict[propertyName] = propertyValue;
+            else
+                expandoDict.Add(propertyName, propertyValue);
+        }
+
+        public async Task<List<ProductRatingMapping>> GetProductRateMapping(int productid, ApiContext apiContext)
+        {
+            //_context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            //var mapData = _context.TblProductRatingMapping.Where(s => s.ProductId == productid)
+            //    .ToList();
+
+            //var mapList = _mapper.Map<List<ProductRatingMapping>>(mapData);
+            //return mapList;
+            return null;
+        }
+
+
+
+        public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            IEnumerable<MasDTO> val = await _integrationService.GetHandleEventsMaster(lMasterlist,apiContext); 
+
+            return val;
+        }
+        public async Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            IEnumerable<MasDTO> riskpm;
+
+            riskpm = _context.TblmasProductMaster.Where(s=>s.MasterType=="Risk")
+                        .Select(p => new MasDTO
+                        {
+                            mID = p.ProductMasterId,
+                            mValue = p.Value,
+                            mType = lMasterlist
+                        }).ToList();
+
+            IEnumerable<MasDTO> risk = riskpm.GroupBy(x => x.mValue).Select(o => o.FirstOrDefault()); 
+            return risk;
+
+        }
+
+        public async Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            try
+            {
+
+                var _tblmapping = _mapper.Map<List<TblmasMapping>>(MapDto.mapping);
+                _context.TblmasMapping.AddRange(_tblmapping);
+
+                _context.SaveChanges();
+                var Mappingitem = _mapper.Map<List<MappingDto>>(_tblmapping);
+                return Mappingitem;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

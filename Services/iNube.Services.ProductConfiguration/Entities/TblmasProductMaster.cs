@@ -20,6 +20,7 @@ namespace iNube.Services.ProductConfiguration.Entities
             TblProductInsurableItemsInsurableItemType = new HashSet<TblProductInsurableItems>();
             TblProductRcbdetailsInput = new HashSet<TblProductRcbdetails>();
             TblProductRcbdetailsLevel = new HashSet<TblProductRcbdetails>();
+            TblProductSwitchOnDetails = new HashSet<TblProductSwitchOnDetails>();
             TblProductsCob = new HashSet<TblProducts>();
             TblProductsLob = new HashSet<TblProducts>();
             TblmasClausesWarrentiesExclusionsCwetype = new HashSet<TblmasClausesWarrentiesExclusions>();
@@ -52,6 +53,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual ICollection<TblProductInsurableItems> TblProductInsurableItemsInsurableItemType { get; set; }
         public virtual ICollection<TblProductRcbdetails> TblProductRcbdetailsInput { get; set; }
         public virtual ICollection<TblProductRcbdetails> TblProductRcbdetailsLevel { get; set; }
+        public virtual ICollection<TblProductSwitchOnDetails> TblProductSwitchOnDetails { get; set; }
         public virtual ICollection<TblProducts> TblProductsCob { get; set; }
         public virtual ICollection<TblProducts> TblProductsLob { get; set; }
         public virtual ICollection<TblmasClausesWarrentiesExclusions> TblmasClausesWarrentiesExclusionsCwetype { get; set; }

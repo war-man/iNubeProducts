@@ -58,7 +58,7 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<ClaimDataDTO, TblClaims>()
             .ForMember(dest => dest.TblClaimInsurable, opt => opt.MapFrom(src => src.ClaimInsurable))
             .ForMember(dest => dest.TblBankAccounts, opt => opt.MapFrom(src => src.TblBankAccounts))
-            //.ForMember(dest => dest.TblClaimdoc, opt => opt.MapFrom(src => src.TblClaimdoc))
+            .ForMember(dest => dest.TblClaimdoc, opt => opt.MapFrom(src => src.Alldoc))
             .ForMember(dest => dest.LossId, opt => opt.MapFrom(src => src.lossIntimatedBy))
             .ForMember(dest => dest.LocationOfEvent, opt => opt.MapFrom(src => src.locationOfLoss))
             .ForMember(dest => dest.LossOfDescription, opt => opt.MapFrom(src => src.lossDescription))
@@ -66,11 +66,21 @@ namespace iNube.Services.Claims.Helpers
            // .ForMember(dest => dest.TblClaimHistory, opt => opt.MapFrom(src => src.ClaimsHistory))
             .ReverseMap();
 
+            CreateMap<Alldoc, TblClaimdoc>();
+            CreateMap<TblClaimdoc, Alldoc>();
+
+            CreateMap<ClaimDataDTO, Alldoc>();
+            CreateMap<Alldoc, ClaimDataDTO>();
+
 
             CreateMap<ClaimProcessDTO, TblClaims>()
             .ForMember(dest => dest.TblClaimInsurable, opt => opt.MapFrom(src => src.ClaimInsurable))
             .ForMember(dest => dest.TblClaimHistory, opt => opt.MapFrom(src => src.ClaimHistory))
+            .ForMember(dest => dest.TblClaimdoc, opt => opt.MapFrom(src => src.Alldoc))
             .ReverseMap();
+
+            CreateMap<ClaimProcessDTO, Alldoc>();
+            CreateMap<Alldoc, ClaimProcessDTO>();
 
             CreateMap<TblClaimDetails, ClaimDetailsDTO>();
             CreateMap<ClaimDetailsDTO, TblClaimDetails>();
@@ -84,8 +94,7 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<TblClaimdoc, ClaimdocDTO>();
             CreateMap<ClaimdocDTO, TblClaimdoc>();
 
-            //CreateMap<ClaimResponseDTO, TblClaims>();
-            //CreateMap<TblClaims, ClaimResponseDTO>();
+           
 
             //CreateMap<TblClaimdoc, ClaimdocumentDTO>();
             //CreateMap<ClaimdocumentDTO, TblClaimdoc>();

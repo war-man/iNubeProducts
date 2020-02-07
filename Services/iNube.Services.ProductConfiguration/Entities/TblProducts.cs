@@ -12,7 +12,9 @@ namespace iNube.Services.ProductConfiguration.Entities
             TblProductClausesWarrentiesExclusions = new HashSet<TblProductClausesWarrentiesExclusions>();
             TblProductInsurableItems = new HashSet<TblProductInsurableItems>();
             TblProductPremium = new HashSet<TblProductPremium>();
+            TblProductRatingMapping = new HashSet<TblProductRatingMapping>();
             TblProductRcbdetails = new HashSet<TblProductRcbdetails>();
+            TblProductSwitchOnDetails = new HashSet<TblProductSwitchOnDetails>();
         }
 
         public int ProductId { get; set; }
@@ -31,6 +33,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public decimal? PartnerId { get; set; }
         public decimal? OrganizationId { get; set; }
         public bool? IsSingleCover { get; set; }
+        public bool? IsMasterPolicy { get; set; }
 
         public virtual TblmasProductMaster Cob { get; set; }
         public virtual TblmasProductMaster Lob { get; set; }
@@ -40,6 +43,8 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual ICollection<TblProductClausesWarrentiesExclusions> TblProductClausesWarrentiesExclusions { get; set; }
         public virtual ICollection<TblProductInsurableItems> TblProductInsurableItems { get; set; }
         public virtual ICollection<TblProductPremium> TblProductPremium { get; set; }
+        public virtual ICollection<TblProductRatingMapping> TblProductRatingMapping { get; set; }
         public virtual ICollection<TblProductRcbdetails> TblProductRcbdetails { get; set; }
+        public virtual ICollection<TblProductSwitchOnDetails> TblProductSwitchOnDetails { get; set; }
     }
 }

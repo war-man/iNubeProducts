@@ -22,6 +22,7 @@ namespace iNube.Services.Accounting.Entities
         public decimal? OrganizationId { get; set; }
         public decimal? ContractId { get; set; }
         public decimal? TransactionHeaderId { get; set; }
+        public decimal? ProductId { get; set; }
 
         public virtual TblTransactionHeader TransactionHeader { get; set; }
     }

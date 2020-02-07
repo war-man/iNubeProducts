@@ -28,13 +28,13 @@ namespace iNube.Services.Policy.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER; Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblAdditionalDetails>(entity =>
             {
@@ -119,6 +119,9 @@ namespace iNube.Services.Policy.Entities
                 entity.HasIndex(e => e.ProductIdPk)
                     .HasName("missing_index_77_76");
 
+                entity.HasIndex(e => new { e.CreatedDate, e.ProductIdPk, e.CustomerId })
+                    .HasName("nci_wi_tblPolicy_D653896E6374389F7AD7E5A8DA6A7039");
+
                 entity.Property(e => e.PolicyId)
                     .HasColumnName("PolicyID")
                     .HasColumnType("numeric(18, 0)")
@@ -193,6 +196,8 @@ namespace iNube.Services.Policy.Entities
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.MasterPremium).HasColumnType("numeric(18, 2)");
+
                 entity.Property(e => e.MobileNumber)
                     .HasMaxLength(15)
                     .IsUnicode(false);
@@ -223,6 +228,8 @@ namespace iNube.Services.Policy.Entities
                     .HasColumnName("PolicyTypeID")
                     .HasMaxLength(30)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PremiumAmount).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.ProductIdPk).HasColumnName("Product_ID_PK");
 

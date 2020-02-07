@@ -351,5 +351,15 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         {
             throw new NotImplementedException();
         }
+        //For Accounting
+        public async Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(decimal OrgId,ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GetPartnerNameById(decimal PartnerId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

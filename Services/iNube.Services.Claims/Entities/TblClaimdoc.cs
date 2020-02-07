@@ -20,6 +20,7 @@ namespace iNube.Services.Claims.Entities
         public int ClaimId { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string DmsdocId { get; set; }
 
         public virtual TblClaims Claim { get; set; }
         public virtual ICollection<TblClaimTransactionNew> TblClaimTransactionNew { get; set; }

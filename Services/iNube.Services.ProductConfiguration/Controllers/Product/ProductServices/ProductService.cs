@@ -31,6 +31,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, ApiContext apiContext);
         void Delete(int ProductID, ApiContext apiContext);
         Task<ProductResponse> ProductCodevalidation(string code, ApiContext apiContext);
+        Task<ProductResponse> ProductNamevalidation(string name, ApiContext apiContext);
         Task<ProductDTO> ModifyProducts(ProductDTO objProduct, ApiContext apiContext);
         Task<List<ProductClausesWarrentiesExclusionsDTO>> CWEDetails(int LOBId, int CWETypeID, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetProductMaster(string masterType, int parentID, ApiContext apiContext);
@@ -53,9 +54,17 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<DocumentResponse> Docupload(string productcode,string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<DocumentResponse> PromoDocupload(string productcode, string productId,HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<List<LeadInfoDTO>> BulkSMS(ApiContext apiContext);
         Task<LeadInfoDTO> GetLeadInfo(int LeadID,ApiContext apiContext);
-
+        Task<List<CoverListValue>> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext);
+        Task<ProductResponse> PromoApply(PromoDTO promo, ApiContext apiContext);
+        Task<dynamic> GetProductRateConfig(int productid, ApiContext apiContext);
+        Task<List<ProductRatingMapping>> GetProductRateMapping(int productid, ApiContext apiContext);
+       // Task<LGIDTO> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext);
+        Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext);
     }
 
     public class ProductService : IProductService
@@ -247,6 +256,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             return await _productConfigService(apiContext.ProductType).ProductCodevalidation(code, apiContext);
         }
+        public async Task<ProductResponse> ProductNamevalidation(string name, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).ProductNamevalidation(name, apiContext);
+        }
 
         public async Task<ProductResponse> GetProductGWP(ProductDTO productDTO, ApiContext apiContext)
         {
@@ -290,6 +303,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return await _productConfigService(apiContext.ProductType).Docupload(productcode, productId, httpRequest, cancellationToken, apiContext);
         }
 
+        public async Task<DocumentResponse> PromoDocupload(string productcode, string productId,HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).PromoDocupload(productcode, productId, httpRequest, cancellationToken, apiContext);
+        }
+
         public async Task<List<LeadInfoDTO>> BulkSMS(ApiContext apiContext)
         {
             return await _productConfigService(apiContext.ProductType).BulkSMS(apiContext);
@@ -301,5 +319,38 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return await _productConfigService(apiContext.ProductType).GetLeadInfo(LeadID,apiContext);
         }
 
+        public async Task<List<CoverListValue>> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).BenefitValueLGIAsync(product, apiContext);
+        }
+
+        public async Task<ProductResponse> PromoApply(PromoDTO promo, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).PromoApply(promo, apiContext);
+        }
+        
+        public async Task<dynamic> GetProductRateConfig(int productid, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).GetProductRateConfig(productid, apiContext);
+        }
+
+        public async Task<List<ProductRatingMapping>> GetProductRateMapping(int productid, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).GetProductRateMapping(productid, apiContext);
+        }
+        public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).GetHandleEventsMaster(lMasterlist,apiContext);
+        }
+        
+        public async Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).GetRiskParam(lMasterlist, apiContext);
+        }
+        
+        public async Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).CreateMapping(MapDto, apiContext);
+        }
     }
 }

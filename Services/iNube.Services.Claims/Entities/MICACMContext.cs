@@ -45,7 +45,7 @@ namespace iNube.Services.Claims.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblBank>(entity =>
             {
@@ -689,6 +689,10 @@ namespace iNube.Services.Claims.Entities
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.DmsdocId)
+                    .HasColumnName("DMSdocId")
+                    .HasMaxLength(250);
+
                 entity.Property(e => e.DocumentName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -755,6 +759,8 @@ namespace iNube.Services.Claims.Entities
                 entity.Property(e => e.PolicyNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ProductIdPk).HasColumnName("Product_ID_PK");
 
                 entity.HasOne(d => d.ClaimStatus)
                     .WithMany(p => p.TblClaimsClaimStatus)

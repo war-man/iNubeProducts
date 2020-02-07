@@ -53,6 +53,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             if (partner.PartnerId == 0)
             {
                 partner.CreatedBy = apiContext.UserId;
+                partner.OrganizationId = apiContext.OrgId;
                 flag = true;
                 partner.CreatedDate = DateTime.Now;
                 _context.TblPartners.Add(partner);
@@ -98,11 +99,15 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                     var filterProduct = productList.ToList().Where(p => lstPolicyProduct.Contains(p.mID));
                     return filterProduct;
                 }
-                return productList;
+                else {
+                
+                    return null;
+                }
+                
             }
             else if (sMasterList == "Partner")
             {
-                ddDTOs = _context.TblPartners.OrderByDescending(p => p.CreatedDate)
+                ddDTOs = _context.TblPartners.OrderByDescending(p => p.OrganizationId==apiContext.OrgId)
                  .Select(c => new ddDTO
                  {
                      mID = (int)c.PartnerId,
@@ -143,7 +148,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         /// </summary>
         /// <param name="AssignProductDto">The assign product dto.</param>
         /// <returns></returns>
-        public async Task<PolicyAgreementResponse> SaveAssignProduct(AssignProductDTO AssignProductDto, ApiContext apiContext)
+        public async Task<PolicyAgreementResponse> SaveAssignProduct( AssignProductDTO AssignProductDto, ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
 
@@ -154,38 +159,79 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             StringBuilder sb = new StringBuilder();
             var partner = _context.TblPartners.FirstOrDefault(p => p.PartnerId == AssignProductDto.PartnerId);
             var partnerName = partner.PartnerName;
-            foreach (var item in AssignProductDto.lstProductId)
-            {
+
+            List<ProductDTO> productList = new List<ProductDTO>();
+                foreach (var item in AssignProductDto.lstProductId)
+                {
                 foreach (var pId in item)
                 {
-                    demodata = String.Concat(pId.ToString().PadLeft(5, '0'), "/" + AssignProductDto.PartnerId.ToString().PadLeft(5, '0'));
-                    var pks = _context.TblPolicyAgreement.Any(x => x.PolicyNo == demodata);
-                    if (pks == false)
+                    var productDetails = await _integrationService.GetProductNameAsync((decimal)pId, apiContext);
+                    productList.Add(productDetails);
+                    if (productDetails.PartnerId.ToString() != "")
                     {
-                        tb = new TblPolicyAgreement();
-                        tb.PolicyNo = String.Concat(pId.ToString().PadLeft(5, '0'), "/" + AssignProductDto.PartnerId.ToString().PadLeft(5, '0'));
-                        tb.AgentId = AssignProductDto.PartnerId;
-                        //tb.CreatedBy = apiContext.UserId;
-                        tb.PolicyStartDate = AssignProductDto.EffectiveFrom;
-                        tb.PolicyEndDate = AssignProductDto.EffectiveTo;
-                        tb.PolicyIssueDate = AssignProductDto.AssignDate;
-                        tb.ProductIdPk = Convert.ToInt32(AssignProductDto.ProductId);
-                        tb.CreatedDate = DateTime.Now;
-                        tb.IsUploadedToIcm = 1;
-                        tb.ProductIdPk = pId;
-                        _context.TblPolicyAgreement.Add(tb);
-                        sb.Append(demodata + ",");
+
+                        demodata = String.Concat(pId.ToString().PadLeft(5, '0'), "/" + AssignProductDto.PartnerId.ToString().PadLeft(5, '0'));
+                        var pks = _context.TblPolicyAgreement.Any(x => x.PolicyNo == demodata);
+                        if (pks == false)
+                        {
+                            tb = new TblPolicyAgreement();
+                            tb.PolicyNo = String.Concat(pId.ToString().PadLeft(5, '0'), "/" + AssignProductDto.PartnerId.ToString().PadLeft(5, '0'));
+                            tb.AgentId = AssignProductDto.PartnerId;
+                            //tb.CreatedBy = apiContext.UserId;
+                            tb.PolicyStartDate = AssignProductDto.EffectiveFrom;
+                            tb.PolicyEndDate = AssignProductDto.EffectiveTo;
+                            tb.PolicyIssueDate = AssignProductDto.AssignDate;
+                            tb.ProductIdPk = Convert.ToInt32(AssignProductDto.ProductId);
+                            tb.CreatedDate = DateTime.Now;
+                            tb.IsUploadedToIcm = 1;
+                            tb.ProductIdPk = pId;
+                            _context.TblPolicyAgreement.Add(tb);
+                            sb.Append(demodata + ",");
+                        }
+                        else
+                        {
+                            error = new ErrorInfo() { ErrorCode = "AssignProduct", ErrorMessage = $"Product code {demodata} already assigned to partner {partnerName}" };
+                            Errors.Add(error);
+                        }
                     }
                     else
                     {
-                        error = new ErrorInfo() { ErrorCode = "AssignProduct", ErrorMessage = $"Product code {demodata} already assigned to partner {partnerName}" };
-                        Errors.Add(error);
+                        if (productDetails.PartnerId == AssignProductDto.PartnerId)
+                        {
+                            demodata = String.Concat(pId.ToString().PadLeft(5, '0'), "/" + AssignProductDto.PartnerId.ToString().PadLeft(5, '0'));
+                            var pks = _context.TblPolicyAgreement.Any(x => x.PolicyNo == demodata);
+                            if (pks == false)
+                            {
+                                tb = new TblPolicyAgreement();
+                                tb.PolicyNo = String.Concat(pId.ToString().PadLeft(5, '0'), "/" + AssignProductDto.PartnerId.ToString().PadLeft(5, '0'));
+                                tb.AgentId = AssignProductDto.PartnerId;
+                                //tb.CreatedBy = apiContext.UserId;
+                                tb.PolicyStartDate = AssignProductDto.EffectiveFrom;
+                                tb.PolicyEndDate = AssignProductDto.EffectiveTo;
+                                tb.PolicyIssueDate = AssignProductDto.AssignDate;
+                                tb.ProductIdPk = Convert.ToInt32(AssignProductDto.ProductId);
+                                tb.CreatedDate = DateTime.Now;
+                                tb.IsUploadedToIcm = 1;
+                                tb.ProductIdPk = pId;
+                                _context.TblPolicyAgreement.Add(tb);
+                                sb.Append(demodata + ",");
+                            }
+                            else
+                            {
+                                error = new ErrorInfo() { ErrorCode = "AssignProduct", ErrorMessage = $"Product code {demodata} already assigned to partner {partnerName}" };
+                                Errors.Add(error);
+                            }
+                        }
+                        else
+                        {
+                            error = new ErrorInfo() { ErrorCode = "AssignProduct", ErrorMessage = $"Product code {demodata} cannot be assigned to partner {partnerName}" };
+                        }
                     }
                 }
             }
 
             _context.SaveChanges();
-
+        
             
 
             var tbl_assignProduct = _mapper.Map<TblPolicyAgreement>(tb);
@@ -205,18 +251,16 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
 
             }
             //Email Api Kit
-            Task.Run(() => SendApiKitAsync(AssignProductDto, partner.Email, partner.Mobile, apiContext));
+            Task.Run(() => SendApiKitAsync(productList,AssignProductDto, partner.Email, partner.Mobile, apiContext));
             //SendApiKitAsync(AssignProductDto, partner.Email, partner.Mobile, apiContext);
             return policyAgreementResponse;
         }
-        private async Task SendApiKitAsync(AssignProductDTO AssignProductDto,string email,string mobileNumber, ApiContext apiContext)
+        private async Task SendApiKitAsync(List<ProductDTO> productList, AssignProductDTO AssignProductDto,string email,string mobileNumber, ApiContext apiContext)
         {
-            foreach (var item in AssignProductDto.lstProductId)
+            //List<ProductDTO> productList = new List<ProductDTO>();
+            foreach (var item in productList)
             {
-                foreach (var pId in item)
-                {
-                    var productKitModel = await GetProductApiAsync(Convert.ToDecimal(pId), email, mobileNumber, apiContext);
-                }
+                    var productKitModel = await GetProductApiAsync(item, item.ProductId, email, mobileNumber, apiContext);
             }
         }
         /// <summary>
@@ -264,10 +308,13 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
 
             string[] lstPartnerType = new string[] { "PartnerType", "PartnerClass" };
+
             var masterList = _context.TblmasPrcommonTypes.Where(p => lstPartnerType.Contains(p.MasterType))
                               .ToDictionary(m => m.CommonTypeId, n => n.Value);
+
             PartnerSearchDTO _partnerSearchDTO = new PartnerSearchDTO();
             var _tblPartners = _context.TblPartners.OrderByDescending(p => p.CreatedDate).Select(x => x);
+
             if (!string.IsNullOrEmpty(partnerSearchDTO.partnerName))
             {
                 _tblPartners = _tblPartners.Where(p => p.PartnerName.Contains(partnerSearchDTO.partnerName));
@@ -291,6 +338,14 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             if (partnerSearchDTO.PartnerClassId > 0)
             {
                 _tblPartners = _tblPartners.Where(p => p.PartnerClassId == partnerSearchDTO.PartnerClassId);
+            }
+            if (partnerSearchDTO.Status == 24)
+            {
+                _tblPartners = _tblPartners.Where(p => p.IsActive == false);
+            }
+            if (partnerSearchDTO.Status == 23)
+            {
+                _tblPartners = _tblPartners.Where(p => p.IsActive == true);
             }
             var partners = _mapper.Map<IEnumerable<PartnersDTO>>(_tblPartners);
             foreach (var item in partners)
@@ -412,18 +467,22 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         #region APIKIt
         public async Task<ProductApiModel> GetPartnerApiKitAsync(decimal productId, ApiContext apiContext)
         {
-            var productKitModel =await GetProductApiAsync(productId,"ashish.sinha@inubesolutions.com","9742745384", apiContext);
+            var product = await _integrationService.GetProductNameAsync(productId, apiContext);
+            var productKitModel =await GetProductApiAsync(product, productId,"ashish.sinha@inubesolutions.com","9742745384", apiContext);
            
             return productKitModel;
         }
         //ProductApiKit
-        private async Task<ProductApiModel> GetProductApiAsync(decimal productId,string partnerEmail,string mobileNumber, ApiContext apiContext)
+        private async Task<ProductApiModel> GetProductApiAsync(ProductDTO product, decimal productId,string partnerEmail,string mobileNumber, ApiContext apiContext)
         {
             // Gte The Product details
-            var product=await _integrationService.GetProductNameAsync(productId, apiContext);
+            //  var product=await _integrationService.GetProductNameAsync(productId, apiContext);
+
+            var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
             ProductApiModel model = new ProductApiModel();
             model.PName = product.ProductName;
 
+            #region CreatePolicy
             ApiMethods apiMethod = new ApiMethods();
             apiMethod.SLNo = "1";
             apiMethod.methodName = "CreatePolicy";
@@ -433,7 +492,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             methodsCall.Name = apiMethod.methodName;
             methodsCall.PolicyType = apiMethod.methodName;
             dynamic policy = new ExpandoObject();
-            var policyParams = await GetPolicyParamsAsync(productId, apiContext, policy);
+            var policyParams = await GetPolicyParamsAsync(productId, apiContext, policy, policyRiskDetails);
             methodsCall.dataParams.AddRange(policyParams);
 
             //SampleCallModel sampleCallModel = new SampleCallModel();
@@ -478,6 +537,10 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             response.Content = "";
             methodsCall.Response.Add(response);
 
+
+            #endregion
+            #region PolicyCancellation
+
             //Policy Cancelation
             apiMethod = new ApiMethods();
             apiMethod.SLNo = "2";
@@ -492,7 +555,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             var fields = ReflectionUtils.GetAllFields(pcRequest.GetType());
             dynamic policyCancel = new ExpandoObject();
             List<DataParams> lstPcdataParams = new List<DataParams>();
-            var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
+            //var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
             DataParams dataParams = null;
             foreach (var item in fields)
             {
@@ -517,6 +580,225 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             methodTypeModel.Type = "[HttpPost]";
             methodsCall.methodTypeModels.Add(methodTypeModel);
             model.methodsCalls.Add(methodsCall);
+
+            #endregion
+
+            #region ClaimIntimation
+            //Claim Intimation
+            apiMethod = new ApiMethods();
+            apiMethod.SLNo = "3";
+            apiMethod.methodName = "ClaimIntimate";
+            model.numberOfApi.Add(apiMethod);
+            methodsCall = new MethodsCall();
+            methodsCall.Name = apiMethod.methodName;
+            methodsCall.PolicyType = apiMethod.methodName;
+            var cIRequest = FillClaimIntimationRequest();
+            var fieldsdata = ReflectionUtils.GetAllFields(cIRequest.GetType());
+            dynamic claimIntimation = new ExpandoObject();
+            List<DataParams> lstCIdataParams = new List<DataParams>();
+            var ciRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
+            DataParams dataparams = null;
+            foreach (var item in fieldsdata)
+            {
+                dataparams = new DataParams();
+                dataparams.Field = item.Name;
+                dataparams.DataType = item.FieldType.Name;
+                // dataParams.IsRequired = Convert.ToBoolean(item.IsReqired) ? "Yes" : "No";
+                dataparams.Description = "";
+                lstCIdataParams.Add(dataparams);
+                AddProperty(claimIntimation, item.Name, item.FieldType.Name);
+            }
+            methodsCall.dataParams.AddRange(lstCIdataParams);
+            methodsCall.PolicyRequest = JsonConvert.SerializeObject(claimIntimation, Formatting.Indented);
+            methodsCall.Response.Add(response);
+            model1 = new URLLinkModel();
+            model1 = new URLLinkModel();
+            model1.TestLink = "https://inubeservicesclaims.azurewebsites.net/api/ClaimManagement/ClaimIntimate";
+            model1.ProductionLink = "https://inubeservicesclaims.azurewebsites.net/api/ClaimManagement/ClaimIntimate";
+            methodsCall.uRLLinkModels.Add(model1);
+            methodTypeModel = new MethodTypeModel();
+            methodTypeModel.Type = "[HttpPost]";
+            methodsCall.methodTypeModels.Add(methodTypeModel);
+            model.methodsCalls.Add(methodsCall);
+            #endregion
+
+
+
+
+            #region Add Insurable Item
+            apiMethod = new ApiMethods();
+            apiMethod.SLNo = "4";
+            apiMethod.methodName = "Add InsurableItem";
+            model.numberOfApi.Add(apiMethod);
+
+            methodsCall = new MethodsCall();
+            methodsCall.Name = apiMethod.methodName;
+            methodsCall.PolicyType = apiMethod.methodName;
+            policy = new ExpandoObject();
+            var InsurableParams = await GetInsurableParamsAsync(productId, apiContext, policy, policyRiskDetails);
+            methodsCall.dataParams.AddRange(InsurableParams);
+
+            //SampleCallModel sampleCallModel = new SampleCallModel();
+            //sampleCallModel.PolicyDate = DateTime.Now;
+            //sampleCallModel.ProductID = 317;
+            //sampleCallModel.ProposerName = " one";
+
+            //methodsCall.SampleCallModel = sampleCallModel;
+            methodsCall.PolicyRequest = JsonConvert.SerializeObject(policy, Formatting.Indented);
+
+
+            model1 = new URLLinkModel();
+            model1 = new URLLinkModel();
+            model1.TestLink = "https://inubeservicespolicy.azurewebsites.net/api/Policy/AddInsurableItem";
+            model1.ProductionLink = "https://inubeservicespolicy.azurewebsites.net/api/Policy/AddInsurableItem";
+            methodsCall.uRLLinkModels.Add(model1);
+            //model.methodsCalls.Add(methodsCall);
+
+
+            methodTypeModel = new MethodTypeModel();
+            methodTypeModel = new MethodTypeModel();
+            methodTypeModel.Type = "[HttpPost]";
+            methodsCall.methodTypeModels.Add(methodTypeModel);
+            model.methodsCalls.Add(methodsCall);
+
+
+            urlParams = new UrlParams();
+            urlParams.ParamsType = "abc";
+            methodsCall.urlParams.Add(urlParams);
+
+
+
+            response = new Response();
+            response.ResponseType = "Success Response";
+            response.code = "200";
+            response.Content = "";
+            methodsCall.Response.Add(response);
+
+            response = new Response();
+            response.ResponseType = "Error Response";
+            response.code = "404 NOT FOUND";
+            response.Content = "";
+            methodsCall.Response.Add(response);
+
+
+            #endregion
+
+            #region Remove Insurable Item
+            apiMethod = new ApiMethods();
+            apiMethod.SLNo = "5";
+            apiMethod.methodName = "Remove InsurableItem";
+            model.numberOfApi.Add(apiMethod);
+
+            methodsCall = new MethodsCall();
+            methodsCall.Name = apiMethod.methodName;
+            methodsCall.PolicyType = apiMethod.methodName;
+            policy = new ExpandoObject();
+            var RemoveInsurableParams = await RemoveInsurableParamsAsync(productId, apiContext, policy, policyRiskDetails);
+            methodsCall.dataParams.AddRange(InsurableParams);
+
+            //SampleCallModel sampleCallModel = new SampleCallModel();
+            //sampleCallModel.PolicyDate = DateTime.Now;
+            //sampleCallModel.ProductID = 317;
+            //sampleCallModel.ProposerName = " one";
+
+            //methodsCall.SampleCallModel = sampleCallModel;
+            methodsCall.PolicyRequest = JsonConvert.SerializeObject(policy, Formatting.Indented);
+
+
+            model1 = new URLLinkModel();
+            model1 = new URLLinkModel();
+            model1.TestLink = "https://inubeservicespolicy.azurewebsites.net/api/Policy/RemoveInsurableItem";
+            model1.ProductionLink = "https://inubeservicespolicy.azurewebsites.net/api/RemoveInsurableItem";
+            methodsCall.uRLLinkModels.Add(model1);
+            //model.methodsCalls.Add(methodsCall);
+
+
+            methodTypeModel = new MethodTypeModel();
+            methodTypeModel = new MethodTypeModel();
+            methodTypeModel.Type = "[HttpPost]";
+            methodsCall.methodTypeModels.Add(methodTypeModel);
+            model.methodsCalls.Add(methodsCall);
+
+
+            urlParams = new UrlParams();
+            urlParams.ParamsType = "abc";
+            methodsCall.urlParams.Add(urlParams);
+
+
+
+            response = new Response();
+            response.ResponseType = "Success Response";
+            response.code = "200";
+            response.Content = "";
+            methodsCall.Response.Add(response);
+
+            response = new Response();
+            response.ResponseType = "Error Response";
+            response.code = "404 NOT FOUND";
+            response.Content = "";
+            methodsCall.Response.Add(response);
+
+
+            #endregion
+
+            #region CalaculatePremium
+            apiMethod = new ApiMethods();
+            apiMethod.SLNo = "6";
+            apiMethod.methodName = "Calculate Premium";
+            model.numberOfApi.Add(apiMethod);
+
+            methodsCall = new MethodsCall();
+            methodsCall.Name = apiMethod.methodName;
+            methodsCall.PolicyType = apiMethod.methodName;
+            policy = new ExpandoObject();
+            var CalculateRateParams = await CalculateRateParamsAsync(productId, apiContext, policy);
+            methodsCall.dataParams.AddRange(CalculateRateParams);
+
+            //SampleCallModel sampleCallModel = new SampleCallModel();
+            //sampleCallModel.PolicyDate = DateTime.Now;
+            //sampleCallModel.ProductID = 317;
+            //sampleCallModel.ProposerName = " one";
+
+            //methodsCall.SampleCallModel = sampleCallModel;
+            methodsCall.PolicyRequest = JsonConvert.SerializeObject(policy, Formatting.Indented);
+
+
+            model1 = new URLLinkModel();
+            model1 = new URLLinkModel();
+            model1.TestLink = "https://inubeservicespolicy.azurewebsites.net/api/Policy/CalCulatePremium";
+            model1.ProductionLink = "https://inubeservicespolicy.azurewebsites.net/api/Policy/CalCulatePremium";
+            methodsCall.uRLLinkModels.Add(model1);
+            //model.methodsCalls.Add(methodsCall);
+
+
+            methodTypeModel = new MethodTypeModel();
+            methodTypeModel = new MethodTypeModel();
+            methodTypeModel.Type = "[HttpPost]";
+            methodsCall.methodTypeModels.Add(methodTypeModel);
+            model.methodsCalls.Add(methodsCall);
+
+
+            urlParams = new UrlParams();
+            urlParams.ParamsType = "abc";
+            methodsCall.urlParams.Add(urlParams);
+
+
+
+            response = new Response();
+            response.ResponseType = "Success Response";
+            response.code = "200";
+            response.Content = "";
+            methodsCall.Response.Add(response);
+
+            response = new Response();
+            response.ResponseType = "Error Response";
+            response.code = "404 NOT FOUND";
+            response.Content = "";
+            methodsCall.Response.Add(response);
+
+
+            #endregion
+
             EmailRequest emailTest = new EmailRequest() { IsAttachment = true, Message = $"ProductApiKit for Mica Services", Subject = $"ApiKit for Product", To = partnerEmail };
             model.EmailTest = emailTest;
             // return model;
@@ -525,10 +807,10 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
 
             return model;
         }
-        private async Task<List<DataParams>> GetPolicyParamsAsync(decimal productId, ApiContext apiContext,dynamic policy)
+        private async Task<List<DataParams>> GetPolicyParamsAsync(decimal productId, ApiContext apiContext,dynamic policy,dynamic policyRiskDetails)
         {
             List<DataParams> lstdataParams = new List<DataParams>();
-            var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
+            //var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
             DataParams dataParams = null;
            
             foreach (var item in policyRiskDetails.ProductRcbDetails)
@@ -608,6 +890,156 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             AddProperty(policy, "InsurableItem", insurableItems);
             return lstdataParams;
         }
+
+        private async Task<List<DataParams>> GetInsurableParamsAsync(decimal productId, ApiContext apiContext, dynamic policy, dynamic policyRiskDetails)
+        {
+            List<DataParams> lstdataParams = new List<DataParams>();
+            //var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
+            DataParams dataParams = null;
+            dataParams = new DataParams();
+            dataParams.Field = "PolicyNumber";
+            dataParams.DataType = "string";
+            dataParams.IsRequired =  "Yes" ;
+            dataParams.Description = "";
+            lstdataParams.Add(dataParams);
+            AddProperty(policy, "PolicyNumber", "string");
+
+       
+
+            //For Insurable 
+            dataParams = new DataParams();
+            dataParams.Field = "InsurableItem Parameter Details";
+            dataParams.Description = "";
+            lstdataParams.Add(dataParams);
+            dynamic insurableItems = new List<dynamic>();
+            foreach (var insItem in policyRiskDetails.ProductRcbInsurableDetails)
+            {
+                dynamic insurableItem = new ExpandoObject();
+                dataParams = new DataParams();
+                dataParams.Field = insItem.InputType;
+                // dataParams.DataType = item.UserInputType;
+                // dataParams.IsRequired = Convert.ToBoolean(item.IsReqired) ? "Yes" : "No";
+                // dataParams.Description = "";
+                lstdataParams.Add(dataParams);
+                AddProperty(insurableItem, "InsurableName", insItem.InputType);
+                dynamic InsurableFields = new List<dynamic>();
+                dynamic insurableDetail = new ExpandoObject();
+                foreach (var item in insItem.InsurableChildRcbdetail)
+                {
+                    dataParams = new DataParams();
+                    dataParams.Field = item.InputType;
+                    dataParams.DataType = item.UserInputType;
+                    dataParams.IsRequired = Convert.ToBoolean(item.IsReqired) ? "Yes" : "No";
+                    dataParams.Description = "";
+                    lstdataParams.Add(dataParams);
+                    AddProperty(insurableDetail, item.InputType, item.UserInputType);
+                }
+                InsurableFields.Add(insurableDetail);
+                AddProperty(insurableItem, "InsurableFields", InsurableFields);              
+                
+                insurableItems.Add(insurableItem);
+            }
+
+    
+            AddProperty(policy, "InsurableItem", insurableItems);
+        
+
+
+            return lstdataParams;
+        }
+
+        private async Task<List<DataParams>> RemoveInsurableParamsAsync(decimal productId, ApiContext apiContext, dynamic policy, dynamic policyRiskDetails)
+        {
+            List<DataParams> lstdataParams = new List<DataParams>();
+            //var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
+            DataParams dataParams = null;
+            dataParams = new DataParams();
+            dataParams.Field = "PolicyNumber";
+            dataParams.DataType = "string";
+            dataParams.IsRequired = "Yes";
+            dataParams.Description = "";
+            lstdataParams.Add(dataParams);
+            AddProperty(policy, "PolicyNumber", "string");
+
+
+
+            //For Insurable 
+            dataParams = new DataParams();
+            dataParams.Field = "InsurableItem Parameter Details";
+            dataParams.Description = "";
+            lstdataParams.Add(dataParams);
+            dynamic insurableItems = new List<dynamic>();
+            foreach (var insItem in policyRiskDetails.ProductRcbInsurableDetails)
+            {
+                dynamic insurableItem = new ExpandoObject();
+                dataParams = new DataParams();
+                dataParams.Field = insItem.InputType;
+                // dataParams.DataType = item.UserInputType;
+                // dataParams.IsRequired = Convert.ToBoolean(item.IsReqired) ? "Yes" : "No";
+                // dataParams.Description = "";
+                lstdataParams.Add(dataParams);
+                AddProperty(insurableItem, "InsurableName", insItem.InputType);
+                dynamic InsurableFields = new List<dynamic>();
+                //dynamic insurableDetail = new ExpandoObject();
+                var insurableDetail = "IdentificationNumber" + ":" + "string";
+                InsurableFields.Add(insurableDetail);
+                AddProperty(insurableItem, "InsurableFields", InsurableFields);
+
+                insurableItems.Add(insurableItem);
+            }
+
+
+            AddProperty(policy, "InsurableItem", insurableItems);
+
+
+
+            return lstdataParams;
+        }
+
+        private async Task<List<DataParams>> CalculateRateParamsAsync(decimal productId, ApiContext apiContext, dynamic policy)
+        {
+            List<DataParams> lstdataParams = new List<DataParams>();
+            // Get The ratingId
+            var ratingId = 37;
+            var policyRateDetails = await _integrationService.GetRateParamsAsync(ratingId, apiContext);
+            DataParams dataParams = null;
+            //For Insurable 
+            dataParams = new DataParams();
+            dataParams.Field = "dictionary_rule";
+            dataParams.Description = "";
+            lstdataParams.Add(dataParams);
+            dynamic insurableItem = new ExpandoObject();
+            foreach (var insItem in policyRateDetails.parameterList)
+            {
+               
+                dataParams = new DataParams();
+                dataParams.Field = insItem;
+                dataParams.DataType = "string";
+                dataParams.IsRequired = "Yes";
+                lstdataParams.Add(dataParams);
+                AddProperty(insurableItem, insItem.ToString(),null);
+            }
+            AddProperty(policy, "dictionary_rule", insurableItem);
+
+            dataParams = new DataParams();
+            dataParams.Field = "rateList";
+            dataParams.Description = "";
+            lstdataParams.Add(dataParams);
+            dynamic rateList = new ExpandoObject();
+            foreach (var insItem in policyRateDetails.rateList)
+            {
+
+                dataParams = new DataParams();
+                dataParams.Field = insItem;
+                dataParams.DataType = "string";
+                dataParams.IsRequired = "Yes";
+                lstdataParams.Add(dataParams);
+                AddProperty(rateList, insItem.ToString(), null);
+            }
+            AddProperty(policy, "rateList", rateList);
+
+            return lstdataParams;
+        }
         public void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
         {
             // ExpandoObject supports IDictionary so we can extend it like this
@@ -625,6 +1057,58 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             policycancelDTO.PolicyStatusId = "Respective cancellation status";
             policycancelDTO.Remarks = "Reason behind the cancellation";
             return policycancelDTO;
+        }
+        private ClaimDataDTO FillClaimIntimationRequest()
+        {
+            ClaimDataDTO claimIntimationDTO = new ClaimDataDTO();
+            claimIntimationDTO.PolicyNumber = "000-111-222";
+            claimIntimationDTO.lossDateTime = DateTime.Now;
+            claimIntimationDTO.locationOfLoss = "Banglore";
+            claimIntimationDTO.lossIntimatedBy = 0;
+            claimIntimationDTO.lossDescription = "loss";
+            claimIntimationDTO.ClaimAmount = 2;
+            claimIntimationDTO.AccHolderName = "xyz";
+            claimIntimationDTO.AccNumber = "1234567890213";
+            claimIntimationDTO.BankName = "AXIS";
+            claimIntimationDTO.BankBranchAdd = "123";
+            claimIntimationDTO.IfscCode = "123deffre";
+            claimIntimationDTO.EmailId = "vithal@inubesolutions.com";
+            claimIntimationDTO.DocumentType = "";
+            claimIntimationDTO.DocumentName = "name";
+            claimIntimationDTO.ClaimStatusId = 9;
+            claimIntimationDTO.Active = true;
+            claimIntimationDTO.PolicyId = 26;
+            claimIntimationDTO.ClaimInsurableId = 0;
+            claimIntimationDTO.InsurableItem = "Person";
+            claimIntimationDTO.Name = "abc";
+            claimIntimationDTO.IdentificationNo = "8907676";
+            claimIntimationDTO.TypeOfLoss = "loss";
+            claimIntimationDTO.BenefitAmount = 4;
+            claimIntimationDTO.ClaimAmounts = 3000;
+            claimIntimationDTO.CreatedBy = "GS";
+            claimIntimationDTO.PartnerId = 0;
+            claimIntimationDTO.OrganizationId = 112;
+            claimIntimationDTO.ClaimNumber = "1234-76-908";
+            BankAccountsDTO bankAccountsDTO = new BankAccountsDTO();
+            bankAccountsDTO.AccountHolderName = "asdf";
+            bankAccountsDTO.AccountNumber = "1234567";
+            bankAccountsDTO.AccountType = "savings";
+            bankAccountsDTO.BankBranchAddress = "rbi layout";
+            bankAccountsDTO.BankId = 60;
+            bankAccountsDTO.BankName = "Axis";
+            bankAccountsDTO.ClaimId = 12;
+            bankAccountsDTO.CreatedBy = "Admin";
+            bankAccountsDTO.CreatedDate = DateTime.Now;
+            claimIntimationDTO.TblBankAccounts.Add(bankAccountsDTO);
+            ClaimInsurableDTO claimInsurableDTO = new ClaimInsurableDTO();
+            claimInsurableDTO.ApprovedClaimAmounts = 0;
+            claimInsurableDTO.BenefitAmount = 2000;
+            claimInsurableDTO.ClaimAmounts = 2000;
+            claimInsurableDTO.ClaimId = 12;
+            claimInsurableDTO.ClaimInsurableId = 10;
+            claimInsurableDTO.CoverName = "dbi";
+            claimIntimationDTO.ClaimInsurable.Add(claimInsurableDTO);
+            return claimIntimationDTO;
         }
 
         private async Task SendNotificationAsync(ProductApiModel productKitModel,string MobileNumber, ApiContext apiContext)
@@ -691,13 +1175,61 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var partner = _context.TblPartners.Find(PartnerId);
            // var delete_partAddress = _context.TblPartnerAddress.Where(a=>a.PartnerId==PartnerId);
-            if (partner != null)
+            //if (partner != null)
+            //{
+            //    partner.IsActive = false;
+            //    _context.TblPartners.Update(partner);
+            //    _context.SaveChanges();
+            //}
+
+            if(partner.IsActive==true )
             {
                 partner.IsActive = false;
                 _context.TblPartners.Update(partner);
                 _context.SaveChanges();
             }
+            else
+            {
+                partner.IsActive = true;
+                _context.TblPartners.Update(partner);
+                _context.SaveChanges();
+            }
         }
 
+        public async Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(decimal OrgId,ApiContext apiContext)
+        {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            var partner = (from tblPartner in _context.TblPartners.OrderByDescending(item => item.CreatedDate)
+                          where (tblPartner.OrganizationId == OrgId)
+                          select new PartnerDetailsDTO
+                          {
+                              PartnerId = tblPartner.PartnerId,
+                              PartnerName = tblPartner.PartnerName,
+                              Email = tblPartner.Email,
+                              OrgId = tblPartner.OrganizationId
+                          }).ToList();
+            partner.Add(new PartnerDetailsDTO { PartnerId= 0, PartnerName="All" , Email="All",OrgId=0 });
+
+            var partnerDetails = _mapper.Map<IEnumerable<PartnerDetailsDTO>>(partner);
+
+            return partnerDetails;
+
+        }
+
+        public async Task<string> GetPartnerNameById(decimal PartnerId, ApiContext apiContext)
+        {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            try { 
+            var pName = _context.TblPartners.SingleOrDefault(p => p.PartnerId == PartnerId).PartnerName;
+            //var _pName = _mapper.Map<PartnerNameById>(pName);
+            return pName;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+
+        }
     }
 }

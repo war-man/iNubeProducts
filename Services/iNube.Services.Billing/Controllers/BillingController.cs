@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Net.Http.Headers;
 using System;
+using iNube.Services.Billing.Helpers;
 using iNube.Services.Billing.Controllers.Billing.BillingService;
 
 namespace iNube.Services.Billing.Controllers.Billing
@@ -76,6 +77,26 @@ namespace iNube.Services.Billing.Controllers.Billing
 
             return Ok(valueFactor);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMasterData(string sMasterlist)
+        {
+            var commonTypesDTOs = await _billingService.GetMasterForLocation(sMasterlist, Context);
+           
+               // var masterdata = commonTypesDTOs.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
+            return Ok(commonTypesDTOs);
+           
+            
+        }
+
+        // GET: api/Product/GetLocation
+        [HttpGet]
+        public async Task<IActionResult> GetLocation(string locationType, int parentID)
+        {
+            var locationData =await _billingService.GetLocation(locationType, parentID, Context);
+            return Ok(locationData);
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveBillingDetails([FromBody]BillingConfigDTO billingitem)
         {
@@ -153,8 +174,37 @@ namespace iNube.Services.Billing.Controllers.Billing
         [HttpPost]
         public async Task<IActionResult> SaveCustomerAsync([FromBody]CustomersDTO Customerdto)
         {
-            var response =await _billingService.SaveCustomerAsync(Customerdto, Context);
-            return Ok(response);
+            //var response =await _billingService.SaveCustomerAsync(Customerdto, Context);
+            //return Ok(response);
+
+            try
+            {
+                //var files = Request.Form.Files;
+                //var filename = "";
+                var response = await _billingService.SaveCustomerAsync(Customerdto, Context);
+                switch (response.Status)
+                {
+                    case BusinessStatus.InputValidationFailed:
+                        return Ok(response);
+                    case BusinessStatus.Created:
+                        return Ok(response);
+                    case BusinessStatus.UnAuthorized:
+                        return Unauthorized();
+                    case BusinessStatus.PreConditionFailed:
+                        return Ok(response);
+                    default:
+                        return Forbid();
+                }
+                //  return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
         }
 
         [HttpGet]
@@ -397,6 +447,14 @@ namespace iNube.Services.Billing.Controllers.Billing
             return Ok(history);
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> GetSearchInvoiceForCustomer(InvoiceCustSearch invoiceCustSearch)
+        {
+            var history = await _billingService.GetSearchInvoiceForCustomer(invoiceCustSearch, Context);
+            return Ok(history);
+        }
+
         //Get Billing Customer Name for Accounting 
         [HttpGet]
         public async Task<IActionResult> GetCustomerName()
@@ -404,6 +462,14 @@ namespace iNube.Services.Billing.Controllers.Billing
             var billingDtos = await _billingService.GetCustomerDetails(Context);
             return Ok(billingDtos);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetObjectParameter()
+        {
+            var billingDtos = await _billingService.GetObjectParameter(Context);
+            return Ok(billingDtos);
+        }
+        
         //Get Mapping Details For Accouting 
         [HttpGet]
         public async Task<IActionResult> GetEventMapDetails()

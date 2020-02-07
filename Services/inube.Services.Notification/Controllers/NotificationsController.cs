@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using inube.Services.Notification.Controllers.DMS.DMSService;
 using inube.Services.Notification.Models;
 using inube.Services.Notification.Template;
 using iNube.Utility.Framework;
@@ -27,12 +28,14 @@ namespace inube.Services.Notification.Controllers
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private ICompositeViewEngine _viewEngine;
-        public NotificationsController(IHostingEnvironment host, IEmailService emailService, IConfiguration configuration, ICompositeViewEngine viewEngine)
+        private readonly IDMSService _iDMSService;
+        public NotificationsController(IDMSService iDMSService, IHostingEnvironment host, IEmailService emailService, IConfiguration configuration, ICompositeViewEngine viewEngine)
         {
             _host = host;
             _emailService = emailService;
             _configuration = configuration;
             _viewEngine = viewEngine;
+            _iDMSService = iDMSService;
         }
 		
 		 [HttpGet]
@@ -47,7 +50,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendNotificationAsync([FromBody]NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService, _host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             if (request.TemplateKey == "PolicyIssue")
             {
@@ -84,7 +87,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendQuestionsNotificationAsync([FromBody]NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             ResponseStatus response = null;
             if (request.TemplateKey == "AptiQuestions")
@@ -117,7 +120,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendQuotationNotificationAsync([FromBody]NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             ResponseStatus response = null;
             if (request.TemplateKey == "QuotationPdf")
@@ -151,7 +154,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendProductApiKitNotificationAsync([FromBody]NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             ResponseStatus response = null;
             if (request.TemplateKey == "ProductApi")
@@ -187,7 +190,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendMultiCoverNotificationAsync([FromBody]NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
             ResponseStatus response = null;
             if (request.TemplateKey == "InsuranceCertificate")
@@ -240,7 +243,7 @@ namespace inube.Services.Notification.Controllers
         [HttpPost]
         public async Task<IActionResult> SendTemplateNotificationAsync([FromBody]NotificationRequest request)
         {
-            TemplateController templateController = new TemplateController(_host, _emailService, _configuration, _viewEngine);
+            TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
 
             dynamic templateData = await GetNotificationModelAsync(request, templateController);
@@ -267,12 +270,12 @@ namespace inube.Services.Notification.Controllers
 
             // SMSDTO.SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + SMSDTO.PolicyNumber + "is generated and Policy Link http://bit.ly/2Y9eAZV and Claims http://bit.ly/33EQvLz ";
 
-            //var SMSAPI = "https://www.smsgatewayhub.com/api/mt/SendSMS?APIKey=6nnnnyhH4ECKDFC5n59Keg&senderid=SMSTST&channel=2&DCS=0&flashsms=0&number=91" + SMSDTO.RecipientNumber + "&text=" + SMSDTO.SMSMessage;
+            var SMSAPI = "https://www.smsgatewayhub.com/api/mt/SendSMS?APIKey=6nnnnyhH4ECKDFC5n59Keg&senderid=SMSTST&channel=2&DCS=0&flashsms=0&number=91" + SMSDTO.RecipientNumber + "&text=" + SMSDTO.SMSMessage;
 
 
 
-            //var client = new WebClient();
-            //var content = client.DownloadString(SMSAPI);
+            var client = new WebClient();
+            var content = client.DownloadString(SMSAPI);
         }
         private async Task<dynamic> GetNotificationModelAsync(NotificationRequest request, TemplateController templateController)
         {

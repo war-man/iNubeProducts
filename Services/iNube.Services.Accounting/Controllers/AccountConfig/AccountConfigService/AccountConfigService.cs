@@ -45,6 +45,8 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         Task<CoaaccountMappingDto> GetCOAMappingById(decimal accountMappingId, ApiContext apiContext);
         Task<CoaaccountMappingDto> ModifyCoaMapping(CoaaccountMappingDto objMapAccounts, ApiContext apiContext);
         void DeleteCoaMapping(decimal AccountMappingId, ApiContext apiContext);
+        Task<IEnumerable<TransactionRuleMappingDto>> GetTransaction(ApiContext apiContext);
+        Task<IEnumerable<SubLedgerReferencesDto>> GetSubLedgerType(ApiContext apiContext);
     }
 
     public class AccountConfigService : IAccountConfigService
@@ -260,11 +262,21 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         }
 
+        public async Task<IEnumerable<SubLedgerReferencesDto>> GetSubLedgerType(ApiContext apiContext)
+        {
+            return await _accountsService(apiContext.ProductType).GetSubLedgerType(apiContext);
+        }
+
         //For Importting the file Into Excel
         public async Task<DemoResponse<List<CoaMapExcelImportDTO>>> Import(IFormFile formFile, CancellationToken cancellationToken, ApiContext apiContext)
         {
             return await _accountsService(apiContext.ProductType).Import(formFile, cancellationToken, apiContext);
 
+        }
+
+        public async Task<IEnumerable<TransactionRuleMappingDto>> GetTransaction(ApiContext apiContext)
+        {
+            return await _accountsService(apiContext.ProductType).GetTransaction(apiContext);
         }
     }
 }

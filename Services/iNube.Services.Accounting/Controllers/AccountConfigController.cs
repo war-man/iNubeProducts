@@ -243,11 +243,23 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
             var accountDtos = await _accountService.GetAccountType(Context);
             return Ok(accountDtos);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetSubLedgers()
+        {
+            var subLedgerDtos = await _accountService.GetSubLedgerType(Context);
+            return Ok(subLedgerDtos);
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetTransactionDetails()
         {
             var transactionDtos =await _accountService.GetTransactionDetails(Context);
+            return Ok(transactionDtos);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetTransactionConditionDetails()
+        {
+            var transactionDtos = await _accountService.GetTransaction(Context);
             return Ok(transactionDtos);
         }
 

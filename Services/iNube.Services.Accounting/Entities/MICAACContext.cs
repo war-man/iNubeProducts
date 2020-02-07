@@ -186,6 +186,8 @@ namespace iNube.Services.Accounting.Entities
 
                 entity.Property(e => e.PartnerId).HasColumnType("numeric(18, 0)");
 
+                entity.Property(e => e.ProductId).HasColumnType("numeric(18, 0)");
+
                 entity.Property(e => e.RuleName).IsUnicode(false);
 
                 entity.Property(e => e.TransactionHeaderId).HasColumnType("numeric(18, 0)");
@@ -209,6 +211,8 @@ namespace iNube.Services.Accounting.Entities
                 entity.Property(e => e.TransactionConditionsId)
                     .HasColumnType("numeric(18, 0)")
                     .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AccountName).IsUnicode(false);
 
                 entity.Property(e => e.AccountType).IsUnicode(false);
 

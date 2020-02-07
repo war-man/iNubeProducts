@@ -16,7 +16,7 @@ using iNube.Utility.Framework.Notification;
 using Newtonsoft.Json;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 {
@@ -25,7 +25,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<PolicyResponse> CreatePolicy(dynamic policyDetail, ApiContext apiContext);
 
         Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext);
-
+        Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext);
         Task<PolicyDTO> ModifyPolicy(string policyNumber,PolicyDTO policyDetail, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetMaster(string sMasterlist, ApiContext apiContext);
         Task<PolicyDTO> GetPolicyById(decimal policyId, ApiContext apiContext);
@@ -46,7 +46,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequet, ApiContext apiContext);
         Task<List<ddDTOs>> PolicyDashboardMaster(ApiContext apiContext);
         Task<LeadInfoDTO> CustomerPolicy(int CustomerId, ApiContext apiContext);
-
+        Task<IEnumerable<PolicyCountDTO>> PolicySearchDashboard(PolicySearchDashboardDTO policysearch, ApiContext apiContext);
+        Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest,ApiContext apiContext);
+        Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext);
+        Task<EndorsmentDTO> SwitchOnOff(dynamic switchOnOffRequest, ApiContext apiContext);
+        //Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string policyNumber, ApiContext apiContext);
+        Task<decimal> GetPolicyDetailsByPolicyNo(string PolicyNO,ApiContext apiContext);
+        Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext);
+        Task<object> CalCulatePremium(DynamicData premiumParameter, ApiContext apiContext);
+        Task<PolicyDTO> ModifyInsurabableItem(dynamic modifydata, ApiContext apiContext);
+        Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
+        Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount ,ApiContext apiContext);
     }
     public class PolicyService : IPolicyService
     {
@@ -76,6 +86,23 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).CreateMultiCoverPolicy(policyDetail, apiContext);
         }
+        //Update InsurableItem
+
+        public async Task<PolicyDTO> ModifyInsurabableItem(object modifydata, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).ModifyInsurabableItem(modifydata, apiContext);
+        }
+
+        //Get InsurableItemDetails
+
+        public async Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetInsurableItemDetails(policyNo, insurableItemName,apiContext);
+        }
+        public async Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).CreatePolicyWithPayment(policyDetail, apiContext);
+        }
 
 
         public async Task<bool> SendEmailAsync(EmailRequest emailTest)
@@ -94,6 +121,23 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<PolicyDTO> ModifyPolicy(string policyNumber, PolicyDTO policyDetail, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).ModifyPolicy(policyNumber, policyDetail, apiContext);
+        }
+        //GetCDBalanceByPolicyNo
+        //public async Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string policyNumber, ApiContext apiContext)
+        //{
+        //    return await _policyProductService(apiContext.ProductType).GetCdBalanceBYPolicyAsync(policyNumber, apiContext);
+        //}
+        //GetPolicydetailsByPolicyNO
+
+        //GetMasterPolicy
+        public async Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetAllPolicy(productCode, apiContext);
+        }
+
+        public async Task<decimal> GetPolicyDetailsByPolicyNo(string PolicyNO, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetPolicyDetailsByPolicyNo(PolicyNO, apiContext);
         }
 
         public async Task<IEnumerable<ddDTOs>> GetMaster(string sMasterlist, ApiContext apiContext)
@@ -580,5 +624,36 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).CustomerPolicy(CustomerId, apiContext);
         }
+        public async Task<IEnumerable<PolicyCountDTO>> PolicySearchDashboard(PolicySearchDashboardDTO policysearch, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).PolicySearchDashboard(policysearch, apiContext);
+        }
+
+
+        public async Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
+        {
+
+            return await _policyProductService(apiContext.ProductType).AddInsurableItem(insurableItemRequest, apiContext);
+
+        }
+        public async Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).RemoveInsurableItem(insurableItemRequest, apiContext);
+        }
+        public async Task<EndorsmentDTO> SwitchOnOff(dynamic switchOnOffRequest, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).SwitchOnOff(switchOnOffRequest, apiContext);
+        }           
+        
+        public async Task<object> CalCulatePremium(DynamicData premiumParameter, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).CalCulatePremium(premiumParameter, apiContext);
+        }           
+        public async Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).UpdateSumInsured(PolicyNumber, amount, apiContext);
+        }           
+        
+       
     }
 }

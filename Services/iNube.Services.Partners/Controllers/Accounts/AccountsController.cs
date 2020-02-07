@@ -5,12 +5,14 @@ using iNube.Services.Partners.Controllers.Accounts.AccountsService;
 using iNube.Services.Partners.Models;
 using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iNube.Services.Partners.Controllers.Accounts
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class AccountsController : BaseApiController
     {
         public IAccountService _accountService;
@@ -216,6 +218,14 @@ namespace iNube.Services.Partners.Controllers.Accounts
         {
             var response = (await _accountService.GetProductNameAsync(partnerid, Context));
             return response;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MasterPolicyCD(MasterCDDTO masterCDDTO)
+        {
+            var response = (await _accountService.MasterPolicyCD(masterCDDTO, Context));
+            return Ok(response);
+
         }
 
 

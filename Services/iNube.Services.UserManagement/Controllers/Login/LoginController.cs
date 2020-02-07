@@ -107,9 +107,9 @@ namespace iNube.Services.UserManagement.Controllers.Login
         // GET: api/Login/GetUserTypeByUserName
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult GetUserType(string username, string productType, string serverType)
+        public IActionResult GetUserType(string username, string productType)
         {
-            var usrtype = _loginService.GetUserType(username, productType, serverType);
+            var usrtype = _loginService.GetUserType(username, productType);
             return Ok(usrtype);
         }
 

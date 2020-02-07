@@ -26,30 +26,30 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
     }
     public class IntegrationService : IIntegrationService
     {
-        //readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
+        // readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
         //readonly string productUrl = "https://localhost:44347";
         readonly string productUrl = "http://dev2-mica-product.aws.vpc.:9007";
 
         //readonly string claimUrl = "https://inubeservicesclaims.azurewebsites.net";
         //readonly string claimUrl = "https://localhost:44344";
-        readonly string claimUrl = "http://dev2-mica-claims.aws.vpc.:9002";
+		 readonly string claimUrl = "http://dev2-mica-claims.aws.vpc.:9002";
 
         //readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
         //readonly string policyUrl = "https://localhost:44351";
-        readonly string policyUrl = "http://dev2-mica-policy.aws.vpc.:9006";
+		 readonly string policyUrl = "http://dev2-mica-policy.aws.vpc.:9006";
 
-        //string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
+      //  string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
         //string notificationUrl = "http://localhost:53000";
         readonly string notificationUrl = "http://dev2-mica-notification.aws.vpc.:9004";
 
 
         //readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
         //readonly string partnerUrl = "https://localhost:44315";
-        readonly string partnerUrl = "http://dev2-mica-partner.aws.vpc.:9005";
+		readonly string partnerUrl = "http://dev2-mica-partner.aws.vpc.:9005";
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
-        //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+       // readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+		readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
@@ -59,8 +59,8 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
 
         public async Task<UserNameById> GetUserNameById(string Id, ApiContext apiContext)
         {
-            var uri = UsermanangementUrl + "/api/UserProfile/GetUserNameById?Id=" + Id;
-            var data = await GetApiInvoke<UserNameById>(uri, apiContext);
+            var uri = UsermanangementUrl + "/api/UserProfile/GetUserNameById?Id="+ Id;
+            var data =  await GetApiInvoke<UserNameById>(uri, apiContext);
             return data;
         }
 
@@ -71,7 +71,7 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
             return await PostListApiInvoke<BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
         }
 
-        public async Task<BillingEventResponseDTO> GetProductItemizedDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> GetProductItemizedDetailsAsync(BillingEventRequest EventRequest,ApiContext apiContext)
         {
             var uri = productUrl + "/api/Product/BillingEventResponse";
 
@@ -123,7 +123,7 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();
-            if (!string.IsNullOrEmpty(apiContext.Token))
+           if (!string.IsNullOrEmpty(apiContext.Token))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
             }

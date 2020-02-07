@@ -37,5 +37,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         Task<CoaaccountMappingDto> GetCOAMappingById(decimal accountMappingId, ApiContext apiContext);
         Task<CoaaccountMappingDto> ModifyCoaMapping(CoaaccountMappingDto objMapAccounts, ApiContext apiContext);
         void DeleteCoaMapping(decimal AccountMappingId, ApiContext apiContext);
+        Task<IEnumerable<TransactionRuleMappingDto>> GetTransaction(ApiContext apiContext);
+        Task<IEnumerable<SubLedgerReferencesDto>> GetSubLedgerType(ApiContext apiContext);
     }
 }

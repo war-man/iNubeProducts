@@ -30,6 +30,8 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         Task<PartnerUploadlogoResponse> UploadLogo(LogoDTO logo, ApiContext apiContext);
         Task<PartnerResponse> PartnerCodeValidations(string partnercode, ApiContext apiContext);
         void DeletePartner(decimal PartnerId, ApiContext apiContext);
+        Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(decimal OrgId,ApiContext apiContext);
+        Task<string> GetPartnerNameById(decimal PartnerId, ApiContext apiContext);
     }
 
     public class PartnerService : IPartnerService
@@ -171,6 +173,14 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         public void DeletePartner(decimal PartnerId, ApiContext apiContext)
         {
              _partnerProductService(apiContext.ProductType).DeletePartner(PartnerId, apiContext);
+        }
+        public async Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(decimal OrgId,ApiContext apiContext)
+        {
+            return await _partnerProductService(apiContext.ProductType).GetPartnerDetails(OrgId ,apiContext);
+        }
+        public async Task<string> GetPartnerNameById(decimal PartnerId, ApiContext apiContext)
+        {
+            return await _partnerProductService(apiContext.ProductType).GetPartnerNameById(PartnerId,apiContext);
         }
     }
 }

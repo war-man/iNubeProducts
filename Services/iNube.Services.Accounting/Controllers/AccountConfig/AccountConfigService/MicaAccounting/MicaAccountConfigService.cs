@@ -4,6 +4,7 @@ using iNube.Services.Accounting.Helpers;
 using iNube.Services.Accounting.Models;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using System;
@@ -96,7 +97,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 _context.TblTransactionRuleMapping.Add(dto);
                 _context.SaveChanges();
                 var transMapDto = _mapper.Map<TransactionRuleMappingDto>(dto);
-                return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Transaction Mapping Succesfully Done For Rule Name:{transMapDto.RuleName}" };
+                return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Journal Entry Create Succesfully For:{transMapDto.RuleName}" };
             }
             catch (Exception ex)
             {
@@ -166,6 +167,28 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
             return null;
         }
 
+        //Returning Directly Model
+        public async Task<IEnumerable<TransactionRuleMappingDto>> GetTransaction(ApiContext apiContext)
+        {
+             _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            var tblAccount = _context.TblTransactionRuleMapping.OrderBy(item => item.CreatedDate).Include(add => add.TblTransactionConditions).Include(add => add.TblSubLedgerReferences);
+           
+            var coaDTO = _mapper.Map<IList<TransactionRuleMappingDto>>(tblAccount);
+            foreach(var ac in coaDTO)
+            {
+                foreach(var acCdn in ac.TransactionConditions)
+                {
+                    var account = _context.TblCoaaccounts.Where(item => item.AccountCode == acCdn.AccountCode);
+                    foreach(var acName in account)
+                    {
+                        acCdn.AccountName = acName.AccountName;
+                    }
+                }
+            }
+            return coaDTO;
+        }
+
+
         public async Task<IEnumerable<AccountTypeDto>> GetAccountType(ApiContext apiContext)
         {
             _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
@@ -181,6 +204,29 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                     ToRange = c.ToRange,
                 });
                 return accountDTOS;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public async Task<IEnumerable<SubLedgerReferencesDto>> GetSubLedgerType(ApiContext apiContext)
+        {
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            try
+            {
+                var account_list = _context.TblSubLedgerReferences.ToList();
+                IEnumerable<SubLedgerReferencesDto> subLedgerDTOS;
+                subLedgerDTOS = account_list.Select(c => new SubLedgerReferencesDto
+                {
+                    LedgerObject = c.LedgerObject,
+                    LedgerColName = c.LedgerColName,
+                    TransactionRuleMappingId = c.TransactionRuleMappingId,
+                    SubLedgerReferencesId = c.SubLedgerReferencesId,
+                });
+                return subLedgerDTOS;
             }
             catch (Exception ex)
             {
@@ -218,6 +264,8 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
             var transactionConditionList = from tblMappin in _context.TblTransactionRuleMapping
                                            join tblConditions in _context.TblTransactionConditions on tblMappin.TransactionRuleMappingId equals tblConditions.TransactionRuleMappingId
                                            join tblSubLedger in _context.TblSubLedgerReferences on tblMappin.TransactionRuleMappingId equals tblSubLedger.TransactionRuleMappingId
+                                           join tblAccount in _context.TblCoaaccounts on tblConditions.AccountCode equals tblAccount.AccountCode
+
                                            select new TransactionRuleMappingConditionsDto
                                            {
                                                TransactionRuleMappingId = tblMappin.TransactionRuleMappingId,
@@ -226,6 +274,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                                                Event = tblMappin.Event,
                                                TypeofTransaction = tblConditions.TypeofTransaction,
                                                AccountCode = tblConditions.AccountCode,
+                                               AccountName = tblAccount.AccountName,
                                                AccountType = tblConditions.AccountType,
                                                Value = tblConditions.Value,
                                                Description = tblConditions.Description,
@@ -310,19 +359,18 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 var journalDtos = from tblTransactionRuleCondition in _context.TblTransactionConditions
                                   join tblTransactionRuleMapping in _context.TblTransactionRuleMapping on tblTransactionRuleCondition.TransactionRuleMappingId equals tblTransactionRuleMapping.TransactionRuleMappingId
                                   join tblaccountType in _context.TblAccountType on tblTransactionRuleCondition.AccountType equals tblaccountType.AccountType
-                                  join tblsubLedgerReference in _context.TblSubLedgerReferences on tblTransactionRuleMapping.TransactionRuleMappingId equals tblsubLedgerReference.TransactionRuleMappingId
                                   select new JournalEntryConfriguationDto
                                   {
+                                      TransactionRuleMappingId = tblTransactionRuleMapping.TransactionRuleMappingId,
                                       RuleName = tblTransactionRuleMapping.RuleName,
                                       Object = tblTransactionRuleMapping.Object,
                                       Event = tblTransactionRuleMapping.Event,
                                       TypeofTransaction = tblTransactionRuleCondition.TypeofTransaction,
                                       AccountCode = tblTransactionRuleCondition.AccountCode,
+                                      AccountName = tblTransactionRuleCondition.AccountName,
                                       AccountType = tblaccountType.AccountType,
                                       Value = tblTransactionRuleCondition.Value,
                                       Description = tblTransactionRuleCondition.Description,
-                                      SubLedgerObject = tblsubLedgerReference.LedgerObject,
-                                      SubLedgerColumn = tblsubLedgerReference.LedgerColName,
                                   };
                 var journalList = _mapper.Map<IEnumerable<JournalEntryConfriguationDto>>(journalDtos);
                 return journalList;
@@ -484,7 +532,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
             _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             if (fromDate != null && toDate != null)
             {
-                var accounts = from transHeader in _context.TblTransactionHeader.OrderByDescending(a => a.CreatedDate)
+                var accounts = from transHeader in _context.TblTransactionHeader.OrderBy(a => a.CreatedDate)
                                join trasCondition in _context.TblTransaction on transHeader.TransactionHeaderId equals trasCondition.TransactionHeaderId
                                join actName in _context.TblCoaaccounts on trasCondition.AccountCode equals actName.AccountCode
                                select new TransactionSearchAccountDto
@@ -492,7 +540,8 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                                    TransactionHeaderId = transHeader.TransactionHeaderId,
                                    TransactionRuleMappingId = transHeader.TransactionRuleMappingId,
                                    RuleName = transHeader.RuleName,
-                                   CreatedDate = transHeader.CreatedDate,
+                                   CreatedDate = transHeader.CreatedDate.Value.Date,
+                                   CreatedDateTime = transHeader.CreatedDate,
                                    TransactionId = trasCondition.TransactionId,
                                    TypeOfTransaction = trasCondition.TypeOfTransaction,
                                    Amount = trasCondition.Amount,
@@ -506,6 +555,10 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                                    Value = trasCondition.Value,
                                    AccountCode = trasCondition.AccountCode,
                                    AccountName = actName.AccountName,
+                                   CustomerAcCode=0,
+                                   CustomerAcName="",
+                                   OrgId = trasCondition.OrganizationId,
+                                   PartnerId = trasCondition.PartnerId
                                };
                 if (transactionAccountSearchDto.AccountCode != null)
                 {
@@ -517,7 +570,18 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                     accounts = accounts.Where(acnt => acnt.AccountType == transactionAccountSearchDto.AccountType);
                 }
 
-                accounts = accounts.Where(trans => trans.CreatedDate >= fromDate && trans.CreatedDate <= toDate);
+                if (transactionAccountSearchDto.OrgId != null)
+                {
+                    accounts = accounts.Where(acnt => acnt.OrgId == transactionAccountSearchDto.OrgId);
+                }
+
+                if (transactionAccountSearchDto.PartnerId != null)
+                {
+                    accounts = accounts.Where(acnt => acnt.PartnerId == transactionAccountSearchDto.PartnerId);
+                }
+
+
+                accounts = accounts.Where(trans => trans.CreatedDate >= fromDate.Date && trans.CreatedDate <= toDate.Date);
                 var _accounts = accounts.ToList();
                 var subledger = from subLedger in _context.TblTransactionSubLedger
                                 join LedgerReferences in _context.TblSubLedgerReferences on subLedger.SubLedgerReferencesId equals LedgerReferences.SubLedgerReferencesId
@@ -526,27 +590,54 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                                     SubLedgerReferenceId = subLedger.SubLedgerReferencesId,
                                     SubLedgerReferenceName = LedgerReferences.LedgerColName,
                                     LedgerValue = subLedger.Value,
+                                    TransactionHeadersId = subLedger.TransactionHeaderId
                                 };
+                
 
                 var temp = "";
                 var temp1 = "";
                 Dictionary<string, string> dict = new Dictionary<string, string>();
-                foreach (var ledger in subledger)
-                {
-                    if (!dict.ContainsKey(ledger.SubLedgerReferenceName))
-                    {
-
-                        dict.Add(ledger.SubLedgerReferenceName, ledger.LedgerValue);
-                    }
-                }
-                foreach (var dic in dict)
-                {
-                    temp = dic.Key + "=" + dic.Value;
-                    temp1 = temp + "/" + temp1;
-                }
                 foreach (var act in _accounts)
                 {
+                    foreach (var ledger in subledger)
+                    {
+                        if (ledger.TransactionHeadersId == act.TransactionHeaderId)
+                        {
+                            if (!dict.ContainsKey(ledger.SubLedgerReferenceName))
+                            {
+                                dict.Add(ledger.SubLedgerReferenceName, ledger.LedgerValue);
+                            }
+                            
+                        }
+                    }
+                    foreach (var dic in dict)
+                    {
+                        temp = dic.Key + "=" + dic.Value;
+                        temp1 = temp + "/" + temp1;
+                    }
                     act.Description = temp1;
+                    temp1 = "";
+                    temp = "";
+                    dict.Clear();
+                }
+                //Addition of Customer ACCOde and Name
+                var coaMappingData = from tblCOA in _context.TblCoaaccountMapping
+                                     select new
+                                     {
+                                         CustomerAcCode = tblCOA.RefAccountCode,
+                                         CustomerAcName = tblCOA.Name,
+                                         MicaAccountCode = tblCOA.MicaAccountCode
+                                     };
+                foreach(var aCustomer in _accounts)
+                {
+                    foreach(var coaMap in coaMappingData)
+                    {
+                        if (aCustomer.AccountCode == Int32.Parse(coaMap.MicaAccountCode))
+                        {
+                            aCustomer.CustomerAcCode = coaMap.CustomerAcCode;
+                            aCustomer.CustomerAcName = coaMap.CustomerAcName;
+                        }
+                    }
                 }
 
                 var _accountDtos = _mapper.Map<IEnumerable<TransactionAccountSearchDto>>(_accounts);

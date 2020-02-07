@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -15,10 +13,7 @@ using iNube.Services.Claims.Models;
 using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
-using static iNube.Services.Claims.Models.BankAccountsDTO;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -102,7 +97,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        
         public async Task<IActionResult> GetFinanceBankData(SearchFinanceRequest financeRequest)
         {
             var response = await _claimService.GetFinanceBankDataAsync(financeRequest, Context);
@@ -379,5 +374,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetBalanceSumInsured(string policyNo) {
+
+        var res= await _claimService.GetBalanceSumInsured(policyNo, Context);
+            return Ok(res);
+        }
+
+
     }
 }

@@ -361,11 +361,10 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile
         }
 
         [HttpGet]
-        public string DeleteUserById(string Id)
+        public IActionResult DeleteUserById(string Id)
         {
             var response = _userService.DeleteUserById(Id, Context);
-            return response;
-
+            return Ok(response);
         }
 
         [HttpGet]

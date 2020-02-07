@@ -26,7 +26,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         Task<SendOtpResponse> SendOTP(SendOtp sendOtp, ApiContext apiContext);
         Task<SendOtpResponse> ResetOTP(SendOtp sendOtp, ApiContext apiContext);
         UserEmailResponse UserEmailValidations(string emailid, ApiContext apiContext);
-        String DeleteUserById(string Id, ApiContext apiContext);
+        UserDTO DeleteUserById(string Id, ApiContext apiContext);
         UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext apiContext);
         UserNameById GetUserNameById(string Id, ApiContext apiContext);
     }

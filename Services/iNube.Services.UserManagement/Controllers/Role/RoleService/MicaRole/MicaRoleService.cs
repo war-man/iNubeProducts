@@ -35,7 +35,15 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
 
         public UserRoleResponse AssignRole(UserRoleMapDTO userRoles, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (userRoles.EnvId > 0)
+            {
+                _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, userRoles.EnvId.ToString());
+            }
+            else
+            {
+                _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var roledata = _context.AspNetUserRoles.FirstOrDefault(x => x.UserId == userRoles.UserId);
             UserRolesDTO roleDTO = new UserRolesDTO();
             if (userRoles.RoleId.Length != 0)

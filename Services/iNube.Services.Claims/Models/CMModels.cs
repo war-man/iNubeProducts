@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
+
 namespace iNube.Services.Claims.Models
 {
     public partial class ClaimDTO
@@ -93,6 +94,7 @@ namespace iNube.Services.Claims.Models
         {
             ClaimInsurable = new List<ClaimInsurableDTO>();
             ClaimHistory = new List<ClaimsHistoryDTO>();
+            Alldoc = new List<Alldoc>();
         }
         public int ClaimId { get; set; }
         public int ClaimStatusId { get; set; }
@@ -103,10 +105,13 @@ namespace iNube.Services.Claims.Models
         public string PolicyNumber { get; set; }
         public string InsuredName { get; set; }
         public decimal? ApprovedClaimAmounts { get; set; }
+       // public string DmsdocId { get; set; }
+       // public string DocumentName { get; set; }
+
 
         public virtual List<ClaimInsurableDTO> ClaimInsurable { get; set; }
         public virtual List<ClaimsHistoryDTO> ClaimHistory { get; set; }
-       // public virtual ICollection<ClaimdocDTO> ClaimDoc { get; set; }
+        public virtual List<Alldoc> Alldoc { get; set; }
     }
 
     public partial class SearchClaimDTO
@@ -312,6 +317,7 @@ namespace iNube.Services.Claims.Models
         public decimal? OrganizationId { get; set; }
         public string PolicyNo { get; set; }
         public string ErroMessage { get; set; }
+        public int? ProductIdPk { get; set; }
 
 
         public virtual TblmasCmcommonTypes ClaimStatus { get; set; }
@@ -421,6 +427,7 @@ namespace iNube.Services.Claims.Models
         public int ClaimId { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string DmsdocId { get; set; }
 
         public virtual TblClaims Claim { get; set; }
         public virtual ICollection<ClaimTransactionnewDTO> ClaimTransactionNewDTO { get; set; }
@@ -619,16 +626,45 @@ namespace iNube.Services.Claims.Models
             public string FailedReason { get; set; }
      }
 
+    public partial class AccountDTO
+    {
+        public string PolicyNo { get; set; }
+        public string ClaimNo { get; set; }
+        public string ClaimStatus { get; set; }
+        public string InsuredName { get; set; }
+        public string InsuredRefNo { get; set; }
+        public decimal Amount { get; set; }
+        public string Utrno { get; set; }
+        public string PaymentStatus { get; set; }
+        public string PaymentDate { get; set; }
+    }
+
+    public partial class AccountCheckDTO
+    {
+        public string PolicyNo { get; set; }
+        public string ClaimNo { get; set; }
+        public string ClaimStatus { get; set; }
+        public string InsuredName { get; set; }
+        public string InsuredRefNo { get; set; }
+        public decimal Amount { get; set; }
+        public string Utrno { get; set; }
+        public string PaymentStatus { get; set; }
+        public string PaymentDate { get; set; }
+    }
+
     public partial class ClaimDataDTO
     {
             public ClaimDataDTO()
             {
                 ClaimInsurable = new List<ClaimInsurableDTO>();
-            //    ClaimsHistory = new List<ClaimsHistoryDTO>();
+               // Claimdocument = new List<ClaimdocDTO>();
                 TblBankAccounts = new List<BankAccountsDTO>();
+                Alldoc = new List<Alldoc>();
+                
 
             }
             public string PolicyNumber { get; set; }
+           
             public DateTime? lossDateTime { get; set; }
             public string locationOfLoss { get; set; }
             public int lossIntimatedBy { get; set; }
@@ -641,7 +677,7 @@ namespace iNube.Services.Claims.Models
             public string IfscCode { get; set; }
             public string EmailId { get; set; }
             public string DocumentType { get; set; }
-            public string DocumentName { get; set; }
+            
             public int ClaimStatusId { get; set; }
             public bool? Active { get; set; }
             public decimal? PolicyId { get; set; }
@@ -656,25 +692,22 @@ namespace iNube.Services.Claims.Models
             public string CreatedBy { get; set; }
             public decimal? PartnerId { get; set; }
             public decimal? OrganizationId { get; set; }
-        //public string ClaimManagerRemarks { get; set; }
-        //public int? LossId { get; set; }
-        //public DateTime? LossDateTime { get; set; }
-        //public string LocationOfEvent { get; set; }
-        //public string LossOfDescription { get; set; }
-
-        public string ClaimNumber { get; set; }
-            //public virtual TblmasCmcommonTypes ClaimStatus { get; set; }
-            //public virtual TblmasCmcommonTypes Loss { get; set; }
-
+            public int? ProductIdPk { get; set; }
+            public string ClaimNumber { get; set; }
             public virtual List<BankAccountsDTO> TblBankAccounts { get; set; }
             public virtual List<ClaimInsurableDTO> ClaimInsurable { get; set; }
-            //public virtual ICollection<ClaimdocDTO> TblClaimdoc { get; set; }
-            //public virtual ICollection<PaymentDTO> TblPayment { get; set; }
-           // public virtual List<ClaimsHistoryDTO> ClaimsHistory { get; set; }
+           // public virtual List<ClaimdocDTO> Claimdocument { get; set; }
+           public virtual List<Alldoc> Alldoc { get; set; }
+    }
+
+    public partial class Alldoc
+    {
+        public string DmsdocId { get; set; }
+        public string DocumentName { get; set; }
     }
 
 
-     public class DemoResponse<T>
+    public class DemoResponse<T>
      {
             public int Code { get; set; }
 
@@ -1188,4 +1221,106 @@ namespace iNube.Services.Claims.Models
         public int? NoOfRecordsFailed { get; set; }
         public string DocFileName { get; set; }
     }
+
+    //Accoutnin Transaction 
+    public class TransactionRuleMappingDto
+    {
+        public TransactionRuleMappingDto()
+        {
+            TransactionConditions = new HashSet<TransactionConditionsDto>();
+            SubLedgerReferences = new HashSet<SubLedgerReferencesDto>();
+        }
+
+        public decimal TransactionRuleMappingId { get; set; }
+        public string RuleName { get; set; }
+        public string Object { get; set; }
+        public string Event { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+
+        public virtual ICollection<TransactionConditionsDto> TransactionConditions { get; set; }
+        public virtual ICollection<SubLedgerReferencesDto> SubLedgerReferences { get; set; }
+    }
+    public class TransactionConditionsDto
+    {
+        public decimal TransactionConditionsId { get; set; }
+        public string TypeofTransaction { get; set; }
+        public int? AccountCode { get; set; }
+        public string AccountName { get; set; }
+        public string AccountType { get; set; }
+        public string Value { get; set; }
+        public string Description { get; set; }
+        public string SubLedgerReference { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+        public decimal TransactionRuleMappingId { get; set; }
+    }
+
+    public class SubLedgerReferencesDto
+    {
+        public decimal SubLedgerReferencesId { get; set; }
+        public string LedgerObject { get; set; }
+        public string LedgerColName { get; set; }
+        public decimal TransactionRuleMappingId { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+        public string TableName { get; set; }
+
+    }
+
+    // Sending Transaction Data to One Shot In Accouting Transaction 
+    public class TransactionHeaderDto
+    {
+        public TransactionHeaderDto()
+        {
+            Transaction = new List<TransactionDto>();
+            TransactionSubLedger = new List<TransactionSubLedgerDto>();
+        }
+
+        public decimal TransactionHeaderId { get; set; }
+        public decimal TransactionRuleMappingId { get; set; }
+        public string RuleName { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+
+        public virtual List<TransactionDto> Transaction { get; set; }
+        public virtual List<TransactionSubLedgerDto> TransactionSubLedger { get; set; }
+    }
+    public class TransactionDto
+    {
+        public decimal TransactionId { get; set; }
+        public string TypeOfTransaction { get; set; }
+        public decimal? Amount { get; set; }
+        public string Description { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+        public string RuleName { get; set; }
+        public string Object { get; set; }
+        public string Event { get; set; }
+        public string AccountType { get; set; }
+        public string Value { get; set; }
+        public int? AccountCode { get; set; }
+        public string Currency { get; set; }
+        public decimal? PartnerId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public decimal? ContractId { get; set; }
+        public decimal? TransactionHeaderId { get; set; }
+        public decimal? ProductId { get; set; }
+    }
+    public class TransactionSubLedgerDto
+    {
+        public decimal TransactionSubLedgerId { get; set; }
+        public decimal TransactionHeaderId { get; set; }
+        public decimal SubLedgerReferencesId { get; set; }
+        public string Value { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+    }
+    public class TransactionsResponse : ResponseStatus
+    {
+        public TransactionHeaderDto Transactions { get; set; }
+    }
+
+
+    
 }

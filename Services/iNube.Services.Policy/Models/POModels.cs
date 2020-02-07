@@ -20,6 +20,7 @@ namespace iNube.Services.Policy.Models
         public string ProductCode { get; set; }
         public int? ProductId { get; set; }
         public int? PartnerId { get; set; }
+        public bool? IsPayment { get; set; }
     }
 
 
@@ -77,8 +78,13 @@ namespace iNube.Services.Policy.Models
         public string Email { get; set; }
         public string CoverEvent { get; set; }
         public string CoverName { get; set; }
+        public decimal? MasterPremium { get; set; }
+        public decimal? PremiumAmount { get; set; }
+
         public List<PolicyInsurableDetailsDTO> PolicyInsurableDetails { get; set; }
     }
+
+  
 
     public partial class PartnersDTO
     {
@@ -111,8 +117,10 @@ namespace iNube.Services.Policy.Models
         public ProductDTO()
         {
             InsurableRcbdetails = new List<InsurableRcbdetailsDTO>();
+            ProductSwitchOnDetails = new List<ProductSwitchOnDetailsDTO>();
         }
         public int ProductId { get; set; }
+        public decimal RateingId { get; set; }
         public int? Lobid { get; set; }
         public int? Cobid { get; set; }
         public int? ProductStatusId { get; set; }
@@ -133,6 +141,8 @@ namespace iNube.Services.Policy.Models
         public string COB1 { get; set; }
         public int mID { get; set; }
         public string mValue { get; set; }
+        public bool? IsSingleCover { get; set; }
+        public bool? IsMasterPolicy { get; set; }
 
         public virtual List<InsurableRcbdetailsDTO> InsurableRcbdetails { get; set; }
         //public virtual ICollection<ProductBenefitsDTO> ProductBenefits { get; set; }
@@ -145,6 +155,33 @@ namespace iNube.Services.Policy.Models
         public virtual ICollection<ProductPremiumDTO> ProductPremium { get; set; }
         public virtual ICollection<ddDTOs> RiskDetails { get; set; }
         public virtual ICollection<ddDTOs> ClaimDetails { get; set; }
+        public virtual ICollection<ddDTOs> ProductSwitchOnProperty { get; set; }
+        public virtual ICollection<ProductSwitchOnDetailsDTO> ProductSwitchOnDetails { get; set; }
+        public virtual ICollection<ProductRatingMapping> CalculateConfig { get; set; }
+    }
+
+    public partial class ProductRatingMapping
+    {
+        public int MappingId { get; set; }
+        public string RateParameterName { get; set; }
+        public string RiskParameterName { get; set; }
+        public bool? IsActive { get; set; }
+        public int? ProductId { get; set; }
+        public decimal? RatingConfigId { get; set; }
+
+
+    }
+    public partial class ProductSwitchOnDetailsDTO
+    {
+        public int mID { get; set; }
+        public decimal SwitchOnId { get; set; }
+        public int? ProductId { get; set; }
+        public string InputType { get; set; }
+        public bool? IsReqired { get; set; }
+        public int InputId { get; set; }
+        public bool? mIsRequired { get; set; }
+        public string mValue { get; set; }
+        public bool? disable { get; set; }
     }
 
     public class ProductResponse : ResponseStatus
@@ -388,6 +425,7 @@ namespace iNube.Services.Policy.Models
         public decimal TxnAmount { get; set; }
         public decimal PaymentId { get; set; }
         public bool IsRefund { get; set; }
+        public decimal OrgId { get; set; }
     }
     public class CdTransactionsResponse : ResponseStatus
     {
@@ -395,7 +433,7 @@ namespace iNube.Services.Policy.Models
     }
     public class PolicyResponse : ResponseStatus
     {
-        public PolicyDTO policy { get; set; }
+        public Dictionary<string,string> policy { get; set; }
         public BusinessStatus Status { get; internal set; }
     }
     public class CdTransactionsDTO
@@ -487,6 +525,8 @@ namespace iNube.Services.Policy.Models
         public string PartnerName { get; set; }
         public string PolicyEndDate { get; set; }
         public string ProductName { get; set; }
+        public decimal? PremiumAmount { get; set; }
+        public decimal? SumInsured { get; set; }
     }
     public class ProductsModel
     {
@@ -581,6 +621,7 @@ namespace iNube.Services.Policy.Models
         public int PageSize { get; set; }
         public string SortOn { get; set; }
         public string SortDirection { get; set; }
+        public decimal EnvId { get; set; }
 
     }
     public class PolicycancelDTO
@@ -673,6 +714,7 @@ namespace iNube.Services.Policy.Models
         public string Event { get; set; }
         public string TypeofTransaction { get; set; }
         public int? AccountCode { get; set; }
+        public string AccountName { get; set; }
         public string AccountType { get; set; }
         public string Value { get; set; }
         public string Description { get; set; }
@@ -684,6 +726,7 @@ namespace iNube.Services.Policy.Models
         public string TableName { get; set; }
         public decimal SubLedgerReferencesId { get; set; }
     }
+
 
     //public class SendTransactionDto
     //{
@@ -701,6 +744,51 @@ namespace iNube.Services.Policy.Models
     //    public int? AccountCode { get; set; }
     //    public string Currency { get; set; }
     //}
+    //For Response Data
+    public class TransactionRuleMappingDto
+    {
+        public TransactionRuleMappingDto()
+        {
+            TransactionConditions = new HashSet<TransactionConditionsDto>();
+            SubLedgerReferences = new HashSet<SubLedgerReferencesDto>();
+        }
+
+        public decimal TransactionRuleMappingId { get; set; }
+        public string RuleName { get; set; }
+        public string Object { get; set; }
+        public string Event { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+
+        public virtual ICollection<TransactionConditionsDto> TransactionConditions { get; set; }
+        public virtual ICollection<SubLedgerReferencesDto> SubLedgerReferences { get; set; }
+    }
+    public class TransactionConditionsDto
+    {
+        public decimal TransactionConditionsId { get; set; }
+        public string TypeofTransaction { get; set; }
+        public int? AccountCode { get; set; }
+        public string AccountName { get; set; }
+        public string AccountType { get; set; }
+        public string Value { get; set; }
+        public string Description { get; set; }
+        public string SubLedgerReference { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+        public decimal TransactionRuleMappingId { get; set; }
+    }
+
+    public class SubLedgerReferencesDto
+    {
+        public decimal SubLedgerReferencesId { get; set; }
+        public string LedgerObject { get; set; }
+        public string LedgerColName { get; set; }
+        public decimal TransactionRuleMappingId { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string IsActive { get; set; }
+        public string TableName { get; set; }
+
+    }
 
     // Sending Transaction Data to One Shot In Accouting Transaction 
     public class TransactionHeaderDto
@@ -739,6 +827,7 @@ namespace iNube.Services.Policy.Models
         public decimal? OrganizationId { get; set; }
         public decimal? ContractId { get; set; }
         public decimal? TransactionHeaderId { get; set; }
+        public decimal? ProductId { get; set; }
     }
     public class TransactionSubLedgerDto
     {
@@ -774,6 +863,7 @@ namespace iNube.Services.Policy.Models
         public string CoverValue { get; set; }
         public decimal PolicyId { get; set; }
         public decimal? BenefitAmount { get; set; }
+        public bool? IsActive { get; set; }
     }
 
     #region MultiCover
@@ -1087,8 +1177,66 @@ namespace iNube.Services.Policy.Models
         // public virtual MasPinCodeDTO Pincode { get; set; }
         // public virtual MasStateDTO State { get; set; }
     }
+    public class PolicySearchDashboardDTO
+    {
+        public decimal? PartnerId { get; set; }
+        public int? ProductId { get; set; }
+    }
+
+    public class PolicyCountDTO
+    {
+        public int Count { get; set; }
+        public string ProductName { get; set; }
+        public string PartnerName { get; set; }
+        public decimal? PartnerId { get; set; }
+        public int? ProductId { get; set; }
+    }
+
+    public partial class PartnerDetailsDTO
+    {
+        public decimal PartnerId { get; set; }
+        public string PartnerName { get; set; }
+        public string Email { get; set; }
+    }
+    public partial class EndorsmentDTO : ResponseStatus
+    {
+        public string PolicyNo { get; set; }
+     
+    }
 
 
+    public class MasterCDDTO
+    {
+
+        public MasterCDDTO()
+        {
+            CdTransactionsDTO = new List<MasterCdTransactionsDTO>();
+
+        }
+        public string AccountNo { get; set; }
+        public List<MasterCdTransactionsDTO> CdTransactionsDTO { get; set; }
+        public BusinessStatus Status { get; set; }
+
+    }
+    public class MasterCdTransactionsDTO
+    {
+        public decimal ProductId { get; set; }
+        public string TxnType { get; set; }
+        public decimal Amount { get; set; }
+        public string PaymentReferenceNo { get; set; }
+
+    }
+    public class DynamicData
+    {
+        public dynamic dictionary_rule { get; set; }
+        public dynamic dictionary_rate { get; set; }
+    }
+
+    public class CalculationResult
+    {
+        public string Entity { get; set; }
+        public string EValue { get; set; }
+    }
 }
 
 

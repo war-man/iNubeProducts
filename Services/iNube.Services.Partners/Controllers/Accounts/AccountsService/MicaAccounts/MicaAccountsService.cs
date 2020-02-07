@@ -7,6 +7,7 @@ using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -62,6 +63,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         //FOR ACCOUNTING TRANSACTION
         //Fetching Properties
+        //Fetching Properties
         private static PropertyInfo[] GetProperties(object obj)
         {
             return obj.GetType().GetProperties();
@@ -73,57 +75,470 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             //TO Get the Details of PolicyUpdate as Status
             try
             {
-                var Response = "";
-                var accountproperties = GetProperties(cdTransactions);
-                var accountMapList = await _integrationService.GetAccountMapAsync(apiContext);
-                SendTransactionDto transactionObj = new SendTransactionDto();
-                foreach (var accountMap in accountMapList)
+                var Responce = "";
+                //var accountMapList = await _integrationService.GetAccountMapAsync(apiContext);
+                var accountMapDetailsList = await _integrationService.GetAccountMapDetailsAsync(apiContext);
+                TransactionHeaderDto transactionHeaderObj = new TransactionHeaderDto();
+                List<TransactionDto> transactiondtObj = new List<TransactionDto>();
+                List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
+
+                string dateTime = DateTime.Now.ToString();
+                string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
+                DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
+                //Storing All Transaction Header Value
+                foreach (var accountMap in accountMapDetailsList)
                 {
-                    if (accountMap.RuleName == "ReplinishCDaccounts")
+                    var accountproperties = GetProperties(cdTransactions);
+                    if (accountMap.Object == "CD" && accountMap.Event == "Replenished")
                     {
-                        foreach (var actnProp in accountproperties)
+                        if (transactionHeaderObj.TransactionRuleMappingId != accountMap.TransactionRuleMappingId)
                         {
-                                var ledgerColName = accountMap.LedgerColName;
-                                var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
-                                //Crating dictionary for Storing Value  as Partner and Product(check weather the value is applicable)
-                                //Dictionary<string, string> dict = new Dictionary<string, string>();
-                                //dict.Add(ledgerColName, ledgerColValue.ToString());
-                                //var currency = cdTransactions.GetType().GetProperty("Currency").GetValue(cdTransactions, null);
-                                var sumInsured = cdTransactions.GetType().GetProperty("TxnAmount").GetValue(cdTransactions, null);
-                                var description = accountMap.LedgerColName + "=" + ledgerColValue;
-                                //Currency and Amount Value should come from REflection of accountProperties
-                                transactionObj.TypeOfTransaction = accountMap.TypeofTransaction;
-                                transactionObj.Amount = (decimal)sumInsured;
-                                transactionObj.Currency = "INR";
-                                transactionObj.Description = description;
-                                transactionObj.CreatedDate = accountMap.CreatedDate;
-                                transactionObj.IsActive = "Y";
-                                transactionObj.RuleName = accountMap.RuleName;
-                                transactionObj.Object = accountMap.Object;
-                                transactionObj.Event = accountMap.Event;
-                                transactionObj.AccountType = accountMap.AccountType;
-                                transactionObj.Value = accountMap.Value;
-                                transactionObj.AccountCode = accountMap.AccountCode;
-                            
+                            transactionHeaderObj.TransactionRuleMappingId = accountMap.TransactionRuleMappingId;
+                            transactionHeaderObj.RuleName = accountMap.RuleName;
+                            transactionHeaderObj.IsActive = "Y";
+                            transactionHeaderObj.CreatedDate = date;
                         }
-                        var Sendtransaction = await _integrationService.CreateTranasactionAsync(transactionObj, apiContext);
-                        Response = Sendtransaction.Status.ToString();
                     }
                 }
-                
-                //Accounting Finished
-                return Response;
+                //Storing all TransactionConditions Value
+                foreach (var accountMapCd in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapCd.TransactionConditions)
+                    {
+                        var accountproperties = GetProperties(cdTransactions);
+                        if (accountMapCd.Object == "CD" && accountMapCd.Event == "Replenished")
+                        {
+                            TransactionDto transactionDto = new TransactionDto();
+                            foreach (var actnProp in accountproperties)
+                            {
+                                var Amount = cdTransactions.GetType().GetProperty("TxnAmount").GetValue(cdTransactions, null);
+                                transactionDto.TypeOfTransaction = accountMap.TypeofTransaction;
+                                if (accountMap.TypeofTransaction == "Credit")
+                                {
+                                    if (accountMap.AccountName == "PremiumHoldingAccount" || accountMap.AccountName == "Premium Holding Account")
+                                    {
+                                        transactionDto.Amount = (decimal)Amount;
+                                    }
+                                    else
+                                    {
+                                        transactionDto.Amount = (decimal)Amount;
+                                    }
+                                }
+                                if (accountMap.TypeofTransaction == "Debit")
+                                {
+                                    if (accountMap.AccountName == "CashDepositAccount" || accountMap.AccountName == "Cash Deposit Account")
+                                    {
+                                        transactionDto.Amount = (decimal)Amount;
+                                    }
+                                    else
+                                    {
+                                        transactionDto.Amount = (decimal)Amount;
+                                    }
+                                }
+                                //transactionDto.Amount = (decimal)Amount;
+                                transactionDto.Description = accountMap.Description;
+                                transactionDto.IsActive = "Y";
+                                if (cdTransactions.GetType().GetProperty("Currency") != null)
+                                {
+                                    var currency = cdTransactions.GetType().GetProperty("Currency").GetValue(cdTransactions, null);
+                                    transactionDto.Currency = currency.ToString();
+                                }
+                                else
+                                {
+                                    transactionDto.Currency = "INR";
+                                }
+                                transactionDto.CreatedDate = accountMap.CreatedDate;
+                                transactionDto.RuleName = accountMapCd.RuleName;
+                                transactionDto.Object = accountMapCd.Object;
+                                transactionDto.Event = accountMapCd.Event;
+                                transactionDto.AccountType = accountMap.AccountType;
+                                transactionDto.Value = accountMap.Value;
+                                transactionDto.AccountCode = accountMap.AccountCode;
+                                //Addition of Partner Id and Product Id
+                                if (cdTransactions.GetType().GetProperty("PartnerId") != null)
+                                {
+                                    var partnerId = cdTransactions.GetType().GetProperty("PartnerId").GetValue(cdTransactions, null);
+                                    transactionDto.PartnerId = (decimal)partnerId;
+                                }
+                                else
+                                {
+                                    transactionDto.PartnerId = apiContext.PartnerId;
+                                }
+                                
+                                if (cdTransactions.GetType().GetProperty("OrgId") != null)
+                                {
+                                    var partnerId = cdTransactions.GetType().GetProperty("OrgId").GetValue(cdTransactions, null);
+                                    transactionDto.OrganizationId = (decimal)partnerId;
+                                }
+                                else
+                                {
+                                    transactionDto.OrganizationId = apiContext.OrgId;
+                                }
+                                if (cdTransactions.GetType().GetProperty("ProductId") != null)
+                                {
+                                    var productId = cdTransactions.GetType().GetProperty("ProductId").GetValue(cdTransactions, null);
+                                    transactionDto.ProductId = Convert.ToDecimal(productId);
+                                }
+                                else
+                                {
+                                    transactionDto.ProductId = 0;
+                                }
+                            }
+                            transactiondtObj.Add(transactionDto);
+                        }
+                    }
+                }
+                transactionHeaderObj.Transaction.AddRange(transactiondtObj);
+                //Storing Ledger Value 
+                foreach (var accountMapSl in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapSl.SubLedgerReferences)
+                    {
+                        TransactionSubLedgerDto transSubLedger = new TransactionSubLedgerDto();
+                        var accountproperties = GetProperties(cdTransactions);
+                        if (accountMapSl.Object == "CD" && accountMapSl.Event == "Replenished")
+                        {
+                            foreach (var actnProp in accountproperties)
+                            {
+                                transSubLedger.SubLedgerReferencesId = accountMap.SubLedgerReferencesId;
+                                if(accountMap.LedgerObject == "CD")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "PartnerCode")
+                                    {
+                                        ledgerColName = "PartnerId";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductId";
+                                    }
+                                    if (ledgerColName == "ReceiptNumber")
+                                    {
+                                        ledgerColName = "PaymentRefernceId";
+                                    }
+                                    if (cdTransactions.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
+                                        transSubLedger.Value = ledgerColValue.ToString();
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Policy")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "PartnerCode")
+                                    {
+                                        ledgerColName = "PartnerId";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductId";
+                                    }
+                                    
+                                    if (cdTransactions.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
+                                        transSubLedger.Value = ledgerColValue.ToString();
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Product")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "PartnerCode")
+                                    {
+                                        ledgerColName = "PartnerId";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductId";
+                                    }
+                                    if (cdTransactions.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
+                                        transSubLedger.Value = ledgerColValue.ToString();
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Claim")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "PartnerCode")
+                                    {
+                                        ledgerColName = "PartnerId";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductId";
+                                    }
+                                    if (cdTransactions.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
+                                        transSubLedger.Value = ledgerColValue.ToString();
+                                    }
+                                }
+                                transSubLedger.IsActive = "Y";
+                            }
+                            transactionLedgerObj.Add(transSubLedger);
+                        }
+                    }
+                }
+                transactionHeaderObj.TransactionSubLedger.AddRange(transactionLedgerObj);
+
+                var Sendtransaction = await _integrationService.CreateTranasactionAsync(transactionHeaderObj, apiContext);
+                Responce = Sendtransaction.Status.ToString();
+
+
+                return Responce;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
             return null;
         }
 
+        //For Reverse Transaction 
+        public async Task<String> AccountReverseMap(ApiContext apiContext, object cdTransactions)
+        {
+            // FOR ACCOUNT MAPPING TRANSACTION
+            //var status = AccountingTransactionResponse(apiContext);
+            //TO Get the Details of PolicyUpdate as Status
+            try
+            {
+                var Responce = "";
+                //var accountMapList = await _integrationService.GetAccountMapAsync(apiContext);
+                var accountMapDetailsList = await _integrationService.GetAccountMapDetailsAsync(apiContext);
+                TransactionHeaderDto transactionHeaderObj = new TransactionHeaderDto();
+                List<TransactionDto> transactiondtObj = new List<TransactionDto>();
+                List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
+
+                string dateTime = DateTime.Now.ToString();
+                string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
+                DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
+                //Storing All Transaction Header Value
+                foreach (var accountMap in accountMapDetailsList)
+                {
+                    var accountproperties = GetProperties(cdTransactions);
+                    if (accountMap.Object == "CD" && accountMap.Event == "Replenished")
+                    {
+                        if (transactionHeaderObj.TransactionRuleMappingId != accountMap.TransactionRuleMappingId)
+                        {
+                            transactionHeaderObj.TransactionRuleMappingId = accountMap.TransactionRuleMappingId;
+                            transactionHeaderObj.RuleName = accountMap.RuleName;
+                            transactionHeaderObj.IsActive = "Y";
+                            transactionHeaderObj.CreatedDate = date;
+                        }
+                    }
+                }
+                //Storing all TransactionConditions Value
+                foreach (var accountMapCd in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapCd.TransactionConditions)
+                    {
+                        var accountproperties = GetProperties(cdTransactions);
+                        if (accountMapCd.Object == "CD" && accountMapCd.Event == "Replenished")
+                        {
+                            TransactionDto transactionDto = new TransactionDto();
+                            foreach (var actnProp in accountproperties)
+                            {
+                                var Amount = cdTransactions.GetType().GetProperty("TxnAmount").GetValue(cdTransactions, null);
+                                transactionDto.TypeOfTransaction = accountMap.TypeofTransaction;
+                                if (accountMap.TypeofTransaction == "Debit") 
+                                {
+                                    if (accountMap.AccountName == "PremiumHoldingAccount" || accountMap.AccountName == "Premium Holding Account")
+                                    {
+                                        transactionDto.Amount = (decimal)Amount;
+                                    }
+                                    else
+                                    {
+                                        transactionDto.Amount = (decimal)Amount;
+                                    }
+                                }
+                                if (accountMap.TypeofTransaction == "Credit")
+                                {
+                                    if (accountMap.AccountName == "CashDepositAccount" || accountMap.AccountName == "Cash Deposit Account")
+                                    {
+                                        transactionDto.Amount = (decimal)Amount;
+                                    }
+                                    else
+                                    {
+                                        transactionDto.Amount = (decimal)Amount;
+                                    }
+                                }
+                                //transactionDto.Amount = (decimal)Amount;
+                                transactionDto.Description = accountMap.Description;
+                                transactionDto.IsActive = "Y";
+                                if (cdTransactions.GetType().GetProperty("Currency") != null)
+                                {
+                                    var currency = cdTransactions.GetType().GetProperty("Currency").GetValue(cdTransactions, null);
+                                    transactionDto.Currency = currency.ToString();
+                                }
+                                else
+                                {
+                                    transactionDto.Currency = "INR";
+                                }
+                                transactionDto.CreatedDate = accountMap.CreatedDate;
+                                transactionDto.RuleName = accountMapCd.RuleName;
+                                transactionDto.Object = accountMapCd.Object;
+                                transactionDto.Event = accountMapCd.Event;
+                                transactionDto.AccountType = accountMap.AccountType;
+                                transactionDto.Value = accountMap.Value;
+                                transactionDto.AccountCode = accountMap.AccountCode;
+                                //Addition of Partner Id and Product Id
+                                if (cdTransactions.GetType().GetProperty("PartnerId") != null)
+                                {
+                                    var partnerId = cdTransactions.GetType().GetProperty("PartnerId").GetValue(cdTransactions, null);
+                                    transactionDto.PartnerId = (decimal)partnerId;
+                                }
+                                else
+                                {
+                                    transactionDto.PartnerId = apiContext.PartnerId;
+                                }
+
+                                if (cdTransactions.GetType().GetProperty("OrgId") != null)
+                                {
+                                    var partnerId = cdTransactions.GetType().GetProperty("OrgId").GetValue(cdTransactions, null);
+                                    transactionDto.OrganizationId = (decimal)partnerId;
+                                }
+                                else
+                                {
+                                    transactionDto.OrganizationId = apiContext.OrgId;
+                                }
+                                if (cdTransactions.GetType().GetProperty("ProductId") != null)
+                                {
+                                    var productId = cdTransactions.GetType().GetProperty("ProductId").GetValue(cdTransactions, null);
+                                    transactionDto.ProductId = Convert.ToDecimal(productId);
+                                }
+                                else
+                                {
+                                    transactionDto.ProductId = 0;
+                                }
+                            }
+                            transactiondtObj.Add(transactionDto);
+                        }
+                    }
+                }
+                transactionHeaderObj.Transaction.AddRange(transactiondtObj);
+                //Storing Ledger Value 
+                foreach (var accountMapSl in accountMapDetailsList)
+                {
+                    foreach (var accountMap in accountMapSl.SubLedgerReferences)
+                    {
+                        TransactionSubLedgerDto transSubLedger = new TransactionSubLedgerDto();
+                        var accountproperties = GetProperties(cdTransactions);
+                        if (accountMapSl.Object == "CD" && accountMapSl.Event == "Replenished")
+                        {
+                            foreach (var actnProp in accountproperties)
+                            {
+                                transSubLedger.SubLedgerReferencesId = accountMap.SubLedgerReferencesId;
+                                if (accountMap.LedgerObject == "CD")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "PartnerCode")
+                                    {
+                                        ledgerColName = "PartnerId";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductId";
+                                    }
+                                    if (ledgerColName == "ReceiptNumber")
+                                    {
+                                        ledgerColName = "PaymentRefernceId";
+                                    }
+                                    if (cdTransactions.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
+                                        transSubLedger.Value = ledgerColValue.ToString();
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Policy")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "PartnerCode")
+                                    {
+                                        ledgerColName = "PartnerId";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductId";
+                                    }
+                                    if (ledgerColName == "ReceiptNumber")
+                                    {
+                                        ledgerColName = "PaymentRefernceId";
+                                    }
+                                    if (cdTransactions.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
+                                        transSubLedger.Value = ledgerColValue.ToString();
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Product")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "PartnerCode")
+                                    {
+                                        ledgerColName = "PartnerId";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductId";
+                                    }
+                                    if (ledgerColName == "ReceiptNumber")
+                                    {
+                                        ledgerColName = "PaymentRefernceId";
+                                    }
+                                    if (cdTransactions.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
+                                        transSubLedger.Value = ledgerColValue.ToString();
+                                    }
+                                }
+                                if (accountMap.LedgerObject == "Claim")
+                                {
+                                    var ledgerColName = accountMap.LedgerColName;
+                                    if (ledgerColName == "PartnerCode")
+                                    {
+                                        ledgerColName = "PartnerId";
+                                    }
+                                    if (ledgerColName == "ProductCode")
+                                    {
+                                        ledgerColName = "ProductId";
+                                    }
+                                    if (ledgerColName == "ReceiptNumber")
+                                    {
+                                        ledgerColName = "PaymentRefernceId";
+                                    }
+                                    if (cdTransactions.GetType().GetProperty(ledgerColName) != null)
+                                    {
+                                        var ledgerColValue = cdTransactions.GetType().GetProperty(ledgerColName).GetValue(cdTransactions, null);
+                                        transSubLedger.Value = ledgerColValue.ToString();
+                                    }
+                                }
+                                transSubLedger.IsActive = "Y";
+                            }
+                            transactionLedgerObj.Add(transSubLedger);
+                        }
+                    }
+                }
+                transactionHeaderObj.TransactionSubLedger.AddRange(transactionLedgerObj);
+
+                var Sendtransaction = await _integrationService.CreateTranasactionAsync(transactionHeaderObj, apiContext);
+                Responce = Sendtransaction.Status.ToString();
+
+
+                return Responce;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+
+
         public async Task<ReplnishCDResponse> ReplnishCDTransaction(CdTransactionsDTO cdTransactions, ApiContext apiContext)
         {
-            //Accounting 
+            //Accounting
 
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             //First Check for A/C exist 
@@ -143,6 +558,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 cdTransactions.LedgerBalance = ledgerBalance;
                 // cdTransactions.TransactionDate = Convert.ToDateTime(DateTime.Now.ToString("dd/mm/yyyy"));
                 cdTransactions.TransactionDate = DateTime.Now;
+               
                 cdTransactions.Description = $"CD Replenish- {cdTransactions.TxnAmount}";
 
                 if (cdAccount.InitialAmount == 0)
@@ -154,6 +570,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 }
                 var accountTransaction = _mapper.Map<TblCdtransactions>(cdTransactions);
                 accountTransaction.TxnType = "Credit";
+                accountTransaction.CreatedDate = DateTime.Now;
                 _context.TblCdtransactions.Add(accountTransaction);
                 cdAccount.LedgerBalance = ledgerBalance + cdTransactions.TxnAmount;
                 cdAccount.AvailableBalance = availableAmount + cdTransactions.TxnAmount;
@@ -250,10 +667,15 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 // reverseTransactions.TransactionDate = Convert.ToDateTime(DateTime.Now.ToString("dd/mm/yyyy"));
                 reverseTransactions.TxnType = "Credit";
                 // reverseTransactions.CreditAccountNo = cdTransaction.TxnId;
-                reverseTransactions.Description = $"Payment Reverse- {reverseTransactions.TxnAmount} for TxnId- {cdTransaction.TxnId}";
+                if (string.IsNullOrEmpty(reverseTransactions.Description))
+                {
+                    reverseTransactions.Description = $"Payment Reverse- {reverseTransactions.TxnAmount} for TxnId- {cdTransaction.TxnId}";
+                }
                 _context.TblCdtransactions.Add(reverseTransactions);
                 _context.SaveChanges();
                 var accountTransaction = _mapper.Map<CdTransactionsDTO>(reverseTransactions);
+                //ACCOUNTING TRANSACTION CALLING
+                var account = AccountReverseMap(apiContext, reverseCdAccount);
                 return new CdTransactionsResponse { Status = BusinessStatus.Created, cdTransactions = accountTransaction, Id = accountTransaction.TxnId.ToString(), ResponseMessage = $"CD Reverse- {reverseTransactions.TxnAmount} done successfully!!" };
             }
             return new CdTransactionsResponse { Status = BusinessStatus.NotFound, ResponseMessage = $" No records found having account number {reverseCdAccount.AccountNo} " };
@@ -297,13 +719,21 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 var ledgerBalance = cdAccount.LedgerBalance != null ? cdAccount.LedgerBalance : 0;
                 cdTransaction.AccountNo = cdAccount.AccountNo;
                 cdTransaction.AvailableAmount = availableAmount - policyBooking.TxnAmount;
-                if (cdAccount.IsLocked)
+
+                if (string.IsNullOrEmpty(policyBooking.Description))
                 {
-                    cdTransaction.Description = $"Account locked for Policy Booking- {policyBooking.PolicyNo}";
+                    if (cdAccount.IsLocked)
+                    {
+                        cdTransaction.Description = $"Account locked for Policy Booking- {policyBooking.PolicyNo}";
+                    }
+                    else
+                    {
+                        cdTransaction.Description = $"Policy Booking- {policyBooking.PolicyNo}";
+                    }
                 }
                 else
                 {
-                    cdTransaction.Description = $"Policy Booking- {policyBooking.PolicyNo}";
+                    cdTransaction.Description = policyBooking.Description;
                 }
                 cdTransaction.InitialAmount = availableAmount;
                 cdTransaction.LedgerBalance = ledgerBalance;
@@ -321,6 +751,8 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 _context.SaveChanges();
                 var accountTransaction = _mapper.Map<CdTransactionsDTO>(cdTransaction);
                 accountTransaction.AccountNoNavigation = null;
+                //AccountTranawsaction
+                //var account = AccountMap(apiContext, policyBooking);
                 return new CdTransactionsResponse { Status = BusinessStatus.Created, cdTransactions = accountTransaction, Id = accountTransaction.TxnId.ToString(), ResponseMessage = $" Transaction done for account number {accountTransaction.AccountNo} " };
             }
             return new CdTransactionsResponse { Status = BusinessStatus.NotFound, ResponseMessage = $" No records found having account number {policyBooking.AccountNo} " };
@@ -338,6 +770,8 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 var accountTransaction = _mapper.Map<CdTransactionsDTO>(cdTransaction);
                 return new CdTransactionsResponse { Status = BusinessStatus.Updated, cdTransactions = accountTransaction, Id = accountTransaction.TxnId.ToString(), ResponseMessage = $" Transaction updated having account number {accountTransaction.AccountNo} " };
             }
+            //AccountTranawsaction
+            //var account = AccountMap(apiContext, policyBooking);
             return new CdTransactionsResponse { Status = BusinessStatus.NotFound, ResponseMessage = $" No records found having account number {policyBooking.AccountNo} " };
 
         }
@@ -420,7 +854,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             return accountsearch.ToList();
         }
 
-        private string GetAccountNumber(decimal ProductId, decimal PartnerId)
+        private string GetAccountNumber(decimal ProductId, decimal? PartnerId)
         {
             return string.Concat(ProductId.ToString().PadLeft(5, '0'), "/" + PartnerId.ToString().PadLeft(5, '0'));
         }
@@ -668,5 +1102,92 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
             return chunks;
         }
+
+
+        private async Task<MasterCDDTO> MasterCD(MasterCDDTO masterCDDTO, ApiContext apiContext)
+        {
+            var cdAccountsDTO = masterCDDTO;
+
+            var cdTransactionDTO = masterCDDTO.CdTransactionsDTO;
+
+
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            var Errors = new List<ErrorInfo>();
+
+            //Step-1:Create CD:
+
+            var cdaccount = _context.TblCdaccounts.FirstOrDefault(p => p.AccountNo == cdAccountsDTO.AccountNo);
+
+
+            if (cdaccount == null)
+            {
+
+                TblCdaccounts account = new TblCdaccounts();
+
+                account.AccountNo = cdAccountsDTO.AccountNo;
+                account.OrganizationId = apiContext.OrgId;
+                account.InitialAmount = 0;
+                account.AvailableBalance = 0;
+                account.LedgerBalance = 0;
+                account.CreatedBy = apiContext.UserId;
+                account.CreatedDate = DateTime.Now;
+                account.ThresholdValue = 0;
+                account.DropLimit = 0;
+                account.Remark = "Intial Setup" + account.InitialAmount;
+                account.Active = true;
+
+                _context.TblCdaccounts.Add(account);
+                _context.SaveChanges();
+
+
+                /// Step - 2  //CD ReplishMent
+
+                foreach (var item in masterCDDTO.CdTransactionsDTO)
+                {
+                    if (item.TxnType == "Credit")
+                    {
+
+                        CdTransactionsDTO transactionsDTO = new CdTransactionsDTO();
+
+                        transactionsDTO.AccountNo = cdAccountsDTO.AccountNo;
+                        transactionsDTO.TxnType = item.TxnType;
+                        transactionsDTO.TxnAmount = item.Amount;
+                        transactionsDTO.PaymentRefernceId = item.PaymentReferenceNo;
+                        transactionsDTO.PaymentModeId = 19;
+
+                        var response = await ReplnishCDTransaction(transactionsDTO, apiContext);
+                        
+                    }
+                    else if(item.TxnType == "Debit")
+                    {
+                        PolicyBookingTransaction policyBooking = new PolicyBookingTransaction();
+
+                        policyBooking.ProductId = item.ProductId;
+                        policyBooking.AccountNo = cdAccountsDTO.AccountNo;
+                        policyBooking.PolicyNo = cdAccountsDTO.AccountNo;
+                        policyBooking.TxnAmount = item.Amount;
+                        policyBooking.PaymentId = Convert.ToDecimal(item.PaymentReferenceNo);
+
+                        var response = await GenerateCDTransaction(policyBooking, apiContext);
+                    }
+
+                    
+                }
+                
+
+            }
+
+            masterCDDTO.Status = BusinessStatus.Created;
+
+            return masterCDDTO;
+        }
+
+        public async Task<MasterCDDTO> MasterPolicyCD(MasterCDDTO masterCDDTO,ApiContext apiContext)
+        {
+            var response = await MasterCD(masterCDDTO,apiContext);
+
+            return response;
+        }
+                     
     }
 }

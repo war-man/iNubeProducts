@@ -2,6 +2,7 @@
 using FluentValidation.AspNetCore;
 using HealthChecks.UI.Client;
 using inube.Services.Notification.Controllers.DMS.DMSService;
+using inube.Services.Notification.Controllers.RDLC.RdlcService;
 using inube.Services.Notification.Models;
 using iNube.Services.Notification.Helpers;
 using iNube.Utility.Framework.Filters.Attribute;
@@ -41,7 +42,9 @@ namespace inube.Services.Notification
             // configure DI for application services
             services.AddScoped<ILoggerManager, LoggerManager>();
             services.AddTransient<IEmailService, EmailService>();
-           // services.AddScoped<IIntegrationService, IntegrationService>();
+            // services.AddScoped<IIntegrationService, IntegrationService>();
+            services.AddScoped<IReportsService, ReportsService>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {

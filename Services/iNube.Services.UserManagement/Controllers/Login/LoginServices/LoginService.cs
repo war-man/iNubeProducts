@@ -24,7 +24,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices
         AspNetUsersDTO RefreshTokenAuthenticate(LoginDTO loginDTO);
         bool GoogleValidate(AspNetUsersDTO asp, string productType, string serverType);
         Task<string> ForgetUserNameAsync(string emailId, string productType);
-        UserLoginResponse GetUserType(string username, string productType, string serverType);
+        UserLoginResponse GetUserType(string username, string productType);
         LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId,bool isTokenExpire);
         Task<bool> SendEmailAsync(EmailTest emailTest);
         EnvironmentResponse GetEnvironmentConnection(string product, decimal EnvId, ApiContext apiContext);
@@ -125,9 +125,9 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices
         }
 
 
-        public UserLoginResponse GetUserType(string username, string productType, string serverType)
+        public UserLoginResponse GetUserType(string username, string productType)
         {
-            return _loginService(productType).GetUserType(username, productType, serverType);
+            return _loginService(productType).GetUserType(username, productType);
         }
 
 

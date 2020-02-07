@@ -29,7 +29,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MotorLog
             throw new NotImplementedException();
         }
 
-        public UserLoginResponse GetUserType(string username, string productType, string serverType)
+        public UserLoginResponse GetUserType(string username, string productType)
         {
             throw new NotImplementedException();
         }

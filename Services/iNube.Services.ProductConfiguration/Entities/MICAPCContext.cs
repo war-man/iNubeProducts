@@ -29,9 +29,13 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual DbSet<TblProductEntity> TblProductEntity { get; set; }
         public virtual DbSet<TblProductInsurableItems> TblProductInsurableItems { get; set; }
         public virtual DbSet<TblProductPremium> TblProductPremium { get; set; }
+        public virtual DbSet<TblProductRatingMapping> TblProductRatingMapping { get; set; }
         public virtual DbSet<TblProductRcbdetails> TblProductRcbdetails { get; set; }
+        public virtual DbSet<TblProductSwitchOnDetails> TblProductSwitchOnDetails { get; set; }
         public virtual DbSet<TblProducts> TblProducts { get; set; }
+        public virtual DbSet<TblPromo> TblPromo { get; set; }
         public virtual DbSet<TblmasClausesWarrentiesExclusions> TblmasClausesWarrentiesExclusions { get; set; }
+        public virtual DbSet<TblmasMapping> TblmasMapping { get; set; }
         public virtual DbSet<TblmasPccommonTypes> TblmasPccommonTypes { get; set; }
         public virtual DbSet<TblmasProductMaster> TblmasProductMaster { get; set; }
 
@@ -62,6 +66,8 @@ namespace iNube.Services.ProductConfiguration.Entities
                 entity.Property(e => e.BenifitId)
                     .HasColumnName("BenifitID")
                     .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.PremiumAmount).HasColumnType("numeric(10, 2)");
 
                 entity.HasOne(d => d.Benifit)
                     .WithMany(p => p.TblBenifitRangeDetails)
@@ -201,6 +207,8 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .HasMaxLength(50);
 
                 entity.Property(e => e.FirstName).HasMaxLength(255);
+
+                entity.Property(e => e.IsPayment).HasDefaultValueSql("('FALSE')");
 
                 entity.Property(e => e.MobileNumber).HasMaxLength(50);
 
@@ -490,6 +498,26 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .HasConstraintName("FK_tblProductPremium_tblProducts");
             });
 
+            modelBuilder.Entity<TblProductRatingMapping>(entity =>
+            {
+                entity.HasKey(e => e.MappingId);
+
+                entity.ToTable("tblProductRatingMapping", "PC");
+
+                entity.Property(e => e.MappingId).HasColumnName("MappingID");
+
+                entity.Property(e => e.RateParameterName).HasMaxLength(50);
+
+                entity.Property(e => e.RatingConfigId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.RiskParameterName).HasMaxLength(50);
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.TblProductRatingMapping)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_tblProductRatingMapping_tblProducts");
+            });
+
             modelBuilder.Entity<TblProductRcbdetails>(entity =>
             {
                 entity.HasKey(e => e.RcbdetailsId);
@@ -537,6 +565,34 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .WithMany(p => p.TblProductRcbdetails)
                     .HasForeignKey(d => d.ProductId)
                     .HasConstraintName("FK_tblProductRCBdetails_tblProducts");
+            });
+
+            modelBuilder.Entity<TblProductSwitchOnDetails>(entity =>
+            {
+                entity.HasKey(e => e.SwitchOnId);
+
+                entity.ToTable("tblProductSwitchOnDetails", "PC");
+
+                entity.Property(e => e.SwitchOnId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.InputId).HasColumnName("InputID");
+
+                entity.Property(e => e.InputType).HasMaxLength(50);
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.HasOne(d => d.Input)
+                    .WithMany(p => p.TblProductSwitchOnDetails)
+                    .HasForeignKey(d => d.InputId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tblProductSwitchOnDetails_tblmasProductMaster");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.TblProductSwitchOnDetails)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_tblProductSwitchOnDetails_tblProducts");
             });
 
             modelBuilder.Entity<TblProducts>(entity =>
@@ -589,6 +645,25 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .HasConstraintName("FK_tblProducts_tblmasPCCommonTypes_statusid");
             });
 
+            modelBuilder.Entity<TblPromo>(entity =>
+            {
+                entity.HasKey(e => e.PromoId);
+
+                entity.ToTable("tblPromo", "PC");
+
+                entity.Property(e => e.PromoId).HasColumnName("PromoID");
+
+                entity.Property(e => e.PolicyNumber).HasMaxLength(50);
+
+                entity.Property(e => e.ProductCode).HasMaxLength(250);
+
+                entity.Property(e => e.PromoCode1)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.PromoCode2).HasMaxLength(50);
+            });
+
             modelBuilder.Entity<TblmasClausesWarrentiesExclusions>(entity =>
             {
                 entity.HasKey(e => e.Cweid);
@@ -632,6 +707,21 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .WithMany(p => p.TblmasClausesWarrentiesExclusionsSubLevel)
                     .HasForeignKey(d => d.SubLevelId)
                     .HasConstraintName("FK_tblmasClausesWarrentiesExclusionsSubLevel_tblmasProductMaster");
+            });
+
+            modelBuilder.Entity<TblmasMapping>(entity =>
+            {
+                entity.HasKey(e => e.MappingId);
+
+                entity.ToTable("tblmasMapping", "PC");
+
+                entity.Property(e => e.MappingId).HasColumnName("MappingID");
+
+                entity.Property(e => e.RateName).HasMaxLength(50);
+
+                entity.Property(e => e.RatingId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.RiskName).HasMaxLength(50);
             });
 
             modelBuilder.Entity<TblmasPccommonTypes>(entity =>

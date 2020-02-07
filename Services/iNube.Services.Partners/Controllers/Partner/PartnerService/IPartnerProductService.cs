@@ -22,5 +22,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         Task<PartnerUploadlogoResponse> UploadLogo(LogoDTO logo, ApiContext apiContext);
         Task<PartnerResponse> PartnerCodeValidations(string partnercode, ApiContext apiContext);
         void DeletePartner(decimal PartnerId, ApiContext apiContext);
+        Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(decimal OrgId,ApiContext apiContext);
+        Task<string> GetPartnerNameById(decimal PartnerId, ApiContext apiContext);
     }
 }

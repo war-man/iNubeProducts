@@ -263,6 +263,7 @@ namespace iNube.Services.Billing.Models
     public class CustomerResponse : ResponseStatus
     {
         public CustomersDTO customer { get; set; }
+        public BusinessStatus Status { get; internal set; }
     }
 
     public partial class CustomersDTO
@@ -849,10 +850,22 @@ namespace iNube.Services.Billing.Models
     {
         public string CustomerName { get; set; }
         public int InvoiceId { get; set; }
-        public string StatusId { get; set; }
+        public int? StatusId { get; set; }
         public string InvoiceNo { get; set; }
         public DateTime? InvoiceEffectiveDate { get; set; }
         public DateTime? InvoiceEndDate { get; set; }
+    }
+
+    public partial class InvoiceCustSearch
+    {
+        public string CustomerName { get; set; }
+        public int InvoiceId { get; set; }
+        public int? StatusId { get; set; }
+        public string InvoiceNo { get; set; }
+        public DateTime? InvoiceEffectiveDate { get; set; }
+        public DateTime? InvoiceEndDate { get; set; }
+        public decimal OrgId { get; set; }
+        public decimal EnvId { get; set; }
     }
 
     public partial class InvoiceSearchHistory
@@ -867,10 +880,11 @@ namespace iNube.Services.Billing.Models
         public string Status { get; set; }
         public decimal? Balance { get; set; }
         public string ContractName { get; set; }
-        public string StatusId { get; set; }
+        public int? StatusId { get; set; }
         public string InvoiceNo { get; set; }
         public DateTime? InvoiceEffectiveDate { get; set; }
         public DateTime? InvoiceEndDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         public decimal? Paid { get; set; }
         public DateTime? DueDate { get; set; }
         public int? DefaultDays { get; set; }
@@ -884,6 +898,7 @@ namespace iNube.Services.Billing.Models
         public decimal? RevisedPenaltyAmount { get; set; }
         public decimal? RevisedInvoiceAmountGrid { get; set; }
         public string UserName { get; set; }
+        public decimal CustId { get; set; }
     }
 
     public class RegenerateInvoiceHistory
@@ -1038,6 +1053,7 @@ namespace iNube.Services.Billing.Models
         public string Code { get; set; }
         public string CIN { get; set; }
         public string PAN { get; set; }
+        public string CustEmail { get; set; }
     }
 
 

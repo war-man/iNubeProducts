@@ -202,5 +202,14 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
             throw new NotImplementedException();
 
         }
+        public async Task<IEnumerable<TransactionRuleMappingDto>> GetTransaction(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<SubLedgerReferencesDto>> GetSubLedgerType(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -330,7 +330,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             return accountsearch.ToList();
         }
 
-        private string GetAccountNumber(decimal ProductId, decimal PartnerId)
+        private string GetAccountNumber(decimal ProductId, decimal? PartnerId)
         {
             return string.Concat(ProductId.ToString().PadLeft(5, '0'), "/" + PartnerId.ToString().PadLeft(5, '0'));
         }
@@ -530,7 +530,9 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             return chunks;
         }
 
-
-
+        public Task<MasterCDDTO> MasterPolicyCD(MasterCDDTO masterCDDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

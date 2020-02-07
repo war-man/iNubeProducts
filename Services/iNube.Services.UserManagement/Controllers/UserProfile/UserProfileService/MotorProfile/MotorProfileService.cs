@@ -34,7 +34,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             throw new NotImplementedException();
         }
 
-        public string DeleteUserById(string Id, ApiContext apiContext)
+        public UserDTO DeleteUserById(string Id, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

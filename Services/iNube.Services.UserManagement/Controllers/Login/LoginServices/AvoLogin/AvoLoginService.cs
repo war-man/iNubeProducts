@@ -139,13 +139,13 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             return true;
         }
 
-        public UserLoginResponse GetUserType(string username, string productType, string serverType)
+        public UserLoginResponse GetUserType(string username, string productType)
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(productType);
 
             var userdetails = (from cu in _cpcontext.TblCustomerUsers
                                join ce in _cpcontext.TblCustomerEnvironment on cu.CustomerId equals ce.CustomerId
-                               where cu.UserName == username && ce.Product == productType
+                               where cu.UserName == username && ce.Product == productType && cu.IsActive == true
                                select new UserLoginType
                                {
                                    UserType = cu.UserType,

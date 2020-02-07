@@ -72,6 +72,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             var response =await _AvoProductService.GetRiderSumAssured(mapQuoteDTO);
             return Ok(response);
         }
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> GetAssignProduct(AssignProductList AssignProductList)
+        {
+//            var response =await _AvoProductService.GetRiderSumAssured(mapQuoteDTO);
+            return Ok();
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetRiskClaimMaster(string masterType, int typeId, int parentID)
@@ -161,22 +168,30 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         // POST: api/Product/CreateProduct
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody]ProductDTO productDTO)
         {
-            var response =await _productService.Create(productDTO, Context);
-            //TODO: Need to return ResponseStatus instead of ErrorResponse
-            switch (response.Status)
+           
+            var validresponse = await _productService.ProductCodevalidation(productDTO.ProductCode, Context);
+            if (validresponse.Status != BusinessStatus.InputValidationFailed)
             {
-                case BusinessStatus.InputValidationFailed:
-                    return Ok(response);
-                case BusinessStatus.Created:
-                    return Ok(response);
-                case BusinessStatus.UnAuthorized:
-                    return Unauthorized();
-                default:
-                    return Forbid();
+                var response = await _productService.Create(productDTO, Context);
+                //TODO: Need to return ResponseStatus instead of ErrorResponse
+                switch (response.Status)
+                {
+                    case BusinessStatus.InputValidationFailed:
+                        return Ok(response);
+                    case BusinessStatus.Created:
+                        return Ok(response);
+                    case BusinessStatus.UnAuthorized:
+                        return Unauthorized();
+                    default:
+                        return Forbid();
+                }
+            }
+            else {
+                return Ok(validresponse);
             }
         }
 
@@ -316,6 +331,28 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             
            
         }
+        [HttpGet]
+        public async Task<IActionResult> ProductNamevalidation(String productname)
+        {
+            var response = await _productService.ProductNamevalidation(productname, Context);
+
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                case BusinessStatus.Ok:
+                    return Ok(response);
+                default:
+                    return Forbid();
+            }
+
+
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> GetProductMaster(string masterType, int parentID)
@@ -417,14 +454,57 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             var response = await _productService.Docupload(productcode,productId, Request, cancellationToken, Context);
             return Ok(response);
         }
-		
-		[HttpGet]
-        [AllowAnonymous]
-        public IActionResult HC()
+        [HttpPost("[action]")]
+        public async Task<IActionResult> PromoDocupload(string productcode, string productId,CancellationToken cancellationToken)
         {
-            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            var response = await _productService.PromoDocupload(productcode, productId,Request, cancellationToken, Context);
+            return Ok(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> BenefitValueLGIAsync([FromBody]LGIDTO product)
+        {
+            var response = await _productService.BenefitValueLGIAsync(product, Context);
+            return Ok(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> PromoApply([FromBody]PromoDTO promoDTO)
+        {
+            var response = await _productService.PromoApply(promoDTO, Context);
+            return Ok(response);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetProductRateConfig(int  productId)
+        {
+            var response = await _productService.GetProductRateConfig(productId, Context);
+            return Ok(response);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetProductRateMapping(int productId)
+        {
+            var response = await _productService.GetProductRateMapping(productId, Context);
             return Ok(response);
         }
 
+        
+        [HttpGet]
+        public async Task<IActionResult> GetHandleEventsMaster(string lMasterlist)
+        {
+            var response = await _productService.GetHandleEventsMaster(lMasterlist,Context);
+            return Ok(response);
+        }
+       
+        [HttpGet]
+        public async Task<IActionResult> GetRiskParam(string lMasterlist)
+        {
+            var objectval = await _productService.GetRiskParam(lMasterlist, Context);
+            return Ok(objectval);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> CreateMapping([FromBody]MappingListDto MapDto)
+        {
+            var MappingData = await _productService.CreateMapping(MapDto, Context);
+            return Ok(MappingData);
+        }
     }
 }

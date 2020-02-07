@@ -11,7 +11,7 @@ namespace iNube.Services.Partners.Entities
         }
 
         public decimal Cdid { get; set; }
-        public decimal PartnerId { get; set; }
+        public decimal? PartnerId { get; set; }
         public string AccountNo { get; set; }
         public decimal? InitialAmount { get; set; }
         public decimal? AvailableBalance { get; set; }

@@ -12,6 +12,9 @@ namespace iNube.Services.ProductConfiguration.Helpers
     {
         public AutoMapperProfile()
         {
+            CreateMap<MappingDto, TblmasMapping>();
+            CreateMap<TblmasMapping, MappingDto>();
+
             CreateMap<ProductDTO, TblProducts>()
                 //.ForMember(dest => dest.TblProductCovers, opt => opt.MapFrom(src => src.ProductCovers))
                 //.ForMember(dest => dest.TblProductBenefits, opt => opt.MapFrom(src => src.ProductBenefits))
@@ -20,8 +23,14 @@ namespace iNube.Services.ProductConfiguration.Helpers
                 .ForMember(dest => dest.TblProductClausesWarrentiesExclusions, opt => opt.MapFrom(src => src.ProductClausesWarrentiesExclusions))
                 .ForMember(dest => dest.TblProductInsurableItems, opt => opt.MapFrom(src => src.ProductInsurableItems))
                 .ForMember(dest => dest.TblProductRcbdetails, opt => opt.MapFrom(src => src.ProductRcbdetails))
+                .ForMember(dest => dest.TblProductSwitchOnDetails, opt => opt.MapFrom(src => src.ProductSwitchOnDetails))
+                .ForMember(dest => dest.TblProductRatingMapping, opt => opt.MapFrom(src => src.CalculateConfig))
+             
             .ForMember(dest => dest.TblProductPremium, opt => opt.MapFrom(src => src.ProductPremium)).ReverseMap();
 
+
+            CreateMap<ProductSwitchOnDetailsDTO, TblProductSwitchOnDetails>().ReverseMap();
+            CreateMap<ProductRatingMapping, TblProductRatingMapping>().ReverseMap();
 
             //CreateMap<ProductDTO, TblProducts>();
             //CreateMap<TblProducts, ProductDTO>();

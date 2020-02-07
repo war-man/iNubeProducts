@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Claims", "iN
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Billing", "iNube.Services.Billing\iNube.Services.Billing.csproj", "{8029228D-8269-4103-A538-65FD2BD1F256}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Notification", "inube.Services.Notification\iNube.Services.Notification.csproj", "{86AAEE86-43E7-4BA5-B7CF-9FC57CED79DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "inube.Services.Notification", "inube.Services.Notification\inube.Services.Notification.csproj", "{86AAEE86-43E7-4BA5-B7CF-9FC57CED79DE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{7BC54E3B-EA54-475D-9C0A-926C17BADD54}"
 EndProject
@@ -26,6 +26,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Proposal", "iNube.Services.Proposal\iNube.Services.Proposal.csproj", "{A01E70B8-5CE8-49BE-A21A-D812EB7212B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Accounting", "iNube.Services.Accounting\iNube.Services.Accounting.csproj", "{B836A72D-D3ED-46EB-9749-C9751DD73709}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.ReInsurance", "iNube.Services.ReInsurance\iNube.Services.ReInsurance.csproj", "{2EE2B16A-476A-45A4-88B4-6B6F086F1DD3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Services.Rating", "iNube.Services.Rating\iNube.Services.Rating.csproj", "{106A631C-DC78-4B2A-964D-5DD5009C631F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +81,14 @@ Global
 		{B836A72D-D3ED-46EB-9749-C9751DD73709}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B836A72D-D3ED-46EB-9749-C9751DD73709}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B836A72D-D3ED-46EB-9749-C9751DD73709}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EE2B16A-476A-45A4-88B4-6B6F086F1DD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EE2B16A-476A-45A4-88B4-6B6F086F1DD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EE2B16A-476A-45A4-88B4-6B6F086F1DD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EE2B16A-476A-45A4-88B4-6B6F086F1DD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{106A631C-DC78-4B2A-964D-5DD5009C631F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{106A631C-DC78-4B2A-964D-5DD5009C631F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{106A631C-DC78-4B2A-964D-5DD5009C631F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{106A631C-DC78-4B2A-964D-5DD5009C631F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

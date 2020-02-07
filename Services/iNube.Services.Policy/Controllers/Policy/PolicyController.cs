@@ -246,6 +246,29 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return NotFound(response);
             }
         }
+          //For multicover Policy By Payment
+
+        [HttpPost]
+        public async Task<IActionResult> CreatePolicyWithPayment([FromBody]dynamic policyDTO)
+        {
+            var response = await _policyService.CreatePolicyWithPayment(policyDTO, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return BadRequest(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.Error:
+                    return BadRequest(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized(response);
+                case BusinessStatus.PreConditionFailed:
+                    return Ok(response);
+
+                default:
+                    return NotFound(response);
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> PolicyInsurableDetails(string PolicyNumber)
@@ -266,6 +289,118 @@ namespace iNube.Services.Policy.Controllers.Policy
         {
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> PolicySearchDashboard([FromBody]PolicySearchDashboardDTO policysearch)
+        {
+            var searchPolicyDetails = await  _policyService.PolicySearchDashboard(policysearch, Context);
+            return Ok(searchPolicyDetails);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddInsurableItem([FromBody]dynamic insurableItemRequest)
+        {
+            var response = await _policyService.AddInsurableItem(insurableItemRequest, Context);
+            return ServiceResponse(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveInsurableItem([FromBody]dynamic insurableItemRequest)
+        {
+            var searchPolicyDetails = await _policyService.RemoveInsurableItem(insurableItemRequest, Context);
+            return ServiceResponse(searchPolicyDetails);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SwitchOnOff([FromBody]dynamic switchOnOffRequest)
+        {
+            var searchPolicyDetails = await _policyService.SwitchOnOff(switchOnOffRequest, Context);
+            return ServiceResponse(searchPolicyDetails);
+        }
+
+        //GetCDBalanceBYPolicyNO
+        //[AllowAnonymous]
+        //[HttpGet]
+        //public async Task<IActionResult> GetCdBalanceBYPolicyAsync(string policyNo)
+        //{
+        //    var response = await _policyService.GetCdBalanceBYPolicyAsync(policyNo, Context);
+        //    if (response != null)
+        //    {
+        //        return Ok(response);
+        //    }
+        //    return NotFound();
+        //}
+
+        //GetPolicyDataByPolicyNO
+        //[AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetCdBalancePolicyNo(string PolicyNO)
+        {
+            var response = await _policyService.GetPolicyDetailsByPolicyNo(PolicyNO, Context);
+           // var txnId = response.BundleTxnId;
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        }
+
+        //GetActiveMasterpolicy
+        [HttpGet]
+        public async Task<IActionResult> GetAllPolicy(string ProductCode)
+        {
+          
+            var response = await _policyService.GetAllPolicy(ProductCode, Context);
+            // var txnId = response.BundleTxnId;
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        }
+
+        //Update Insurable Items
+
+        [HttpPut]
+        public async Task<IActionResult> ModifyInsurabableItem(object modifydata)
+        {
+          
+            await _policyService.ModifyInsurabableItem(modifydata,Context);
+            return Ok();
+        }
+
+        //Get InsurableItem Details
+        [HttpGet]
+        public async Task<IActionResult> GetInsurableItemDetails(string policyNo,string insurableItemName)
+        {
+            var response = await _policyService.GetInsurableItemDetails(policyNo, insurableItemName,Context);
+            // var txnId = response.BundleTxnId;
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        }
+
+
+
+
+        //Premium Calculation
+
+        [HttpPost]
+        public async Task<IActionResult> CalCulatePremium([FromBody]DynamicData premiumParameter)
+        {
+            var premiumValue = await _policyService.CalCulatePremium(premiumParameter, Context);
+            return Ok(premiumValue);
+        }
+
+        //update sumInsured 
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateSumInsured(string PolicyNumber, decimal amount)
+        {
+            var SumInsured = await _policyService.UpdateSumInsured(PolicyNumber, amount, Context);
+            return Ok(SumInsured);
         }
     }
 }

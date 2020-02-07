@@ -60,6 +60,8 @@ namespace iNube.Services.Policy.Entities
         public string CoverName { get; set; }
         public bool? IsActive { get; set; }
         public string PolicyStatus { get; set; }
+        public decimal? MasterPremium { get; set; }
+        public decimal? PremiumAmount { get; set; }
 
         public virtual ICollection<TblPolicyDetails> TblPolicyDetails { get; set; }
         public virtual ICollection<TblPolicyInsurableDetails> TblPolicyInsurableDetails { get; set; }

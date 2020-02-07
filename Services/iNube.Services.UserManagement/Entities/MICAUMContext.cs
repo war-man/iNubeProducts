@@ -75,6 +75,12 @@ namespace iNube.Services.UserManagement.Entities
                 entity.Property(e => e.Name).HasMaxLength(256);
 
                 entity.Property(e => e.NormalizedName).HasMaxLength(256);
+
+                entity.Property(e => e.OrganizationId)
+                    .HasColumnName("OrganizationID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.PartnerId).HasColumnType("numeric(18, 0)");
             });
 
             modelBuilder.Entity<AspNetUserClaims>(entity =>

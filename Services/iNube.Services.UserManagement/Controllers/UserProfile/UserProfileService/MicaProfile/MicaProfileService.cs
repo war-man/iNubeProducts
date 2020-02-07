@@ -66,8 +66,16 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     userDetails.UserName = userDetails.Email;
                     userDetails.CreatedBy = apiContext.UserId;
                     userDetails.CreatedDate = DateTime.Now;
-                    userDetails.OrganizationId = user.CustomerID > 0 ? user.CustomerID: apiContext.OrgId;
-
+                    userDetails.IsActive = true;
+                    if(userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
+                    {
+                        userDetails.OrganizationId = userDetails.OrganizationId;
+                    }
+                    else
+                    {
+                        userDetails.OrganizationId = apiContext.OrgId;
+                    }
+                    //.OrganizationId = user.CustomerID > 0 ? user.CustomerID: apiContext.OrgId;
                     AspNetUsers _users = _mapper.Map<AspNetUsers>(user);
                     if (string.IsNullOrEmpty(_users.Id))
                     {
@@ -89,14 +97,20 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     var cpdata = _cpcontext.TblCustomerUsers.SingleOrDefault(a => a.UserName == userDetails.Email);
                     TblCustomerUsers customerUsers = new TblCustomerUsers();
 
-                    customerUsers.CustomerId = apiContext.OrgId;
+                    if (userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
+                    {
+                        customerUsers.CustomerId = userDetails.OrganizationId;
+                    }
+                    else
+                    {
+                        customerUsers.CustomerId = apiContext.OrgId;
+                    }
                     customerUsers.UserName = userDetails.Email;
                     customerUsers.Email = userDetails.Email;
                     customerUsers.CreatedDate = DateTime.Now;
                     customerUsers.ContactNumber = userDetails.ContactNumber;
                     customerUsers.UserId = _users.Id;
                     customerUsers.IsActive = true;
-                    customerUsers.CustomerId = apiContext.OrgId;
                     customerUsers.LoginProvider = "Form";
                     customerUsers.IsFirstTimeLogin = 1;
 
@@ -150,6 +164,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 return new UserResponse { Status = BusinessStatus.Created, users = user, Id = _usersDetail.UserId, ResponseMessage = $"User modified successfully!" };
             }
         }
+
         //public UserDTO CreateProfileUser(UserDTO user)
         //{
         //    //  var userDetail = user.TblUserDetails.First();
@@ -216,6 +231,18 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var _users = _context.TblUserDetails.OrderByDescending(u => u.CreatedDate).Select(x => x);
+            if (searchRequest.Status == 1009)
+            {
+                _users = _users.Where(u => u.IsActive==true);
+            }
+            if (searchRequest.Status == 1010)
+            {
+                _users = _users.Where(u => u.IsActive == false);
+            }
+            if(searchRequest.Status==1011)
+            {
+                 _users = _context.TblUserDetails.OrderByDescending(u => u.CreatedDate).Select(x => x);
+            }
             if (!string.IsNullOrEmpty(searchRequest.FirstName))
             {
                 _users = _users.Where(u => u.FirstName.Contains(searchRequest.FirstName));
@@ -227,6 +254,10 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             if (!string.IsNullOrEmpty(searchRequest.EmailId))
             {
                 _users = _users.Where(u => u.Email == searchRequest.EmailId);
+            }
+            if (searchRequest.PartnerId > 0)
+            {
+                _users = _users.Where(u => u.PartnerId == searchRequest.PartnerId);
             }
             if (!string.IsNullOrEmpty(searchRequest.ContactNumber))
             {
@@ -363,7 +394,15 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public PasswordResponse ChangePassword(Password pass, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (pass.EnvId > 0)
+            {
+                _context = (MICAUMContext)DbManager.GetContext(pass.ProductType, pass.EnvId.ToString());
+            }
+            else
+            {
+                _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             byte[] passwordHash;
             byte[] passwordSalt;
             var _aspUsers = _context.AspNetUsers.FirstOrDefault(x => x.Id == pass.Id);
@@ -436,7 +475,15 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public async Task<SendOtpResponse> SendOTP(SendOtp sendOtp, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (sendOtp.EnvId > 0)
+            {
+                _context = (MICAUMContext)DbManager.GetContext(sendOtp.ProductType, sendOtp.EnvId.ToString());
+            }
+            else
+            {
+                _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var user = _context.AspNetUsers.SingleOrDefault(x => x.UserName == sendOtp.UserName);
             try
             {
@@ -474,7 +521,15 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public async Task<SendOtpResponse> ResetOTP(SendOtp sendOtp, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (sendOtp.EnvId > 0)
+            {
+                _context = (MICAUMContext)DbManager.GetContext(sendOtp.ProductType, sendOtp.EnvId.ToString());
+            }
+            else
+            {
+                _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var user = _context.AspNetUsers.SingleOrDefault(x => x.Email == sendOtp.Email);
             try
             {
@@ -518,7 +573,15 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public VerifyOTPResponse VerifyingOTP(VerifyOTP onetp, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (onetp.EnvId > 0)
+            {
+                _context = (MICAUMContext)DbManager.GetContext(onetp.ProductType, onetp.EnvId.ToString());
+            }
+            else
+            {
+                _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var sentotp = _context.TblSendOtp.SingleOrDefault(x => x.UserId == onetp.UserId);
 
             if (sentotp.Otp == onetp.Otp)
@@ -538,8 +601,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 return new VerifyOTPResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"Invalid OTP" }; ;
             }
         }
-
-
+        
         public UserEmailResponse UserEmailValidations(string emailid, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
@@ -553,16 +615,39 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 return new UserEmailResponse { Status = BusinessStatus.Ok };
             }
         }
-        public String DeleteUserById(string Id, ApiContext apiContext)
+
+        public UserDTO DeleteUserById(string Id, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var tbl_userdata = _context.AspNetUsers.Where(item => item.Id == Id).FirstOrDefault();
-            tbl_userdata.IsActive = false;
-            _context.SaveChanges();
-            return "Deleted!";
-        }
 
-      
+            var user = _context.TblUserDetails.Where(item => item.UserId == Id).FirstOrDefault();
+            user.IsActive = (user.IsActive==false? user.IsActive=true: user.IsActive=false);
+            _context.TblUserDetails.Update(user);
+
+            var tbl_userdata = _context.AspNetUsers.Where(item => item.Id == Id).FirstOrDefault();
+            tbl_userdata.IsActive = (tbl_userdata.IsActive == false ? tbl_userdata.IsActive = true : tbl_userdata.IsActive = false);
+            //tbl_userdata.IsActive = !tbl_userdata.IsActive;
+
+            _context.AspNetUsers.Update(tbl_userdata);
+            _context.SaveChanges();
+
+            _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
+
+            var cpdata = _cpcontext.TblCustomerUsers.SingleOrDefault(a => a.UserId == Id);
+            cpdata.IsActive = (cpdata.IsActive == false ? cpdata.IsActive = true : cpdata.IsActive = false);
+
+            //cpdata.IsActive = !cpdata.IsActive;
+
+            _cpcontext.TblCustomerUsers.Update(cpdata);
+            _cpcontext.SaveChanges();
+
+            EmailTest emailTest = new EmailTest();
+            emailTest.To = tbl_userdata.Email;
+            emailTest.Subject = "Deletion of User";
+            emailTest.Message = "Dear User,\n" + "      " + "\n" + "      Your account has been Deactivated to Activate please contact Admin." + "\n" + "\nThanks & Regards:\n" + "      " + "MICA Team";
+
+            return null;
+        }
 
         public UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext apiContext)
         {
@@ -601,6 +686,5 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             }
             
         }
-
     }
 }

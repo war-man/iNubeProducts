@@ -134,6 +134,7 @@ namespace iNube.Services.Accounting.Models
         public decimal? OrganizationId { get; set; }
         public decimal? ContractId { get; set; }
         public decimal? TransactionHeaderId { get; set; }
+        public decimal? ProductId { get; set; }
     }
     //public class TransactionAccountSearchDto
     //{
@@ -158,6 +159,7 @@ namespace iNube.Services.Accounting.Models
         public decimal TransactionRuleMappingId { get; set; }
         public string RuleName { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public DateTime? CreatedDateTime { get; set; }
         public decimal TransactionId { get; set; }
         public string TypeOfTransaction { get; set; }
         public decimal? Amount { get; set; }
@@ -170,6 +172,8 @@ namespace iNube.Services.Accounting.Models
         public string Value { get; set; }
         public int? AccountCode { get; set; }
         public string AccountName { get; set; }
+        public int? CustomerAcCode { get; set; }
+        public string CustomerAcName { get; set; }
         public string ReferenceDescription { get; set; }
     }
 
@@ -182,6 +186,7 @@ namespace iNube.Services.Accounting.Models
         public string Event { get; set; }
         public string TypeofTransaction { get; set; }
         public int? AccountCode { get; set; }
+        public string AccountName { get; set; }
         public string AccountType { get; set; }
         public string Value { get; set; }
         public string Description { get; set; }
@@ -292,6 +297,8 @@ namespace iNube.Services.Accounting.Models
         public string TypeofTransaction { get; set; }
         public int? AccountCode { get; set; }
         public string AccountType { get; set; }
+        //Addition for AccountName for Fetching 
+        public string AccountName { get; set; }
         public string Value { get; set; }
         public string Description { get; set; }
         public string SubLedgerReference { get; set; }
@@ -302,16 +309,16 @@ namespace iNube.Services.Accounting.Models
 
     public class JournalEntryConfriguationDto
     {
+        public decimal TransactionRuleMappingId { get; set; }
         public string RuleName { get; set; }
         public string Object { get; set; }
         public string Event { get; set; }
         public string TypeofTransaction { get; set; }
         public int? AccountCode { get; set; }
+        public string AccountName { get; set; }
         public string AccountType { get; set; }
         public string Value { get; set; }
         public string Description { get; set; }
-        public string SubLedgerObject { get; set; }
-        public string SubLedgerColumn { get; set; }
     }
     public  class CoaAccountMappingDto
     {
@@ -376,6 +383,7 @@ namespace iNube.Services.Accounting.Models
         public decimal TransactionRuleMappingId { get; set; }
         public string RuleName { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public DateTime? CreatedDateTime { get; set; }
         public decimal TransactionId { get; set; }
         public string TypeOfTransaction { get; set; }
         public decimal? Amount { get; set; }
@@ -388,7 +396,11 @@ namespace iNube.Services.Accounting.Models
         public string Value { get; set; }
         public int? AccountCode { get; set; }
         public string AccountName { get; set; }
+        public int? CustomerAcCode { get; set; }
+        public string CustomerAcName { get; set; }
         public string ReferenceDescription { get; set; }
+        public decimal? OrgId { get; set; }
+        public decimal? PartnerId { get; set; }
     }
 
 

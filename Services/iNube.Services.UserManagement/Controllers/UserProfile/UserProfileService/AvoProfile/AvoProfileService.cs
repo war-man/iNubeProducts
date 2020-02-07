@@ -9,13 +9,14 @@ using iNube.Utility.Framework.Notification;
 using System.Threading.Tasks;
 using iNube.Utility.Framework.Model;
 using iNube.Services.UserManagement.Helpers;
-
+using iNube.Services.UserManagement.Entities.MICACP;
 
 namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileService.MicaProfile
 {
     public class AvoProfileService : IUserProductService
     {
         private MICAUMContext _context;
+        private MICACPContext _cpcontext;
         private IMapper _mapper;
         private bool Result;
         public static int otpvalue { get; set; }
@@ -505,13 +506,28 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 return new UserEmailResponse { Status = BusinessStatus.Ok };
             }
         }
-        public String DeleteUserById(string Id, ApiContext apiContext)
+
+        public UserDTO DeleteUserById(string Id, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var tbl_userdata = _context.AspNetUsers.Where(item => item.Id == Id).FirstOrDefault();
+            var tbl_userdata = _context.AspNetUsers.Where(item => item.Id == Id)
+                                               .Include(add => add.TblUserAddress)
+                                               .Include(add => add.TblUserAddress)
+                                               .FirstOrDefault();
             tbl_userdata.IsActive = false;
+
+            var user = _cpcontext.TblCustomerUsers.Where(p => p.UserName == tbl_userdata.UserName).FirstOrDefault();
+            user.IsActive = false;
+
+            EmailTest emailTest = new EmailTest();
+            emailTest.To = tbl_userdata.Email;
+            emailTest.Subject = "Deletion of User";
+            emailTest.Message = "Dear User,\n" + "      " + "\n" + "      Your account has been deleted: " + "\n" + "\nThanks & Regards:\n" + "      " + "MICA Team";
+
             _context.SaveChanges();
-            return "Deleted!";
+
+            var data = _mapper.Map<UserDTO>(tbl_userdata);
+            return data;
         }
 
         public UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext apiContext)

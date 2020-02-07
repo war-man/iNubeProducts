@@ -1,4 +1,5 @@
-﻿using System;
+﻿using iNube.Utility.Framework.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,6 +32,12 @@ namespace iNube.Services.UserManagement.Models
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+
+    public class CustomerResponse : ResponseStatus
+    {
+        public CustomerSettingsDTO customerSettingsDTO { get; set; }
+    }
+
 
     public partial class CustomerSettingsDTO
     {

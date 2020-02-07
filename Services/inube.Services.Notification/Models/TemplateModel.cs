@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,6 +41,7 @@ namespace inube.Services.Notification.Models
         public string PolicyNumber { get; set; }
         public string SMSMessage { get; set; }
     }
+    [BsonIgnoreExtraElements]
     public class FileUploadDTO
     {
         public string FileName { get; set; }
