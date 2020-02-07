@@ -22,7 +22,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
     {
         //readonly string BillingConfigUrl = "https://localhost:44362";
      //   readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
-		readonly string BillingConfigUrl = "http://dev2-mica-billing.aws.vpc.:9001";
+		readonly string BillingConfigUrl = "http://dev2-mica-billing.aws.vpc.:9011";
 
 
         public async Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext)
