@@ -18,7 +18,7 @@
     "EC2"
   ],
   "networkMode": "awsvpc",
-  "cpu": "128",
-  "memory": "128",
+  "cpu": "300",
+  "memory": "300",
   "family": "dev2-mica-partner"
 }
