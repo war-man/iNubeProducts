@@ -19,6 +19,6 @@
   ],
   "networkMode": "awsvpc",
   "cpu": "300",
-  "memory": "300",
+  "memory": "300", 
   "family": "dev2-mica-user"
 }
