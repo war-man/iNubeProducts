@@ -11,14 +11,15 @@
           "protocol": "tcp",
           "containerPort": 9009
         }
-      ]
+      ],
+      "cpu": "300",
+      "memory": "300",
+      "family": "dev2-mica-user"
     }
   ],
   "requiresCompatibilities": [
     "EC2"
   ],
   "networkMode": "awsvpc",
-  "cpu": "300",
-  "memory": "300", 
-  "family": "dev2-mica-user"
+  
 }
