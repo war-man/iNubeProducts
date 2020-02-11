@@ -1,24 +1,33 @@
 {
+  "family": "dev2-mica-claims",
+  "taskRoleArn": "",
   "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
   "containerDefinitions": [
     {
       "name": "dev2-mica-claims",
       "image": "<IMAGE1_NAME>",
-      "essential": true,
+
+      "cpu": 300,
+      "memory": 300,
+
       "portMappings": [
         {
+          "containerPort": 9002,
           "hostPort": 9002,
-          "protocol": "tcp",
-          "containerPort": 9002
+          "protocol": "tcp"
         }
-      ]
+      ],
+      "essential": true
+
     }
   ],
+
+
   "requiresCompatibilities": [
     "EC2"
   ],
-  "networkMode": "awsvpc",
   "cpu": "300",
-  "memory": "300",
-  "family": "dev2-mica-claims"
+  "memory": "300"
+
 }

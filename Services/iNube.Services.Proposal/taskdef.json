@@ -1,24 +1,33 @@
 {
+  "family": "dev2-mica-proposal",
+  "taskRoleArn": "",
   "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
   "containerDefinitions": [
     {
       "name": "dev2-mica-proposal",
       "image": "<IMAGE1_NAME>",
-      "essential": true,
+
+      "cpu": 300,
+      "memory": 300,
+
       "portMappings": [
         {
+          "containerPort": 9008,
           "hostPort": 9008,
-          "protocol": "tcp",
-          "containerPort": 9008
+          "protocol": "tcp"
         }
-      ]
+      ],
+      "essential": true
+
     }
   ],
+
+
   "requiresCompatibilities": [
     "EC2"
   ],
-  "networkMode": "awsvpc",
   "cpu": "300",
-  "memory": "300",
-  "family": "dev2-mica-proposal"
+  "memory": "300"
+
 }
