@@ -10,8 +10,7 @@
             
             "cpu": 300,
             "memory": 300,
-            "memoryReservation": 0,
-          
+                     
             "portMappings": [
                 {
                     "containerPort": 9009,
