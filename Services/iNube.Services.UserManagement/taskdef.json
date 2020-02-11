@@ -11,9 +11,7 @@
             "cpu": 300,
             "memory": 300,
             "memoryReservation": 0,
-          "links": [
-            ""
-          ],
+          
             "portMappings": [
                 {
                     "containerPort": 9009,
@@ -21,17 +19,12 @@
                     "protocol": "tcp"
                 }
             ],
-            "essential": true,
+            "essential": true
             
         }
     ],
     
-    "placementConstraints": [
-        {
-            "type": "memberOf",
-            "expression": ""
-        }
-    ],
+    
     "requiresCompatibilities": [
         "EC2"
     ],
