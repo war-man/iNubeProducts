@@ -15,7 +15,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:cmlatest Services/inube.Services.Claims
+      - docker build -t $REPOSITORY_URI:cmlatest Services/iNube.Services.Claims
       - docker tag $REPOSITORY_URI:cmlatest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
@@ -34,8 +34,8 @@ phases:
  
 artifacts:
     files:
-    - Services/inube.Services.Claims/appspec.yml
-    - Services/inube.Services.Claims/taskdef.json
+    - Services/iNube.Services.Claims/appspec.yml
+    - Services/iNube.Services.Claims/taskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json
