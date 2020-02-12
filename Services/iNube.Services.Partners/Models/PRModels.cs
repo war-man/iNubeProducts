@@ -249,7 +249,7 @@ namespace iNube.Services.Partners.Models
         {
             PartnerAddress = new HashSet<PartnerAddressDTO>();
         }
-
+        public bool Flag { get; set; }
         public decimal PartnerId { get; set; }
         public int? PartnerTypeId { get; set; }
         public int? PartnerClassId { get; set; }

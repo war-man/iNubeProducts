@@ -40,32 +40,32 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
     public class IntegrationService : IIntegrationService
     {
 
-       // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
+        //readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
         //readonly string partnerUrl = "https://localhost:44315";
-		readonly string partnerUrl = "http://dev2-mica-user.aws.vpc.:9005";
+		readonly string partnerUrl = "http://dev2-mica-partner.aws.vpc.:9005";
 
        // readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
         //readonly string policyUrl = "https://localhost:44351";
 	   readonly string policyUrl = "http://dev2-mica-policy.aws.vpc.:9006";
 
-        //readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
+      //  readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
         //readonly string productUrl = "https://localhost:44347";
 		readonly string productUrl = "http://dev2-mica-product.aws.vpc.:9007";
 
        // readonly string UsermanangementUrl = "https://localhost:44367";
-//          readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+          //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
         readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
 
         //CHECKING FOR ACCOUNTING
         //readonly string accountApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionMappingDetails";
         //readonly string accountApiUrl = "http://localhost:52166/api/AccountConfig/GetTransactionMappingDetails";
-        readonly string accountApiUrl = "http://dev2-mica-user.aws.vpc.:9011/api/AccountConfig/GetTransactionMappingDetails";
-        //readonly string accountRuleApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionConditionDetails";
+        readonly string accountRuleApiUrl = "http://dev2-mica-accounting.aws.vpc.:9011/api/AccountConfig/GetTransactionMappingDetails";
+        ///readonly string accountRuleApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionConditionDetails";
 
 
-     //   readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
+        //readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
         //readonly string createTransactionApi = "http://localhost:52166/api/AccountConfig/CreateTransaction";
-         readonly string createTransactionApi = "http://dev2-mica-user.aws.vpc.:9011/api/AccountConfig/CreateTransaction";
+         readonly string createTransactionApi = "http://dev2-mica-accounting.aws.vpc.:9011/api/AccountConfig/CreateTransaction";
 
 
         //ACCOUNTING

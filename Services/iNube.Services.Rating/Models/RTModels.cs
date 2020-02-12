@@ -204,7 +204,6 @@ namespace iNube.Services.Rating.Models
         public bool? IsActive { get; set; }
         public string ExpressionResult { get; set; }
         public int? Steps { get; set; }
-
     }
     public class CalculationConfigParamDTO
     {
@@ -223,7 +222,6 @@ namespace iNube.Services.Rating.Models
             CalculationConfigExpression = new HashSet<CalculationConfigExpressionDTO>();
             CalculationConfigParam = new HashSet<CalculationConfigParamDTO>();
         }
-
         public decimal CalculationConfigId { get; set; }
         public string CalculationConfigName { get; set; }
         public DateTime? CreatedDate { get; set; }

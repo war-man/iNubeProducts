@@ -568,10 +568,11 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             {
                 foreach (var rateitem in Expression)
                 {
+                    
                     expression = rateitem.ExpressionValue;
                     resultExpression = Replace(expression, json_Dictionary);
                     double result = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
-                    calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = result.ToString() });
+                    calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = Math.Round((Convert.ToDecimal(result)), 2).ToString() });
                     json_Dictionary.Add(rateitem.ExpressionResult, result.ToString());
                    // calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = result.ToString() });
                     //foreach(var tr in calcultion)

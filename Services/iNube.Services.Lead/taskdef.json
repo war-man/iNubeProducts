@@ -1,33 +1,24 @@
 {
-  "family": "dev2-mica-lead",
-  "taskRoleArn": "",
   "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
-  "networkMode": "awsvpc",
   "containerDefinitions": [
     {
       "name": "dev2-mica-lead",
       "image": "<IMAGE1_NAME>",
-
-      "cpu": 300,
-      "memory": 300,
-
+      "essential": true,
       "portMappings": [
         {
-          "containerPort": 9003,
           "hostPort": 9003,
-          "protocol": "tcp"
+          "protocol": "tcp",
+          "containerPort": 9003
         }
-      ],
-      "essential": true
-
+      ]
     }
   ],
-
-
   "requiresCompatibilities": [
     "EC2"
   ],
-  "cpu": "300",
-  "memory": "300"
-
+  "networkMode": "awsvpc",
+  "cpu": "128",
+  "memory": "128",
+  "family": "dev2-mica-lead"
 }

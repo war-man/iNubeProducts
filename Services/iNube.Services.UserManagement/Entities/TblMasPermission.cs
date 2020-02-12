@@ -37,6 +37,10 @@ namespace iNube.Services.UserManagement.Entities
         public bool? HasFinancial { get; set; }
         public int? SortOrderBy { get; set; }
         public int? Active { get; set; }
+        public bool? PolicyDashboard { get; set; }
+        public bool? ClaimsDashboard { get; set; }
+        public bool? ProductDashboard { get; set; }
+        public bool? CdaccountDashboard { get; set; }
 
         public virtual ICollection<TblUserPermissions> TblUserPermissions { get; set; }
     }

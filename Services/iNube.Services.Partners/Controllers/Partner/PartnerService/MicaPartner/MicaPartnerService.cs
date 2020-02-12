@@ -48,13 +48,13 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             TblPartners partner = _mapper.Map<TblPartners>(partnerDTO);
-            bool flag = false;
+            partnerDTO.Flag = false;
             // _context.Entry(partner).State = partner.PartnerId == 0 ? EntityState.Added : EntityState.Modified;
             if (partner.PartnerId == 0)
             {
                 partner.CreatedBy = apiContext.UserId;
                 partner.OrganizationId = apiContext.OrgId;
-                flag = true;
+                partnerDTO.Flag = true;
                 partner.CreatedDate = DateTime.Now;
                 _context.TblPartners.Add(partner);
             }
@@ -76,7 +76,12 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                 await SendEmailAsync(partner.Email, partner.PartnerName);
             }
             partnerDTO.PartnerId = partner.PartnerId;
-            return new PartnerResponse() { Status = BusinessStatus.Created, Id = partnerDTO.PartnerId.ToString(), partner = partnerDTO, ResponseMessage = $"Partner ID: {partnerDTO.PartnerId} successfully {(flag == true ? "created " : "modified")} for Partner: {partnerDTO.PartnerName}" };
+
+            List<string> lstParameters = new List<string>();
+            lstParameters.Add(partnerDTO.PartnerId.ToString());
+            lstParameters.Add(partnerDTO.PartnerName);
+
+            return new PartnerResponse() { Status = BusinessStatus.Created, Id = partnerDTO.PartnerId.ToString(), partner = partnerDTO,ResponseMessage = $"Partner ID: {partnerDTO.PartnerId} successfully {(partnerDTO.Flag == true ? "created " : "modified")} for Partner: {partnerDTO.PartnerName}" , MessageKey = (partnerDTO.Flag == true ? "CreatePartnerMsg" : "ModifiedPartnerMsg") , MessageValue = lstParameters };
         }
         /// <summary>
         /// Gets the master asynchronous.
@@ -242,12 +247,22 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                 policyAgreementResponse.Errors.AddRange(Errors);
                 policyAgreementResponse.Status = BusinessStatus.PreConditionFailed;
                 policyAgreementResponse.ResponseMessage = $"Product already assigned to partner {partnerName}!!";
-
+                //Translation response
+                policyAgreementResponse.MessageKey = "ProductAlreadyAssignedMsg";
+                List<string> lstParameters = new List<string>();
+                lstParameters.Add(partnerName);
+                policyAgreementResponse.MessageValue = lstParameters;
             }
             else
             {
                 policyAgreementResponse.Status = BusinessStatus.Created;
                 policyAgreementResponse.ResponseMessage = $"Product code {sb.ToString()} successfully assigned to Partner {partnerName}";
+                //Translation response
+                policyAgreementResponse.MessageKey = "AssignedProductMsg";
+                List<string> lstParamaters = new List<string>();
+                lstParamaters.Add(sb.ToString());
+                lstParamaters.Add(partnerName);
+                policyAgreementResponse.MessageValue = lstParamaters;
 
             }
             //Email Api Kit
