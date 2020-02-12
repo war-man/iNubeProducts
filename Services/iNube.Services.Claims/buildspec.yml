@@ -10,12 +10,12 @@ phases:
       - $ECR_LOGIN
       - REPOSITORY_URI=820227512150.dkr.ecr.ap-south-1.amazonaws.com/micacontainerregistry
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}') 
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:cmlatest Services/iNube.Services.Claims
+      - docker build -t $REPOSITORY_URI:cmlatest Services/inube.Services.Claims
       - docker tag $REPOSITORY_URI:cmlatest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
@@ -26,7 +26,7 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"mica-inube-claim-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - printf '[{"name":"dev2-mica-claims","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > productionimagedefinition.json
-      - printf '{"ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json 
+      - printf '{"ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
@@ -34,8 +34,8 @@ phases:
  
 artifacts:
     files:
-    - Services/iNube.Services.Claims/appspec.yml
-    - Services/iNube.Services.Claims/taskdef.json
+    - Services/inube.Services.Claims/appspec.yml
+    - Services/inube.Services.Claims/taskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
-    - imageDetail.json 
+    - imageDetail.json
