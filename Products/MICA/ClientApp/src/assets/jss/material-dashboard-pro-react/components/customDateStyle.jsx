@@ -1,0 +1,97 @@
+import {
+  primaryColor,
+  dangerColor,
+  successColor,
+  defaultFont
+} from "assets/jss/material-dashboard-pro-react.jsx";
+
+const customDateStyle = {
+  disabled: {
+    "&:before": { 
+      borderColor: "transparent !important"
+    }
+  },
+  underline: {
+    "&:hover:not($disabled):before,&:before": {
+      borderColor: "#D2D2D2 !important",
+      borderWidth: "1px !important"
+    },
+    "&:after": {
+      borderColor: primaryColor
+    }
+  },
+  underlineError: {
+    "&:after": {
+      borderColor: dangerColor
+    }
+  },
+  underlineSuccess: {
+    "&:after": {
+      borderColor: successColor
+    }
+  },
+  labelRoot: {
+    ...defaultFont,
+    color: "#333 ",
+    fontWeight: "500",
+    fontSize: "14px",
+    lineHeight: "1.42857",
+    top: "10px",
+    
+    
+    "& + $underline": {
+      marginTop: "0px"
+    },
+    "&:focus":{
+      //fontsize: "75%",
+      //transform: `translate3d(0, 100%, 0)`,
+     //opacity: "1"
+    
+     
+    }
+  },
+  labelRootError: {
+    color: dangerColor + " !important"
+  },
+  labelRootSuccess: {
+    color: successColor + " !important"
+  },
+  formControl: {
+    margin: "0 0 17px 0",
+    paddingTop: "1.4rem",
+    position: "relative",
+    verticalAlign: "unset",
+    "& svg,& .fab,& .far,& .fal,& .fas,& .material-icons": {
+      color: "#495057"
+    }
+  },
+  whiteUnderline: {
+    "&:hover:not($disabled):before,&:before": {
+      backgroundColor: "#FFFFFF"
+    },
+    "&:after": {
+      backgroundColor: "#FFFFFF"
+    }
+  },
+  input: {
+    color: "#495057",
+    "&,&::placeholder": {
+      fontSize: "14px",
+      //fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontWeight: "400",
+      lineHeight: "1.42857",
+      opacity: "1"
+    },
+    "&::placeholder": {
+      color: "#333"
+    }
+  },
+  whiteInput: {
+    "&,&::placeholder": {
+      color: "#FFFFFF",
+      opacity: "1"
+    }
+  }
+};
+
+export default customDateStyle;

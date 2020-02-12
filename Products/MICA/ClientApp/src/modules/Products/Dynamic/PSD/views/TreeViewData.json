@@ -1,0 +1,57 @@
+ {
+            SchemaId: 1,
+            ParentId:"root",
+            SchemaName: "OLA",
+            SchemaType: "Package",
+            AttributeList: [{
+            AttributeId: 1,
+            AttributeType: "Cover",
+            Icon: "Assignment",
+            PageData: [
+                {
+                    id: "FirstName",
+                    Name: "Mobile",
+                    Year: "Submit"
+                }
+            ]
+			},
+			{
+            AttributeId: 1,
+            AttributeType: "Clauses",
+            Icon: "Assignment",
+            PageData: [
+                {
+                    id: "FirstName",
+                    Name: "Mobile",
+                    Year: "Submit"
+                }
+            ]
+        },],
+            SubMenu: [{
+            SchemaId: 1,
+            ParentId:"root/1",
+            SchemaName: "One_Plus",
+            SchemaType: "Insurable Item",
+            AttributeList: [{
+            AttributeId: 1,
+            AttributeType: "Risk",
+            Icon: "Assignment",
+            PageData: [
+                {
+                    id: "FirstName",
+                    Name: "Mobile",
+                    Year: "Submit"
+                }
+            ]
+			}],
+			SubMenu:[]
+        },]
+		
+		
+		
+		
+}
+		
+
+
+      
