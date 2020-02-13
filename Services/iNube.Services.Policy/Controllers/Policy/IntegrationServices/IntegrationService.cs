@@ -61,7 +61,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 	   readonly string productUrl = "http://dev2-mica-product.aws.vpc.:9007";
 	   
        //readonly string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-       readonly string notificationUrl = "http://dev2-mica-notification.aws.vpc.:9004";
+       readonly string notificationUrl = "http://dev2-mica-notification.aws.vpc.:9004"; 
 
         // readonly string notificationUrl = "http://localhost:53000";
         //  readonly string notificationUrl = "http://mica-inube-notification-service.mica-internal.:9004";
