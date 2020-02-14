@@ -4720,7 +4720,7 @@ img {
   /* flex: 1 1; */
   padding: 0 1rem;
   /* flex: 1 1 auto; */
-  margin-left: 10px;
+  margin-left: 25px;
   margin-top: 10px;
   margin-bottom: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
@@ -4731,14 +4731,14 @@ img {
   position: absolute; }
 
 .banner label {
-  margin: 17px 0;
-  font-size: 1.2rem !important;
+  margin: 18px 0;
+  font-size: 1rem !important;
   font-weight: 500;
   color: #231ffb; }
 
 .banner h5 {
   margin: 17px 3px;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 500;
   color: #231ffb;
   padding-right: 1rem; }
