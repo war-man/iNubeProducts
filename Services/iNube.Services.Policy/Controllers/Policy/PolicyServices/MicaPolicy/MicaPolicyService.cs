@@ -1635,22 +1635,22 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         //Get Policymodel
                         try
                         {
-                            var policyEmailModel = await GetInsuranceCertificateModel(policyDetail, productDetails, policyUpdate, mappedPolicy, partnerDetails, singleCover, apiContext);
-                            NotificationRequest request = new NotificationRequest();
-                            request.SendSms = true;
-                            request.smsRequest = new SMSRequest()
-                            {
-                                PolicyNumber = policyNumber,
-                                RecipientNumber = policyUpdate.MobileNumber,
-                                SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/" + policyNumber,
-                            };
-                            request.TemplateKey = "InsuranceCertificate";
-                            request.AttachPDF = true;
-                            request.NotificationPayload = JsonConvert.SerializeObject(policyEmailModel);
-                            request.SendEmail = true;
-                            //ACCOUNTING TRANSACTION CALLING
-                            //var account = AccountMap(apiContext, policyUpdate);
-                            var notificationResponse = await _integrationService.SendMultiCoverNotificationAsync(request, apiContext);
+                            //var policyEmailModel = await GetInsuranceCertificateModel(policyDetail, productDetails, policyUpdate, mappedPolicy, partnerDetails, singleCover, apiContext);
+                            //NotificationRequest request = new NotificationRequest();
+                            //request.SendSms = true;
+                            //request.smsRequest = new SMSRequest()
+                            //{
+                            //    PolicyNumber = policyNumber,
+                            //    RecipientNumber = policyUpdate.MobileNumber,
+                            //    SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/" + policyNumber,
+                            //};
+                            //request.TemplateKey = "InsuranceCertificate";
+                            //request.AttachPDF = true;
+                            //request.NotificationPayload = JsonConvert.SerializeObject(policyEmailModel);
+                            //request.SendEmail = true;
+                            ////ACCOUNTING TRANSACTION CALLING
+                            ////var account = AccountMap(apiContext, policyUpdate);
+                            //var notificationResponse = await _integrationService.SendMultiCoverNotificationAsync(request, apiContext);
                         }
 
                         catch (Exception ex)
@@ -1659,7 +1659,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             var msgr = ex.ToString();
                         }
                         //Adding of Accounting Transaction Part
-                        var account = AccountMap(apiContext, policyUpdate, productDetails, partnerDetails);
+                       // var account = AccountMap(apiContext, policyUpdate, productDetails, partnerDetails);
                         // await SendNotificationAsync(policyNumber, partnerDetails.Email, policyUpdate.Email, policyUpdate.MobileNumber,cover,coverEvent,productName);
                         return new PolicyResponse { Status = BusinessStatus.Created, Id = policyNumber, ResponseMessage = $"Policy created with policy number {policyNumber}" };
                     }
