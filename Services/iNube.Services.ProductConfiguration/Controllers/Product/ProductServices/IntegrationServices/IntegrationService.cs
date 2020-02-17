@@ -19,14 +19,16 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
     public class IntegrationService : IIntegrationService
     {
 
-       // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-        readonly string partnerUrl = "http://dev2-mica-partner.aws.vpc.:9005";
+        // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
+        //readonly string partnerUrl = "http://dev2-mica-partner.aws.vpc.:9005";
+        readonly string partnerUrl = "http://mica-inube-partner-service.mica-internal.:9005";
         //readonly string partnerUrl = "https://localhost:44315";
 
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
         //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+        //readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+        readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
 
         //readonly string RatingUrl = "http://localhost:58593";
         readonly string RatingUrl = "https://inubeservicesrating.azurewebsites.net";
