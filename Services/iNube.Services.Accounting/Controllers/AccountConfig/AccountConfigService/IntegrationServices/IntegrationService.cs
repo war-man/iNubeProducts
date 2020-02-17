@@ -19,7 +19,8 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
         
         //readonly string UsermanangementUrl = "https://localhost:44367";
        // readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-		readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+		//readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+        readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
             var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;

@@ -28,29 +28,35 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
     {
        // readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
        //readonly string productUrl = "https://localhost:44347";
-		readonly string productUrl = "http://dev2-mica-product.aws.vpc.:9007";
-        
-		//readonly string claimUrl = "https://inubeservicesclaims.azurewebsites.net";
-        //readonly string claimUrl = "https://localhost:44344";
-		 readonly string claimUrl = "http://dev2-mica-claims.aws.vpc.:9002";
+		//readonly string productUrl = "http://dev2-mica-product.aws.vpc.:9007";
+        readonly string productUrl = "http://mica-inube-product-service.mica-internal.:9007";
 
-       // readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
+        //readonly string claimUrl = "https://inubeservicesclaims.azurewebsites.net";
+        //readonly string claimUrl = "https://localhost:44344";
+        //readonly string claimUrl = "http://dev2-mica-claims.aws.vpc.:9002";
+        readonly string claimUrl = "http://mica-inube-claim-service.mica-internal.:9002";
+
+        // readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
         //readonly string policyUrl = "https://localhost:44351";
-		 readonly string policyUrl = "http://dev2-mica-policy.aws.vpc.:9006";
+        //readonly string policyUrl = "http://dev2-mica-policy.aws.vpc.:9006";
+        readonly string policyUrl = "http://mica-inube-policy-service.mica-internal.:9006";
+
 
         //string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
         //string notificationUrl = "http://localhost:53000";
-		readonly string notificationUrl = "http://dev2-mica-notification.aws.vpc.:9004";
-		
+        //readonly string notificationUrl = "http://dev2-mica-notification.aws.vpc.:9004";
+        readonly string notificationUrl = "http://mica-inube-notification-service.mica-internal.:9004";
+
 
         //readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
         //readonly string partnerUrl = "https://localhost:44315";
-		readonly string partnerUrl = "http://dev2-mica-partner.aws.vpc.:9005";
+        //readonly string partnerUrl = "http://dev2-mica-partner.aws.vpc.:9005";
+        readonly string partnerUrl = "http://mica-inube-partner-service.mica-internal.:9005";
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
         //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-		readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
-
+        //readonly string UsermanangementUrl = "http://dev2-mica-user.aws.vpc.:9009";
+        readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
             var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
