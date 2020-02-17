@@ -269,5 +269,13 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
                     return Forbid();
             }
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HC()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
     }
 }
