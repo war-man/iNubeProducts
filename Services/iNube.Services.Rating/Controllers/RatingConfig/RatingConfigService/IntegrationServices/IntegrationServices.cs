@@ -19,7 +19,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
     {
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
-        readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+        //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+        readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
