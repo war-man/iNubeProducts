@@ -3,7 +3,7 @@
   "name": "mica-pwa",
   "icons": [
     {
-      "src": "./mica.png",
+      "src": "/images/iNubeText.png",
       "sizes": "512x512",
       "type": "image/png"
     }
