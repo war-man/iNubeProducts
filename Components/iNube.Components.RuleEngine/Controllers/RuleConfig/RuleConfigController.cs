@@ -16,7 +16,7 @@ using iNube.Utility.Framework.Model;
 
 namespace iNube.Components.RuleEngine.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]")]
     [ApiController]
     public class RuleConfigController : ControllerBase
     {
@@ -35,7 +35,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
 
         // View All Parameters
-        [HttpGet]
+        [HttpGet("GetAllParameter")]
         public IActionResult GetAllParameters()
         {
             var tblparameters = _userService.GetAllParameters();
@@ -45,7 +45,7 @@ namespace iNube.Components.RuleEngine.Controllers
         
 
         // View All ParamSet
-        [HttpGet]
+        [HttpGet("GetAllParamSet")]
         public IActionResult GetAllParamset()
         {
             var tblparamset = _userService.GetAllParamset();
@@ -54,7 +54,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
         
         // View All ParamSetDetails
-        [HttpGet]
+        [HttpGet("GetAllParamSetDetails")]
         public IActionResult GetAllParamsetDetail()
         {
             var tblparamsetdetails = _userService.GetAllParamsetDetail();
@@ -63,7 +63,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
         
         // View All Rules
-        [HttpGet]
+        [HttpGet("GetAllRules")]
         public IActionResult GetAllRules()
         {
             var tblrules = _userService.GetAllRules();
@@ -72,7 +72,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
 
         // View All RulesConditions
-        [HttpGet]
+        [HttpGet("GetAllRulesCondition")]
         public IActionResult GetAllRuleCondition()
         {
             var tblrulescondition = _userService.GetAllRuleCondition();
@@ -82,7 +82,7 @@ namespace iNube.Components.RuleEngine.Controllers
 
         
         // View All RulesConditionsValue
-        [HttpGet]
+        [HttpGet("GetAllRulesConditionValue")]
         public IActionResult GetAll_RuleConditionValue()
         {
             var tblrulesconditionvalue = _userService.GetAllRuleConditionValue();
@@ -91,7 +91,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
         
         // View All RulesSetMapping
-        [HttpGet]
+        [HttpGet("GetAllRuleSetMapping")]
         public IActionResult GetAllRuleSetMapping()
         {
             var tblrulesetmap = _userService.GetAllRuleSetMapping();
@@ -99,7 +99,7 @@ namespace iNube.Components.RuleEngine.Controllers
             return Ok(tblrulesetmapDtos);
         }
 
-        [HttpGet]
+        [HttpGet("GetAllRuleMap")]
         public IActionResult GetAllRuleMapping(int ruleid, string mastermodel, string action, string modelName)
         {
             var tblruleMap = _userService.GetAllRuleMapping(ruleid ,mastermodel,action,modelName);
@@ -111,7 +111,7 @@ namespace iNube.Components.RuleEngine.Controllers
         
         // Creating the Parameters
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("CreateParameters")]
         public IActionResult CreateParameters([FromBody]ParametersDto tblParametersDto)
         {
             // map dto to entity
@@ -130,7 +130,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
 
         // Updating Parameters
-        [HttpPut]
+        [HttpPut("{id}")]
         public IActionResult UpdateParameters(int id, [FromBody]ParametersDto tblparameterdto)
         {
             // map dto to entity and set id
@@ -152,7 +152,7 @@ namespace iNube.Components.RuleEngine.Controllers
 
         // Creating Parameter Set
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("CreateParamset")]
         public IActionResult CreateParamset([FromBody]ParamSetDto tblParamsetDto)
         {
             // map dto to entity
@@ -173,7 +173,7 @@ namespace iNube.Components.RuleEngine.Controllers
         
         // Creating ParamSetDetails
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("CreateParamSetDetails")]
         public IActionResult Insert_ParamSetDetails([FromBody]ParamSetDetailsDto tblParamsetDetailsDto)
         {
             // map dto to entity
@@ -194,7 +194,7 @@ namespace iNube.Components.RuleEngine.Controllers
 
         // Creating Rules
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("CreateRules")]
         public IActionResult CreateRules([FromBody]RulesDto tblrulesDto)
         {
             // map dto to entity
@@ -216,7 +216,7 @@ namespace iNube.Components.RuleEngine.Controllers
         // Creating RulesConditions
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("CreateRuleCondition")]
         public IActionResult CreateRuleConditions([FromBody]RuleConditionsDto tblrulesconditionDto)
         {
             // map dto to entity
@@ -236,7 +236,7 @@ namespace iNube.Components.RuleEngine.Controllers
 
         // Creating RuleConditionsValue
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("CreateRuleConditionValue")]
         public IActionResult CreateRuleConditionValue([FromBody]RuleConditionValuesDto tblrulesconditionvalueDto)
         {
             // map dto to entity
@@ -257,7 +257,7 @@ namespace iNube.Components.RuleEngine.Controllers
         // Inserting into the ParamSetMapping 
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("CreateRuleParamSetMapping")]
         public IActionResult CreateRuleSetMapping([FromBody]RuleParamSetMappingDto tblrulesetmapDto)
         {
             // map dto to entity
@@ -274,13 +274,16 @@ namespace iNube.Components.RuleEngine.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpGet]
+        [HttpGet("HC")]
         [AllowAnonymous]
         public IActionResult HC()
         {
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
-        
+
+
+
+
     }
 }
