@@ -1,0 +1,41 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Fetching ECR Login...
+      - aws --version
+      - ECR_LOGIN=$(aws ecr get-login --no-include-email --region ap-south-1)
+      - echo Logging in to Amazon ECR...
+      - $ECR_LOGIN
+      - REPOSITORY_URI=820227512150.dkr.ecr.ap-south-1.amazonaws.com/micacontainerregistry
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:egilatest Services/
+      - docker tag $REPOSITORY_URI:egilatest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:egilatest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"edelweiss-dev-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"edelweiss-prod-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > productionimagedefinition.json
+      - printf '{"ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
+      - cat imagedefinitions.json
+      - cat productionimagedefinition.json
+      - cat imageDetail.json
+    
+ 
+artifacts:
+    files:
+    - Services/appspec.yml
+    - Services/taskdef.json
+    - imagedefinitions.json
+    - productionimagedefinition.json
+    - imageDetail.json      

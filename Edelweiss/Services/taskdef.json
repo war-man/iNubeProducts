@@ -1,0 +1,33 @@
+{
+  "family": "ed-mica-extension",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "ed-mica-extension", 
+      "image": "<IMAGE1_NAME>",
+
+      "cpu": 512,
+      "memory": 512,
+
+      "portMappings": [
+        {
+          "containerPort": 9025,
+          "hostPort": 9025,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+
+    }
+  ],
+
+
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "512",
+  "memory": "512"
+
+}

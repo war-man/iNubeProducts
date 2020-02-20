@@ -1,0 +1,4 @@
+
+> material-dashboard-pro-react@1.4.0 test E:\Maanya\Intership\MICA1\ClientApp
+> jest
+
