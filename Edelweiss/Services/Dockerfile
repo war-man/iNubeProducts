@@ -4,10 +4,10 @@ WORKDIR /app
 
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
-COPY ["MicaExtension_EGI.csproj", "Services/"]
-RUN dotnet restore "Services/MicaExtension_EGI.csproj"
-COPY . "Services/"
-WORKDIR "/src/Services"
+COPY ["MicaExtension_EGI.csproj", "Edelweiss/Services/"]
+RUN dotnet restore "Edelweiss/Services/MicaExtension_EGI.csproj"
+COPY . "Edelweiss/Services/"
+WORKDIR "/src/Edelweiss/Services"
 RUN dotnet build "MicaExtension_EGI.csproj" -c Release -o /app
 
 FROM build AS publish

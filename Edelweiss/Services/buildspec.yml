@@ -15,7 +15,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:egilatest Services/
+      - docker build -t $REPOSITORY_URI:egilatest Edelweiss/Services/
       - docker tag $REPOSITORY_URI:egilatest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
@@ -34,8 +34,8 @@ phases:
  
 artifacts:
     files:
-    - Services/appspec.yml
-    - Services/taskdef.json
+    - Edelweiss/Services/appspec.yml
+    - Edelweiss/Services/taskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json      
