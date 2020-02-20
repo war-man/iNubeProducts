@@ -1,0 +1,33 @@
+{
+  "family": "ed-mica-accounting",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "ed-mica-accounting",
+      "image": "<edaccounting>",
+
+      "cpu": 512,
+      "memory": 512,
+
+      "portMappings": [
+        {
+          "containerPort": 9011,
+          "hostPort": 9011,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+
+    }
+  ],
+
+
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "512",
+  "memory": "512"
+
+}

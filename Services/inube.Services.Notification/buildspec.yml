@@ -36,6 +36,8 @@ artifacts:
     files:
     - Services/inube.Services.Notification/appspec.yml
     - Services/inube.Services.Notification/taskdef.json
+    - Services/inube.Services.Notification/edappspec.yml
+    - Services/inube.Services.Notification/edtaskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json

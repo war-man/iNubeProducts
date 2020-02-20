@@ -36,6 +36,8 @@ artifacts:
     files:
     - Services/iNube.Services.Claims/appspec.yml
     - Services/iNube.Services.Claims/taskdef.json
+    - Services/iNube.Services.Claims/edappspec.yml
+    - Services/iNube.Services.Claims/edtaskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json
