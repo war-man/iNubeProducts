@@ -12,10 +12,11 @@ using Microsoft.AspNetCore.Authorization;
 using iNube.Components.RuleEngine.Models;
 using iNube.Components.RuleEngine.Entities;
 using iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService;
+using iNube.Utility.Framework.Model;
 
 namespace iNube.Components.RuleEngine.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class RuleConfigController : ControllerBase
     {
@@ -34,7 +35,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
 
         // View All Parameters
-        [HttpGet("GetAllParameter")]
+        [HttpGet]
         public IActionResult GetAllParameters()
         {
             var tblparameters = _userService.GetAllParameters();
@@ -44,7 +45,7 @@ namespace iNube.Components.RuleEngine.Controllers
         
 
         // View All ParamSet
-        [HttpGet("GetAllParamSet")]
+        [HttpGet]
         public IActionResult GetAllParamset()
         {
             var tblparamset = _userService.GetAllParamset();
@@ -53,7 +54,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
         
         // View All ParamSetDetails
-        [HttpGet("GetAllParamSetDetails")]
+        [HttpGet]
         public IActionResult GetAllParamsetDetail()
         {
             var tblparamsetdetails = _userService.GetAllParamsetDetail();
@@ -62,7 +63,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
         
         // View All Rules
-        [HttpGet("GetAllRules")]
+        [HttpGet]
         public IActionResult GetAllRules()
         {
             var tblrules = _userService.GetAllRules();
@@ -71,7 +72,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
 
         // View All RulesConditions
-        [HttpGet("GetAllRulesCondition")]
+        [HttpGet]
         public IActionResult GetAllRuleCondition()
         {
             var tblrulescondition = _userService.GetAllRuleCondition();
@@ -81,7 +82,7 @@ namespace iNube.Components.RuleEngine.Controllers
 
         
         // View All RulesConditionsValue
-        [HttpGet("GetAllRulesConditionValue")]
+        [HttpGet]
         public IActionResult GetAll_RuleConditionValue()
         {
             var tblrulesconditionvalue = _userService.GetAllRuleConditionValue();
@@ -90,7 +91,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
         
         // View All RulesSetMapping
-        [HttpGet("GetAllRuleSetMapping")]
+        [HttpGet]
         public IActionResult GetAllRuleSetMapping()
         {
             var tblrulesetmap = _userService.GetAllRuleSetMapping();
@@ -98,7 +99,7 @@ namespace iNube.Components.RuleEngine.Controllers
             return Ok(tblrulesetmapDtos);
         }
 
-        [HttpGet("GetAllRuleMap")]
+        [HttpGet]
         public IActionResult GetAllRuleMapping(int ruleid, string mastermodel, string action, string modelName)
         {
             var tblruleMap = _userService.GetAllRuleMapping(ruleid ,mastermodel,action,modelName);
@@ -110,7 +111,7 @@ namespace iNube.Components.RuleEngine.Controllers
         
         // Creating the Parameters
         [AllowAnonymous]
-        [HttpPost("CreateParameters")]
+        [HttpPost]
         public IActionResult CreateParameters([FromBody]ParametersDto tblParametersDto)
         {
             // map dto to entity
@@ -129,7 +130,7 @@ namespace iNube.Components.RuleEngine.Controllers
         }
 
         // Updating Parameters
-        [HttpPut("{id}")]
+        [HttpPut]
         public IActionResult UpdateParameters(int id, [FromBody]ParametersDto tblparameterdto)
         {
             // map dto to entity and set id
@@ -151,7 +152,7 @@ namespace iNube.Components.RuleEngine.Controllers
 
         // Creating Parameter Set
         [AllowAnonymous]
-        [HttpPost("CreateParamset")]
+        [HttpPost]
         public IActionResult CreateParamset([FromBody]ParamSetDto tblParamsetDto)
         {
             // map dto to entity
@@ -172,7 +173,7 @@ namespace iNube.Components.RuleEngine.Controllers
         
         // Creating ParamSetDetails
         [AllowAnonymous]
-        [HttpPost("CreateParamSetDetails")]
+        [HttpPost]
         public IActionResult Insert_ParamSetDetails([FromBody]ParamSetDetailsDto tblParamsetDetailsDto)
         {
             // map dto to entity
@@ -193,7 +194,7 @@ namespace iNube.Components.RuleEngine.Controllers
 
         // Creating Rules
         [AllowAnonymous]
-        [HttpPost("CreateRules")]
+        [HttpPost]
         public IActionResult CreateRules([FromBody]RulesDto tblrulesDto)
         {
             // map dto to entity
@@ -215,7 +216,7 @@ namespace iNube.Components.RuleEngine.Controllers
         // Creating RulesConditions
 
         [AllowAnonymous]
-        [HttpPost("CreateRuleCondition")]
+        [HttpPost]
         public IActionResult CreateRuleConditions([FromBody]RuleConditionsDto tblrulesconditionDto)
         {
             // map dto to entity
@@ -235,7 +236,7 @@ namespace iNube.Components.RuleEngine.Controllers
 
         // Creating RuleConditionsValue
         [AllowAnonymous]
-        [HttpPost("CreateRuleConditionValue")]
+        [HttpPost]
         public IActionResult CreateRuleConditionValue([FromBody]RuleConditionValuesDto tblrulesconditionvalueDto)
         {
             // map dto to entity
@@ -256,7 +257,7 @@ namespace iNube.Components.RuleEngine.Controllers
         // Inserting into the ParamSetMapping 
 
         [AllowAnonymous]
-        [HttpPost("CreateRuleParamSetMapping")]
+        [HttpPost]
         public IActionResult CreateRuleSetMapping([FromBody]RuleParamSetMappingDto tblrulesetmapDto)
         {
             // map dto to entity
@@ -273,10 +274,13 @@ namespace iNube.Components.RuleEngine.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HC()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
         
-
-
-
     }
 }
