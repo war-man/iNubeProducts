@@ -34,7 +34,7 @@ phases:
       - cat productionimagedefinition.json
       - cat imageDetail.json
     
- 
+  
 artifacts:
     files:
     - Services/iNube.Services.Billing/appspec.yml
