@@ -38,5 +38,4 @@ artifacts:
     - Components/iNube.Components.RuleEngine/appspec.yml
     - Components/iNube.Components.RuleEngine/taskdef.json
     - imagedefinitions.json
-    - productionimagedefinition.json
     - imageDetail.json      
