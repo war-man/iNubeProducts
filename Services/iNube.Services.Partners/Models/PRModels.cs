@@ -477,6 +477,7 @@ namespace iNube.Services.Partners.Models
     public class PolicyAgreementResponse : ResponseStatus
     {
         public PolicyAgreementDTO policyAgreement { get; set; }
+        public EditAssignProductDTO editAssign { get; set; }
     }
     public class PartnerResponse : ResponseStatus
     {
@@ -1160,6 +1161,12 @@ namespace iNube.Services.Partners.Models
         public decimal Amount { get; set; }
         public string PaymentReferenceNo { get; set; }
             
+    }
+    public class EditAssignProductDTO
+    {
+        public decimal PolicyId { get; set; }
+        public DateTime? PolicyEndDate { get; set; }
+        public decimal? AgentId { get; set; }
     }
   
 

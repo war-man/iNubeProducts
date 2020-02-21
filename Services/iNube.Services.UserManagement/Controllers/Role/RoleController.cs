@@ -41,6 +41,13 @@ namespace iNube.Services.UserManagement.Controllers.Role
             var _roles = _roleService.GetRoles(Context);
             return Ok(_roles);
         }
+        // Get: api/Role/GetRoleById
+        [HttpGet]
+        public IActionResult GetRolePermissionsById(string roleid)
+        {
+            var _roles = _roleService.GetRolePermissionsById(roleid,Context);
+            return Ok(_roles);
+        }
 
         // POST: api/Role/AssignRole
         [HttpPost]

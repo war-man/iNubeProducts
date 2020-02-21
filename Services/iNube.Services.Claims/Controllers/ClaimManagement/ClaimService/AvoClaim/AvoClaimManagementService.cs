@@ -87,7 +87,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
 
-        public async Task<ClaimsDTO> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext)
+        public async Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

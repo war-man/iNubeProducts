@@ -22,6 +22,17 @@ namespace iNube.Services.Policy.Models
         public int? PartnerId { get; set; }
         public bool? IsPayment { get; set; }
     }
+    public class PolicyPremiumDetailsDTO
+    {
+        public string SumInsured { get; set; }
+        public string PD_Age { get; set; }
+        public string PD_DriveExperince { get; set; }
+        public string PD_NoOfTW { get; set; }
+        public string PD_NoOfPC { get; set; }
+        public string AdditionalDriver { get; set; }
+        public string FromStateTax { get; set; }
+        public string ToStateTax { get; set; }
+    }
 
 
     public partial class PolicyDTO
@@ -247,6 +258,7 @@ namespace iNube.Services.Policy.Models
         //public string Product { get; set; }
         public decimal? CoverId { get; set; }
         public string BenefitCriterias { get; set; }
+        public decimal? PremiumAmount { get; set; }
         public virtual ICollection<BenifitRangeDetails> BenifitRangeDetails { get; set; }
     }
 
@@ -434,6 +446,12 @@ namespace iNube.Services.Policy.Models
     public class PolicyResponse : ResponseStatus
     {
         public Dictionary<string,string> policy { get; set; }
+        public BusinessStatus Status { get; internal set; }
+    }
+
+    public class ProposalResponse : ResponseStatus
+    {
+        public Dictionary<string, string> proposal { get; set; }
         public BusinessStatus Status { get; internal set; }
     }
     public class CdTransactionsDTO
@@ -1236,6 +1254,77 @@ namespace iNube.Services.Policy.Models
     {
         public string Entity { get; set; }
         public string EValue { get; set; }
+    }
+
+    public class RiskField
+    {
+        public string insurableName { get; set; }
+        public dynamic  Riskfields{ get; set; }
+
+    }
+    public class InsurableField
+    {
+        public InsurableField()
+        {
+            RiskFields = new List<RiskField>();
+
+        }
+        public int DriverCount { get; set; }
+        public string StartDate { get; set; }
+        public string ProposalNumber { get; set; }
+        public List<RiskField> RiskFields { get; set; }
+}
+    public class PaymentInfo
+
+    {
+
+        public string RefrenceNumber { get; set; }
+
+        public decimal Amount { get; set; }
+
+
+
+    }
+    public partial class PremiumReturnDto
+
+    {
+
+        public decimal PerDayPremium { get; set; }
+
+        public decimal FireTheft365 { get; set; }
+
+        public decimal ADPremium { get; set; }
+
+        public decimal GST { get; set; }
+
+        public decimal Total { get; set; }
+
+        public decimal MonthlyPremium { get; set; }
+
+    }
+
+
+
+    public partial class PremiumRequestDTO
+
+    {
+
+        public string DriverAge { get; set; }
+
+        public string SI { get; set; }
+
+        public string StateCode { get; set; }
+
+        public string DriverExp { get; set; }
+
+        public string NoOfPC { get; set; }
+
+        public string NoOfTW { get; set; }
+
+        public string AdditionalDriver { get; set; }
+
+        public string BillingFrequency { get; set; }
+
     }
 }
 

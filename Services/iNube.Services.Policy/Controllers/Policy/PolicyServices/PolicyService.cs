@@ -25,8 +25,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<PolicyResponse> CreatePolicy(dynamic policyDetail, ApiContext apiContext);
 
         Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext);
+        Task<ProposalResponse> CreateProposal(dynamic policyDetail, ApiContext apiContext);
         Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext);
         Task<PolicyDTO> ModifyPolicy(string policyNumber,PolicyDTO policyDetail, ApiContext apiContext);
+        Task<dynamic> IssuePolicy(dynamic IssuepolicyDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetMaster(string sMasterlist, ApiContext apiContext);
         Task<PolicyDTO> GetPolicyById(decimal policyId, ApiContext apiContext);
         Task<PolicyDTO> GetPolicyByNumber(string policyNumber, ApiContext apiContext);
@@ -55,8 +57,20 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext);
         Task<object> CalCulatePremium(DynamicData premiumParameter, ApiContext apiContext);
         Task<PolicyDTO> ModifyInsurabableItem(dynamic modifydata, ApiContext apiContext);
+     
         Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
+        Task<List<dynamic>> GetProposalDetails(string proposalNo, ApiContext apiContext);
+        Task<List<PolicyPremiumDetailsDTO>> GetRiskItemByPolicyNo(string PolicyNO, ApiContext apiContext);
+       // Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
         Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount ,ApiContext apiContext);
+        Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext);
+        Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
+
+
+
+
+        Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext);
+
     }
     public class PolicyService : IPolicyService
     {
@@ -86,18 +100,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).CreateMultiCoverPolicy(policyDetail, apiContext);
         }
+        //Create proposal
+        public async Task<ProposalResponse> CreateProposal(dynamic policyDetail, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).CreateProposal(policyDetail, apiContext);
+        }
         //Update InsurableItem
 
         public async Task<PolicyDTO> ModifyInsurabableItem(object modifydata, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).ModifyInsurabableItem(modifydata, apiContext);
         }
+        
+    
 
         //Get InsurableItemDetails
 
         public async Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).GetInsurableItemDetails(policyNo, insurableItemName,apiContext);
+        }
+        public async Task<List<dynamic>> GetProposalDetails(string policyNo, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetProposalDetails(policyNo,apiContext);
+        }
+       
+        public async Task<List<PolicyPremiumDetailsDTO>> GetRiskItemByPolicyNo(string policyNo, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetRiskItemByPolicyNo(policyNo,apiContext);
         }
         public async Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext)
         {
@@ -122,6 +152,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).ModifyPolicy(policyNumber, policyDetail, apiContext);
         }
+        public async Task<dynamic> IssuePolicy(dynamic IssuepolicyDTO, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).IssuePolicy( IssuepolicyDTO, apiContext);
+        }
         //GetCDBalanceByPolicyNo
         //public async Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string policyNumber, ApiContext apiContext)
         //{
@@ -138,6 +172,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<decimal> GetPolicyDetailsByPolicyNo(string PolicyNO, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).GetPolicyDetailsByPolicyNo(PolicyNO, apiContext);
+        }
+        public async Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetPolicyDetailsByNumber(policyNumber, apiContext);
         }
 
         public async Task<IEnumerable<ddDTOs>> GetMaster(string sMasterlist, ApiContext apiContext)
@@ -652,8 +690,21 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).UpdateSumInsured(PolicyNumber, amount, apiContext);
-        }           
+        }
+
+        public async Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetProposalByMobileNo(MobNo, apiContext);
+        }
+
         
-       
+
+
+        public async Task<ProposalResponse> UpdateProposal(object modifydata, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).UpdateProposal(modifydata, apiContext);
+        }
+
+
     }
 }

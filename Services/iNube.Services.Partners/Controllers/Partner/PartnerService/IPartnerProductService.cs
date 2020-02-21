@@ -24,5 +24,6 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         void DeletePartner(decimal PartnerId, ApiContext apiContext);
         Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(decimal OrgId,ApiContext apiContext);
         Task<string> GetPartnerNameById(decimal PartnerId, ApiContext apiContext);
+        Task<PolicyAgreementResponse> EditAssignProductDate(EditAssignProductDTO policyAgreementDTO, ApiContext apiContext);
     }
 }

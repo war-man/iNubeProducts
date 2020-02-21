@@ -21,9 +21,8 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
     public class IntegrationService : IIntegrationService
     {
         //readonly string BillingConfigUrl = "https://localhost:44362";
-       // readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
-		//readonly string BillingConfigUrl = "http://dev2-mica-billing.aws.vpc.:9001";
-        readonly string BillingConfigUrl = "http://mica-inube-billing-service.mica-internal.:9001";
+        readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
+		//readonly string BillingConfigUrl = "http://mica-inube-billing-service.mica-internal.:9001";
 
 
         public async Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext)

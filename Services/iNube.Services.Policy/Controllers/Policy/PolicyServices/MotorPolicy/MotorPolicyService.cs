@@ -188,5 +188,49 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<ProposalResponse> CreateProposal(dynamic policyDetail, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<dynamic> GetRiskItemByPolicyNo(string policyNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        Task<List<PolicyPremiumDetailsDTO>> IPolicyProductService.GetRiskItemByPolicyNo(string policyNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+     
+        Task<List<dynamic>> IPolicyProductService.GetProposalDetails(string proposalNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+      
+
+        public Task<PolicyResponse> IssuePolicy(dynamic IssuepolicyDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ProposalResponse> UpdateProposal(object modifydata, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

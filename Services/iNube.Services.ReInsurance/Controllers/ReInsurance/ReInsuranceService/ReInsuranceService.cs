@@ -418,7 +418,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     scontract1.ParticipantCode = i.ParticipantCode;
                     if (i.ParticipantTypeId != null)
                     {
-                        scontract1.ParticipantType = msterdata.FirstOrDefault(p => p.mID == i.ParticipantTypeId).mValue;
+                        if (msterdata.FirstOrDefault(p => p.mID == i.ParticipantTypeId).mValue != null)
+                        {
+                            scontract1.ParticipantType = msterdata.FirstOrDefault(p => p.mID == i.ParticipantTypeId).mValue;
+                        }
                     }
                     scontract1.ParticipantName = i.ParticipantName;
 

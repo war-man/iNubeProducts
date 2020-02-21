@@ -14,6 +14,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
     public interface IRoleService
     {
         IEnumerable<RolesDTO> GetRoles(ApiContext apiContext);
+        IEnumerable<RolesDTO> GetRolePermissionsById(string roleid,ApiContext apiContext);
         UserRoleResponse AssignRole(UserRoleMapDTO userRoles, ApiContext apiContext);
         IEnumerable<RolesDTO> GetUserRole(string userId, ApiContext apiContext);
         IEnumerable<RolesDTO> GetAllUserRoles(string userId, ApiContext apiContext);
@@ -35,6 +36,11 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
         public IEnumerable<RolesDTO> GetRoles(ApiContext apiContext)
         {
             return _roleService(apiContext.ProductType).GetRoles(apiContext);
+        }
+
+        public IEnumerable<RolesDTO> GetRolePermissionsById(string roleid,ApiContext apiContext)
+        {
+            return _roleService(apiContext.ProductType).GetRolePermissionsById(roleid, apiContext);
         }
 
         public UserRoleResponse AssignRole(UserRoleMapDTO userRoles, ApiContext apiContext)

@@ -15,7 +15,7 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
     public interface IDMSService
     {
         DMSResponse Documentupload(HttpRequest httpRequest, string tagName, string tagValue);
-        DMSResponse DocumentSimpleupload(FileUploadDTO fileUploadDTO);
+        List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO);
         Task<List<string>> SearchParam(string tagName, string tagvalue);
         Task<DMSDTO> DownloadFile(string id);
         void DeleteDocument(string id);
@@ -131,34 +131,62 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
         }
 
 
-        public DMSResponse DocumentSimpleupload(FileUploadDTO fileUploadDTO)
+        public List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO)
         {
             var client = new MongoClient(_settings.ConnectionString);
             //var db=ConnectionInfo()
             var database = client.GetDatabase(_settings.DatabaseName);
             DMSDTO dMSDTO = new DMSDTO();
-            string guid = System.Guid.NewGuid().ToString();
-            dMSDTO.docId = guid;
-           // var files = httpRequest.Form.Files;
            
+           // dMSDTO.docId = guid;
+            DMSResponse dMSResponse = new DMSResponse();
 
-                dMSDTO.fileName = fileUploadDTO.FileName;
-              
+            List<DMSResponse> dMSResponselist = new List<DMSResponse>();
+
+            foreach (var images in fileUploadDTO.fileUploadDTOs)
+            {
+                string guid = System.Guid.NewGuid().ToString();
+                dMSDTO.docId = guid;
+
+                dMSDTO.fileName = images.FileName;
+
                 dMSDTO.uploadDate = DateTime.Now;
-           
-                dMSDTO.contentType = fileUploadDTO.ContentType;
-                dMSDTO.data = fileUploadDTO.FileData;
+
+                dMSDTO.contentType = images.ContentType;
+                dMSDTO.data = images.FileData;
 
 
 
-            var bsonDocument = dMSDTO.ToBsonDocument();
-            var jsonDocument = bsonDocument.ToJson();
-            var document = BsonSerializer.Deserialize<BsonDocument>(jsonDocument);
-            var collection = database.GetCollection<BsonDocument>(_settings.CollectionName);
-            collection.InsertOneAsync(document);
+                var bsonDocument = dMSDTO.ToBsonDocument();
+                var jsonDocument = bsonDocument.ToJson();
+                var document = BsonSerializer.Deserialize<BsonDocument>(jsonDocument);
+                var collection = database.GetCollection<BsonDocument>(_settings.CollectionName);
+                collection.InsertOneAsync(document);
+
+                var docid = dMSDTO.docId;
+                var tagname = images.Tagname;
+                var tagvalue = images.TagValue;
+                AddTags(docid, tagname, tagvalue);
+                dMSResponse = new DMSResponse();
+                dMSResponse.Docid = docid;
+
+                dMSResponselist.Add(dMSResponse);
+
+            }
+          
+            // var files = httpRequest.Form.Files;
+
+
+
+
+
+           // DMSResponse dMSResponse = new DMSResponse();
+           // dMSResponse.Docid = docid;
+
+            
             // dMSDTO.docId =guid;
-            //return dMSDTO.docId;
-            return new DMSResponse { Docid = dMSDTO.docId , Status=iNube.Utility.Framework.Model.BusinessStatus.Ok};
+            return dMSResponselist;
+         //   return new DMSResponse { Docid = dMSDTO.docId , Status=iNube.Utility.Framework.Model.BusinessStatus.Ok};
 
 
         }

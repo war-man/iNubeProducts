@@ -3,6 +3,7 @@ using iNube.Services.UserManagement.Entities;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,17 +14,57 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
     {
         private MICAUMContext _context;
         private IMapper _mapper;
-
-        public MicaRoleService(MICAUMContext context, IMapper mapper)
+        public IConfiguration _config;
+        public MicaRoleService(MICAUMContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            _config = configuration;
         }
 
         public IEnumerable<RolesDTO> GetRoles(ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             IEnumerable<AspNetRoles> _roles = _context.AspNetRoles.Select(roles => roles);
+
+            string custid = _config.GetSection("Inubeadmin").GetSection("Customerid").Value;
+
+            if (apiContext.OrgId == Convert.ToDecimal(custid))
+            {
+                _roles = _roles.Where(r => r.OrganizationId == apiContext.OrgId);
+            }
+            //else if (apiContext.OrgId > 0 && apiContext.PartnerId > 0)
+            //{
+            //    _roles = _roles.Where(r => (r.OrganizationId == apiContext.OrgId && r.PartnerId == apiContext.PartnerId));
+            //}
+            else if (apiContext.OrgId != Convert.ToDecimal(custid) && apiContext.OrgId > 0)
+            {
+                _roles = _roles.Where(r => (r.OrganizationId != Convert.ToDecimal(custid)));
+            }
+
+            IEnumerable<RolesDTO> _rolesDTOs = _mapper.Map<IEnumerable<RolesDTO>>(_roles);
+            foreach (RolesDTO roles in _rolesDTOs)
+            {
+                roles.Label = roles.Name;
+                roles.Value = roles.Id;
+            }
+            return _rolesDTOs;
+        }
+
+        public IEnumerable<RolesDTO> GetRolePermissionsById(string roleid, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            IEnumerable<AspNetRoles> _roles = _context.AspNetRoles.Where(r => r.Id == roleid);
+            string custid = _config.GetSection("Inubeadmin").GetSection("Customerid").Value;
+            if (apiContext.OrgId == Convert.ToDecimal(custid))
+            {
+                _roles = _roles.Where(r => r.OrganizationId == apiContext.OrgId);
+            }
+            else if (apiContext.OrgId != Convert.ToDecimal(custid) && apiContext.OrgId > 0)
+            {
+                _roles = _roles.Where(r => (r.OrganizationId != Convert.ToDecimal(custid)));
+            }
+
             IEnumerable<RolesDTO> _rolesDTOs = _mapper.Map<IEnumerable<RolesDTO>>(_roles);
             foreach (RolesDTO roles in _rolesDTOs)
             {
@@ -225,12 +266,14 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             if (string.IsNullOrEmpty(_roles.Id))
             {
                 _roles.Id = Guid.NewGuid().ToString();
-                
+
                 DateTime now = DateTime.Now;
                 var date = now.Day;
                 var month = now.Month;
                 var year = now.Year;
                 _roles.ConcurrencyStamp = date + "/" + month + "/" + year;
+                _roles.OrganizationId = apiContext.OrgId;
+                _roles.PartnerId = apiContext.PartnerId;
                 _context.AspNetRoles.Add(_roles);
                 _context.SaveChanges();
                 var _roleDTOs = _mapper.Map<RolesDTO>(_roles);

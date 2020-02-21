@@ -57,7 +57,7 @@ namespace iNube.Services.Policy.Controllers.Policy
             }
         }
         // POST: api/Product/CreatePolicy
-        [AllowAnonymous]
+       // [AllowAnonymous]
         [HttpPut]
         public async Task<IActionResult> ModifyPolicy(string PolicyNumber,[FromBody]PolicyDTO policyDTO)
         {
@@ -88,6 +88,16 @@ namespace iNube.Services.Policy.Controllers.Policy
         public async Task<IActionResult> GetPolicyByNumber(string policyNumber)
         {
             var response = await _policyService.GetPolicyByNumber(policyNumber, Context);
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        } [HttpGet]
+        public async Task<IActionResult> GetPolicyDetailsByNumber(string policyNumber)
+        {
+           
+            var response = await _policyService.GetPolicyDetailsByNumber(policyNumber, Context);
             if (response != null)
             {
                 return Ok(response);
@@ -368,6 +378,30 @@ namespace iNube.Services.Policy.Controllers.Policy
             await _policyService.ModifyInsurabableItem(modifydata,Context);
             return Ok();
         }
+        [HttpPut]
+        public async Task<IActionResult> UpdateProposal(object modifydata)
+        {
+          
+            var response=await _policyService.UpdateProposal(modifydata,Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.Updated:
+                    return Ok(response);
+                case BusinessStatus.InputValidationFailed:
+                    return BadRequest(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.Error:
+                    return BadRequest(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized(response);
+                case BusinessStatus.PreConditionFailed:
+                    return Ok(response);
+
+                default:
+                    return NotFound(response);
+            }
+        }
 
         //Get InsurableItem Details
         [HttpGet]
@@ -381,9 +415,6 @@ namespace iNube.Services.Policy.Controllers.Policy
             }
             return NotFound();
         }
-
-
-
 
         //Premium Calculation
 
@@ -402,5 +433,79 @@ namespace iNube.Services.Policy.Controllers.Policy
             var SumInsured = await _policyService.UpdateSumInsured(PolicyNumber, amount, Context);
             return Ok(SumInsured);
         }
+        //Create Proposal
+        [HttpPost]
+        public async Task<IActionResult> CreateProposal([FromBody]dynamic policyDTO)
+        {
+            var response = await _policyService.CreateProposal(policyDTO, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return BadRequest(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.Error:
+                    return BadRequest(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized(response);
+                case BusinessStatus.PreConditionFailed:
+                    return Ok(response);
+
+                default:
+                    return NotFound(response);
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetRiskItemByPolicyNo(string PolicyNO)
+        {
+            var response = await _policyService.GetRiskItemByPolicyNo(PolicyNO,  Context);
+            // var txnId = response.BundleTxnId;
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetProposalDetailsByProposalNo(string proposalNo)
+        {
+            var response = await _policyService.GetProposalDetails(proposalNo, Context);
+            // var txnId = response.BundleTxnId;
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        }
+
+        //IssuePolicy
+        [HttpPut]
+        public async Task<IActionResult> IssuePolicy(dynamic IssuepolicyDTO)
+        {
+           var response= await _policyService.IssuePolicy( IssuepolicyDTO, Context);
+            return Ok(response);
+        }
+
+        //Get Proposal by Mobile No
+
+        [HttpGet]
+        public async Task<IActionResult> GetProposalByMobileNumber(string MobileNumber)
+        {
+            var response = await _policyService.GetProposalByMobileNo(MobileNumber, Context);
+            // var txnId = response.BundleTxnId;
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        }
+
+
+
+
     }
 }

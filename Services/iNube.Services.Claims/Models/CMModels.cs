@@ -95,6 +95,7 @@ namespace iNube.Services.Claims.Models
             ClaimInsurable = new List<ClaimInsurableDTO>();
             ClaimHistory = new List<ClaimsHistoryDTO>();
             Alldoc = new List<Alldoc>();
+
         }
         public int ClaimId { get; set; }
         public int ClaimStatusId { get; set; }
@@ -103,8 +104,8 @@ namespace iNube.Services.Claims.Models
         public int? ApprovedClaimAmount { get; set; }
         public string EmailId { get; set; }
         public string PolicyNumber { get; set; }
-        public string InsuredName { get; set; }
-        public decimal? ApprovedClaimAmounts { get; set; }
+       // public string InsuredName { get; set; }
+       // public decimal? ApprovedClaimAmounts { get; set; }
        // public string DmsdocId { get; set; }
        // public string DocumentName { get; set; }
 
@@ -328,6 +329,15 @@ namespace iNube.Services.Claims.Models
         public virtual ICollection<ClaimInsurableDTO> ClaimInsurable { get; set; }
         public virtual ICollection<ClaimsHistoryDTO> ClaimsHistory { get; set; }
     }
+
+    
+    public class ClaimResponses : ResponseStatus
+    {
+        public string PolicyNo { get; set; }
+        public string ClaimNumber { get; set; }
+    }
+
+
 
     public partial class ClaimDashboard
     {

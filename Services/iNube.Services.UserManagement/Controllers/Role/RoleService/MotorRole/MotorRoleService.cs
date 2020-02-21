@@ -19,6 +19,11 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MotorRole
             throw new NotImplementedException();
         }
 
+        public IEnumerable<RolesDTO> GetRolePermissionsById(string roleid,ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<RolesDTO> GetUserRole(string userId, ApiContext apiContext)
         {
             throw new NotImplementedException();

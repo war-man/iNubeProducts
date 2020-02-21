@@ -60,10 +60,11 @@ namespace inube.Services.Notification.Controllers.DMS
         }
 
         [HttpPost("[action]")]
-        public IActionResult DocumentSimpleupload(FileUploadDTO fileUploadDTO)
+        public List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO)
         {
-            _dMSService.DocumentSimpleupload(fileUploadDTO);
-            return Ok();
+           var response= _dMSService.DocumentSimpleupload(fileUploadDTO);
+
+            return response;
         }
 
         [HttpGet]

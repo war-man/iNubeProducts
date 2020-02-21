@@ -132,7 +132,6 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             return _masPermissionDTOs;
         }
 
-
         /// <summary>
         /// Assigns the permission.
         /// </summary>

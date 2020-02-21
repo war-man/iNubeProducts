@@ -455,7 +455,9 @@ namespace inube.Services.Notification.Template
                 {
                     await templateHelper.ProcessNotificationEmailAsync(templateModel.FileName, binary, model.EmailTest);
                     FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
-                     _iDMSService.DocumentSimpleupload(fileUploadDTO);
+                    ImageDTO imageDTO = new ImageDTO();
+                    imageDTO.fileUploadDTOs.Add(fileUploadDTO);
+                     _iDMSService.DocumentSimpleupload(imageDTO);
                 }
                 return new ResponseStatus() { Status = BusinessStatus.Created, MessageKey = content.FileName };
             }

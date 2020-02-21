@@ -78,93 +78,121 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         public async Task<RatingRulesResponse> CreateRatingRules(RatingDTO ratingDto, ApiContext apiContext)
         {
             _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            RatingDetailDTO ratingDetails = new RatingDetailDTO();
-            var name = _context.TblParameterSet.Where(x => x.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)).Select(x => x.ParameterSetName).Single();
 
-            Dictionary<decimal, String> dict = new Dictionary<decimal, string>();
-            var parameterDetails = (from tblRateSet in _context.TblParameterSet
-                                    join tblSetDetails in _context.TblParameterSetDetails on tblRateSet.ParameterSetId equals tblSetDetails.ParameterSetId
-                                    join tblParamerer in _context.TblRatingParameters on tblSetDetails.ParametersId equals tblParamerer.ParametersId
-                                    where tblRateSet.ParameterSetName == name
-                                    // where tblRateSet.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)
-                                    select new ParameterList
-                                    {
-                                        RatingParameterId = tblParamerer.ParametersId,
-                                        RatingParamName = tblParamerer.ParameterName
-                                    }).ToList();
-
-            try
+            
+            if (ratingDto.RateObj != "")
             {
-                if (ratingDto.IsParameter == false)
-                {
+                RatingDetailDTO ratingDetails = new RatingDetailDTO();
+                var name = _context.TblParameterSet.Where(x => x.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)).Select(x => x.ParameterSetName).Single();
 
-                }
-                else
-                {
 
-                    try
-                    {
-                        foreach (var item in ratingDto.DynamicList)
-                        {
-                            foreach (var itemDetail in item)
-                            {
-                                // Create object for RatingRulesDTO
-                                RatingRulesDTO ratingRulesDTO = new RatingRulesDTO();
+                //var name = _context.TblParameterSet.Where(x => x.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)).Select(x => x.ParameterSetName).Single();
 
-                                foreach (var property in itemDetail)
-                                {
-                                    if (property.Name.ToString() == "Rate")
-                                    {
-                                        ratingRulesDTO.Rate = property.Value.ToString();
-                                    }
-                                    else
-                                    {
-                                        RatingRuleConditionsDTO ruleConditionsDTO = new RatingRuleConditionsDTO();
-                                        var str = property.Name.ToString();
-                                        var result = str.Substring(str.Length - 2);
-                                        if (result == "To")
+                Dictionary<decimal, String> dict = new Dictionary<decimal, string>();
+                var parameterDetails = (from tblRateSet in _context.TblParameterSet
+                                        join tblSetDetails in _context.TblParameterSetDetails on tblRateSet.ParameterSetId equals tblSetDetails.ParameterSetId
+                                        join tblParamerer in _context.TblRatingParameters on tblSetDetails.ParametersId equals tblParamerer.ParametersId
+                                        where tblRateSet.ParameterSetName == name
+                                        // where tblRateSet.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)
+                                        select new ParameterList
                                         {
-                                            ruleConditionsDTO.ConditionValueTo = property.Value.ToString();
+                                            RatingParameterId = tblParamerer.ParametersId,
+                                            RatingParamName = tblParamerer.ParameterName
+                                        }).ToList();
+
+                try
+                {
+                    if (ratingDto.IsParameter == false)
+                    {
+
+                    }
+                    else
+                    {
+
+                        try
+                        {
+                            foreach (var item in ratingDto.DynamicList)
+                            {
+                                foreach (var itemDetail in item)
+                                {
+                                    // Create object for RatingRulesDTO
+                                    RatingRulesDTO ratingRulesDTO = new RatingRulesDTO();
+
+                                    foreach (var property in itemDetail)
+                                    {
+                                        if (property.Name.ToString() == "Rate")
+                                        {
+                                            ratingRulesDTO.Rate = property.Value.ToString();
                                         }
                                         else
                                         {
-                                            ruleConditionsDTO.ConditionValueFrom = property.Value.ToString();
+                                            RatingRuleConditionsDTO ruleConditionsDTO = new RatingRuleConditionsDTO();
+                                            var str = property.Name.ToString();
+                                            var result = str.Substring(str.Length - 2);
+                                            if (result == "To")
+                                            {
+                                                ruleConditionsDTO.ConditionValueTo = property.Value.ToString();
+                                            }
+                                            else
+                                            {
+                                                ruleConditionsDTO.ConditionValueFrom = property.Value.ToString();
+                                            }
+
+                                            var spl = property.Name.Split(' ')[0];
+                                            ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName.Remove(it.RatingParamName.Length - 1) == spl.ToString()).RatingParameterId;//add
+
+
+                                            ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
                                         }
-
-                                        var spl = property.Name.Split(' ')[0];
-                                        ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName.Remove(it.RatingParamName.Length - 1) == spl.ToString()).RatingParameterId;//add
-
-
-                                        ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
                                     }
+                                    ratingDto.RatingRules.Add(ratingRulesDTO);
                                 }
-                                ratingDto.RatingRules.Add(ratingRulesDTO);
                             }
                         }
+                        catch (Exception ex)
+                        {
+
+
+                        }
+
+
+                        var res = 1;
                     }
-                    catch (Exception ex)
-                    {
 
+                    var dto = _mapper.Map<TblRating>(ratingDto);
+                    // dto.DynamicList.push();
+                    //dto[0]. = ratingDto[0].RatingRules[0].RatingRuleConditions;
+                    dto.RateObj = _context.TblParameterSet.First(x => x.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)).ParameterSetName;
+                    _context.TblRating.Add(dto);
+                    _context.SaveChanges();
+                    var acntDTO = _mapper.Map<RatingDTO>(dto);
+                    return new RatingRulesResponse { Status = BusinessStatus.Created, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
 
-                    }
-
-
-                    var res = 1;
                 }
+                catch (Exception ex)
+                {
 
+                }
+                //if
+            }
+            else {
+                try { 
                 var dto = _mapper.Map<TblRating>(ratingDto);
                 // dto.DynamicList.push();
                 //dto[0]. = ratingDto[0].RatingRules[0].RatingRuleConditions;
-                dto.RateObj = _context.TblParameterSet.First(x => x.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)).ParameterSetName;
+                //dto.RateObj = _context.TblParameterSet.First(x => x.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)).ParameterSetName;
                 _context.TblRating.Add(dto);
                 _context.SaveChanges();
                 var acntDTO = _mapper.Map<RatingDTO>(dto);
                 return new RatingRulesResponse { Status = BusinessStatus.Created, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
             }
-            catch (Exception ex)
+                catch (Exception ex)
             {
 
             }
+
+        }
+
             return null;
         }
 
@@ -457,6 +485,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<object> CheckCalculationRate(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext)
         {
+            ResponseStatus errorResponse = new ResponseStatus();
             ResponseStatus response = new ResponseStatus();
             ResponseStatus rateresponse = new ResponseStatus();
             _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
@@ -524,20 +553,29 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     }
                     catch(Exception ex)
                     {
-
+                        errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+                        return errorResponse;
                     }
                 }
                 else
                 {
-                    dynamic sendRate = new ExpandoObject();
-                    var rating = _context.TblRating.FirstOrDefault(item => item.RateName== ConfigParamName);
-                    ratingId = rating.RatingId.ToString();
-                    dynamic serlise = JsonConvert.SerializeObject(sendRate);
-                    dynamic dcRateExec = JsonConvert.DeserializeObject(serlise);
-                    rateresponse = await CheckRuleSets(rating.RatingId.ToString(), dcRateExec, apiContext);
-                    if (!rate.ContainsKey(ConfigParamName))
+                    try
                     {
-                        rate.Add(ConfigParamName, rateresponse.ResponseMessage);
+                        dynamic sendRate = new ExpandoObject();
+                        var rating = _context.TblRating.FirstOrDefault(item => item.RateName == ConfigParamName);
+                        ratingId = rating.RatingId.ToString();
+                        dynamic serlise = JsonConvert.SerializeObject(sendRate);
+                        dynamic dcRateExec = JsonConvert.DeserializeObject(serlise);
+                        rateresponse = await CheckRuleSets(rating.RatingId.ToString(), dcRateExec, apiContext);
+                        if (!rate.ContainsKey(ConfigParamName))
+                        {
+                            rate.Add(ConfigParamName, rateresponse.ResponseMessage);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+                        return errorResponse;
                     }
                 }
             }
@@ -555,10 +593,18 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 json_Dictionary.Add(dict.Key, dict.Value);
                 calcultion.Add(new CalculationResult { Entity = dict.Key, EValue = dict.Value.ToString() });
             }
-            foreach (var dictrate in rate)
+            try
             {
-                json_Dictionary.Add(dictrate.Key, dictrate.Value);
-                calcultion.Add(new CalculationResult { Entity = dictrate.Key, EValue = dictrate.Value.ToString() });
+                foreach (var dictrate in rate)
+                {
+                    json_Dictionary.Add(dictrate.Key, dictrate.Value);
+                    calcultion.Add(new CalculationResult { Entity = dictrate.Key, EValue = dictrate.Value.ToString() });
+                }
+            }
+            catch(Exception ex)
+            {
+                errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+                return errorResponse;
             }
 
             var expression = "";
@@ -587,10 +633,12 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             }
             catch(Exception ex)
             {
-                calcultion.Add(new CalculationResult { Entity = "Error", EValue = "Configured Expression is Wrong,Modify the Expression" });
-                return calcultion.ToList();
+                //calcultion.Add(new CalculationResult { Entity = "Error", EValue = "Incorrect Input Parameter" });
+                //return calcultion.ToList();
+                errorResponse.ResponseMessage = "Incorrect Input Parameter";
+                return errorResponse;
             }
-            
+
             //Dictionary<string, string> myResult = new Dictionary<string, string>();
             //foreach (var dicItem in calcultion)
             //{
@@ -604,7 +652,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             //{
             //    calcultion.Add(new CalculationResult { Entity = dicIyemData.Key, EValue = dicIyemData.Value.ToString() });
             //}
-
+            
             return calcultion.ToList();
             //return reslt.ToList();
         }
@@ -630,6 +678,36 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     return value.ToString();
                 throw new Exception($"Unknown key {key}");
             });
+        }
+        //For Year Calculation (Ellustration)
+        public static Dictionary<string,object> CalYear(string Year,string Principle ,string RateInterest,string EMI)
+        {
+            Dictionary<string, object> resultValue = new Dictionary<string, object>();
+            Dictionary<string, object> json = new Dictionary<string, object>();
+            try
+            {
+                json.Add("Year", Year);
+                json.Add("Principle", Principle);
+                json.Add("RateInterest", RateInterest);
+                json.Add("EMI", EMI);
+                var resultExpression = "";
+                string yearExpression = "{EMI}-({Principle}*{RateInterest}/100)/12";
+                for (int i = 1; i <= Convert.ToInt64(Year); i++)
+                {
+                    resultExpression = Replace(yearExpression, json);
+                    double calResult = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
+                    resultValue.Add("Balance"+i, calResult);
+                    foreach (var it in json)
+                    {
+                        resultValue.Add(it.Key+i, it.Value);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return resultValue;
         }
         //RateRule
         public async Task<IEnumerable<GetParamSetDetailDTO>> GetRateRule(ApiContext apiContext)

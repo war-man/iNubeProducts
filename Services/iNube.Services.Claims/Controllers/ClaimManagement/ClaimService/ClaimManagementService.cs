@@ -25,7 +25,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<List<FinanceProcessDTO>> GetSettledFinanceDataAsync(SearchFinanceRequest financeRequest, ApiContext apiContext);
         Task<List<FinanceProcessDTO>> GetPaymentFinanceDataAsync(SearchFinanceRequest financeRequest, ApiContext apiContext);
         Task<ClaimProcessDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext);
-        Task<ClaimsDTO> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext);
+        Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext);
         Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext);
         Task<IEnumerable<SearchDTO>> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext);
         Task<List<object>> ClaimDetails(decimal ClaimId, ApiContext apiContext);
@@ -66,7 +66,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             return await _productService(apiContext.ProductType).CreateClaimAsync(policyDetail, apiContext);
         }
 
-        public async Task<ClaimsDTO> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext)
+        public async Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).ClaimIntimate(claims, apiContext);
         }

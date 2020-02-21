@@ -361,5 +361,10 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         {
             throw new NotImplementedException();
         }
+
+        public Task<PolicyAgreementResponse> EditAssignProductDate(EditAssignProductDTO policyAgreementDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -67,7 +67,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     userDetails.CreatedBy = apiContext.UserId;
                     userDetails.CreatedDate = DateTime.Now;
                     userDetails.IsActive = true;
-                    if(userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
+                    if (userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
                     {
                         userDetails.OrganizationId = userDetails.OrganizationId;
                     }
@@ -86,7 +86,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _users.PasswordHash = Utilities.GenerateDefaultPassword();
                         emailTest.To = userDetails.Email;
                         emailTest.Subject = "User profile creation";
-                        emailTest.Message = "Your account has been created with Username:" + _users.UserName + " and password: mica123 \n" + "This is a system generated password. Kindly reset the same after log in."; 
+                        emailTest.Message = "Your account has been created with Username:" + _users.UserName + " and password: mica123 \n" + "This is a system generated password. Kindly reset the same after log in.";
                         _context.AspNetUsers.Add(_users);
                     }
                     _context.SaveChanges();
@@ -231,17 +231,30 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var _users = _context.TblUserDetails.OrderByDescending(u => u.CreatedDate).Select(x => x);
+            if (apiContext.OrgId > 0 && apiContext.PartnerId > 0)
+            {
+                _users = _users.Where(u => (u.OrganizationId == apiContext.OrgId && u.PartnerId == apiContext.PartnerId));
+            }
+            //else
+            //{
+            //    _users = _users.Where(pr => (pr.OrganizationId == apiContext.OrgId && pr.PartnerId == apiContext.PartnerId));
+            //}
+            else if (apiContext.OrgId > 0)
+            {
+                _users = _users.Where(u => u.OrganizationId == apiContext.OrgId);
+            }
+
             if (searchRequest.Status == 1009)
             {
-                _users = _users.Where(u => u.IsActive==true);
+                _users = _users.Where(u => u.IsActive == true);
             }
             if (searchRequest.Status == 1010)
             {
                 _users = _users.Where(u => u.IsActive == false);
             }
-            if(searchRequest.Status==1011)
+            if (searchRequest.Status == 1011)
             {
-                 _users = _context.TblUserDetails.OrderByDescending(u => u.CreatedDate).Select(x => x);
+                _users = _context.TblUserDetails.OrderByDescending(u => u.CreatedDate).Select(x => x);
             }
             if (!string.IsNullOrEmpty(searchRequest.FirstName))
             {
@@ -601,7 +614,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 return new VerifyOTPResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"Invalid OTP" }; ;
             }
         }
-        
+
         public UserEmailResponse UserEmailValidations(string emailid, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
@@ -621,7 +634,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
 
             var user = _context.TblUserDetails.Where(item => item.UserId == Id).FirstOrDefault();
-            user.IsActive = (user.IsActive==false? user.IsActive=true: user.IsActive=false);
+            user.IsActive = (user.IsActive == false ? user.IsActive = true : user.IsActive = false);
             _context.TblUserDetails.Update(user);
 
             var tbl_userdata = _context.AspNetUsers.Where(item => item.Id == Id).FirstOrDefault();
@@ -653,7 +666,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             //var claimdetails = _context.TblClaimdoc.SingleOrDefault(x => x.ClaimId == ClaimId);
-            
+
             var users = _context.TblUserDetails.SingleOrDefault(a => a.UserId == image.UserId);
             users.ProfileImage = image.Document;
 
@@ -668,7 +681,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         }
 
         //Get User name from CreatedUserId for Billing
-        public  UserNameById GetUserNameById(string Id, ApiContext apiContext)
+        public UserNameById GetUserNameById(string Id, ApiContext apiContext)
         {
             try
             {
@@ -680,11 +693,11 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 var data = _mapper.Map<UserNameById>(UserName);
                 return data;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
-            
+
         }
     }
 }

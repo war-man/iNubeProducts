@@ -37,8 +37,11 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             var cdaccount = _context.TblCdaccounts.FirstOrDefault(p => p.AccountNo == cdAccountNumber);
             if (cdaccount != null)
             {
+                //For Translation
+                List<string> lstErrParameters = new List<string>();
+                lstErrParameters.Add(cdAccountNumber);
                 Errors.Add(new ErrorInfo { ErrorCode = "CdAccount", ErrorMessage = $"CD Account {cdAccountNumber} already exist" });
-                return new CDAccountResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"", Errors = Errors };
+                return new CDAccountResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"", Errors = Errors , MessageKey = "AccountExists", MessageValue = lstErrParameters };
             }
             var productAssign = _context.TblPolicyAgreement.FirstOrDefault(p => p.PolicyNo == cdAccountNumber);
             if (productAssign != null && cdaccount==null)
@@ -54,11 +57,20 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 _context.TblCdaccounts.Add(account);
                 _context.SaveChanges();
                 cdAccountsDTO.Cdid = account.Cdid;
-                return new CDAccountResponse { Status = BusinessStatus.Created, ResponseMessage = $"CD Account No {cdAccountNumber} created successfully for Partner {cdAccountsDTO.PartnerName} and Product  {cdAccountsDTO.ProductName}" };
+
+                //For Translation
+                List<string> lstParameters = new List<string>();
+                lstParameters.Add(cdAccountNumber);
+                lstParameters.Add(cdAccountsDTO.PartnerName);
+                lstParameters.Add(cdAccountsDTO.ProductName);
+                return new CDAccountResponse { Status = BusinessStatus.Created, ResponseMessage = $"CD Account No {cdAccountNumber} created successfully for Partner {cdAccountsDTO.PartnerName} and Product  {cdAccountsDTO.ProductName}" ,MessageKey="AccountCreated",MessageValue=lstParameters};
             }
             //var Errors = new List<ErrorInfo>();
-            Errors.Add(new ErrorInfo { ErrorCode = "CdAccount", ErrorMessage = $"CDAccount {cdAccountNumber} already exist!" });
-            return new CDAccountResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"", Errors = Errors };
+            //For Translation
+            List<string> lstErrorParameters = new List<string>();
+            lstErrorParameters.Add(cdAccountNumber);
+            Errors.Add(new ErrorInfo { ErrorCode = "CdAccount", ErrorMessage = $"CDAccount {cdAccountNumber} already exist!"});
+            return new CDAccountResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"", Errors = Errors ,MessageKey="AccountExists",MessageValue= lstErrorParameters };
         }
 
         //FOR ACCOUNTING TRANSACTION
@@ -592,9 +604,15 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 //ACCOUNTING TRANSACTION CALLING
                 var account = AccountMap(apiContext, cdTransactions);
 
-                return new ReplnishCDResponse { Status = BusinessStatus.Created, cdReplnish = cdReplnish, Id = cdTransactions.TxnId.ToString(), ResponseMessage = $"CD Replenishment for {cdTransactions.TxnAmount} is done successfully!" };
+                //For Translation
+                List<string> lstParameters = new List<string>();
+                lstParameters.Add(cdTransactions.TxnAmount.ToString());
+
+                return new ReplnishCDResponse { Status = BusinessStatus.Created, cdReplnish = cdReplnish, Id = cdTransactions.TxnId.ToString(), ResponseMessage = $"CD Replenishment for {cdTransactions.TxnAmount} is done successfully!",MessageKey="CDReplenish", MessageValue=lstParameters };
             }
-            return new ReplnishCDResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"No records found having account number {cdTransactions.AccountNo} " };
+            List<string> listParameters = new List<string>();
+            listParameters.Add(cdTransactions.AccountNo);
+            return new ReplnishCDResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"No records found having account number {cdTransactions.AccountNo} " ,MessageKey="NoRecordsAcc", MessageValue= listParameters };
         }
 
         public async Task<CdAccountsDTO> GetCDAccountById(decimal Cdid, ApiContext apiContext)

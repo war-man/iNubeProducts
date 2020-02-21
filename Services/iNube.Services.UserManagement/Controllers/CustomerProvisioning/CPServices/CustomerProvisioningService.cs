@@ -129,7 +129,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             userDetailsDTO.Email = userdetails.EmailId;
             userDetailsDTO.PanNo = userdetails.PanNo;
             userDetailsDTO.BranchName = userdetails.BranchName;
-            userDetailsDTO.RoleId = "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020"; //Role Admin
+            userDetailsDTO.RoleId = "efffe944-6a34-433b-964f-9311c90192eb"; //Role Customer Admin
             userDetailsDTO.PartnerId = 0;
             userDetailsDTO.OrganizationId = customerProvisioningDTO.CustomerId;
             userDTO.UserDetails.Add(userDetailsDTO);

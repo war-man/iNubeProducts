@@ -911,7 +911,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             return ClaimDTO;
         }
 
-        public async Task<ClaimsDTO> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext)
+        public async Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext)
         {
 
             List<ClaimInsurableDTO> claimInsurableDTO = new List<ClaimInsurableDTO>();
@@ -922,10 +922,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PolicyNumber", PropertyName = "PolicyNumber", ErrorMessage = $"PolicyNumber : {claims.PolicyNumber} Already Exist" };
 
-                ClaimsDTO claimsDTO = new ClaimsDTO();
+                ClaimResponses claimsDTO = new ClaimResponses();
 
                 claimsDTO.Errors.Add(errorInfo);
-                return new ClaimsDTO { Status = BusinessStatus.NotFound, Errors = claimsDTO.Errors };
+                return new ClaimResponses { Status = BusinessStatus.NotFound, Errors = claimsDTO.Errors };
             }
 
             UpdateClaimData(claims, apiContext);
@@ -939,7 +939,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
 
            
-            var _claimsDTOs = _mapper.Map<ClaimsDTO>(_tblclaims);
+            var _claimsDTOs = _mapper.Map<ClaimResponses>(_tblclaims);
             _claimsDTOs.Status = BusinessStatus.Created;
             _claimsDTOs.ResponseMessage = "record created..";
 
@@ -1599,18 +1599,21 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var Insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == claimsDTO.ClaimId).ToList();
             EmailTest emailTest = new EmailTest();
             TblClaimHistory claimsHistory = new TblClaimHistory();
-            TblClaimdoc claimdoc = new TblClaimdoc();
+            List<ClaimdocDTO> _claimdoc = new List<ClaimdocDTO>();
 
             var oldstatusId = ClaimApproval.ClaimStatusId;
             // Get Clone 
             //  var hisClaimApproval= Clone.ClaimApproval.
 
             TblClaims claimsprocess = _mapper.Map<TblClaims>(ClaimApproval);
+            
             claimsprocess.ModifiedBy = apiContext.UserId;
             claimsprocess.ModifiedDate = DateTime.Now;
             claimsprocess.ClaimStatusId = claimsDTO.ClaimStatusId;
             claimsprocess.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
             claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
+            //claimsprocess.TblClaimdoc.Add(tblClaimdoc);
+            
             if (claimsprocess.ClaimStatusId == 9)
             {
                 emailTest.To = claimsDTO.EmailId;
@@ -1634,6 +1637,19 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 item.ApprovedClaimAmounts = claimsDTO.ClaimInsurable.FirstOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId).ApprovedClaimAmounts;
                 _context.TblClaimInsurable.Update(item);
             }
+
+            foreach (var item in claimsDTO.Alldoc)
+            {
+                TblClaimdoc Claimdoc = new TblClaimdoc();
+
+                Claimdoc.DmsdocId = item.DmsdocId;
+                Claimdoc.DocumentName = item.DocumentName;
+                Claimdoc.ClaimId = claimsDTO.ClaimId;
+                _context.TblClaimdoc.Add(Claimdoc);
+                _context.SaveChanges();
+
+            }
+
             //adding new record to tblhistory on updating claimstatus of existing claim from tblclaims
             claimsHistory.ClaimId = ClaimApproval.ClaimId;
             //claimsHistory.ClaimStatusId = claimsDTO.ClaimStatusId;
@@ -1657,17 +1673,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             claimsHistory.Active = true;
 
-            //updating doc details in tblclaimdoc 
-            //claimdoc.ClaimId = ClaimApproval.ClaimId;
-            //claimdoc.DmsdocId = claimsDTO.DmsdocId;
-            //claimdoc.DocumentName = claimsDTO.DocumentName;
-
-
+            
             _context.TblClaimHistory.Add(claimsHistory);
-           // _context.TblClaimdoc.Update(claimdoc);
+           
             _context.SaveChanges();
 
             var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
+
             //Accouting Transaction 
             var account = AccountMapApproval(apiContext, claimsDTO);
             return _claimprocess;

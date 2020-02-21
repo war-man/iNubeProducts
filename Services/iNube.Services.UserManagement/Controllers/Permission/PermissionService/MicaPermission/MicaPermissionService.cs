@@ -105,7 +105,6 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             return _masPermissionDTOs;
         }
 
-
         /// <summary>
         /// Assigns the permission.
         /// </summary>
@@ -181,6 +180,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             return new UserPermissionResponse { Status = BusinessStatus.Created, Id = userPermissions?.UserPermissionsId.ToString(), ResponseMessage = $"Assigned Permissions successfully!!" };
 
         }
+
         public IEnumerable<MasPermissionDTO> GetRolePermissions(UserRoleMapDTO userPermissionDTO, ApiContext apiContext)
         {
             return GetUserRolePermissions(userPermissionDTO, apiContext);
@@ -260,6 +260,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                            });
             return _masPermissionDTOs;
         }
+
         private IEnumerable<MasPermissionDTO> GetMenuChildren(IEnumerable<MasPermissionDTO> permissions, int parentId, string roleId)
         {
             IEnumerable<MasPermissionDTO> masPermissionDTOs = permissions
@@ -287,6 +288,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                     });
             return masPermissionDTOs;
         }
+
         private IEnumerable<MasPermissionDTO> GetChildren(IEnumerable<TblMasPermission> permissions, int parentId)
         {
             IEnumerable<MasPermissionDTO> masPermissionDTOs = permissions
@@ -316,7 +318,29 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             TblUserPermissions newRolePermissions = null;
+            var permission = _context.TblUserPermissions.Where(p => p.RoleId == permissionIds.RoleId).Select(p => p);
+            if (permission != null)
+            {
+                var existingPerm = _context.TblUserPermissions.Where(r => r.RoleId == permissionIds.RoleId && r.UserorRole == "Role").ToList();
+                //Delete which are not in current permissions--
+                var delPermission = existingPerm.Where(m => m.RoleId == permissionIds.RoleId && m.UserorRole == "Role").ToList();
+                foreach (var perm in delPermission)
+                {
+                    _context.TblUserPermissions.Remove(perm);
+                }
+            }
 
+            foreach (var permissionId in permissionIds.PermissionIds)
+            {
+                newRolePermissions = new TblUserPermissions();
+                newRolePermissions.PermissionId = permissionId;
+                newRolePermissions.RoleId = permissionIds.RoleId;
+                newRolePermissions.UserorRole = "Role";
+                // userPermissions.CreatedBy = CreatedBy;
+                newRolePermissions.CreatedDate = DateTime.Now;
+                newRolePermissions.Status = true;
+                _context.TblUserPermissions.Add(newRolePermissions);
+            }
             //foreach (var item in permissionIds.RolePermissionIds)
             //{
             //    var newPermission = item.PermissionIds.ToList();
@@ -334,17 +358,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             //        newPermission.Remove((int)incPerm.PermissionId);
             //    }
             //Add new record
-            foreach (var permissionId in permissionIds.PermissionIds)
-            {
-                newRolePermissions = new TblUserPermissions();
-                newRolePermissions.PermissionId = permissionId;
-                newRolePermissions.RoleId = permissionIds.RoleId;
-                newRolePermissions.UserorRole = "Role";
-                // userPermissions.CreatedBy = CreatedBy;
-                newRolePermissions.CreatedDate = DateTime.Now;
-                newRolePermissions.Status = true;
-                _context.TblUserPermissions.Add(newRolePermissions);
-            }
+
             //}
             _context.SaveChanges();
             return new NewRolePermissionResponse { Status = BusinessStatus.Created, Id = newRolePermissions?.UserPermissionsId.ToString(), ResponseMessage = $"Assigned Permissions successfully!!" };

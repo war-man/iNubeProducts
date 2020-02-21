@@ -415,8 +415,6 @@ namespace iNube.Services.UserManagement.Entities
 
                 entity.Property(e => e.AppId).HasColumnName("AppID");
 
-                entity.Property(e => e.CdaccountDashboard).HasColumnName("CDAccountDashboard");
-
                 entity.Property(e => e.Collapse)
                     .HasMaxLength(100)
                     .IsUnicode(false);

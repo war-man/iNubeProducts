@@ -92,7 +92,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             }
             //var res = _mapper.Map<TblProductClausesWarrentiesExclusions>(objProductmodel.TblProductClausesWarrentiesExclusions);
             _context.TblProductClausesWarrentiesExclusions.UpdateRange(objProductmodel.TblProductClausesWarrentiesExclusions);
-          //  _context.SaveChanges();
+            //  _context.SaveChanges();
+            //var id = 0;
             foreach (var item in objProductmodel.TblProductPremium)
             {
                 if (item.LevelId == 51)
@@ -109,10 +110,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     item.RefId = Convert.ToInt32(objProductmodel.TblProductInsurableItems.SelectMany(p => p.TblProductCovers).FirstOrDefault(s => s.CoverTypeId == item.SubLevelId).CoverId);
 
                 }
-                //else if (item.LevelId == 62)
-                //{
-                //    item.RefId = Convert.ToInt32(objProductmodel.TblProductInsurableItems.SelectMany(p => p.TblProductCovers).FirstOrDefault(s => s.CoverTypeId == item.SubLevelId).CoverId);
-                //}
+                else if (item.LevelId == 62)
+                {
+                    //id = Convert.ToInt32(objProductmodel.TblProductInsurableItems.SelectMany(p => p.TblProductCovers).FirstOrDefault(s => s.CoverTypeId == item.SubLevelId).CoverId);
+                    item.RefId = 0;
+                    //Convert.ToInt32(_context.TblProductBenefits.SingleOrDefault(s => s.CoverId == id).BenefitId);
+
+                }
             }
             _context.TblProductPremium.UpdateRange(objProductmodel.TblProductPremium);
           //  _context.SaveChanges();
@@ -1124,7 +1128,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             var data = _context.TblProducts.Any(e => e.ProductCode == code);
             if (data == true)
             {
-                return new ProductResponse() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Product Code {code} already taken" };
+                return new ProductResponse() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Product Code {code} already exist" };
             }
             else
             {

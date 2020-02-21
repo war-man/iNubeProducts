@@ -299,7 +299,10 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                                            PolicyStartDate=a.PolicyStartDate,
                                            PolicyEndDate=a.PolicyEndDate,
                                            CreatedDate=a.CreatedDate,
-                                           ProductIdPk=a.ProductIdPk
+                                           ProductIdPk=a.ProductIdPk,
+                                           PolicyId=a.PolicyId,
+                                           PolicyNo=a.PolicyNo,
+                                           AgentId=a.AgentId
                                        }).ToList();
             var productNameList = await _integrationService.GetProductMasterAsync(apiContext);
             if (productNameList!=null) { 
@@ -867,7 +870,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                     AddProperty(insurableDetail, item.InputType, item.UserInputType);
                 }
                 InsurableFields.Add(insurableDetail);
-                AddProperty(insurableItem, "InsurableFields", InsurableFields);
+                AddProperty(insurableItem, "RiskItems", InsurableFields);
 
                 //Cover Details
                 dynamic Covers = new List<dynamic>();
@@ -950,7 +953,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                     AddProperty(insurableDetail, item.InputType, item.UserInputType);
                 }
                 InsurableFields.Add(insurableDetail);
-                AddProperty(insurableItem, "InsurableFields", InsurableFields);              
+                AddProperty(insurableItem, "RiskItems", InsurableFields);              
                 
                 insurableItems.Add(insurableItem);
             }
@@ -998,7 +1001,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                 //dynamic insurableDetail = new ExpandoObject();
                 var insurableDetail = "IdentificationNumber" + ":" + "string";
                 InsurableFields.Add(insurableDetail);
-                AddProperty(insurableItem, "InsurableFields", InsurableFields);
+                AddProperty(insurableItem, "RiskItems", InsurableFields);
 
                 insurableItems.Add(insurableItem);
             }
@@ -1245,6 +1248,23 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                 throw ex;
             }
 
+        }
+
+        public async Task<PolicyAgreementResponse> EditAssignProductDate(EditAssignProductDTO policyAgreementDTO,ApiContext apiContext)
+        {
+            _context= (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            var policyAgreement = _context.TblPolicyAgreement.Find(policyAgreementDTO.PolicyId);
+
+            if (policyAgreement == null)
+                throw new AppException("Record not found");
+
+            // update policy end date
+            policyAgreement.PolicyEndDate = policyAgreementDTO.PolicyEndDate;
+
+            _context.TblPolicyAgreement.Update(policyAgreement);
+            _context.SaveChanges();
+            return new PolicyAgreementResponse() {Status=BusinessStatus.Updated, ResponseMessage = "Policy End date updated successfully!" , editAssign = policyAgreementDTO , MessageKey ="DateModifiedSuccessfully"};
         }
     }
 }

@@ -206,7 +206,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             var roleName = _context.AspNetRoles.FirstOrDefault(u => u.Id == userDetails.RoleId).Name;
             var issuer = _config["Jwt:Issuer"];
             var audience = _config["Jwt:Audience"];
-            var expiry = isTokenExpire ? DateTime.Now.AddMinutes(120) : DateTime.Now.AddYears(3);
+            var expiry = isTokenExpire ?  DateTime.Now.AddYears(3):DateTime.Now.AddMinutes(120);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             // Add standard claims

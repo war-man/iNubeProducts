@@ -22,6 +22,9 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<TblClaims, ClaimsDTO>();
             CreateMap<ClaimsDTO, TblClaims>();
 
+            CreateMap<TblClaims, ClaimResponses>();
+            CreateMap<ClaimResponses, TblClaims>();
+
             CreateMap<TblClaims, SearchDTO>();
             CreateMap<SearchDTO, TblClaims>();
 
@@ -79,8 +82,6 @@ namespace iNube.Services.Claims.Helpers
             .ForMember(dest => dest.TblClaimdoc, opt => opt.MapFrom(src => src.Alldoc))
             .ReverseMap();
 
-            CreateMap<ClaimProcessDTO, Alldoc>();
-            CreateMap<Alldoc, ClaimProcessDTO>();
 
             CreateMap<TblClaimDetails, ClaimDetailsDTO>();
             CreateMap<ClaimDetailsDTO, TblClaimDetails>();

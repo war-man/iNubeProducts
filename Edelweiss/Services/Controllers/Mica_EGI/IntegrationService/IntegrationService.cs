@@ -119,7 +119,6 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
             HttpClient client = new HttpClient();
             //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             //client.BaseAddress = new Uri(url);
             //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
             using (var response = await client.GetAsync(url))

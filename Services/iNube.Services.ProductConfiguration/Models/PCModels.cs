@@ -669,6 +669,7 @@ namespace iNube.Services.ProductConfiguration.Models
         //public string BenefitType { get; set; }
         //public string Product { get; set; }
         public decimal? CoverId { get; set; }
+        public decimal? PremiumAmount { get; set; }
 
         public virtual ICollection<BenifitRangeDetails> BenifitRangeDetails { get; set; }
     }

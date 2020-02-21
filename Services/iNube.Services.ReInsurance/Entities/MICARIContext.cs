@@ -578,7 +578,6 @@ namespace iNube.Services.ReInsurance.Entities
                 entity.HasOne(d => d.Rimapping)
                     .WithMany(p => p.TblRimappingDetail)
                     .HasForeignKey(d => d.RimappingId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_RIMappingDetail");
 
                 entity.HasOne(d => d.TreatyGroup)

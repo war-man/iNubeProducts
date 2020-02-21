@@ -253,7 +253,16 @@ namespace iNube.Services.Partners.Controllers.Partner
             return Ok(response);
         }
 
-         [HttpGet]
+        [HttpPut]
+        public async Task<IActionResult> EditAssignProductDate(decimal PolicyId,EditAssignProductDTO policyAgreementDTO)
+        {
+           policyAgreementDTO.PolicyId = PolicyId;
+           var response= await _partnerService.EditAssignProductDate(policyAgreementDTO, Context);
+            return Ok(response);
+
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
         {

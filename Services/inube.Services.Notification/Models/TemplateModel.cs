@@ -42,12 +42,26 @@ namespace inube.Services.Notification.Models
         public string SMSMessage { get; set; }
     }
     [BsonIgnoreExtraElements]
+
+    public class ImageDTO
+    {
+        public ImageDTO()
+        {
+            fileUploadDTOs = new List<FileUploadDTO>();
+        }
+          
+
+         public  List<FileUploadDTO> fileUploadDTOs { get; set; }
+    }
+
     public class FileUploadDTO
     {
         public string FileName { get; set; }
         public string FileExtension { get; set; }
         public byte[] FileData { get; set; }
         public string ContentType { get; set; }
+        public string Tagname { get; set; }
+        public string TagValue { get; set; }
     }
     public class PartnerEmail
     {

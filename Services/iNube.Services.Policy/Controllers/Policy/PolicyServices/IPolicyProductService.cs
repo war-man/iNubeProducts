@@ -10,9 +10,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<PolicyResponse> CreatePolicy(dynamic policyDetail, ApiContext apiContext);
 
         Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext);
+  
         Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext);
 
         Task<PolicyDTO> ModifyPolicy(string policyNumber, PolicyDTO policyDetail, ApiContext apiContext);
+        Task<PolicyResponse> IssuePolicy(dynamic IssuepolicyDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetMaster(string sMasterlist, ApiContext apiContext);
         Task<PolicyDTO> GetPolicyById(decimal policyId, ApiContext apiContext);
         Task<PolicyDTO> GetPolicyByNumber(string policyNumber, ApiContext apiContext);
@@ -44,9 +46,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext);
         Task<object> CalCulatePremium(DynamicData premiumParameter, ApiContext apiContext);
         Task<PolicyDTO> ModifyInsurabableItem(object modifydata, ApiContext apiContext);
+      
         Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
+
         Task<decimal> UpdateSumInsured (string PolicyNumber, decimal amount,ApiContext apiContext);
+        Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext);
 
+        Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
 
+        Task<List<PolicyPremiumDetailsDTO>> GetRiskItemByPolicyNo(string policyNo, ApiContext apiContext);
+        Task<ProposalResponse> UpdateProposal(object modifydata, ApiContext apiContext);
+        Task<ProposalResponse> CreateProposal(dynamic ProposalDetail, ApiContext apiContext);
+        Task<List<dynamic>> GetProposalDetails(string proposalNo, ApiContext apiContext);
     }
 }
