@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using iNube.Services.MicaExtension_EGI.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.Controllers.EGI.IntegrationServices
 {
@@ -24,69 +25,72 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
     }
     public class IntegrationService : IIntegrationService
     {
-        readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-       //readonly string productUrl = "https://localhost:44347";
-		//readonly string productUrl = "http://mica-inube-product-service.mica-internal.:9007";
+
+        private IConfiguration _configuration;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
         
-		readonly string claimUrl = "https://inubeservicesclaims.azurewebsites.net";
-        //readonly string claimUrl = "https://localhost:44344";
-		// readonly string claimUrl = "http://mica-inube-claim-service.mica-internal.:9002";
+        public IntegrationService(IConfiguration configuration)
+        {
+           
+            _configuration = configuration;
+            PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
+            BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
+            ClaimUrl = _configuration["Integration_Url:Claim:ClaimUrl"];
+            NotificationUrl = _configuration["Integration_Url:Notification:NotificationUrl"];
+            PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
+            ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
+            ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
 
-        readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
-       // readonly string policyUrl = "https://localhost:44351";
-		// readonly string policyUrl = "http://mica-inube-policy-service.mica-internal.:9006";
-
-        string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-        //string notificationUrl = "http://localhost:53000";
-		//readonly string notificationUrl = "http://mica-inube-notification-service.mica-internal.:9004";
-		
-
-        readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-        //readonly string partnerUrl = "https://localhost:44315";
-		//readonly string partnerUrl = "http://mica-inube-partner-service.mica-internal.:9005";
-
-        //readonly string UsermanangementUrl = "https://localhost:44367";
-        //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        //readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
-
-        //readonly string rating = "http://localhost:58593";
-        readonly string rating = "http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/swagger/index.html";
+        }        
 
 
         public async Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/CreatePolicy";
+            var uri = PolicyUrl + "/api/Policy/CreatePolicy";
             return await PostApiInvoke<dynamic, PolicyResponse>(uri, apiContext, policyDetail);
         }
 
         public async Task<List<PolicyDetailsDTO>> GetPolicyList(string productCode, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/GetAllPolicy?ProductCode=" + productCode;
+            var uri = PolicyUrl + "/api/Policy/GetAllPolicy?ProductCode=" + productCode;
             return await GetApiInvoke<List<PolicyDetailsDTO>>(uri, apiContext);
         }
 
         public async Task<dynamic> GenerateCDTransaction(CDDTO cdModel, ApiContext apiContext)
         {
-            var uri = partnerUrl + "/api/Accounts/GenerateCDTransaction";
+            var uri = PartnerUrl + "/api/Accounts/GenerateCDTransaction";
             return await PostApiInvoke<CDDTO, dynamic>(uri, apiContext, cdModel);
         }
 
         public async Task<dynamic> CalculatePremium(SchedulerPremiumDTO premiumDTO, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/CalCulatePremium";
+            var uri = PolicyUrl + "/api/Policy/CalCulatePremium";
 
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, premiumDTO);
         }
 
         public async Task<dynamic> GetPolicyDetails(string PolicyNo, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/GetPolicyDetailsByNumber?policyNumber" + PolicyNo;
+            var uri = PolicyUrl + "/api/Policy/GetPolicyDetailsByNumber?policyNumber" + PolicyNo;
             return await GetApiInvoke<dynamic>(uri, apiContext);
         }
 
-
-
-        ApiContext context = new ApiContext();
+        //Calculation Premium for Rating
+        public async Task<dynamic> CalCulateRatingPremium(SchedulerPremiumDTO dynamicData)
+        {
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+            var uri = PolicyUrl + "/api/Policy/CalCulatePremium";
+            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
+        }
+                   
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
@@ -236,21 +240,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
                 //throw;
             }
             return new List<TResponse>();
-        }
-
-        //Calculation Premium for Rating
-        public async Task<dynamic> CalCulateRatingPremium(SchedulerPremiumDTO dynamicData)
-        {
-            //context apicontext = new context();
-            context.OrgId = 277;
-            context.UserId = "a95d03cd-df18-4756-a577-3412b6817dd0";
-            context.Token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg";
-            context.ServerType = "1";
-            context.IsAuthenticated = true;
-            var uri = policyUrl + "/api/Policy/CalCulatePremium";
-            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, context, dynamicData);
-        }
-
+        }       
 
     }
 }
