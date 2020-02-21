@@ -1,177 +1,77 @@
 ﻿using iNube.Utility.Framework.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace iNube.Services.MicaExtension_EGI.Models
 {
-
-    public partial class QuotationDTO
-    {
-
-        public decimal QuoteId { get; set; }
-        public string QuotationNumber { get; set; }
-        public string PrimaryDriverName { get; set; }
-        public string Mobileno { get; set; }
-        public decimal? Age { get; set; }
-        public decimal? Experience { get; set; }
-        public string VehicleAge { get; set; }
-        public int? City { get; set; }
-        public string VehicleMakeModelId { get; set; }
-        public string PolicyNumber { get; set; }
-        public string SumInsured { get; set; }
-        public DateTime? CreatedDateTime { get; set; }
-        public decimal? NumberOfDrivers { get; set; }
-        public decimal? NumberOfVehicle { get; set; }
-        public decimal? Premium { get; set; }
-        public string Frequency { get; set; }
-        public DateTime? StartDate { get; set; }
-    }
-
+ 
     public class ScheduleDTO
     {
-
         public decimal ScheduleId { get; set; }
+        public string PolicyNo { get; set; }
+        public string VehicleRegistrationNo { get; set; }
+        public string VehicleType { get; set; }
+        public bool Mon { get; set; }
+        public bool Tue { get; set; }
+        public bool Wed { get; set; }
+        public bool Thu { get; set; }
+        public bool Fri { get; set; }
+        public bool Sat { get; set; }
+        public bool Sun { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime ModifiedDate { get; set; }
+        public decimal? ModifyCount { get; set; }
+        public bool IsActive { get; set; }
+
+    }
+
+    public class ScheduleResponseDTO : ResponseStatus
+    {
+        public ScheduleResponseDTO()
+        {
+            ScheduleDTO = new ScheduleDTO();
+        }
+        public ScheduleDTO ScheduleDTO { get; set; }
+    }
+
+    public class GetScheduleDTO 
+    {
         public string VehicleRegistrationNo { get; set; }
         public string PolicyNo { get; set; }
-        public bool? Mon { get; set; }
-        public bool? Tue { get; set; }
-        public bool? Wed { get; set; }
-        public bool? Thu { get; set; }
-        public bool? Fri { get; set; }
-        public bool? Sat { get; set; }
-        public bool? Sun { get; set; }
-        public bool? RepeatWeek { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public decimal? ModifyCount { get; set; }
-        public bool? IsActive { get; set; }
-        public int VehicleMasId { get; set; }
         public string VehicleType { get; set; }
-    }
-
-    public class ScheduleStatusDTO : ResponseStatus
-    {
-
-        public ScheduleDTO scheduleDTO { get; set; }
-        public string CarModel { get; set; }
-        public byte[] CarImageBytes { get; set; }
+        public bool Mon { get; set; }
+        public bool Tue { get; set; }
+        public bool Wed { get; set; }
+        public bool Thu { get; set; }
+        public bool Fri { get; set; }
+        public bool Sat { get; set; }
+        public bool Sun { get; set; }
+        public bool? SwitchStatus { get; set; }
         public bool SwitchEnabled { get; set; }
     }
+
+    public class GetScheduleResponse : ResponseStatus
+    {
+        public GetScheduleResponse()
+        {
+            GetSchedule = new GetScheduleDTO();
+        }
+        public GetScheduleDTO GetSchedule { get; set; }
+
+    }
+
     public class DynamicData
     {   
         public RuleDTO dictionary_rule { get; set; }
         public RateDTO dictionary_rate { get; set; }
     }
 
-    public partial class VehicleDetailsDTO
-    {
-        public int VehicleId { get; set; }
-        public string VehicleModel { get; set; }
-        public string VehicleType { get; set; }
-        public byte[] VehicleImage { get; set; }
-        public DateTime? CreatedDate { get; set; }
-
-    }
-
-    public partial class VehicleDetailsDataDTO
-    {
-        public decimal VehicleDetailsDataId { get; set; }
-        public int? VehicleId { get; set; }
-        public decimal? AgeOfVehicle { get; set; }
-        public decimal? SumInsured { get; set; }
-        public bool? IsActive { get; set; }
-    }
-
-    public partial class SendOtpDTO
-    {
-        public decimal Id { get; set; }
-        public string Email { get; set; }
-        public string ContactNumber { get; set; }
-        public string Otp { get; set; }
-
-    }
     public class CalculationResult
     {
         public string Entity { get; set; }
         public string EValue { get; set; }
     }
-    //Response fields
-    public class VehicleDetailsResponse : ResponseStatus
-    {
-        public VehicleDetailsDTO vehicleDetails { get; set; }
-    }
-
-    public partial class ddDTO
-    {
-        public int mID { get; set; }
-        public string mValue { get; set; }
-        public string mType { get; set; }
-    }
-
-    public class SendOtpResponse : ResponseStatus
-    {
-        public SendOtp sendOtp { get; set; }
-    }
-
-    public class SendOtp
-    {
-
-        public decimal Id { get; set; }
-        public string Email { get; set; }
-        public string ContactNumber { get; set; }
-        public string Otp { get; set; }
-    }
-
-    public class VerifyOTPResponse : ResponseStatus
-    {
-        public VerifyOTP verifyotp { get; set; }
-    }
-
-    public partial class VerifyOTP
-    {
-
-        public decimal Id { get; set; }
-        public string Email { get; set; }
-        public string ContactNumber { get; set; }
-        public string Otp { get; set; }
-    }
-
-    public class EmailTest
-    {
-        public string To { get; set; }
-        public string Subject { get; set; }
-        public string Message { get; set; }
-    }
-
-    public class SMSRequest
-    {
-
-        public string APIKey { get; set; }
-        public string SenderId { get; set; }
-        public string Channel { get; set; }
-        public string RecipientNumber { get; set; }
-        public string SMSMessage { get; set; }
-    }
-
-    public partial class MasCityDTO
-    {
-
-        public int CityId { get; set; }
-        public int? StateId { get; set; }
-        public string CityCode { get; set; }
-        public string Pincode { get; set; }
-        public string CityName { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public string ModifiedBy { get; set; }
-        public bool? IsActive { get; set; }
-        public string ExternalRefCode { get; set; }
-        public string Type { get; set; }
-
-       // public virtual TblMasState State { get; set; }
-    }
-   
+ 
     public partial class taxDto
     {
         public decimal IGST { get; set; }
@@ -189,55 +89,8 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
        // public int CityId { get; set; }
         public DynamicData premiumObj { get; set; }
-    }
-
-    //public partial class context
-    //{
-    //    public string ProductType { get; set; }
-    //    public decimal PartnerId { get; set; }
-    //    public decimal OrgId { get; set; }
-    //    public string Role { get; set; }
-    //    public string Email { get; set; }
-    //    public string SessionId { get; set; }
-    //    public string CorrelationId { get; set; }
-    //    public string Name { get; set; }
-    //    public string UserId { get; set; }
-    //    public bool IsAuthenticated { get; set; }
-    //    public string MediaType { get; set; }
-    //    public string ClientIpAddress { get; set; }
-    //    public string RequestId { get; set; }
-    //    public string ApplicationIdentifier { get; set; }
-    //    public string Locale { get; set; }
-    //    public string Token { get; set; }
-    //    public string UserName { get; set; }
-    //    public string ServerType { get; set; }
-    //    public string MobileNumber { get; set; }
-
-    //}
-
-    public class MasterPolicyDTO
-    {
-        public MasterPolicyDTO()
-        {
-            InsurableItem = new List<MasterInsurableDTO>();
-        }
-        public string PolicyNumber { get; set; }
-        public List<MasterInsurableDTO> InsurableItem { get; set; }
-
-    }
-
-    public class MasterInsurableDTO
-    {
-        public MasterInsurableDTO()
-        {
-            InsurableFields = new List<InsurableFieldsDTO>();
-        }
-
-        public string InsurableName { get; set; }
-        public List<InsurableFieldsDTO> InsurableFields { get; set; }
-
-    }
-
+    }    
+       
     public class InsurableFieldsDTO
     {
         public string Name { get; set; }
@@ -269,18 +122,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public Dictionary<string, string> policy { get; set; }
         public BusinessStatus Status { get; internal set; }
         public int QuotationNumber { get; set; }
-    }
-
-    public class PolicyDTO
-    {
-        public PolicyDTO()
-        {
-            QuotationDTO = new QuotationDTO();
-        }
-        public dynamic PolicyObj { get; set; }
-        public QuotationDTO QuotationDTO { get; set; }
-    }
-
+    }  
 
     public class SchedulerPremiumDTO
     {
@@ -336,28 +178,21 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal? SumInsured { get; set; }
     }
 
-    public partial class CityMasDTO
-    {            
-        public int? CityId { get; set; }
-        public string CityName { get; set; }
-        public string StateCode { get; set; }
-    }
-
     public partial class PremiumRequestDTO
     {
         public string StateCode { get; set; }
-        public string SI { get; set; }
-        public string NoOfPC { get; set; }
-        public string NoOfTW { get; set; }
-        public string DriverAge { get; set; }
-        public string DriverExp { get; set; }
-        public string AdditionalDriver { get; set; }
+        public int SI { get; set; }
+        public int NoOfPC { get; set; }
+        public int NoOfTW { get; set; }
+        public int DriverAge { get; set; }
+        public int DriverExp { get; set; }
+        public int AdditionalDriver { get; set; }
         public string BillingFrequency { get; set; }
     }
-   public partial class PremiumReturnDto
+    public partial class PremiumReturnDto : ResponseStatus
     {
         public decimal PerDayPremium { get; set; }
-        public decimal FireTheft365 { get; set; }
+        public decimal FireTheft { get; set; }
         public decimal ADPremium { get; set; }
         public decimal GST { get; set; }
         public decimal Total { get; set; }
@@ -365,16 +200,17 @@ namespace iNube.Services.MicaExtension_EGI.Models
     }
 
 
+
+
     public class PolicyPremiumDetailsDTO
     {
-        public string SumInsured { get; set; }
-        public string PD_Age { get; set; }
-        public string PD_DriveExperince { get; set; }
-        public string NoOfTW { get; set; }
-        public string NoOfPC { get; set; }
-        public string AdditionalDriver { get; set; }
-        public string FromStateTax { get; set; }
-        public string ToStateTax { get; set; }
+        public decimal SumInsured { get; set; }
+        public int PD_Age { get; set; }
+        public int PD_DriveExperince { get; set; }
+        public int NoOfTW { get; set; }
+        public int NoOfPC { get; set; }
+        public int AdditionalDriver { get; set; }
+        public string StateCode { get; set; }
     }
 
     public class SwitchOnOffResponse : ResponseStatus
@@ -382,5 +218,33 @@ namespace iNube.Services.MicaExtension_EGI.Models
        //public bool FinalResponse { get; set; }
     }
 
+    public class EndorsementPremiumDTO
+    {
+        public string PolicyNo { get; set; }
+        public string SI { get; set; }
+        public int PcCount { get; set; }
+        public int TwCount { get; set; }
+        public string TypeOfEndorsement { get; set; }
+        public DateTime EndorsementEffectiveDate { get; set; }
+
+    }
+
+    public class ActivityDTO
+    {
+        public DateTime? DateTime { get; set; }
+        public string VehicleNo { get; set; }
+        public string SwitchState { get; set; }
+        public string SwitchType { get; set; }
+    }
+
+    public class ActivityResponse : ResponseStatus
+    {
+        public ActivityResponse()
+        {
+            ActivityDTO = new List<ActivityDTO>();
+        }
+        public List<ActivityDTO> ActivityDTO { get; set; }
+    }
+    
 }
 

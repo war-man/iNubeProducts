@@ -11,11 +11,7 @@ namespace iNube.Services.MicaExtension_EGI.Helpers
 
         public AutoMapperProfile()
         {
-
-            CreateMap<TblQuotation, QuotationDTO>().ReverseMap();
             CreateMap<TblSchedule, ScheduleDTO>().ReverseMap();
-
-            CreateMap<TblSendOtp, SendOtp>().ReverseMap();
 
         }
     }

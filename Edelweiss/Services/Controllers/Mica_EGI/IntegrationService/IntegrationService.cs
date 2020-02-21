@@ -1,6 +1,4 @@
-﻿
-
-using iNube.Utility.Framework.Model;
+﻿using iNube.Utility.Framework.Model;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,14 +14,13 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
     {
 
         Task<dynamic> CalCulateRatingPremium(SchedulerPremiumDTO dynamicData);
-        Task<object> AddInsurableItem(MasterPolicyDTO masterPolicyDTO, ApiContext apiContext);
         Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext);
 
         //Scheduler Module AR
         Task<dynamic> GenerateCDTransaction(CDDTO cdModel, ApiContext apiContext);
         Task<List<PolicyDetailsDTO>> GetPolicyList(string productCode, ApiContext apiContext);
         Task<dynamic> CalculatePremium(SchedulerPremiumDTO premiumDTO, ApiContext apiContext);
-
+        Task<dynamic> GetPolicyDetails(string PolicyNo, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -81,6 +78,11 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, premiumDTO);
         }
 
+        public async Task<dynamic> GetPolicyDetails(string PolicyNo, ApiContext apiContext)
+        {
+            var uri = policyUrl + "/api/Policy/GetPolicyDetailsByNumber?policyNumber" + PolicyNo;
+            return await GetApiInvoke<dynamic>(uri, apiContext);
+        }
 
 
 
@@ -249,13 +251,6 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, context, dynamicData);
         }
 
-        public async Task<object> AddInsurableItem(MasterPolicyDTO masterPolicyDTO, ApiContext apiContext)
-        {
-            var uri = policyUrl + "/api/Policy/AddInsurableItem";
-            return await PostApiInvoke<MasterPolicyDTO, dynamic>(uri, apiContext, masterPolicyDTO);
-        }
-
-        
 
     }
 }

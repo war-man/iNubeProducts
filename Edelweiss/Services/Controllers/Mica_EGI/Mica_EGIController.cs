@@ -24,64 +24,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
         private IMicaEGIService _quotationService;
 
-
-
         public Mica_EGIController(IMicaEGIService quotationService)
         {
-
             _quotationService = quotationService;
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> CreateQuotation(QuotationDTO quotationDTO)
-        {
-            var data = await _quotationService.CreateQuotation(quotationDTO);
-            return Ok(data);
-        }
-        [HttpPut]
-        public async Task<IActionResult> UpdateQuotation(QuotationDTO quotationDTO)
-        {
-            var data = await _quotationService.UpdateQuotation(quotationDTO);
-            return Ok(data);
-        }
         [HttpGet]
-        public async Task<IActionResult> GetQuotation()
-        {
-            var data = await _quotationService.GetQuotation();
-            return Ok(data);
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetQuotationbyMobileNo(string mobileNo)
-        {
-            var data = await _quotationService.GetQuotationbyMobileNo(mobileNo);
-            return Ok(data);
-        }
-        [HttpGet]
-        public IActionResult GetSchedule()
-        {
-
-            var response = _quotationService.GetSchedule();
-            return Ok(response);
-
-        }
-
-        [HttpPost]
-        public IActionResult CreateSchedule(ScheduleDTO scheduleDTO)
-        {
-            var reponse = _quotationService.CreateSchedule(scheduleDTO);
-            return Ok(reponse);
-        }
-
-        [HttpGet]
-        public IActionResult ScheduleStatus(string VehicleRegstrationNo, string PolicyNo)
-        {
-            var response = _quotationService.ScheduleStatus(VehicleRegstrationNo, PolicyNo);
-            return Ok(response);
-        }
-
-        [HttpGet]
-
         [AllowAnonymous]
         public IActionResult HC()
         {
@@ -89,137 +37,52 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return Ok(response);
         }
 
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<IActionResult> GetVehicleDetails(int VehicleId)
-        {
-            var objectval = await _quotationService.GetVehicleDetails(VehicleId, Context);
-            return Ok(objectval);
-        }
-
-        [HttpGet]
-        public IActionResult GetSIFromMakeModel(decimal VehicleId)
-        {
-            var data = _quotationService.GetSIFromMakeModel(VehicleId, Context);
-            return Ok(data);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetVehicleMaster(string lMasterlist, bool isFilter = true)
-        {
-            var objectval = await _quotationService.GetVehicleMaster(lMasterlist, Context);
-
-            //if (isFilter)
-            //{
-            //    var masterdata = objectval.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
-            //    return Ok(masterdata);
-            //}
-
-            return Ok(objectval);
-        }
-
         [HttpPost]
-        public async Task<IActionResult> SendOTP(SendOtp sendOtp)
-        {
-            var response = await _quotationService.SendOTP(sendOtp);
-            return Ok(response);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> VerifyingOTP(VerifyOTP verifyOTP)
-        {
-            var response = await _quotationService.VerifyingOTP(verifyOTP);
-            return Ok(response);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ResetOTP(SendOtp sendOtp)
-        {
-            var response = await _quotationService.ResetOTP(sendOtp);
-            return Ok(response);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetCityMaster(string lMasterlist, bool isFilter = true)
-        {
-            var cityDTOs = await _quotationService.GetCityMaster(lMasterlist);
-
-            //if (isFilter)
-            //{
-            //    var masterdata = cityDTOs.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
-            //    return Ok(masterdata);
-            //}
-            return Ok(cityDTOs);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CalCulatePremium([FromBody]PremiumRequestDTO premiumParameter)
+        public async Task<IActionResult> CalculatePremium([FromBody]PremiumRequestDTO premiumParameter)
         {
             var premiumValue = await _quotationService.CalCulatePremium(premiumParameter);
             return Ok(premiumValue);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> HandleAdditionalVehicles(string PolicyNumber, string VehicleRegistrationNo)
-        {
-            var response = _quotationService.HandleAdditionalVehicles(PolicyNumber, VehicleRegistrationNo);
-            return Ok(response);
-        }
 
-
-        [HttpPost]
-        public async Task<IActionResult> HandleAdditionalDriver(string PolicyNumber, string DriverName)
+        [HttpGet]
+        public IActionResult GetSchedule(string VehicleRegistrationNo, string PolicyNo)
         {
-            var response = _quotationService.HandleAdditionalVehicles(PolicyNumber, DriverName);
+
+            var response = _quotationService.GetSchedule(VehicleRegistrationNo,PolicyNo);
             return Ok(response);
+
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePolicy(PolicyDTO policyDTO)
+        public IActionResult CreateUpdateSchedule(ScheduleDTO scheduleDTO)
         {
-            var response = await _quotationService.CreatePolicy(policyDTO);
+            var reponse = _quotationService.CreateSchedule(scheduleDTO);
+            return Ok(reponse);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SwitchOnOFF(string VehicleNo, string PolicyNo, bool SwitchStat)
+        {
+            var response = await _quotationService.SwitchOnOff(VehicleNo, PolicyNo, SwitchStat);
+
             return Ok(response);
         }
-                
-        [HttpGet]
-        public async Task<bool> DailyScheduler()
+
+        [HttpPost]
+        public IActionResult EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
         {
-            var response = await _quotationService.DailyScheduler();
-            return response;
-        }
-
-
-        [HttpGet]
-        public async Task<bool> OLDSwitchOnOff(string VehicleRegistrationNo, string PolicyNo, bool SwitchStatus)
-        {
-            var response = await _quotationService.OldSwitchOnOff(VehicleRegistrationNo, PolicyNo, SwitchStatus);
-            return response;
-        }
-
-
-        [HttpGet]
-        public IActionResult SmartCityMaster(string searchString)
-        {
-            var cityDTOs = _quotationService.SmartCityMaster(searchString);
-                       
-            return Ok(cityDTOs);
-        }
-
-
-        [HttpGet]
-        public IActionResult SmartVehicleMaster(string searchString)
-        {
-            var cityDTOs = _quotationService.SmartVehicleMaster(searchString);
-
-            return Ok(cityDTOs);
-        }
-
-        [HttpGet]
-        public IActionResult GetStateCode(string CityName)
-        {
-            var response = _quotationService.GetStateCode(CityName);
+            var response = _quotationService.EndorsementPremium(endorsementPremium);
             return Ok(response);
         }
+
+        [HttpGet]
+        public IActionResult ActivityReport(string PolicyNo, string Month)
+        {
+            var response = _quotationService.ActivityReport(PolicyNo, Month);
+            return Ok(response);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> NightScheduler()
@@ -236,15 +99,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
             return Ok(response);
         }
-
-        [HttpGet]
-        public async Task<IActionResult> SwitchOnOFF(string VehicleNo ,string PolicyNo, bool SwitchStat)
-        {
-            var response = await _quotationService.SwitchOnOff(VehicleNo, PolicyNo, SwitchStat);
-
-            return Ok(response);
-        }
-
-
+                
     }
 }

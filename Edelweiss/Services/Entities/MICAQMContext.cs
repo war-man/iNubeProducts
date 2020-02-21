@@ -18,6 +18,7 @@ namespace MicaExtension_EGI.Entities
         public virtual DbSet<TblDailyActiveVehicles> TblDailyActiveVehicles { get; set; }
         public virtual DbSet<TblMasCity> TblMasCity { get; set; }
         public virtual DbSet<TblMasState> TblMasState { get; set; }
+        public virtual DbSet<TblMonthlyBalance> TblMonthlyBalance { get; set; }
         public virtual DbSet<TblPayment> TblPayment { get; set; }
         public virtual DbSet<TblPremiumBookingLog> TblPremiumBookingLog { get; set; }
         public virtual DbSet<TblQuotation> TblQuotation { get; set; }
@@ -35,7 +36,7 @@ namespace MicaExtension_EGI.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
@@ -46,7 +47,7 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblDailyActiveVehicles>(entity =>
             {
                 entity.HasKey(e => e.ActiveId)
-                    .HasName("PK__tblDaily__6949E34D248510D8");
+                    .HasName("PK__tblDaily__6949E34D7D2F2453");
 
                 entity.ToTable("tblDailyActiveVehicles", "QM");
 
@@ -132,6 +133,22 @@ namespace MicaExtension_EGI.Entities
                 entity.Property(e => e.StateType).HasMaxLength(50);
             });
 
+            modelBuilder.Entity<TblMonthlyBalance>(entity =>
+            {
+                entity.HasKey(e => e.AutoId)
+                    .HasName("PK__TblMonth__6B232905082BA0C2");
+
+                entity.ToTable("TblMonthlyBalance", "QM");
+
+                entity.Property(e => e.AutoId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Balance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.BalanceDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Month).HasMaxLength(15);
+            });
+
             modelBuilder.Entity<TblPayment>(entity =>
             {
                 entity.HasKey(e => e.PaymentId);
@@ -157,7 +174,7 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblPremiumBookingLog>(entity =>
             {
                 entity.HasKey(e => e.LogId)
-                    .HasName("PK__TblPremi__5E548648C3174030");
+                    .HasName("PK__TblPremi__5E548648443CE55B");
 
                 entity.ToTable("TblPremiumBookingLog", "QM");
 
@@ -223,7 +240,7 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblSchedule>(entity =>
             {
                 entity.HasKey(e => e.ScheduleId)
-                    .HasName("PK__TblSched__9C8A5B49393445C7");
+                    .HasName("PK__TblSched__9C8A5B49FA133F52");
 
                 entity.ToTable("TblSchedule", "QM");
 
@@ -237,23 +254,17 @@ namespace MicaExtension_EGI.Entities
 
                 entity.Property(e => e.ModifyCount).HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.VehicleMasId).HasColumnName("VehicleMasID");
+                entity.Property(e => e.PolicyNo).IsRequired();
 
-                entity.Property(e => e.VehicleType)
-                    .HasMaxLength(5)
-                    .IsUnicode(false);
+                entity.Property(e => e.VehicleRegistrationNo).IsRequired();
 
-                entity.HasOne(d => d.VehicleMas)
-                    .WithMany(p => p.TblSchedule)
-                    .HasForeignKey(d => d.VehicleMasId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_tblSchedule_tblVehicleDetails");
+                entity.Property(e => e.VehicleType).IsRequired();
             });
 
             modelBuilder.Entity<TblScheduleReport>(entity =>
             {
                 entity.HasKey(e => e.ReportId)
-                    .HasName("PK__tblSched__D5BD48059CBE32DE");
+                    .HasName("PK__tblSched__D5BD48055E75A757");
 
                 entity.ToTable("tblScheduleReport", "QM");
 
@@ -273,7 +284,7 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblSchedulerLog>(entity =>
             {
                 entity.HasKey(e => e.LogId)
-                    .HasName("PK__TblSched__5E5486481147DB3B");
+                    .HasName("PK__TblSched__5E548648D8DE4672");
 
                 entity.ToTable("TblSchedulerLog", "QM");
 
@@ -313,7 +324,7 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblSwitchLog>(entity =>
             {
                 entity.HasKey(e => e.LogId)
-                    .HasName("PK__tblSwitc__5E548648AE93CB49");
+                    .HasName("PK__tblSwitc__5E5486481D77CB8B");
 
                 entity.ToTable("tblSwitchLog", "QM");
 
@@ -327,7 +338,7 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblSwitchStatus>(entity =>
             {
                 entity.HasKey(e => e.SwitchId)
-                    .HasName("PK__tblSwitc__829FE145B6BC0A1D");
+                    .HasName("PK__tblSwitc__829FE14517271D20");
 
                 entity.ToTable("tblSwitchStatus", "QM");
 
@@ -361,7 +372,7 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblVehicleDetailsData>(entity =>
             {
                 entity.HasKey(e => e.VehicleDetailsDataId)
-                    .HasName("PK__VehicleD__152742F0AF903CB6");
+                    .HasName("PK__tblVehic__152742F00C16C3DC");
 
                 entity.ToTable("tblVehicleDetailsData", "QM");
 
