@@ -60,6 +60,16 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     }
 
+    public class AllScheduleResponse : ResponseStatus
+    {
+        public AllScheduleResponse()
+        {
+            GetSchedule = new List<GetScheduleDTO>();
+        }
+        public List<GetScheduleDTO> GetSchedule { get; set; }
+
+    }
+
     public class DynamicData
     {   
         public RuleDTO dictionary_rule { get; set; }

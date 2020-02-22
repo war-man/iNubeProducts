@@ -27,6 +27,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<SwitchOnOffResponse> SwitchOnOff(string VehicleRegistrationNo, string PolicyNo, bool SwitchStatus);
         ActivityResponse ActivityReport(string PolicyNo, string Month);
         Task<PremiumReturnDto> EndorsementPremium(EndorsementPremiumDTO endorsementPremium);
+
+        AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -1794,6 +1796,53 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return returnobj;
         }
+
+        public AllScheduleResponse GetAllVehicleSchedule(string PolicyNo)
+        {
+            AllScheduleResponse response = new AllScheduleResponse();
+           
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentTimeHour = IndianTime.Hour;
+
+            var data = _context.TblSchedule.Where(x => x.PolicyNo == PolicyNo).ToList();
+
+            foreach (var scheduledata in data)
+            {
+                GetScheduleDTO getSchedule = new GetScheduleDTO();
+
+                var checkstatus = _context.TblSwitchLog.LastOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == scheduledata.VehicleRegistrationNo
+                                                                    && x.CreatedDate.Value.Date == IndianTime.Date);
+
+
+                getSchedule.PolicyNo = PolicyNo;
+                getSchedule.VehicleRegistrationNo = scheduledata.VehicleRegistrationNo;
+                getSchedule.Mon = scheduledata.Mon;
+                getSchedule.Tue = scheduledata.Mon;
+                getSchedule.Wed = scheduledata.Wed;
+                getSchedule.Thu = scheduledata.Thu;
+                getSchedule.Fri = scheduledata.Fri;
+                getSchedule.Sat = scheduledata.Sat;
+               getSchedule.Sun = scheduledata.Sun;
+                getSchedule.VehicleType = scheduledata.VehicleType;
+                getSchedule.SwitchStatus = checkstatus.SwitchStatus;
+
+                    if (CurrentTimeHour < Convert.ToDecimal(_configuration["Scheduler_Validation:TimeInHours"]))
+                    {
+                        getSchedule.SwitchEnabled = true;
+                    }
+                    else
+                    {
+                        getSchedule.SwitchEnabled = false;
+                    }
+
+                response.GetSchedule.Add(getSchedule);
+
+            }
+
+            return response;
+
+        }
+
     }
 }
 
