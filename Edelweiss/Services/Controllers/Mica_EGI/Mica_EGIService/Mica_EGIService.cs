@@ -672,7 +672,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             tblSwitchlog.VehicleNumber = VehicleRegistrationNo;
                             tblSwitchlog.SwitchStatus = true;
                             tblSwitchlog.CreatedDate = IndianTime;
-
+                            tblSwitchlog.SwitchType = "Manual";
                             _context.TblSwitchLog.Add(tblSwitchlog);
                             _context.SaveChanges();
                         }
@@ -746,7 +746,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             tblSwitchlog.VehicleNumber = VehicleRegistrationNo;
                             tblSwitchlog.SwitchStatus = true;
                             tblSwitchlog.CreatedDate = IndianTime;
-
+                            tblSwitchlog.SwitchType = "Manual";
                             _context.TblSwitchLog.Add(tblSwitchlog);
                             _context.SaveChanges();
                         }
@@ -792,8 +792,22 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     //Call the Policy Service to Get Policy Details.
                     //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
+
+                    var PolicyData = await _integrationService.GetPolicyDetails(PolicyNo, apiContext);
+
                     PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
 
+                    if (PolicyData != null)
+                    {
+
+                        detailsDTO.SumInsured = PolicyData["si"];
+                        detailsDTO.NoOfPC = PolicyData["noOfPC"];
+                        detailsDTO.NoOfTW = PolicyData["noOfTW"];
+                        detailsDTO.PD_Age = PolicyData["driverAge"];
+                        detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
+                        detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
+                        detailsDTO.StateCode = PolicyData["stateCode"];
+                    }
 
 
                     //CalculatePremiumObject
@@ -958,7 +972,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
 
-                SuccessResponse.ResponseMessage = "Successfully Switch OFF";
+                SuccessResponse.ResponseMessage = "Successfully Switch ON";
                 SuccessResponse.Status = BusinessStatus.Updated;
 
             }
@@ -1192,17 +1206,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
 
-            PolicyNumberList.Add("0418/0408/0866/00/000");
+            //PolicyNumberList.Add("0418/0408/0866/00/000");
             PolicyNumberList.Distinct();
 
             foreach (var policy in PolicyNumberList)
             {
+                ActivePC = 0;
+                ActiveTW = 0;
+
                 var ScheduleData = _context.TblSchedule.Where(x=>x.PolicyNo == policy).ToList();
                                 
                 bool? CurrentDayStat = false;
 
                 foreach (var schedule in ScheduleData)
-                {
+                {               
+
                     switch (CurrentDay)
                     {
                         case "Monday":
@@ -1252,30 +1270,33 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         _context.TblSwitchLog.Add(switchLog);
                         _context.SaveChanges();
-                    }
 
-                    if(schedule.VehicleType == "PC")
-                    {
-                        ActivePC += 1;
+
+                        if (schedule.VehicleType == "PC")
+                        {
+                            ActivePC += 1;
+                        }
+                        else if (schedule.VehicleType == "TW")
+                        {
+                            ActiveTW += 1;
+                        }
                     }
-                    else if(schedule.VehicleType == "TW")
-                    {
-                        ActiveTW += 1;
-                    }
-                 
                 }
 
+                if (ActivePC > 0 || ActiveTW > 0)
+                {
 
-                dailyActiveVehicles = new TblDailyActiveVehicles();
+                    dailyActiveVehicles = new TblDailyActiveVehicles();
 
-                dailyActiveVehicles.PolicyNumber = policy;
-                dailyActiveVehicles.ActivePc = ActivePC;
-                dailyActiveVehicles.ActiveTw = ActiveTW;
-                dailyActiveVehicles.TxnDate = IndianTime;
-                dailyActiveVehicles.Premium = 0;
+                    dailyActiveVehicles.PolicyNumber = policy;
+                    dailyActiveVehicles.ActivePc = ActivePC;
+                    dailyActiveVehicles.ActiveTw = ActiveTW;
+                    dailyActiveVehicles.TxnDate = IndianTime;
+                    dailyActiveVehicles.Premium = 0;
 
-                _context.TblDailyActiveVehicles.Add(dailyActiveVehicles);
-                _context.SaveChanges();
+                    _context.TblDailyActiveVehicles.Add(dailyActiveVehicles);
+                    _context.SaveChanges();
+                }
             }
 
             return true;
@@ -1322,7 +1343,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             foreach (var policy in PolicyNumberList)
             {
 
-                var getDailyStat = _context.TblDailyActiveVehicles.FirstOrDefault(x=>x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
+                var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x=>x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
 
                 var ActivePCCount = getDailyStat.ActivePc;
                 var ActiveTWCount = getDailyStat.ActiveTw;
@@ -1344,13 +1365,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (PolicyData != null)
                 {
 
-                    detailsDTO.SumInsured = PolicyData["SI"];
-                    detailsDTO.NoOfPC = PolicyData["NoOfPC"];
-                    detailsDTO.NoOfTW = PolicyData["NoOfTW"];
-                    detailsDTO.PD_Age = PolicyData["DriverAge"];
-                    detailsDTO.PD_DriveExperince = PolicyData["DriverExp"];
-                    detailsDTO.AdditionalDriver = PolicyData["AdditionalDriver"];
-                    detailsDTO.StateCode = PolicyData["StateCode"];
+                    detailsDTO.SumInsured = PolicyData["si"];
+                    detailsDTO.NoOfPC = PolicyData["noOfPC"];
+                    detailsDTO.NoOfTW = PolicyData["noOfTW"];
+                    detailsDTO.PD_Age = PolicyData["driverAge"];
+                    detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
+                    detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
+                    detailsDTO.StateCode = PolicyData["stateCode"];
                 }
 
 

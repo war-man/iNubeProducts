@@ -74,7 +74,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         public async Task<dynamic> GetPolicyDetails(string PolicyNo, ApiContext apiContext)
         {
-            var uri = PolicyUrl + "/api/Policy/GetPolicyDetailsByNumber?policyNumber" + PolicyNo;
+            var uri = PolicyUrl + "/api/Policy/GetPolicyDetailsByNumber?policyNumber=" + PolicyNo;
             return await GetApiInvoke<dynamic>(uri, apiContext);
         }
 
