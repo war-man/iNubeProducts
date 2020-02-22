@@ -1217,7 +1217,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 ActivePC = 0;
                 ActiveTW = 0;
 
-                var ScheduleData = _context.TblSchedule.Where(x=>x.PolicyNo == policy).ToList();
+                var ScheduleData = _context.TblSchedule.Where(x=>x.PolicyNo == policy && x.IsActive==true).ToList();
                                 
                 bool? CurrentDayStat = false;
 
