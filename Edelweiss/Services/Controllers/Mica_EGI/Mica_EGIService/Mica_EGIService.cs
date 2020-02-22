@@ -1648,13 +1648,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             if (PolicyData != null)
             {
-                detailsDTO.SumInsured = PolicyData["SI"];
-                detailsDTO.NoOfPC = PolicyData["NoOfPC"];
-                detailsDTO.NoOfTW = PolicyData["NoOfTW"];
-                detailsDTO.PD_Age = PolicyData["DriverAge"];
-                detailsDTO.PD_DriveExperince = PolicyData["DriverExp"];
-                detailsDTO.AdditionalDriver = PolicyData["AdditionalDriver"];
-                detailsDTO.StateCode = PolicyData["StateCode"];
+
+                detailsDTO.SumInsured = PolicyData["si"];
+                detailsDTO.NoOfPC = PolicyData["noOfPC"];
+                detailsDTO.NoOfTW = PolicyData["noOfTW"];
+                detailsDTO.PD_Age = PolicyData["driverAge"];
+                detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
+                detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
+                detailsDTO.StateCode = PolicyData["stateCode"];
             }
 
 
