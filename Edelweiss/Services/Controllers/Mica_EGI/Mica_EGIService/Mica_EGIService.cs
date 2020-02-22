@@ -70,6 +70,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     
                     response.GetSchedule.PolicyNo = PolicyNo;
                     response.GetSchedule.VehicleRegistrationNo = VehicleRegistrationNo;
+                    response.GetSchedule.VehicleType = scheduledata.VehicleType;
                     response.GetSchedule.Mon = scheduledata.Mon;
                     response.GetSchedule.Tue = scheduledata.Mon; 
                     response.GetSchedule.Wed = scheduledata.Wed;
