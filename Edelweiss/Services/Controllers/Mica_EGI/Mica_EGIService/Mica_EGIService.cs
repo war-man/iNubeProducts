@@ -179,8 +179,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 else
                 {
                     var tblschedule = _context.TblSchedule.SingleOrDefault(x => x.VehicleRegistrationNo == mapData.VehicleRegistrationNo);
-
-                    tblschedule.CreatedDate = mapData.CreatedDate;
+                                     
                     tblschedule.Mon = mapData.Mon;
                     tblschedule.Tue = mapData.Tue;
                     tblschedule.Fri = mapData.Wed;
