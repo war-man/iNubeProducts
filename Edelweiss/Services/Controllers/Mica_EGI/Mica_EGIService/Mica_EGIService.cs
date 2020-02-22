@@ -135,7 +135,32 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         public ScheduleResponseDTO CreateSchedule(ScheduleDTO scheduleDTO)
         {
             ScheduleResponseDTO response = new ScheduleResponseDTO();
-            if (scheduleDTO.VehicleType == "PC" || scheduleDTO.VehicleType == "TW")
+
+            if (String.IsNullOrEmpty(scheduleDTO.PolicyNo)) 
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+                response.ResponseMessage = "Null/Empty Inputs";
+                response.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "PolicyNumber is Empty";
+                errorInfo.ErrorCode = "GEN001";
+                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                response.Errors.Add(errorInfo);
+                return response;
+
+            }else if(String.IsNullOrEmpty(scheduleDTO.VehicleRegistrationNo))
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+                response.ResponseMessage = "Null/Empty Inputs";
+                response.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Vehicle Number is Empty";
+                errorInfo.ErrorCode = "GEN001";
+                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                response.Errors.Add(errorInfo);
+                return response;
+            }
+
+
+                if (scheduleDTO.VehicleType == "PC" || scheduleDTO.VehicleType == "TW")
             {
                 var mapData = _mapper.Map<TblSchedule>(scheduleDTO);
 
