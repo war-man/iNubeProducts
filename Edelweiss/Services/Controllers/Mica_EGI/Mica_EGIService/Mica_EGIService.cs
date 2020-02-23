@@ -306,7 +306,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 returnobj.GST = Math.Round(Convert.ToDecimal(yearlyGST));
             }
             returnobj.Total = Math.Round(returnobj.FireTheft + returnobj.ADPremium + returnobj.GST);
-
+                                returnobj.Status = BusinessStatus.Ok;
             return returnobj;
                             }
                             else
@@ -1311,16 +1311,36 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (ActivePC > 0 || ActiveTW > 0)
                 {
 
-                    dailyActiveVehicles = new TblDailyActiveVehicles();
+                    var checkactivity = _context.TblDailyActiveVehicles.Any(x=>x.PolicyNumber == policy && x.TxnDate == IndianTime.Date);
 
-                    dailyActiveVehicles.PolicyNumber = policy;
-                    dailyActiveVehicles.ActivePc = ActivePC;
-                    dailyActiveVehicles.ActiveTw = ActiveTW;
-                    dailyActiveVehicles.TxnDate = IndianTime;
-                    dailyActiveVehicles.Premium = 0;
+                    if (checkactivity == true)
+                    {
+                        var activitydata = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == policy && x.TxnDate == IndianTime.Date);
 
-                    _context.TblDailyActiveVehicles.Add(dailyActiveVehicles);
-                    _context.SaveChanges();
+                        activitydata.ActivePc = ActivePC;
+                        activitydata.ActiveTw = ActiveTW;
+                        activitydata.TxnDate = IndianTime;
+                        activitydata.Premium = 0;
+
+                        _context.TblDailyActiveVehicles.Update(activitydata);
+                        _context.SaveChanges();
+
+                    }
+                    else if (checkactivity == false)
+                    {
+
+                        dailyActiveVehicles = new TblDailyActiveVehicles();
+
+                        dailyActiveVehicles.PolicyNumber = policy;
+                        dailyActiveVehicles.ActivePc = ActivePC;
+                        dailyActiveVehicles.ActiveTw = ActiveTW;
+                        dailyActiveVehicles.TxnDate = IndianTime;
+                        dailyActiveVehicles.Premium = 0;
+
+                        _context.TblDailyActiveVehicles.Add(dailyActiveVehicles);
+                        _context.SaveChanges();
+
+                    }
                 }
             }
 
@@ -1680,9 +1700,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
 
-            var taxType = TaxTypeForStateCode(detailsDTO.StateCode);
+            TaxTypeDTO taxType = new TaxTypeDTO();
+            taxType = TaxTypeForStateCode(detailsDTO.StateCode);
 
-
+            
 
             //CalculatePremiumObject as of Endorsement
             SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
@@ -1747,6 +1768,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium - OldPremiumData.MonthlyPremium;
                 DifferentialPremium.Total = NewPremiumData.Total - OldPremiumData.Total;
 
+                DifferentialPremium.Status = BusinessStatus.Ok;
                 return DifferentialPremium;
             }
 

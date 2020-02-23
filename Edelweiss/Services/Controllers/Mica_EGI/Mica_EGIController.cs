@@ -70,9 +70,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpPost]
-        public IActionResult EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
+        public async Task <IActionResult> EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
         {
-            var response = _quotationService.EndorsementPremium(endorsementPremium);
+            var response = await _quotationService.EndorsementPremium(endorsementPremium);
             return ServiceResponse(response);
         }
 
