@@ -41,7 +41,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         public async Task<IActionResult> CalculatePremium([FromBody]PremiumRequestDTO premiumParameter)
         {
             var premiumValue = await _quotationService.CalCulatePremium(premiumParameter);
-            return Ok(premiumValue);
+            return ServiceResponse(premiumValue);
         }
 
 
@@ -50,7 +50,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         {
 
             var response = _quotationService.GetSchedule(VehicleRegistrationNo,PolicyNo);
-            return Ok(response);
+            return ServiceResponse(response);
 
         }
 
@@ -58,7 +58,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         public IActionResult CreateUpdateSchedule(ScheduleDTO scheduleDTO)
         {
             var reponse = _quotationService.CreateSchedule(scheduleDTO);
-            return Ok(reponse);
+            return ServiceResponse(reponse);
         }
 
         [HttpPost]
@@ -66,21 +66,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         {
             var response = await _quotationService.SwitchOnOff(VehicleNo, PolicyNo, SwitchStat);
 
-            return Ok(response);
+            return ServiceResponse(response);
         }
 
         [HttpPost]
         public IActionResult EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
         {
             var response = _quotationService.EndorsementPremium(endorsementPremium);
-            return Ok(response);
+            return ServiceResponse(response);
         }
 
         [HttpGet]
         public IActionResult ActivityReport(string PolicyNo, string Month)
         {
             var response = _quotationService.ActivityReport(PolicyNo, Month);
-            return Ok(response);
+            return ServiceResponse(response);
         }
 
 

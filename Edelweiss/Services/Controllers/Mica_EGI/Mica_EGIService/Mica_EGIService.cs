@@ -84,7 +84,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                                   && x.VehicleNumber == VehicleRegistrationNo
                                                                   && x.CreatedDate.Value.Date == IndianTime.Date);
 
-                    response.GetSchedule.SwitchStatus = checkstatus.SwitchStatus;
+                    if (checkstatus == null)
+                    {
+                        response.GetSchedule.SwitchStatus = false;
+                    }
+                    else
+                    {
+
+                        response.GetSchedule.SwitchStatus = checkstatus.SwitchStatus;
+                    }
 
                     if(CurrentTimeHour < Convert.ToDecimal(_configuration["Scheduler_Validation:TimeInHours"]))
                     {
@@ -367,7 +375,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
         }
 
-        private TaxTypeDTO TaxTypeForStateCode(String stateabbreviation)
+        private TaxTypeDTO TaxTypeForStateCode(string stateabbreviation)
         {
 
             var statedata = _context.TblMasState.SingleOrDefault(c => c.StateAbbreviation == stateabbreviation);
@@ -1284,6 +1292,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         {
                             ActiveTW += 1;
                         }
+
+                    }
+                    else if(CurrentDayStat == false)
+                    {
+                        switchLog = new TblSwitchLog();
+                        switchLog.PolicyNo = policy;
+                        switchLog.VehicleNumber = schedule.VehicleRegistrationNo;
+                        switchLog.SwitchStatus = false;
+                        switchLog.SwitchType = "Auto";
+                        switchLog.CreatedDate = IndianTime;
+
+                        _context.TblSwitchLog.Add(switchLog);
+                        _context.SaveChanges();
                     }
                 }
 
