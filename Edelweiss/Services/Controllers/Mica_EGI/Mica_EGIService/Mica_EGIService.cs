@@ -29,6 +29,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<PremiumReturnDto> EndorsementPremium(EndorsementPremiumDTO endorsementPremium);
 
         AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
+        List<ddDTO> GetVehicleMaster(string lMasterlist);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -1339,7 +1340,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                    
 
             var ReportID = scheduleReport.ReportId;
-
           
             var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x=>x.PolicyNumber).Distinct().ToList();
 
@@ -1843,6 +1843,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return response;
 
+        }
+
+        public List<ddDTO> GetVehicleMaster(string lMasterlist)
+        {
+
+            List<ddDTO> obj;
+
+            obj = _context.TblVehicleDetails.Select(x => new ddDTO { mID = x.VehicleId, mValue = x.VehicleModel, mType = x.VehicleType }).ToList();
+
+            return obj;
         }
 
     }

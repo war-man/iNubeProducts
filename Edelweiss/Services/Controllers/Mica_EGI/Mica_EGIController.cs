@@ -106,5 +106,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var response = _quotationService.GetAllVehicleSchedule(PolicyNo);
             return Ok(response);
         }
+
+        [HttpGet]
+        public IActionResult GetVehicleMaster(string lMasterlist, bool isFilter = true)
+        {
+            var objectval = _quotationService.GetVehicleMaster(lMasterlist);
+            
+            return Ok(objectval);
+        }
+
     }
 }

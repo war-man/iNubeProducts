@@ -255,6 +255,13 @@ namespace iNube.Services.MicaExtension_EGI.Models
         }
         public List<ActivityDTO> ActivityDTO { get; set; }
     }
-    
+
+    public partial class ddDTO
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+    }
+
 }
 
