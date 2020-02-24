@@ -77,7 +77,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpGet]
-        public IActionResult ActivityReport(string PolicyNo, string Month)
+        public IActionResult ActivityLog(string PolicyNo, string Month)
         {
             var response = _quotationService.ActivityReport(PolicyNo, Month);
             return ServiceResponse(response);
