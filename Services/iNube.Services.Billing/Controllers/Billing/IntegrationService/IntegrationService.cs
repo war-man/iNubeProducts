@@ -7,6 +7,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+
 
 namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
 {
@@ -26,96 +28,92 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
     }
     public class IntegrationService : IIntegrationService
     {
-        readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-       //readonly string productUrl = "https://localhost:44347";
-		//readonly string productUrl = "http://mica-inube-product-service.mica-internal.:9007";
-        
-		readonly string claimUrl = "https://inubeservicesclaims.azurewebsites.net";
-        //readonly string claimUrl = "https://localhost:44344";
-		// readonly string claimUrl = "http://mica-inube-claim-service.mica-internal.:9002";
+        private IConfiguration _configuration;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
 
-        readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
-        //readonly string policyUrl = "https://localhost:44351";
-		// readonly string policyUrl = "http://mica-inube-policy-service.mica-internal.:9006";
+        public IntegrationService(IConfiguration configuration)
+        {
 
-        string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-        //string notificationUrl = "http://localhost:53000";
-		//readonly string notificationUrl = "http://mica-inube-notification-service.mica-internal.:9004";
-		
+            _configuration = configuration;
+            PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
+            BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
+            ClaimUrl = _configuration["Integration_Url:Claim:ClaimUrl"];
+            NotificationUrl = _configuration["Integration_Url:Notification:NotificationUrl"];
+            PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
+            ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            //UserUrl = "http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9009";
+            AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
+            ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
 
-        readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-        //readonly string partnerUrl = "https://localhost:44315";
-		//readonly string partnerUrl = "http://mica-inube-partner-service.mica-internal.:9005";
-
-        //readonly string UsermanangementUrl = "https://localhost:44367";
-        readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-		//readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
+        }
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
-            var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
         }
 
         public async Task<UserNameById> GetUserNameById(string Id, ApiContext apiContext)
         {
-            var uri = UsermanangementUrl + "/api/UserProfile/GetUserNameById?Id="+ Id;
+            var uri = UserUrl + "/api/UserProfile/GetUserNameById?Id="+ Id;
             var data =  await GetApiInvoke<UserNameById>(uri, apiContext);
             return data;
         }
 
         public async Task<IEnumerable<BilingEventDataDTO>> GetProductBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/BillingEventData";
+            var uri = ProductUrl + "/api/Product/BillingEventData";
 
             return await PostListApiInvoke<BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
         }
 
         public async Task<BillingEventResponseDTO> GetProductItemizedDetailsAsync(BillingEventRequest EventRequest,ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/BillingEventResponse";
+            var uri = ProductUrl + "/api/Product/BillingEventResponse";
 
             return await PostApiInvoke<BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
         }
 
         public async Task<IEnumerable<BilingEventDataDTO>> GetPolicyBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/BillingEventData";
+            var uri = PolicyUrl + "/api/Policy/BillingEventData";
 
             return await PostListApiInvoke<BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
         }
 
         public async Task<BillingEventResponseDTO> GetPolicyItemizedDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/BillingEventResponse";
+            var uri = PolicyUrl + "/api/Policy/BillingEventResponse";
 
             return await PostApiInvoke<BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
         }
 
         public async Task<IEnumerable<BilingEventDataDTO>> GetClaimBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
         {
-            var uri = claimUrl + "/api/ClaimManagement/BillingEventData";
+            var uri = ClaimUrl + "/api/ClaimManagement/BillingEventData";
 
             return await PostListApiInvoke<BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
         }
 
         public async Task<BillingEventResponseDTO> GetClaimItemizedDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
         {
-            var uri = claimUrl + "/api/ClaimManagement/BillingEventResponse";
+            var uri = ClaimUrl + "/api/ClaimManagement/BillingEventResponse";
 
             return await PostApiInvoke<BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
         }
 
         public async Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext)
         {
-            var uri = notificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
+            var uri = NotificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
             return await PostApiInvoke<NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
         }
 
 
         public async Task<OrganizationResponse> SaveCustomerAsync(OrganizationDTO EventRequest, ApiContext apiContext)
         {
-            var uri = partnerUrl + "/api/Organization/CreateOrganizationAsync";
+            var uri = PartnerUrl + "/api/Organization/CreateOrganizationAsync";
             return await PostApiInvoke<OrganizationDTO, OrganizationResponse>(uri, apiContext, EventRequest);
         }
 
