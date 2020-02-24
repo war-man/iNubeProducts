@@ -22,7 +22,7 @@ namespace MicaExtension_EGI.Entities
         public bool Sat { get; set; }
         public bool Sun { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        public DateTime ModifiedDate { get; set; }
         public decimal? ModifyCount { get; set; }
         public bool IsActive { get; set; }
 

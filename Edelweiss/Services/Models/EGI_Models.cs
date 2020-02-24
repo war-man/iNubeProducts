@@ -207,6 +207,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal GST { get; set; }
         public decimal Total { get; set; }
         public decimal MonthlyPremium { get; set; }
+        public decimal FinalAmount { get; set; }
     }
 
 
@@ -263,5 +264,23 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string mType { get; set; }
     }
 
+    public class BillingDTO 
+    {
+        public decimal AutoId { get; set; }
+        public string PolicyNumber { get; set; }
+        public decimal? Balance { get; set; }
+        public string Month { get; set; }
+        public string Type { get; set; }
+        public DateTime? BalanceDate { get; set; }
+    }
+
+    public class BillingResponse : ResponseStatus
+    {
+        public BillingResponse()
+        {
+            BillingDTO = new BillingDTO();
+        }
+        public BillingDTO BillingDTO { get; set; }
+    }
 }
 

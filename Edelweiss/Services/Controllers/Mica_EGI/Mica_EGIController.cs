@@ -18,7 +18,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
     [Route("api/[controller]/[action]")]
     [ApiController]
-  //  [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class Mica_EGIController : BaseApiController
     {
 
@@ -114,6 +114,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             
             return Ok(objectval);
         }
+
+        [HttpGet]
+        public IActionResult BillingDetails(string PolicyNo, string Month)
+        {
+            var response = _quotationService.BillingDetails(PolicyNo, Month);
+            return ServiceResponse(response);
+        }
+
 
     }
 }

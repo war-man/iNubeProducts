@@ -136,11 +136,13 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblMonthlyBalance>(entity =>
             {
                 entity.HasKey(e => e.AutoId)
-                    .HasName("PK__TblMonth__6B232905082BA0C2");
+                    .HasName("PK__TblMonth__6B232905D1D034C5");
 
                 entity.ToTable("TblMonthlyBalance", "QM");
 
-                entity.Property(e => e.AutoId).HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.AutoId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Balance).HasColumnType("numeric(18, 2)");
 

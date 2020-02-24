@@ -12,6 +12,7 @@ namespace iNube.Services.MicaExtension_EGI.Helpers
         public AutoMapperProfile()
         {
             CreateMap<TblSchedule, ScheduleDTO>().ReverseMap();
+            CreateMap<TblMonthlyBalance, BillingDTO>().ReverseMap();
 
         }
     }
