@@ -37,7 +37,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> ddDTOs;
 
 
@@ -55,7 +55,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<ddDTO>> GetObjects(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> obj;
             obj = from pr in _context.TblObjects.OrderByDescending(p => p.CreatedDate)
                   select new ddDTO
@@ -72,7 +72,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //Get AllEventDetails For Accounting Module
         public async Task<IEnumerable<EventMappingModel>> GetEventMapDetails(ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var accountMapDTOS = from tblobjectEventMap in _context.TblObjectEventMapping
@@ -102,7 +102,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<EventObjParamMapping>> GetEventObjectParameter(ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var accountMapDTOS = from tblobjectEventParam in _context.TblObjectEventParameter
@@ -132,7 +132,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //Get Customer Name for Accounting Details
         public async Task<IEnumerable<CustomersDTOS>> GetCustomerDetails(ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var abc = _context.TblCustomers.OrderBy(C => C.IsActive == true);
             var customerList = _mapper.Map<IEnumerable<CustomersDTOS>>(abc);
@@ -144,7 +144,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<ddDTO>> GetEvents(string lMasterlist, int obj, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> eve;
             eve = from a in _context.TblObjectEventMapping.Where(x => x.ObjectId == obj).OrderByDescending(x => x.CreatedBy)
                   join o in _context.TblObjects on a.ObjectId equals o.ObjectId
@@ -160,7 +160,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<objParamDTO>> GetValueFactor(string lMasterlist, int objectid, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<objParamDTO> param;
             param = _context.TblObjectEventParameter.Where(x => x.ObjectId == objectid && x.Coltype == "C").Select(x => new objParamDTO
             {
@@ -173,7 +173,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<IEnumerable<objParamDTO>> GetAllEventMapping(ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var mapdescription = _context.TblObjectEventMapping.Select(x => new objParamDTO
             {
                 mID = x.EventMappingId,
@@ -186,7 +186,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<ddDTO>> GetMasterForLocation(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> ddDTOs;
             ddDTOs = _context.TblMasCountry
              .Select(c => new ddDTO
@@ -200,7 +200,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<ddDTO>> GetLocation(string locationType, int parentID, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             IEnumerable<ddDTO> ddDTOs;
 
@@ -257,7 +257,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<BillingConfigDTO> SaveBillingDetails(BillingConfigDTO billingitem, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -290,7 +290,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //update for Billing
         public async Task<BillingConfigDTO> ModifyBilling(BillingConfigDTO objBilling, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tbl_bill = _mapper.Map<TblBillingConfig>(objBilling);
             var tbl_Billing = _context.TblBillingConfig.Find(tbl_bill.BillingConfigId);
 
@@ -312,7 +312,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<IEnumerable<HistoryDTO>> GetHistry(decimal contractid, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var BillingHistory = (from s in _context.TblBillingConfig.Where(x => x.ContractId == contractid)
                                   join cs in _context.TblBillingItem on s.BillingConfigId equals cs.BillingConfigId
                                   select new HistoryDTO
@@ -401,7 +401,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //search for Billing
         public async Task<IEnumerable<BillingConfigDTO>> SearchBilling(BillingSearchDTO billingSearchDTO, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var _bill = from bi in _context.TblBillingConfig.OrderByDescending(p => p.CreatedDate)
                         select bi;
@@ -446,7 +446,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<List<BillingItemDetailDTO>> SaveBillingItemDetails(BillingIDetailDTO billingitemdetail, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -465,7 +465,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<ContractDTO>> SearchContract(ContractDTO contractdto, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _contract = from pr in _context.TblContract.OrderByDescending(p => p.CreatedDate)
                             select pr;
 
@@ -502,7 +502,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<IEnumerable<ContractDTO>> SearchContractById(int contractid, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ContractDTO> scontract = _context.TblContract.Where(a => a.ContractId == contractid)
                             .Select(c => new ContractDTO
                             {
@@ -519,7 +519,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<String> GetObjectEvent(int obj, int eve, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var str1 = _context.TblObjects.First(c => c.ObjectId == obj).ObjectName;
             var str2 = _context.TblEvents.First(b => b.EventId == eve).EventName;
             //select a.ObjectName,b.EventName from[BI].[tblObjects] a, [BI].[tblEvents] b where a.ObjectId=b.ObjectId
@@ -534,7 +534,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             //          join o in _context.TblObjects on a.ObjectId equals o.ObjectId
             //          join e in _context.TblEvents on a.EventId equals e.EventId
             //          select a.EventMappingId;
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var str = _context.TblObjectEventMapping.Where(x => x.ObjectId == obj && x.EventId == eve).Select(x => new { x.EventMappingId, x.Description }).SingleOrDefault();
 
             List<string> Mapdata = new List<string>();
@@ -545,7 +545,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<IQueryable<String>> GetEventMapping(int mappingid, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var mapdescription = _context.TblObjectEventMapping.Where(x => x.EventMappingId == mappingid).Select(x => x.Description);
             return mapdescription;
 
@@ -553,7 +553,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<CustomerResponse> SaveCustomerAsync(CustomersDTO Customerdto, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //try
             //{
             //var dtomap = _mapper.Map<CustomersDTO>(Customerdto);
@@ -591,7 +591,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<CustomersDTO> GetCustomerById(decimal Customerid, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var _customer = _context.TblCustomers.Where(item => item.CustomerId == Customerid)
                    .Include(add => add.TblCustAddress)
@@ -607,7 +607,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<CustomersDTO> ModifyCustomer(CustomersDTO customerDto, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -626,7 +626,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<InvoiceConfigDTO> ModifyInvoice(InvoiceConfigDTO invoiceData, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -644,7 +644,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<IEnumerable<ObjectsDTO>> GetObjectParameter(ApiContext context)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
             var data = _context.TblObjects;
             var dtoObject = _mapper.Map<IList<ObjectsDTO>>(data);
             return dtoObject;
@@ -653,7 +653,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<BillingConfigDTO> GetBillingById(decimal billingconfigid, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var _billingconfig = _context.TblBillingConfig.Where(item => item.ContractId == billingconfigid)
                    .Include(add => add.TblBillingItem)
@@ -666,7 +666,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //Payment
         public async Task<List<PaymentDTO>> CreatePayment(PaymentListDTO paymentDto, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -684,7 +684,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<IEnumerable<PaymentHistoryDTO>> GetPaymentByInvoiceId(int invoiceId, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             // var _Payment = _context.TblPayment.Where(x => x.InvoiceId == invoiceId).Select(x => x);
 
@@ -749,7 +749,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<IEnumerable<CustomerSearchDTO>> CustomerSearch(CustomerSearchDTO customersDTO, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var _cust = (from cust in _context.TblCustomers.OrderByDescending(x => x.CreatedDate)
                          join cont in _context.TblContract on cust.CustomerId equals cont.CustomerId
@@ -781,7 +781,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<CustomerResponse> CustomerNamevalidation(string Name, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var data = _context.TblCustomers.Any(e => e.CustomerName == Name);
 
             if (data == true)
@@ -796,7 +796,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<CustomerConfigDTO> CreateCustomerConfig(CustomerConfigDTO configDTO, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -817,7 +817,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<PaymentDTO> UpdatePaymentStatus(PaymentDTO pay, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -851,7 +851,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<CustomerConfigDTO> UploadCustConfigImage(CustomerConfigDTO contractimg, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -880,7 +880,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<CustomersDTO> UploadCustLogo(CustomersDTO CustomerLogo, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -911,7 +911,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         // Save Invoice config(Create Invoice)
         public async Task<InvoiceConfigDTO> CreateInvoice(InvoiceConfigDTO invoiceConfig, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var invoice = _mapper.Map<TblInvoiceConfig>(invoiceConfig);
@@ -930,7 +930,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         // Save Create Contract to database(Create Contract)
         public async Task<ContractDTO> CreateContract(ContractDTO contract, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -951,7 +951,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         // To get data from data base and show in grid
         public async Task<IEnumerable<ContractHistoryDetails>> GetContractHistory(decimal customerId, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var customer = _context.TblCustomers.Where(c => c.CustomerId == customerId);
@@ -987,7 +987,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<ContractDocDTO> UploadFiles(ContractDocDTO contractDoc, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //_context = (MICACMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             //var claimdetails = _context.TblClaimdoc.SingleOrDefault(x => x.ClaimId == ClaimId);
 
@@ -1012,7 +1012,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //view the uploaded document
         public async Task<IEnumerable<ContractDocDTO>> DocumentView(decimal ContractId, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tblContractDoc = _context.TblContractDoc.Where(s => s.ContractId == ContractId).ToList();
             if (tblContractDoc != null)
             {
@@ -1024,7 +1024,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         // Save Invoice config(Create Invoice)
         public async Task<InvoiceConfigDTO> CreateInvoiceConfig(InvoiceConfigDTO invoiceConfig, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var invoice = _mapper.Map<TblInvoiceConfig>(invoiceConfig);
@@ -1043,7 +1043,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         // To get data from data base and show in grid
         public async Task<IEnumerable<InvoiceConfigHistory>> GetInvoiceConfigHistory(ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var history = from invoice in _context.TblInvoiceConfig
@@ -1069,7 +1069,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         // Save Search Invoice (Create Invoice)
         public async Task<InvoiceDTO> SearchInvoice(InvoiceDTO invoiceDto, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 //CustomersDTO customers = new CustomersDTO();
@@ -1090,7 +1090,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //To get data from data base and show in grid for Search Invoice table
         public async Task<IEnumerable<InvoiceSearchHistory>> GetSearchInvoiceHistory(InvoiceContractSearch invoiceContractSearch, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             InvoiceSearchHistory invoiceSearchHistory = new InvoiceSearchHistory();
 
             string[] lstStatus = new string[] { "InvoiceStatus" };
@@ -1204,7 +1204,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         {
             //if (invoiceCustSearch.EnvId > 0)
             //{
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //}
             //else
             //{
@@ -1331,7 +1331,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //Save the regenerated invoice in InvoicePenalty table
         public async Task<InvoicePenaltyDTO> CreateRegenerateInvoice(InvoicePenaltyDTO invoicePenalty, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 
@@ -1355,7 +1355,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //Search customer based on customer Id
         public async Task<IEnumerable<CustomersDTO>> SearchCustomer(decimal customerId, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<CustomersDTO> scustomer = _context.TblCustomers.Where(a => a.CustomerId == customerId)
                            .Select(c => new CustomersDTO
                            {
@@ -1372,7 +1372,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<InvoiceResponse> GenerateInvoiceAsync(InvoiceRequest invoiceRequest, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 if (invoiceRequest.InvoiceStartDate != null && invoiceRequest.InvoiceEndDate != null)
@@ -1438,7 +1438,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<InvoiceConfigDTO> GetInvoiceBillingDetailsAsync(InvoiceRequest invoiceRequest, InvoiceConfigDTO lstInvoiceConfig, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             InvoiceDTO invoiceDto = new InvoiceDTO();
             InvoiceConfigDTO invoiceConfigDto = new InvoiceConfigDTO();
@@ -1471,7 +1471,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //Verifying BillingConfigId with BillingConfigId from TblBillingItem and selecting whole BillingItem table
         public async Task<InvoiceDTO> SaveBillingInvoiceAsync(decimal BillingConfigId, InvoiceRequest invoiceRequest, InvoiceConfigDTO invoiceConfigDTO, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             try
             {
@@ -1585,7 +1585,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //Based on EventMappingId get the count of ProductCreation, PolicyCreation.... and save in (var billingEventDetail|..)
         private async Task<IEnumerable<BilingEventDataDTO>> GetBillingEventDetailsAsync(int EventMappingId, InvoiceRequest invoiceRequest, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             BillingEventRequest EventRequet = new BillingEventRequest();
             EventRequet.FromDate = (DateTime)invoiceRequest.InvoiceStartDate;
@@ -1616,7 +1616,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         }
         public async Task<BillingEventResponseDTO> GetBillingItemizedDetailsAsync(int EventMappingId, InvoiceRequest invoiceRequest, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //int EventMappingId = 2;
             BillingEventRequest EventRequet = new BillingEventRequest();
 
@@ -1674,7 +1674,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         //Saving In PDF
         public async Task<InvoiceModel> InvoicePdfGeneration(InvoiceModel invoiceModel, InvoiceDTO invoiceDto, InvoiceRequest invoiceRequest, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             int count = 0;
             // InvoiceModel invoiceModel = new InvoiceModel();
             NotificationRequest notificationRequest = new NotificationRequest();
@@ -2093,7 +2093,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
         public async Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext)
         {
-            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _spocdetails = _context.TblCustomers.Where(x => x.CustomerId == customerId)
                 .Include(add => add.TblCustAddress)
                 .Include(add => add.TblCustSpocDetails)
