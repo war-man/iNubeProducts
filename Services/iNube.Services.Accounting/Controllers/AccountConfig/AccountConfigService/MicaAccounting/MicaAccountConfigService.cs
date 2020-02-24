@@ -5,6 +5,7 @@ using iNube.Services.Accounting.Models;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using System;
@@ -24,19 +25,20 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
         private readonly Func<string, IAccountingConfigService> _accountsService;
-
+        private IConfiguration _configuration;
         public MicaAccountConfigService(Func<string, IAccountingConfigService> accountsService, IMapper mapper, MICAACContext context,
-            IOptions<AppSettings> appSettings)
+            IOptions<AppSettings> appSettings, IConfiguration configuration)
         {
             _mapper = mapper;
             _appSettings = appSettings.Value;
             _context = context;
             _accountsService = accountsService;
+            _configuration = configuration;
         }
 
         public async Task<AccountResponce> CreateAccounts(CoaaccountsDto coaacountsdto, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             try
             {
                 var dto = _mapper.Map<TblCoaaccounts>(coaacountsdto);
@@ -56,7 +58,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //Delete CoaMapping
         public async void DeleteCoaMapping(decimal AccountMappingId, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var delete_caoMap = _context.TblCoaaccountMapping.Find(AccountMappingId);
             if (delete_caoMap != null)
             {
@@ -67,7 +69,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<CoaMapResponse> CreateCoaMapping(CoaaccountMappingDto coamappingdto, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var dto = _mapper.Map<TblCoaaccountMapping>(coamappingdto);
@@ -90,7 +92,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<TransactionMapResponse> CreateTransactionMap(TransactionRuleMappingDto transactionmappingdto, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var dto = _mapper.Map<TblTransactionRuleMapping>(transactionmappingdto);
@@ -125,7 +127,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<TransactionResponse> CreateTransaction(TransactionHeaderDto transactionDto, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var dto = _mapper.Map<TblTransactionHeader>(transactionDto);
@@ -144,7 +146,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<CoaaccountsDto> GetAccountById(decimal accountId, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tblAccount = _context.TblCoaaccounts.Find(accountId);
             if (tblAccount != null)
             {
@@ -157,7 +159,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //Get TransactionMapping By ID
         public async Task<CoaaccountMappingDto> GetCOAMappingById(decimal accountMappingId, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tblAccount = _context.TblCoaaccountMapping.Find(accountMappingId);
             if (tblAccount != null)
             {
@@ -170,7 +172,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //Returning Directly Model
         public async Task<IEnumerable<TransactionRuleMappingDto>> GetTransaction(ApiContext apiContext)
         {
-             _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+             _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tblAccount = _context.TblTransactionRuleMapping.OrderBy(item => item.CreatedDate).Include(add => add.TblTransactionConditions).Include(add => add.TblSubLedgerReferences);
            
             var coaDTO = _mapper.Map<IList<TransactionRuleMappingDto>>(tblAccount);
@@ -191,7 +193,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<IEnumerable<AccountTypeDto>> GetAccountType(ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var account_list = _context.TblAccountType.ToList();
@@ -214,7 +216,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<IEnumerable<SubLedgerReferencesDto>> GetSubLedgerType(ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var account_list = _context.TblSubLedgerReferences.ToList();
@@ -260,7 +262,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<IEnumerable<TransactionRuleMappingConditionsDto>> GetTransactionRuleMappingCondition(ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var transactionConditionList = from tblMappin in _context.TblTransactionRuleMapping
                                            join tblConditions in _context.TblTransactionConditions on tblMappin.TransactionRuleMappingId equals tblConditions.TransactionRuleMappingId
                                            join tblSubLedger in _context.TblSubLedgerReferences on tblMappin.TransactionRuleMappingId equals tblSubLedger.TransactionRuleMappingId
@@ -293,7 +295,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<IEnumerable<TransactionDto>> GetTransactionDetails(ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var transactionList = _context.TblTransaction.ToList();
@@ -325,7 +327,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //CoaMapping Details for Export to Excel Part
         public async Task<IEnumerable<CoaAccountMappingDto>> GetCoaMappingDetails(ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var coaMapppingDto = from tblCoaMappping in _context.TblCoaaccountMapping
@@ -353,7 +355,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //Get the Journal Entry Confriguation Grid
         public async Task<IEnumerable<JournalEntryConfriguationDto>> GetJournalEnntryDetails(ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var journalDtos = from tblTransactionRuleCondition in _context.TblTransactionConditions
@@ -383,7 +385,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         // Getting details with AccountName and Id
         public async Task<IEnumerable<AccountDetailsDto>> GetAccountDetails(ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var accountDTOS = from tblaccount in _context.TblCoaaccounts
@@ -440,7 +442,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<IEnumerable<CoaaccountsSearchDto>> SearchAccount(AccountSearchDetailsDto accountSearchDto, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _accounts = from act in _context.TblCoaaccounts.OrderByDescending(a => a.CreatedDate)
                             join actType in _context.TblAccountType on act.AccountTypeId equals actType.AccountTypeId
                             select new AccountSearchDetailsDto
@@ -483,7 +485,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //Searching of CoaMapping
         public async Task<IEnumerable<CoaMappingSearchDto>> SearchCOAMapping(CoaMappingSearchDto coaMappingSearch, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _coaMapping = from coaMap in _context.TblCoaaccountMapping.OrderByDescending(a => a.CreatedDate)
                               join actName in _context.TblCoaaccounts on (decimal)coaMap.AccountId equals actName.AccountId
                               select new CoaMappingSearchDto
@@ -515,7 +517,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<IEnumerable<TransactionDto>> SearchTransaction(TransactionSearchDto searchTransaction, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _transaction = from trans in _context.TblTransaction.OrderByDescending(a => a.CreatedDate)
                                select trans;
             if (searchTransaction.CreatedDate != null)
@@ -529,7 +531,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //Fetching Transaction Data
         public async Task<IEnumerable<TransactionAccountSearchDto>> SearchTransactionAccount(TransactionSearchAccountDto transactionAccountSearchDto, DateTime fromDate, DateTime toDate, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             if (fromDate != null && toDate != null)
             {
                 var accounts = from transHeader in _context.TblTransactionHeader.OrderBy(a => a.CreatedDate)
@@ -649,7 +651,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<IEnumerable<TransactionDto>> SearchTransactionD(DateTime fromDate, DateTime toDate, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _transaction = from trans in _context.TblTransaction.OrderByDescending(a => a.CreatedDate)
                                select trans;
             if (fromDate != null && toDate != null)
@@ -662,7 +664,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<CoaaccountsDto> ModifyAccounts(CoaaccountsDto objAccounts, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tbl_account = _mapper.Map<TblCoaaccounts>(objAccounts);
             var tbl_Accounts = _context.TblCoaaccounts.Find(tbl_account.AccountId);
 
@@ -687,7 +689,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
         public async Task<CoaaccountMappingDto> ModifyCoaMapping(CoaaccountMappingDto objMapAccounts, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tbl_accountMap = _mapper.Map<TblCoaaccountMapping>(objMapAccounts);
             var tbl_AccountsMap = _context.TblCoaaccountMapping.Find(tbl_accountMap.AccountMappingId);
 
@@ -712,7 +714,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //Disabling of COAAccounts
         public async Task<CoaaccountsDto> DisabeAccounts(CoaaccountsDto objAccounts, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tbl_account = _mapper.Map<TblCoaaccounts>(objAccounts);
             var tbl_Accounts = _context.TblCoaaccounts.Find(tbl_account.AccountId);
 
@@ -729,7 +731,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         //For Importting the file Into Excel
         public async Task<DemoResponse<List<CoaMapExcelImportDTO>>> Import(IFormFile formFile, CancellationToken cancellationToken, ApiContext apiContext)
         {
-            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             if (formFile == null || formFile.Length <= 0)
             {
                 return DemoResponse<List<CoaMapExcelImportDTO>>.GetResult(-1, "formfile is empty");

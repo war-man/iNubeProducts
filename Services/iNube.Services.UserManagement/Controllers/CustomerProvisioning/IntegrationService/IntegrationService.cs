@@ -1,5 +1,6 @@
 ﻿using iNube.Services.UserManagement.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -20,14 +21,34 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
 
     public class IntegrationService : IIntegrationService
     {
-        //readonly string BillingConfigUrl = "https://localhost:44362";
-        readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
-		//readonly string BillingConfigUrl = "http://mica-inube-billing-service.mica-internal.:9001";
+        private IConfiguration _configuration;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+
+        public IntegrationService(IConfiguration configuration)
+        {
+
+            _configuration = configuration;
+            PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
+            BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
+            ClaimUrl = _configuration["Integration_Url:Claim:ClaimUrl"];
+            NotificationUrl = _configuration["Integration_Url:Notification:NotificationUrl"];
+            PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
+            ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
+            ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
+
+        }
+
+  //      //readonly string BillingConfigUrl = "https://localhost:44362";
+  //      readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
+		////readonly string BillingConfigUrl = "http://mica-inube-billing-service.mica-internal.:9001";
 
 
         public async Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext)
         {
-            var uri = BillingConfigUrl + "/api/Billing/GetCustProvisioningDetailsAsync?customerId=" + customerId;
+            var uri = BillingUrl + "/api/Billing/GetCustProvisioningDetailsAsync?customerId=" + customerId;
             return await GetApiInvoke<CustomersDTO>(uri, apiContext);
         }
 
