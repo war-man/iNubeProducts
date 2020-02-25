@@ -1698,13 +1698,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 return DifferentialPremium;
 
             }
-            else if (endorsementPremium.PcCount <= 0)
+            else if (endorsementPremium.PcCount < 0)
             {
                 ErrorInfo errorInfo = new ErrorInfo();
 
-                DifferentialPremium.ResponseMessage = "Minimum One Private Car Should Be Their";
+                DifferentialPremium.ResponseMessage = "Private Car Count Cannot be negative";
                 DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Minimum One PC Should Be Their";
+                errorInfo.ErrorMessage = "PC Count Cannot be negative";
                 errorInfo.ErrorCode = "ExtEP001";
                 errorInfo.PropertyName = "PCCountVerify";
                 DifferentialPremium.Errors.Add(errorInfo);
@@ -1761,18 +1761,53 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW + endorsementPremium.TwCount).ToString();
 
 
+                int TotalPCCount = detailsDTO.NoOfPC + endorsementPremium.PcCount;
+                int TotalTWCount = detailsDTO.NoOfTW + endorsementPremium.TwCount;
+
+                if (TotalPCCount > 4 || TotalPCCount == 0)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Private Car Count Cannot be Zero or Greater than 3";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Private Car Count Cannot be Zero or Greater than 3";
+                    errorInfo.ErrorCode = "ExtEP005";
+                    errorInfo.PropertyName = "PCCountVerify";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+               else  if (TotalTWCount > 4 )
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Two Wheeler Count Cannot be Greater than 3";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Two Wheeler Count Cannot be Greater than 3";
+                    errorInfo.ErrorCode = "ExtEP006";
+                    errorInfo.PropertyName = "TWCountVerify";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+
+
                 //RateObject
 
                 premiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
                 premiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
                 premiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
-                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = (detailsDTO.NoOfPC + endorsementPremium.PcCount).ToString();
-                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = (detailsDTO.NoOfPC + endorsementPremium.PcCount).ToString();
-                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = (detailsDTO.NoOfTW + endorsementPremium.TwCount).ToString();
+                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = TotalPCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = TotalPCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = TotalTWCount.ToString();
 
 
                 premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
                 premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+
+
+
+               
 
                 //Call CalculatePremium for with Endorsment Data MICA
                 var NewPremiumData = await InternalCalculatePremium(premiumDTO);
@@ -1875,14 +1910,46 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW - endorsementPremium.TwCount).ToString();
 
 
+
+
+                int TotalPCCount = detailsDTO.NoOfPC - endorsementPremium.PcCount;
+                int TotalTWCount = detailsDTO.NoOfTW - endorsementPremium.TwCount;
+
+                if (TotalPCCount > 4 || TotalPCCount == 0)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Private Car Count Cannot be Zero or Greater than 3";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Private Car Count Cannot be Zero or Greater than 3";
+                    errorInfo.ErrorCode = "ExtEP005";
+                    errorInfo.PropertyName = "PCCountVerify";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+                else if (TotalTWCount > 4 || TotalTWCount < 0)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Two Wheeler Count Cannot  Negative or be Greater than 3";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Two Wheeler Count Cannot be Negative or Greater than 3";
+                    errorInfo.ErrorCode = "ExtEP006";
+                    errorInfo.PropertyName = "TWCountVerify";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+
                 //RateObject
 
                 premiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
                 premiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
                 premiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
-                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = (detailsDTO.NoOfPC - endorsementPremium.PcCount).ToString();
-                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = (detailsDTO.NoOfPC - endorsementPremium.PcCount).ToString();
-                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = (detailsDTO.NoOfTW - endorsementPremium.TwCount).ToString();
+                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = TotalPCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = TotalPCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = TotalTWCount.ToString();
 
 
                 premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
