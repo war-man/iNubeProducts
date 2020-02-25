@@ -20,7 +20,7 @@ import CardBody from "components/Card/CardBody.jsx";
 import { Animated } from "react-animated-css";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
-
+//import CircularProgress from '@material-ui/core/CircularProgress';
 
 const style = {
     infoText: {
@@ -43,9 +43,12 @@ const style = {
 const Permission = (props) => {
     let menuname = props.menuname;
     let listData = props.listData;
+    let dashboard = props.dashboard;
     let testCheck = props.testCheck;
     let changeCollapse = props.changeCollapse;
-    let foo = (a, b, location, c) => {
+    let testCheck1 = props.testCheck1;
+    let changeCollapse1 = props.changeCollapse1;
+    let permissions = (a, b, location, c) => {
         return (
             <div>
                 <React.Fragment>
@@ -69,7 +72,42 @@ const Permission = (props) => {
                                     <Collapse in={!item.collapse} unmountOnExit>
                                         <ListItem>
                                             <List className="list-padding">
-                                                {foo(item.children, b + 1, location.concat([index]), c)}
+                                                {permissions(item.children, b + 1, location.concat([index]), c)}
+                                            </List>
+                                        </ListItem>
+                                    </Collapse>
+                            }
+                        </React.Fragment>
+                    )}
+                </React.Fragment>
+            </div>
+        );
+    }
+    let dashboardmenu = (a1, b1, location1, c1) => {
+        return (
+            <div>
+                <React.Fragment>
+                    {a1.map((item, index) =>
+                        <React.Fragment>
+                            <ListItem className="tree-Assign-Privileges">
+                                <ListItemIcon className="checkboxPading" >
+                                    <CustomCheckbox
+                                        value={item.status}
+                                        onChange={(e) => { testCheck1(index, location1, c1, e) }}
+                                        checked={item.status}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </ListItemIcon>
+                                <ListItemText className="checkboxText" primary={item.label} onClick={() => { changeCollapse1(index, location1, c1) }} />
+                            </ListItem>
+                            {
+                                (item.children.length == 0) ? "" :
+                                    <Collapse in={!item.collapse} unmountOnExit>
+                                        <ListItem>
+                                            <List className="list-padding">
+                                                {dashboardmenu(item.children, b1 + 1, location1.concat([index]), c1)}
                                             </List>
                                         </ListItem>
                                     </Collapse>
@@ -89,7 +127,7 @@ const Permission = (props) => {
                         <List>
                             {listData.map((item, index) =>
                                 <div className="permissiongrid" id="'+ randomID +'">
-                                    <GridItem xs={12} sm={12}>
+                                    {/*    <GridItem xs={12} sm={12}>
                                         {menuname ? null
                                             : <Dropdown
                                                 required={true}
@@ -100,7 +138,7 @@ const Permission = (props) => {
                                                 onChange={(e) => props.handleDropdown(e)}
                                                 formControlProps={{ fullWidth: true }}
                                             />}
-                                    </GridItem>
+                                    </GridItem>*/}
                                     <GridItem xs={12} sm={12}>
                                         <ListItem className="mica-admin" >
                                             <ListItemIcon className="checkboxPading" >
@@ -112,7 +150,7 @@ const Permission = (props) => {
                                         <GridItem>
                                             <ListItem className="partner-admin">
                                                 <List>
-                                                    {foo(item.mdata, 0, [], index)}
+                                                    {permissions(item.mdata, 0, [], index)}
                                                 </List>
                                             </ListItem>
                                         </GridItem>
@@ -123,9 +161,35 @@ const Permission = (props) => {
                         </List>
                     </CardBody>
                 </GridContainer>
+                <GridContainer>
+                    <CardBody className="permission-card">
+                        <List>
+                            {dashboard.map((item, index) =>
+                                <div className="permissiongrid" id="'+ randomID +'">
+                                    <GridItem xs={12} sm={12}>
+                                        <ListItem className="mica-admin" >
+                                            <ListItemIcon className="checkboxPading" >
+                                            </ListItemIcon>
+                                            <ListItemText className="checboxText" primary={item.roleName} />
+                                        </ListItem>
+                                        <GridItem>
+                                            <ListItem className="partner-admin">
+                                                <List>
+                                                    {dashboardmenu(item.mdata, 0, [], index)}
+                                                </List>
+                                            </ListItem>
+                                        </GridItem>
+                                    </GridItem>
+                                </div>
+                            )}
+
+                        </List>
+                    </CardBody>
+                </GridContainer>{/**/}
                 <GridContainer lg={12} justify="center">
                     <GridItem xs={7} sm={3} md={3} lg={1} >
-                        <Button id="permissionbnt" onClick={props.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
+                        <Button id="permissionbnt" /*disabled={props.btnload1}*/ onClick={props.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
+                        {/*{props.btnload1 ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                     </GridItem>
                 </GridContainer>
             </GridItem>

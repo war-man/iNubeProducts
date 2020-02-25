@@ -235,6 +235,8 @@ class PasswordPage extends React.Component {
                     localStorage.setItem('displayName', data.displayName);
                     localStorage.setItem('userToken', data.token);
                     localStorage.setItem('locale', 'en_US');
+                    localStorage.setItem('partnerId', data.partnerId);
+                    localStorage.setItem('organizationId', data.organizationId);
 
                     if (data.profileImage == "" || data.profileImage == null || data.profileImage == undefined) {
                         localStorage.setItem('profilepicture', image);

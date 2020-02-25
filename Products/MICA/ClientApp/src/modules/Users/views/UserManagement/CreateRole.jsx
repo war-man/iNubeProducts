@@ -27,6 +27,12 @@ import swal from 'sweetalert';
 import role from "assets/img/users.png";
 import { Animated } from "react-animated-css";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Edit from "@material-ui/icons/Edit";
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import Modal from '@material-ui/core/Modal';
+import { config } from "../../../../config";
 
 const style = {
     infoText: {
@@ -63,8 +69,10 @@ class CreateRole extends React.Component {
         this.state = {
             permissionpage: false,
             id: "",
+            btnload: false,
+            btnload1: false,
             roledata: "",
-            dasboard: [],
+            dashboard: [],
             rolename: "",
             rowData: "",
             rolenormalizedname: "",
@@ -79,25 +87,25 @@ class CreateRole extends React.Component {
             showtable: false,
             showname: false,
             simpleSelect: "",
+            open: false,
             data: [],
             MasPermissionDTO: [],
             Roles: {
                 "name": "",
+                "normalizedName": ""
             },
             initialRoles: {
                 "name": "",
             },
             dashboardvalue: "",
             listData: [],
-            searchRequest:
-                {
-                    "firstName": "",
-                    "employeeNumber": "",
-                    "emailId": "",
-                    "contactNumber": "",
-                    "panNo": "",
-                    "partnerId": 0,
-                },
+            rolemenupermissions: {
+                "roleId": ""
+            },
+            searchRequest: {
+                "roleid": "",
+                "editrolename": "",
+            },
             rolepermissions: {
                 "roleId": "",
                 "permissionIds": []
@@ -108,9 +116,12 @@ class CreateRole extends React.Component {
     }
 
     CreateRole() {
-        if (this.state.Roles.name != "")
-        {
+        if (this.state.Roles.name != "") {
+            let role = this.state.Roles;
+            role["normalizedName"] = role.name;
+            this.setState({ role })
             console.log("final role", this.state.Roles);
+            this.setState({ btnload: true });
             fetch(`${UserConfig.UserConfigUrl}/api/Role/CreateRole`, {
                 method: 'POST',
                 headers: {
@@ -118,9 +129,10 @@ class CreateRole extends React.Component {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                 },
-                body: JSON.stringify(this.state.Roles)
+                body: JSON.stringify(role)
             }).then(response => response.json())
                 .then(data => {
+                    this.setState({ btnload: false });
                     console.log("response data", data);
                     if (data.status == 2) {
                         this.setState({ newroleid: data.id, permissionpage: true, Roles: this.state.initialRoles });
@@ -128,6 +140,8 @@ class CreateRole extends React.Component {
                             text: data.responseMessage,
                             icon: "success"
                         });
+                        this.handleRolepermission();
+                        this.handleAllRoles();
                     } else if (data.status == 8) {
                         swal({
                             text: data.errors[0].errorMessage,
@@ -142,38 +156,16 @@ class CreateRole extends React.Component {
                     else { }
                 });
 
-            let roleid = 'ed8ad4c5-e9c0-4ced-a0bb-7d5873556cf8';
-            fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetAllPermissions?roleid=` + roleid, {  //fetching all permissions based on role having all privilages
-                method: 'Get',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-            }).then(response => response.json())
-                .then(data => {
-                    this.setState({ listData: data });
-                    console.log("list data", this.state.listData);
-                });
-
-            fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetDashboards`, {  //Fetching all Dashboards data to dropdown
-                method: 'Get',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-            }).then(response => response.json())
-                .then(data => {
-                    this.setState({ dasboard: data });
-                    console.log("dasboard data", this.state.dasboard);
-                });
         } else {
             swal({
                 text: "Some fields are missing",
                 icon: "error"
             });
         }
+
+    }
+
+    handleAllRoles = () => {
         fetch(`${UserConfig.UserConfigUrl}/api/Role/GetRoles`, {
             method: 'GET',
             headers: {
@@ -195,30 +187,20 @@ class CreateRole extends React.Component {
     handleClose = () => {
         this.setState({
             showtable: false,
-            //showname: true
+            open: false,
+            menuname: false
         });
     }
 
     componentDidMount() {
-        fetch(`${UserConfig.UserConfigUrl}/api/Role/GetRoles`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.setState({ RolesDTO: data });
-                console.log("roles", this.state.RolesDTO);
-                if (this.state.RolesDTO.length > 0) {
-                    this.datatable();
-                }
-            });
+        this.setState({ menuname: false });
+        this.handleAllRoles();
+        this.handleRolepermission();
+    }
 
-        let roleid = 'ed8ad4c5-e9c0-4ced-a0bb-7d5873556cf8';
-        fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetAllPermissions?roleid=` + roleid, {
+    handleRolepermission = () => {
+
+        fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetAllPermissions`, {
             method: 'Get',
             headers: {
                 'Accept': 'application/json',
@@ -228,7 +210,7 @@ class CreateRole extends React.Component {
         }).then(response => response.json())
             .then(data => {
                 this.setState({ listData: data });
-                console.log("list data", this.state.listData);
+                console.log("permission data", this.state.listData);
             });
 
         fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetDashboards`, {
@@ -240,10 +222,60 @@ class CreateRole extends React.Component {
             },
         }).then(response => response.json())
             .then(data => {
-                this.setState({ dasboard: data });
-                console.log("dasboard data", this.state.dasboard);
+                this.setState({ dashboard: data });
+                console.log("permission data", this.state.dashboard);
             });
     }
+
+    handleOpen = () => {
+        this.setState({ open: true });
+    }
+
+    handleEdit = (roleId, rolename) => {
+        //if (this.state.userId == "") {
+        //    swal("", "Please select user to edit details", "error")
+        //} else {
+        let role = this.state.searchRequest;
+        role.roleid = roleId;
+        role.editrolename = rolename;
+        this.setState({ role, menuname: true });
+        console.log("perms: ", roleId)
+        console.log("perms: ", this.state.searchRequest)
+        this.handleOpen();
+        let perm = this.state.rolemenupermissions;
+        perm.roleId = roleId;
+        this.setState({ perm });
+        console.log("perms: ", perm)
+        fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetRolePermissionsbyid`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(perm)
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ listData: data });
+                console.log("list data", this.state.listData);
+            });
+
+        fetch(`${UserConfig.UserConfigUrl}/api/Permission/Roledashboard`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(perm)
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ dashboard: data });
+                console.log("dashboards: ", this.state.dashboard);
+            });
+    };
 
     datatable = () => {
         this.setState({
@@ -254,34 +286,39 @@ class CreateRole extends React.Component {
                     name: prop.name,
                     normalizedname: prop.normalizedName,
                     concurrencystamp: prop.concurrencyStamp,
-                    radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.id)} />
+                    //radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.id)} />
+                    radio: <div>
+                        <Tooltip title={< TranslationContainer translationKey="Edit" />} placement="bottom" arrow>
+                            <IconButton color="info" justIcon round simple className="edit" onClick={() => this.handleEdit(prop.id, prop.name)} /*editModal={this.state.editModal}*/><Edit /></IconButton>
+                        </Tooltip >
+                    </div>
                 };
             })
         });
     }
 
-    editFunction(id, uId) {
-        var orgArr = this.state.RolesDTO;
-        var roleArr = [];
-        $.each(orgArr, function (k, v) {
-            if (v.id == uId) {
-                roleArr.push(orgArr[id]);
-            }
-        })
-        console.log("roles dto", roleArr)
-        const roleid = roleArr[0].id;
-        const roledata = roleArr[0];
-        const rolename = roleArr[0].name;
-        this.state.id = roleid;
-        console.log("id", this.state.id)
-        this.state.roledata = roledata;
-        console.log("roledata", this.state.roledata)
-        this.state.rolename = rolename;
-        console.log("rolename", this.state.rolename)
-        this.state.rowData = roleArr;
-        this.setState({ rowData: roleArr });
-        this.setState({});
-    }
+    //editFunction(id, uId) {
+    //    var orgArr = this.state.RolesDTO;
+    //    var roleArr = [];
+    //    $.each(orgArr, function (k, v) {
+    //        if (v.id == uId) {
+    //            roleArr.push(orgArr[id]);
+    //        }
+    //    })
+    //    console.log("roles dto", roleArr)
+    //    const roleid = roleArr[0].id;
+    //    const roledata = roleArr[0];
+    //    const rolename = roleArr[0].name;
+    //    this.state.id = roleid;
+    //    console.log("id", this.state.id)
+    //    this.state.roledata = roledata;
+    //    console.log("roledata", this.state.roledata)
+    //    this.state.rolename = rolename;
+    //    console.log("rolename", this.state.rolename)
+    //    this.state.rowData = roleArr;
+    //    this.setState({ rowData: roleArr });
+    //    this.setState({});
+    //}
 
     testCheck = (index, location, c, event) => {
         if (location.length > 0) {
@@ -297,13 +334,13 @@ class CreateRole extends React.Component {
         event.preventDefault();
     }
 
-    testCheck = (index, location, c, event) => {
+    testCheck1 = (index, location, c, event) => {
         if (location.length > 0) {
-            let responses = [...this.state.listData[c].mdata];
+            let responses = [...this.state.dashboard[c].mdata];
             responses[location[0]]['children'][index]['status'] = !responses[location[0]]['children'][index]['status'];
             this.setState({ responses });
         } else {
-            let responses = [...this.state.listData[c].mdata];
+            let responses = [...this.state.dashboard[c].mdata];
             responses[index].status = !responses[index].status;
             this.setState({ responses });
             this.setChildren(responses[index]['children'], responses[index].status);
@@ -318,6 +355,15 @@ class CreateRole extends React.Component {
         }
         listData[index]['collapse'] = !listData[index]['collapse'];
         this.setState(listData);
+    }
+
+    changeCollapse1 = (index, location, c) => {
+        let dashboard = this.state.dashboard[c].mdata;
+        for (let i = 0; i < location.length; i++) {
+            dashboard = dashboard[location[i]]['children'];
+        }
+        dashboard[index]['collapse'] = !dashboard[index]['collapse'];
+        this.setState(dashboard);
     }
 
     setChildren = (parent, value) => {
@@ -346,6 +392,7 @@ class CreateRole extends React.Component {
 
     searchdata = () => {
         this.setState({ showtable: true });
+        this.handleAllRoles();
     }
 
     calculate = (listData, tempArray) => {
@@ -365,18 +412,19 @@ class CreateRole extends React.Component {
         this.setState({ redirect: true });
     }
 
-    onChange = (currentNode, selectedNodes) => {
-        this.state.permission.push(currentNode.permissionId);
-    }
-
     handleSubmit = () => {
         const that = this;
         let x = {};
-        let listData = this.state.listData;
-        console.log("new Roleid", this.state.newroleid);
-        x.roleId = this.state.newroleid;
+        let listData = that.state.listData;
+        let dashboard = that.state.dashboard
+        console.log("new Roleid", that.state.newroleid);
+        if (this.state.newroleid != "") {
+            x.roleId = that.state.newroleid;
+        } else {
+            x.roleId = that.state.searchRequest.roleid;
+        }
         x.permissionIds = [];
-        let RolesDTO = this.state.RolesDTO;//for converting rolename to roleid
+        let RolesDTO = that.state.RolesDTO;//for converting rolename to roleid
         for (let i = 0; i < listData.length; i++) {
             let y = {};
             y.newpermissionIds = [];
@@ -395,56 +443,72 @@ class CreateRole extends React.Component {
             }
         }
 
-        x.permissionIds = [...new Set(x.permissionIds)];
-
-        x.permissionIds.push(this.state.dashboardvalue);
-        console.log("Final data", x);
-        if (this.state.dashboardvalue != "") {
-            fetch(`${UserConfig.UserConfigUrl}/api/Permission/AssignRolePermissions`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-                body: JSON.stringify(x)
-            }).then(function (response) {
-                console.log("response", response);
-                return response.json();
-            }).then(function (data) {
-                console.log("data", data);
-                if (data.status == 2) {
-                    swal({
-                        text: "Privileges assigned successfully",
-                        icon: "success"
-                    });
-                    that.setState({ permissionpage: false });
-                    console.log("data", data);
+        for (let i = 0; i < dashboard.length; i++) {
+            let y = {};
+            y.newpermissionIds = [];
+            for (let j = 0; j < dashboard[i].mdata.length; j++) {
+                if (dashboard[i].mdata[j].status == true) {
+                    y.newpermissionIds = y.newpermissionIds.concat([dashboard[i].mdata[j].permissionId]);
                 }
-                else if (data.status == 8) {
-                    swal({
-                        title: "Error",
-                        text: data.errors[0].errorMessage,
-                        icon: "error"
-                    });
-                }
-                else if (data.status == 400) {
-                    swal({
-                        title: "Sorry",
-                        text: "Please try again",
-                        icon: "error"
-                    });
-                }
-                else {
-                }
-            });
-        } else {
-            swal({
-                title: "Error",
-                text: "Please select Dashboad",
-                icon: "error"
-            });
+                y.newpermissionIds = this.handleSubmitForChildren(dashboard[i].mdata[j].children, y.newpermissionIds);
+            }
+            if (y.newpermissionIds.length > 0) {
+                y.newpermissionIds = [...new Set(y.newpermissionIds)];
+                console.log("dashboards changes: ", y.newpermissionIds);
+                x.permissionIds = x.permissionIds.concat(y.newpermissionIds);
+                console.log("dashboards changes: ", x.permissionIds);
+            }
         }
+
+        x.permissionIds = [...new Set(x.permissionIds)];
+        //if (this.state.searchRequest.roleid == "") {
+        //    x.permissionIds.push(this.state.dashboardvalue);
+        //}
+        console.log("Final data", x);
+        this.setState({ btnload1: true });
+        fetch(`${UserConfig.UserConfigUrl}/api/Permission/AssignRolePermissions`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(x)
+        }).then(function (response) {
+            console.log("response", response);
+            return response.json();
+        }).then(function (data) {
+            console.log("data", data);
+            that.setState({ btnload1: false });
+            if (data.status == 2) {
+                swal({
+                    text: "Privileges assigned successfully",
+                    icon: "success"
+                });
+                that.setState({ permissionpage: false });
+                console.log("data", data);
+                if (this.state.menuname == true) {
+                    this.handleClose();
+                }
+            }
+            else if (data.status == 8) {
+                swal({
+                    title: "Error",
+                    text: data.errors[0].errorMessage,
+                    icon: "error"
+                });
+            }
+            else if (data.status == 400) {
+                swal({
+                    title: "Sorry",
+                    text: "Please try again",
+                    icon: "error"
+                });
+            }
+            else {
+            }
+        });
+
     }
 
     handleSubmitForChildren(parent, y) {
@@ -516,60 +580,91 @@ class CreateRole extends React.Component {
                 {this.state.showtable ?
                     <GridContainer>
                         <GridItem xs={12}>
-                            <ReactTable
-                                title={"Roles"}
-                                data={this.state.data}
-                                filterable
-                                columns={[
-                                    //{
-                                    //    Header: "",
-                                    //    accessor: "radio",
-                                    //    minWidth: 10,
-                                    //    style: { textAlign: "center" },
-                                    //    headerClassName: 'react-table-center',
-                                    //    sortable: false,
-                                    //    filterable: false,
-                                    //    resizable: false,
-                                    //},
-                                    //{
-                                    //    Header: "Role Id",
-                                    //    accessor: "id",
-                                    //    style: { textAlign: "left" },
-                                    //    headerClassName: 'react-table-center',
-                                    //    minWidth: 80,
-                                    //    resizable: false,
-                                    //},
-                                    {
-                                        Header: "Role Name",
-                                        accessor: "name",
-                                        setCellProps: (value) => ({ style: { textAlign: "center" } }),
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 50,
-                                        resizable: false,
-                                    },
-                                    //{
-                                    //    Header: "Normalized Name",
-                                    //    accessor: "normalizedname",
-                                    //    style: { textAlign: "center" },
-                                    //    headerClassName: 'react-table-center',
-                                    //    minWidth: 50,
-                                    //    resizable: false,
-                                    //},
-                                    {
-                                        Header: "Date of Role Created",
-                                        accessor: "concurrencystamp",
-                                        setCellProps: (value) => ({ style: { textAlign: "center" } }),
-                                        headerClassName: 'react-table-center',
-                                        minWidth: 50,
-                                        resizable: false,
-                                    },
-                                ]}
-                                defaultPageSize={5}
-                                showPaginationTop={false}
-                                pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
-                                showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
-                                className="-striped -highlight"
-                            />
+                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                <ReactTable
+                                    title={"Roles"}
+                                    data={this.state.data}
+                                    filterable
+                                    columns={[
+
+                                        //{
+                                        //    Header: "Role Id",
+                                        //    accessor: "id",
+                                        //    style: { textAlign: "left" },
+                                        //    headerClassName: 'react-table-center',
+                                        //    minWidth: 80,
+                                        //    resizable: false,
+                                        //},
+                                        {
+                                            Header: "Role Name",
+                                            accessor: "name",
+                                            setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 50,
+                                            resizable: false,
+                                        },
+                                        {
+                                            Header: "Edit",
+                                            accessor: "radio",
+                                            minWidth: 10,
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            sortable: false,
+                                            filterable: false,
+                                            resizable: false,
+                                        },
+                                        //{
+                                        //    Header: "Normalized Name",
+                                        //    accessor: "normalizedname",
+                                        //    style: { textAlign: "center" },
+                                        //    headerClassName: 'react-table-center',
+                                        //    minWidth: 50,
+                                        //    resizable: false,
+                                        //},
+                                        {
+                                            Header: "Date of Role Created",
+                                            accessor: "concurrencystamp",
+                                            setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 50,
+                                            resizable: false,
+                                        },
+                                    ]}
+                                    defaultPageSize={5}
+                                    showPaginationTop={false}
+                                    pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                    showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                    className="-striped -highlight"
+                                />
+                            </Animated>
+                            <Modal
+                                aria-labelledby="simple-modal-title"
+                                aria-describedby="simple-modal-description"
+                                open={this.state.open}
+                                onClose={this.handleClose}>
+
+                                <div className={classes.paper} id="modal">
+                                    {/*<h4>  <small className="center-text"> <TranslationContainer translationKey="ModifyUser" /> </small> </h4>*/}
+                                    <h4>  <small className="center-text"> Edit Role </small> </h4>
+                                    <Button color="success"
+                                        round
+                                        className={classes.marginRight}
+                                        id="close-bnt"
+                                        onClick={this.handleClose}>
+                                        &times;
+                                                        </Button>
+                                    <GridContainer justify="center">
+                                        <div className="banner">
+                                            {/* <label> <TranslationContainer translationKey="Username" /></label><h5>{`${this.state.userName}`}</h5>&nbsp;&nbsp;<hr></hr>*/}
+                                            <label><h5>Role name: {this.state.searchRequest.editrolename}</h5></label>
+                                        </div>
+                                    </GridContainer>
+                                    <div id="disp" >
+                                        <Permission handleSubmit={this.handleSubmit} /*btnload1={this.state.btnload1}*/ dashboard={this.state.dashboard} handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                    </div>
+                                </div>
+
+                            </Modal>
                         </GridItem>
                         <GridContainer justify="center">
                             <GridItem xs={3} sm={3} md={3}>
@@ -622,9 +717,10 @@ class CreateRole extends React.Component {
                                 />
                             </GridItem>*/}
                             <GridItem xs={12} sm={4}>
-                                <Button color="success" id="top-bnt" round className={classes.marginRight} style={modalSearch} onClick={this.CreateRole}>
+                                <Button /*disabled={this.state.btnload}*/ color="success" id="top-bnt" round className={classes.marginRight} style={modalSearch} onClick={this.CreateRole}>
                                     <TranslationContainer translationKey="Save" />
                                 </Button>
+                                {/*  {this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                             </GridItem>
                         </GridContainer>
 
@@ -632,52 +728,54 @@ class CreateRole extends React.Component {
                 </Card>
                 <GridContainer justify="center">
                     <GridItem xs={12}>
-                        <ReactTable
-                            title={"Roles"}
-                            data={this.state.data}
-                            filterable
-                            columns={[
-                                //{
-                                //    Header: "Role Id",
-                                //    accessor: "id",
-                                //    style: { textAlign: "left" },
-                                //    headerClassName: 'react-table-center',
-                                //    minWidth: 100,
-                                //    resizable: false,
+                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                            <ReactTable
+                                title={"Roles"}
+                                data={this.state.data}
+                                filterable
+                                columns={[
+                                    //{
+                                    //    Header: "Role Id",
+                                    //    accessor: "id",
+                                    //    style: { textAlign: "left" },
+                                    //    headerClassName: 'react-table-center',
+                                    //    minWidth: 100,
+                                    //    resizable: false,
 
-                                //},
-                                {
-                                    Header: "Role Name",
-                                    accessor: "name",
-                                    setCellProps: (value) => ({ style: { textAlign: "center" } }),
-                                    headerClassName: 'react-table-center',
-                                    minWidth: 50,
-                                    resizable: false,
+                                    //},
+                                    {
+                                        Header: "Role Name",
+                                        accessor: "name",
+                                        setCellProps: (value) => ({ style: { textAlign: "center" } }),
+                                        headerClassName: 'react-table-center',
+                                        minWidth: 50,
+                                        resizable: false,
 
-                                },
+                                    },
 
-                                //{
-                                //    Header: "Normalized Name",
-                                //    accessor: "normalizedname",
-                                //    style: { textAlign: "left" },
-                                //    headerClassName: 'react-table-center',
-                                //    minWidth: 50,
-                                //    resizable: false,
-                                //},
-                                {
-                                    Header: "Date of Role Created",
-                                    accessor: "concurrencystamp",
-                                    setCellProps: (value) => ({ style: { textAlign: "center" } }),
-                                    headerClassName: 'react-table-center',
-                                    minWidth: 70,
-                                    resizable: false,
-                                },
-                            ]}
-                            defaultPageSize={5}
-                            showPaginationTop={false}
-                            showPaginationBottom
-                            className="-striped -highlight"
-                        />
+                                    //{
+                                    //    Header: "Normalized Name",
+                                    //    accessor: "normalizedname",
+                                    //    style: { textAlign: "left" },
+                                    //    headerClassName: 'react-table-center',
+                                    //    minWidth: 50,
+                                    //    resizable: false,
+                                    //},
+                                    {
+                                        Header: "Date of Role Created",
+                                        accessor: "concurrencystamp",
+                                        setCellProps: (value) => ({ style: { textAlign: "center" } }),
+                                        headerClassName: 'react-table-center',
+                                        minWidth: 70,
+                                        resizable: false,
+                                    },
+                                ]}
+                                defaultPageSize={5}
+                                showPaginationTop={false}
+                                showPaginationBottom
+                                className="-striped -highlight"
+                            />
+                        </Animated>
                     </GridItem>
                 </GridContainer>
                 {this.state.permissionpage ?
@@ -688,11 +786,11 @@ class CreateRole extends React.Component {
                             </CardIcon>
                             <h4>
                                 <small><TranslationContainer translationKey="AssignPrivilegestotheRole" />
-                        </small> </h4>
+                                </small> </h4>
                         </CardHeader>
                         <CardBody>
                             <GridContainer justify="center" >
-                                <Permission handleSubmit={this.handleSubmit} handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} dasboard={this.state.dasboard} menuname={this.state.menuname} onChange={this.onChange} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                <Permission handleSubmit={this.handleSubmit} dashboard={this.state.dashboard}/*btnload1={this.state.btnload1}*/ handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} />
                             </GridContainer>
                         </CardBody>
                     </Card>

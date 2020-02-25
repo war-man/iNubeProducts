@@ -5,10 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using HealthChecks.UI.Client;
+using iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationConfigService;
 using iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService;
 using iNube.Components.RuleEngine.Controllers.RuleConfig.RuleEngineService;
 using iNube.Components.RuleEngine.Entities;
+using iNube.Components.RuleEngine.Entities.AllocationEntities;
 using iNube.Components.RuleEngine.Helpers;
+using iNube.Utility.Framework.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -35,72 +38,33 @@ namespace iNube.Components.RuleEngine
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
             var connectionstring = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<RuleEngineContext>(x => x.UseSqlServer(connectionstring));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddAutoMapper();
-            services.AddHealthChecks();
-            services.AddHealthChecks().AddSqlServer(connectionstring);
-
-            // configure strongly typed settings objects
+            services.AddDbContext<MICAALContext>(x => x.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;"));
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
-            // configure jwt authentication
-            var appSettings = appSettingsSection.Get<AppSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            services.AddScoped<IRuleConfigService, RuleConfigService>();
-            services.AddScoped<IRuleEngineService, RuleEngineService>();
+            ConfigureModuleService(services);
 
-            // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Title = "Rule Engine",
-                    Version = "v1"
-                });
-            });
+            services.InitializedCommonServices(Configuration);
+
+            services.AddHealthChecks().AddSqlServer(connectionstring);
+            services.AddAutoMapper(typeof(Startup));
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
-            // HealthCheck middleware
-            app.UseHealthChecks("/hc", new HealthCheckOptions()
-            {
-                Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            });
-            // global cors policy
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
-
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Rule Engine V1");
-            });
-
-            app.UseHttpsRedirection();
-            app.UseMvc();
+            app.InitializedCommonConfiguration(env, Configuration);
+            app.UseAuthentication();
         }
+
+        public void ConfigureModuleService(IServiceCollection services)
+        {
+            services.AddScoped<IRuleConfigService, RuleConfigService>();
+            services.AddScoped<IRuleEngineService, RuleEngineService>();
+            services.AddScoped<IAllocationConfigService, AllocationConfigService>();
+        }
+
     }
 }
