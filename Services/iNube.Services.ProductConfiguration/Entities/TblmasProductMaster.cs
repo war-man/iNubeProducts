@@ -11,6 +11,7 @@ namespace iNube.Services.ProductConfiguration.Entities
             TblCoverRcbdetails = new HashSet<TblCoverRcbdetails>();
             TblInsurableChildRcbdetails = new HashSet<TblInsurableChildRcbdetails>();
             TblInsurableRcbdetails = new HashSet<TblInsurableRcbdetails>();
+            TblProductBasicConfiguration = new HashSet<TblProductBasicConfiguration>();
             TblProductBenefits = new HashSet<TblProductBenefits>();
             TblProductCoversCoverEvent = new HashSet<TblProductCovers>();
             TblProductCoversCoverEventFactor = new HashSet<TblProductCovers>();
@@ -44,6 +45,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual ICollection<TblCoverRcbdetails> TblCoverRcbdetails { get; set; }
         public virtual ICollection<TblInsurableChildRcbdetails> TblInsurableChildRcbdetails { get; set; }
         public virtual ICollection<TblInsurableRcbdetails> TblInsurableRcbdetails { get; set; }
+        public virtual ICollection<TblProductBasicConfiguration> TblProductBasicConfiguration { get; set; }
         public virtual ICollection<TblProductBenefits> TblProductBenefits { get; set; }
         public virtual ICollection<TblProductCovers> TblProductCoversCoverEvent { get; set; }
         public virtual ICollection<TblProductCovers> TblProductCoversCoverEventFactor { get; set; }

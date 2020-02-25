@@ -471,9 +471,9 @@ namespace iNube.Services.Policy.Controllers.Policy
 
 
         [HttpGet]
-        public async Task<IActionResult> GetProposalDetailsByProposalNo(string proposalNo)
+        public async Task<IActionResult> GetProposalPolicyDetail(string proposalNo,string Mobileno, string policyno)
         {
-            var response = await _policyService.GetProposalDetails(proposalNo, Context);
+            var response = await _policyService.GetProposalDetails(proposalNo, Mobileno, policyno, Context);
             // var txnId = response.BundleTxnId;
             if (response != null)
             {
@@ -503,6 +503,19 @@ namespace iNube.Services.Policy.Controllers.Policy
             }
             return NotFound();
         }
+
+
+        //EndorsementAPI
+
+        [HttpPut]
+        public async Task<IActionResult> PolicyEndoresemenet(dynamic endoresementDto)
+        {
+            var response = await _policyService.PolicyEndoresemenet(endoresementDto, Context);
+            return ServiceResponse(response);
+        }
+
+
+
 
 
 

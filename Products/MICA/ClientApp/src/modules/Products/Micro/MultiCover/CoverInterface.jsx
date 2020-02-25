@@ -9,12 +9,15 @@ import Visibility from "@material-ui/icons/Visibility";
 import Edit from "@material-ui/icons/Edit";
 import BenefitInterface from "../MultiCover/BenefitInterface.jsx";
 import swal from 'sweetalert';
+import Accordion from "components/Accordion/AccordianWithoutLoop.jsx";
+import GridItem from "components/Grid/GridItem.jsx";
 
 class CoverInterface extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
+           
             CoverRiskList:[],
             hidepremiumAmount:false,
             productBenefits: 
@@ -30,6 +33,7 @@ class CoverInterface extends React.Component {
                     "benefitCriteria": "",
                     "benefitCriteriaValue": "",
                     "maxBenefitAmount": "",
+                    "premiumAmount": "",
                     "singleValue": false,
                     benifitRangeDetails: [
                         //{
@@ -146,7 +150,8 @@ class CoverInterface extends React.Component {
 
             if (event.target.checked != undefined) {
                 masterDTO['checkBox'] = event.target.checked;
-                this.props.ProductDTO.isCoverEvent = event.target.checked;
+                this.props.props.state.CoverEventShow = event.target.checked;
+           //     this.props.ProductDTO.isCoverEvent = event.target.checked;
              //   this.props.ProductDTO.productCover['singleValue'] = event.target.checked;
 
                 this.props.ProductDTO.productCover.coverEventId = "";
@@ -158,7 +163,8 @@ class CoverInterface extends React.Component {
                 this.props.ProductDTO.productCover.coverEventFactorValueUnitId = "";
 
                 this.props.ProductDTO.productCover.coverEventFactorId = "";
-                console.log("select checkbox", this.props.ProductDTO.productCover);
+                console.log("select checkbox", this.props.ProductDTO, this.props.ProductDTO.productCover, event.target.checked, this.props.ProductDTO.isCoverEvent);
+                this.setState({});
             }
 
         this.setState({ masterDTO });
@@ -181,7 +187,8 @@ class CoverInterface extends React.Component {
             //this.props.ProductDTO.insurableRcbdetails[Iindex].coverRcbdetails[Cindex].inputId = value;
 
             if (filtertype.length > 0) {
-                this.GetRiskClaimMaster('Risk', filtertype[0].mID, event.target.value);
+                //this.GetRiskClaimMaster('Risk', filtertype[0].mID, event.target.value);
+                this.GetRiskClaimMaster('Risk', "64", 1000);
 
             }
         }
@@ -213,7 +220,8 @@ class CoverInterface extends React.Component {
         if (type === "Cover") {
 
             if (filtertype.length > 0) {
-                this.GetRiskClaimMaster('Risk', filtertype[0].mID, event.target.value);
+               // this.GetRiskClaimMaster('Risk', filtertype[0].mID, event.target.value);
+                this.GetRiskClaimMaster('Risk', "64",1000);
               
             }
         }
@@ -258,7 +266,7 @@ class CoverInterface extends React.Component {
             .then(data => {
                 console.log("Risk data  server for cover level", data);
                 if (type === "Risk") {
-                    if (typeId == 55) {
+                    if (typeId == 64) {
                         this.state.CoverRiskList = data;
                     }
                 }
@@ -857,7 +865,7 @@ class CoverInterface extends React.Component {
 
     addCoverelist = (e, index, Iindex) => {
         console.log("cover index", index);
-       ;
+     
         if (this.props.ProductDTO.productCover.coverTypeId != "" && this.props.ProductDTO.productCover.coverDescription != ""&&  this.ValdationCheckFun()) {
             this.props.ProductDTO.ProductDTO.isCoverEvent = true;
             this.addCoverCWEFun(index, Iindex);
@@ -933,27 +941,27 @@ class CoverInterface extends React.Component {
             //});
 
 
-            this.props.ProductDTO.insurableRcbdetails[Iindex].coverRcbdetails = this.props.ProductDTO.insurableRcbdetails[Iindex].coverRcbdetails.concat(
+            //this.props.ProductDTO.insurableRcbdetails[Iindex].coverRcbdetails = this.props.ProductDTO.insurableRcbdetails[Iindex].coverRcbdetails.concat(
 
-                {
+            //    {
 
-                    "inputType": "string",
-                    "isReqired": true,
-                    "inputId": 0,
-                    "levelId": 0,
-                    "insurableRcbdetailsId": 0,
-                    "coverChildRcbdetails": [
-                        {
+            //        "inputType": "string",
+            //        "isReqired": true,
+            //        "inputId": 0,
+            //        "levelId": 0,
+            //        "insurableRcbdetailsId": 0,
+            //        "coverChildRcbdetails": [
+            //            {
 
-                            "inputType": "string",
-                            "isReqired": true,
-                            "inputId": 0,
-                            "coverRcbdetailsId": 0
-                        }
-                    ]
-                }
-            );
-
+            //                "inputType": "string",
+            //                "isReqired": true,
+            //                "inputId": 0,
+            //                "coverRcbdetailsId": 0
+            //            }
+            //        ]
+            //    }
+            //);
+            this.props.props.addCoverRiskParameter(Iindex);
 
             const filtertype = this.props.props.state.RiskList.filter(m => m.mValue === "Insurable Item");
 
@@ -1008,7 +1016,7 @@ class CoverInterface extends React.Component {
             const CoverType = this.props.props.state.MasterDTO.Cover[this.props.Iindex][0].filter(item => item.mID == pCover.coverTypeId)[0].mValue;
             const CoverEventID = this.props.props.state.MasterDTO.CoverEvent.filter(item => item.mID == pCover.coverEventId);
 
-            this.props.props.state.InitialInsurable[Iindex].InitialCover = this.props.props.state.InitialInsurable[Iindex].InitialCover.concat({ view: !this.props.props.state.viewdisable,title: "Cover:", value: CoverType, title1: (this.props.ProductDTO.ProductDTO.isCoverEvent === true && CoverEventID.length == 0) ? "" : "CoverEvent:", value1: (this.props.ProductDTO.ProductDTO.isCoverEvent === true && CoverEventID.length == 0) ? "" : CoverEventID[0].mValue, deleteAccordion: this.deleteAccordion, Iindex: Iindex, content: <BenefitInterface props={this} ProductDTO={this.props.ProductDTO} Bindex={this.props.props.state.InitialInsurable[Iindex].InitialCover.length} Iindex={Iindex} /> })
+            this.props.props.state.InitialInsurable[Iindex].InitialCover = this.props.props.state.InitialInsurable[Iindex].InitialCover.concat({ view: !this.props.props.state.viewdisable,title: "Cover:", value: CoverType, title1:"", value1: "", deleteAccordion: this.deleteAccordion, Iindex: Iindex, content: <BenefitInterface props={this} ProductDTO={this.props.ProductDTO} Bindex={this.props.props.state.InitialInsurable[Iindex].InitialCover.length} Iindex={Iindex} /> })
          
 
             /*delete selected cover */
@@ -1050,7 +1058,7 @@ class CoverInterface extends React.Component {
             console.log("productBenefits update", this.props.props.state.MasterDTO.checkBox);
 
            // this.props.ProductDTO.productCover.cwetypeId = "";
-
+            this.props.props.CheckedRadioFun(this.props.props.state.SelectedName, 'radiolist');
             this.setState({});
 
         }
@@ -1084,6 +1092,8 @@ class CoverInterface extends React.Component {
     }
 
     componentDidMount() {
+
+
         this.setState({ hidepremiumAmount: this.props.props.state.hidepremiumAmount });
         if (this.props.props.state.CoverCollapseShow == true) {
             const filterCWEid = this.props.props.state.TypeList.filter(s => s.mValue == "Insurable Item")[0].mID;
@@ -1092,7 +1102,7 @@ class CoverInterface extends React.Component {
                 this.GetCWEDetails(this.props.ProductDTO, filterCWEid, this.props.ProductDTO.productInsurableItem[this.props.Iindex].insurableItemId, this.props.Iindex);
 
             }
-
+           
             if (this.props.ProductDTO.productInsurableItem[this.props.Iindex].productCovers.length > 0) {
 
                 for (var j = 0; j < this.props.ProductDTO.productInsurableItem[this.props.Iindex].productCovers.length; j++) {
@@ -1131,8 +1141,8 @@ class CoverInterface extends React.Component {
 
 
         const filterCWEtype = this.props.props.state.TypeList.filter(s => s.mID == typeId)[0].mValue;
-
-        const CWEdata = this.props.productClausesWarrentiesExclusions.filter(s => s.levelId == typeId && s.refId == refID && this.props.ProductDTO.ProductDTO.productId)
+        console.log("productClausesWarrentiesExclusions filter", this.props, this.props.ProductDTO.productClausesWarrentiesExclusion);
+        const CWEdata = this.props.props.state.ProductDTO.productClausesWarrentiesExclusions.filter(s => s.levelId == typeId && s.refId == refID && this.props.ProductDTO.ProductDTO.productId)
         
         if (CWEdata.length > 0) {
             console.log("CWEdata", CWEdata, filterCWEtype)
@@ -1287,29 +1297,65 @@ class CoverInterface extends React.Component {
         console.log("pks", this.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].InsurablesTableList);
     }
     /*Delete accordion for cover*/
-    deleteAccordion = (e, index, Iindex) => {
-
-        console.log("deleteAccordion", e, index);
+    deleteAccordion = (e, Iindex, index ) => {
+        this.props.props.deleteCoverRiskParameter(Iindex, index);
+        console.log("deleteAccordion", e, index, Iindex, this.props.ProductDTO.productInsurableItem);
         this.props.props.state.InitialInsurable[Iindex].InitialCover.splice(index, 1);
-        const deletecover=this.props.props.state.MasterDTO.CoverMaster.filter(s => s.mID == this.props.ProductDTO.productInsurableItem[Iindex].productCovers[index].coverTypeId);
+        const deletecover = this.props.props.state.MasterDTO.CoverMaster.filter(s => s.mID == this.props.ProductDTO.productInsurableItem[Iindex].productCovers[index].coverTypeId);
         console.log("deletecover", deletecover);
         if (deletecover.length > 0) {
             this.props.props.state.MasterDTO.Cover[Iindex][0].push(deletecover[0])
         }
         this.props.ProductDTO.productInsurableItem[Iindex].productCovers.splice(index, 1);
-    
+
         if (this.props.props.state.InitialInsurable[Iindex].InitialCover.length == 0 && this.props.props.state.InitialInsurable.length == 1) {
-        
+
             this.props.ProductDTO.ProductDTO.isCoverEvent = false;
         }
+
+       
         this.setState({});
-
     }
+    /* Add collapse in insurable level*/
 
+    AccordianFunction = (Iindex) => {
+        console.log("AddCont: cover", this.props.props.state.InitialInsurable[Iindex], this.props.props.state.MasterDTO.Cover[Iindex], this.props.ProductDTO.productInsurableItem[Iindex]);
+       // const CoverEventID = this.props.props.state.MasterDTO.CoverEvent.filter(item => item.mID == this.props.ProductDTO.productCover.coverEventId);
+
+        console.log("CoverMasterDTO", this.props.props.state.MasterDTO, this.props.props.state.MasterDTO.CoverMaster, this.props.ProductDTO.productInsurableItem[Iindex].productCovers, this.props.ProductDTO.isCoverEvent)
+
+        this.props.ProductDTO.productInsurableItem[Iindex].productCovers = this.props.ProductDTO.productInsurableItem[Iindex].productCovers;
+        return (
+            <GridItem xs={12}>
+                {(this.props.props.state.InitialInsurable[Iindex].InitialCover.length>0)?this.props.props.state.InitialInsurable[Iindex].InitialCover.map((prop, key) => {
+                    return (
+
+                        <Accordion
+                            index={Iindex}
+                            
+                            collapses={
+                                [{
+                                    key: key, view: !this.props.props.state.viewdisable, title: "Cover:", value: this.props.props.state.MasterDTO.CoverMaster.filter(item => item.mID == this.props.ProductDTO.productInsurableItem[Iindex].productCovers[key].coverTypeId)[0].mValue,
+                                    title1: (this.props.props.state.CoverEventShow === false) ? "" : "CoverEvent:",
+                                    value1: (this.props.props.state.CoverEventShow === false) ? "" : (this.props.props.state.viewdisable) ? ((this.props.props.state.MasterDTO.CoverEvent.filter(item => item.mID == this.props.ProductDTO.productInsurableItem[Iindex].productCovers[key].coverEventId).length > 0) ? this.props.props.state.MasterDTO.CoverEvent.filter(item => item.mID == this.props.ProductDTO.productInsurableItem[Iindex].productCovers[key].coverEventId)[0].mValue : "") : this.props.props.state.MasterDTO.CoverEvent.filter(item => item.mID == this.props.ProductDTO.productCover.coverEventId)[0].mValue, deleteAccordion: this.deleteAccordion, Iindex: Iindex, content: <BenefitInterface props={this} ProductDTO={this.props.ProductDTO} state={this.props.props.state} Bindex={key} Iindex={Iindex} />
+                                }]
+                            }
+                       
+                        />
+
+                    );
+                })
+                :null}
+            </GridItem>
+        )
+
+
+    };
 
 
     render() {
-        console.log("CoverInterface",this.props)
+        console.log("CoverInterface", this.props)
+     
         return (
             
             <AddCover {...this.props} {...this} />

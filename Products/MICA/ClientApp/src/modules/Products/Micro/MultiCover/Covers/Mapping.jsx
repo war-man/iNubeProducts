@@ -274,7 +274,7 @@ class Mapping extends React.Component {
                                         {
 
                                             Header: "Risk Parameter",
-                                            accessor: "RiskParameterName",
+                                            accessor: "RiskParameter",
                                             style: { textAlign: "center" },
                                             headerClassName: 'react-table-center',
                                             minWidth: 50,
@@ -289,12 +289,14 @@ class Mapping extends React.Component {
                                     className="-striped -highlight discription-tab"
                                 />
                             </GridItem>
-                        </GridContainer> : null}
+                      
                 <GridContainer justify="center">
                     <Button id="submitBtn" color="info" round className={classes.marginRight} onClick={this.handleSaveMap} >
                         Save
                         </Button>
-                </GridContainer>
+                            </GridContainer>
+                        </GridContainer> 
+                        : null}
        </div>
         );
     }

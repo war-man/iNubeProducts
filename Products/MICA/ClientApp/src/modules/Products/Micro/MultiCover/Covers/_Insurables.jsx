@@ -61,7 +61,8 @@ const Insurables = (props) =>{
       return (
        
                   <GridContainer xl={12}>
-                
+              {!insurableData.viewdisable &&
+                  <GridContainer xl={12}>
                       <GridItem xs={12} sm={4}>
                   <Dropdown labelText="Insurable Category" required={true} lstObject={insurableData.MasterDTO.InsurableCategory} value={insurableData.ProductDTO.productInsurableItems.insurableCategoryId} name='insurableCategoryId' onChange={(e) => insurableData.GetInusrableMasterData('InsuranceType', 'productInsurableItems', e, insurableData.InitialInsurable.length)} disabled={insurableData.viewdisable} formControlProps={{ fullWidth: true }} />
                             {insurableData.errormessage && (insurableData.ProductDTO.productInsurableItem.insurableCategoryId == "") ? <p className="error">This Field is Required</p> : null}
@@ -73,11 +74,10 @@ const Insurables = (props) =>{
               <CustomRadioButton radiolist={insurableData.radiolist1} disabled={insurableData.viewdisable} onChange={(e) => insurableData.onChangeradio(e, 'radiolist1')} />
                       <GridItem xs={12} sm={1}>
                   {!insurableData.viewdisable && <Button round color="info" onClick={(e) => { insurableData.addinurablelist(e, insurableData.InitialInsurable.length); }} > Add</Button >}
-                    </GridItem>
-                  <Accordion
-                     // active={0}
-                  collapses={insurableData.InitialInsurable}
-                  />
+              </GridItem>
+
+              </GridContainer> }
+              {insurableData.AccordianFunction()}
 
 
                   </GridContainer>

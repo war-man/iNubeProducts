@@ -28,7 +28,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<TblProductChannels> ChannelDetails(decimal ChannelId, ApiContext apiContext);
         Task<TblProductClausesWarrentiesExclusions> ClaimsDetails(decimal Cweid, ApiContext apiContext);
         Task<TblProductRcbdetails> RiskDetails(decimal RcbdetailsId, ApiContext apiContext);
-        Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, ApiContext apiContext);
+        Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, string FieldType, ApiContext apiContext);
         void Delete(int ProductID, ApiContext apiContext);
         Task<ProductResponse> ProductCodevalidation(string code, ApiContext apiContext);
         Task<ProductResponse> ProductNamevalidation(string name, ApiContext apiContext);
@@ -203,9 +203,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         }
 
         //SearchRiskDetails
-        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, ApiContext apiContext)
+        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type,string FieldType, ApiContext apiContext)
         {
-            return await _productConfigService(apiContext.ProductType).RCBDetails(ProductId, type, apiContext);
+            return await _productConfigService(apiContext.ProductType).RCBDetails(ProductId, type, FieldType, apiContext);
         }
 
         public async Task<List<ProductClausesWarrentiesExclusionsDTO>> CWEDetails(int LOBId, int CWETypeID, ApiContext apiContext)

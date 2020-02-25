@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration;
 using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
-using iNube.Services.Policy.Entities.DynamicReportEntites;
+using iNube.Services.Policy.Entities.DynamicReportEntities;
 using iNube.Services.Policy.Models;
 using iNube.Utility.Framework.Model;
 using System;
@@ -14,6 +14,8 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
     public interface IReportService
     {
         Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext);
+        Task<ReportConfigResonse> SaveConfigParameters(ReportConfigDTO reportConfigDTO, ApiContext apiContext);
+        Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext);
     }
 
     public class ReportService : IReportService
@@ -36,6 +38,14 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).GetMaster(lMasterlist, apiContext);
+        }
+        public async Task<ReportConfigResonse> SaveConfigParameters(ReportConfigDTO reportConfigDTO, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).SaveConfigParameters(reportConfigDTO, apiContext);
+        }
+        public async Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).GetReportConfigName(lMasterlist, apiContext);
         }
     }
 }

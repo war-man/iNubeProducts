@@ -114,27 +114,27 @@ const Covers = (props) => {
 
     return (
         <div>
-            <GridContainer lg={12}>
-                
-            <CustomCheckbox
+            {!coversData.viewdisable && <GridContainer lg={12}>
+
+                <CustomCheckbox
                     name="CoverEvent"
                     labelText="Cover Event"
                     value={coversData.MasterDTO.checkBox}
                     onChange={(e) => propFun.SetCoverEventValue(e)}
-                    disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable: coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}
+                    disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}
                     checked={coversData.MasterDTO.checkBox}
-                formControlProps={{
-                    fullWidth: true
-                }}
+                    formControlProps={{
+                        fullWidth: true
+                    }}
 
-                    />
-               
+                />
+
                 {coversData.MasterDTO.checkBox && <GridItem xs={12} sm={4}>
-                    <Dropdown labelText="Cover Event" id="ProductDTO.coverEventId" required={true} lstObject={coversData.MasterDTO.CoverEvent} value={coversProductDetails.ProductDTO.productCover.coverEventId} name='coverEventId' onChange={(e) => propFun.GetInusrableMasterData('CoverEventFactor', 'productCover', e, Iindex, Cindex)} disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent} formControlProps={{ fullWidth: true }} />
-                {coversData.errormessage && (coversData.ProductDTO.productCover.coverEventId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                    <Dropdown labelText="Cover Event" id="ProductDTO.coverEventId" required={true} lstObject={coversData.MasterDTO.CoverEvent} value={coversProductDetails.ProductDTO.productCover.coverEventId} name='coverEventId' onChange={(e) => propFun.GetInusrableMasterData('CoverEventFactor', 'productCover', e, Iindex, Cindex)} disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.isCoverEvent} formControlProps={{ fullWidth: true }} />
+                    {coversData.errormessage && (coversData.ProductDTO.productCover.coverEventId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
                 </GridItem>}
-            </GridContainer>
-        <GridContainer lg={12}>
+            </GridContainer>}
+        {!coversData.viewdisable && <GridContainer lg={12}>
           
             <GridItem xs={12} sm={4}>
                     <Dropdown labelText="Covers" id="ProductDTO.coverTypeId" required={true} lstObject={(coverdatalist[0] === undefined) ? [] : coverdatalist[0]} value={coversProductDetails.ProductDTO.productCover.coverTypeId} name='coverTypeId' onChange={(e) => propFun.GetInusrableMasterData('', 'productCover', e,  Iindex,Cindex)} disabled={coversData.viewdisable} formControlProps={{ fullWidth: true }} />
@@ -243,7 +243,8 @@ const Covers = (props) => {
                     <CustomInput
                         required={true}
                         labelText="Cover Event From Factor Value"
-                        id="gstnumber"
+                            id="gstnumber"
+                            inputType="number" type="numeric" negative={true}
                             value={coversProductDetails.ProductDTO.productCover.coverEventFactorValueFrom}
                         name="coverEventFactorValueFrom"
                             onChange={(e) => propFun.SetCoverProductDetailsValue('productCover', e, Cindex, Iindex)}
@@ -260,7 +261,8 @@ const Covers = (props) => {
                         <CustomInput
                             required={true}
                             labelText="Cover Event To Factor Value"
-                            id="gstnumber"
+                                id="gstnumber"
+                                inputType="number" type="numeric" negative={true}
                                 value={coversProductDetails.ProductDTO.productCover.coverEventFactorValueTo}
                             name="coverEventFactorValueTo"
                                 onChange={(e) => propFun.SetCoverProductDetailsValue('productCover', e, Cindex, Iindex)}
@@ -298,11 +300,8 @@ const Covers = (props) => {
 
             </GridItem>
            
-        </GridContainer>
-        <Accordion
-           // active={0}
-                collapses={coversData.InitialInsurable[Iindex].InitialCover}
-        />
+        </GridContainer>}
+            {coversProductDetails.AccordianFunction(Iindex)} 
         </div>
 
     );
