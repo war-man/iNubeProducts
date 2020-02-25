@@ -29,6 +29,7 @@ import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 import data_Not_found from "assets/img/data-not-found-new.png";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
     paper: {
@@ -115,6 +116,7 @@ class ModifyUser extends React.Component {
             showtable: false,
             panNo: "",
             data: [],
+            load: false,
             masterList: [],
             display: false,
             UserData:
@@ -389,7 +391,7 @@ class ModifyUser extends React.Component {
             request.emailId != "" || request.contactNumber != "" ||
             request.panNo != "" || request.partnerId != "" || request.status != ""
         ) {
-            this.setState({ loader: false });
+            this.setState({ loader: false, load: true});
             fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/SearchUser`, {
                 method: 'POST',
                 body: JSON.stringify(request),
@@ -422,7 +424,7 @@ class ModifyUser extends React.Component {
     }
 
     tabledata = () => {
-        this.setState({ loader: true, showtable: true });
+        this.setState({ loader: true, load: false, showtable: true });
         this.setState({
             data: this.state.userdetails.map((prop, key) => {
                 const { classes } = this.props;
@@ -678,7 +680,8 @@ class ModifyUser extends React.Component {
                                             <GridContainer lg={12} justify="center">
                                                 <GridItem xs={5} sm={3} md={3} lg={1} >
                                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                        <Button color="success" round onClick={this.showUserTable}> <TranslationContainer translationKey="Search" /> </Button>
+                                                        <Button color="success"/* disabled={this.state.load} */round onClick={this.showUserTable}> <TranslationContainer translationKey="Search" /> </Button>
+                                                        {/* {this.state.load ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                                                     </Animated>
                                                 </GridItem>
                                             </GridContainer>
@@ -695,94 +698,95 @@ class ModifyUser extends React.Component {
                     <GridContainer xl={12}>
                         {this.state.showtable ?
                             <GridItem lg={12}>
-                                <ReactTable
-                                    title={"Users"}
-                                    data={this.state.data}
-                                    filterable
-                                    columns={[
-                                        //{
-                                        //    Header: "Select",
-                                        //    accessor: "radio",
-                                        //    minWidth: 30,
-                                        //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                        //    headerClassName: 'react-table-center',
-                                        //    sortable: false,
-                                        //    filterable: false,
-                                        //    resizable: false,
-                                        //},
-                                        {
-                                            Header: "User Name",
-                                            accessor: "UserName",
-                                            setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                            headerClassName: 'react-table-center',
-                                            minWidth: 100,
-                                            resizable: false,
+                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                    <ReactTable
+                                        title={"Users"}
+                                        data={this.state.data}
+                                        filterable
+                                        columns={[
+                                            //{
+                                            //    Header: "Select",
+                                            //    accessor: "radio",
+                                            //    minWidth: 30,
+                                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                            //    headerClassName: 'react-table-center',
+                                            //    sortable: false,
+                                            //    filterable: false,
+                                            //    resizable: false,
+                                            //},
+                                            {
+                                                Header: "User Name",
+                                                accessor: "UserName",
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center',
+                                                minWidth: 100,
+                                                resizable: false,
 
-                                        },
-                                        {
-                                            Header: "First Name",
-                                            accessor: "FirstName",
-                                            setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                            headerClassName: 'react-table-center',
-                                            minWidth: 70,
-                                            resizable: false,
-                                        },
-                                        //   {
-                                        //    Header: "Employee ID",
-                                        //    accessor: "EmpId",
-                                        //    style: { textAlign: "center" },
-                                        //    headerClassName: 'react-table-center',
-                                        //    minWidth: 70,
-                                        //    resizable: false,
-                                        //},
-                                        {
-                                            Header: "Date Of Birth",
-                                            accessor: "DOB",
-                                            setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                            headerClassName: 'react-table-center',
-                                            minWidth: 70,
-                                            resizable: false,
-                                        },
-                                        {
-                                            Header: "PAN",
-                                            accessor: "PanNo",
-                                            setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                            headerClassName: 'react-table-center',
-                                            minWidth: 70,
-                                            resizable: false,
-                                        },
-                                        {
-                                            Header: "Mobile Number",
-                                            accessor: "PhNo",
-                                            setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                            headerClassName: 'react-table-center',
-                                            minWidth: 70,
-                                            resizable: false,
-                                        },
-                                        {
-                                            Header: "Action",
-                                            accessor: "btn",
-                                            minwidth: 30,
-                                            style: { textalign: "left" },
-                                            headerclassname: 'react-table-center',
-                                            resizable: false,
-                                        },
-                                        {
-                                            Header: "Status",
-                                            accessor: "status",
-                                            minwidth: 30,
-                                            style: { textalign: "left" },
-                                            headerclassname: 'react-table-center',
-                                            resizable: false,
-                                        },
-                                    ]}
-                                    pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
-                                    defaultPageSize={5}
-                                    showPaginationTop={false}
-                                    showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
-                                    className="-striped -highlight"
-                                />
-
+                                            },
+                                            {
+                                                Header: "First Name",
+                                                accessor: "FirstName",
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center',
+                                                minWidth: 70,
+                                                resizable: false,
+                                            },
+                                            //   {
+                                            //    Header: "Employee ID",
+                                            //    accessor: "EmpId",
+                                            //    style: { textAlign: "center" },
+                                            //    headerClassName: 'react-table-center',
+                                            //    minWidth: 70,
+                                            //    resizable: false,
+                                            //},
+                                            {
+                                                Header: "Date Of Birth",
+                                                accessor: "DOB",
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center',
+                                                minWidth: 70,
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "PAN",
+                                                accessor: "PanNo",
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center',
+                                                minWidth: 70,
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "Mobile Number",
+                                                accessor: "PhNo",
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center',
+                                                minWidth: 70,
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "Action",
+                                                accessor: "btn",
+                                                minwidth: 30,
+                                                style: { textalign: "left" },
+                                                headerclassname: 'react-table-center',
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "Status",
+                                                accessor: "status",
+                                                minwidth: 30,
+                                                style: { textalign: "left" },
+                                                headerclassname: 'react-table-center',
+                                                resizable: false,
+                                            },
+                                        ]}
+                                        pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                        defaultPageSize={5}
+                                        showPaginationTop={false}
+                                        showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                        className="-striped -highlight"
+                                    />
+                                </Animated>
                                 {/*          <GridContainer>
                                     <div className="center-modify-user-product">
                                         <Button color="success" id="push-right" round className={classes.marginRight} onClick={this.handleView}> View </Button>
