@@ -86,6 +86,7 @@ namespace iNube.Components.RuleEngine.Controllers
         {
             ResponseStatus response = new ResponseStatus();
 
+            List<ErrorInfo> errorMsg = new List<ErrorInfo>();
             string[] words = RuleId.Split(',');
             var main_rule = from tblrules in _context_rule.TblRules
                             join tblrulecondition in _context_rule.TblRuleConditions on tblrules.RuleId equals tblrulecondition.RuleId
@@ -286,20 +287,30 @@ namespace iNube.Components.RuleEngine.Controllers
                             result = Regex.IsMatch(paramvalue, regex);
                             if (!result)
                             {
-                                response.ResponseMessage = "Invalid";
+                                response.ResponseMessage = "Invalid ";
+                                //For Error Message 
+                                ErrorInfo errMessage1 = new ErrorInfo();
+                                errMessage1.ErrorMessage = "Mobile Validation Fail";
+                                errorMsg.Add(errMessage1);
+                                response.Errors = errorMsg;
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
                             }
 
-                        }
+                        }       
                         else if(rule.param_type == "PassportNum") { 
                             
                             var regex = @"^(?!0{3,20})[a-zA-Z0-9]{3,20}$";
                             result = Regex.IsMatch(paramvalue, regex);
                             if (!result) {
                                 response.ResponseMessage = "Invalid";
+                                //For Error Message 
+                                ErrorInfo errMessage2 = new ErrorInfo();
+                                errMessage2.ErrorMessage = "Passport Validation Fail";
+                                errorMsg.Add(errMessage2);
+                                response.Errors = errorMsg;
                             }
                             else
                             {
@@ -423,6 +434,7 @@ namespace iNube.Components.RuleEngine.Controllers
                             response.Status = BusinessStatus.InputValidationFailed;
                             ///response.ResponseMessage = "False";
                             response.ResponseMessage = "Invalid";
+                            
                         }
                         else
                         {
