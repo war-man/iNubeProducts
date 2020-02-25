@@ -32,6 +32,7 @@ import validationPage from "./ValidationPage";
 import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+//import CircularProgress from '@material-ui/core/CircularProgress';
 
 //import data_Not_found from "assets/img/data_Not_found.png"
 //import data_Not_found from "assets/img/data-not-found.png"
@@ -82,6 +83,8 @@ class AssignRole extends React.Component {
         this.state = {
             isButtonVisibility: false,
             isButtonDisabled: true,
+            btnload: false,
+            btnload1: false,
             perFlag: false,
             search: false,
             name: "",
@@ -118,6 +121,7 @@ class AssignRole extends React.Component {
             nodata: false,
             showpage: false,
             listData: [],
+            dashboard: [],
             open: false,
             editModal: false,
             userId: "",
@@ -171,6 +175,7 @@ class AssignRole extends React.Component {
         }
         usrrole.roleId = [...this.state.selected];
         this.setState({ usrrole });
+        this.setState({ btnload: true });
         fetch(`${UserConfig.UserConfigUrl}/api/Role/AssignRole`, {
             method: 'POST',
             headers: {
@@ -184,6 +189,7 @@ class AssignRole extends React.Component {
                 return response.json();
             })
             .then(data => {
+                this.setState({ btnload: false });
                 console.log("response: ", data);
                 if (data.status == 2) {
                     swal({
@@ -233,6 +239,22 @@ class AssignRole extends React.Component {
                     this.setState({ listData: data });
                     console.log("list data", this.state.listData);
                 });
+
+            fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetUserRoleDashboard`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(permissions)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({ dashboard: data });
+                    console.log("dashboards: ", this.state.dashboard);
+                });
+
         } else {
             this.setState({ perFlag: false });
         }
@@ -355,18 +377,27 @@ class AssignRole extends React.Component {
         event.preventDefault();
     }
 
-    testCheck = (index, location, c, event) => {
+    testCheck1 = (index, location, c, event) => {
         if (location.length > 0) {
-            let responses = [...this.state.listData[c].mdata];
+            let responses = [...this.state.dashboard[c].mdata];
             responses[location[0]]['children'][index]['status'] = !responses[location[0]]['children'][index]['status'];
             this.setState({ responses });
         } else {
-            let responses = [...this.state.listData[c].mdata];
+            let responses = [...this.state.dashboard[c].mdata];
             responses[index].status = !responses[index].status;
             this.setState({ responses });
             this.setChildren(responses[index]['children'], responses[index].status);
         }
         event.preventDefault();
+    }
+
+    changeCollapse1 = (index, location, c) => {
+        let dashboard = this.state.dashboard[c].mdata;
+        for (let i = 0; i < location.length; i++) {
+            dashboard = dashboard[location[i]]['children'];
+        }
+        dashboard[index]['collapse'] = !dashboard[index]['collapse'];
+        this.setState(dashboard);
     }
 
     changeCollapse = (index, location, c) => {
@@ -546,6 +577,21 @@ class AssignRole extends React.Component {
                     this.setState({ perFlag: true });
                     console.log("list data", this.state.listData);
                 });
+
+            fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetUserRoleDashboard`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(permissions)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({ dashboard: data, perFlag: true });
+                    console.log("dashboards: ", data,this.state.dashboard);
+                });
         } else {
             this.setState({ perFlag: false });
         }
@@ -569,12 +615,14 @@ class AssignRole extends React.Component {
         const that = this;
         let x = {};
         let listData = this.state.listData;
+        let dashboard = this.state.dashboard;
         if (this.state.cuserid != "") {
             x.userId = this.state.cuserid;
         } else {
             x.userId = this.state.userId;
         }
         x.rolePermissionIds = [];
+
         let RolesDTO = this.state.RolesDTO;//for converting rolename to roleid
 
         for (let i = 0; i < listData.length; i++) {
@@ -593,13 +641,29 @@ class AssignRole extends React.Component {
             }
 
             if (y.permissionIds.length > 0) {
+                let d = {};
+                d.permissionIds = [];
                 y.permissionIds = [...new Set(y.permissionIds)];
+                //dashboards menus
+                for (let i = 0; i < dashboard.length; i++) {
+                    for (let j = 0; j < dashboard[i].mdata.length; j++) {
+                        if (dashboard[i].mdata[j].status == false) {
+                            d.permissionIds = d.permissionIds.concat([dashboard[i].mdata[j].permissionId]);
+                        }
+                        d.permissionIds = this.handleSubmitForChildren(dashboard[i].mdata[j].children, d.permissionIds);
+                    }
+                    if (d.permissionIds.length > 0) {
+                        d.permissionIds = [...new Set(d.permissionIds)];
+                        console.log("dashboards changes: ", d.permissionIds);
+                    }
+                }
+                y.permissionIds = y.permissionIds.concat(d.permissionIds);
                 x.rolePermissionIds = x.rolePermissionIds.concat(y);
             }
         }
-
+       
         x.rolePermissionIds = [...new Set(x.rolePermissionIds)];
-
+        that.setState({ btnload1: true });
         fetch(`${UserConfig.UserConfigUrl}/api/Permission/SaveRolePermissions`, {
             method: 'POST',
             headers: {
@@ -612,6 +676,7 @@ class AssignRole extends React.Component {
             console.log("response", response);
             return response.json();
         }).then(function (data) {
+            that.setState({ btnload1: false });
             if (data.status == 2) {
                 swal({
                     text: "Privileges assigned successfully",
@@ -746,7 +811,7 @@ class AssignRole extends React.Component {
                                                                 </GridItem>*/}
                                                         <GridItem xs={12} sm={4} md={3}>
                                                             <CustomInput
-                                                               // success={this.state.partneridState == "success"}
+                                                                // success={this.state.partneridState == "success"}
                                                                 error={this.state.partneridState}
                                                                 labelText="Partner ID"
                                                                 name="partnerId"
@@ -810,88 +875,88 @@ class AssignRole extends React.Component {
                                         <GridContainer xl={12}>
                                             {this.state.showusertable ?
                                                 <GridItem lg={12}>
+                                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                        <ReactTable
+                                                            title={"Users"}
+                                                            data={this.state.data}
+                                                            filterable
+                                                            columns={[
+                                                                {
+                                                                    Header: "Select",
+                                                                    accessor: "radio",
+                                                                    minWidth: 20,
+                                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                                    headerClassName: 'react-table-center',
+                                                                    sortable: false,
+                                                                    filterable: false,
+                                                                    resizable: false,
+                                                                },
+                                                                {
+                                                                    Header: "User Name",
+                                                                    accessor: "UserName",
+                                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                                    headerClassName: 'react-table-center',
+                                                                    minWidth: 70,
+                                                                    resizable: false,
 
-                                                    <ReactTable
-                                                        title={"Users"}
-                                                        data={this.state.data}
-                                                        filterable
-                                                        columns={[
-                                                            {
-                                                                Header: "Select",
-                                                                accessor: "radio",
-                                                                minWidth: 20,
-                                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                                headerClassName: 'react-table-center',
-                                                                sortable: false,
-                                                                filterable: false,
-                                                                resizable: false,
-                                                            },
-                                                            {
-                                                                Header: "User Name",
-                                                                accessor: "UserName",
-                                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                                headerClassName: 'react-table-center',
-                                                                minWidth: 70,
-                                                                resizable: false,
+                                                                },
+                                                                {
+                                                                    Header: "First Name",
+                                                                    accessor: "FirstName",
+                                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                                    headerClassName: 'react-table-center',
+                                                                    minWidth: 50,
+                                                                    resizable: false,
 
-                                                            },
-                                                            {
-                                                                Header: "First Name",
-                                                                accessor: "FirstName",
-                                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                                headerClassName: 'react-table-center',
-                                                                minWidth: 50,
-                                                                resizable: false,
-
-                                                            },
-                                                            //{
-                                                            //    Header: "Employee ID",
-                                                            //    accessor: "EmpId",
-                                                            //    style: { textAlign: "right" },
-                                                            //    headerClassName: 'react-table-center',
-                                                            //    minWidth: 50,
-                                                            //    resizable: false,
-                                                            //},
-                                                            {
-                                                                Header: "Date Of Birth",
-                                                                accessor: "DOB",
-                                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                                headerClassName: 'react-table-center',
-                                                                minWidth: 50,
-                                                                resizable: false,
-                                                            },
-                                                            {
-                                                                Header: "PAN",
-                                                                accessor: "PanNo",
-                                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                                headerClassName: 'react-table-center',
-                                                                minWidth: 50,
-                                                                resizable: false,
-                                                            },
-                                                            {
-                                                                Header: "Mobile Number",
-                                                                accessor: "PhNo",
-                                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                                headerClassName: 'react-table-center',
-                                                                minWidth: 50,
-                                                                resizable: false,
-                                                            },
-                                                            //{
-                                                            //    Header: "Partner ID",
-                                                            //    accessor: "partnerId",
-                                                            //    style: { textAlign: "right" },
-                                                            //    headerClassName: 'react-table-center',
-                                                            //    minWidth: 50,
-                                                            //    resizable: false,
-                                                            //},
-                                                        ]}
-                                                        defaultPageSize={5}
-                                                        showPaginationTop={false}
-                                                        pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
-                                                        showPaginationBottom={true}
-                                                        className="-striped -highlight"
-                                                    />
-
+                                                                },
+                                                                //{
+                                                                //    Header: "Employee ID",
+                                                                //    accessor: "EmpId",
+                                                                //    style: { textAlign: "right" },
+                                                                //    headerClassName: 'react-table-center',
+                                                                //    minWidth: 50,
+                                                                //    resizable: false,
+                                                                //},
+                                                                {
+                                                                    Header: "Date Of Birth",
+                                                                    accessor: "DOB",
+                                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                                    headerClassName: 'react-table-center',
+                                                                    minWidth: 50,
+                                                                    resizable: false,
+                                                                },
+                                                                {
+                                                                    Header: "PAN",
+                                                                    accessor: "PanNo",
+                                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                                    headerClassName: 'react-table-center',
+                                                                    minWidth: 50,
+                                                                    resizable: false,
+                                                                },
+                                                                {
+                                                                    Header: "Mobile Number",
+                                                                    accessor: "PhNo",
+                                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                                    headerClassName: 'react-table-center',
+                                                                    minWidth: 50,
+                                                                    resizable: false,
+                                                                },
+                                                                //{
+                                                                //    Header: "Partner ID",
+                                                                //    accessor: "partnerId",
+                                                                //    style: { textAlign: "right" },
+                                                                //    headerClassName: 'react-table-center',
+                                                                //    minWidth: 50,
+                                                                //    resizable: false,
+                                                                //},
+                                                            ]}
+                                                            defaultPageSize={5}
+                                                            showPaginationTop={false}
+                                                            pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                                            showPaginationBottom={true}
+                                                            className="-striped -highlight"
+                                                        />
+                                                    </Animated>
                                                     <GridContainer lg={12} justify="center">
                                                         <GridItem xs={5} sm={3} md={3} lg={1} >
                                                             <Button color="success" round onClick={this.handleClose}> <TranslationContainer translationKey="OK" /></Button>
@@ -909,7 +974,7 @@ class AssignRole extends React.Component {
                                                             <GridContainer lg={12} justify="center">
                                                                 <GridItem xs={5} sm={3} md={3} lg={1} >
                                                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                                        <Button className="secondary-color" round onClick={() => this.searchagain()}><TranslationContainer translationKey="tryagain" /> Try again </Button>
+                                                                        <Button className="secondary-color" round onClick={() => this.searchagain()}><TranslationContainer translationKey="tryagain" /></Button>
                                                                     </Animated>
                                                                 </GridItem>
                                                             </GridContainer>
@@ -982,7 +1047,8 @@ class AssignRole extends React.Component {
                                             </GridContainer>
                                             <GridContainer lg={12} justify="center">
                                                 <GridItem xs={5} sm={3} md={3} lg={2} >
-                                                    <Button color="success" onClick={this.saveroles} round className={classes.submit}> <TranslationContainer translationKey="SaveRoles" /> </Button>
+                                                    <Button color="success" /*disabled={this.state.btnload} */ onClick={this.saveroles} round className={classes.submit}> <TranslationContainer translationKey="SaveRoles" /> </Button>
+                                                    {/* {this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                                                 </GridItem>
                                             </GridContainer>
                                         </Animated>
@@ -1000,7 +1066,7 @@ class AssignRole extends React.Component {
                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                             <CardBody>
                                                 <GridContainer justify="center" display={this.state.isButtonVisibility} >
-                                                    <Permission menuname={this.state.menuname} handleSubmit={this.handleSubmit} onChange={this.onChange} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                                    <Permission handleSubmit={this.handleSubmit} dashboard={this.state.dashboard} /*btnload1={this.state.btnload1}*/ menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
                                                 </GridContainer>
                                             </CardBody>
                                         </Animated>

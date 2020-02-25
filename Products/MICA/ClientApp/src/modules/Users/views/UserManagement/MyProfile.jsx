@@ -59,6 +59,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import UserProfileLoader from "../../../../components/Loaders/UserProfileLoader";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const style = {
     infoText: {
@@ -115,6 +116,7 @@ class MyProfile extends React.Component {
         this.state = {
             display: true,
             pageloader: true,
+            btnload: false,
             addressradioVal: "",
             radioVal: "",
             edituser: false,
@@ -729,7 +731,7 @@ class MyProfile extends React.Component {
     handleDateValidation() {
         //function fn_DateCompare(DateA, DateB) {     // this function is good for dates > 01/01/1970
 
-        this.setState({ validdoj: false});
+        this.setState({ validdoj: false });
         const userdob = this.state.UserData.dob;
         const userdoj = this.state.UserData.doj;
         var array = userdob.split('/');
@@ -833,7 +835,7 @@ class MyProfile extends React.Component {
             userDTO['userAddress'] = useraddress;
 
             this.setState({ userDTO });
-
+            this.setState({ btnload: true });
             console.log("final userdata", userDTO);
             fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/CreateProfileUser`, {
                 method: 'Post',
@@ -845,6 +847,7 @@ class MyProfile extends React.Component {
                 body: JSON.stringify(userDTO)
             }).then(response => response.json())
                 .then((data) => {
+                    this.setState({ btnload: false });
                     if (data.status == 2) {
                         swal({
                             text: data.responseMessage,
@@ -1196,7 +1199,8 @@ class MyProfile extends React.Component {
                             </Card>
                             {this.state.isButtonVisibility ?
                                 <GridContainer justify="center">
-                                    <Button round disabled={this.state.disabled} align="center" onClick={this.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
+                                    <Button round /*disabled={this.state.btnload}*/ align="center" onClick={this.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
+                                    {/* {this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                                 </GridContainer>
                                 : null}
                         </GridItem>

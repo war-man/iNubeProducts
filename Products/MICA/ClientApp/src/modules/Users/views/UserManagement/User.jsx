@@ -24,7 +24,7 @@ import { Redirect } from 'react-router-dom';
 import swal from 'sweetalert';
 import UserAddress from "./UserAddress.jsx";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
@@ -77,6 +77,9 @@ class User extends React.Component {
         super(props);
         this.state = {
             loader: false,
+            hideexternal: false,
+            btnload: false,
+            btnload1: false,
             radioVal: "",
             addressradioVal: "",
             empFlag: false,
@@ -96,6 +99,10 @@ class User extends React.Component {
             middleName: "",
             middleNameState: false,
             lastName: "",
+            isCustomer: {
+                customerid: "",
+                partnerid: "",
+            },
             lastNameState: false,
             maritalStatus: "",
             maritalStatusState: "",
@@ -446,7 +453,18 @@ class User extends React.Component {
                 this.setState({ loader: true });
             }.bind(this), 2000
         );
-        console.log("token", localStorage.getItem('userToken'));
+        //console.log("response data", localStorage.getItem('organizationId'))
+        //console.log("response data", localStorage.getItem('partnerId'));
+
+        let cust = this.state.isCustomer;
+        cust.customerid = localStorage.getItem('organizationId');
+        cust.partnerid = localStorage.getItem('partnerId');
+        this.setState({ cust });
+        console.log("response data", cust);
+        if (cust.customerid == 112 && cust.partnerid == 0 || cust.partnerid != 0) {
+            this.setState({ hideexternal: true });
+        }
+
         fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/GetMasterData?sMasterlist=abc`, {
             method: 'GET',
             headers: {
@@ -582,7 +600,7 @@ class User extends React.Component {
             userdetails.dob = this.newdatechange(this.state.UserData.dob);
             userdetails.doj = this.newdatechange(this.state.UserData.doj);
 
-            this.setState({ userdetails });
+            this.setState({ userdetails, btnload: true });
             let address = [];
             address.push(this.state.UserAddress.perm);
             if (this.state.UserAddress.permSelectedValue == 1) {
@@ -609,6 +627,7 @@ class User extends React.Component {
                 body: JSON.stringify(userDTO)
             }).then(response => response.json())
                 .then((data) => {
+                    this.setState({ btnload: false });
                     if (data.status == 2) {
                         swal({
                             text: data.responseMessage,
@@ -791,6 +810,7 @@ class User extends React.Component {
         state.emailvaidation = "";
         state.emailState = "";
         this.setState({ state });
+        this.setState({ btnload1: true });
         fetch(`${UserConfig.PartnerConfigUrl}/api/Partner/GetPartnerDetails?partnerId=` + this.state.partnerid, {
             method: 'GET',
             headers: {
@@ -809,6 +829,7 @@ class User extends React.Component {
                 }
                 return response.json()
             }).then((data) => {
+                this.setState({ btnload1: false });
                 console.log("data", data)
                 if (data != undefined) {
                     this.setState({
@@ -911,38 +932,37 @@ class User extends React.Component {
                         <CardBody>
                             <GridContainer>
                                 <GridItem xs={12} sm={6} style={radioAlign}>
-                                    <div>
-
-                                        <FormControlLabel
-                                            control={
-                                                <Radio
-                                                    checked={this.state.selectedValue == "1004"}
-                                                    onChange={this.handleRadioChange}
-                                                    value="1004"
-                                                    name="radio button demo"
-                                                    aria-label="B"
-                                                    icon={
-                                                        <FiberManualRecord
-                                                            className={classes.radioUnchecked}
-                                                        />
-                                                    }
-                                                    checkedIcon={
-                                                        <FiberManualRecord
-                                                            className={classes.radioChecked}
-                                                        />
-                                                    }
-                                                    classes={{
-                                                        checked: classes.radio,
-                                                        root: classes.radioRoot
-                                                    }}
-                                                />
-                                            }
-                                            classes={{
-                                                label: classes.label
-                                            }}
-                                            label={<TranslationContainer translationKey="InternalUser" />}
-                                            //label="Internal User"
-                                        />
+                                    <FormControlLabel
+                                        control={
+                                            <Radio
+                                                checked={this.state.selectedValue == "1004"}
+                                                onChange={this.handleRadioChange}
+                                                value="1004"
+                                                name="radio button demo"
+                                                aria-label="B"
+                                                icon={
+                                                    <FiberManualRecord
+                                                        className={classes.radioUnchecked}
+                                                    />
+                                                }
+                                                checkedIcon={
+                                                    <FiberManualRecord
+                                                        className={classes.radioChecked}
+                                                    />
+                                                }
+                                                classes={{
+                                                    checked: classes.radio,
+                                                    root: classes.radioRoot
+                                                }}
+                                            />
+                                        }
+                                        classes={{
+                                            label: classes.label
+                                        }}
+                                        label={<TranslationContainer translationKey="InternalUser" />}
+                                    //label="Internal User"
+                                    />
+                                    {this.state.hideexternal ? null :
                                         <FormControlLabel
                                             control={
                                                 <Radio
@@ -971,13 +991,13 @@ class User extends React.Component {
                                                 label: classes.label
                                             }}
                                             label={<TranslationContainer translationKey="ExternalUser" />}
-                                            //label="External User"
+                                        //label="External User"
                                         />
-                                    </div>
+                                    }
                                 </GridItem>
                             </GridContainer>
                             {this.state.empFlag ? <Employee employeeChange={this.employeeChange} employeeidState={this.state.employeeidState} handleemployeedata={this.handleemployeedata} employeeid={this.state.employeeid} /> : null}
-                            {this.state.partFlag ? <Partner partnerChange={this.partnerChange} partneridState={this.state.partneridState} handlepartnerdata={this.handlepartnerdata} partnerid={this.state.partnerid} /> : null}
+                            {this.state.partFlag ? <Partner /*btnload1={this.state.btnload1} */ partnerChange={this.partnerChange} partneridState={this.state.partneridState} handlepartnerdata={this.handlepartnerdata} partnerid={this.state.partnerid} /> : null}
                             {this.state.isUser ? <CreateUser UserData={this.state.UserData} disable={this.state.disable} classes={this.classes} handleAddressRadioChange={this.handleAddressRadioChange} addressradiobutton={this.state.addressradiobutton} partnerName={this.state.partnerName} UserAddress={this.state.UserAddress} errormessage={this.state.errormessage} middleNameState={this.state.middleNameState} lastNameState={this.state.lastNameState} maritalStatusState={this.state.maritalStatusState} addressLine1State={this.state.addressLine1State} addressLine2State={this.state.addressLine2State} addressLine3State={this.state.addressLine3State} contactNumberState={this.state.contactNumberState} landLineResidenceState={this.state.landLineResidenceState} landLineOfficeState={this.state.landLineOfficeState} emailState={this.state.emailState} panNoState={this.state.panNoState} branchNameState={this.state.branchNameState} branchCodeState={this.state.branchCodeState} firstNameState={this.state.firstNameState} GetMasterData={this.GetMasterData} masterList={this.state.masterList} visibility={this.state.visibility} SetValue={this.SetValue} handleSubmit={this.handleSubmit} LocationDTO={this.state.LocationDTO} GetLocation={this.GetLocation} assignrolesubmit={this.assignrolesubmit} onDateChange={this.onDateChange} emailvaidation={this.state.emailvaidation} /> : null}
                             {this.renderRedirect()}
                         </CardBody>
@@ -997,7 +1017,8 @@ class User extends React.Component {
                 {this.state.isUser ?
                     <GridContainer justify="center">
                         <GridItem >
-                            <Button round onClick={this.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
+                            <Button round /*disabled={this.state.btnload} */ onClick={this.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
+                            {/*{this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                         </GridItem>
                     </GridContainer>
                     : null}

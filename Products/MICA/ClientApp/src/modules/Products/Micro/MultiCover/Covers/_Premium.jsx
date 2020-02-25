@@ -29,7 +29,11 @@ const Premium = (props) => {
         <GridContainer lg={12} style={{ position: 'relative', left: '17px' }}>
 
             <CustomRadioButton disabled={premiumData.viewdisable} radiolist={premiumData.radiolist} onChange={(e) => premiumData.onChangeradio(e, 'radiolist')} />
-            {premiumData.hideRatingCheckBox &&
+            <GridItem xs={2} sm={2} md={2}>
+                <MasterDropdown required={true} labelText="Currency" disabled={premiumData.viewdisable} lstObject={premiumData.MasterDTOlist} filterName='Currency' value={(premiumData.ProductDTO.productPremium.length>0)?premiumData.ProductDTO.productPremium[0].currencyId:null} name='currencyId' onChange={(e) => premiumData.SetCoverProductDetailsValue('productPremium', e, 0, 0)} formControlProps={{ fullWidth: true }} />
+                {premiumData.errormessage && (premiumData.ProductDTO.productPremium[0].currencyId === "") ? <p className="error">This Field is Required</p> : null}
+            </GridItem>
+            {premiumData.hideRatingCheckBox && !premiumData.viewdisable &&
                 <CustomCheckbox
                     name="RatingCheckBox"
                     labelText="Rating"
@@ -60,17 +64,19 @@ const Premium = (props) => {
 
                             <h5 className="bold-font" small>{item.description}-{(premiumData.MasterDTO.CoverMaster.length > 0) ? ((premiumData.MasterDTO.CoverMaster.filter(s => s.mID == item.subLevelId)).length > 0) ? (premiumData.MasterDTO.CoverMaster.filter(s => s.mID == item.subLevelId)[0].mValue) : "" : ""}</h5>) : null)}
                     </GridItem>
-                    <GridItem xs={2} sm={2} md={2}>
+                    {/* <GridItem xs={2} sm={2} md={2}>
                         <MasterDropdown required={true} labelText="Currency" disabled={premiumData.viewdisable} lstObject={premiumData.MasterDTOlist} filterName='Currency' value={premiumData.ProductDTO.productPremium[i].currencyId} name='currencyId' onChange={(e) => premiumData.SetCoverProductDetailsValue('productPremium', e, i, 0)} formControlProps={{ fullWidth: true }} />
                         {premiumData.errormessage && (premiumData.ProductDTO.productPremium[i].currencyId === "") ? <p className="error">This Field is Required</p> : null}
                     </GridItem>
-                    <GridItem xs={12} sm={12} md={5}>
+                    */}
+                    {!premiumData.hidepremiumAmount && <GridItem xs={12} sm={12} md={5}>
                         <CustomInput
                             labelText="Premium Amount"
                             required={true}
-                            inputType="number"
-                           // onBlur={() => premiumData.onBlur('productPremium')}
+                         
+                            onBlur={() => premiumData.onBlur(data.mValue, 'productPremium', i, premiumData.ProductDTO.productPremium[i].levelId, premiumData.ProductDTO.productPremium[i].subLevelId)}
                             id="gstnumber"
+                            inputType="number" type="numeric" negative={true}
                             value={premiumData.ProductDTO.productPremium[i].premiumAmount}
                             name="premiumAmount"
                             onChange={(e) => premiumData.SetCoverProductDetailsValue('productPremium', e, i, 0)}
@@ -79,81 +85,22 @@ const Premium = (props) => {
                                 fullWidth: true
                             }}
                         />
+
                         {premiumData.errormessage && (premiumData.ProductDTO.productPremium[i].premiumAmount == "") ? <p className="error">This Field is Required</p> : null}
+                        {(premiumData.ProductDTO.productPremium[i].flag ) && <p className="error">Premium Amount can not more then Benefit Amount</p>}
                     </GridItem>
+                    }
                 </GridContainer>
                 ))
             ))}
-            {premiumData.hidepremiumAmount ? <p className="error">Please Fill Premium Amount in BenefitTable</p> : ""}
+            {(premiumData.hidepremiumAmount && !premiumData.viewdisable) ? <p className="error">*Please fill Premium Amount in Benefit Level</p> : ""}
             {premiumData.RatingCheckBox && premiumData.hideRatingCheckBox && <GridItem xs={12} >
                 <CalCulationResult />
             </GridItem>}
-            {/*
-            {premiumData.ProductDTO.productPremium.length > 0 && premiumData.radiolist[1].mIsRequired && premiumData.Insurabletitle.map((item, i) => (
-                <GridContainer lg={12} >
-                  
-                        <h4>{item[1]}:</h4>  
-                  
-                <GridItem xs={2} sm={2} md={2}>
-                        <MasterDropdown required={true} labelText="Currency" disabled={premiumData.viewdisable} lstObject={[]} filterName='Currency' value={premiumData.ProductDTO.productPremium[i].currencyId} name='currencyId' onChange={(e) => premiumData.SetCoverProductDetailsValue('productPremium', e, i, 0)} formControlProps={{ fullWidth: true }} />
-                    {premiumData.errormessage && (premiumData.ProductDTO.productPremium.currencyId === "") ? <p className="error">This Field is Required</p> : null}
-                </GridItem>
-                <GridItem xs={12} sm={12} md={5}>
-                    <CustomInput
-                        labelText="Premium Amount"
-                        required={true}
-                        id="gstnumber"
-                            value={premiumData.ProductDTO.productPremium[i].premiumAmount}
-                        name="premiumAmount"
-                            onChange={(e) => premiumData.SetCoverProductDetailsValue('productPremium', e, i, 0)}
-                        disabled={premiumData.viewdisable}
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                    />
-                    {premiumData.errormessage && (premiumData.ProductDTO.ProductDTO.premiumAmount == "") ? <p className="error">This Field is Required</p> : null}
-                    </GridItem>
-                </GridContainer>
-            ))}
-
-
-            {premiumData.ProductDTO.productPremium.length > 0 && premiumData.radiolist[2].mIsRequired && premiumData.Insurabletitle.map((item, i) => (
-                console.log("item inside arr", item[1]),
-              
-                item.map((prop, j) => (
-                    (j > 1) ? (
-                        <GridContainer lg={12} >
-                            <h4 small>{item[1]}/</h4>,
-                            <h4 small>{prop[0]}:</h4>
-
-                            <GridItem xs={2} sm={2} md={2}>
-                                <MasterDropdown required={true} labelText="Currency" disabled={premiumData.viewdisable} lstObject={[]} filterName='Currency' value={premiumData.ProductDTO.productPremium[0].currencyId} name='currencyId' onChange={(e) => premiumData.SetCoverProductDetailsValue('productPremium', e, props.pindex, props.Iindex)} formControlProps={{ fullWidth: true }} />
-                                {premiumData.errormessage && (premiumData.ProductDTO.productPremium.currencyId === "") ? <p className="error">This Field is Required</p> : null}
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={5}>
-                                <CustomInput
-                                    labelText="Premium Amount"
-                                    required={true}
-                                    id="gstnumber"
-                                    value={premiumData.ProductDTO.productPremium[i].premiumAmount}
-                                    name="premiumAmount"
-                                    onChange={(e) => premiumData.SetCoverProductDetailsValue('productPremium', e, i, 0)}
-                                    disabled={premiumData.viewdisable}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                                {premiumData.errormessage && (premiumData.ProductDTO.ProductDTO.premiumAmount == "") ? <p className="error">This Field is Required</p> : null}
-                            </GridItem>
-                        </GridContainer>
-                    ) : null
-                    ))
-                
-            ))}
-            */}
-            <GridContainer>
+            
+            {premiumData.hideRatingCheckBox && <GridContainer>
                 <Button id="submitBtn" color="info" round onClick={premiumData.mappingPopUp}> Mapping  </Button>
-            </GridContainer>
+            </GridContainer>}
 
             </GridContainer>
            

@@ -7,11 +7,11 @@ using Microsoft.Extensions.Configuration;
 
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using iNube.Services.Policy.Entities.DynamicReportEntites;
 using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
 using iNube.Services.Policy.Models;
 //using iNube.Services.UserManagement.Helpers;
 using iNube.Services.Policy.Helpers.DynamicReportHelpers;
+using iNube.Services.Policy.Entities.DynamicReportEntities;
 
 namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaReport
 {
@@ -20,19 +20,19 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
         private MICARPContext _context;
         private IMapper _mapper;
         private IRPIntegrationService _integrationService;
-        //private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
-        public MicaReportService(MICARPContext context, IMapper mapper, IRPIntegrationService integrationService)
+        public MicaReportService(MICARPContext context, IMapper mapper, IRPIntegrationService integrationService, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
-            //_configuration = configuration;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context=(MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context=(MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> ddDTOs;
 
             ddDTOs = _context.TblRpmasters
@@ -43,7 +43,39 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
                  mType = c.MasterType
              });
             return ddDTOs;
+        }
 
+        public async Task<ReportConfigResonse> SaveConfigParameters(ReportConfigDTO reportConfigDTO, ApiContext apiContext)
+        {
+            try
+            {
+                _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+                var dto = _mapper.Map<TblReportConfig>(reportConfigDTO);
+                _context.TblReportConfig.Add(dto);
+                _context.SaveChanges();
+                var paramDto = _mapper.Map<ReportConfigDTO>(dto);
+                return new ReportConfigResonse { Status = BusinessStatus.Created, ResponseMessage = "Parameter Configuration Done Successfully!" };
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
+        {
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            IEnumerable<ddDTO> obj;
+            obj = from pr in _context.TblReportConfig.OrderByDescending(p => p.CreatedDate)
+                  select new ddDTO
+                  {
+                      mID = pr.ReportConfigId,
+                      mValue = pr.ReportConfigName,
+                      mType = lMasterlist,
+
+                  };
+            return obj;
         }
 
     }

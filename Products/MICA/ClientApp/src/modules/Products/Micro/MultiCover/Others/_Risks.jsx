@@ -30,6 +30,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Dropdown from "components/Dropdown/Dropdown.jsx";
 
 const style = {
     infoText: {
@@ -157,13 +158,19 @@ const Risk = (props) => {
                                         (props.componentData.insurableRcbdetails.map((list,index )=> (
 
                                            
-                                            < GridContainer>
+                                            <GridContainer>
                                                 {(list.levelId == m.mID) ?
                                                     <GridContainer> <p className="bold-font">{list.inputType}</p></GridContainer> : null}
+
+                                                {(list.levelId == m.mID && list.insurableChildRcbdetails.length > 1) ? <GridContainer><GridItem xs={12} sm={12} md={4}>
+                                                    <Dropdown required={true} disabled={props.viewdisable} required={true} labelText="Identification Number" lstObject={list.insurableChildRcbdetails}  onChange={(e) => props.componentData.SetIdentification(e, index)} name='IdentificationNumber' formControlProps={{ fullWidth: true }} />
+                                                </GridItem>  </GridContainer>:null}
+
                                                 {((list.insurableChildRcbdetails.length > 1) ? (
 
                                                     (list.insurableChildRcbdetails.map((prop, k) => (
                                                         ((prop.levelId == m.mID) ?
+                                                  
                                                             <GridItem xs={12} sm={12} md={3} className="downlevel">
 
                                                                 <CustomCheckbox key={k}
@@ -181,6 +188,7 @@ const Risk = (props) => {
                                                                 />
 
                                                             </GridItem>
+                                                            
                                                             : null)
                                                     )))) : null)}
                                                 {(list.levelId == m.mID && list.coverRcbdetails.length >0) ? <GridContainer> <h5 className="bold-font">Cover</h5>   </GridContainer> : null}

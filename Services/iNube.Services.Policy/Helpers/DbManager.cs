@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.UserManagement.Helpers
 {
@@ -72,12 +73,12 @@ namespace iNube.Services.UserManagement.Helpers
             return dbConnectionString;
         }
 
-        public static async Task<DbContext> GetContextAsync(string product, string connectionKey)
+        public static async Task<DbContext> GetContextAsync(string product, string connectionKey ,IConfiguration configuration)
         {
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService());
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)

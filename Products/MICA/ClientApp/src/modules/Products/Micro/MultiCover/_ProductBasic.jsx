@@ -124,17 +124,22 @@ const ProductBasic = (props) => {
                             {props.errormessage && (props.ProductDTO.cobid == "") ? <p className="error">This Field is Required</p> : null}
                         </GridItem>
                         <GridItem xs={12} sm={12} md={4}>
-                            <CustomDatetime success={props.activeFromState === "success"} disabled={props.viewdisable} required={true} onFocus={props.onClick} error={props.activeFromState === "error"} validdate={props.validdate} labelText="Active From" id='dtActiveFrom' name='activeFrom' onChange={(evt) => props.onDateChange('datetime', 'ProductDTO', 'activeFrom', evt)} value={props.ProductDTO.activeFrom} formControlProps={{ fullWidth: true }} />
+                            <CustomDatetime success={props.activeFromState === "success"} disabled={props.viewdisable} required={true} onFocus={props.onClick} error={props.activeFromState === "error"} validdate={true} labelText="Active From" id='dtActiveFrom' name='activeFrom' onChange={(evt) => props.onDateChange('datetime', 'ProductDTO', 'activeFrom', evt)} value={props.ProductDTO.activeFrom} formControlProps={{ fullWidth: true }} />
                             {props.errormessage && (props.ProductDTO.activeFrom == "") ? <p className="error">This Field is Required</p> : null}
                         </GridItem>
 
                         <GridItem xs={12} sm={12} md={4}>
-                            <CustomDatetime success={props.activeToState === "success"} disabled={props.viewdisable} required={true} error={props.activeToState === "error"} validdate={props.validdate} datediff={props.datediff} labelText="Active To" id='dtActiveFrom' name='activeTo' onChange={(evt) => props.onDateChange('datetime', 'ProductDTO', 'activeTo', evt)} value={props.ProductDTO.activeTo} formControlProps={{ fullWidth: true }} />
+                            <CustomDatetime success={props.activeToState === "success"} disabled={props.viewdisable} required={true} error={props.activeToState === "error"} validdate={false} datediff={props.datediff} labelText="Active To" id='dtActiveFrom' name='activeTo' onChange={(evt) => props.onDateChange('datetime', 'ProductDTO', 'activeTo', evt)} value={props.ProductDTO.activeTo} formControlProps={{ fullWidth: true }} />
                             {props.errormessage && (props.ProductDTO.activeTo == "") ? <p className="error">This Field is Required</p> : null}
                         </GridItem>
                         <GridItem className="dropPro" xs={12} sm={12} md={4}>
                             <MasterDropdown success={props.productStatusIdState === "success"} disabled={props.viewdisable} required={true} error={props.productStatusIdState === "error"} labelText="Product Status" id="ddlstatus" lstObject={props.masterList} filterName='ProductStatus' value={props.ProductDTO.productStatusId} name='productStatusId' onChange={(event) => props.SetValue("string", event)} formControlProps={{ fullWidth: true }} />
                             {props.errormessage && (props.ProductDTO.productStatusId == "") ? <p className="error">This Field is Required</p> : null}
+                        </GridItem>
+
+                        <GridItem xs={12} sm={12} md={4}>
+                            <Dropdown required={true} disabled={props.viewdisable} required={true} labelText="Product Type" lstObject={props.MasterDTO.ProductType} value={props.ProductDTO.productTypeId} name='productTypeId' onChange={(e) => props.GetMasterData('ProductType', 'ProductDTO', e)} formControlProps={{ fullWidth: true }} />
+                            {props.errormessage && (props.ProductDTO.productTypeId == "") ? <p className="error">This Field is Required</p> : null}
                         </GridItem>
                         <GridItem className="dropPro" xs={12} sm={12} md={4}>
                             <CustomCheckbox

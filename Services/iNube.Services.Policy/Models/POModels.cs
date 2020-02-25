@@ -446,13 +446,11 @@ namespace iNube.Services.Policy.Models
     public class PolicyResponse : ResponseStatus
     {
         public Dictionary<string,string> policy { get; set; }
-        public BusinessStatus Status { get; internal set; }
     }
 
     public class ProposalResponse : ResponseStatus
     {
         public Dictionary<string, string> proposal { get; set; }
-        public BusinessStatus Status { get; internal set; }
     }
     public class CdTransactionsDTO
     {

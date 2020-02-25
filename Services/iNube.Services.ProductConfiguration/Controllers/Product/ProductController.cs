@@ -377,16 +377,16 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
 
         // GET: api/Product/SearchRiskDetails
         [HttpGet]
-        public async Task<IActionResult> GetProductRiskDetails(decimal ProductId)
+        public async Task<IActionResult> GetProductRiskDetails(decimal ProductId, string FieldType="")
         {
-            var searchRiskdetails =await _productService.RCBDetails(ProductId,"Risk", Context);
+            var searchRiskdetails =await _productService.RCBDetails(ProductId,"Risk", FieldType, Context);
             return Ok(searchRiskdetails);
         }
         // GET: api/Product/SearchRiskDetails
         [HttpGet]
-        public async Task<IActionResult> GetProductClaimsDetails(decimal ProductId)
+        public async Task<IActionResult> GetProductClaimsDetails(decimal ProductId,string FieldType="")
         {
-            var searchClaimDetails =await _productService.RCBDetails(ProductId,"Claim",Context);
+            var searchClaimDetails =await _productService.RCBDetails(ProductId,"Claim", FieldType, Context);
             return Ok(searchClaimDetails);
         }
 

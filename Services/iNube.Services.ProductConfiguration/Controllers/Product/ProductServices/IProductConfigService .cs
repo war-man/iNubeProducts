@@ -20,7 +20,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<TblProductChannels> ChannelDetails(decimal ChannelId, ApiContext apiContext);
         Task<TblProductClausesWarrentiesExclusions> ClaimsDetails(decimal Cweid, ApiContext apiContext);
         Task<TblProductRcbdetails> RiskDetails(decimal RcbdetailsId, ApiContext apiContext);
-        Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, ApiContext apiContext);
+        Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type,string FieldType, ApiContext apiContext);
         void Delete(int ProductID, ApiContext apiContext);
         Task<ProductResponse> ProductCodevalidation(string code, ApiContext apiContext);
         Task<ProductDTO> ModifyProducts(ProductDTO objProduct, ApiContext apiContext);

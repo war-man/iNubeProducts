@@ -28,18 +28,21 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         private readonly IServiceProvider _serviceProvider;
         private ILoggerManager _logger;
         private readonly IEmailService _emailService;
-        public MotorProductService(MICAPCContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService)
+        private readonly IConfiguration _configuration;
+
+        public MotorProductService(MICAPCContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IConfiguration configuration)
         {
 
             _mapper = mapper;
             _serviceProvider = serviceProvider;
             _logger = logger;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         public async Task<ProductResponse> Create(ProductDTO productDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             try
             {
                 productDTO =await UpdateProductModel(productDTO);
@@ -82,7 +85,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //update for products
         public async Task<ProductDTO> ModifyProducts(ProductDTO objProduct, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             var tbl_product = _mapper.Map<TblProducts>(objProduct);
             var tbl_Products = _context.TblProducts.Find(tbl_product.ProductId);
 
@@ -121,7 +124,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //get for master
         public async Task<IEnumerable<ddDTOs>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             IEnumerable<ddDTOs> ddDTOs;
 
             if (lMasterlist == "Product")
@@ -165,7 +168,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //get for products
         public async Task<IEnumerable<ProductDTO>> GetProducts(string lProductlist, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             var products_list = _context.TblProducts.Select(x => x);
             var productDTOs = _mapper.Map<IList<ProductDTO>>(products_list);
             return productDTOs;
@@ -174,7 +177,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //search for products
         public async Task<IEnumerable<ProductDTO>> SearchProduct(ProductSearchDTO productSearchDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             string[] lobCob = new string[] { "LOB", "COB" };
             var masterList = _context.TblmasPccommonTypes.Where(p => lobCob.Contains(p.MasterType))
                               .ToDictionary(m => m.CommonTypeId, n => n.Value);
@@ -211,7 +214,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<ProductDTO>> SearchAssignProduct(ProductSearchDTO productSearchDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             string[] lobCob = new string[] { "LOB", "COB" };
             var masterList = _context.TblmasPccommonTypes.Where(p => lobCob.Contains(p.MasterType))
                               .ToDictionary(m => m.CommonTypeId, n => n.Value);
@@ -249,7 +252,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //Get product by Id
         public async Task<ProductDTO> GetProductById(int ProductId, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             var tblProduct = _context.TblProducts.Where(item => item.ProductId == ProductId)
                         //.Include(add => add.TblProductBenefits)
                         .Include("TblProductBenefits.TblBenifitRangeDetails")
@@ -308,21 +311,21 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //SearchChannelDetails
         public async Task<TblProductChannels> ChannelDetails(decimal ChannelId, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             return _context.TblProductChannels.Find(ChannelId);
         }
         
         //SearchClaimDetails
         public async Task<TblProductClausesWarrentiesExclusions> ClaimsDetails(decimal Cweid, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             return _context.TblProductClausesWarrentiesExclusions.Find(Cweid);
         }
         
         //SearchRiskDetails
-        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, ApiContext apiContext)
+        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type,string FieldType, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             var rcbDetails = (from rc in _context.TblProductRcbdetails
                               join p in _context.TblmasProductMaster on rc.InputId equals p.ProductMasterId
                               where rc.ProductId == ProductId && rc.InputType == type && (bool)rc.IsReqired
@@ -344,7 +347,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<List<ProductClausesWarrentiesExclusionsDTO>> CWEDetails(int LOBId, int CWETypeID, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             var cweType = _context.TblmasPccommonTypes.FirstOrDefault(t => t.CommonTypeId == CWETypeID).Value;
             var Type = cweType.Substring(0, 1);
             var tblCCWEList = _context.TblmasClausesWarrentiesExclusions.Where(t => t.Lobid == LOBId && t.CwetypeId == CWETypeID).ToList();
@@ -360,7 +363,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<ddDTOs>> GetProductMaster(string masterType, int parentID, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             List<int> lstParentId = new List<int> { 0, parentID };
             var productMasters_list = _context.TblmasProductMaster.Where(x => x.MasterType == masterType && x.IsActive && lstParentId.Contains((int)x.ParentId))
                 .OrderByDescending(p => p.IsDisable).ThenBy(p => p.SortOrder);
@@ -410,13 +413,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<TblProductRcbdetails> RiskDetails(decimal RcbdetailsId, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             return _context.TblProductRcbdetails.Find(RcbdetailsId);
         }
 
         public async Task<ProductResponse> ProductCodevalidation(string code, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             var data = _context.TblProducts.Any(e => e.ProductCode == code);
             if (data == true)
             {
@@ -430,7 +433,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<ProductResponse> GetProductGWP(ProductDTO productDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             var TotalGWP = from P in _context.TblProducts.Where(e => e.ProductId == productDTO.ProductId)
                            group P by P.ProductId into g
                            select new { productCount = g.Count(), productSum = g.Sum(o => o.PremiumAmount), issuedate = g.Select(s => s.CreatedDate).ToList() };

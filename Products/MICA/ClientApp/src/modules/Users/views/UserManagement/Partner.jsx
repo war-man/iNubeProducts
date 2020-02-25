@@ -30,6 +30,7 @@ import Button from "components/CustomButtons/Button.jsx";
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
 import './style.css';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { Animated } from "react-animated-css";
 
@@ -119,11 +120,13 @@ const Partner = (props) => {
                         <GridItem >
                             <div>
                                 <Button color="success"
+                                    //disabled={props.btnload1}
                                     round className={props.classes.marginRight}
                                     onClick={props.handlepartnerdata}
                                     id="validateBtn" >
                                     <TranslationContainer translationKey="Validate" />
                                 </Button>
+                                {/* {props.btnload1 ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                             </div>
                         </GridItem>
                     </GridContainer>
