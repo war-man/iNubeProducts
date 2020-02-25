@@ -31,14 +31,24 @@ namespace iNube.Services.Billing.Controllers.Billing
         [HttpGet]
         public async Task<IActionResult> GetMaster(string lMasterlist, bool isFilter = true)
         {
-            var commonTypesDTOs =await _billingService.GetMaster(lMasterlist, Context);
-
-            if (isFilter)
+            try
             {
-                var masterdata = commonTypesDTOs.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
-                return Ok(masterdata);
+                var commonTypesDTOs = await _billingService.GetMaster(lMasterlist, Context);
+
+                if (isFilter)
+                {
+                    var masterdata = commonTypesDTOs.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
+                    return Ok(masterdata);
+                }
+                return Ok(commonTypesDTOs);
             }
-            return Ok(commonTypesDTOs);
+            catch (Exception ex)
+            {
+
+                var response = new ResponseStatus() { Status = BusinessStatus.Ok, ResponseMessage = ex.ToString() };
+                return Ok(response);
+            }
+           
         }
 
         [HttpGet]
@@ -556,7 +566,7 @@ namespace iNube.Services.Billing.Controllers.Billing
         [AllowAnonymous]
         public IActionResult HC()
         {
-            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok , ResponseMessage="Working as expected"};
             return Ok(response);
         }
     }
