@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using iNube.Services.Partners.Controllers.Partner.PartnerService;
 using iNube.Utility.Framework.Model;
 using iNube.Services.UserManagement.Helpers;
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.Partners.Controllers.Office.OfficeService
 {
@@ -17,16 +18,18 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
     {
         private MICAPRContext _context;
         private IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public MicaOfficeService(MICAPRContext context, IMapper mapper)
+        public MicaOfficeService(MICAPRContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var office = _mapper.Map<TblOrgOffice>(officeDTO);
             //_context.Entry(office).State=(office.OrgOfficeId == 0)?EntityState.Added : EntityState.Modified;
@@ -50,7 +53,7 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
 
         public async Task<OrgOfficeDTO> GetOffice(int officeID, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
             TblOrgOffice _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OrgOfficeId == officeID)
@@ -61,7 +64,7 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
         }
         public async Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(int officeID, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             // OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
             var _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == "2323")
@@ -73,7 +76,7 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
 
         public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> officeDTOs;
 
             officeDTOs = _context.TblOrgOffice

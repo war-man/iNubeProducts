@@ -1,5 +1,6 @@
 ﻿using iNube.Services.Partners.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,81 +27,77 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
     }
     public class IntegrationService : IIntegrationService
     {
-        //readonly string productUrl = "https://localhost:44347";
-        readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-		//readonly string productUrl = "http://mica-inube-product-service.mica-internal.:9007";
-
-        readonly string userApiUrl = "https://inubeservicesusermgmt.azurewebsites.net";
-        //readonly string userApiUrl = "https://localhost:44367";
-		// readonly string userApiUrl = "http://mica-inube-user-service.mica-internal.:9009";
-
-        //readonly string UsermanangementUrl = "https://localhost:44367";
-        readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        //readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
-
-        //Url For Accesing Transacttion Acces
-        //readonly string accountApiUrl = "http://localhost:52166/api/AccountConfig/GetTransactionMappingDetails";
-        readonly string accountRuleApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionConditionDetails";
-
-
-        readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
-        //readonly string createTransactionApi = "http://localhost:52166/api/AccountConfig/CreateTransaction";
-        // readonly string createTransactionApi = "http://mica-inube-accounting-service.mica-internal.:9011/api/AccountConfig/CreateTransaction";
-
-
-        readonly string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-        //readonly string notificationUrl = "http://mica-inube-notification-service.mica-internal.:9004";
-
+        private IConfiguration _configuration;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
         readonly string ratingUrl = "https://inubeservicesrating.azurewebsites.net";
         //readonly string ratingUrl = "http://mica-inube-notification-service.mica-internal.:9004";
 
+        public IntegrationService(IConfiguration configuration)
+        {
+
+            _configuration = configuration;
+            PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
+            BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
+            ClaimUrl = _configuration["Integration_Url:Claim:ClaimUrl"];
+            NotificationUrl = _configuration["Integration_Url:Notification:NotificationUrl"];
+            PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
+            ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            //UserUrl = "http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9009";
+            AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
+            ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
+
+
+        }
+
         public async Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext)
         {
-            var uri = accountRuleApiUrl;
+            var uri = AccountingUrl + "/api/AccountConfig/GetTransactionConditionDetails";
             var accountMapListDetails = await GetListApiInvoke<TransactionRuleMappingDto>(uri, apiContext);
             return accountMapListDetails;
         }
         //Accounting CreateTransaction
         public async Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext)
         {
-            var uri = createTransactionApi;
+            var uri = AccountingUrl+ "/api/AccountConfig/CreateTransaction";
             return await PostApiInvoke<TransactionHeaderDto, TransactionsResponse>(uri, apiContext, transaction);
         }
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
-            var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
         }
 
         public async Task<ProductDTO> GetProductNameAsync(decimal productId, ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/GetProductById?productId=" + productId;
+            var uri = ProductUrl + "/api/Product/GetProductById?productId=" + productId;
             return await GetApiInvoke<ProductDTO>(uri, apiContext);
         }
 
         public async Task<IEnumerable<ddDTO>> GetProductMasterAsync(ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/GetMasterData?sMasterlist=Product&isFilter=false";
+            var uri = ProductUrl + "/api/Product/GetMasterData?sMasterlist=Product&isFilter=false";
             var productList = await GetListApiInvoke<ddDTO>(uri, apiContext);
             return productList;
         }
 
         public async Task<UserResponse> CreateUserAsync(UserDTO userDTO, ApiContext apiContext)
         {
-            var uri = userApiUrl + "/api/UserProfile/CreateProfileUser";
+            var uri = UserUrl + "/api/UserProfile/CreateProfileUser";
             var productList = await PostApiInvoke<UserDTO, UserResponse>(uri, apiContext, userDTO);
             return productList;
         }
 
         public async Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext)
         {
-            var uri = notificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
+            var uri = NotificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
             return await PostApiInvoke<NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
         }
         public async Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal productId, ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/GetInsurableRiskDetails?ProductId=" + productId;
+            var uri = ProductUrl + "/api/Product/GetInsurableRiskDetails?ProductId=" + productId;
             return await GetApiInvoke<ProductRiskDetailsDTO>(uri, apiContext);
 
         }
