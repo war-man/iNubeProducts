@@ -20,7 +20,6 @@ namespace iNube.Services.Rating.Models
         public DateTime? CreatedDate { get; set; }
 
         public virtual ICollection<ParameterSetDetailsDTO> ParameterSetDetails { get; set; }
-
     }
     public class ParameterSetDataDTO
     {
