@@ -764,7 +764,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<dynamic> PolicyCancellation1(dynamic endoresementDto, ApiContext apiContext)
         {
-
+         
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             var policyNo = (string)endoresementDto["PolicyNumber"];
             var _tblPolicy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == policyNo);
@@ -2518,123 +2518,124 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
 
             }
-
-            string EndorsementNo = "";
-            var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
-            if (policy != null)
+            try
             {
-                policy.PolicyVersion++;
-                EndorsementNo = policy.PolicyNo + "" + "_" + (policy.PolicyVersion).ToString();
-
-                if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
+                string EndorsementNo = "";
+                var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
+                if (policy != null)
                 {
-                    List<TblPolicyInsurableDetails> lstPolicyInsurableDetailsDto = new List<TblPolicyInsurableDetails>();
+                    policy.PolicyVersion++;
+                    EndorsementNo = policy.PolicyNo + "" + "_" + (policy.PolicyVersion).ToString();
 
-                    foreach (var item in insurableItemRequest.InsurableItem)
+                    if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
                     {
-                        var InsurableItemName = item.InsurableName;
+                        List<TblPolicyInsurableDetails> lstPolicyInsurableDetailsDto = new List<TblPolicyInsurableDetails>();
 
-                        TblPolicyInsurableDetails policyInsurableDetailsDto = null;
-
-
-
-                        foreach (var insurableInsurablefields in item.RiskItems)
+                        foreach (var item in insurableItemRequest.InsurableItem)
                         {
-                            policyInsurableDetailsDto = new TblPolicyInsurableDetails();
-                            policyInsurableDetailsDto.PolicyId = policy.PolicyId;
-                            policyInsurableDetailsDto.InsurableItem = InsurableItemName;
-                            policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
-                            policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
-                            policyInsurableDetailsDto.BenefitAmount = 0;
-                            policyInsurableDetailsDto.IsActive = true;
-                            lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
+                            var InsurableItemName = item.InsurableName;
+
+                            TblPolicyInsurableDetails policyInsurableDetailsDto = null;
+
+
+
+                            foreach (var insurableInsurablefields in item.RiskItems)
+                            {
+                                policyInsurableDetailsDto = new TblPolicyInsurableDetails();
+                                policyInsurableDetailsDto.PolicyId = policy.PolicyId;
+                                policyInsurableDetailsDto.InsurableItem = InsurableItemName;
+                                policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
+                                policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
+                                policyInsurableDetailsDto.BenefitAmount = 0;
+                                policyInsurableDetailsDto.IsActive = true;
+                                lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
+                            }
+
                         }
 
-                    }
-
-                    _context.TblPolicyInsurableDetails.AddRange(lstPolicyInsurableDetailsDto);
+                        _context.TblPolicyInsurableDetails.AddRange(lstPolicyInsurableDetailsDto);
 
 
-                    var EndorsmentType = (string)insurableItemRequest["EndorsementType"];
+                        var EndorsmentType = (string)insurableItemRequest["EndorsementType"];
 
-                    if (EndorsmentType == "Addition of vehicle")
-                    {
-
-                        var policyNo = (string)insurableItemRequest["PolicyNumber"];
-                        var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
-                        var policyId = tbl_particiant.PolicyId;
-                        var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-
-                        if (tblPolicyDetailsdata != null)
+                        if (EndorsmentType == "Addition of vehicle")
                         {
-                            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                            dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
-                            foreach (var insurableName in json.InsurableItem)
+                            var policyNo = (string)insurableItemRequest["PolicyNumber"];
+                            var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
+                            var policyId = tbl_particiant.PolicyId;
+                            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+
+                            if (tblPolicyDetailsdata != null)
                             {
-                                foreach (var item in insurableItemRequest.InsurableItem)
+                                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                                dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                                dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+                                foreach (var insurableName in json.InsurableItem)
                                 {
-                                    var name1 = insurableName.InsurableName;
-                                    if (name1 == "Vehicle" && item.InsurableName == "Vehicle")
+                                    foreach (var item in insurableItemRequest.InsurableItem)
                                     {
-                                        foreach (var insurableName1 in json1.InsurableItem)
+                                        var name1 = insurableName.InsurableName;
+                                        if (name1 == "Vehicle" && item.InsurableName == "Vehicle")
                                         {
-
-                                            // var name2 = insurableName1.InsurableName;
-
-                                            var count = insurableName.RiskItems.Count;
-
-                                            //var additiondrivercount = json.additionalDriver + 1;
-                                            // var addtionaldriver = Convert.ToInt32(additiondrivercount);
-                                            if (insurableName.InsurableName == "Vehicle")
+                                            foreach (var insurableName1 in json1.InsurableItem)
                                             {
 
-                                                if (count < 3)
+                                                // var name2 = insurableName1.InsurableName;
+
+                                                var count = insurableName.RiskItems.Count;
+
+                                                //var additiondrivercount = json.additionalDriver + 1;
+                                                // var addtionaldriver = Convert.ToInt32(additiondrivercount);
+                                                if (insurableName.InsurableName == "Vehicle")
                                                 {
 
-                                                    if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
+                                                    if (count < 3)
                                                     {
-                                                        json1.si = insurableItemRequest.SI;
-                                                    }
-                                                    foreach (var fields in item.RiskItems)
-                                                    {
-                                                        try
-                                                        {
-                                                            //Note validation has to come vechile addition count can not be greater then 3
 
-                                                            if (insurableName1.InsurableName == "Vehicle" && insurableName.InsurableName == "Vehicle")
+                                                        if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
+                                                        {
+                                                            json1.si = insurableItemRequest.SI;
+                                                        }
+                                                        foreach (var fields in item.RiskItems)
+                                                        {
+                                                            try
                                                             {
-                                                                insurableName1.RiskItems.Add(fields);
-                                                                //insurableName1.RiskItems = insurableName.RiskItems;
+                                                                //Note validation has to come vechile addition count can not be greater then 3
+
+                                                                if (insurableName1.InsurableName == "Vehicle" && insurableName.InsurableName == "Vehicle")
+                                                                {
+                                                                    insurableName1.RiskItems.Add(fields);
+                                                                    //insurableName1.RiskItems = insurableName.RiskItems;
+                                                                }
                                                             }
-                                                        }
-                                                        catch (Exception e)
-                                                        {
-                                                        }
+                                                            catch (Exception e)
+                                                            {
+                                                            }
 
+                                                        }
                                                     }
-                                                }
-                                                else
-                                                {
-                                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Vehicle can not be added" };
+                                                    else
+                                                    {
+                                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Vehicle can not be added" };
 
-                                                    Errors.Add(errorInfo);
-                                                    return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of vehicle can not more than Three." };
-                                                }
+                                                        Errors.Add(errorInfo);
+                                                        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of vehicle can not more than Three." };
+                                                    }
 
+                                                }
                                             }
+
                                         }
-
                                     }
-                                }
 
+                                }
+                                tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+                                _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+                                _context.SaveChanges();
                             }
-                            tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                            _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                            _context.SaveChanges();
                         }
-                    }
 
                         //Add Driver
 
@@ -2733,7 +2734,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
 
                 }
-            return null;
+            }
+            catch (Exception ex) {
+                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = ex.InnerException.ToString() };
+                Errors.Add(errorInfo);
+                return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
+
+            }
+          
         }
            
         
@@ -2742,109 +2750,126 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
-
-            string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
-
-            var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
-            if (policy != null)
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            EndorsmentDTO endorsmentDTO = new EndorsmentDTO();
+            try
             {
-                if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
+                string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
+
+                var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
+                if (policy != null)
                 {
-
-                    foreach (var item in insurableItemRequest.InsurableItem)
+                    if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
                     {
 
-
-                        foreach (var insurableInsurablefields in item.RiskItems)
+                        foreach (var item in insurableItemRequest.InsurableItem)
                         {
 
-                            string IdentificationNo = insurableInsurablefields["Identification Number"].ToString();
 
-                            var verify = _context.TblPolicyInsurableDetails.Where(x => x.IdentificationNo == IdentificationNo && x.PolicyId == policy.PolicyId);
-
-                            foreach (var insureditem in verify)
+                            foreach (var insurableInsurablefields in item.RiskItems)
                             {
-                                insureditem.IsActive = false;
 
-                            }
+                                string IdentificationNo = insurableInsurablefields["Identification Number"].ToString();
 
-                        }
+                                var verify = _context.TblPolicyInsurableDetails.Where(x => x.IdentificationNo == IdentificationNo && x.PolicyId == policy.PolicyId);
 
-                    }
-
-
-
-                    var policyNo = (string)insurableItemRequest["PolicyNumber"];
-                    var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
-                    var policyId = tbl_particiant.PolicyId;
-                    var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                    var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                    dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                    dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-
-                    foreach (var item in insurableItemRequest.InsurableItem)
-                    {
-
-                        foreach (var insurableName in json.InsurableItem)
-                        {
-                            foreach (var insurableName1 in json1.InsurableItem)
-                            {
-                                if (item.InsurableName == insurableName.InsurableName)
+                                foreach (var insureditem in verify)
                                 {
-                                    foreach (var fields in item.RiskItems)
-                                    {
-                                        if (insurableName.RiskItems.Count > 0)
-                                        {
-                                            try
-                                            {
-                                                foreach (var jsoninsurableFields in insurableName.RiskItems)
-                                                {
+                                    insureditem.IsActive = false;
 
-                                                    var InputidentificationNumber = (string)fields["Identification Number"];
-                                                    var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                                                    if (InputidentificationNumber == TblIdentificationNo)
-                                                    {
-                                                        var removeitem = jsoninsurableFields;
-                                                        insurableName.RiskItems.Remove(removeitem);
-
-                                                    }
-                                                }
-
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                //var name = insurableName1.InsurableName;
-                                                //var name1 = insurableName1.RiskItems;
-                                                //if (item.InsurableName == insurableName1.InsurableName)
-                                                    insurableName1.RiskItems = insurableName.RiskItems;
-                                                // insurableName1.Add(insurableName.RiskItems
-                                               // json1.InsurableItem = insurableName.RiskItems;
-                                            }
-
-                                        }
-                                    }
                                 }
 
                             }
+
                         }
 
+
+
+                        var policyNo = (string)insurableItemRequest["PolicyNumber"];
+                        var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
+                        var policyId = tbl_particiant.PolicyId;
+                        var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+                        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                        dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                        dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+                        foreach (var item in insurableItemRequest.InsurableItem)
+                        {
+
+                            foreach (var insurableName in json.InsurableItem)
+                            {
+                                foreach (var insurableName1 in json1.InsurableItem)
+                                {
+                                    if (item.InsurableName == insurableName.InsurableName)
+                                    {
+                                        foreach (var fields in item.RiskItems)
+                                        {
+                                            if (insurableName.RiskItems.Count > 0)
+                                            {
+                                                try
+                                                {
+                                                    foreach (var jsoninsurableFields in insurableName.RiskItems)
+                                                    {
+
+                                                        var InputidentificationNumber = (string)fields["Identification Number"];
+                                                        var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                                                        if (InputidentificationNumber == TblIdentificationNo)
+                                                        {
+                                                            var removeitem = jsoninsurableFields;
+                                                            insurableName.RiskItems.Remove(removeitem);
+
+                                                        }
+                                                    }
+
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    //var name = insurableName1.InsurableName;
+                                                    //var name1 = insurableName1.RiskItems;
+                                                    //if (item.InsurableName == insurableName1.InsurableName)
+                                                    insurableName1.RiskItems = insurableName.RiskItems;
+                                                    // insurableName1.Add(insurableName.RiskItems
+                                                    // json1.InsurableItem = insurableName.RiskItems;
+                                                }
+
+                                            }
+                                            else
+                                            {
+
+
+
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+
+                        }
+                        tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+                        _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+                        await _context.SaveChangesAsync();
+
+
+                        endorsmentDTO.ResponseMessage = $"RiskItems Deleted successfully for this Policy Number{PolicyNo}";
+                        return endorsmentDTO;
+
+                        //   _context.SaveChanges();
                     }
-                    tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                    _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                    await _context.SaveChangesAsync();
 
 
-
-
-                    //   _context.SaveChanges();
                 }
 
-
+               
+                return new EndorsmentDTO();
             }
+            catch (Exception ex) {
 
-
-            return new EndorsmentDTO();
-
+                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = ex.InnerException.ToString() };
+                Errors.Add(errorInfo);
+                endorsmentDTO.Errors = Errors;
+                return endorsmentDTO;
+            }
 
         }
 
@@ -3640,78 +3665,90 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             ProposalResponse proposalResponse = new ProposalResponse();
             List<ErrorInfo> Errors = new List<ErrorInfo>();
+            try
+            {
+                string endorsementType = endoresementDto["EndorsementType"].ToString();
 
-            string endorsementType = endoresementDto["EndorsementType"].ToString();
+                if (endorsementType == "")
+                {
 
-            if (endorsementType == "") {
-                
                     ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PO001", PropertyName = "EndorsementType", ErrorMessage = "EndorsementType can not be empty" };
                     Errors.Add(errorInfo);
                     return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
-                
-
-            }
-
-            string EndorsementNo = "";
 
 
+                }
 
-            //Addition of vehicle
-
-            
-            if (endorsementType == "Addition of vehicle")
-            {
-                //Add insurable item and updating json of Polic Request 
-                var data = await AddInsurableItem(endoresementDto, apiContext);
-
-                //Updating json of policyRequest
-                
-                proposalResponse.Status = data.Status;
-                proposalResponse.Errors.AddRange(data.Errors);
-                proposalResponse.ResponseMessage = data.ResponseMessage;
-                proposalResponse.Id = data.Id;
-                return proposalResponse;
-            }
+                string EndorsementNo = "";
 
 
-            if (endorsementType == "Addition of driver")
-            {
-                //Add insurable item and updating json of Polic Request 
-                var data = await AddInsurableItem(endoresementDto, apiContext);
 
-                //Updating json of policyRequest
+                //Addition of vehicle
 
-           
-                proposalResponse.Status = data.Status;
-                proposalResponse.Errors.AddRange(data.Errors);
-                proposalResponse.ResponseMessage = data.ResponseMessage;
-                proposalResponse.Id = data.Id;
-                return proposalResponse;
-            }
 
-            //For that row isActive will be false
+                if (endorsementType == "Addition of vehicle")
+                {
+                    //Add insurable item and updating json of Polic Request 
+                    var data = await AddInsurableItem(endoresementDto, apiContext);
 
-            //Note tested but ruturn type have to handle the return type
-            if (endorsementType == "Deletion of vehicle" || endorsementType == "Deletion of driver")
-            {
-                var data = await RemoveInsurableItem(endoresementDto, apiContext);
-             
+                    //Updating json of policyRequest
+
+                    proposalResponse.Status = data.Status;
+                    proposalResponse.Errors.AddRange(data.Errors);
+                    proposalResponse.ResponseMessage = data.ResponseMessage;
+                    proposalResponse.Id = data.Id;
+                    return proposalResponse;
+                }
+
+
+                if (endorsementType == "Addition of driver")
+                {
+                    //Add insurable item and updating json of Polic Request 
+                    var data = await AddInsurableItem(endoresementDto, apiContext);
+
+                    //Updating json of policyRequest
+
+
+                    proposalResponse.Status = data.Status;
+                    proposalResponse.Errors.AddRange(data.Errors);
+                    proposalResponse.ResponseMessage = data.ResponseMessage;
+                    proposalResponse.Id = data.Id;
+                    return proposalResponse;
+                }
+
+                //For that row isActive will be false
+
+                //Note tested but ruturn type have to handle the return type
+                if (endorsementType == "Deletion of vehicle" || endorsementType == "Deletion of driver")
+                {
+                    var data = await RemoveInsurableItem(endoresementDto, apiContext);
+
+                    return null;
+
+                    //return data;
+                }
+
+                //Tested have to handle the return type
+                if (endorsementType == "Cancel Policy")
+                {
+
+                    var data = PolicyCancellation1(endoresementDto, apiContext);
+                    return data;
+                }
+
                 return null;
-
-                //return data;
             }
 
-            //Tested have to handle the return type
-            if (endorsementType == "Cancel Policy")
+            catch (Exception ex)
             {
-
-                var data = PolicyCancellation1(endoresementDto, apiContext);
-                return data;
+                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = ex.InnerException.ToString() };
+                Errors.Add(errorInfo);
+                proposalResponse.Errors = Errors;
+                return proposalResponse;
             }
-
-            return null;
 
         }
+        
 
 
     }
