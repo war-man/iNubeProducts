@@ -10,6 +10,11 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MotorR
     public class MotorReportService: IReportProductService
     {
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext context)
+        {   
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

@@ -7,6 +7,7 @@ import CardBody from "components/Card/CardBody.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import Icon from "@material-ui/core/Icon";
+import { Redirect } from 'react-router-dom';
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
@@ -17,37 +18,25 @@ import $ from 'jquery';
 import swal from 'sweetalert';
 
 
+
 class AddVehicle extends React.Component {
 
     constructor(props) {
         super(props)
 
         this.state = {
-            vehicleModel:"",
+            policyNo:"",
+            vehicleModel: "",
+            vehicleModel1: "",
+            showDropZone: false,
             quotationdataDto: {},
             NoOfDriver: '',
             VehicleAge: '',
-            VehicleNumber: '',
+            VehicleAge1: '',
+            //VehicleNumber: '',
             VehicleModelNumber: '',
-            insurableObj: [{
-
-                "InsurableName": "Vehicle",
-
-                "InsurableFields": [
-
-                    {
-
-                        "Name": "",
-
-                        "Identification Number": "",
-
-                        "Vehicle Registration Date": ""
-
-                    }
-
-                ]
-
-            }],
+            insurableObj: [],
+            vehiclepremiumDto: {},
             proposalIssueDTO:
             {
 
@@ -55,13 +44,72 @@ class AddVehicle extends React.Component {
                 "InsurableItem": [],
 
 
-            }
+            },
+            policyIssueRequest: {
+
+            },
+            RiskObj: {
+
+                Model: "",
+
+                VehicleNumber: "",
+
+                IdentificationNumber: "223",
+
+                YearofRegistration: "",
+
+                VehicleType: "sdsd",
+
+                Documents: []
+            },
+            duplicateRiskObj: {
+
+                "Model": "",
+
+                "VehicleNumber": "",
+
+                "Identification Number": "223",
+
+                "YearofRegistration": "",
+
+                "Vehicle Type": "sdsd",
+
+                "Documents": []
+            },
+            scheduleDTO: {
+                "policyNo": "",
+                "vehicleRegistrationNo": "",
+                "vehicleType": "",
+                "mon": false,
+                "tue": false,
+                "wed": false,
+                "thu": false,
+                "fri": false,
+                "sat": false,
+                "sun": false,
+            },
+            poliNo:"",
+        
         }
     }
+    AddVehicle = (files) => {
+        debugger;
+        if (this.state.policyIssueRequest.InsurableItem[1].InsurableName == "Vehicle") {
 
+            this.state.policyIssueRequest.InsurableItem[1].RiskItems.push(this.state.RiskObj);
+
+
+        }
+        //this.setState({ RiskObj: this.state.duplicateRiskObj });
+        console.log(" this.state.policyRqst", this.state.policyRqst);
+    }
     Issuepolicy = () => {
-        this.state.proposalIssueDTO.InsurableItem = this.state.insurableObj;
-        console.log("Issuepolicy", this.state.proposalIssueDTO);
+        debugger;
+        //let policyno = this.state.scheduleDTO.policyNo;
+        this.state.scheduleDTO.vehicleRegistrationNo = this.state.RiskObj.VehicleNumber;
+        this.AddVehicle();
+        debugger;
+        console.log("Issuepolicy", this.state.policyIssueRequest);
         fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/IssuePolicy`, {
             method: 'PUT',
             headers: {
@@ -70,58 +118,110 @@ class AddVehicle extends React.Component {
                 'authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5NTc4NmM2OS0xNjAxLTQzMGQtODM1Ni01M2RlNDUyZjUxZTYiLCJFbWFpbCI6InZpdGFsQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJEZW1vIFJvbGUiLCJOYW1lIjoidml0aGFsIiwiVXNlck5hbWUiOiJ2aXRhbEBpbnViZXNvbHV0aW9ucy5jb20iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMSIsImV4cCI6MTY3MDY1NDMzMCwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.nZsItQ97TGtSZ-IrZ8SlDeOCIKnaCI4tmeLC953z9qA'
 
             },
-            body: JSON.stringify(this.state.proposalIssueDTO)
+            body: JSON.stringify(this.state.policyIssueRequest)
         }).then(response => response.json())
             .then(data => {
+
+                this.state.policyNo = data.id;
+                let sDTO = this.state.scheduleDTO;
+                sDTO.policyNo = data.id;
+                //this.setState({poliNo:data.id})
+
+                this.setState({ sDTO });
+
+                //let policynothis = data.id;
+                //policyno = policynothis;
+              
+                if (data.status == 2) {
+
+                    this.renderRedirect();
+                    this.setState({ redirect: true });
+
                 swal({
-                    text: "Policy issued with policy number"+ ""+data,
+                    text: data.responseMessage,
                     icon: "success"
                 })
-                console.log("dddd", data);
+                    console.log("dddd", data);
+                    fetch(`http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/CreateUpdateSchedule`, {
+                        method: 'Post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg'
+
+                        },
+                        body: JSON.stringify(this.state.scheduleDTO)
+                    }).then(response => response.json())
+                        .then(data => { 
+                            swal({
+                                text: "Schedule Created Successfully!",
+                                icon: "success"
+                            })
+                            this.setState({ disablesendotp: true, disableresendotp: false })
+                            console.log("dddd", data);
+                        })
+                }
             })
-    }
+      
+        console.log("ssssss", this.state.scheduleDTO);
 
+        
+    }
+    
     componentDidMount() {
-        console.log("qaaaaa", this.props.location.state.quotationDetailsDto);
-        console.log("prNo", this.props.location.state.proposalno);
         if (this.props.location.state != undefined) {
-            this.setState({ quotationdataDto: this.props.location.state.quotationDetailsDto });
-            this.state.proposalIssueDTO.ProposalNumber = this.props.location.state.proposalno;
-            this.state.insurableObj[0].InsurableFields[0].Name = this.state.quotationdataDto.primaryDriverName;
-            console.log("thisquotationDto", this.state.quotationdataDto);
+            this.state.scheduleDTO.vehicleType = this.props.location.state.drvvehicleType;
+            this.state.RiskObj.Model = this.props.location.state.adddrvMakeModel;
+            console.log("this.state.scheduleDTO.vehicleType", this.state.RiskObj.Model, this.state.scheduleDTO.vehicleType);
+           
+            this.setState({ quotationdataDto: this.props.location.state.quotationDetailsDto, policyIssueRequest: this.props.location.state.policyIssueDTO, vehiclepremiumDto: this.props.location.state.premDTO });
+            //this.state.policyIssueRequest = this.props.location.state.policyRqst;
+            //this.state.insurableObj[0].RiskItems[0].Name = this.state.quotationdataDto.primaryDriverName;
+            console.log("policyIssueRequestis.stat", this.state.policyIssueRequest);
+
+            fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleDetails?VehicleId=` + this.props.location.state.quotationDetailsDto.vehicleMakeModelId, {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("qdata21:", data);
+                    this.setState({ vehicleModel: data.vehicleModel });
+                });
+
+            console.log("this.state.insurableObj", this.state.insurableObj);
         }
-        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleDetails?VehicleId=` + this.props.location.state.quotationDetailsDto.vehicleMakeModelId, {
-            method: 'get',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log("qdata21:", data);
-                this.setState({ vehicleModel: data.vehicleModel});
-            });
-
-
     }
-    //onInputChange = (evt) => {
-    //    const Data = this.state.quotationDetailsDto;
-    //    Data[evt.target.name] = evt.target.value;
-    //    this.setState({ Data });
-    //}
-    showOnClick = () => {
+    onInputChange = (evt) => {
+
+        const Data = this.state.RiskObj;
+        Data[evt.target.name] = evt.target.value;
+        this.setState({ Data });
+    }
+    showOnClick = (evt) => {
+        debugger;
         this.setState({ showDropZone: true })
+    }
+    showOnClick1 = () => {
+        this.setState({ showDropZone1: true })
+    }
+    showOnClick2 = () => {
+        this.setState({ showDropZone2: true })
+    }
+    showOnClick3 = () => {
+        this.setState({ showDropZone3: true })
     }
 
     getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
 
     handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
 
-    uploadfile = (files) => {
+    uploadfilefront = (files) => {
         debugger;
-        //var myJSON = JSON.stringify(files); 
-        console.log("StData", files.map(f => f.meta))
+        let obj = this.state.RiskObj;
         var data = new FormData();
         if (files.length > 0) {
             for (var i = 0; i < files.length; i++) {
@@ -139,11 +239,32 @@ class AddVehicle extends React.Component {
             processData: false,
 
             data: data,
-            beforeSend: function (xhr) {
+            beforeSend: function (data, xhr) {
                 /* Authorization header */
-                xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+                //xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
             },
-            success: function (message) {
+            success: function (data, message) {
+                console.log("dddata", data);
+                let docObj = [
+                ]
+                for (var i = 0; i < data.dMSDTOs.length; i++) {
+
+                    docObj.push(data.dMSDTOs[i]);
+                }
+                console.log("docobj", docObj);
+                for (var i = 0; i < docObj.length; i++) {
+                    let x = {};
+                    x.docId = docObj[i].docId;
+                    x.fileName = docObj[i].fileName;
+                    let mainobj = obj.Documents;
+                    mainobj.push(x);
+                   
+                    console.log("docobj", mainobj);
+                }
+               
+                //this.state.documentObj.docId = data.docId;
+                //this.state.documentObj.fileName = data.fileName;
+
                 swal({
                     text: "Document Uploaded Successful",
                     icon: "success"
@@ -157,99 +278,128 @@ class AddVehicle extends React.Component {
                 });
             }
         });
-
+        this.setState({});
+        console.log("this.state.Riskobj", this.state.RiskObj);
     }
- 
+
+    renderRedirect = () => {
+        if (this.state.redirect === true) {
+            return <Redirect to={{
+                pathname: '/pages/LogonVehicle',
+                state: { policyIssueRequest: this.state.policyIssueRequest, RiskObj: this.state.RiskObj, scheduleDTO: this.state.scheduleDTO, vehiclepremiumDto: this.state.vehiclepremiumDto, policyNo: this.state.policyNo}
+            }} />
+        }
+    }
+
+
+
     render() {
         const { classes, loggingIn } = this.props;
-    console.log(this.state);
+        console.log(this.state);
 
-    return (
-        <div className={classes.container}>
-            <Card>
-                <CardHeader color="rose" icon>
-                    <CardIcon color="rose">
-                        {/*  <FilterNone /> */}
-                        <Icon></Icon>
-                    </CardIcon>
-                    {
-                        <h3>
-                            <small>  Vehicle Details </small>
-                        </h3>
-                    }
-                </CardHeader>
-                <CardBody>
-                    <GridContainer justify="center">
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                labelText="Vehicle Number"
-                                name="vehicleMakeModelId"
-                                value={this.state.quotationdataDto.vehicleMakeModelId}
-                                //onChange={(e) => this.onInputChangepropsal(e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
+        return (
+            <div className={classes.container}>
+                <Card>
+                    <CardHeader color="rose" icon>
+                        <CardIcon color="rose">
+                            {/*  <FilterNone /> */}
+                            <Icon></Icon>
+                        </CardIcon>
+                        {
+                            <h3>
+                                <small>  Vehicle Details </small>
+                            </h3>
+                        }
+                    </CardHeader>
+                    <CardBody>
+                        <GridContainer justify="center">
 
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                labelText="Make & Model"
-                                //name="VehicleModelNumber"
-                                value={this.state.vehicleModel}
-                                //onChange={(e) => this.onInputChangepropsal(e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                labelText="Year of"
-                                name="VehicleAge"
-                                value={this.state.quotationdataDto.vehicleAge}
-                                //onChange={(e) => this.onInputChangepropsal(e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
-                    </GridContainer>
-                    <GridContainer justify="center">
-
-                        {this.state.showDropZone ?
                             <GridItem xs={12} sm={12} md={4}>
-                                <Dropzone
-                                    getUploadParams={this.getUploadParams}
-                                    onChangeStatus={this.handleChangeStatus}
-                                    onSubmit={this.uploadfile}
-                                    accept="image/*,audio/*,video/*,application/pdf/*,word/*"
+                                <Button color="primary" round onClick={this.AddVehicle}> Add Vehicle </Button>
+                            </GridItem>
+
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <GridItem xs={12} sm={12} md={4}>
+                                <CustomInput
+                                    labelText="Vehicle Number"
+                                    name="VehicleNumber"
+                                    value={this.state.RiskObj.VehicleNumber}
+                                    onChange={(e) => this.onInputChange(e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
                                 />
-                            </GridItem> : null}
-                    </GridContainer>
-                    <GridContainer justify="center">
+                            </GridItem>
 
-                        <Button color="primary" round onClick={(e) => this.showOnClick(e)}> Upload File </Button>
-                    </GridContainer>
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <GridItem xs={12} sm={12} md={4}>
+                                <CustomInput
+                                    labelText="Make & Model"
+                                    name="Model"
+                                    value={this.state.RiskObj.Model}
+                                    onChange={(e) => this.onInputChange(e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
+                            </GridItem>
 
-                    <GridContainer justify="center">
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <GridItem xs={12} sm={12} md={4}>
+                                <CustomInput
+                                    labelText="Year of Registration"
+                                    name="YearofRegistration"
+                                    value={this.state.RiskObj.YearofRegistration}
+                                    onChange={(e) => this.onInputChange(e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
+                            </GridItem>
 
-                        <Button color="primary" round onClick={this.Issuepolicy}> Issue Policy </Button>
+                        </GridContainer>
+                        <GridContainer>
 
-                    </GridContainer>
-                   
-                </CardBody>
-           </Card>
-           
-      </div>
-    );
-  }
+                            {this.state.showDropZone ?
+                                <GridItem xs={12} sm={12} md={4}>
+                                    <Dropzone
+                                        getUploadParams={this.getUploadParams}
+                                        onChangeStatus={this.handleChangeStatus}
+                                        onSubmit={(e) => this.uploadfilefront(e)}
+                                        name="front"
+                                        //value={this.state.RiskObj.Documents}
+                                        accept="image/*,audio/*,video/*,application/pdf/*,word/*"
+                                    />
+                                </GridItem> : null}
+
+                        </GridContainer>
+
+
+
+
+                        <GridContainer justify="center">
+
+                            <Button color="primary" name="frontCarImage" round onClick={(e) => this.showOnClick(e)}> Upload</Button>
+
+
+                      
+                        </GridContainer>
+
+                        <GridContainer justify="center">
+                            {this.renderRedirect()}
+                            <Button color="primary" round onClick={this.Issuepolicy}> Issue Policy </Button>
+
+                        </GridContainer>
+
+                    </CardBody>
+                </Card>
+
+            </div>
+        );
+    }
 }
 AddVehicle.propTypes = {
     classes: PropTypes.object.isRequired

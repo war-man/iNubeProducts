@@ -12,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using iNube.Utility.Framework.Notification;
 using iNube.Utility.Framework.Model;
 using iNube.Services.UserManagement.Helpers;
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.Partners.Controllers.Partner.PartnerService
 {
@@ -22,6 +23,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         private IMapper _mapper;
         private IIntegrationService _integrationService;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
         /// <summary>
         /// Initializes a new instance of the <see cref="PartnerService"/> class.
         /// </summary>
@@ -29,12 +31,13 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         /// <param name="mapper">The mapper.</param>
         /// <param name="integrationService">The integration service.</param>
         /// <param name="emailService">The email service.</param>
-        public MotorPartnerService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService, IEmailService emailService)
+        public MotorPartnerService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService, IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _emailService = emailService;
+            _configuration = configuration;
         }
         /// <summary>
         /// Creates the partner asynchronous.
@@ -43,7 +46,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         /// <returns></returns>
         public async Task<PartnerResponse> CreatePartnerAsync(PartnersDTO partnerDTO, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             TblPartners partner = _mapper.Map<TblPartners>(partnerDTO);
             // _context.Entry(partner).State = partner.PartnerId == 0 ? EntityState.Added : EntityState.Modified;
             if (partner.PartnerId == 0)
@@ -74,7 +77,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         public async Task<IEnumerable<ddDTO>> GetMasterAsync(ApiContext apiContext, string sMasterList, string partnerId = "")
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             IEnumerable<ddDTO> ddDTOs;
             if (sMasterList == "Product" && !string.IsNullOrEmpty(partnerId))
@@ -118,7 +121,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         /// <returns></returns>
         public async Task<PartnersDTO> GetPartner(int partnerId, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             TblPartners _tblPartner = _context.TblPartners.Where(org => org.PartnerId == partnerId)
                                     .Include(add => add.TblPartnerAddress)
@@ -135,7 +138,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         public async Task<PolicyAgreementResponse> SaveAssignProduct(AssignProductDTO AssignProductDto, ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             TblPolicyAgreement tb = null;
             List<ErrorInfo> Errors = new List<ErrorInfo>();
@@ -198,7 +201,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         public async Task<IEnumerable<PolicyAgreementDTO>> GetAssignProduct(decimal partnerId,ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblPolicyAgreements = _context.TblPolicyAgreement.ToList();
             var agreement = _mapper.Map<IEnumerable<PolicyAgreementDTO>>(tblPolicyAgreements);
@@ -213,7 +216,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         /// <returns></returns>
         public async Task<IEnumerable<PartnersDTO>> GetSearchPartner(PartnerSearchDTO partnerSearchDTO, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             string[] lstPartnerType = new string[] { "PartnerType", "PartnerClass" };
             var masterList = _context.TblmasPrcommonTypes.Where(p => lstPartnerType.Contains(p.MasterType))
@@ -256,7 +259,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         /// <returns></returns>
         public async Task<PolicyAgreementDTO> GetSearchProductDetails(SearchProductModel productdetails, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tbl_productdetails = _context.TblPolicyAgreement.Where(p => p.AgentId == productdetails.PartnerId && p.ProductIdPk == productdetails.ProductId).FirstOrDefault();
             var details = _mapper.Map<PolicyAgreementDTO>(tbl_productdetails);
@@ -288,7 +291,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         }
         public async Task<PolicyAgreementDTO> DeletePartnerById(decimal partnerId, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tbl_partnerdata = _context.TblPartners.Where(item => item.PartnerId == partnerId).FirstOrDefault();
             tbl_partnerdata.IsActive = false;
@@ -297,7 +300,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         }
         public async Task<IEnumerable<ddDTO>> GetAssignProductbyId(AssignedProducts assignedProducts, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var productList = await _integrationService.GetProductMasterAsync(apiContext);
             if (!string.IsNullOrEmpty(assignedProducts.ProductName))
             {

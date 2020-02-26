@@ -78,7 +78,9 @@ class HomePage extends React.Component {
         super(props)
 
         this.state = {
+            makeModel:"",
             username: "",
+            vehicleType:"",
             newmasterList: [],
             citylist: [],
             redirect: false,
@@ -168,11 +170,15 @@ class HomePage extends React.Component {
         console.log("porpsdat", props)
 
 
-        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleMaster?isFilter=true `, {
+        //fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleMaster?isFilter=true `, {
+        fetch(`http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetVehicleMaster?isFilter=true`, {
+
             method: 'get',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg'
+
             },
         })
             .then(response => response.json())
@@ -225,8 +231,14 @@ class HomePage extends React.Component {
     }
 
     handleCity = (event, values, name) => {
+        debugger;
         console.log("eve", values);
-        if (name == "vehicleMakeModelId") {
+        if (name == "vehicleMakeModelId" && values != null) {
+               let vehicletype = this.state.masterList.filter(x => x.mID == values.mID)[0].mType;
+               let makemodel = this.state.masterList.filter(x => x.mID == values.mID)[0].mValue;
+               this.setState({ vehicleType: vehicletype, makeModel: makemodel })
+               console.log("this.state.vehicleType", this.state.vehicleType, this.state.makeModel);
+
             fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetSIFromMakeModel?VehicleId=` + values.mID, {
                 method: 'get',
                 headers: {
@@ -237,6 +249,10 @@ class HomePage extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     console.log("calcprem", data);
+
+                   
+                   
+
                     this.state.quotationDTO.sumInsured = data;
                     console.log("qdto", this.state.quotationDTO);
                     this.setState({});
@@ -245,7 +261,7 @@ class HomePage extends React.Component {
         }
 
         let quotation = this.state.quotationDTO;
-        if (name == "vehicleMakeModelId") {
+        if (name == "vehicleMakeModelId" && values != null) {
             quotation[name] = values.mID;
         } else if (name == "city" && values != null) {
             quotation[name] = values.cityId;
@@ -283,7 +299,7 @@ class HomePage extends React.Component {
         if (this.state.redirect === true) {
             return <Redirect to={{
                 pathname: '/pages/DriverPage',
-                state: { quotationDTO: this.state.quotationDTO, stateCode: this.state.stateCode,}
+                state: { quotationDTO: this.state.quotationDTO, stateCode: this.state.stateCode, vehicleType: this.state.vehicleType, makeModel: this.state.makeModel }
             }} />
         }
     }

@@ -161,8 +161,16 @@ class DriverPage extends React.Component {
 
             policyRequest:
             {
-                "InsurableItem": [{ "InsurableName": "Driver", "InsurableFields": [{ "Name": "", "Identification Number": "223", "Aadhaar No.": "33", "Licence No.": "333", "Driving Experience": "" }], "Covers": [] }, { "InsurableName": "Vehicle", "InsurableFields": [{ "Make": "pks", "Model": "sds", "Vehicle Number": "2323", "Year of Registration": "3", "Vehicle Type": "sdsd" }], "Covers": [{ "CoverName": "Fire & Theft", "CoverFields": [{ "Cover Name": "Fire & Theft", "CEF Value": "3" }] }, { "CoverName": "Accidental Damage", "CoverFields": [{ "Cover Name": "Accidental Damage", "CEF Value": "3" }] }] }], "Identification Number": "233", "Name": "", "Product Code": "983", "No. Of Risks": "3", "Policy Start Date": "", "Mobile Number": "", "Policy End Date": "2020-2-19", "Email ID": "prasant.k@inubesolutions.com",
-                "CalculatePremium": {
+                "InsurableItem": [{
+                    "InsurableName": "Driver", "RiskItems": [{
+                        "Name": "",
+                        "Identification Number": "223",
+                        "Aadhaar No.": "33",
+                        "Licence No.": "333",
+                        "Driving Experience": ""
+                    }], "Covers": []
+                }, { "InsurableName": "Vehicle", "RiskItems": [{ "Make": "pks", "Model": "sds", "Vehicle Number": "2323", "Year of Registration": "3", "Vehicle Type": "sdsd" }], "Covers": [{ "CoverName": "Fire & Theft", "CoverFields": [{ "Cover Name": "Fire & Theft", "CEF Value": "3" }] }, { "CoverName": "Accidental Damage", "CoverFields": [{ "Cover Name": "Accidental Damage", "CEF Value": "3" }] }] }], "Identification Number": "233", "Name": "", "Product Code": "7832", "No. Of Risks": "3", "Policy Start Date": "", "Mobile Number": "", "Policy End Date": "2020-2-19", "Email ID": "prasant.k@inubesolutions.com",
+               
                     "stateCode": "",
                     "si": "",
                     "noOfPC": "1",
@@ -171,7 +179,7 @@ class DriverPage extends React.Component {
                     "driverExp": "",
                     "additionalDriver": "",
                     "billingFrequency": ""
-                },
+                ,
                 "PaymentInfo": [{ "RefrenceNumber": "1", "Amount": "" }],
 
             },
@@ -265,7 +273,7 @@ class DriverPage extends React.Component {
 
             premiumDTO: {
                 "stateCode": "",
-                "si": 0,
+                "si": "",
                 "noOfPC": "1",
                 "noOfTW": "0",
                 "driverAge": "",
@@ -284,7 +292,8 @@ class DriverPage extends React.Component {
             premium: "",
             ftfor30Days: "",
             value2: "",
-
+            vehType:"",
+            drMakeModel:"",
 
             premiumperday: "",
             ft365days: "",
@@ -545,8 +554,8 @@ class DriverPage extends React.Component {
 
         while (insurablelen >=0) {
             if (this.state.policyRequest.InsurableItem[insurablelen].InsurableName == "Driver") {
-                this.state.policyRequest.InsurableItem[insurablelen].InsurableFields[0].Name = this.state.quotationDto.primaryDriverName;
-                this.state.policyRequest.InsurableItem[insurablelen].InsurableFields[0]['Driving Experience'] = this.state.premiumDTO.driverExp;
+                this.state.policyRequest.InsurableItem[insurablelen].RiskItems[0].Name = this.state.quotationDto.primaryDriverName;
+                this.state.policyRequest.InsurableItem[insurablelen].RiskItems[0]['Driving Experience'] = this.state.premiumDTO.driverExp;
 
             }
 
@@ -592,6 +601,8 @@ class DriverPage extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg'
+
             },
             body: JSON.stringify(this.state.sendotp)
         }).then(response => response.json())
@@ -615,7 +626,6 @@ class DriverPage extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                //'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
             body: JSON.stringify(this.state.quotationDto)
         }).then(response => response.json())
@@ -872,7 +882,7 @@ class DriverPage extends React.Component {
     }
     //payment step 5
     handlepayment = () => {
-        let calculateDto = this.state.policyRequest.CalculatePremium;
+        let calculateDto = this.state.policyRequest;
         calculateDto.stateCode = this.state.premiumDTO.stateCode;
         calculateDto.si = this.state.premiumDTO.si;
         calculateDto.noOfPC = this.state.premiumDTO.noOfPC;
@@ -887,8 +897,7 @@ class DriverPage extends React.Component {
         if (this.state.policyRequest["Policy Start Date"] != "") {
             this.state.policyRequest["Policy Start Date"] = this.datechange(this.state.policyRequest["Policy Start Date"]);
         }
-        this.setState({ activeStep: this.state.activeStep + 1, step5: false, step6: true });
-
+      
         fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/CreateProposal`, {
             method: 'POST',
             headers: {
@@ -903,6 +912,8 @@ class DriverPage extends React.Component {
                 console.log("respdata", data.response);
                 this.setState({ proposalNo: data.id })
                 if (data.status == 2) {
+                    //this.setState({ activeStep: this.state.activeStep + 1, step5: false, step6: true });
+                    this.setState({ redirect: true })
                     swal({
                         //let res = partnerId.toString();
                         text: data.responseMessage,
@@ -931,13 +942,13 @@ class DriverPage extends React.Component {
         if (this.state.redirect === true) {
             return <Redirect to={{
                 pathname: '/pages/AddDriver',
-                state: { proposalNo: this.state.proposalNo, quotationDto: this.state.quotationDto }
+                state: { proposalNo: this.state.proposalNo, quotationDto: this.state.quotationDto, policyRequest: this.state.policyRequest, premiumDTO: this.state.premiumDTO, vehType: this.state.vehType, drMakeModel: this.state.drMakeModel}
             }} />
         }
     }
     proposalRedirect = () => {
-        this.renderRedirect();
-        this.setState({ redirect: true })
+       
+        this.setState({ activeStep: this.state.activeStep + 1, step5: false, step6: true });
 
     }
     //handleSubmit = () => {
@@ -950,7 +961,8 @@ class DriverPage extends React.Component {
     componentDidMount() {
         if (this.props.location.state != undefined) {
           
-
+            this.state.vehType = this.props.location.state.vehicleType;
+            this.state.drMakeModel=this.props.location.state.makeModel
             this.state.premiumperday = this.state.quotationDto.premium;
             this.setState({ quotationDto: this.props.location.state.quotationDTO });
             //this.state.premiumDto.premiumObj.dictionary_rate.PDAGERT_PAge = this.props.location.state.quotationDTO.age;
@@ -1320,8 +1332,7 @@ class DriverPage extends React.Component {
                                             </GridContainer>
                                             <GridItem>
                                                 {this.renderRedirect()}
-                                                <Button round color="primary" onClick={this.handlepayment}> Go</Button>
-                                                <Button round color="primary" onClick={this.proposalRedirect}>Next</Button>
+                                                <Button round color="primary" onClick={this.proposalRedirect}> Go</Button>
                                             </GridItem>
                                         </GridContainer>
                                     </div> // step 5 ends
@@ -1340,16 +1351,26 @@ class DriverPage extends React.Component {
                                                 <h5 style={{ textAlign: "center" }}>Simply download the app and activate your cover</h5>
                                                 <br />
                                             </GridItem>
+                                          
                                             <GridContainer justify="center">
                                                 <a href="https://play.google.com/store?hl=en"> <img src={andriodapp} style={{ width: "8.8rem" }} /> </a><span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                                 <a href="https://www.apple.com/in/ios/app-store/" ><img src={iosapp} style={{ width: "10rem" }} /></a>
                                                 {/*<MuiButton>IOS Application</MuiButton>
                                                 <MuiButton>Andriod Application</MuiButton>*/}
                                             </GridContainer>
+                                            <GridContainer justify="center">
+                                                {this.renderRedirect()}
+                                                <Button round color="primary" onClick={this.handlepayment}>Success</Button>
+                                            </GridContainer>
+                                            <GridContainer justify="center">
+                                                <Button round color="primary">Failure</Button>
+                                            </GridContainer>
                                         </GridContainer>
+                                      
+
                                     </div>//step 6 ends
                                     : null}
-                               
+                                
                             </CardBody>
                         </Card>
 

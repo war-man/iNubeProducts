@@ -5,6 +5,7 @@ using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,16 +21,18 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         private IMapper _mapper;
         private IIntegrationService _integrationService;
         private readonly IEmailService _emailService;
-        public MotorAccountsService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService, IEmailService emailService)
+        private readonly IConfiguration _configuration;
+        public MotorAccountsService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService, IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _emailService = emailService;
+            _configuration = configuration;
         }
         public async Task<CDAccountResponse> CreateCdAccountAsync(CdAccountsDTO cdAccountsDTO, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //Check for product assign 
             var cdAccountNumber = GetAccountNumber(cdAccountsDTO.ProductId, cdAccountsDTO.PartnerId);
@@ -54,7 +57,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         public async Task<ReplnishCDResponse> ReplnishCDTransaction(CdTransactionsDTO cdTransactions, ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //First Check for A/C exist 
             if (string.IsNullOrEmpty(cdTransactions.AccountNo))
             {
@@ -106,7 +109,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         public async Task<CdAccountsDTO> GetCDAccountById(decimal Cdid, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var cdAccount = _context.TblCdaccounts.Find(Cdid);
             if (cdAccount != null)
@@ -119,7 +122,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         public async Task<CdTransactionsDTO> GetCDTransactionById(decimal Cdid, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var cdAccount = _context.TblCdtransactions.Find(Cdid);
             if (cdAccount != null)
@@ -132,7 +135,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         public async Task<CdTransactionsResponse> ReverseCDTransaction(PolicyBookingTransaction reverseCdAccount, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //Check for the transaction record
             TblCdtransactions cdTransaction;
@@ -180,7 +183,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         }
         public async Task<CdTransactionsResponse> GenerateCDTransaction(PolicyBookingTransaction policyBooking, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //Check for the transaction record
             if (string.IsNullOrEmpty(policyBooking.AccountNo))
@@ -234,7 +237,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         }
         public async Task<CdTransactionsResponse> UpdateCDTransaction(PolicyBookingTransaction policyBooking, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //Check for the transaction record
             var cdTransaction = _context.TblCdtransactions.FirstOrDefault(t => t.AccountNo == policyBooking.AccountNo);
@@ -251,7 +254,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         public async Task<IEnumerable<CdAccountResponseDTO>> SearchCdAccountAsync(SearchTransactionModel searchCDModel, ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var productList = await _integrationService.GetProductMasterAsync(apiContext);
             try
@@ -293,7 +296,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         public async Task<IEnumerable<CdTransactionsResponseDTO>> SearchCdAccountTransactionAsync(SearchTransactionModel searchTransactionModel, ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var productList = await _integrationService.GetProductMasterAsync(apiContext);
             if (string.IsNullOrEmpty(searchTransactionModel.AccountNo))
@@ -360,7 +363,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         public async Task<List<object>> GetAccountFilter(int Cdid, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var AccountNo = from A in _context.TblCdaccounts.Where(x => x.Cdid == Cdid)
                             select A.AccountNo;
 
@@ -420,7 +423,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         public async Task<Dictionary<int, string>> GetProductNameAsync(int partnerid, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //var PartnerData = _context.TblAssignProduct.Where(x => x.PatnerId == partnerid);
             var PartnerData = _context.TblCdaccounts.Where(x => x.PartnerId == partnerid);
             var AccountNo = PartnerData.Select(x => x.AccountNo);
@@ -460,7 +463,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         public async Task<List<ddDTO>> GetCdAccountMasterAsync(bool isProduct, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             if (isProduct)
             {
                 return await GetProductName(apiContext);
@@ -485,7 +488,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         public async Task<List<ddDTO>> GetProductName(ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblcddata = _context.TblCdaccounts.OrderByDescending(x => x.AccountNo);
             var AccountNo = tblcddata.Select(x => x.AccountNo);

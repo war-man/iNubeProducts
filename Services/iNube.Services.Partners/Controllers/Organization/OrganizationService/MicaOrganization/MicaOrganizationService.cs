@@ -11,6 +11,7 @@ using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Utility.Framework.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 {
@@ -20,18 +21,20 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         private MICAPRContext _context;
         private IMapper _mapper;
 
+        private readonly IConfiguration _configuration;
         private IIntegrationService _integrationService;
-        public MicaOrganizationService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService)
+        public MicaOrganizationService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
+            _configuration = configuration;
         }
 
         //get for master
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist , ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             IEnumerable<ddDTO> ddDTOs;
             ddDTOs  = _context.TblmasPrcommonTypes
@@ -47,7 +50,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         // get Location
         public async Task<IEnumerable<ddDTO>> GetLocation(string locationType, int parentID,ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             IEnumerable<ddDTO> ddDTOs;
 
@@ -104,7 +107,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<OrganizationResponse> CreateOrganizationAsync(OrganizationDTO orgDTO,ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration)); ;
 
             TblOrganization organization = _mapper.Map<TblOrganization>(orgDTO);
             //_context.Entry(organization).State = organization.OrganizationId == 0 ? EntityState.Added : EntityState.Modified;
@@ -138,7 +141,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         public async Task<OrganizationDTO> GetOrganization(int orgId,ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             OrganizationDTO _organizationDTO = new OrganizationDTO();
             TblOrganization _tblOrg = _context.TblOrganization.Where(org => org.OrganizationId == orgId)
@@ -151,7 +154,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<IEnumerable<OrganizationDTO>> SearchOrganizationById(int orgId,ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _org = _context.TblOrganization.Where(org => org.OrganizationId == orgId)
                         .Include(add => add.TblOrgAddress)
                         .Include(spoc => spoc.TblOrgSpocDetails)
@@ -162,7 +165,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<IEnumerable<OrganizationDTO>> SearchOrganization(OrgSearchDTO searchorg,ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _org = _context.TblOrganization
                  .Include(add => add.TblOrgAddress)
                  .Include(spoc => spoc.TblOrgSpocDetails)
@@ -179,7 +182,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<int> CreateUserAsync(OrganizationDTO orgDTO,ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration)); ;
 
             if (orgDTO.ConfigurationTypeId == 3)
             {
@@ -224,7 +227,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<IEnumerable<OrganizationDTO>> GetOrgByParentId(int orgid, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var orgdata = _context.TblOrganization.Select(o => o.ParentId == orgid);
             var _result = _mapper.Map<List<OrganizationDTO>>(orgdata);

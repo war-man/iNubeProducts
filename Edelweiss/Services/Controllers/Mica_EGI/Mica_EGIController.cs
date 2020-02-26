@@ -62,9 +62,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpPost]
-        public async Task<IActionResult> SwitchOnOFF(string VehicleNo, string PolicyNo, bool SwitchState)
+        public async Task<IActionResult> SwitchOnOff(SwitchOnOffDTO switchOnOff)
         {
-            var response = await _quotationService.SwitchOnOff(VehicleNo, PolicyNo, SwitchState);
+            var response = await _quotationService.SwitchOnOff(switchOnOff);
 
             return ServiceResponse(response);
         }

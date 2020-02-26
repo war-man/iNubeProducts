@@ -20,19 +20,19 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
         private MICARPContext _context;
         private IMapper _mapper;
         private IRPIntegrationService _integrationService;
-        private readonly IConfiguration _configuration;
+        //private readonly IConfiguration _configuration;
 
-        public MicaReportService(MICARPContext context, IMapper mapper, IRPIntegrationService integrationService, IConfiguration configuration)
+        public MicaReportService(MICARPContext context, IMapper mapper, IRPIntegrationService integrationService)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
-            _configuration = configuration;
+            //_configuration = configuration;
         }
 
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context=(MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             IEnumerable<ddDTO> ddDTOs;
 
             ddDTOs = _context.TblRpmasters
@@ -49,7 +49,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
         {
             try
             {
-                _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+                _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
 
                 var dto = _mapper.Map<TblReportConfig>(reportConfigDTO);
                 _context.TblReportConfig.Add(dto);
@@ -57,7 +57,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
                 var paramDto = _mapper.Map<ReportConfigDTO>(dto);
                 return new ReportConfigResonse { Status = BusinessStatus.Created, ResponseMessage = "Parameter Configuration Done Successfully!" };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -65,7 +65,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
 
         public async Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             IEnumerable<ddDTO> obj;
             obj = from pr in _context.TblReportConfig.OrderByDescending(p => p.CreatedDate)
                   select new ddDTO
@@ -78,5 +78,50 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
             return obj;
         }
 
+        public async Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
+        {
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            // HandleEvent objEvent = new HandleEvent();
+
+            var reportparamList = from tblreportConfig in _context.TblReportConfig
+                                  join tblconfigParam in _context.TblReportConfigParam on tblreportConfig.ReportConfigId equals tblconfigParam.ReportConfigId
+                                  where tblreportConfig.ReportConfigId == ReportConfigId
+                                  select new ReportConfigParamDTO
+                                  {
+                                      ParameterName = tblconfigParam.ParameterName,
+                                      RangeType = tblconfigParam.RangeType,
+                                      DataType = tblconfigParam.DataType
+                                  };
+            List<ReportParamsDTO> AddparamList = new List<ReportParamsDTO>();
+            //List<string> typeList = new List<string>();
+            foreach(var i in reportparamList)
+            {
+                if(i.RangeType =="Yes")
+                {
+                    AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName + "" + "From", DataType = i.DataType });
+                    AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName + "" + "To", DataType = i.DataType });
+
+                    //ReportParamsDTO paramList = new ReportParamsDTO();
+                    //paramList.ParameterName = i.ParameterName + "" + "From";
+                    //paramList.DataType = i.DataType;
+                    //AddparamList.Add(paramList);
+
+                    //paramList.ParameterName = i.ParameterName + "" + "To";
+                    //AddparamList.Add(paramList);
+                    // typeList.Add(i.ParameterName + "To");
+                }
+
+                else
+                {
+                    //ReportParamsDTO paramList = new ReportParamsDTO();
+                    //paramList.ParameterName = i.ParameterName;
+                    //AddparamList.Add(paramList);
+                    AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName , DataType = i.DataType });
+                    //typeList.Add(i.ParameterName);
+                }
+
+            }
+            return AddparamList;
+        }
     }
 }

@@ -282,5 +282,14 @@ namespace iNube.Services.MicaExtension_EGI.Models
         }
         public BillingDTO BillingDTO { get; set; }
     }
+
+    public partial class SwitchOnOffDTO
+    {
+        public string VehicleRegistrationNo { get; set; }
+        public string PolicyNo { get; set; }
+        public bool SwitchState { get; set; }
+    }
+
+
 }
 

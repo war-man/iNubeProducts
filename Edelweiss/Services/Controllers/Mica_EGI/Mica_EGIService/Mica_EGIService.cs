@@ -24,7 +24,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata);
         Task<bool> NightScheduler();
         Task<bool> PremiumBookingScheduler();
-        Task<SwitchOnOffResponse> SwitchOnOff(string VehicleRegistrationNo, string PolicyNo, bool SwitchStatus);
+        Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff);
         ActivityResponse ActivityReport(string PolicyNo, string Month);
         Task<PremiumReturnDto> EndorsementPremium(EndorsementPremiumDTO endorsementPremium);
 
@@ -491,8 +491,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
         
-        public async Task<SwitchOnOffResponse> SwitchOnOff(string VehicleRegistrationNo, string PolicyNo, bool SwitchStatus)
+        public async Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff)
         {
+
+
+            string VehicleRegistrationNo = switchOnOff.VehicleRegistrationNo;
+            string PolicyNo=switchOnOff.PolicyNo;
+            bool SwitchStatus=switchOnOff.SwitchState;
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
             var CurrentDay = IndianTime.DayOfWeek.ToString();
