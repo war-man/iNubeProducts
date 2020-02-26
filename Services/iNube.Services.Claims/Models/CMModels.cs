@@ -319,6 +319,7 @@ namespace iNube.Services.Claims.Models
         public string PolicyNo { get; set; }
         public string ErroMessage { get; set; }
         public int? ProductIdPk { get; set; }
+        public string ClaimFields { get; set; }
 
 
         public virtual TblmasCmcommonTypes ClaimStatus { get; set; }
@@ -687,7 +688,7 @@ namespace iNube.Services.Claims.Models
             public string IfscCode { get; set; }
             public string EmailId { get; set; }
             public string DocumentType { get; set; }
-            
+            public string AccType { get; set; }
             public int ClaimStatusId { get; set; }
             public bool? Active { get; set; }
             public decimal? PolicyId { get; set; }
@@ -707,7 +708,8 @@ namespace iNube.Services.Claims.Models
             public virtual List<BankAccountsDTO> TblBankAccounts { get; set; }
             public virtual List<ClaimInsurableDTO> ClaimInsurable { get; set; }
            // public virtual List<ClaimdocDTO> Claimdocument { get; set; }
-           public virtual List<Alldoc> Alldoc { get; set; }
+            public virtual List<Alldoc> Alldoc { get; set; }
+            public dynamic DataModelDTO { get; set; }
     }
 
     public partial class Alldoc

@@ -1,5 +1,6 @@
 ﻿using iNube.Services.Claims.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -39,57 +40,56 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
     }
     public class IntegrationService : IIntegrationService
     {
+        private IConfiguration _configuration;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
 
-        readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-        //readonly string partnerUrl = "https://localhost:44315";
-		//readonly string partnerUrl = "http://mica-inube-partner-service.mica-internal.:9005";
+        public IntegrationService(IConfiguration configuration)
+        {
 
-        readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
-        //readonly string policyUrl = "https://localhost:44351";
-	   //readonly string policyUrl = "http://mica-inube-policy-service.mica-internal.:9006";
+            _configuration = configuration;
+            PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
+            BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
+            ClaimUrl = _configuration["Integration_Url:Claim:ClaimUrl"];
+            NotificationUrl = _configuration["Integration_Url:Notification:NotificationUrl"];
+            PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
+            ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            //UserUrl = "http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9009";
+            AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
+            ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
 
-        readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-        //readonly string productUrl = "https://localhost:44347";
-		//readonly string productUrl = "http://mica-inube-product-service.mica-internal.:9007";
+        }
 
-       // readonly string UsermanangementUrl = "https://localhost:44367";
-          readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        //readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
-
-        //CHECKING FOR ACCOUNTING
-        //readonly string accountApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionMappingDetails";
-        //readonly string accountApiUrl = "http://localhost:52166/api/AccountConfig/GetTransactionMappingDetails";
-        //readonly string accountApiUrl = "http://mica-inube-accounting-service.mica-internal.:9011/api/AccountConfig/GetTransactionMappingDetails";
-        readonly string accountRuleApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionConditionDetails";
-
-
-        readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
-        //readonly string createTransactionApi = "http://localhost:52166/api/AccountConfig/CreateTransaction";
-        // readonly string createTransactionApi = "http://mica-inube-accounting-service.mica-internal.:9011/api/AccountConfig/CreateTransaction";
-
-
+        
+       
+        
+       // readonly string accountRuleApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionConditionDetails";
+        
+       // readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/CreateTransaction";
+        
         //ACCOUNTING
         public async Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext)
         {
-            var uri = accountRuleApiUrl;
+            var uri = AccountingUrl;
             var accountMapListDetails = await GetListApiInvoke<TransactionRuleMappingDto>(uri, apiContext);
             return accountMapListDetails;
         }
         //Accounting CreateTransaction
         public async Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext)
         {
-            var uri = createTransactionApi;
+            var uri = AccountingUrl;
             return await PostApiInvoke<TransactionHeaderDto, TransactionsResponse>(uri, transaction,apiContext);
         }
 
         public async Task<PartnersDTO> GetPartnerDetailAsync(string partnerId)
         {
-            var uri = partnerUrl + "/api/Partner/GetPartnerDetails?partnerId=" + partnerId;
+            var uri = PartnerUrl + "/api/Partner/GetPartnerDetails?partnerId=" + partnerId;
             return await GetApiInvoke<PartnersDTO>(uri);
         }
         public async Task<decimal> UpdatePolicySumInsuredAsync(string PolicyNumber,decimal amount,ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/UpdateSumInsured?PolicyNumber="+ PolicyNumber+"&amount="+ amount;
+            var uri = PolicyUrl + "/api/Policy/UpdateSumInsured?PolicyNumber="+ PolicyNumber+"&amount="+ amount;
             return await GetApiInvoke<decimal>(uri, apiContext);
         }
 
@@ -106,31 +106,31 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
 
         public async Task<IEnumerable<ddDTOs>> GetMaster(string sMasterList, ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/GetMasterData?sMasterlist=" + sMasterList;
+            var uri = ProductUrl + "/api/Product/GetMasterData?sMasterlist=" + sMasterList;
             return await GetListApiInvoke<ddDTOs>(uri, apiContext);
         }
 
         public async Task<ProductDTO> GetProductById(int ProductId, ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/GetProductById?productId=" + ProductId;
+            var uri = ProductUrl + "/api/Product/GetProductById?productId=" + ProductId;
             return await GetApiInvoke<ProductDTO>(uri, apiContext);
         }
 
         public async Task<ProductDTO> GetProductNameAsync(decimal productId, ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/GetProductById?productId=" + productId;
+            var uri = ProductUrl + "/api/Product/GetProductById?productId=" + productId;
             return await GetApiInvoke<ProductDTO>(uri, apiContext);
         }
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
-            var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             var result= await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
             return result;
         }
         public async Task<String> GetEnvironmentConnectionforDoc(string product, decimal EnvId)
         {
-            var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             var result= await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
             return result.Dbconnection;
         }
@@ -143,42 +143,42 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
 
         public async Task<IEnumerable<PolicyDTO>> PolicySearch(PolicysearchDTO policysearch,ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/PolicySearch";
+            var uri = PolicyUrl + "/api/Policy/PolicySearch";
             return await PostListApiInvoke<PolicysearchDTO, PolicyDTO>(uri, apiContext, policysearch);
         }
 
         public async Task<PolicyDTO> ModifyPolicy(string policyNo, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/ModifyPolicy?policyNumber=" + policyNo;
+            var uri = PolicyUrl + "/api/Policy/ModifyPolicy?policyNumber=" + policyNo;
             return await GetApiInvoke<PolicyDTO>(uri, apiContext);
         }
 
         public async Task<IEnumerable<PolicyDTO>> GetPolicyDetails(ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/GetPolicyDetails";
+            var uri = PolicyUrl + "/api/Policy/GetPolicyDetails";
             return await GetListApiInvoke<PolicyDTO>(uri, apiContext);
         }
 
         public async Task<IEnumerable<decimal>> GetPolicyByDetails(PolicySearchbyPidDTO claimDashBoard, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/GetPolicyByDetails";
+            var uri = PolicyUrl + "/api/Policy/GetPolicyByDetails";
             return await PostListApiInvoke<PolicySearchbyPidDTO, decimal>(uri, apiContext,claimDashBoard);
         }
 
         public async Task<PolicyDTO> GetPolicyById(decimal policyId, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/GetPolicyById?policyId=" + policyId;
+            var uri = PolicyUrl + "/api/Policy/GetPolicyById?policyId=" + policyId;
             return await GetApiInvoke<PolicyDTO>(uri, apiContext);
         }
         public async Task<PolicyDTO> GetPolicyByNumber(string policyNo, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/GetPolicyByNumber?policyNumber=" + policyNo;
+            var uri = PolicyUrl + "/api/Policy/GetPolicyByNumber?policyNumber=" + policyNo;
             return await GetApiInvoke<PolicyDTO>(uri, apiContext);
         }
 
         public async Task<IEnumerable<ProductRcbdetailsDTO>> GetProductClaimsDetailsAsync(string productId, ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/GetProductClaimsDetails?ProductId=" + productId;
+            var uri = ProductUrl + "/api/Product/GetProductClaimsDetails?ProductId=" + productId;
             return await GetListApiInvoke<ProductRcbdetailsDTO>(uri, apiContext);
         }
         public async Task<ClaimDTO> CreatePostCallAsync(string requestUri, FileRequest request, ApiContext apiContext)
@@ -293,7 +293,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
 
         public async Task<IEnumerable<ProductDTO>> GetProductIdAsync(ProductSearchDTO productSearchDTO, ApiContext apiContext)
         {
-            var uri = productUrl + "/api/Product/SearchProduct";
+            var uri = ProductUrl + "/api/Product/SearchProduct";
 
             return await PostListApiInvoke<ProductSearchDTO, ProductDTO>(uri, apiContext, productSearchDTO);
         }
@@ -329,13 +329,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
 
         public async Task<BillingEventResponseDTO> PolicyData(BillingEventRequest pDTO, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/BillingEventResponse";
+            var uri = PolicyUrl + "/api/Policy/BillingEventResponse";
             return await GetApiInvoke<BillingEventResponseDTO>(uri, apiContext);
         }
 
         public async Task<IEnumerable<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequet, ApiContext apiContext)
         {
-            var uri = policyUrl + "/api/Policy/GetPolicyForClaimsInvoice";
+            var uri = PolicyUrl + "/api/Policy/GetPolicyForClaimsInvoice";
             return await PostListApiInvoke<BillingEventRequest, PolicyDataForClaims>(uri, apiContext, EventRequet);
         }
     }

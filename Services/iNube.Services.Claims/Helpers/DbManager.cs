@@ -1,12 +1,14 @@
 ﻿using iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices;
 using iNube.Services.Claims.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace iNube.Services.Claims.Helpers
 {
@@ -70,12 +72,12 @@ namespace iNube.Services.Claims.Helpers
             return dbConnectionString;
         }
 
-        public static async Task<DbContext> GetContextAsync(string product, string connectionKey)
+        public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService());
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)

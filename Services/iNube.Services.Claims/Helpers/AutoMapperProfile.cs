@@ -66,7 +66,8 @@ namespace iNube.Services.Claims.Helpers
             .ForMember(dest => dest.LocationOfEvent, opt => opt.MapFrom(src => src.locationOfLoss))
             .ForMember(dest => dest.LossOfDescription, opt => opt.MapFrom(src => src.lossDescription))
             .ForMember(dest => dest.PolicyNo, opt => opt.MapFrom(src => src.PolicyNumber))
-           // .ForMember(dest => dest.TblClaimHistory, opt => opt.MapFrom(src => src.ClaimsHistory))
+            .ForMember(dest => dest.ClaimFields, opt => opt.MapFrom(src => src.DataModelDTO))
+            // .ForMember(dest => dest.TblClaimHistory, opt => opt.MapFrom(src => src.ClaimsHistory))
             .ReverseMap();
 
             CreateMap<Alldoc, TblClaimdoc>();
