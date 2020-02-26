@@ -125,6 +125,18 @@ class LogonVehicle extends React.Component {
                 switchStatus: false,
                 switchEnabled: false,
             },
+            createschedule: {
+                vehicleRegistrationNo: "",
+                policyNo: "",
+                vehicleType: "",
+                mon: false,
+                tue: false,
+                wed: false,
+                thu: false,
+                fri: false,
+                sat: false,
+                sun: false,
+            },
             mobileno: "",
 
             sum: "",
@@ -475,6 +487,26 @@ class LogonVehicle extends React.Component {
             });
     }
 
+    handlecreateSchedule = () => {
+        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/CreateUpdateSchedule`, {
+            method: 'Post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('edelweisstoken')
+            },
+            body: JSON.stringify(this.state.scheduleDTO)
+        }).then(response => response.json())
+            .then(data => {
+                swal({
+                    text: "Schedule Created Successfully!",
+                    icon: "success"
+                })
+                // this.setState({ disablesendotp: true, disableresendotp: false })
+                console.log("dddd", data);
+            })
+    }
+
     handleOpen = (item) => {
         console.log("data", item, this.state.policynumber);
         fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=` + item + `&PolicyNo=` + this.state.policynumber + ``, {
@@ -544,6 +576,12 @@ class LogonVehicle extends React.Component {
         addvehicle.InsurableItem[0].RiskItems[0].VehicleType = this.state.typevehicle;
         this.setState({ addvehicle });
 
+        let newschedule = this.state.createschedule;
+        newschedule.policyNo = this.state.policynumber;
+        newschedule.vehicleRegistrationNo = this.state.RiskObj.VehicleNumber;
+        newschedule.vehicleType = this.state.typevehicle;
+        this.setState({ newschedule })
+
         fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/PolicyEndoresemenet`, {
             method: 'PUT',
             headers: {
@@ -554,20 +592,16 @@ class LogonVehicle extends React.Component {
             body: JSON.stringify(addvehicle)
         }).then(response => response.json())
             .then(data => {
-                //let policynothis = data.id;
-                //policyno = policynothis;
-
                 if (data.status == 3) {
-
                     swal({
                         text: "policy endorsement for" + " " + data.id + " " + "has been issued successfully",
                         icon: "success"
                     })
-
+                    this.handlecreateSchedule();
                 }
             })
         this.handleCloseaddvehicle();
-        // this.handlePolicyDetails(this.state.policynumber);
+        //this.handlePolicyDetails(this.state.policynumber);
     }
 
     handleopenDialog = () => {
@@ -740,7 +774,6 @@ class LogonVehicle extends React.Component {
     }
 
     onInputChange = (evt) => {
-
         const Data = this.state.RiskObj;
         Data[evt.target.name] = evt.target.value;
         this.setState({ Data });
