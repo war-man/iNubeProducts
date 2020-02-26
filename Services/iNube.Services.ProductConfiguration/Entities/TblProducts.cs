@@ -8,6 +8,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public TblProducts()
         {
             TblInsurableRcbdetails = new HashSet<TblInsurableRcbdetails>();
+            TblProductBasicConfiguration = new HashSet<TblProductBasicConfiguration>();
             TblProductChannels = new HashSet<TblProductChannels>();
             TblProductClausesWarrentiesExclusions = new HashSet<TblProductClausesWarrentiesExclusions>();
             TblProductInsurableItems = new HashSet<TblProductInsurableItems>();
@@ -34,11 +35,13 @@ namespace iNube.Services.ProductConfiguration.Entities
         public decimal? OrganizationId { get; set; }
         public bool? IsSingleCover { get; set; }
         public bool? IsMasterPolicy { get; set; }
+        public int? ProductTypeId { get; set; }
 
         public virtual TblmasProductMaster Cob { get; set; }
         public virtual TblmasProductMaster Lob { get; set; }
         public virtual TblmasPccommonTypes ProductStatus { get; set; }
         public virtual ICollection<TblInsurableRcbdetails> TblInsurableRcbdetails { get; set; }
+        public virtual ICollection<TblProductBasicConfiguration> TblProductBasicConfiguration { get; set; }
         public virtual ICollection<TblProductChannels> TblProductChannels { get; set; }
         public virtual ICollection<TblProductClausesWarrentiesExclusions> TblProductClausesWarrentiesExclusions { get; set; }
         public virtual ICollection<TblProductInsurableItems> TblProductInsurableItems { get; set; }

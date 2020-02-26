@@ -64,7 +64,8 @@ const CustomTableCell = withStyles(theme => ({
 }))(TableCell);
 
 const Benefits = (props) => {
-    
+    console.log("amount textbox for premium", props.componentData.props.props.props.props.state.hidepremiumAmount);
+    let premiumAmounthide = props.componentData.props.props.props.props.state.hidepremiumAmount;
     const { classes } = props;
     console.log("Bindex", props);
     const benefitsData = props.componentData.props.props.props.props.state;
@@ -80,77 +81,11 @@ const Benefits = (props) => {
     return (
         <div>
         <GridContainer lg={12} style={{ position: 'relative', left: '30px' }}>
-                {coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].singleValueSelected !== "1" ?
+                {coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].singleValue ==true ?
 
                 null : (< GridContainer >
 
-                    {/*
-                    <GridContainer>
-                        <GridItem xs={12} sm={12} md={12}>
-                                <Card style={{ boxShadow: 'none',border:'0' }}>
-                                <CardBody className="Benifits-Tab">
-                       
-                                    <Table className="createTableClass table-striped" style={{ borderRadius: '6px  ', width: '100%', margin: '0 auto' }} id="paymentTable">
-                                        <TableHead className="tableClassRow" style={tableClassRow}>
-                                            <TableRow className="tableClassRow">
-                                                <CustomTableCell className="tableClassRow"><h7><b>Cover Event Factor - From Value </b></h7></CustomTableCell>
-                                                <CustomTableCell className="tableClassRow"><h7><b>Cover Event Factor - To Value</b></h7></CustomTableCell>
-                                                <CustomTableCell className="tableClassRow"><h7><b>Amount</b></h7></CustomTableCell>
-                                                <CustomTableCell className="tableClassRow"><h7><b></b></h7></CustomTableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        {
-                                            benefitsData.ProductDTO.tblBenifitRangeDetails.map((item, index) =>
-                                                <TableRow className="tableClassRow" key={index}>
-                                                    <CustomTableCell><CustomInput
-                                                        // labelText="Benefit From Value"
-                                                        // id="benefitAmount"
-                                                        disabled={benefitsData.disabled}
-                                                        value={item.fromValue}
-                                                        name="fromValue"
-                                                        onChange={(e) => benefitsData.setBenifitValue('fromValue', e, index)}
-                                                        disabled={benefitsData.viewdisable}
-                                                        formControlProps={{
-                                                            fullWidth: true
-                                                        }}
-                                                    /></CustomTableCell>
-
-                                                    <CustomTableCell><CustomInput
-                                                        disabled={benefitsData.viewdisable}
-                                                        //  labelText="Benefit To Value"
-                                                        // id="benefitAmount"
-                                                        value={item.toValue}
-                                                        name="toValue"
-                                                        onChange={(e) => benefitsData.setBenifitValue('toValue', e, index)}
-                                                        disabled={benefitsData.viewdisable}
-                                                        formControlProps={{
-                                                            fullWidth: true
-                                                        }}
-                                                    /></CustomTableCell>
-                                                    <CustomTableCell><CustomInput
-                                                        disabled={benefitsData.viewdisable}
-                                                        //    labelText="Benefit Amount"
-                                                        id="benefitAmount"
-                                                        value={item.benefitAmount}
-                                                        name="benefitAmount"
-                                                        onChange={(e) => benefitsData.setBenifitValue('benefitAmount', e, index)}
-                                                        disabled={benefitsData.viewdisable}
-                                                        formControlProps={{
-                                                            fullWidth: true
-                                                        }}
-                                                    /></CustomTableCell>
-
-                                                    <CustomTableCell>{!benefitsData.viewdisable && <Button color="warning" onClick={(e) => benefitsData.addRecord(e, index)} id="round" >Add</Button>}</CustomTableCell>
-                                                   
-                                                        </TableRow>
-                                        )}
-                                    </Table> 
-                                </CardBody>
-                            </Card>
-                        </GridItem>
-                    </GridContainer>
-
- */}
+                    
 
                     <GridItem xs={12}>
 
@@ -195,7 +130,7 @@ const Benefits = (props) => {
                                     minWidth: 40,
                                     style: { textAlign: "right" },
                                     headerClassName: 'react-table-center',
-                                    show: props.componentData.state.hidepremiumAmount
+                                    show: premiumAmounthide
                                 },
                                 {
                                     Header: "",
@@ -255,7 +190,8 @@ const Benefits = (props) => {
                                 disabled={(benefitsData.viewdisable === false) ? benefitsData.benefitinputdisable : true}
                                     inputType="number"
                                     type="numeric"
-                                labelText="Benefit Amount"
+                                    labelText="Benefit Amount"
+                                    negative={true}
                                 id="benefitAmount"
                                     value={coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].benefitAmount}
                                 name="benefitAmount"
@@ -275,11 +211,11 @@ const Benefits = (props) => {
                        
                         disabled={benefitsData.viewdisable}
                             labelText="Maximum Benefit Amount"
-                            inputType="number"
-                        id="gstnumber"
+                           
+                            id="gstnumber"
                             value={coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].maxBenefitAmount}
                             name="maxBenefitAmount"
-                            type="numeric"
+                            inputType="number" type="numeric" negative={true}
                             onBlur={() => benefitFun.onBlur('productBenefits',Iindex, Bindex)}
                             onChange={(e) => benefitFun.SetCoverProductDetailsValue('productBenefits', e, Bindex, Iindex)}
                         //   disabled={benefitsData.viewdisable}
@@ -288,15 +224,15 @@ const Benefits = (props) => {
                             fullWidth: true
                         }}
                         />
+                        {((coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].benefitAmount) >eval(coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].maxBenefitAmount))?<p className="error">Maximum Benefit Amount cant not be less then Benefit Amount  </p>:null}
                 </GridItem>
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomInput
-                           
-                            inputType="number"
-                        labelText="Maximum Benefit Criteria Value"
+                            inputType="number" type="numeric" negative={true} 
+                          labelText="Maximum Benefit Criteria Value"
                         id="gstnumber"
                             value={coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].benefitCriteriaValue}
-                        name="benefitCriteriaValue"
+                            name="benefitCriteriaValue"
                             onChange={(e) => benefitFun.SetCoverProductDetailsValue('productBenefits', e, Bindex, Iindex)}
                             disabled={(coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].maxBenefitAmount != "") ? true : false}
                         formControlProps={{
@@ -304,7 +240,25 @@ const Benefits = (props) => {
                         }}
                         />
                     </GridItem>
-
+                  
+                    {coversProductDetails.props.state.hidepremiumAmount && coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].singleValue === true ? <GridItem xs={12} sm={12} md={5}>
+                        <CustomInput
+                            labelText="Premium Amount"
+                            required={true}
+                            inputType="number" type="numeric" negative={true}
+                            //onBlur={() => premiumData.onBlur(data.mValue, 'productPremium', i, premiumData.ProductDTO.productPremium[i].levelId, premiumData.ProductDTO.productPremium[i].subLevelId)}
+                            id="gstnumber"
+                            value={coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].premiumAmount}
+                            name="premiumAmount"
+                            onChange={(e) => benefitFun.SetCoverProductDetailsValue('productBenefits', e, Bindex, Iindex)}
+                            //disabled={(coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].premiumAmount != "") ? true : false}
+                            disabled={(benefitsData.viewdisable === false) ? benefitsData.benefitinputdisable : true}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                        {(eval(coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].benefitAmount) < eval(coversProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].premiumAmount)) &&<p className="error">Premium Amount can not more then Benefit Amount</p>}
+                    </GridItem> : null}
             </GridContainer>
 
             </GridContainer>

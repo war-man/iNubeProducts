@@ -32,7 +32,7 @@ import Mapping from "./Covers/Mapping.jsx";
 import Modal from '@material-ui/core/Modal';
 import withStyles from "@material-ui/core/styles/withStyles";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
-
+import Accordion from "components/Accordion/AccordianWithoutLoop.jsx";
 
 
 
@@ -66,16 +66,25 @@ const searchClose = {
 
 }
 
+
 //import { content } from "html2canvas/dist/types/css/property-descriptors/content";
 class ProductConfig extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            hideRatingCheckBox: false,
+            ClaimSIlabel:"ClaimSI",
+            PaymentList:[],
+            CoverEventShow:false,
+            premiumerror:false,
+            channelDate:0,
+            radioType: "",
+            category: "",
+            Type:"",
+            hideRatingCheckBox: true,
             RatingCheckBox: false,
             errMassage: "",
             hidepremiumAmount: false,
-            SelectedName: "",
+            SelectedName: "Product",
             pageloader: false,
             validationmaxbenefit: false,
             checkboxdisabled: false,
@@ -107,6 +116,7 @@ class ProductConfig extends React.Component {
             // addbtnshow: false,
             radiolist: [],
             // { value: "0", labelText: "Product Level", selectedValue: "1", name: "Product", flag: true }, { value: "1", labelText: "Insurable Level", selectedValue: "0", name: "Insurable", flag: false }, { value: "2", labelText: "Cover Level", selectedValue: "0", name: "Cover", flag: false }
+            CDRadio: [{ cob: null, disable: false, label: null, lob: null, mID: 1, mIsRequired: false, mType: "CD/AC", mValue: "Product", planCode: null, selectedValue: 1, value: null }, { cob: null, disable: false, label: null, lob: null, mID: 0, mIsRequired: false, mType: "CD/AC", mValue: "Partner", planCode: null, selectedValue: 1, value: null }],
             radiolist1: [{ cob: null, disable: false, label: null, lob: null, mID: 1, mIsRequired: false, mType: "Type", mValue: "Single Risk", planCode: null, selectedValue: 1, value: null }, { cob: null, disable: false, label: null, lob: null, mID: 0, mIsRequired: false, mType: "Type", mValue: "Multiple Risk", planCode: null, selectedValue: 1, value: null }],
             // radiolist2: [{ cob: null, disable: false, label: null, lob: null, mID: 0, mIsRequired: false, mType: "Type", mValue: "SingleCover", planCode: null, selectedValue: 0, value: null }, { cob: null, disable: false, label: null, lob: null, mID: 1, mIsRequired: false, mType: "Type", mValue: "MultipleCover", planCode: null, selectedValue: 0, value: null }],
             maxbenefitinputdisable: false,
@@ -399,6 +409,7 @@ class ProductConfig extends React.Component {
             ],
             ProductDTO: {
                 "productId": 0,
+                "productTypeId":"",
                 "lobid": "",
                 "rateingId":0,
                 "isSingleCover": true,
@@ -432,7 +443,9 @@ class ProductConfig extends React.Component {
                 "productPremium": [],
                 "insurableRcbdetails": [],
                 "productSwitchOnProperty": [],
-                "CalculateConfig":[]
+                "CalculateConfig": [],
+                "ProductBasicConfigurationDetails": [],
+                "ProductBasicConfiguration ":[]
             },
             ProductDTOs: {},
             description: "",
@@ -445,6 +458,13 @@ class ProductConfig extends React.Component {
             prodchan: [],
             clauses: [],
             MasterDTO: {
+                Tax: [],
+                AllowPayment: [],
+                CDCreation: [],
+                PremiumBreakup: [],
+                ClaimSI:[],
+                Payment: [],
+                ProductType:[],
                 Switchon: [],
                 InsurableTypeMaster: [],
                 CoverMaster: [],
@@ -546,7 +566,7 @@ class ProductConfig extends React.Component {
         this.IsValidProductDetails(this.ProductDetails);
 
         if (this.state.ValidationUI === true) {
-
+           
 
             let pks = this.ProductDetails.ProductDTO.activeFrom;
             let dks = this.ProductDetails.ProductDTO.activeTo;
@@ -657,6 +677,41 @@ class ProductConfig extends React.Component {
             console.log("pro channel", this.ProductDetails.productChannel);
 
 
+            //Extra Feature
+            productDTO.ProductBasicConfigurationDetails = [];
+
+
+            if (this.state.MasterDTO.Payment.length > 0) {
+                productDTO.ProductBasicConfigurationDetails = [...productDTO.ProductBasicConfigurationDetails,...this.state.MasterDTO.Payment];
+
+            }
+             if (this.state.MasterDTO.Tax.length > 0) {
+                productDTO.ProductBasicConfigurationDetails = [...productDTO.ProductBasicConfigurationDetails, ...this.state.MasterDTO.Tax];
+
+            }
+             if (this.state.MasterDTO.AllowPayment.length > 0) {
+                productDTO.ProductBasicConfigurationDetails = [...productDTO.ProductBasicConfigurationDetails, ...this.state.MasterDTO.AllowPayment];
+
+            }
+             if (this.state.MasterDTO.CDCreation.length > 0) {
+                productDTO.ProductBasicConfigurationDetails = [...productDTO.ProductBasicConfigurationDetails, ...this.state.MasterDTO.CDCreation];
+
+            }
+             if (this.state.MasterDTO.PremiumBreakup.length > 0) {
+                productDTO.ProductBasicConfigurationDetails = [...productDTO.ProductBasicConfigurationDetails, ...this.state.MasterDTO.PremiumBreakup];
+
+            }
+             if (this.state.MasterDTO.ClaimSI.length > 0) {
+                productDTO.ProductBasicConfigurationDetails = [...productDTO.ProductBasicConfigurationDetails, ...this.state.MasterDTO.ClaimSI];
+
+            }
+            // if (this.state.MasterDTO.ProductType.length > 0) {
+            //    productDTO.ProductBasicConfigurationDetails = [...productDTO.ProductBasicConfigurationDetails, ...this.state.MasterDTO.ProductType];
+
+            //}
+          
+
+
 
             //this.ProductDetails.productChannel.effectiveFrom = this.datechange(this.ProductDetails.productChannel.effectiveFrom);
             // this.ProductDetails.productChannel.effectiveTo = this.datechange(this.ProductDetails.productChannel.effectiveTo);
@@ -756,7 +811,7 @@ class ProductConfig extends React.Component {
             console.log("last productDTO", this.state.ProductDTO)
 
 
-            // fetch(`https://localhost:44347/api/Product/CreateProduct`, {
+            //fetch(`https://localhost:44347/api/Product/CreateProduct`, {
             fetch(`${productConfig.productConfigUrl}/api/Product/CreateProduct`, {
                 method: 'POST',
                 headers: {
@@ -1111,6 +1166,7 @@ class ProductConfig extends React.Component {
         this.setState({ open: false });
         this.setState({ mshow: false });
         this.setState({ opendescription: false });
+        this.setState({ mappingPop: false });
     };
     handleCloseCWE(level, Iindex, Cindex) {
         if (level == "Insurable Item") {
@@ -1412,6 +1468,7 @@ class ProductConfig extends React.Component {
             if (filtertype.length > 0) {
                 this.GetRiskClaimMaster('Risk', filtertype[0].mID, event.target.value);
                 this.GetRiskClaimMaster('Claim', filterClaimtype[0].mID, event.target.value);
+             
             }
         }
 
@@ -1543,6 +1600,19 @@ class ProductConfig extends React.Component {
         console.log("event", event.target.name)
         this.setState({ reg });
 
+
+        if (type == "ProductType") {
+           
+            let payment = this.state.MasterDTO.ProductType.filter(s=>s.mID==value);
+            if (payment.length > 0) {
+
+                if (payment[0].mValue == "Indemibly") {
+                    this.setState({ ClaimSIlabel: "SumInsured" });
+                } else if (payment[0].mValue == "Benefit") {
+                    this.setState({ ClaimSIlabel: "Benefit" });
+                }
+            }
+        }
         if (type === "Clauses") {
 
 
@@ -1574,8 +1644,8 @@ class ProductConfig extends React.Component {
 
                 const filtertype = this.state.TypeList.filter(m => m.mValue === "Product");
 
-
-
+            
+            
 
                 // console.log("FilterTypeList", FilterTypeList);
                 //this.GetMasterService('InsuranceType', 0);
@@ -1590,6 +1660,10 @@ class ProductConfig extends React.Component {
             if (type === "InsurableCategory") {
                 this.GetMasterService('Switchon', value);
                 this.GetMasterService('CoverEvent', event.target.value);
+                this.GetRiskClaimMaster('Claim', 0, event.target.value);
+              
+             //Extra Feature
+            //    this.GetRiskClaimMaster('Payment', 65, event.target.value);
 
             }
 
@@ -1759,7 +1833,14 @@ class ProductConfig extends React.Component {
 
 
                 //}
+                else if (type == "PremiumBreakup") {
+                    let locDTO = this.state.MasterDTO;
+                    locDTO["Tax"] = data.filter(s => s.mValue == "Tax");
 
+                    locDTO[type] = data.filter(s => s.mValue != "Tax");
+                  
+
+                }
                 else {
                     const lData = data;
                     let locDTO = this.state.MasterDTO;
@@ -1832,7 +1913,7 @@ class ProductConfig extends React.Component {
                 console.log("data  server", data);
                 if (type === "Risk") {
 
-
+                    data = data.filter(s => s.mValue != "Identification Number");
                     if (typeId == "0") {
 
                         const masterDTO = this.state.MasterDTO;
@@ -1859,6 +1940,9 @@ class ProductConfig extends React.Component {
                         //  this.state.FilterCoverDTO = data.filter(item => item.levelId == "56");
                         //this.setState({});
                         //console.log("FilterDTO", this.state.FilterCoverDTO)
+
+                       
+
                         masterDTO['Risk'] = this.state.MasterDTO['Risk'].concat(data);
                         // }
 
@@ -2067,9 +2151,7 @@ class ProductConfig extends React.Component {
     }
 
     onDateChange = (formate, type, name, event) => {
-        const { validdate } = this.state;
-        this.setState({ validdate: false });
-
+      
         var today = event.toDate();
         if (today.getDate() < 10) {
             var dt = '0' + today.getDate();
@@ -2093,11 +2175,13 @@ class ProductConfig extends React.Component {
             let ProductDTO = this.state.ProductDTO;
             ProductDTO[name] = date;
             this.setState({ ProductDTO });
-            var timeDiff = Math.abs(date2.getTime() - date1.getTime());
-            var datediff = this.state.date;
-            datediff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            var datediff = -Math.abs(datediff - 1);
-            this.setState({ datediff });
+            if (name == "activeFrom") {
+                var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+                var datediff = this.state.datediff;
+                datediff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                datediff = -Math.abs(datediff - 1);
+                this.setState({ datediff });
+            }
         }
         if (type == 'Channel') {
             let productChannel = this.ProductDetails.productChannel;
@@ -2109,8 +2193,7 @@ class ProductConfig extends React.Component {
 
     };
     onDateChangeChannels = (formate, type, name, event, index) => {
-        const { validdate } = this.state;
-        this.setState({ validdate: false });
+     
 
         //var today = event.toDate();
         var today = event.toDate();
@@ -2138,8 +2221,21 @@ class ProductConfig extends React.Component {
             let productChannel = this.ProductDetails.productChannel[index];
             productChannel[name] = date;
             this.setState({ productChannel });
+            if (name == "effectiveFrom") {
+
+                var timeDiff = Math.abs(date2.getTime() - date1.getTime());
+                let  channeldatediff   = 0;
+                channeldatediff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                channeldatediff = -Math.abs(channeldatediff - 1)
+                console.log("after change", channeldatediff)
+                this.state.channelDate = channeldatediff;
+                this.setState({  });
+            }
         }
-        console.log("after change", this.ProductDetails.productChannel)
+        this.channelsTable();
+
+       
+        console.log("after change", this.ProductDetails.productChannel, this.state.channelDate)
 
         this.change(event, name, formate, date);
 
@@ -2188,8 +2284,10 @@ class ProductConfig extends React.Component {
     //};
     IsValidProductDetails = (productDetails) => {
         let CoverCount = 0;
+        let message = "Some Fields are missing in ";
+        let tempmassage = "";
         if (productDetails.ProductDTO.productCode === "" || productDetails.ProductDTO.activeFrom === "" || productDetails.ProductDTO.activeTo === "" || productDetails.ProductDTO.productName === "" || productDetails.ProductDTO.productStatusId === 0) {
-            this.state.errMassage = "Some Fields are missing in Product Basic";
+            tempmassage = tempmassage +"Product Basic,";
             this.state.ValidationUI = false; this.state.errormessage = true;
         }
 
@@ -2197,7 +2295,7 @@ class ProductConfig extends React.Component {
             for (var i = 0; i < productDetails.productInsurableItem.length; i++) {
                 if (productDetails.productInsurableItem[i].insurableCategoryId === "" || productDetails.productInsurableItem[i].insurableItemTypeId === "") {
                     this.state.ValidationUI = false; this.state.errormessage = true;
-                    this.state.errMassage = "Some Fields are missing in Insurable Item";
+                    tempmassage = tempmassage +"Insurable Item,";
                 }
                 if (productDetails.productInsurableItem[i].productCovers.length > 0) {
                     for (var j = 0; j < productDetails.productInsurableItem[i].productCovers.length; j++) {
@@ -2206,10 +2304,11 @@ class ProductConfig extends React.Component {
                         if (this.state.MasterDTO.checkBox == true) {
 
                             if (productDetails.productInsurableItem[i].productCovers[j].coverTypeId == "" || productDetails.productInsurableItem[i].productCovers[j].coverDescription == "") {
-                                this.state.errMassage = "Some Fields are missing in Cover";
+                                tempmassage= tempmassage+"Cover,";
                                 this.state.ValidationUI = false; this.state.errormessage = true;
+
                                 if (productDetails.productInsurableItem[i].productCovers[j].coverEventId == "" || productDetails.productInsurableItem[i].productCovers[j].coverEventFactorId == "" || productDetails.productInsurableItem[i].productCovers[j].coverEventFactorValueUnitId == "") {
-                                    this.state.errMassage = "Some Fields are missing in Cover";
+                                    tempmassage = tempmassage+"CoverEvent,";
                                     this.state.ValidationUI = false; this.state.errormessage = true;
 
 
@@ -2219,19 +2318,19 @@ class ProductConfig extends React.Component {
                         if (productDetails.productInsurableItem[i].productCovers[j].productBenefits.length > 0) {
                             console.log("check validation", productDetails.productInsurableItem[i].productCovers[j].productBenefits[0])
                             if (productDetails.productInsurableItem[i].productCovers[j].productBenefits[0].benefitCriteriaValue === "" && productDetails.productInsurableItem[i].productCovers[j].productBenefits[0].maxBenefitAmount === "") {
-                                this.state.errMassage = "Some Fields are missing in Benefit";
+                                tempmassage = tempmassage +"MaxBenefitAmount or BenefitCriteriaValue,";
                                 this.state.ValidationUI = false; this.state.errormessage = true;
                             }
                         } else {
                             this.state.ValidationUI = false; this.state.errormessage = true;
-                            this.state.errMassage = "Some Fields are missing in Benefit";
+                            tempmassage = tempmassage+"Benefit,";
                         }
                         if (productDetails.productInsurableItem[i].productCovers[j].singleValue == false) {
                             if (productDetails.productInsurableItem[i].productCovers[j].productBenefits[0].benifitRangeDetails.length > 0) {
                                 for (var k = 0; k < productDetails.productInsurableItem[i].productCovers[j].productBenefits[0].benifitRangeDetails.length; k++) {
                                     if (productDetails.productInsurableItem[i].productCovers[j].productBenefits[0].benifitRangeDetails[k].fromValue == "" || productDetails.productInsurableItem[i].productCovers[j].productBenefits[0].benifitRangeDetails[k].toValue == "" || productDetails.productInsurableItem[i].productCovers[j].productBenefits[0].benifitRangeDetails[k].brokage == "") {
                                         this.state.ValidationUI = false; this.state.errormessage = true;
-                                        this.state.errMassage = "Some Fields are missing in Benefit Range Details";
+                                        tempmassage = tempmassage+"Benefit Range Details,";
 
 
                                     }
@@ -2245,17 +2344,21 @@ class ProductConfig extends React.Component {
 
                     }
                 } else {
-                    //if (CoverCount == 0) {
-                    //    this.state.ValidationUI = false; this.state.errormessage = true;
-                    //    this.state.errMassage = "Some Fields are missing in Cover";
-                    //}
+                    if (CoverCount == 0) {
+                        this.state.ValidationUI = false; this.state.errormessage = true;
+                        tempmassage = tempmassage+"Cover,";
+                    }
                 }
             }
         } else {
             this.state.ValidationUI = false; this.state.errormessage = true;
-            this.state.errMassage = "Some Fields are missing in Insurable Item";
+            tempmassage = tempmassage+"Insurable Item,";
         }
+        if (productDetails.productClausesWarrentiesExclusion.length == 0) {
+            this.state.ValidationUI = false; this.state.errormessage = true;
+            tempmassage = tempmassage + "C/W/E,";
 
+        }
 
 
 
@@ -2264,12 +2367,12 @@ class ProductConfig extends React.Component {
                 if (productDetails.productChannel[i].effectiveFrom !== "" && productDetails.productChannel[i].effectiveTo !== "" && productDetails.productChannel[i].brokage !== "" && productDetails.productChannel[i].channelTypeId !== "") {
 
                 } else {
-                    this.state.errMassage = "Some Fields are missing in Channel";
+                    tempmassage = tempmassage+"Channel";
                     this.state.ValidationUI = false; this.state.errormessage = true;
                 }
             }
         } else {
-            this.state.errMassage = "Some Fields are missing in Channel";
+            tempmassage= tempmassage+"Channel";
             this.state.ValidationUI = false; this.state.errormessage = true;
         }
         //if (productDetails.productPremium.length > 0) {
@@ -2282,7 +2385,7 @@ class ProductConfig extends React.Component {
         //    this.state.ValidationUI = false; this.state.errormessage = true;
         //}
 
-
+        this.state.errMassage =message+tempmassage;
     }
 
     handleSimple = event => {
@@ -2448,7 +2551,18 @@ class ProductConfig extends React.Component {
     componentDidMount() {
         this.GetRiskClaimMaster('Risk', 0, 0);
         this.GetRiskClaimMaster('Claim', 0, 0);
+          //Extra Feature
+        this.GetRiskClaimMaster('ProductType', 0, 0);
+        this.GetMasterService('Payment',0);
         this.GetMasterService('Switchon', 0);
+      
+        this.GetMasterService('AllowPayment', 0);
+        this.GetMasterService('CDCreation', 0);
+        this.GetMasterService('PremiumBreakup', 0);
+        this.GetMasterService('ClaimSI', 0);
+        this.GetMasterService('ProductType', 0);
+
+
         this.setState({ btnhide: true });
         fetch(`${productConfig.productConfigUrl}/api/Product/GetMasterData?sMasterlist=das`, {
             method: 'GET',
@@ -2504,6 +2618,7 @@ class ProductConfig extends React.Component {
                     .then(response => response.json())
                     .then(data => {
                         console.log("product data from server", data);
+                     
                         if (data.productSwitchOnDetails.length > 0) {
                             this.state.MasterDTO.Switchon = data.productSwitchOnDetails;
                         }
@@ -2554,6 +2669,9 @@ class ProductConfig extends React.Component {
                                 that.state.MasterDTO['InsurableTypeMaster'] = sdata.filter(id => id.mType == "InsuranceType");
                                 that.state.MasterDTO['CoverMaster'] = sdata.filter(id => id.mType == "Cover");
                                 that.state.MasterDTO['BenefitCriteria'] = sdata.filter(id => id.mType == "BenefitCriteria");
+                                that.state.MasterDTO['CoverEvent'] = sdata.filter(id => id.mType == "CoverEvent");
+                                that.state.MasterDTO['CoverEventFactor'] = sdata.filter(id => id.mType == "CoverEventFactor");
+                                that.state.MasterDTO['CoverEventFactorValue'] = sdata.filter(id => id.mType == "CoverEventFactorValue");
 
                                 //   const len = data.productInsurableItems.length - 1;
                                 for (var i = 0; i < data.productInsurableItems.length; i++) {
@@ -2562,7 +2680,10 @@ class ProductConfig extends React.Component {
                                         const arr = [];
                                         arr.push(sdata.filter(id => id.mType == "Cover"));
                                         this.state.MasterDTO["Cover"].push(arr);
+                                        if (data.productInsurableItems[i].productCovers[j].coverEventId !=null) {
+                                            this.setState({ CoverEventShow: true });
 
+                                        }
 
 
 
@@ -2599,6 +2720,8 @@ class ProductConfig extends React.Component {
                                         const radioType = this.state.radiolist1.filter(item => item.mID == (this.ProductDetails.productInsurableItem[i].isSingle))[0].mValue;
                                         const category = that.state.MasterDTO.InsurableCategory.filter(item => item.mID === data.productInsurableItems[i].insurableCategoryId)[0].mValue;
                                         const Type = that.state.MasterDTO.InsuranceType.filter(item => item.mID === data.productInsurableItems[i].insurableItemTypeId)[0].mValue;
+                          
+
                                         this.state.Insurabletitle.push([category, Type]);
 
 
@@ -2610,6 +2733,11 @@ class ProductConfig extends React.Component {
 
 
                                 if (that.state.radiolist.length > 0) {
+                                
+                                    if (data.productPremium[0].levelId == 62) {
+                                        this.setState({ hidepremiumAmount: true });
+                                    }
+
                                     const name = that.state.radiolist.filter(item => item.mID === data.productPremium[0].levelId)[0].mValue;
                                     if (name !== undefined) {
                                         let checkedRadio = that.state['radiolist'].filter(item => item.mValue === name);
@@ -2936,6 +3064,11 @@ class ProductConfig extends React.Component {
             : this.state.masterList.filter((e) => e.mType === 'ClaimType')[0].mdata
             ;
         this.setState({ ClaimList: claimlist });
+        //const PaymentType = (this.state.masterList.filter(e => e.mType === 'PaymentType')[0]) === undefined
+        //    ? []
+        //    : this.state.masterList.filter((e) => e.mType === 'PaymentType')[0].mdata
+        //    ;
+        //this.setState({ PaymentList: PaymentType });
 
         //this.state.radiolist = this.state.TypeList.map((item, index) => {
 
@@ -3051,6 +3184,7 @@ class ProductConfig extends React.Component {
         let productDTO = this.ProductDetails;
         let productClause = this.ProductDetails.productClausesWarrentiesExclusion;
         let CustomClause = this.state.CustomClause;
+        CustomClause.levelId = 51;
         let cwetypeId = this.state.CustomClause.cwetypeId;
         this.state.cvalue = (this.state.masterList.filter(e => e.mType === 'CWEType')[0]) === undefined
             ? []
@@ -3279,7 +3413,7 @@ class ProductConfig extends React.Component {
     }
 
     channelsTable = () => {
-
+        console.log("channelDate", this.state.channelDate)
         if (this.state.newmasterlist.length > 0) {
             console.log("product channel", this.state.masterList, this.state.newmasterlist);
 
@@ -3293,11 +3427,11 @@ class ProductConfig extends React.Component {
                         id: key + 1,
                         selectType: <Dropdown id="ProductDTO.lobid" labelText={(this.ProductDetails.productChannel[key].channelTypeId == "") ? "Select" : ""} lstObject={(this.state.search === true) ? this.state.chlistarray[0] : this.state.chlistarray[key]} value={this.ProductDetails.productChannel[key].channelTypeId} name='channelTypeId' onChange={(e) => this.SetProductDetailchannelsValue('productChannel', '', e, key)} disabled={(this.state.nonedit === true) ? true : (key === this.state.chindex + 1) ? false : true} formControlProps={{ fullWidth: true }} />,
                         //    selectType: <MasterDropdown labelText="Select Type" required={true} id="ProductDTO.ChannelID" lstObject={this.state.masterList} filterName='Channels' value={this.ProductDetails.productChannel[key].channelTypeId} model="ProductDTO" name='channelTypeId' onChange={(e) => this.SetProductDetailchannelsValue('productChannel', '', e, key)} disabled={this.state.viewdisable} formControlProps={{ fullWidth: true }} />,
-                        effectiveFrom: <CustomDatetime id='dteffectiveFrom' name='effectiveFrom' onChange={(evt) => this.onDateChangeChannels('datetime', 'Channel', 'effectiveFrom', evt, key)} value={this.ProductDetails.productChannel[key].effectiveFrom} disabled={(this.state.nonedit === true) ? true : (key === this.state.chindex + 1) ? false : true} formControlProps={{ fullWidth: true }} />,
+                        effectiveFrom: <CustomDatetime id='dteffectiveFrom' name='effectiveFrom' validdate={true} onChange={(evt) => this.onDateChangeChannels('datetime', 'Channel', 'effectiveFrom', evt, key)} value={this.ProductDetails.productChannel[key].effectiveFrom} disabled={(this.state.nonedit === true) ? true : (key === this.state.chindex + 1) ? false : true} formControlProps={{ fullWidth: true }} />,
                         // fromValue: prop.fromValue,
-                        effectiveTo: <CustomDatetime id='dteffectiveTo' name='effectiveTo' onChange={(evt) => this.onDateChangeChannels('datetime', 'Channel', 'effectiveTo', evt, key)} value={this.ProductDetails.productChannel[key].effectiveTo} disabled={(this.state.nonedit === true) ? true : (key === this.state.chindex + 1) ? false : true} formControlProps={{ fullWidth: true }} />,
+                        effectiveTo: <CustomDatetime id='dteffectiveTo' name='effectiveTo' validdate={false} datediff={this.state.channelDate} onChange={(evt) => this.onDateChangeChannels('datetime', 'Channel', 'effectiveTo', evt, key)} value={this.ProductDetails.productChannel[key].effectiveTo} disabled={(this.state.nonedit === true) ? true : (key === this.state.chindex + 1) ? false : true} formControlProps={{ fullWidth: true }} />,
 
-                        brokage: <CustomInput labelText="" id="brokageText" inputType="number" value={this.ProductDetails.productChannel[key].brokage} name="brokage" onChange={(e) => this.SetProductDetailchannelsValue('productChannel', '', e, key)} disabled={(this.state.nonedit === true) ? true : (key === this.state.chindex + 1) ? false : true} formControlProps={{ fullWidth: true }
+                        brokage: <CustomInput labelText="" id="brokageText" inputType="number" type="numeric" negative={true} value={this.ProductDetails.productChannel[key].brokage}  name="brokage" onChange={(e) => this.SetProductDetailchannelsValue('productChannel', '', e, key)} disabled={(this.state.nonedit === true) ? true : (key === this.state.chindex + 1) ? false : true} formControlProps={{ fullWidth: true }
                         } />,
 
                         Action: <div><Button justIcon round simple color="info" className="add" disabled={(this.state.maxchlen > key + 1) ? ((this.state.nonedit === true) ? true : (key === this.state.chindex + 1) ? false : true) : true} onClick={(e) => this.addChannelRecord(e, key)} ><Add /> </Button >
@@ -3320,9 +3454,9 @@ class ProductConfig extends React.Component {
                     id: key + 1,
                     // fromValue: < CustomInput value={prop.fromValue} disabled={this.state.disabled} name = "fromValue"  onChange = {(e) => this.setBenifitValue('fromValue', e, key) }     formControlProps = {{  fullWidth: true }} />,
                     fromValue: prop.fromValue,
-                    toValue: < CustomInput value={prop.toValue} disabled={this.state.viewdisable} name="toValue" onChange={(e) => this.setBenifitValue('toValue', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
-                    Amount: < CustomInput value={prop.benefitAmount} disabled={this.state.viewdisable} name="benefitAmount" onChange={(e) => this.setBenifitValue('benefitAmount', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
-                    PremiumAmount: < CustomInput value={prop.premiumAmount} disabled={this.state.viewdisable} name="premiumAmount" onChange={(e) => this.setBenifitValue('premiumAmount', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
+                    toValue: < CustomInput value={prop.toValue} inputType="number" type="numeric" negative={true} disabled={this.state.viewdisable} name="toValue" onChange={(e) => this.setBenifitValue('toValue', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
+                    Amount: < CustomInput value={prop.benefitAmount} inputType="number" type="numeric" negative={true} disabled={this.state.viewdisable} name="benefitAmount" onChange={(e) => this.setBenifitValue('benefitAmount', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
+                    PremiumAmount: < CustomInput value={prop.premiumAmount} inputType="number" type="numeric" negative={true} disabled={this.state.viewdisable} name="premiumAmount" onChange={(e) => this.setBenifitValue('premiumAmount', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
                     Action: <Button color="info" disabled={this.state.viewdisable} justIcon round simple className="add" onClick={(e) => this.addRecord(e, key, Iindex, Cindex)}><Add /></Button>
 
                 };
@@ -3369,81 +3503,84 @@ class ProductConfig extends React.Component {
     CheckedRadioFun = (name, listname) => {
         this.setState({ hideRatingCheckBox: false });
         this.setState({ hidepremiumAmount: false });
+
+        
         let checkedRadio = this.state[listname].filter(item => item.mValue === name);
+        if (checkedRadio.length>0) {
+            checkedRadio[0].selectedValue = checkedRadio[0].mID;
+            checkedRadio[0].mIsRequired = true;
 
-        checkedRadio[0].selectedValue = checkedRadio[0].mID;
-        checkedRadio[0].mIsRequired = true;
-
-        if (listname === "radiolist") {
-            if (checkedRadio[0].value === "1") {
-                this.state.addbtnshow = true;
+            if (listname === "radiolist") {
+                if (checkedRadio[0].value === "1") {
+                    this.state.addbtnshow = true;
 
 
-                console.log("addbtnshow1", this.state.addbtnshow);
-            } else {
-                this.state.addbtnshow = false;
+                    console.log("addbtnshow1", this.state.addbtnshow);
+                } else {
+                    this.state.addbtnshow = false;
 
+                }
             }
-        }
-        //if (listname === "radiolist1") {
-        //    if (checkedRadio[0].value === "1") {
-        //        this.state.addbtncovershow = true;
+            //if (listname === "radiolist1") {
+            //    if (checkedRadio[0].value === "1") {
+            //        this.state.addbtncovershow = true;
 
 
-        //        console.log("addbtncovershow", this.state.addbtncovershow);
-        //    } else {
-        //        this.state.addbtncovershow = false;
+            //        console.log("addbtncovershow", this.state.addbtncovershow);
+            //    } else {
+            //        this.state.addbtncovershow = false;
 
-        //    }
-        //}
-        console.log("addbtnshow", this.state.addbtnshow);
-        let uncheckedRadio = this.state[listname].filter(item => item.mValue !== name);
-        uncheckedRadio.map((item) => item.selectedValue = "0");
-        uncheckedRadio.map((item) => item.mIsRequired = false);
+            //    }
+            //}
+            console.log("addbtnshow", this.state.addbtnshow);
+            let uncheckedRadio = this.state[listname].filter(item => item.mValue !== name);
+            uncheckedRadio.map((item) => item.selectedValue = "0");
+            uncheckedRadio.map((item) => item.mIsRequired = false);
 
-        if (listname == "radiolist1") {
+            if (listname == "radiolist1") {
 
-            if (name === "Single Risk") {
+                if (name === "Single Risk") {
 
-                this.ProductDetails.productInsurableItems.isSingle = checkedRadio[0].mID;
-                // this.addPremiumFun(1, checkedRadio[0].mID);
+                    this.ProductDetails.productInsurableItems.isSingle = checkedRadio[0].mID;
+                    // this.addPremiumFun(1, checkedRadio[0].mID);
+                }
+                if (name === "Multiple Risk") {
+                    this.ProductDetails.productInsurableItems.isSingle = checkedRadio[0].mID;
+                    // this.addPremiumFun(1, checkedRadio[0].mID);
+                }
             }
-            if (name === "Multiple Risk") {
-                this.ProductDetails.productInsurableItems.isSingle = checkedRadio[0].mID;
-                // this.addPremiumFun(1, checkedRadio[0].mID);
+
+            this.ProductDetails.productPremium = [];
+            if (name === "Product") {
+                this.setState({ hideRatingCheckBox: true });
+                this.addPremiumFun(1, checkedRadio[0].mID, name);
             }
-        }
-
-        this.ProductDetails.productPremium = [];
-        if (name === "Product") {
-            this.setState({ hideRatingCheckBox: true });
-            this.addPremiumFun(1, checkedRadio[0].mID, name);
-        }
-        if (name === "Insurable Item") {
-            this.addPremiumFun(this.ProductDetails.productInsurableItem.length, checkedRadio[0].mID, name);
-        }
-        if (name === "Cover") {
-
-            let coverlen = 0;
-            for (var k = 0; k < this.ProductDetails.productInsurableItem.length; k++) {
-                coverlen++;
+            if (name === "Insurable Item") {
+                this.addPremiumFun(this.ProductDetails.productInsurableItem.length, checkedRadio[0].mID, name);
             }
-            this.addPremiumFun(coverlen, checkedRadio[0].mID, name);
-            // this.addPremiumFun(lenData);
-        }
+            if (name === "Cover") {
 
-        if (name === "Benefit") {
-            this.setState({ hidepremiumAmount: true });
-            let benelen = 0;
-            for (var k = 0; k < this.ProductDetails.productInsurableItem.length; k++) {
-                benelen++;
+                let coverlen = 0;
+                for (var k = 0; k < this.ProductDetails.productInsurableItem.length; k++) {
+                    coverlen++;
+                }
+                this.addPremiumFun(coverlen, checkedRadio[0].mID, name);
+                // this.addPremiumFun(lenData);
             }
-            // this.addPremiumFun(benelen, checkedRadio[0].mID, name);
-            // this.addPremiumFun(lenData);
-        }
 
-        //  this.addPremiumFun(lenData);
-        this.setState({ checkedRadio, uncheckedRadio });
+            if (name === "Benefit") {
+                this.setState({ hidepremiumAmount: true });
+                let benelen = 0;
+                for (var k = 0; k < this.ProductDetails.productInsurableItem.length; k++) {
+                    benelen++;
+                }
+                this.addPremiumFun(benelen, checkedRadio[0].mID, name);
+                // this.addPremiumFun(lenData);
+            }
+
+            //  this.addPremiumFun(lenData);
+            this.setState({ checkedRadio, uncheckedRadio });
+        }
     }
     /////////////////////////////////////////////////////////
     addbtnfun = (e) => {
@@ -3464,10 +3601,15 @@ class ProductConfig extends React.Component {
     }
 
 
-    deleteAccordion = (e, index) => {
-        console.log("deleteAccordion", e, index);
+    deleteAccordion = (e,index) => {
+        console.log("deleteAccordion", e);
         this.state.InitialInsurable.splice(index, 1);
         this.ProductDetails.productInsurableItem.splice(index, 1);
+        this.ProductDetails.insurableRcbdetails.splice(index, 1);
+        this.ProductDetails.productPremium.splice(index, 1);
+        if (this.state.InitialInsurable.length == 0) {
+            this.ProductDetails.ProductDTO.isCoverEvent = false;
+        }
         this.setState({});
         console.log("delete insurable", this.state.InitialInsurable, this.ProductDetails.productInsurableItem);
 
@@ -3475,8 +3617,45 @@ class ProductConfig extends React.Component {
 
     }
 
+    addCoverRiskParameter = (Iindex) => {
+
+        this.ProductDetails.insurableRcbdetails[Iindex].coverRcbdetails = this.ProductDetails.insurableRcbdetails[Iindex].coverRcbdetails.concat(
+
+            {
+
+                "inputType": "string",
+                "isReqired": true,
+                "inputId": 0,
+                "levelId": 0,
+                "insurableRcbdetailsId": 0,
+                "coverChildRcbdetails": [
+                    {
+
+                        "inputType": "string",
+                        "isReqired": true,
+                        "inputId": 0,
+                        "coverRcbdetailsId": 0
+                    }
+                ]
+            }
+        );
+        this.setState({});
+    }
+    deleteCoverRiskParameter = (Iindex, index) => {
+        
+        console.log("delete cover from accodion", this.ProductDetails.insurableRcbdetails, Iindex, index, this.ProductDetails.productPremium);
+
+       let cid= this.ProductDetails.productInsurableItem[Iindex].productCovers[index].coverTypeId;
+        this.ProductDetails.insurableRcbdetails[Iindex].coverRcbdetails.splice(index, 1);
 
 
+       let cindex=this.ProductDetails.productPremium.findIndex(p => p.subLevelId == cid);
+        if (cindex != -1) {
+            this.ProductDetails.productPremium.splice(cindex, 1);
+        }
+        console.log("delete after cover from accodion", this.ProductDetails.insurableRcbdetails, Iindex, index, this.ProductDetails.productPremium);
+        this.setState({});
+    }
 
     //////////////////////////////////////////////////////////
     addinurablelist = (e, Iindex) => {
@@ -3553,7 +3732,7 @@ class ProductConfig extends React.Component {
             this.ProductDetails.productInsurableItems.insurableItemTypeId = "";
             this.ProductDetails.productInsurableItems.insurableCategoryId = "";
 
-
+            this.CheckedRadioFun(this.state.SelectedName, 'radiolist');
             this.setState({});
         }
     }
@@ -3566,6 +3745,7 @@ class ProductConfig extends React.Component {
             for (var i = 0; i < len; i++) {
                 this.ProductDetails.productPremium = this.ProductDetails.productPremium.concat({
                     "productId": 0,
+                    "flag":false,
                     "premiumAmount": "",
                     "currencyId": "",
                     "levelId": Lid,
@@ -3579,6 +3759,7 @@ class ProductConfig extends React.Component {
                 this.ProductDetails.productPremium = this.ProductDetails.productPremium.concat({
                     "SNo": i,
                     "productId": 0,
+                    "flag":false,
                     "premiumAmount": "",
                     "currencyId": "",
                     "levelId": Lid,
@@ -3598,6 +3779,7 @@ class ProductConfig extends React.Component {
                     this.ProductDetails.productPremium = this.ProductDetails.productPremium.concat({
                         "description": this.state.Insurabletitle[i][1],
                         "productId": 0,
+                        "flag": false,
                         "premiumAmount": "",
                         "currencyId": "",
                         "levelId": Lid,
@@ -3611,24 +3793,25 @@ class ProductConfig extends React.Component {
 
         if (name === "Benefit") {
 
-            const Ilen = this.ProductDetails.productInsurableItem.length;
+            //const Ilen = this.ProductDetails.productInsurableItem.length;
 
-            for (var i = 0; i < Ilen; i++) {
+            //for (var i = 0; i < Ilen; i++) {
 
-                for (var j = 0; j < this.ProductDetails.productInsurableItem[i].productCovers.length; j++) {
+            //    for (var j = 0; j < this.ProductDetails.productInsurableItem[i].productCovers.length; j++) {
 
                     this.ProductDetails.productPremium = this.ProductDetails.productPremium.concat({
 
                         "productId": 0,
                         "premiumAmount": "",
+                        "flag": false,
                         "currencyId": "",
                         "levelId": Lid,
                         "subLevelId": ""
                     });
 
-                }
-            }
-        }
+        //        }
+        //    }
+       }
         console.log("List Premium", this.ProductDetails.productPremium, len);
     }
 
@@ -3683,9 +3866,9 @@ class ProductConfig extends React.Component {
     mappingPopUp = () => {
         this.setState({ mappingPop: true });
     }
-    handleClose = () => {
-        this.setState({ mappingPop: false });
-    };
+    //handleClose = () => {
+      
+    //};
     savemappingFun = (mapdata) => {
 
         console.log("mapdata", mapdata, this.state.ProductDTO);
@@ -3711,11 +3894,261 @@ class ProductConfig extends React.Component {
         this.handleClose();
     }
 
+    /* Add collapse in insurable level*/
+
+    AccordianFunction = () => {
+  
+        //const radioType = this.state.radiolist1.filter(item => item.mID == (this.ProductDetails.productInsurableItem[this.state.InitialInsurable.length].isSingle));
+        if (this.state.MasterDTO.InsurableCategory.length > 0 && this.ProductDetails.productInsurableItem.length > 0 ) {
+           // const category = this.state.MasterDTO.InsurableCategory.filter(item => item.mID === this.ProductDetails.productInsurableItem[count].insurableCategoryId)[0].mValue;
+            //const Type = this.state.MasterDTO.InsuranceType.filter(item => item.mID === this.ProductDetails.productInsurableItem[0].insurableItemTypeId)[0].mValue;
+
+            //console.log("AddCont:", this.state.InitialInsurable, this.ProductDetails.productInsurableItems, this.ProductDetails.productInsurableItem);
+            console.log("AddCont:", this.state.MasterDTO.InsuranceType, this.ProductDetails.productInsurableItem);
+            return (
+                <GridItem xs={12}>
+                    {this.state.InitialInsurable.map((prop, key) => {
+                    
+                        return (
+
+                            <Accordion
+                                index={key}
+
+                                collapses={
+                                    [
+                                        { view: !this.state.viewdisable, title: "Insurable Category:", value: this.state.MasterDTO.InsurableCategory.filter(item => item.mID === this.ProductDetails.productInsurableItem[key].insurableCategoryId)[0].mValue, title1: "Insurable Item:", value1: this.state.MasterDTO.InsurableTypeMaster.filter(item => item.mID === this.ProductDetails.productInsurableItem[key].insurableItemTypeId)[0].mValue, title2: "Risk Type:", value2: this.state.radiolist1.filter(item => item.mID == (this.ProductDetails.productInsurableItem[key].isSingle))[0].mValue, deleteAccordion: this.deleteAccordion, content: <CoverInterface  props={this} ProductDTO={this.ProductDetails} Iindex={key} />, InitialCover: [] }
+                                    ]
+                                }
+                            />
+
+                        );
+                    })
+                    }
+                </GridItem>
+
+            )
+        }
+       
+    };
+
+    onBlur = (type,callcomponent,Iindex,levelId=0,subLevelId=0) => {
+        this.setState({ premiumerror: false });
+        //debugger
+        let max = "";
+        let min = "";
+        let tempmin = 0;
+        let tempmax = 0;
+        console.log("Check Cover details", this.ProductDetails.productInsurableItem, Iindex, levelId, subLevelId, this.ProductDetails.productPremium);
+        if (type == "Product") {
+        for (var i = 0; i < this.ProductDetails.productInsurableItem.length; i++) {
+            for (var j = 0; j < this.ProductDetails.productInsurableItem[i]['productCovers'].length; j++) {
+
+                if (this.ProductDetails.productInsurableItem[i]['productCovers'][j].singleValueSelected == 0) {
+                    max = Math.max.apply(Math, this.ProductDetails.productInsurableItem[i]['productCovers'][j].productBenefits.map(function (o) { return o.benefitAmount; }));
+                    min = Math.min.apply(Math, this.ProductDetails.productInsurableItem[i]['productCovers'][j].productBenefits.map(function (o) { return o.benefitAmount; }));
+                } else {
+                    max = Math.max.apply(Math, this.ProductDetails.productInsurableItem[i]['productCovers'][j].productBenefits[0].benifitRangeDetails.map(function (o) { return o.benefitAmount; }));
+                    min = Math.min.apply(Math, this.ProductDetails.productInsurableItem[i]['productCovers'][j].productBenefits[0].benifitRangeDetails.map(function (o) { return o.benefitAmount; }));
+
+
+                }
+                // min
+                if (tempmin == 0) {
+                    tempmin = min;
+                }
+                else if (min < tempmin) {
+                    tempmin = min;
+                }
+                // max
+                if (tempmax == 0) {
+                    tempmax = max;
+                }
+                else if (max > tempmax) {
+                    tempmax = max;
+                }
+            }
+        }
+     
+         
+            if (tempmin < eval(this.ProductDetails.productPremium[0].premiumAmount)) {
+                this.ProductDetails.productPremium[Iindex].flag = true;
+                this.setState({ premiumerror: true });
+              
+
+            } else {
+           
+                this.ProductDetails.productPremium[Iindex].flag = false;
+                this.setState({ premiumerror: false });
+            }
+        }
+        if (type == "Insurable Item") {
+            for (var j = 0; j < this.ProductDetails.productInsurableItem[Iindex]['productCovers'].length; j++) {
+
+                if (this.ProductDetails.productInsurableItem[Iindex]['productCovers'][j].singleValueSelected == 0) {
+                    max = Math.max.apply(Math, this.ProductDetails.productInsurableItem[Iindex]['productCovers'][j].productBenefits.map(function (o) { return o.benefitAmount; }));
+                    min = Math.min.apply(Math, this.ProductDetails.productInsurableItem[Iindex]['productCovers'][j].productBenefits.map(function (o) { return o.benefitAmount; }));
+                } else {
+                    max = Math.max.apply(Math, this.ProductDetails.productInsurableItem[Iindex]['productCovers'][j].productBenefits[0].benifitRangeDetails.map(function (o) { return o.benefitAmount; }));
+                    min = Math.min.apply(Math, this.ProductDetails.productInsurableItem[Iindex]['productCovers'][j].productBenefits[0].benifitRangeDetails.map(function (o) { return o.benefitAmount; }));
+
+
+                }
+                // min
+                if (tempmin == 0) {
+                    tempmin = min;
+                }
+                else if (min < tempmin) {
+                    tempmin = min;
+                }
+                // max
+                if (tempmax == 0) {
+                    tempmax = max;
+                }
+                else if (max > tempmax) {
+                    tempmax = max;
+                }
+            }
+
+            if (tempmin < eval(this.ProductDetails.productPremium[Iindex].premiumAmount)) {
+                this.ProductDetails.productPremium[Iindex].flag = true;
+                this.setState({ premiumerror: true});
+            } else {
+                this.ProductDetails.productPremium[Iindex].flag = false;
+                this.setState({ premiumerror: false});
+            }
+        }
+        if (type == "Cover") {
+          
+           
+            for (var key = 0; key < this.ProductDetails.productInsurableItem.length; key++) {
+                console.log("index level", key);
+                if (this.ProductDetails.productInsurableItem[key]['productCovers'].length > 0) {
+                    for (var j = 0; j < this.ProductDetails.productInsurableItem[key]['productCovers'].length; j++) {
+                        let index = this.ProductDetails.productInsurableItem[key]['productCovers'].findIndex(s => s.coverTypeId == subLevelId);
+                        console.log("index sublevel", index);
+                        if (index != null && index != -1) {
+
+                            if (this.ProductDetails.productInsurableItem[key]['productCovers'][j].singleValueSelected == 0) {
+                                max = Math.max.apply(Math, this.ProductDetails.productInsurableItem[key]['productCovers'][index].productBenefits.map(function (o) { return o.benefitAmount; }));
+                                min = Math.min.apply(Math, this.ProductDetails.productInsurableItem[key]['productCovers'][index].productBenefits.map(function (o) { return o.benefitAmount; }));
+
+                            } else {
+                                max = Math.max.apply(Math, this.ProductDetails.productInsurableItem[key]['productCovers'][index].productBenefits[0].benifitRangeDetails.map(function (o) { return o.benefitAmount; }));
+                                min = Math.min.apply(Math, this.ProductDetails.productInsurableItem[key]['productCovers'][index].productBenefits[0].benifitRangeDetails.map(function (o) { return o.benefitAmount; }));
+
+
+                            }
+                        }
+
+                    }
+             
+            console.log("Max and min value check inside loop", tempmin, tempmax, min, max);
+            // min
+            if (tempmin == 0) {
+                tempmin = min;
+            }
+            else if (min < tempmin) {
+                tempmin = min;
+            }
+            // max
+            if (tempmax == 0) {
+                tempmax = max;
+            }
+            else if (max > tempmax) {
+                tempmax = max;
+            }
+
+
+         console.log("Max and min value check inside loop", tempmin, tempmax, min, max);
+            if (tempmin < eval(this.ProductDetails.productPremium[Iindex].premiumAmount)) {
+                this.ProductDetails.productPremium[Iindex].flag = true;
+                //this.setState({ premiumerror: true });
+            } else {
+                this.ProductDetails.productPremium[Iindex].flag = false;
+                //this.setState({ premiumerror: false });
+                    }
+                }
+
+
+            }
+
+        }
+        console.log("Max and min value check", tempmin, tempmax, min, max);
+      
+        
+       // Math.max.apply(Math, this.ProductDetails.productInsurableItem[Iindex]['productCovers'][Cindex].productBenefits.map(function (o) { return o.benefitAmount; }));
+
+
+    }
+
+    onChangePaymentradio = (e, listname) => {
+
+        const name = e.target.name;
+        this.state.SelectedName = e.target.name;
+        console.log("radio Name", e.target.name);
+
+        this.setState({ hideRatingCheckBox: false });
+        this.setState({ hidepremiumAmount: false });
+
+
+        let checkedRadio = this.state.MasterDTO[listname].filter(item => item.mValue === name);
+        if (checkedRadio.length > 0) {
+            checkedRadio[0].selectedValue = checkedRadio[0].mID;
+            checkedRadio[0].mIsRequired = true;
+
+            if (listname === "radiolist") {
+                if (checkedRadio[0].value === "1") {
+                    this.state.addbtnshow = true;
+
+
+                    console.log("addbtnshow1", this.state.addbtnshow);
+                } else {
+                    this.state.addbtnshow = false;
+
+                }
+            }
+
+            console.log("addbtnshow", this.state.addbtnshow);
+            let uncheckedRadio = this.state.MasterDTO[listname].filter(item => item.mValue !== name);
+            uncheckedRadio.map((item) => item.selectedValue = "0");
+            uncheckedRadio.map((item) => item.mIsRequired = false);
+
+            this.setState({ checkedRadio,uncheckedRadio});
+
+        }
+    }
+    SetIdentification = (event, i) => {
+    
+        const index = this.ProductDetails.insurableRcbdetails[i].insurableChildRcbdetails.findIndex(item => item.mID === event.target.value);
+        const uniqueindex = this.ProductDetails.insurableRcbdetails[i].insurableChildRcbdetails.findIndex(item => item.uniqueCode === true);
+
+
+        
+//        this.ProductDetails.insurableRcbdetails[i].insurableChildRcbdetails[uniqueindex].uniqueCode = false;
+            
+        if (index != -1) {
+            let responses = [...this.ProductDetails.insurableRcbdetails[i].insurableChildRcbdetails];
+            responses[index].mIsRequired = true;
+            if (uniqueindex != -1) {
+                responses[uniqueindex].uniqueCode = false;
+
+                responses[uniqueindex].disable = false;
+            }
+            responses[index].uniqueCode = true;
+            responses[index].disable = true;
+
+            this.setState({ responses });
+
+        }
+        console.log("Risk index check", uniqueindex,index, this.ProductDetails.insurableRcbdetails[i].insurableChildRcbdetails);
+        
+    }
 
     render() {
         const { classes } = this.props;
         return (
             <div className="productconfig">
+                
                 <GridContainer>
 
                     <GridItem xs={12} sm={12} md={12}>
@@ -3723,7 +4156,7 @@ class ProductConfig extends React.Component {
                             <ProductBasic SetMasterPolicyCheckBox={this.SetMasterPolicyCheckBox} ProductDTO={this.state.ProductDTO} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} onClick={this.onDateClick} message={this.state.message} servermessage={this.state.servermessage} onDateChange={this.onDateChange} MasterDTO={this.state.MasterDTO} GetMasterData={this.GetMasterData} masterList={this.state.masterList} SetValue={this.SetValue} classes={this.classes} activeToState={this.state.activeToState} activeFromState={this.state.activeFromState} productNameState={this.state.productNameState} productCodeState={this.state.productCodeState} productStatusIdState={this.state.productStatusIdState} message={this.state.message} validdate={this.state.validdate} datediff={this.state.datediff} viewdisable={this.state.viewdisable} />
                             : <PageContentLoader />}
                         {this.state.pageloader ?
-                            <ProductDetails SetRatingCheckBox={this.SetRatingCheckBox} hideRatingCheckBox={this.state.hideRatingCheckBox} RatingCheckBox={this.state.RatingCheckBox} hidepremiumAmount={this.state.hidepremiumAmount} checkBox={this.state.checkBox} RiskList={this.state.RiskList} SetCWEValue={this.SetCWEValue} SetCoverRiskClaimsDetailsValue={this.SetCoverRiskClaimsDetailsValue} SetInsurableRiskClaimsDetailsValue={this.SetInsurableRiskClaimsDetailsValue} insurableRcbdetails={this.ProductDetails.insurableRcbdetails} InitialInsurable={this.state.InitialInsurable} ClaimList={this.state.ClaimList} GetClausesMasterData={this.GetClausesMasterData} TypeList={this.state.TypeList} tableInsurabledata={this.state.tableInsurabledata} SetValueCWE={this.SetValueCWE} handleCloseCWE={this.handleCloseCWE} handleShowCWE={this.handleShowCWE} handleEditCWE={this.handleEditCWE} handleOpenCWE={this.handleOpenCWE} handledescriptionCWE={this.handledescriptionCWE} SetCoverEventValue={this.SetCoverEventValue} Covertitle={this.state.Covertitle} CheckCoverEventFun={this.CheckCoverEventFun} handleTreeChange={this.handleTreeChange} addInsurableFun={this.addInsurableCWEFun} GetClausesData={this.GetClausesData} Insurabletitle={this.state.Insurabletitle} radiolist1={this.state.radiolist1} radiolist={this.state.radiolist} onChangeradio={this.onChangeradio} MasterDTOlist={this.state.MasterDTOlist} addinurablelist={this.addinurablelist} SetCoverProductDetailsValue={this.SetCoverProductDetailsValue} GetInusrableMasterData={this.GetInusrableMasterData} insurablecollapeslist={this.state.insurablecollapeslist} addbtnfun={this.addbtnfun} addbtnshow={this.state.addbtnshow} benefitinputdisable={this.state.benefitinputdisable} maxbenefitinputdisable={this.state.maxbenefitinputdisable} channelstableData={this.state.channelstableData} ValidationUI={this.state.ValidationUI} benifittabledata={this.state.benifittabledata} Columns={this.state.Columns} addRow={this.addRow} changeRow={this.changeRow} removeRow={this.removeRow} errormessage={this.state.errormessage} ProductDTO={this.ProductDetails} setBenifitValue={this.setBenifitValue} ctable={this.state.ctable} onInputChange={this.onInputChange} onInsurableChange={this.onInsurableChange} addRecord={this.addRecord} SetclauseValue={this.SetclauseValue} handledescription={this.handledescription} description={this.state.description} opendescription={this.state.opendescription} open={this.state.open} clauseName={this.state.clauseName} CustomClause={this.state.CustomClause} handleShow={this.handleShow} mshow={this.state.mshow} handledata={this.handledata} handleOpen={this.handleOpen} handleClose={this.handleClose} viewdisable={this.state.viewdisable} handleEdit={this.handleEdit} resultclauses={this.state.resultclauses} AddClauses={this.AddClauses} clauses={this.state.clauses} onDateChange={this.onDateChange} MasterDTO={this.state.MasterDTO} GetMasterData={this.GetMasterData} masterList={this.state.masterList} SetValue={this.SetProductDetailsValue} classes={this.classes} handleRadioChange={this.handleRadioChange} AddDetails={this.addDetails} SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} masClausesWarrentiesExclusionsDTO={this.state.masClausesWarrentiesExclusionsDTO} show={this.state.show} onDateChange={this.onDateChange} handleddlChange={this.handleddlChange} benefitCriteriaValueState={this.state.benefitCriteriaValueState} premiumAmountState={this.state.premiumAmountState} tabledata={this.state.tabledata} tablelength={this.state.tabledata.length} setbool={this.setbool} boolValue={this.state.boolValue} disabled={this.state.disabled} mappingPop={this.state.mappingPop} mappingPopUp={this.mappingPopUp} handleClose={this.handleClose} />
+                            <ProductDetails CDRadio={this.state.CDRadio} SetIdentification={this.SetIdentification} PaymentList={this.state.PaymentList} ClaimSIlabel={this.state.ClaimSIlabel} onChangePaymentradio={this.onChangePaymentradio} premiumerror={this.state.premiumerror} onBlur={this.onBlur} AccordianFunction={this.AccordianFunction}SetRatingCheckBox={this.SetRatingCheckBox} hideRatingCheckBox={this.state.hideRatingCheckBox} RatingCheckBox={this.state.RatingCheckBox} hidepremiumAmount={this.state.hidepremiumAmount} checkBox={this.state.checkBox} RiskList={this.state.RiskList} SetCWEValue={this.SetCWEValue} SetCoverRiskClaimsDetailsValue={this.SetCoverRiskClaimsDetailsValue} SetInsurableRiskClaimsDetailsValue={this.SetInsurableRiskClaimsDetailsValue} insurableRcbdetails={this.ProductDetails.insurableRcbdetails} InitialInsurable={this.state.InitialInsurable} ClaimList={this.state.ClaimList} GetClausesMasterData={this.GetClausesMasterData} TypeList={this.state.TypeList} tableInsurabledata={this.state.tableInsurabledata} SetValueCWE={this.SetValueCWE} handleCloseCWE={this.handleCloseCWE} handleShowCWE={this.handleShowCWE} handleEditCWE={this.handleEditCWE} handleOpenCWE={this.handleOpenCWE} handledescriptionCWE={this.handledescriptionCWE} SetCoverEventValue={this.SetCoverEventValue} Covertitle={this.state.Covertitle} CheckCoverEventFun={this.CheckCoverEventFun} handleTreeChange={this.handleTreeChange} addInsurableFun={this.addInsurableCWEFun} GetClausesData={this.GetClausesData} Insurabletitle={this.state.Insurabletitle} radiolist1={this.state.radiolist1} radiolist={this.state.radiolist} onChangeradio={this.onChangeradio} MasterDTOlist={this.state.MasterDTOlist} addinurablelist={this.addinurablelist} SetCoverProductDetailsValue={this.SetCoverProductDetailsValue} GetInusrableMasterData={this.GetInusrableMasterData} insurablecollapeslist={this.state.insurablecollapeslist} addbtnfun={this.addbtnfun} addbtnshow={this.state.addbtnshow} benefitinputdisable={this.state.benefitinputdisable} maxbenefitinputdisable={this.state.maxbenefitinputdisable} channelstableData={this.state.channelstableData} ValidationUI={this.state.ValidationUI} benifittabledata={this.state.benifittabledata} Columns={this.state.Columns} addRow={this.addRow} changeRow={this.changeRow} removeRow={this.removeRow} errormessage={this.state.errormessage} ProductDTO={this.ProductDetails} setBenifitValue={this.setBenifitValue} ctable={this.state.ctable} onInputChange={this.onInputChange} onInsurableChange={this.onInsurableChange} addRecord={this.addRecord} SetclauseValue={this.SetclauseValue} handledescription={this.handledescription} description={this.state.description} opendescription={this.state.opendescription} open={this.state.open} clauseName={this.state.clauseName} CustomClause={this.state.CustomClause} handleShow={this.handleShow} mshow={this.state.mshow} handledata={this.handledata} handleOpen={this.handleOpen} handleClose={this.handleClose} viewdisable={this.state.viewdisable} handleEdit={this.handleEdit} resultclauses={this.state.resultclauses} AddClauses={this.AddClauses} clauses={this.state.clauses} onDateChange={this.onDateChange} MasterDTO={this.state.MasterDTO} GetMasterData={this.GetMasterData} masterList={this.state.masterList} SetValue={this.SetProductDetailsValue} classes={this.classes} handleRadioChange={this.handleRadioChange} AddDetails={this.addDetails} SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} masClausesWarrentiesExclusionsDTO={this.state.masClausesWarrentiesExclusionsDTO} show={this.state.show} onDateChange={this.onDateChange} handleddlChange={this.handleddlChange} benefitCriteriaValueState={this.state.benefitCriteriaValueState} premiumAmountState={this.state.premiumAmountState} tabledata={this.state.tabledata} tablelength={this.state.tabledata.length} setbool={this.setbool} boolValue={this.state.boolValue} disabled={this.state.disabled} mappingPop={this.state.mappingPop} mappingPopUp={this.mappingPopUp} />
                             : <PageContentLoader />}
                         {this.state.pageloader ?
                             <ProductSave onSave={this.handleSubmit} onCancel={this.reset} btnhide={this.state.btnhide} />
@@ -3736,7 +4169,7 @@ class ProductConfig extends React.Component {
                     aria-labelledby="simple-modal-title"
                     aria-describedby="simple-modal-description"
                     open={this.state.mappingPop}
-                    onClose={this.state.handleClose}
+                    onClose={this.handleClose}
 
                 >
                     <div className={classes.paper} id="modal">
@@ -3745,7 +4178,7 @@ class ProductConfig extends React.Component {
                             round
                             className={classes.marginRight}
                             style={searchClose}
-                            onClick={this.state.handleClose}>
+                            onClick={this.handleClose}>
                             &times;
                                                         </Button>
                         <h4><small className="center-text"> Mapping </small></h4>

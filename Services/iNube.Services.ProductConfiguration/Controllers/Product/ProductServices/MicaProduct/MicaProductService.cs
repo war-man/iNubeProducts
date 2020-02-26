@@ -19,7 +19,7 @@ using iNube.Services.ProductConfiguration.Controllers.Product.IntegrationService
 using System.Data.SqlClient;
 using System.Net;
 using System.Dynamic;
-
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductServices.MicaProduct
 {
@@ -31,7 +31,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         private readonly IServiceProvider _serviceProvider;
         private ILoggerManager _logger;
         private readonly IEmailService _emailService;
-        public MicaProductService(MICAPCContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IIntegrationService integrationService)
+        private readonly IConfiguration _configuration;
+        public MicaProductService(MICAPCContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IIntegrationService integrationService, IConfiguration configuration)
         {
 
             _mapper = mapper;
@@ -39,11 +40,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _logger = logger;
             _emailService = emailService;
             _integrationService = integrationService;
+            _configuration = configuration;
         }
 
         public async Task<ProductResponse> Create(ProductDTO productDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 productDTO = await UpdateProductModel(productDTO, apiContext);
@@ -67,7 +69,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         public async Task<TblProducts> ReUpdateProductModel(TblProducts objProductmodel, ApiContext apiContext)
         {
 
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             foreach (var item in objProductmodel.TblProductClausesWarrentiesExclusions)
             {
 
@@ -119,11 +121,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 }
             }
             _context.TblProductPremium.UpdateRange(objProductmodel.TblProductPremium);
-          //  _context.SaveChanges();
+            //  _context.SaveChanges();
 
-            foreach (var item in objProductmodel.TblProductRatingMapping) {
+            foreach (var item in objProductmodel.TblProductRatingMapping)
+            {
                 item.ProductId = objProductmodel.ProductId;
-               
+
             }
             _context.TblProductRatingMapping.UpdateRange(objProductmodel.TblProductRatingMapping);
             _context.SaveChanges();
@@ -135,7 +138,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //For invoice generation-- displaying line item details in email pdf
         public async Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, pDTO.EvtId.ToString()));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, pDTO.EvtId.ToString(), _configuration));
             BillingEventResponseDTO BillingData = new BillingEventResponseDTO();
             if (pDTO.FromDate != null && pDTO.ToDate != null)
             {
@@ -158,7 +161,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //For invoice generation-- getting product count
         public async Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, pDTO.EvtId.ToString()));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, pDTO.EvtId.ToString(), _configuration));
             //var BilingData = (from P in _context.TblProducts.OrderBy(p => p.CreatedDate)
             //                  select new ProductBilingDataDTO
             //                  {
@@ -181,7 +184,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         public async Task<MasterDataResponse> AddMasterData(MasterDataDTO masterDataDTO, ApiContext apiContext)
         {
             //throw new NotImplementedException();
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var masdata = _mapper.Map<TblmasProductMaster>(masterDataDTO);
             _context.TblmasProductMaster.Add(masdata);
             _context.SaveChanges();
@@ -205,7 +208,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //update for products
         public async Task<ProductDTO> ModifyProducts(ProductDTO objProduct, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tbl_product = _mapper.Map<TblProducts>(objProduct);
             var tbl_Products = _context.TblProducts.Find(tbl_product.ProductId);
 
@@ -239,7 +242,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //get for master
         public async Task<IEnumerable<ddDTOs>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTOs> ddDTOs;
 
             if (lMasterlist == "Product")
@@ -311,7 +314,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //get for products
         public async Task<IEnumerable<ProductDTO>> GetProducts(string lProductlist, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var products_list = _context.TblProducts.Select(x => x);
             var productDTOs = _mapper.Map<IList<ProductDTO>>(products_list);
             return productDTOs;
@@ -394,9 +397,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             {
                 // add list to db ..
                 // here just read and return
-                //string connetionString = await _integrationService.GetEnvironmentConnectionforDoc(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
-                string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
-                using (var bulkCopy = new SqlBulkCopy(connetionString, SqlBulkCopyOptions.KeepIdentity))
+                var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+                //string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
+                using (var bulkCopy = new SqlBulkCopy(connectionString, SqlBulkCopyOptions.KeepIdentity))
                 {
                     // my DataTable column names match my SQL Column names, so I simply made this loop. However if your column names don't match, just pass in which datatable name matches the SQL column name in Column Mappings
                     foreach (DataColumn col in dt.Columns)
@@ -507,9 +510,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             {
                 // add list to db ..
                 // here just read and return
-                //string connetionString = await _integrationService.GetEnvironmentConnectionforDoc(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
-                string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
-                using (var bulkCopy = new SqlBulkCopy(connetionString, SqlBulkCopyOptions.KeepIdentity))
+                var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+                //string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
+                using (var bulkCopy = new SqlBulkCopy(connectionString, SqlBulkCopyOptions.KeepIdentity))
                 {
                     // my DataTable column names match my SQL Column names, so I simply made this loop. However if your column names don't match, just pass in which datatable name matches the SQL column name in Column Mappings
                     foreach (DataColumn col in dt.Columns)
@@ -539,11 +542,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             if (productSearchDTO.EnvId > 0)
             {
-                _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, productSearchDTO.EnvId.ToString()));
+                _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, productSearchDTO.EnvId.ToString(), _configuration));
             }
             else
             {
-                _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+                _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             }
 
 
@@ -619,7 +622,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<ProductDTO>> SearchAssignProduct(ProductSearchDTO productSearchDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             string[] lobCob = new string[] { "LOB", "COB" };
             var masterList = _context.TblmasProductMaster.Where(p => lobCob.Contains(p.MasterType))
                               .ToDictionary(m => m.ProductMasterId, n => n.Value);
@@ -662,7 +665,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //Get product by Id
         public async Task<ProductDTO> GetProductById(int ProductId, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblProduct = _context.TblProducts.Where(item => item.ProductId == ProductId)
                    .Include(add => add.TblProductInsurableItems)
@@ -678,7 +681,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                         .Include(add => add.TblInsurableRcbdetails)
                         .Include("TblInsurableRcbdetails.TblInsurableChildRcbdetails")
                        .Include("TblInsurableRcbdetails.TblCoverRcbdetails")
-
+                       .Include(add=>add.TblProductBasicConfiguration)
                     .Include("TblInsurableRcbdetails.TblCoverRcbdetails.TblCoverChildRcbdetails")
 
                         .FirstOrDefault();
@@ -697,7 +700,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //Get product by Id
         public async Task<ProductDTO> GetProductByCode(string ProductCode, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tblProduct = _context.TblProducts.Where(item => item.ProductCode == ProductCode)
                    .Include(add => add.TblProductInsurableItems)
                    .Include("TblProductInsurableItems.TblProductCovers")
@@ -712,6 +715,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                         .Include(add => add.TblProductRatingMapping)
                         .Include("TblInsurableRcbdetails.TblInsurableChildRcbdetails")
                         .Include("TblInsurableRcbdetails.TblCoverRcbdetails")
+                           .Include(add => add.TblProductBasicConfiguration)
                         .Include("TblInsurableRcbdetails.TblCoverRcbdetails.TblCoverChildRcbdetails")
                          .FirstOrDefault();
 
@@ -720,7 +724,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 return GetProductMasterUpdate(tblProduct);
             }
             return null;
-            }
+        }
 
         private ProductDTO GetProductMasterUpdate(TblProducts tblProduct)
         {
@@ -872,7 +876,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             //Calculate Premium
 
-            if (tblProduct.TblProductRatingMapping.Count()>0)
+            if (tblProduct.TblProductRatingMapping.Count() > 0)
             {
                 productDTO.RateingId = tblProduct.TblProductRatingMapping.FirstOrDefault(s => s.ProductId == productDTO.ProductId).MappingId;
 
@@ -886,38 +890,58 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         //SearchChannelDetails
         public async Task<TblProductChannels> ChannelDetails(decimal ChannelId, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             return _context.TblProductChannels.Find(ChannelId);
         }
 
         //SearchClaimDetails
         public async Task<TblProductClausesWarrentiesExclusions> ClaimsDetails(decimal Cweid, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             return _context.TblProductClausesWarrentiesExclusions.Find(Cweid);
         }
 
         //SearchRiskDetails
-        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, ApiContext apiContext)
+        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, string FieldType, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            var rcbDetails = (from rc in _context.TblProductRcbdetails
-                              join p in _context.TblmasProductMaster on rc.InputId equals p.ProductMasterId
-                              where rc.ProductId == ProductId && rc.InputType == type && (bool)rc.IsReqired
-                              orderby p.SortOrder //&& rc.IsReqired
-                              select new ProductRcbdetailsDTO
-                              {
-                                  InputType = p.Value,
-                                  InputId = p.ProductMasterId,
-                                  RcbdetailsId = rc.RcbdetailsId,
-                                  UserInputType = p.UserInputType
-                              }).ToList();
-            return rcbDetails;
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            if (FieldType != "")
+            {
+                var rcbDetails = (from rc in _context.TblProductRcbdetails
+                                  join p in _context.TblmasProductMaster on rc.InputId equals p.ProductMasterId
+                                  where rc.ProductId == ProductId && rc.InputType == type && (bool)rc.IsReqired && p.TypeCode == FieldType
+                                  orderby p.SortOrder //&& rc.IsReqired
+                                  select new ProductRcbdetailsDTO
+                                  {
+                                      InputType = p.Value,
+                                      InputId = p.ProductMasterId,
+                                      RcbdetailsId = rc.RcbdetailsId,
+                                      UserInputType = p.UserInputType
+                                  }).ToList();
+                return rcbDetails;
+            }
+            else
+            {
+
+                var rcbDetails = (from rc in _context.TblProductRcbdetails
+                                  join p in _context.TblmasProductMaster on rc.InputId equals p.ProductMasterId
+                                  where rc.ProductId == ProductId && rc.InputType == type && (bool)rc.IsReqired
+                                  orderby p.SortOrder //&& rc.IsReqired
+                                  select new ProductRcbdetailsDTO
+                                  {
+                                      InputType = p.Value,
+                                      InputId = p.ProductMasterId,
+                                      RcbdetailsId = rc.RcbdetailsId,
+                                      UserInputType = p.UserInputType
+                                  }).ToList();
+                return rcbDetails;
+            }
+
         }
 
         public async Task<List<ProductClausesWarrentiesExclusionsDTO>> CWEDetails(int LOBId, int CWETypeID, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var cweType = _context.TblmasPccommonTypes.FirstOrDefault(t => t.CommonTypeId == CWETypeID).Value;
             var Type = cweType.Substring(0, 1);
             var tblCCWEList = _context.TblmasClausesWarrentiesExclusions.Where(t => t.Lobid == LOBId && t.CwetypeId == CWETypeID).ToList();
@@ -933,7 +957,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<ddDTOs>> GetProductMaster(string masterType, int parentID, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             List<int> lstParentId = new List<int> { 0, parentID };
             var productMasters_list = _context.TblmasProductMaster.Where(x => x.MasterType == masterType && x.IsActive && lstParentId.Contains((int)x.ParentId))
                 .OrderByDescending(p => p.IsDisable).ThenBy(p => p.SortOrder);
@@ -957,7 +981,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //string temp = "LOB,COB";
             List<string> mList = masterType.Split(",").ToList();
 
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             List<int> lstParentId = new List<int> { 0, parentID };
             var productMasters_list = _context.TblmasProductMaster.Where(x => mList.Contains(x.MasterType) && x.IsActive)
                 .OrderByDescending(p => p.IsDisable).ThenBy(p => p.SortOrder);
@@ -978,7 +1002,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<EntityDTOs>> GetEntityMaster(ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //List<int> lstParentId = new List<int> { 0, parentID };
             var productMasters_list = _context.TblProductEntity.ToList();
             IEnumerable<EntityDTOs> entityDTOs;
@@ -1001,7 +1025,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<MasterEntityDTO> AddEntityData(MasterEntityDTO entityDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var records = _context.TblProductEntity.Where(p => p.MasterId != 0).Max(x => x.Level);
             var _entity = _mapper.Map<TblProductEntity>(entityDTO);
 
@@ -1022,7 +1046,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<ProductDTO> UpdateProductModel(ProductDTO objProduct, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             ProductRcbdetailsDTO rcbDetail = null;
             InsurableChildRcbdetailsDTO InsChildrcbDetail = null;
             CoverChildRcbdetailsDTO CoverChildrcbDetail = null;
@@ -1084,6 +1108,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     InsChildrcbDetail.InputId = i.mID;
                     InsChildrcbDetail.LevelId = i.LevelId;
                     InsChildrcbDetail.SubLevelId = i.SubLevelId;
+                    InsChildrcbDetail.UniqueCode = i.UniqueCode;
                     item.InsurableChildRcbdetail.Add(InsChildrcbDetail);
                 }
                 foreach (var m in item.CoverRcbdetails)
@@ -1113,18 +1138,32 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             objProduct.PremiumAmount = objProduct.ProductPremium.Sum(s => s.PremiumAmount);
             // objProduct.InsurableRcbdetails = temp;
+            if (objProduct.ProductBasicConfigurationDetails != null)
+            {
+                ProductBasicConfigurationDTO ProductBasicConfiguration = new ProductBasicConfigurationDTO();
+                foreach (var item in objProduct.ProductBasicConfigurationDetails)
+                {
+                    ProductBasicConfiguration = new ProductBasicConfigurationDTO();
+                    ProductBasicConfiguration.InputType = item.mType;
+                    ProductBasicConfiguration.IsReqired = item.mIsRequired;
+                    ProductBasicConfiguration.InputId = item.mID;
+                    objProduct.ProductBasicConfiguration.Add(ProductBasicConfiguration);
+                }
+            }
+
+
             return objProduct;
         }
 
         public async Task<TblProductRcbdetails> RiskDetails(decimal RcbdetailsId, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             return _context.TblProductRcbdetails.Find(RcbdetailsId);
         }
 
         public async Task<ProductResponse> ProductCodevalidation(string code, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var data = _context.TblProducts.Any(e => e.ProductCode == code);
             if (data == true)
             {
@@ -1138,7 +1177,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<ProductResponse> ProductNamevalidation(string name, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var data = _context.TblProducts.Any(e => e.ProductName == name);
             if (data == true)
             {
@@ -1153,7 +1192,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<ProductResponse> GetProductGWP(ProductDTO productDTO, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var TotalGWP = from P in _context.TblProducts.Where(e => e.ProductId == productDTO.ProductId)
                            group P by P.ProductId into g
                            select new { productCount = g.Count(), productSum = g.Sum(o => o.PremiumAmount), issuedate = g.Select(s => s.CreatedDate).ToList() };
@@ -1162,7 +1201,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<ProductDTO>> GetProductByLob(int id, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var data = _context.TblProducts.Where(e => e.Lobid == id).ToList();
             //ProductDTO product = new ProductDTO();
             var _result = _mapper.Map<List<ProductDTO>>(data);
@@ -1176,7 +1215,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<ddDTOs>> GetRiskClaimMaster(string masterType, int typeId, int parentID, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             List<int> lstParentId = new List<int> { parentID };
             var productMasters_list = _context.TblmasProductMaster.Where(x => x.MasterType == masterType && x.IsActive && lstParentId.Contains((int)x.ParentId))
                 .OrderByDescending(p => p.IsDisable).ThenBy(p => p.SortOrder);
@@ -1197,9 +1236,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return ddDTOs;
         }
 
+
+
         public async Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal ProductId, string type, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             ProductRiskDetailsDTO DTO = new ProductRiskDetailsDTO();
 
@@ -1334,7 +1375,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         }
         public async Task<List<LeadInfoDTO>> BulkSMS(ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
 
             var LeadInfo = _context.TblLeadInfo.Where(x => x.Smsstatus == true && x.Emailstatus == true).ToList();
@@ -1388,7 +1429,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<LeadInfoDTO> GetLeadInfo(int LeadID, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var LeadData = _context.TblLeadInfo.FirstOrDefault(x => x.Id == LeadID);
 
@@ -1401,7 +1442,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         public async Task<List<CoverListValue>> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext)
         {
 
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //    var tblProduct = _context.TblProducts.FirstOrDefault(item => item.ProductCode == productCode);
 
@@ -1564,9 +1605,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             {
                 // add list to db ..
                 // here just read and return
-                //string connetionString = await _integrationService.GetEnvironmentConnectionforDoc(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
-                string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
-                using (var bulkCopy = new SqlBulkCopy(connetionString, SqlBulkCopyOptions.KeepIdentity))
+                var connectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+                //string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
+                using (var bulkCopy = new SqlBulkCopy(connectionString, SqlBulkCopyOptions.KeepIdentity))
                 {
                     // my DataTable column names match my SQL Column names, so I simply made this loop. However if your column names don't match, just pass in which datatable name matches the SQL column name in Column Mappings
                     foreach (DataColumn col in dt.Columns)
@@ -1592,7 +1633,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<ProductResponse> PromoApply(PromoDTO promo, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var data = _context.TblPromo.Any(e => e.PromoCode1 == promo.PromoCode1 && e.PromoCode2 == promo.PromoCode2);
             if (data == true)
             {
@@ -1603,7 +1644,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 return new ProductResponse() { Status = BusinessStatus.NotFound, ResponseMessage = $"PromoCode is not valid" };
             }
         }
-        public async Task<dynamic> GetProductRateConfig(int productid,ApiContext apiContext) {
+        public async Task<dynamic> GetProductRateConfig(int productid, ApiContext apiContext)
+        {
             //_context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             //var mapData=_context.TblProductRatingMapping.Where(s => s.ProductId == productid).ToList();
 
@@ -1641,17 +1683,17 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            IEnumerable<MasDTO> val = await _integrationService.GetHandleEventsMaster(lMasterlist,apiContext); 
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            IEnumerable<MasDTO> val = await _integrationService.GetHandleEventsMaster(lMasterlist, apiContext);
 
             return val;
         }
         public async Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<MasDTO> riskpm;
 
-            riskpm = _context.TblmasProductMaster.Where(s=>s.MasterType=="Risk")
+            riskpm = _context.TblmasProductMaster.Where(s => s.MasterType == "Risk")
                         .Select(p => new MasDTO
                         {
                             mID = p.ProductMasterId,
@@ -1659,14 +1701,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                             mType = lMasterlist
                         }).ToList();
 
-            IEnumerable<MasDTO> risk = riskpm.GroupBy(x => x.mValue).Select(o => o.FirstOrDefault()); 
+            IEnumerable<MasDTO> risk = riskpm.GroupBy(x => x.mValue).Select(o => o.FirstOrDefault());
             return risk;
 
         }
 
         public async Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext)
         {
-            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
 

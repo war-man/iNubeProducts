@@ -1,4 +1,5 @@
-﻿using System;
+﻿using iNube.Utility.Framework.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,11 +13,16 @@ namespace iNube.Services.Policy.Models
         public string mType { get; set; }
     }
 
+    public class ReportConfigResonse : ResponseStatus
+    {
+        ReportConfigDTO reportConfig { get; set; }
+    }
+
     public partial class ReportConfigDTO
     {
         public ReportConfigDTO()
         {
-            ReportConfigParamDetailsDTO = new HashSet<ReportConfigParamDetailsDTO>();
+            TblReportConfigParam = new HashSet<ReportConfigParamDTO>();
         }
 
         public int ReportConfigId { get; set; }
@@ -26,33 +32,19 @@ namespace iNube.Services.Policy.Models
         public DateTime? CreatedDate { get; set; }
         public bool? IsActive { get; set; }
 
-        public virtual ICollection<ReportConfigParamDetailsDTO> ReportConfigParamDetailsDTO { get; set; }
+        public virtual ICollection<ReportConfigParamDTO> TblReportConfigParam { get; set; }
     }
 
     public partial class ReportConfigParamDTO
     {
-        public ReportConfigParamDTO()
-        {
-            ReportConfigParamDetailsDTO = new HashSet<ReportConfigParamDetailsDTO>();
-        }
-
         public int ReportConfigParamId { get; set; }
         public string ParameterName { get; set; }
         public string RangeType { get; set; }
         public string DataType { get; set; }
         public DateTime? CreatedDate { get; set; }
-
-        public virtual ICollection<ReportConfigParamDetailsDTO> ReportConfigParamDetailsDTO { get; set; }
-    }
-
-    public partial class ReportConfigParamDetailsDTO
-    {
-        public int ParamDetailsId { get; set; }
-        public int? ReportConfigId { get; set; }
-        public int? ReportConfigParamId { get; set; }
+        public int ReportConfigId { get; set; }
 
         public virtual ReportConfigDTO ReportConfig { get; set; }
-        public virtual ReportConfigParamDTO ReportConfigParam { get; set; }
     }
 
     public partial class RpmastersDTO

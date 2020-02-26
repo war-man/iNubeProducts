@@ -22,6 +22,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual DbSet<TblInsurableRcbdetails> TblInsurableRcbdetails { get; set; }
         public virtual DbSet<TblLeadInfo> TblLeadInfo { get; set; }
         public virtual DbSet<TblMasProductPolicyInput> TblMasProductPolicyInput { get; set; }
+        public virtual DbSet<TblProductBasicConfiguration> TblProductBasicConfiguration { get; set; }
         public virtual DbSet<TblProductBenefits> TblProductBenefits { get; set; }
         public virtual DbSet<TblProductChannels> TblProductChannels { get; set; }
         public virtual DbSet<TblProductClausesWarrentiesExclusions> TblProductClausesWarrentiesExclusions { get; set; }
@@ -227,6 +228,35 @@ namespace iNube.Services.ProductConfiguration.Entities
                 entity.Property(e => e.ProductPolicyInputId).ValueGeneratedNever();
 
                 entity.Property(e => e.PolicyInputValue).HasMaxLength(200);
+            });
+
+            modelBuilder.Entity<TblProductBasicConfiguration>(entity =>
+            {
+                entity.HasKey(e => e.ProductBasicConfigurationId);
+
+                entity.ToTable("tblProductBasicConfiguration", "PC");
+
+                entity.Property(e => e.ProductBasicConfigurationId)
+                    .HasColumnName("ProductBasicConfigurationID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.InputId).HasColumnName("InputID");
+
+                entity.Property(e => e.InputType).HasMaxLength(50);
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.HasOne(d => d.Input)
+                    .WithMany(p => p.TblProductBasicConfiguration)
+                    .HasForeignKey(d => d.InputId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tblProductBasicConfiguration_tblmasProductMaster");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.TblProductBasicConfiguration)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_tblProductBasicConfiguration_tblProducts");
             });
 
             modelBuilder.Entity<TblProductBenefits>(entity =>

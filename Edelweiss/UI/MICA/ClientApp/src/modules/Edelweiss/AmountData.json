@@ -1,0 +1,37 @@
+[
+  {
+     "insurableItem": "Person",
+    "name": "Ashish",
+    "identificationNo": "12345",
+    "typeOfLoss": "Travel Delay",
+    "benefitAmount": "10000"
+
+  },
+  {
+     "insurableItem": "Person",
+    "name": "Ashish",
+    "identificationNo": "12345",
+    "typeOfLoss": "Taxi Ride",
+    "benefitAmount": "15000"
+
+  },
+  {
+     "insurableItem": "Baggage",
+    "name": "Ajay",
+    "identificationNo": "23456",
+    "typeOfLoss": "Baggage Delay",
+    "benefitAmount": "5000"
+  },
+  {
+   
+    "insurableItem": "Baggage",
+    "name": "Ajay",
+    "identificationNo": "23456",
+    "typeOfLoss": "Baggage Loss",
+    "benefitAmount": "10000"
+   
+
+  }
+
+
+]

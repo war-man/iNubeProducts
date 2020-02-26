@@ -483,6 +483,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public string productCode { get; set; }
         public int? Lobid { get; set; }
         public int? Cobid { get; set; }
+        public bool? UniqueCode { get; set; }
     }
 
     public partial class EntityDTOs
@@ -539,6 +540,7 @@ namespace iNube.Services.ProductConfiguration.Models
         {
             InsurableRcbdetails = new List<InsurableRcbdetailsDTO>();
             ProductSwitchOnDetails = new List<ProductSwitchOnDetailsDTO>();
+            ProductBasicConfiguration = new List<ProductBasicConfigurationDTO>();
         }
         public int ProductId { get; set; }
         public decimal RateingId { get; set;}
@@ -564,6 +566,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public string mValue { get; set; }
         public bool? IsSingleCover { get; set; }
         public bool? IsMasterPolicy { get; set; }
+        public int? ProductTypeId { get; set; }
 
         public virtual List<InsurableRcbdetailsDTO> InsurableRcbdetails { get; set; }
         //public virtual ICollection<ProductBenefitsDTO> ProductBenefits { get; set; }
@@ -576,12 +579,22 @@ namespace iNube.Services.ProductConfiguration.Models
         public virtual ICollection<ProductPremiumDTO> ProductPremium { get; set; }
         public virtual ICollection<ddDTOs> RiskDetails { get; set; }
         public virtual ICollection<ddDTOs> ClaimDetails { get; set; }
+        public virtual ICollection<ddDTOs> ProductBasicConfigurationDetails { get; set; }
         public virtual ICollection<ddDTOs> ProductSwitchOnProperty { get; set; }
         public virtual ICollection<ProductSwitchOnDetailsDTO> ProductSwitchOnDetails { get; set; }
         public virtual ICollection<ProductRatingMapping> CalculateConfig { get; set; }
+        public virtual ICollection<ProductBasicConfigurationDTO> ProductBasicConfiguration { get; set; }
     }
 
-    public partial class ProductRatingMapping
+    public partial class ProductBasicConfigurationDTO
+    {
+        public decimal ProductBasicConfigurationId { get; set; }
+        public int? ProductId { get; set; }
+        public string InputType { get; set; }
+        public bool? IsReqired { get; set; }
+        public int InputId { get; set; }
+    }
+        public partial class ProductRatingMapping
     {
         public int MappingId { get; set; }
         public string RateParameterName { get; set; }
@@ -793,7 +806,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public int? mID { get; set; }
         public int? LevelId { get; set; }
         public int? SubLevelId { get; set; }
-
+        public bool? UniqueCode { get; set; }
         // public virtual InsurableRcbdetailsDTO InsurableRcbdetails { get; set; }
     }
     public partial class CoverChildRcbdetailsDTO

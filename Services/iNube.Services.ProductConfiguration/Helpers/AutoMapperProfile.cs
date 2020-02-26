@@ -25,12 +25,14 @@ namespace iNube.Services.ProductConfiguration.Helpers
                 .ForMember(dest => dest.TblProductRcbdetails, opt => opt.MapFrom(src => src.ProductRcbdetails))
                 .ForMember(dest => dest.TblProductSwitchOnDetails, opt => opt.MapFrom(src => src.ProductSwitchOnDetails))
                 .ForMember(dest => dest.TblProductRatingMapping, opt => opt.MapFrom(src => src.CalculateConfig))
+                .ForMember(dest => dest.TblProductBasicConfiguration, opt => opt.MapFrom(src => src.ProductBasicConfiguration))
              
             .ForMember(dest => dest.TblProductPremium, opt => opt.MapFrom(src => src.ProductPremium)).ReverseMap();
 
 
             CreateMap<ProductSwitchOnDetailsDTO, TblProductSwitchOnDetails>().ReverseMap();
             CreateMap<ProductRatingMapping, TblProductRatingMapping>().ReverseMap();
+            CreateMap<ProductBasicConfigurationDTO,TblProductBasicConfiguration>().ReverseMap();
 
             //CreateMap<ProductDTO, TblProducts>();
             //CreateMap<TblProducts, ProductDTO>();

@@ -13,5 +13,15 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MotorR
         {
             throw new NotImplementedException();
         }
+
+        public Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReportConfigResonse> SaveConfigParameters(ReportConfigDTO reportConfigDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

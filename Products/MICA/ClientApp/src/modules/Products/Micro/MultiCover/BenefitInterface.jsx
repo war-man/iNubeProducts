@@ -54,6 +54,7 @@ class BenefitInterface extends React.Component {
                 this.GetMasterService('BenefitCriteria', 0, this.props.Iindex, this.props.Bindex);
             }
         }
+       
         if (this.props.ProductDTO['productCover'].singleValue === false) {
                 this.benifitTable(this.props.Iindex, this.props.Bindex);
         }
@@ -75,6 +76,29 @@ class BenefitInterface extends React.Component {
 
 
         }
+        if (this.props.props.props.props.state.viewdisable == true) {
+            if (this.props.ProductDTO.ProductDTO.productInsurableItems.length > 0) {
+                if (this.props.ProductDTO.ProductDTO.productInsurableItems[this.props.Iindex].productCovers.length > 0) {
+                    if (this.props.ProductDTO.ProductDTO.productInsurableItems[this.props.Iindex].productCovers[this.props.Bindex].singleValue == false) {
+                        this.benifitTable(this.props.Iindex, this.props.Bindex);
+                    }
+                }
+            }
+
+
+        }
+        //if (this.props.ProductDTO.ProductDTO.productInsurableItems.length > 0) {
+        //    for (var i = 0; i < this.props.ProductDTO.ProductDTO.productInsurableItems.length; i++) {
+        //        if (this.props.ProductDTO.ProductDTO.productInsurableItems[i].productCovers.length>0) {
+        //            for (var j = 0; j < this.props.ProductDTO.ProductDTO.productInsurableItems[i].productCovers.length; j++) {
+        //                if (this.props.ProductDTO.ProductDTO.productInsurableItems[i].productCovers[j].singleValue = true) {
+        //                    this.benifitTable(this.props.Iindex, this.props.Bindex);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
     }
 
     onBlur = (callcomponent, Iindex, Cindex) => {
@@ -218,7 +242,7 @@ class BenefitInterface extends React.Component {
 
         const filterCWEtype = this.props.props.props.props.state.TypeList.filter(s => s.mID == typeId)[0].mValue;
 
-        const CWEdata = this.props.productClausesWarrentiesExclusions.filter(s => s.levelId == typeId && s.refId == refID && this.props.ProductDTO.ProductDTO.productId)
+        const CWEdata = this.props.state.ProductDTO.productClausesWarrentiesExclusions.filter(s => s.levelId == typeId && s.refId == refID && this.props.ProductDTO.ProductDTO.productId)
       
         if (CWEdata.length > 0) {
             console.log("CWEdata", CWEdata, filterCWEtype)
@@ -726,6 +750,7 @@ class BenefitInterface extends React.Component {
     /*Benefit range Table*/
 
     benifitTable = (Iindex, Cindex) => {
+       
         console.log("testing table benefits", this.props.ProductDTO.productInsurableItem, Iindex, Cindex)
         if (this.props.ProductDTO.benifitRangeDetails.length > 0) {
 
@@ -735,13 +760,18 @@ class BenefitInterface extends React.Component {
                     id: key + 1,
                     // fromValue: < CustomInput value={prop.fromValue} disabled={this.state.disabled} name = "fromValue"  onChange = {(e) => this.setBenifitValue('fromValue', e, key) }     formControlProps = {{  fullWidth: true }} />,
                     fromValue: prop.fromValue,
-                    toValue: < CustomInput value={prop.toValue} disabled={this.props.viewdisable} name="toValue" onChange={(e) => this.setBenifitValue('toValue', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
-                    Amount: < CustomInput value={prop.benefitAmount} disabled={this.props.viewdisable} name="benefitAmount" onChange={(e) => this.setBenifitValue('benefitAmount', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
-                    PremiumAmount: < CustomInput value={prop.premiumAmount} disabled={this.state.viewdisable} name="premiumAmount" onChange={(e) => this.setBenifitValue('premiumAmount', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
-                    btn: <div><Button color="info" disabled={this.props.viewdisable} justIcon round simple className="add" onClick={(e) => this.addRecord(e, key, Iindex, Cindex)}><Add /></Button>
-                        <Button justIcon round simple color="danger" className="remove" disabled={this.props.viewdisable} onClick={(e) => this.deleteBenefit(e, key, Iindex, Cindex)} ><Delete /> </Button >
+                    toValue: < CustomInput value={prop.toValue} disabled={this.props.props.props.props.state.viewdisable} name="toValue" onChange={(e) => this.setBenifitValue('toValue', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
+                    Amount: < CustomInput value={prop.benefitAmount} disabled={this.props.props.props.props.state.viewdisable} name="benefitAmount" onChange={(e) => this.setBenifitValue('benefitAmount', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
+                    PremiumAmount: <div>< CustomInput value={prop.premiumAmount} disabled={this.props.props.props.props.state.viewdisable} name="premiumAmount" onBlur={() => this.onBlurBenefit(key, Iindex, Cindex)} onChange={(e) => this.setBenifitValue('premiumAmount', e, key, Iindex, Cindex)} formControlProps={{ fullWidth: true }} />,
+                         {(eval(this.props.ProductDTO.productInsurableItem[Iindex].productCovers[Cindex].productBenefits[0].benifitRangeDetails[key].premiumAmount) > eval(this.props.ProductDTO.productInsurableItem[Iindex].productCovers[Cindex].productBenefits[0].benifitRangeDetails[key].benefitAmount))? < p className="error">Premium Amount can not more then Benefit Amount</p>
+                :null}
 
-                    </div>
+                        </div>,
+                    btn: <div><Button color="info" disabled={this.props.props.props.props.state.viewdisable} justIcon round simple className="add" onClick={(e) => this.addRecord(e, key, Iindex, Cindex)}><Add /></Button>
+                        <Button justIcon round simple color="danger" className="remove" disabled={this.props.props.props.props.state.viewdisable} onClick={(e) => this.deleteBenefit(e, key, Iindex, Cindex)} ><Delete /> </Button >
+
+                    </div>,
+                  
                 };
 
             })
@@ -752,7 +782,17 @@ class BenefitInterface extends React.Component {
 
 
     }
+    onBlurBenefit = (index, Iindex, Cindex) => {
+        if (eval(this.props.ProductDTO.productInsurableItem[Iindex].productCovers[Cindex].productBenefits[0].benifitRangeDetails[index].premiumAmount) > eval(this.props.ProductDTO.productInsurableItem[Iindex].productCovers[Cindex].productBenefits[0].benifitRangeDetails[index].benefitAmount)) {
+           // this.props.ProductDTO.productInsurableItem[Iindex].productCovers[Cindex].productBenefits[0].benifitRangeTableDetails[index].flag = true;
+            this.props.props.props.props.state.premiumerror = true;
 
+        } else {
+            ///this.props.ProductDTO.productInsurableItem[Iindex].productCovers[Cindex].productBenefits[0].benifitRangeTableDetails[index].flag=false
+            this.props.props.props.props.state.premiumerror = false;
+        }
+        this.setState({});
+    }
     setBenifitValue = (columnName, event, index, Iindex, Cindex) => {
        
         console.log("columnName", columnName, event);
@@ -886,7 +926,7 @@ class BenefitInterface extends React.Component {
     }
 
     render() {
-        console.log("BenefitInterface", this.props)
+        console.log("BenefitInterface", this.props, this.props.props.props.props.state)
         return (
             
             <CWEDetails  props={this.props.props.props.props} {...this}/>

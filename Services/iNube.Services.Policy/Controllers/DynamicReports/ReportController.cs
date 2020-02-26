@@ -22,6 +22,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         {
             _reportService = reportService;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetMaster(string lMasterlist, bool isFilter = true)
         {
@@ -34,6 +35,30 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
             }
             return Ok(commonTypesDTOs);
          
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveConfigParameters([FromBody]ReportConfigDTO reportConfigDTO)
+        {
+            var response = await _reportService.SaveConfigParameters(reportConfigDTO, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                default:
+                    return Forbid();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetReportConfigName(string lMasterlist, bool isFilter = true)
+        {
+            var objectval = await _reportService.GetReportConfigName(lMasterlist, Context);
+            return Ok(objectval);
         }
     }
 }

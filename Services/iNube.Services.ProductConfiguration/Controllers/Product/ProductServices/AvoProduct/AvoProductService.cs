@@ -49,7 +49,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             apiContext.ProductType = "Avo";
             apiContext.ServerType = "AvoDev";
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             
             var ProductData = _context.TblProducts.Where(x => x.IsActive == true)
                                                   .Select(x => new ddDTOs
@@ -322,7 +322,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             apiContext.ProductType = "Avo";
             apiContext.ServerType = "AvoDev";
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
             
             //using (AVOAIALifeEntities entity = new AVOAIALifeEntities())
@@ -524,7 +524,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             apiContext.ProductType = "Avo";
             apiContext.ServerType = "AvoDev";
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
             List<MasterListItemDTO> lstProducts = new List<MasterListItemDTO>();
             lstProducts = (from Product in _context.TblProducts.Where(a => a.IsActive == true)
@@ -544,7 +544,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             apiContext.ProductType = "Avo";
             apiContext.ServerType = "AvoDev";
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
             Entities.AvoEntities.TblProducts Product = new Entities.AvoEntities.TblProducts();
 
@@ -701,7 +701,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             ApiContext apiContext = new ApiContext();
             apiContext.ProductType = "Avo";
             apiContext.ServerType = "AvoDev";
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
 
             var RiderData = _context.TblProductPlanRiders
@@ -740,7 +740,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             apiContext.ProductType = "Avo";
             apiContext.ServerType = "AvoDev";
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
             //RelationID = 2 , Bcz Spouse RelaationID is 2 in DB 
 
@@ -795,7 +795,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, ApiContext apiContext)
+        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type,string FieldType, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

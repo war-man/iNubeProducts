@@ -12,6 +12,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public int InsurableRcbdetailsId { get; set; }
         public int? LevelId { get; set; }
         public int? SubLevelId { get; set; }
+        public bool? UniqueCode { get; set; }
 
         public virtual TblmasProductMaster Input { get; set; }
         public virtual TblInsurableRcbdetails InsurableRcbdetails { get; set; }

@@ -57,6 +57,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<PolicyPremiumDetailsDTO>> GetRiskItemByPolicyNo(string policyNo, ApiContext apiContext);
         Task<ProposalResponse> UpdateProposal(object modifydata, ApiContext apiContext);
         Task<ProposalResponse> CreateProposal(dynamic ProposalDetail, ApiContext apiContext);
-        Task<List<dynamic>> GetProposalDetails(string proposalNo, ApiContext apiContext);
+        Task<dynamic> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext);
+        Task<ProposalResponse> PolicyEndoresemenet(dynamic endoresementDto, ApiContext apiContext);
     }
 }

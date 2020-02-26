@@ -7,35 +7,55 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+
 
 namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationServices
 {
     public interface IIntegrationService
     {
-        Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
+        Task<string> GetEnvironmentConnection(string product, decimal EnvId);
         Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID,ApiContext apiContext);
         Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
+        private IConfiguration _configuration;
+        readonly string  PartnerUrl, UserUrl, RatingUrl;
 
-        readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-       //readonly string partnerUrl = "https://localhost:44315";
+       // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
+       ////readonly string partnerUrl = "https://localhost:44315";
         
         
-        //readonly string UsermanangementUrl = "https://localhost:44367";
-        readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        //readonly string RatingUrl = "http://localhost:58593";
-        readonly string RatingUrl = "https://inubeservicesrating.azurewebsites.net";
+       // //readonly string UsermanangementUrl = "https://localhost:44367";
+       // readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+       // //readonly string RatingUrl = "http://localhost:58593";
+       // readonly string RatingUrl = "https://inubeservicesrating.azurewebsites.net";
 
-        public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
+
+
+        public IntegrationService(IConfiguration configuration)
         {
-            var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
-            return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+
+            _configuration = configuration;
+            RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
+            PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+          
+
+        }
+
+
+
+        public async Task<String> GetEnvironmentConnection(string product, decimal EnvId)
+        {
+            var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            var result = await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+            return result.Dbconnection;
         }
         public async Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID,ApiContext apiContext)
         {
-            var uri = partnerUrl + "/api/Partner/GetMasterDataAsync?sMasterlist=Product&partnerId=" + pID;
+            var uri = PartnerUrl + "/api/Partner/GetMasterDataAsync?sMasterlist=Product&partnerId=" + pID;
             return await GetListApiInvoke<AssignProductList>(uri, apiContext);
         }
 

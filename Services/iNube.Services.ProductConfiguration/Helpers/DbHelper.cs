@@ -14,8 +14,8 @@ namespace iNube.Services.ProductConfiguration.Helpers
          
         public async Task<string> GetEnvironmentConnectionAsync(string product,decimal EnvId)
         {
-            var constring = await _integrationService.GetEnvironmentConnection(product, EnvId);
-            return constring.Dbconnection;
+            return await _integrationService.GetEnvironmentConnection(product, EnvId);
+            
         }
 
     }
