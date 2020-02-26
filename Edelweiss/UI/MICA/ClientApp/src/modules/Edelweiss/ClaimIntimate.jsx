@@ -475,7 +475,7 @@ class ClaimIntimate extends React.Component {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                        'Authorization': 'Bearer ' + localStorage.getItem('Token')
                     },
                     body: JSON.stringify(detailsdto)
                 }).then(response => response.json())
@@ -675,19 +675,19 @@ class ClaimIntimate extends React.Component {
 
 
 
-        if (this.state.ClaimsAmountData[index].claimAmounts > this.state.ClaimsAmountData[index].benefitAmount) {
+        //if (this.state.ClaimsAmountData[index].claimAmounts > this.state.ClaimsAmountData[index].benefitAmount) {
 
-            this.state.ValidationUI = false;
-            this.state.errorstatus = true;
-            this.setState({});
+        //    this.state.ValidationUI = false;
+        //    this.state.errorstatus = true;
+        //    this.setState({});
 
 
-        } else {
-            this.state.ValidationUI = false;
-            this.state.errorstatus = false;
-            this.setState({});
+        //} else {
+        //    this.state.ValidationUI = false;
+        //    this.state.errorstatus = false;
+        //    this.setState({});
 
-        }
+        //}
 
 
         //for (let i = 0; i < this.state.ClaimsAmountData.length; i++) {
@@ -972,9 +972,7 @@ class ClaimIntimate extends React.Component {
                                 onChange={(e) => this.handleClaimAmount("claimAmounts", e, key)}
                                 formControlProps={{ fullWidth: true }} />
                             {/*     {this.state.erroramt && (this.state.ClaimsAmountData[key].claimAmounts == "") ? <p className="error">*Enter the claim amount</p> : null}*/}
-                            {(this.state.ClaimsAmountData[key].claimAmounts > this.state.ClaimsAmountData[key].benefitAmount) ? <p className="error">*Claim Amount should not be greater than Benefit Amount</p> : null
-                            }
-
+                          
 
                         </GridItem>
                 };

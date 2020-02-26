@@ -94,6 +94,10 @@ namespace iNube.Services.Partners.Models
         public string TypeCode { get; set; }
         public string Value { get; set; }
     }
+    public class EnvironmentResponse : ResponseStatus
+    {
+        public string Dbconnection { get; set; }
+    }
 
     #region Organization
     public partial class OrgAddressDTO
@@ -1099,10 +1103,7 @@ namespace iNube.Services.Partners.Models
         public string DocumentName { get; set; }
         public string DocumentType { get; set; }
     }
-    public class EnvironmentResponse : ResponseStatus
-    {
-        public string Dbconnection { get; set; }
-    }
+  
 
     public class AssignedProducts
     {

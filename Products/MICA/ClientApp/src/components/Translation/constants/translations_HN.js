@@ -375,6 +375,7 @@ export const TRANSLATIONS_HN = {
     AssignedProducts: 'निरुपित उत्पाद',
     Active: 'साथी सक्रिय हुआ',
     Deactive: 'साथी को निष्क्रिय कर दिया',
+    AgentNo: 'एजेंट नं',
 
     //Server messages
     PartnerCodeMsg: 'पार्टनर कोड पहले से मौजूद है',
@@ -382,6 +383,49 @@ export const TRANSLATIONS_HN = {
     ModifiedPartnerMsg: 'साथी आईडी: {0} सफलतापूर्वक संशोधित पार्टनर के लिए: {1}',
     AssignedProductMsg: 'उत्पाद कोड {0} सफलतापूर्वक साथी को सौंपा गया {1}',
     ProductAlreadyAssignedMsg: 'उत्पाद पहले से ही भागीदार को सौंपा गया है {0}!!',
+    DateModifiedSuccessfully: 'नीति समाप्ति तिथि सफलतापूर्वक अपडेट की गई!',
+
+    /****************************************************************/
+
+    //CD Account
+    /****************************************************************/
+
+    //Create CD Account
+    CreateCDAccount: 'सीडी अकाउंट बनाएं',
+    ThresholdLimit: 'सीमा - रेखा(%)',
+    DropLimit: 'ड्रॉप लिमिट (%)',
+    ViewCDAccount: 'सीडी खाता देखें',
+    AccountNumber: 'खाता संख्या:',
+    InitialAmount: 'प्रारंभिक रकम:',
+    AvailableBalance: 'उपलब्ध शेष राशि:',
+    GetStatement: 'स्टेटमेंट प्राप्त करें',
+    TransDate: 'लेन - देन की तारीख',
+    Description: 'विवरण',
+    OpeningBalance: 'प्रारंभिक शेष',
+    TransType: 'सौदे का प्रकार',
+    TransAmount: 'लेन - देन की राशि',
+    ClosingBalance: 'जमा शेष',
+    ReplenishCDAccount: 'सीडी अकाउंट को फिर से भरें',
+    Replenish: 'फिर से भरें',
+    SelectMode: 'मोड का चयन करें',
+    PaymentReferenceId: 'भुगतान संदर्भ आईडी',
+    TransactionAmount: 'लेन - देन की राशि',
+
+    //messages
+    NoAccount: 'सीडी-खाता मौजूद नहीं है',
+    NoRecords: "चयनित माह के लिए कोई रिकॉर्ड नहीं हैं: ",
+    DatesError: 'कृपया तारीख और तिथि से चुनें',
+    NoCDAccount: 'इस भागीदार के लिए सीडी खाता मौजूद नहीं है',
+    InvalidTxtFields: "कुछ फ़ील्ड अनुपलब्ध हैं या कृपया आपके द्वारा दर्ज किए गए डेटा की जांच करें",
+    Tryagain: "पुनः प्रयास करें",
+
+    //ServerMessages
+    AccountCreated: 'पार्टनर {1} और उत्पाद {2} के लिए सीडी खाता नंबर {0} सफलतापूर्वक बनाया गया',
+    AccountExists: 'सीडी खाता {0} पहले से मौजूद है!',
+    CDReplenish: 'सीडी रिप्लेसमेंट {0} के लिए सफलतापूर्वक किया जाता है!',
+    NoRecordsAcc: 'खाता संख्या {0} होने का कोई रिकॉर्ड नहीं मिला',
+
+
 
     /****************************************************************/
 

@@ -1,5 +1,5 @@
 ﻿import React from "react";
-
+//import Yelp from './util/Yelp';
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import ProfileDet from "./_ProfileDet";
@@ -9,11 +9,13 @@ import validationPage from "./ValidationPage.jsx";
 import swal from 'sweetalert';
 import UserConfig from 'modules/Users/UserConfig.js';
 import partnerconfig from "modules/Partners/PartnerConfig.js";
+import { Redirect } from 'react-router-dom';
 
 class Organization extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            redirect: false,
             disabled: this.props.disabled,
             masterList: [],
             masterLists: [],
@@ -130,7 +132,7 @@ class Organization extends React.Component {
             },
             isButtonvisibility:false,
             LocationDTO: {
-                "Country": [],
+                Country: [],
                 State: [],
                 District: [],
                 City: [],
@@ -161,9 +163,9 @@ class Organization extends React.Component {
                 "createdDate": "",
                 "modifiedBy": "",
                 "modifiedDate": "",
-                "tblOrgAddress": [
+                "orgAddress": [
                 ],
-                "tblOrgSpocDetails": [
+                "orgSpocDetails": [
                 ]
             }
         }
@@ -289,16 +291,16 @@ class Organization extends React.Component {
                         OrganizationDTO = data;
 
                         self.setState({ OrganizationDTO: data });
-                        self.GetLocationService('State', self.state.OrganizationDTO.tblOrgAddress[0].orgCountryId);
-                        self.GetLocationService('District', self.state.OrganizationDTO.tblOrgAddress[0].orgStateId);
-                        self.GetLocationService('City', self.state.OrganizationDTO.tblOrgAddress[0].orgDistrictId);
-                        self.GetLocationService('Pincode', self.state.OrganizationDTO.tblOrgAddress[0].orgCityId);
-                        console.log("length", self.state.OrganizationDTO.tblOrgAddress.length)
+                        self.GetLocationService('State', self.state.OrganizationDTO.orgAddress[0].orgCountryId);
+                        self.GetLocationService('District', self.state.OrganizationDTO.orgAddress[0].orgStateId);
+                        self.GetLocationService('City', self.state.OrganizationDTO.orgAddress[0].orgDistrictId);
+                        self.GetLocationService('Pincode', self.state.OrganizationDTO.orgAddress[0].orgCityId);
+                        console.log("length", self.state.OrganizationDTO.orgAddress.length)
                         let addDet = self.state.addressDTO;
-                        addDet['corp'] = self.state.OrganizationDTO.tblOrgAddress[0];
-                        addDet['reg'] = self.state.OrganizationDTO.tblOrgAddress[0];
-                        addDet['mail'] = self.state.OrganizationDTO.tblOrgAddress[0];
-                        addDet['spoc'] = self.state.OrganizationDTO.tblOrgSpocDetails[0];
+                        addDet['corp'] = self.state.OrganizationDTO.orgAddress[0];
+                        addDet['reg'] = self.state.OrganizationDTO.orgAddress[0];
+                        addDet['mail'] = self.state.OrganizationDTO.orgAddress[0];
+                        addDet['spoc'] = self.state.OrganizationDTO.orgSpocDetails[0];
                         self.setState({ addDet });
                         //console.log("adddet", addDet);
                         //console.log("OrganizationAddressLine1", self.state.addressDTO);
@@ -313,8 +315,22 @@ class Organization extends React.Component {
                 });
         }
     }
-        
+
+    reset = () => {
+        //Setting States After Saving
+        let organizationDTO = this.state.fields;
+        organizationDTO['orgAddress'] = "";
+        organizationDTO['orgSpocDetails'] = "";
+       
+        this.setState({ organizationDTO });
+
+        let status = this.state;
+        status['accountNameState'] = "";
+        status['accountDescState'] = "";
+        this.setState({ status });
+    }
     handleSub = event => {
+        debugger
             event.preventDefault();
         let address = [];
         address.push(this.state.addressDTO.reg);
@@ -325,8 +341,8 @@ class Organization extends React.Component {
             address.push(this.state.addressDTO.mail);
         }
         let organizationDTO = this.state.OrganizationDTO;
-        organizationDTO['tblOrgAddress'] = address;
-         organizationDTO['tblOrgSpocDetails'].push(this.state.addressDTO.spoc);
+        organizationDTO['orgAddress'] = address;
+        organizationDTO['orgSpocDetails'].push(this.state.addressDTO.spoc);
         
         this.setState({ organizationDTO });
         fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/CreateOrganizationAsync`, {
@@ -338,23 +354,50 @@ class Organization extends React.Component {
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
             body: JSON.stringify(this.state.OrganizationDTO)
-        }).then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            if (data.status==2) {
+        }).then(response => response.json())
+            .then(data => {
+                if (data.status == 2) {
                 swal({
                     text: data.responseMessage ,
                     icon: "success"
                 });
-                this.setState({ open: true });
-            } else {
-                swal({
-                    text:" Try again by entering values" ,
-                    icon: "error"
-                });
-            }
-        });
+                this.state.open= true;
+               // this.setState({ open: true });
+                    this.setState({
+                        
+                        redirect: true,
+
+                    })
+                } else if (data.status == 8) {
+                    swal({
+                        text: data.errors[0].errorMessage,
+                        icon: "error"
+                    });
+                } else if (data.status == 4) {
+                    swal({
+                        text: data.errors[0].errorMessage,
+                        icon: "error"
+                    });
+            //} else {
+            //    swal({
+            //        text:" Try again by entering values" ,
+            //        icon: "error"
+            //        });
+
+                } console.log("Redirect", this.state.Redirect);
+                console.log("handleSub", data)
+            });
+        
     }
+    renderRedirect = () => {
+              if (this.state.redirect == true) {
+            return <Redirect to={{
+                pathname: '/dashboard/home',
+
+            }} />
+        }
+    }
+
     GetLocation = (type, addType, event) => {
    
        this.SetValue(type,event);
@@ -548,6 +591,7 @@ class Organization extends React.Component {
                         <Button round color="warning" onClick={this.handleSub}>Submit</Button>
                     </div>
                 </GridContainer>
+                {this.renderRedirect()}
             </div>
         );
     }

@@ -26,11 +26,11 @@ class AddDriver extends React.Component {
         super(props)
 
         this.state = {
-            showadditionaldriver:false,
+            showadditionaldriver: false,
             proposalno: "",
             showadddrvflag: true,
             showDropZone: false,
-            showadddrvbtn:false,
+            showadddrvbtn: false,
             redirect: "",
             ddlDTO: [
                 { mID: 1, mValue: "Mr", label: "Mr" },
@@ -42,7 +42,7 @@ class AddDriver extends React.Component {
             VehicleNumber: '',
             VehicleModelNumber: '',
             showadddrvbtn: '',
-            
+
             quotationDetailsDto: {
             },
             policyRqst: {},
@@ -75,14 +75,14 @@ class AddDriver extends React.Component {
 
             }, {
 
-                    "InsurableName": "Vehicle",
+                "InsurableName": "Vehicle",
 
-                    "RiskItems": [
+                "RiskItems": [
 
 
-                    ]
+                ]
 
-                }],
+            }],
             policyIssueDTO:
             {
 
@@ -92,15 +92,15 @@ class AddDriver extends React.Component {
 
             },
             drvvehicleType: "",
-            adddrvMakeModel:"",
+            adddrvMakeModel: "",
         }
     }
- 
+
 
     componentDidMount() {
         if (this.props.location.state != undefined) {
             this.state.drvvehicleType = this.props.location.state.vehType;
-            this.state.adddrvMakeModel=this.props.location.state.drMakeModel
+            this.state.adddrvMakeModel = this.props.location.state.drMakeModel
 
             this.setState({ quotationDetailsDto: this.props.location.state.quotationDto, proposalno: this.props.location.state.proposalNo, policyRqst: this.props.location.state.policyRequest, premDTO: this.props.location.state.premiumDTO });
             this.state.RiskObj.Age = this.props.location.state.quotationDto.age;
@@ -114,7 +114,7 @@ class AddDriver extends React.Component {
                 this.setState({ showadddrvbtn: true });
             }
         }
-      
+
 
     }
     showOnClick = () => {
@@ -122,9 +122,9 @@ class AddDriver extends React.Component {
     }
     onInputChangepropsal = (event) => {
         let RiskObj = this.state.RiskObj;
-        
-        RiskObj[event.target.name] = event.target.value; 
-        this.setState({ RiskObj});
+
+        RiskObj[event.target.name] = event.target.value;
+        this.setState({ RiskObj });
     }
 
 
@@ -254,7 +254,7 @@ class AddDriver extends React.Component {
     }
     AddDrv = () => {
         debugger;
-  
+
         if (this.props.location.state.premiumDTO.additionalDriver > 1 && this.props.location.state.premiumDTO.additionalDriver <= 3) {
 
             for (var i = 0; i < this.state.insurableObj.length; i++) {
@@ -269,7 +269,7 @@ class AddDriver extends React.Component {
         }
 
         this.setState({ showadddrvflag: false, RiskObj: this.state.duplicateRiskObj });
-        this.setState({showadditionaldriver:true})  
+        this.setState({ showadditionaldriver: true })
         console.log(" this.state.policyRqst", this.state.policyRqst);
     }
 
@@ -281,97 +281,79 @@ class AddDriver extends React.Component {
         console.log(this.state);
 
         return (
-           
+
             <div className={classes.container}>
-                
-               <GridContainer>
-                    <Card>
-                        <CardHeader color="rose" icon>
-                            <CardIcon color="rose">
-                                {/*  <FilterNone /> */}
-                                <Icon></Icon>
-                            </CardIcon>
-                            {
-                                <h4>
-                                    <small>  Driver Details </small>
-                                </h4>
-                            }
-                        </CardHeader>
-                        <CardBody>
 
-                            {this.state.showadddrvbtn ? <GridContainer justify="center">
-
-                                <GridItem xs={12} sm={12} md={4}>
-                                    <Button color="primary" round onClick={this.AddDrv}> Add Driver </Button>
-                                </GridItem>
-
-                            </GridContainer> : null}
-
-                            <GridContainer justify="center">
-                                <GridItem xs={12} sm={12} md={2}>
-                                    <Dropdown
-                                        labelText="Title"
-                                        id="TitleId"
-                                        lstObject={this.state.ddlDTO}
-                                        //value={this.state.proposalIssueDTO.InsurableName}
-                                        //name='InsurableName'
-                                        //onChange={(e) => this.GetMasterData(e)}
-                                        formControlProps={{ fullWidth: true }} />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={4}>
-                                    <CustomInput
-                                        labelText="Name"
-                                        name="Name"
-                                        value={this.state.RiskObj.Name}
-                                        onChange={(e) => this.onInputChangepropsal(e)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                </GridItem>
-
-                            </GridContainer>
-
-                            <GridContainer justify="center">
-                                <GridItem xs={12} sm={12} md={4}>
-                                    <CustomInput
-                                        labelText="Age"
-                                        name="Age"
-                                        value={this.state.RiskObj.Age}
-                                       onChange={(e) => this.onInputChangepropsal(e)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                </GridItem>
-
-                            </GridContainer>
-                            <GridContainer justify="center">
-
-                                {this.state.showDropZone ?
-                                    <GridItem xs={12} sm={12} md={4}>
-                                        <Dropzone
-                                            getUploadParams={this.getUploadParams}
-                                            onChangeStatus={this.handleChangeStatus}
-                                            onSubmit={this.uploadfilefront}
-                                            accept="image/*,audio/*,video/*,application/pdf/*,word/*"
+                <GridContainer justify="center">
+                    <GridItem xs={8}>
+                        <Card>
+                            <CardBody>
+                                {this.state.showadddrvbtn ?
+                                    <GridContainer justify="center">
+                                        <GridItem>
+                                            <Button color="primary" round onClick={this.AddDrv}> Add Driver </Button>
+                                        </GridItem>
+                                    </GridContainer> : null}
+                                <GridContainer justify="center">
+                                    {/*<GridItem xs={12} sm={12} md={2}>
+                                        <Dropdown
+                                            labelText="Title"
+                                            id="TitleId"
+                                            lstObject={this.state.ddlDTO}
+                                            //value={this.state.proposalIssueDTO.InsurableName}
+                                            //name='InsurableName'
+                                            //onChange={(e) => this.GetMasterData(e)}
+                                            formControlProps={{ fullWidth: true }} />
+                                    </GridItem>*/}
+                                    <GridItem xs={4} >
+                                        <CustomInput
+                                            labelText="Name"
+                                            name="Name"
+                                            value={this.state.RiskObj.Name}
+                                            onChange={(e) => this.onInputChangepropsal(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
                                         />
-                                    </GridItem> : null}
-                            </GridContainer>
-                            <GridContainer justify="center">
+                                    </GridItem>
+                                    <GridItem xs={4}>
+                                        <CustomInput
+                                            labelText="Age"
+                                            name="Age"
+                                            value={this.state.RiskObj.Age}
+                                            onChange={(e) => this.onInputChangepropsal(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                </GridContainer>
+                                <GridContainer justify="center">
+                                    {this.state.showDropZone ?
+                                        <GridItem xs={12} sm={12} md={4}>
+                                            <Dropzone
+                                                getUploadParams={this.getUploadParams}
+                                                onChangeStatus={this.handleChangeStatus}
+                                                onSubmit={this.uploadfilefront}
+                                                accept="image/*,audio/*,video/*,application/pdf/*,word/*"
+                                            />
+                                        </GridItem> : null}
+                                </GridContainer>
+                                <GridContainer justify="center">
 
-                                <Button color="primary" round onClick={(e) => this.showOnClick(e)}> Upload File </Button>
-                            </GridContainer>
-                           <GridContainer justify="center">
-                                {this.renderRedirect()}
-                                <Button color="primary" round onClick={this.submitDriverDetails}> Submit </Button>
+                                    <Button color="primary" round onClick={(e) => this.showOnClick(e)}> Upload File </Button>
+                                </GridContainer>
+                                <GridContainer justify="center">
+                                    {this.renderRedirect()}
+                                    <Button color="primary" round onClick={this.submitDriverDetails}> Submit </Button>
 
-                            </GridContainer>
-                        </CardBody>
-                    </Card>
-                </GridContainer> 
+                                </GridContainer>
+                            </CardBody>
+                        </Card>
+                    </GridItem>
+                </GridContainer>
 
-                
+
             </div>
         );
     }

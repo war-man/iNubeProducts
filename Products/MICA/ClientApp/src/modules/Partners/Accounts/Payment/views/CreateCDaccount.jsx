@@ -40,6 +40,9 @@ import createcd from "assets/img/security.png";
 import Icon from "@material-ui/core/Icon";
 //import CustomRadioButton from "components/CustomRadiobutton/CustomRadiobutton.jsx";
 import { Animated } from "react-animated-css";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import CommonMessage from "Messages/CommonMessage.jsx";
+
 const style = {
     infoText: {
         fontWeight: "300",
@@ -316,13 +319,10 @@ class CreateCDaccount extends React.Component {
                     console.log('Response data', data);
                     // this.setState({ topics: data });
                     if (data.status == 2) {
-
+                        var msg = CommonMessage(data.messageKey, data.messageValue);
                         swal({
-
-                            //   title: "Perfect",
-
-                            text: data.responseMessage,
-                            //  text: "Account Successfully Created",
+                            //text: data.responseMessage,
+                            text: msg,
                             icon: "success"
                         });
                       this.reset();
@@ -330,15 +330,16 @@ class CreateCDaccount extends React.Component {
                         //this.renderRedirect();
                      
                     } else if (data.status == 8) {
-
+                     //   var msg = CommonMessage(AccountExi)
                         swal({
                             text: data.errors[0].errorMessage,
                             icon: "error"
                         });
                     } else if (data.status == 4) {
-
+                        var msg = CommonMessage(data.messageKey, data.messageValue);
                         swal({
-                            text: data.errors[0].errorMessage,
+                            //text: data.errors[0].errorMessage,
+                            text: msg,
                             icon: "error"
                         });
                     }
@@ -346,7 +347,12 @@ class CreateCDaccount extends React.Component {
                 });
             
         } else {
-            swal("", "Some fields are missing", "error");
+            var msg = CommonMessage("MissingField", []);
+            //swal("", "Some fields are missing", "error");
+            swal({
+                text: msg,
+                icon:"error"
+            });
             this.setState({ errormessage: true });
             }
 
@@ -404,7 +410,10 @@ class CreateCDaccount extends React.Component {
                             {/*  <FilterNone /> */}
                             <Icon><img id="icon" src={createcd} /></Icon>
                         </CardIcon>
-                        <h4 style={header}><small>Create CD Account</small></h4>
+                        <h4>
+                            <small><TranslationContainer translationKey="CreateCDAccount" /></small>
+                        </h4>
+
                     </CardHeader>
                     <CardBody>
                         {this.renderRedirect()}
@@ -419,7 +428,7 @@ class CreateCDaccount extends React.Component {
                                         <CustomInput
                                             success={this.state.thresholdValueState == "success"}
                                             error={this.state.thresholdValueState == "error"}
-                                            labelText="Threshold Limit(%)"
+                                            labelText="ThresholdLimit"
                                             name="thresholdValue"
                                             required={true}
                                             value={this.state.cdAccountsDTO.thresholdValue}
@@ -429,14 +438,19 @@ class CreateCDaccount extends React.Component {
                                                 fullWidth: true
                                             }}
                                         /></Animated>
-                                    {this.state.errormessage && (this.state.cdAccountsDTO.thresholdValue == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                                    {/*{this.state.errormessage && (this.state.cdAccountsDTO.thresholdValue == "") ? <p className="error">*Required field cannot be left blank</p> : null}*/}
+                                    <span className="error">  {this.state.errormessage && (this.state.cdAccountsDTO.thresholdValue == "") ? CommonMessage("RequiredField", []) : null}</span>
+                                    {(this.state.cdAccountsDTO.thresholdValue > 100) ? <p className="error">*Threshold Limit cannot be greater than 1000% </p> : null}
+
+
+
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
                                         <CustomInput
                                             success={this.state.dropLimitState == "success"}
                                             error={this.state.dropLimitState == "error"}
-                                            labelText="Drop Limit(%)"
+                                            labelText="DropLimit"
                                             required={true}
                                             name="dropLimit"
                                             value={this.state.cdAccountsDTO.dropLimit}
@@ -446,7 +460,8 @@ class CreateCDaccount extends React.Component {
                                                 fullWidth: true
                                             }}
                                         /> </Animated>
-                                    {this.state.errormessage && (this.state.cdAccountsDTO.dropLimit == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                                   {/* {this.state.errormessage && (this.state.cdAccountsDTO.dropLimit == "") ? <p className="error">*Required field cannot be left blank</p> : null}*/}
+                                    <span className="error">  {this.state.errormessage && (this.state.cdAccountsDTO.dropLimit == "") ? CommonMessage("RequiredField", []) : null}</span>
                                     {this.state.droplimit ? <p className="error">*Drop limit should not be greater than Threshold limit</p> : null}
                                 </GridItem>
 
@@ -457,7 +472,7 @@ class CreateCDaccount extends React.Component {
                             <GridContainer lg={12} justify="center" >
                                 <GridItem xs={5} sm={3} md={3} lg={1}>
                                     <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
-                                        <Button color="info" onClick={this.onClick} round>Submit</Button>
+                                        <Button color="info" onClick={this.onClick} round><TranslationContainer translationKey="Submit" /></Button>
                                     </Animated>
                                    
                                 </GridItem>

@@ -26,10 +26,12 @@ import ProceedPayment from "modules/Edelweiss/ProceedPayment.jsx";
 import ProceedDate from "modules/Edelweiss/ProceedDate.jsx";
 import BillingFrequency from "modules/Edelweiss/BillingFrequency.jsx";
 import Payment from "modules/Edelweiss/Payment.jsx";
-import ProposalPage from "../modules/Edelweiss/ProposalPage";
-import AddVehicle from "../modules/Edelweiss/AddVehicle.jsx";
-import AddDriver from "../modules/Edelweiss/AddDriver.jsx";
-import ClaimIntimate from "../modules/Edelweiss/ClaimIntimate.jsx";
+import ProposalPage from "modules/Edelweiss/ProposalPage";
+import AddVehicle from "modules/Edelweiss/AddVehicle.jsx";
+import AddDriver from "modules/Edelweiss/AddDriver.jsx";
+import ClaimIntimate from "modules/Edelweiss/ClaimIntimate.jsx";
+import ClaimReports from "modules/Edelweiss/ClaimReports.jsx";
+
 
 const pagesRoutes = [
     {
@@ -148,7 +150,7 @@ const pagesRoutes = [
         path: "/pages/TPPolicy",
         name: "TPPolicy",
         short: "TPPolicy",
-        mini: "DD",
+        mini: "TP",
         icon: MonetizationOn,
         component: TPPolicy
     },
@@ -156,7 +158,7 @@ const pagesRoutes = [
         path: "/pages/ProceedPayment",
         name: "ProceedPayment",
         short: "ProceedPayment",
-        mini: "DD",
+        mini: "PP",
         icon: MonetizationOn,
         component: ProceedPayment
     },
@@ -164,7 +166,7 @@ const pagesRoutes = [
         path: "/pages/ProceedDate",
         name: "ProceedDate",
         short: "ProceedDate",
-        mini: "DD",
+        mini: "PD",
         icon: MonetizationOn,
         component: ProceedDate
     },
@@ -172,7 +174,7 @@ const pagesRoutes = [
         path: "/pages/BillingFrequency",
         name: "BillingFrequency",
         short: "BillingFrequency",
-        mini: "DD",
+        mini: "BF",
         icon: MonetizationOn,
         component: BillingFrequency
     },
@@ -180,7 +182,7 @@ const pagesRoutes = [
         path: "/pages/Payment",
         name: "Payment",
         short: "Payment",
-        mini: "DD",
+        mini: "PA",
         icon: MonetizationOn,
         component: Payment
     },
@@ -188,7 +190,7 @@ const pagesRoutes = [
         path: "/pages/Proposal",
         name: "Proposal",
         short: "Proposal",
-        mini: "DD",
+        mini: "PR",
         icon: MonetizationOn,
         component: ProposalPage
     },
@@ -196,7 +198,7 @@ const pagesRoutes = [
         path: "/pages/AddVehicle",
         name: "AddVehicle",
         short: "AddVehicle",
-        mini: "DD",
+        mini: "AV",
         icon: MonetizationOn,
         component: AddVehicle
     },
@@ -204,7 +206,7 @@ const pagesRoutes = [
         path: "/pages/AddDriver",
         name: "AddDriver",
         short: "AddDriver",
-        mini: "DD",
+        mini: "AD",
         icon: MonetizationOn,
         component: AddDriver
     },
@@ -212,11 +214,20 @@ const pagesRoutes = [
         path: "/pages/ClaimIntimate",
         name: "ClaimIntimate",
         short: "ClaimIntimate",
-        mini: "DD",
+        mini: "CI",
         icon: MonetizationOn,
         component: ClaimIntimate
     },
     {
+        path: "/pages/ClaimReports",
+        name: "ClaimReports",
+        short: "ClaimReports",
+        mini: "CR",
+        icon: MonetizationOn,
+        component: ClaimReports
+    },
+   
+     {
         redirect: true,
         path: "/pages",
         pathTo: "/pages/Homepage",

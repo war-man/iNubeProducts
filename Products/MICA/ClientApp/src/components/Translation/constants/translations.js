@@ -156,7 +156,9 @@ export const TRANSLATIONS = {
         SearchMapping: 'Search Mapping',
         ModifyMapping: 'Modify Mapping',
         DynamicProduct: 'Dynamic Product',
-        DynamicProd:'Dynamic Product',
+        DynamicProd: 'Dynamic Product',
+        //Dynamic Reports
+        ReportConfig: 'Report Config',
         /**********************************************************************/
 
         //UserManagement
@@ -382,7 +384,52 @@ export const TRANSLATIONS = {
         CreatePartnerMsg: 'Partner ID: {0} successfully Created for Partner: {1}',
         ModifiedPartnerMsg: 'Partner ID:{0} successfully Modified for Partner: {1}',
         AssignedProductMsg: 'Product code {0} successfully assigned to Partner {1}',
-        ProductAlreadyAssignedMsg:'Product already assigned to partner {0}!!',
+        ProductAlreadyAssignedMsg: 'Product already assigned to partner {0}!!',
+        DateModifiedSuccessfully: 'Policy End date updated successfully!',
+
+        /****************************************************************/
+
+
+        //CD Account
+        /****************************************************************/
+
+        //Create CD Account
+        CreateCDAccount: 'Create CD Account',
+        ThresholdLimit: 'Threshold Limit(%)',
+        DropLimit: 'Drop Limit(%)',
+        ViewCDAccount: 'View CD Account',
+        AccountNumber: 'Account Number:',
+        InitialAmount: 'Initial Amount:',
+        AvailableBalance: 'Available Balance:',
+        GetStatement: 'Get Statement',
+        TransDate: 'Trans-Date',
+        Description: 'Description',
+        OpeningBalance: 'Opening Balance',
+        TransType: 'Trans-Type',
+        TransAmount: 'Trans-Amount',
+        ClosingBalance: 'Closing Balance',
+        ReplenishCDAccount: 'Replenish CD Account',
+        Replenish: 'Replenish',
+        SelectMode: 'Select Mode',
+        PaymentReferenceId: 'Payment Reference Id',
+        TransactionAmount: 'TransactionAmount',
+
+        //Messages
+        InvalidField: 'Entered fields are not valid. Please enter the valid input!',
+        MissingField: 'Some fields are missing',
+        NoAccount: 'CD-Account does not exist',
+        Norecords: "No Records Found",
+        DatesError: 'Please select From date and To date',
+        NoCDAccount: 'CD Account does not exist for this partner',
+        InvalidTxtFields: "Some fields are missing or Please check the data you entered",
+        Tryagain: "Try again",
+
+        //ServerMessages
+        AccountCreated: 'CD Account No {0} created successfully for Partner {1} and Product  {2}',
+        AccountExists: 'CDAccount {0} already exist!',
+        CDReplenish: 'CD Replenishment for {0} is done successfully!',
+        NoRecordsAcc: 'No records found having account number {0}',
+
 
         /****************************************************************/
 
@@ -673,7 +720,19 @@ export const TRANSLATIONS = {
         RetentionLogic: 'Retention Logic',
         Percentage: 'Percentage',
         Limit: 'Limit',
-        ListOfRetention:'List Of Retention'
+        ListOfRetention: 'List Of Retention',
+
+         /***********************************************************************/
+        //Dynamic Reports
+        ReportConfiguration: 'Report Configuration',
+        ReportName: 'Report Name',
+        DBSchema: 'DB Schema',
+        RangeType: 'Range Type',
+        DataType: 'Data Type',
+
+        //Buttons
+        AddParameter: 'Add Parameter',
+        Save: 'Save',
     },
     hi_IN: TRANSLATIONS_HN,
     kn_IN: TRANSLATIONS_KN,

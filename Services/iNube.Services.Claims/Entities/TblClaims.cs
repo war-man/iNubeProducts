@@ -36,6 +36,7 @@ namespace iNube.Services.Claims.Entities
         public decimal? OrganizationId { get; set; }
         public string PolicyNo { get; set; }
         public int? ProductIdPk { get; set; }
+        public string ClaimFields { get; set; }
 
         public virtual TblmasCmcommonTypes ClaimStatus { get; set; }
         public virtual TblmasCmcommonTypes Loss { get; set; }

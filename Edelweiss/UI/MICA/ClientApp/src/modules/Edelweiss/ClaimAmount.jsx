@@ -138,7 +138,7 @@ const ClaimAmount = (props) => {
                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                 minWidth: 20,
                                 sortable: false,
-                                //  filterable: false 
+                                //  filterable: false
                             },
                             {
                                 // Header: "Cover Event Factor - From Value",
@@ -149,8 +149,8 @@ const ClaimAmount = (props) => {
                                 headerClassName: 'react-table-center'
                             },
                             {
-                                Header: "Name",
-                                accessor: "name",
+                                Header: "Vehicle Type",
+                                accessor: "",
                                 minWidth: 40,
                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                 headerClassName: 'react-table-center'
@@ -158,6 +158,20 @@ const ClaimAmount = (props) => {
                             {
                                 Header: "IdentificationNo",
                                 accessor: "identificationNo",
+                                minWidth: 40,
+                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                headerClassName: 'react-table-center'
+                            },
+                            //{
+                            //    Header: "Vehicle Number",
+                            //    accessor: "",
+                            //    minWidth: 40,
+                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                            //    headerClassName: 'react-table-center'
+                            //},
+                            {
+                                Header: "Make/Model",
+                                accessor: "makeModel",
                                 minWidth: 40,
                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                 headerClassName: 'react-table-center'
@@ -170,14 +184,14 @@ const ClaimAmount = (props) => {
                                 headerClassName: 'react-table-center'
                             },
 
-                            {
-                                Header: "BenefitAmount",
-                                accessor: "benefitAmount",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "center" } }),
-                                headerClassName: 'react-table-center',
+                            //{
+                            //    Header: "Sum Insured",
+                            //    accessor: "benefitAmount",
+                            //    minWidth: 40,
+                            //    setCellProps: (value) => ({ style: { textAlign: "center" } }),
+                            //    headerClassName: 'react-table-center',
 
-                            },
+                            //},
                             {
                                 Header: "ClaimAmount",
                                 accessor: "claimAmounts",
@@ -188,7 +202,6 @@ const ClaimAmount = (props) => {
                                 //filterable: false
 
                             },
-
 
                         ]}
                         defaultPageSize={4}
@@ -220,7 +233,6 @@ const ClaimAmount = (props) => {
                     onChange={(e) => props.handleClaimAmount(e)}
                             formControlProps={{ fullWidth: true }}
                             />
-                            {props.errormessage && (props.DetailsDTO.claimAmount == "") ? <p className="error">*Enter atleast one Claim Amount</p> : null}
                     </Animated>
                     </GridItem>}
                 </GridContainer>

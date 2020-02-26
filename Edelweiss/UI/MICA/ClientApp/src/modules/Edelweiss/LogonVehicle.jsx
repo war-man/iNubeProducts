@@ -254,12 +254,12 @@ class LogonVehicle extends React.Component {
             bsi: 0,
             VehiclesList: [],
             RiskObj: {
-                Model: "",
-                VehicleNumber: "",
-                IdentificationNumber: "",
-                YearofRegistration: "",
-                VehicleType: "",
-                Documents: []
+                "Model": "",
+                "VehicleNumber": "",
+                "Identification Number": "123",
+                "YearofRegistration": "",
+                "VehicleType": "",
+                "Documents": [],
             },
             endorsementPremiumDTO: {
                 "policyNo": "",
@@ -267,7 +267,7 @@ class LogonVehicle extends React.Component {
                 "pcCount": 0,
                 "twCount": 0,
                 "typeOfEndorsement": "Addition",
-                "endorsementEffectiveDate": "2020-02-23T09:48:46.291Z"
+                "endorsementEffectiveDate": ""
             },
             endorsementpremium: {
                 "policyNo": "",
@@ -488,6 +488,7 @@ class LogonVehicle extends React.Component {
     }
 
     handlecreateSchedule = () => {
+        console.log("scheduleDTO: ", this.state.createschedule);
         fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/CreateUpdateSchedule`, {
             method: 'Post',
             headers: {
@@ -495,16 +496,24 @@ class LogonVehicle extends React.Component {
                 'Content-Type': 'application/json',
                 'Authorization': localStorage.getItem('edelweisstoken')
             },
-            body: JSON.stringify(this.state.scheduleDTO)
+            body: JSON.stringify(this.state.createschedule)
         }).then(response => response.json())
             .then(data => {
                 swal({
                     text: "Schedule Created Successfully!",
-                    icon: "success"
-                })
-                // this.setState({ disablesendotp: true, disableresendotp: false })
+                    icon: "success",
+                    buttons: [false, "OK"],
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        this.handlepagereload();
+                    }
+                });
                 console.log("dddd", data);
             })
+    }
+
+    handlepagereload = () => {
+        window.location.reload();
     }
 
     handleOpen = (item) => {
@@ -543,7 +552,13 @@ class LogonVehicle extends React.Component {
     }
 
     handleCloseaddvehicle = () => {
-        this.setState({ openaddvehicle: false });
+        let newvehicle = this.state.RiskObj;
+        newvehicle.IdentificationNumber = "";
+        newvehicle.VehicleNumber = "";
+        newvehicle.VehicleType = "";
+        newvehicle.YearofRegistration = "";
+        newvehicle.Model = "";
+        this.setState({ openaddvehicle: false, newvehicle });
     }
 
     handleDeleteclose = () => {
@@ -567,13 +582,15 @@ class LogonVehicle extends React.Component {
         let addvehicle = this.state.endorsementVehDTO;
         for (var i = 0; i < this.state.VehiclesList.length; i++) {
             if (addvehicle.InsurableItem[0].InsurableName == "Vehicle") {
-                addvehicle.InsurableItem[0].RiskItems.push(this.state.VehiclesList[i]);
+                addvehicle.InsurableItem[0].RiskItems.push(this.state.RiskObj);
             }
+
             console.log("this.state.endorsementVehDTO.", this.state.endorsementVehDTO);
         }
         addvehicle.SI = this.state.suminsured.toString();
         addvehicle.PolicyNumber = this.state.policynumber;
         addvehicle.InsurableItem[0].RiskItems[0].VehicleType = this.state.typevehicle;
+        addvehicle.InsurableItem[0].RiskItems[0]["Identification Number"] = (this.state.vehiclecount + 1).toString();
         this.setState({ addvehicle });
 
         let newschedule = this.state.createschedule;
@@ -597,10 +614,12 @@ class LogonVehicle extends React.Component {
                         text: "policy endorsement for" + " " + data.id + " " + "has been issued successfully",
                         icon: "success"
                     })
+                    this.handleCloseaddvehicle();
                     this.handlecreateSchedule();
+
                 }
             })
-        this.handleCloseaddvehicle();
+        this.setState({ vehicles: this.state.emptyarray });
         //this.handlePolicyDetails(this.state.policynumber);
     }
 
@@ -637,14 +656,12 @@ class LogonVehicle extends React.Component {
 
         console.log("index: ", this.state.index);
 
-
-
         premiumdata.si = premium.si;
         premiumdata.policyNo = this.state.policynumber;
         premiumdata.endorsementEffectiveDate = date;
 
         console.log("vehicle: ", this.state.vehicles[this.state.index]);
-        //this.CalCulatePremium(premium.additionalDriver, premuim);
+
         let vehicle = this.state.vehicles;
 
         let deletevehicles = this.state.deleteEndorsement;
@@ -662,10 +679,13 @@ class LogonVehicle extends React.Component {
         console.log("delete vehilce: ", vehicle);
         this.CalCulateEndorsementPremium(premiumdata);
         this.DeleteEndorsement(deletevehicles);
+
+        this.setState({ vehicles: this.state.emptyarray });
         //this.handlePolicyDetails(this.state.policynumber);
     }
 
     DeleteEndorsement = (endorsementdto) => {
+        debugger;
         fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/PolicyEndoresemenet`, {
             method: 'PUT',
             headers: {
@@ -677,13 +697,30 @@ class LogonVehicle extends React.Component {
         }).then(response => response.json())
             .then(data => {
                 console.log("premdata", data);
-                this.state.perDayPremium = data.perDayPremium;
-                this.state.fireTheft = data.fireTheft;
-                this.state.adPremium = data.adPremium;
-                this.state.gst = data.gst;
-                this.state.total = data.total;
-                this.state.monthlyPremium = data.monthlyPremium;
-                this.setState({});
+                if (data.status == 4) {
+                    swal({
+                        text: data.responseMessage,
+                        icon: "success",
+                        buttons: [false, "OK"],
+                    }).then((willDelete) => {
+                        if (willDelete) {
+                            this.handlepagereload();
+                        }
+                    });
+                }
+                else {
+                    swal({
+                        text: data.responseMessage,
+                        icon: "error"
+                    })
+                }
+                //this.state.perDayPremium = data.perDayPremium;
+                //this.state.fireTheft = data.fireTheft;
+                //this.state.adPremium = data.adPremium;
+                //this.state.gst = data.gst;
+                //this.state.total = data.total;
+                //this.state.monthlyPremium = data.monthlyPremium;
+                //this.setState({});
 
                 //let premperday = data.perDayPremium;
                 //let ft365 = data.fireTheft365;
@@ -725,6 +762,8 @@ class LogonVehicle extends React.Component {
     }
 
     EndorsementPremium = () => {
+        var today = new Date();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
         let endorsement = this.state.endorsementPremiumDTO;
         if (this.state.typevehicle == "PC") {
             endorsement.pcCount = 1;
@@ -736,6 +775,7 @@ class LogonVehicle extends React.Component {
         }
         endorsement.policyNo = this.state.policynumber;
         endorsement.si = this.state.selectedamount;
+        endorsement.endorsementEffectiveDate = date;
         this.setState({ endorsement })
         this.handleCalculateendorsementpremium();
     }
@@ -745,6 +785,7 @@ class LogonVehicle extends React.Component {
     }
 
     handleDeleteopen = (vehicleno, vehiclestype, key) => {
+        debugger;
         var today = new Date();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
         this.state.vehiclestype = vehiclestype;
@@ -765,7 +806,7 @@ class LogonVehicle extends React.Component {
         premiumdata.si = premium.si;
         premiumdata.policyNo = this.state.policynumber;
         premiumdata.endorsementEffectiveDate = date;
-
+        console.log("premiumdata: ", premiumdata);
         this.CalCulateEndorsementPremium(premiumdata);
     }
 
@@ -792,13 +833,19 @@ class LogonVehicle extends React.Component {
         }).then(response => response.json())
             .then(data => {
                 console.log("premdata", data);
-                this.state.perDayPremium = data.perDayPremium;
-                this.state.fireTheft = data.fireTheft;
-                this.state.adPremium = data.adPremium;
-                this.state.gst = data.gst;
-                this.state.total = data.total;
-                this.state.monthlyPremium = data.monthlyPremium;
-                this.setState({});
+                //if (data.status == 8) {
+                //    swal({
+                //        text: data.responseMessage,
+                //        icon:"error"
+                //    })
+                //}
+                //this.state.perDayPremium = data.perDayPremium;
+                //this.state.fireTheft = data.fireTheft;
+                //this.state.adPremium = data.adPremium;
+                //this.state.gst = data.gst;
+                //this.state.total = data.total;
+                //this.state.monthlyPremium = data.monthlyPremium;
+                //this.setState({});
 
                 //let premperday = data.perDayPremium;
                 //let ft365 = data.fireTheft365;
@@ -884,10 +931,13 @@ class LogonVehicle extends React.Component {
     }
 
     handleaddselectedSI = (e, key) => {
+        var today = new Date();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
         let premiumendorse = this.state.endorsementPremiumDTO;
         this.state.selectedSI = this.state.suminsuredamount[key].mValue;
         this.setState({ selectedSI: this.state.suminsuredamount[key].mValue, selectedamount: this.state.suminsuredamount[key].label, premiumendorse, opendialog: false });
         premiumendorse.si = this.state.selectedSI;
+        premiumendorse.endorsementEffectiveDate = date;
         console.log("state.endorsementPremium", this.state.endorsementPremiumDTO);
         this.handleCalculateendorsementpremium();
     }
@@ -954,11 +1004,11 @@ class LogonVehicle extends React.Component {
                                             return (
                                                 <GridContainer justify="center">
                                                     {item.VehicleType == "PC" ?
-                                                        <img src={Car} style={{ width: "10rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
-                                                        : <img src={Bike} style={{ width: "9rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
+                                                        <img src={Car} id="carbikeimage" onClick={() => this.handleOpen(item.VehicleNumber)} />
+                                                        : <img src={Bike} id="carbikeimage" onClick={() => this.handleOpen(item.VehicleNumber)} />
                                                     }
-                                                    <h4 style={{ left: '1rem', top: '0.7rem', position: 'relative' }}>{item.Make}&nbsp;&nbsp;{item.Model}</h4>
-                                                    <h4 style={{ right: '6rem', top: '2.3rem', position: 'relative' }}>{item.VehicleNumber}</h4>
+                                                    <h4 id="headertag1">{item.Make}&nbsp;&nbsp;{item.Model}</h4>
+                                                    <h4 id="headertag2">{item.VehicleNumber}</h4>
                                                     <IconButton onClick={() => this.handleView(item.VehicleNumber, item.VehicleType)} ><Visibility /></IconButton>
                                                     <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item.VehicleType, key)}><Delete /></IconButton>
                                                 </GridContainer>
@@ -1074,11 +1124,11 @@ class LogonVehicle extends React.Component {
                                                                             <td style={{ fontWeight: "400" }}>Total: </td>
                                                                             <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.total}</b>/-</td>
                                                                         </tr>
+                                                                        <tr>
+                                                                            <td style={{ fontWeight: "400" }}>I AUTHORIZE EGIC TO BILL ME UPTO A MAXIMUM ₹<b>{this.state.monthlyPremium}</b>/- PER MONTH </td>
+                                                                        </tr>
                                                                     </tbody>
                                                                 </table>
-                                                            </GridContainer>
-                                                            <GridContainer>
-                                                                <h5>I AUTHORIZE EGIC TO BILL ME UPTO A MAXIMUM ₹<b>{this.state.monthlyPremium}</b>/- PER MONTH </h5>
                                                             </GridContainer>
                                                         </GridContainer>
                                                         <GridContainer jutify="center">

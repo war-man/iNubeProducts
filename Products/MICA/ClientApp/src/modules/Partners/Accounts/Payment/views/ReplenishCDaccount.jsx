@@ -46,6 +46,8 @@ import Paper from '@material-ui/core/Paper';
 import { Animated } from "react-animated-css";
 import validationPage from "modules/Partners/Organization/views/ValidationPage.jsx";
 import ReactTable from "components/MuiTable/MuiTable.jsx";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import CommonMessage from "Messages/CommonMessage.jsx";
 
 
 const style = {
@@ -341,14 +343,24 @@ class ReplenishCDaccount extends React.Component {
                             show: true
                         });
                     } else {
-                        swal("", "CD Account does not exist for this partner", "error");
+                        var msg = CommonMessage("NoCDAccount", []);
+                        swal({
+                            text: msg,
+                            icon: "error",
+                        });
+                        //swal("", "CD Account does not exist for this partner", "error");
                         this.setState({ show: false, hide: false, transactiontable: false });
 
                     }
                 });
 
         } else {
-            swal("", "Some fields are missing", "error");
+            var msg = CommonMessage("MissingField", []);
+            swal({
+                text: msg,
+                icon: "error"
+            });
+            //swal("", "Some fields are missing", "error");
             this.setState({ errormessage: true });
         }
     }
@@ -392,18 +404,35 @@ class ReplenishCDaccount extends React.Component {
                     });
 
                     if (data.status == 2) { 
-					swal({ text: data.responseMessage, icon: "success" });
+                        var msg = CommonMessage(data.messageKey, data.messageValue);
+                        swal({
+                            text: msg,
+                            icon: "success"
+                        });
+					//swal({ text: data.responseMessage, icon: "success" });
                     this.setState({ CdTransaction: this.state.resetCdTransaction, paymentRefernceIdState: "", txnAmountState: "" });
 					}
 
-                    else if (data.status == 8) { swal({ text: data.errors[0].errorMessage, icon: "error" }); }
-
-                    else { swal({ title: "", text: "try again ", icon: "error" }); }
+                    else if (data.status == 8) {
+                        var msg = CommonMessage(data.messageKey, data.messageValue);
+                        swal({
+                            text: msg,
+                            icon: "error"
+                        });
+                        //swal({ text: data.errors[0].errorMessage, icon: "error" });
+                    }
+                    else {
+                    var msg = CommonMessage("Tryagain", []);
+                        swal({ title: "", text: msg, icon: "error" });
+                    }
                 });
         }
         else {
+            var msg = CommonMessage("InvalidTxtFields", []);
+
             swal({
-                text: "Some fields are missing or Please the check fields you entered",
+               // text: "Some fields are missing or Please the check fields you entered",
+                text: msg,
                 icon: "error"
             });
 
@@ -546,7 +575,9 @@ class ReplenishCDaccount extends React.Component {
                                 {/*  <FilterNone /> */}
                                 <Icon><img id="icon" src={Replenish} /></Icon>
                             </CardIcon>
-                            <h4 style={header}><small>Replenish CD Account</small></h4>
+                            <h4>
+                                <small><TranslationContainer translationKey="ReplenishCDAccount" /></small>
+                            </h4>
                         </CardHeader>
                         <CardBody>
 
@@ -569,7 +600,7 @@ class ReplenishCDaccount extends React.Component {
                             <GridContainer lg={12} justify="center">
                                 <GridItem xs={6} sm={3} md={3} lg={1} >
                                     <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
-                                        <Button color="info" round onClick={this.onClick}>Search</Button>
+                                        <Button color="info" round onClick={this.onClick}><TranslationContainer translationKey="Search" /></Button>
                                     </Animated>
                                 </GridItem>
                             </GridContainer>
@@ -580,9 +611,17 @@ class ReplenishCDaccount extends React.Component {
                                         <GridItem xs={8}>
                                             <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                                 <div className="banner">
-                                                    <label> Account Number: </label><h5>{this.state.accdetails[0].accountNo}</h5>
-                                                    <label>Initial Amount:</label> <h5>{this.state.accdetails[0].initialAmount}</h5>
-                                                    <label>Available Balance:</label> <h5>{this.state.accdetails[0].availableBalance}</h5>
+                                                <label>
+                                                    <TranslationContainer translationKey="AccountNumber" />
+                                                </label>
+                                                <h5>{this.state.accdetails[0].accountNo}</h5>
+                                                <label>
+                                                    <TranslationContainer translationKey="InitialAmount" />
+                                                </label>
+                                                <h5>{this.state.accdetails[0].initialAmount}</h5>
+                                                <label>
+                                                    <TranslationContainer translationKey="AvailableBalance" /></label>
+                                                <h5>{this.state.accdetails[0].availableBalance}</h5>
                                                 </div>
                                             </Animated>
 
@@ -649,7 +688,7 @@ class ReplenishCDaccount extends React.Component {
                                         <GridContainer lg={12} justify="center">
                                             <GridItem xs={4} sm={3} md={3} lg={1} >
                                                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                    <Button id="right-15px" color="info" round onClick={this.onClickhide}>Replenish </Button>
+                                                <Button id="right-15px" color="info" round onClick={this.onClickhide}><TranslationContainer translationKey="Replenish" /> </Button>
                                                 </Animated>
                                             </GridItem>
                                         </GridContainer>
@@ -696,7 +735,8 @@ class ReplenishCDaccount extends React.Component {
                                     <GridContainer lg={12} sm={12} md={12} justify="center">
                                         <GridItem xs={12} sm={4}>
                                             <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
-                                                <MasterDropdown labelText="Select Mode"
+                                            <MasterDropdown
+                                                    labelText="SelectMode"
                                                     id="paymentmode"
                                                     lstObject={this.state.masterList}
                                                     filterName='PaymentMode'
@@ -713,7 +753,7 @@ class ReplenishCDaccount extends React.Component {
                                                 <CustomInput
                                                     success={this.state.paymentRefernceIdState == "success"}
                                                     error={this.state.paymentRefernceIdState == "error"}
-                                                    labelText="Payment Reference Id"
+                                                    labelText="PaymentReferenceId"
                                                     name="paymentRefernceId"
                                                     value={this.state.CdTransaction.paymentRefernceId}
                                                     onChange={(e) => this.handleChange("string", e)}
@@ -731,7 +771,7 @@ class ReplenishCDaccount extends React.Component {
                                                 <CustomInput
                                                     success={this.state.txnAmountState == "success"}
                                                     error={this.state.txnAmountState == "error"}
-                                                    labelText="Transaction Amount"
+                                                    labelText="TransactionAmount"
                                                     name="txnAmount"
                                                     value={this.state.CdTransaction.txnAmount}
                                                     onChange={(e) => this.handleChange("string", e)}
@@ -760,7 +800,7 @@ class ReplenishCDaccount extends React.Component {
                                 <GridContainer lg={12} justify="center">
                                     <GridItem xs={5} sm={3} md={3} lg={1} >
                                         <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
-                                            <Button id="left" color="info" round onClick={this.Submit}>Submit</Button>
+                                        <Button id="left" color="info" round onClick={this.Submit}><TranslationContainer translationKey="Submit" /></Button>
                                         </Animated>
                                     </GridItem>
                                 </GridContainer>
@@ -786,7 +826,7 @@ class ReplenishCDaccount extends React.Component {
                                         filterable
                                         columns={[
                                             {
-                                                Header: "S No",
+                                                Header: "SNo",
                                                 accessor: "id",
                                                 //style: { textAlign: "right" }
                                                 headerClassName: 'react-table-center',
@@ -800,7 +840,7 @@ class ReplenishCDaccount extends React.Component {
                                                 //},
 
                                             {
-                                                Header: "Trans-Date",
+                                                Header: "TransDate",
                                                 accessor: "transactionDate",
                                                 style: { textAlign: "center" },
                                                 headerClassName: 'react-table-center',
@@ -816,14 +856,14 @@ class ReplenishCDaccount extends React.Component {
                                                 minWidth: 100
                                             },
                                             {
-                                                Header: "Opening Balance",
+                                                Header: "OpeningBalance",
                                                 accessor: "initialAmount",
                                                 style: { textAlign: "right" },
                                                 headerClassName: 'react-table-center',
                                                 //width: '50'
                                             },
                                             {
-                                                Header: "Trans-Type",
+                                                Header: "TransType",
                                                 accessor: "txnType",
                                                 style: { textAlign: "center" },
                                                 headerClassName: 'react-table-center',
@@ -831,7 +871,7 @@ class ReplenishCDaccount extends React.Component {
 
                                                 },
                                                 {
-                                                    Header: "Trans-Amount",
+                                                    Header: "TransAmount",
                                                     accessor: "txnAmount",
                                                     // headerClassName: 'rt-tr-align-right',
                                                     style: { textAlign: "right" },
@@ -842,7 +882,7 @@ class ReplenishCDaccount extends React.Component {
                                                 },
 
                                                 {
-                                                    Header: "Closing Balance",
+                                                    Header: "ClosingBalance",
                                                     accessor: "availableAmount",
                                                     style: { textAlign: "right" },
                                                     headerClassName: 'react-table-center ',

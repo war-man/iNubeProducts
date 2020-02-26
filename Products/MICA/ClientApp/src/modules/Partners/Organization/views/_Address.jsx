@@ -38,7 +38,7 @@ const Address = (props) => {
                                     validate
                                     steps={[
                                         { stepName: <TranslationContainer translationKey=" RegisteredAddress"/>, stepComponent: RegAddress, stepId: "rAddress", stepData: props },
-                                        { stepName: <TranslationContainer translationKey="CorporateAddress" /> , stepComponent: RegAddress, stepId: "cAddress", stepData: props},
+                                        { stepName: <TranslationContainer translationKey="CorporateAddress" />, stepComponent: RegAddress, stepId: "cAddress", stepData: props},
                                         { stepName: <TranslationContainer translationKey="MailAddress" />, stepComponent: RegAddress, stepId: "mAddress", stepData: props },
                                     ]}
                                     title=""

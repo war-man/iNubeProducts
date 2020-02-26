@@ -42,6 +42,9 @@ import viewcd from "assets/img/shield.png";
 import Icon from "@material-ui/core/Icon";
 import { Animated } from "react-animated-css";
 import ReactTable from "components/MuiTable/MuiTable.jsx";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import CommonMessage from "Messages/CommonMessage.jsx";
+
 
 const tableClassRow = {
     //   color: "red"
@@ -157,7 +160,8 @@ class ViewCDaccount extends React.Component {
                 "partnerName": "",
                 "productId": "",
                 "productName": "",
-            }
+            },
+            errormessage: false,
 
         }
         this.onDateChange = this.onDateChange.bind(this);
@@ -258,12 +262,26 @@ class ViewCDaccount extends React.Component {
 
                     that.setState({ show: true });
                 } else {
-                    swal("", "CD-Account does not exist", "error");
+                    var msg = CommonMessage("NoAccount", []);
+                    //swal("", "CD-Account does not exist", "error");
+                    swal({
+                        text: msg,
+                        icon: "error"
+                    });
                     that.setState({ display: false, hide: false, show: false })
                 }
                 console.log('SearchAccountList data', that.state.SearchAccountList);
             });
         }
+        else {
+            var msg = CommonMessage("SearchParameter", []);
+            swal({
+                text: msg,
+                icon: "error"
+            });
+
+            this.setState({ errormessage: true });
+        } 
     }
 
     onClickView = () => {
@@ -313,11 +331,21 @@ class ViewCDaccount extends React.Component {
                     that.setState({ display: true });
                 } else {
                     that.setState({ display: false });
-                    swal("", "No records found", "error");
+                    var msg = CommonMessage("NoRecords", []);
+                    swal({
+                        text: msg,
+                        icon: "error",
+                    });
+                    //swal("", "No records found", "error");
                 }
             });
         } else {
-            swal("", "Please select From and To date", "error");
+            var msg = CommonMessage("DatesError", []);
+            swal({
+                text: msg,
+                icon: "error",
+            });
+            //swal("", "Please select From and To date", "error");
         }
 
         this.state.SearchAccountModel.fromDate = fdate;
@@ -485,7 +513,9 @@ class ViewCDaccount extends React.Component {
                             {/*  <FilterNone /> */}
                             <Icon><img id="icon" src={viewcd} /></Icon>
                         </CardIcon>
-                        <h4 style={header}><small>View CD Account</small></h4>
+                            <h4>
+                                <small><TranslationContainer translationKey="ViewCDAccount" /></small>
+                            </h4>
                     </CardHeader>
                     <CardBody>
 
@@ -498,7 +528,7 @@ class ViewCDaccount extends React.Component {
                         <GridContainer lg={12} justify="center" >
                             <GridItem xs={5} sm={3} md={3} lg={1}>
                                 <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
-                                    <Button color="info" round onClick={this.onClick} >Search</Button>
+                                        <Button color="info" round onClick={this.onClick} ><TranslationContainer translationKey="Search" /></Button>
                                 </Animated>
                             </GridItem>
                         </GridContainer>
@@ -507,20 +537,29 @@ class ViewCDaccount extends React.Component {
                             <GridContainer lg={12} justify="center" >
                                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                     <div className="banner">
-                                        <label> Account Number: </label><h5>{this.state.SearchAccountList[0].accountNo}</h5>
-                                        <label>Initial Amount:</label> <h5>{this.state.SearchAccountList[0].initialAmount}</h5>
-                                        <label>Available Balance:</label> <h5>{this.state.SearchAccountList[0].availableBalance}</h5>
+                                        <label>
+                                            <TranslationContainer translationKey="AccountNumber" />
+                                        </label>
+                                        <h5>{this.state.SearchAccountList[0].accountNo}</h5>
+                                        <label>
+                                            <TranslationContainer translationKey="InitialAmount" />
+                                        </label>
+                                        <h5>{this.state.SearchAccountList[0].initialAmount}</h5>
+                                        <label>
+                                            <TranslationContainer translationKey="AvailableBalance" />
+                                        </label>
+                                        <h5>{this.state.SearchAccountList[0].availableBalance}</h5>
                                     </div>
                                 </Animated>
 
                                 <GridContainer lg={12} sm={12} className="repli-date-time" justify="center">
                                     <GridItem xs={12} sm={6} md={3}>
 
-                                        <CustomDatetime labelText="From Date" id='dtEffectFrom' DateRange={this.state.DateRange} datediff={this.state.datediff} name='fromDate' onChange={(evt) => this.onDateChange('datetime','SearchAccountModel', 'fromDate', evt)} value={this.state.SearchAccountModel.fromDate} formControlProps={{ fullWidth: true }} />
+                                        <CustomDatetime labelText="FromDate" id='dtEffectFrom' DateRange={this.state.DateRange} datediff={this.state.datediff} name='fromDate' onChange={(evt) => this.onDateChange('datetime','SearchAccountModel', 'fromDate', evt)} value={this.state.SearchAccountModel.fromDate} formControlProps={{ fullWidth: true }} />
 
                                     </GridItem>
                                     <GridItem xs={12} sm={6} md={3}>
-                                        <CustomDatetime labelText="To Date" id='dtEffectFrom' DateRange={this.state.DateRange} datediff={this.state.datediff} name='toDate' onChange={(evt) => this.onDateChange('datetime','SearchAccountModel', 'toDate', evt)} value={this.state.SearchAccountModel.toDate} formControlProps={{ fullWidth: true }} />
+                                        <CustomDatetime labelText="ToDate" id='dtEffectFrom' DateRange={this.state.DateRange} datediff={this.state.datediff} name='toDate' onChange={(evt) => this.onDateChange('datetime','SearchAccountModel', 'toDate', evt)} value={this.state.SearchAccountModel.toDate} formControlProps={{ fullWidth: true }} />
                                         {this.state.errordate ? <p className="error">*ToDate Cannot be less than from date</p> : null}
                                     </GridItem>
                                 </GridContainer>
@@ -531,7 +570,7 @@ class ViewCDaccount extends React.Component {
                             <GridItem xs={5} sm={3} md={3} lg={1}>
                                 {/*  <Button color="info" round > ViewCDbalance</Button> */}
                                 {/*   <Button color="warning" round onClick={this.onClickView} style={balanceBtn} > ViewStatement</Button> */}
-                                <Button color="warning" id="right-15px" round onClick={this.onClickdisplay} round >Get Statement</Button>
+                                    <Button color="warning" id="right-15px" round onClick={this.onClickdisplay} round ><TranslationContainer translationKey="GetStatement" /></Button>
                             </GridItem>
                         </GridContainer>}
 
@@ -567,7 +606,7 @@ class ViewCDaccount extends React.Component {
                             filterable
                             columns={[
                                 {
-                                    Header: "S-No",
+                                    Header: "SNo",
                                     accessor: "id",
                                     headerClassName: 'react-table-center',
                                     style: { textAlign: "center" },
@@ -582,7 +621,7 @@ class ViewCDaccount extends React.Component {
                                 //},
 
                                 {
-                                    Header: "Trans-Date",
+                                    Header: "TransDate",
                                     accessor: "transactionDate",
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -600,7 +639,7 @@ class ViewCDaccount extends React.Component {
                                     resizable: false,
                                 },
                                 {
-                                    Header: "Opening Balance",
+                                    Header: "OpeningBalance",
                                     accessor: "initialAmount",
                                     style: { textAlign: "right" },
                                     headerClassName: 'react-table-center',
@@ -608,7 +647,7 @@ class ViewCDaccount extends React.Component {
                                     resizable: false,
                                 },
                                 {
-                                    Header: "Trans-Type",
+                                    Header: "TransType",
                                     accessor: "txnType",
                                     style: { textAlign: "center" },
                                     headerClassName: 'react-table-center',
@@ -617,7 +656,7 @@ class ViewCDaccount extends React.Component {
 
                                 },
                                 {
-                                    Header: "Trans-Amount",
+                                    Header: "TransAmount",
                                     accessor: "txnAmount",
                                     // headerClassName: 'rt-tr-align-right',
                                     style: { textAlign: "right" },
@@ -630,7 +669,7 @@ class ViewCDaccount extends React.Component {
                                 },
 
                                 {
-                                    Header: "Closing Balance",
+                                    Header: "ClosingBalance",
                                     accessor: "availableAmount",
                                     style: { textAlign: "right" },
                                     headerClassName: 'react-table-center',
