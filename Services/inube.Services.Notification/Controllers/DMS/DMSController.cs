@@ -92,7 +92,7 @@ namespace inube.Services.Notification.Controllers.DMS
         }
 
         [HttpGet]
-        public async Task<IActionResult> DownloadFile(string id)
+        public async Task<IActionResult> GetDocumentById(string id)
         {
             var bytes = await _dMSService.DownloadFile(id);
             var result = new HttpResponseMessage(HttpStatusCode.OK);

@@ -3096,7 +3096,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 // var CalculatePremiumRequest = JsonConvert.DeserializeObject<PremiumRequestDTO>(premiumRequestDTO.ToString());
                 var CalculatePremiumResponse = await _integrationService.PremiumCalCulattion(premiumRequestDTO, apiContext);
 
-                if (CalculatePremiumResponse.Total == paymentinfoRequest[0].Amount)
+                if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.Total) <= 1 || (paymentinfoRequest[0].Amount - CalculatePremiumResponse.Total) >= -1)
                 {
                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(ProposalDetail.ToString());
                     AddProperty(expObj, "PaymentInfoDeatils", CalculatePremiumResponse);
