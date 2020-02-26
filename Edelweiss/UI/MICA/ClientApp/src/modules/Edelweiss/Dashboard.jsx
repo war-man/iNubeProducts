@@ -31,6 +31,7 @@ import Check from "@material-ui/icons/Check";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import Car from "assets/img/Car.jpg";
+import Bike from "assets/img/Bike.png";
 import Scheduler from './Scheduler.jsx';
 import Modal from '@material-ui/core/Modal';
 
@@ -243,7 +244,11 @@ class Dashboard extends React.Component {
                 <GridContainer xs={6} justify="center">
 
                     <GridContainer justify="center">
-                        <img src={Car} style={{ width: "14rem" }} />
+                        {this.props.vehiclestype == "PC" ?
+                            <img src={Car} style={{ width: "14rem" }} />
+                            :
+                            <img src={Bike} style={{ width: "14rem" }} />
+                        }
                     </GridContainer>
                     <GridContainer justify="center">
                         <h4>{this.state.schedule.vehicleRegistrationNo}</h4>

@@ -32,6 +32,7 @@ import Check from "@material-ui/icons/Check";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import Car from "assets/img/Car.jpg";
+import Bike from "assets/img/Bike.png";
 import AddCircle from '@material-ui/icons/AddCircle';
 import Delete from '@material-ui/icons/Delete';
 import Scheduler from './Scheduler.jsx';
@@ -573,8 +574,8 @@ class LogonVehicle extends React.Component {
         this.setState({ opendialog: true });
     }
 
-    handleView = (item) => {
-        this.setState({ openvehicle: true, vehicleno: item });
+    handleView = (vehiclenum, vehicletype) => {
+        this.setState({ openvehicle: true, vehicleno: vehiclenum, vehiclestype: vehicletype });
     }
 
     handleClose = () => {
@@ -919,10 +920,13 @@ class LogonVehicle extends React.Component {
                                         {this.state.vehicles.map(function (item, key) {
                                             return (
                                                 <GridContainer justify="center">
-                                                    <img src={Car} style={{ width: "10rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
+                                                    {item.VehicleType == "PC" ?
+                                                        <img src={Car} style={{ width: "10rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
+                                                        : <img src={Bike} style={{ width: "9rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
+                                                    }
                                                     <h4 style={{ left: '1rem', top: '0.7rem', position: 'relative' }}>{item.Make}&nbsp;&nbsp;{item.Model}</h4>
                                                     <h4 style={{ right: '6rem', top: '2.3rem', position: 'relative' }}>{item.VehicleNumber}</h4>
-                                                    <IconButton onClick={() => this.handleView(item.VehicleNumber)} ><Visibility /></IconButton>
+                                                    <IconButton onClick={() => this.handleView(item.VehicleNumber, item.VehicleType)} ><Visibility /></IconButton>
                                                     <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item.VehicleType, key)}><Delete /></IconButton>
                                                 </GridContainer>
                                             );
@@ -936,8 +940,8 @@ class LogonVehicle extends React.Component {
                                                     <img src={Car} style={{ width: "10rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
                                                     <h4 style={{ left: '1rem', top: '0.7rem', position: 'relative' }}>{item.Model}</h4>
                                                     <h4 style={{ right: '6rem', top: '2.3rem', position: 'relative' }}>{item.VehicleNumber}</h4>
-                                                    <IconButton onClick={() => this.handleView(item.VehicleNumber)} ><Visibility /></IconButton>
-                                                    <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item.VehicleType)}><Delete /></IconButton>
+                                                    <IconButton onClick={() => this.handleView(item.VehicleNumber, item.VehicleType)} ><Visibility /></IconButton>
+                                                    <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item.VehicleType, key)}><Delete /></IconButton>
                                                 </GridContainer>
                                             );
                                         }.bind(this))
@@ -962,7 +966,7 @@ class LogonVehicle extends React.Component {
                                                         </Button>
                                                     </div>
                                                     <div id='disp'>
-                                                        <Dashboard vehicleno={this.state.vehicleno} openvehicle={this.state.openvehicle} suminsured={this.state.suminsured} policynumber={this.state.policynumber} />
+                                                        <Dashboard vehicleno={this.state.vehicleno} vehiclestype={this.state.vehiclestype} openvehicle={this.state.openvehicle} suminsured={this.state.suminsured} policynumber={this.state.policynumber} />
                                                     </div>
                                                 </Card>
                                             </GridItem>
