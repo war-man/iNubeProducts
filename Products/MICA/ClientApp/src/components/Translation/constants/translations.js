@@ -675,7 +675,7 @@ export const TRANSLATIONS = {
         RetentionLogic: 'Retention Logic',
         Percentage: 'Percentage',
         Limit: 'Limit',
-        ListOfRetention: 'List Of Retention'
+        ListOfRetention: 'List Of Retention',
 
          /***********************************************************************/
         //Dynamic Reports
