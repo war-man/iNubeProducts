@@ -25,7 +25,7 @@ class AddVehicle extends React.Component {
         super(props)
 
         this.state = {
-            policyNo:"",
+            policyNo: "",
             vehicleModel: "",
             vehicleModel1: "",
             showDropZone: false,
@@ -49,18 +49,12 @@ class AddVehicle extends React.Component {
 
             },
             RiskObj: {
-
-                Model: "",
-
-                VehicleNumber: "",
-
-                IdentificationNumber: "223",
-
-                YearofRegistration: "",
-
-                VehicleType: "sdsd",
-
-                Documents: []
+                "Model": "",
+                "VehicleNumber": "",
+                "Identification Number": "1",
+                "YearofRegistration": "",
+                "VehicleType": "",
+                "Documents": []
             },
             duplicateRiskObj: {
 
@@ -68,11 +62,11 @@ class AddVehicle extends React.Component {
 
                 "VehicleNumber": "",
 
-                "Identification Number": "223",
+                "Identification Number": "",
 
                 "YearofRegistration": "",
 
-                "Vehicle Type": "sdsd",
+                "VehicleType": "",
 
                 "Documents": []
             },
@@ -88,8 +82,8 @@ class AddVehicle extends React.Component {
                 "sat": false,
                 "sun": false,
             },
-            poliNo:"",
-        
+            poliNo: "",
+
         }
     }
     AddVehicle = (files) => {
@@ -131,16 +125,16 @@ class AddVehicle extends React.Component {
 
                 //let policynothis = data.id;
                 //policyno = policynothis;
-              
+
                 if (data.status == 2) {
 
                     this.renderRedirect();
                     this.setState({ redirect: true });
 
-                swal({
-                    text: data.responseMessage,
-                    icon: "success"
-                })
+                    swal({
+                        text: data.responseMessage,
+                        icon: "success"
+                    })
                     console.log("dddd", data);
                     fetch(`http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/CreateUpdateSchedule`, {
                         method: 'Post',
@@ -152,7 +146,7 @@ class AddVehicle extends React.Component {
                         },
                         body: JSON.stringify(this.state.scheduleDTO)
                     }).then(response => response.json())
-                        .then(data => { 
+                        .then(data => {
                             swal({
                                 text: "Schedule Created Successfully!",
                                 icon: "success"
@@ -162,18 +156,19 @@ class AddVehicle extends React.Component {
                         })
                 }
             })
-      
+
         console.log("ssssss", this.state.scheduleDTO);
 
-        
+
     }
-    
+
     componentDidMount() {
         if (this.props.location.state != undefined) {
             this.state.scheduleDTO.vehicleType = this.props.location.state.drvvehicleType;
+            this.state.RiskObj.VehicleType = this.props.location.state.drvvehicleType;
             this.state.RiskObj.Model = this.props.location.state.adddrvMakeModel;
             console.log("this.state.scheduleDTO.vehicleType", this.state.RiskObj.Model, this.state.scheduleDTO.vehicleType);
-           
+
             this.setState({ quotationdataDto: this.props.location.state.quotationDetailsDto, policyIssueRequest: this.props.location.state.policyIssueDTO, vehiclepremiumDto: this.props.location.state.premDTO });
             //this.state.policyIssueRequest = this.props.location.state.policyRqst;
             //this.state.insurableObj[0].RiskItems[0].Name = this.state.quotationdataDto.primaryDriverName;
@@ -258,10 +253,10 @@ class AddVehicle extends React.Component {
                     x.fileName = docObj[i].fileName;
                     let mainobj = obj.Documents;
                     mainobj.push(x);
-                   
+
                     console.log("docobj", mainobj);
                 }
-               
+
                 //this.state.documentObj.docId = data.docId;
                 //this.state.documentObj.fileName = data.fileName;
 
@@ -286,7 +281,7 @@ class AddVehicle extends React.Component {
         if (this.state.redirect === true) {
             return <Redirect to={{
                 pathname: '/pages/LogonVehicle',
-                state: { policyIssueRequest: this.state.policyIssueRequest, RiskObj: this.state.RiskObj, scheduleDTO: this.state.scheduleDTO, vehiclepremiumDto: this.state.vehiclepremiumDto, policyNo: this.state.policyNo}
+                state: { policyIssueRequest: this.state.policyIssueRequest, RiskObj: this.state.RiskObj, scheduleDTO: this.state.scheduleDTO, vehiclepremiumDto: this.state.vehiclepremiumDto, policyNo: this.state.policyNo }
             }} />
         }
     }
@@ -299,104 +294,69 @@ class AddVehicle extends React.Component {
 
         return (
             <div className={classes.container}>
-                <Card>
-                    <CardHeader color="rose" icon>
-                        <CardIcon color="rose">
-                            {/*  <FilterNone /> */}
-                            <Icon></Icon>
-                        </CardIcon>
-                        {
-                            <h3>
-                                <small>  Vehicle Details </small>
-                            </h3>
-                        }
-                    </CardHeader>
-                    <CardBody>
-                        <GridContainer justify="center">
-
-                            <GridItem xs={12} sm={12} md={4}>
-                                <Button color="primary" round onClick={this.AddVehicle}> Add Vehicle </Button>
-                            </GridItem>
-
-                        </GridContainer>
-                        <GridContainer justify="center">
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    labelText="Vehicle Number"
-                                    name="VehicleNumber"
-                                    value={this.state.RiskObj.VehicleNumber}
-                                    onChange={(e) => this.onInputChange(e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-
-                        </GridContainer>
-                        <GridContainer justify="center">
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    labelText="Make & Model"
-                                    name="Model"
-                                    value={this.state.RiskObj.Model}
-                                    onChange={(e) => this.onInputChange(e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-
-                        </GridContainer>
-                        <GridContainer justify="center">
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    labelText="Year of Registration"
-                                    name="YearofRegistration"
-                                    value={this.state.RiskObj.YearofRegistration}
-                                    onChange={(e) => this.onInputChange(e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-
-                        </GridContainer>
-                        <GridContainer>
-
-                            {this.state.showDropZone ?
-                                <GridItem xs={12} sm={12} md={4}>
-                                    <Dropzone
-                                        getUploadParams={this.getUploadParams}
-                                        onChangeStatus={this.handleChangeStatus}
-                                        onSubmit={(e) => this.uploadfilefront(e)}
-                                        name="front"
-                                        //value={this.state.RiskObj.Documents}
-                                        accept="image/*,audio/*,video/*,application/pdf/*,word/*"
-                                    />
-                                </GridItem> : null}
-
-                        </GridContainer>
-
-
-
-
-                        <GridContainer justify="center">
-
-                            <Button color="primary" name="frontCarImage" round onClick={(e) => this.showOnClick(e)}> Upload</Button>
-
-
-                      
-                        </GridContainer>
-
-                        <GridContainer justify="center">
-                            {this.renderRedirect()}
-                            <Button color="primary" round onClick={this.Issuepolicy}> Issue Policy </Button>
-
-                        </GridContainer>
-
-                    </CardBody>
-                </Card>
-
+                <GridContainer justify="center">
+                    <GridItem xs={8}>
+                        <Card>
+                            <CardBody>
+                                <GridContainer justify="center">
+                                    <GridItem xs={4}>
+                                        <CustomInput
+                                            labelText="Vehicle Number"
+                                            name="VehicleNumber"
+                                            value={this.state.RiskObj.VehicleNumber}
+                                            onChange={(e) => this.onInputChange(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                    <GridItem xs={4}>
+                                        <CustomInput
+                                            labelText="Make & Model"
+                                            name="Model"
+                                            value={this.state.RiskObj.Model}
+                                            onChange={(e) => this.onInputChange(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                    <GridItem xs={4}>
+                                        <CustomInput
+                                            labelText="Year of Registration"
+                                            name="YearofRegistration"
+                                            value={this.state.RiskObj.YearofRegistration}
+                                            onChange={(e) => this.onInputChange(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                </GridContainer>
+                                <GridContainer>
+                                    {this.state.showDropZone ?
+                                        <GridItem >
+                                            <Dropzone
+                                                getUploadParams={this.getUploadParams}
+                                                onChangeStatus={this.handleChangeStatus}
+                                                onSubmit={(e) => this.uploadfilefront(e)}
+                                                name="front"
+                                                //value={this.state.RiskObj.Documents}
+                                                accept="image/*,audio/*,video/*,application/pdf/*,word/*"
+                                            />
+                                        </GridItem> : null}
+                                </GridContainer>
+                                <GridContainer justify="center">
+                                    <Button color="primary" name="frontCarImage" round onClick={(e) => this.showOnClick(e)}> Upload</Button>
+                                </GridContainer>
+                                <GridContainer justify="center">
+                                    {this.renderRedirect()}
+                                    <Button color="primary" round onClick={this.Issuepolicy}> Issue Policy </Button>
+                                </GridContainer>
+                            </CardBody>
+                        </Card>
+                    </GridItem>
+                </GridContainer>
             </div>
         );
     }

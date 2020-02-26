@@ -601,7 +601,8 @@ class LogonVehicle extends React.Component {
                 }
             })
         this.handleCloseaddvehicle();
-        //this.handlePolicyDetails(this.state.policynumber);
+        this.setState({ vehicles: this.state.emptyarray });
+        this.handlePolicyDetails(this.state.policynumber);
     }
 
     handleopenDialog = () => {
@@ -662,7 +663,9 @@ class LogonVehicle extends React.Component {
         console.log("delete vehilce: ", vehicle);
         this.CalCulateEndorsementPremium(premiumdata);
         this.DeleteEndorsement(deletevehicles);
-        //this.handlePolicyDetails(this.state.policynumber);
+
+        this.setState({ vehicles: this.state.emptyarray });
+        this.handlePolicyDetails(this.state.policynumber);
     }
 
     DeleteEndorsement = (endorsementdto) => {
