@@ -273,7 +273,7 @@ class Dashboard extends React.Component {
                             labelText=""
                             value={this.state.schedule.switchStatus}
                             onChange={(e) => this.handleCheckbox(e)}
-                            disabled={this.state.schedule.switchEnabled == false ? true : false}
+                            //disabled={this.state.schedule.switchEnabled == false ? true : false}
                             checked={this.state.schedule.switchStatus}
                             formControlProps={{
                                 fullWidth: true
