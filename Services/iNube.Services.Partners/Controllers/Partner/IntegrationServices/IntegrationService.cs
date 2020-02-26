@@ -29,8 +29,6 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
     {
         private IConfiguration _configuration;
         readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
-        readonly string ratingUrl = "https://inubeservicesrating.azurewebsites.net";
-        //readonly string ratingUrl = "http://mica-inube-notification-service.mica-internal.:9004";
 
         public IntegrationService(IConfiguration configuration)
         {
@@ -47,7 +45,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
-
+            RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
 
         }
 
@@ -103,7 +101,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         }
         public async Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext)
         {
-            var uri = ratingUrl + "/api/RatingConfig/GetHandleEvents?EventId=" + rateId;
+            var uri = RatingUrl + "/api/RatingConfig/GetHandleEvents?EventId=" + rateId;
             return await GetApiInvoke<dynamic>(uri, apiContext);
         }
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
