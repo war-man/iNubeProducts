@@ -501,11 +501,19 @@ class LogonVehicle extends React.Component {
             .then(data => {
                 swal({
                     text: "Schedule Created Successfully!",
-                    icon: "success"
-                })
-                // this.setState({ disablesendotp: true, disableresendotp: false })
+                    icon: "success",
+                    buttons: [false, "OK"],
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        this.handlepagereload();
+                    }
+                });
                 console.log("dddd", data);
             })
+    }
+
+    handlepagereload = () => {
+        window.location.reload();
     }
 
     handleOpen = (item) => {
@@ -608,6 +616,7 @@ class LogonVehicle extends React.Component {
                     })
                     this.handleCloseaddvehicle();
                     this.handlecreateSchedule();
+
                 }
             })
         this.setState({ vehicles: this.state.emptyarray });
@@ -646,8 +655,6 @@ class LogonVehicle extends React.Component {
         this.setState({ deletevehicle: false, premium })
 
         console.log("index: ", this.state.index);
-
-
 
         premiumdata.si = premium.si;
         premiumdata.policyNo = this.state.policynumber;
@@ -693,8 +700,13 @@ class LogonVehicle extends React.Component {
                 if (data.status == 4) {
                     swal({
                         text: data.responseMessage,
-                        icon: "success"
-                    })
+                        icon: "success",
+                        buttons: [false, "OK"],
+                    }).then((willDelete) => {
+                        if (willDelete) {
+                            this.handlepagereload();
+                        }
+                    });
                 }
                 else {
                     swal({
@@ -992,11 +1004,11 @@ class LogonVehicle extends React.Component {
                                             return (
                                                 <GridContainer justify="center">
                                                     {item.VehicleType == "PC" ?
-                                                        <img src={Car} style={{ width: "10rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
-                                                        : <img src={Bike} style={{ width: "9rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
+                                                        <img src={Car} id="carbikeimage" onClick={() => this.handleOpen(item.VehicleNumber)} />
+                                                        : <img src={Bike} id="carbikeimage" onClick={() => this.handleOpen(item.VehicleNumber)} />
                                                     }
-                                                    <h4 style={{ left: '1rem', top: '0.7rem', position: 'relative' }}>{item.Make}&nbsp;&nbsp;{item.Model}</h4>
-                                                    <h4 style={{ right: '6rem', top: '2.3rem', position: 'relative' }}>{item.VehicleNumber}</h4>
+                                                    <h4 id="headertag1">{item.Make}&nbsp;&nbsp;{item.Model}</h4>
+                                                    <h4 id="headertag2">{item.VehicleNumber}</h4>
                                                     <IconButton onClick={() => this.handleView(item.VehicleNumber, item.VehicleType)} ><Visibility /></IconButton>
                                                     <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item.VehicleType, key)}><Delete /></IconButton>
                                                 </GridContainer>

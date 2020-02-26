@@ -94,6 +94,19 @@ class Dashboard extends React.Component {
                 "policyNo": "",
                 "switchState": true
             },
+            hidepage: true,
+            createschedule: {
+                vehicleRegistrationNo: "",
+                policyNo: "",
+                vehicleType: "",
+                mon: false,
+                tue: false,
+                wed: false,
+                thu: false,
+                fri: false,
+                sat: false,
+                sun: false,
+            },
             openschedule: false,
             getSchedule: {
                 "vehicleRegistrationNo": "KA01W6666",
@@ -213,6 +226,12 @@ class Dashboard extends React.Component {
         object.vehicleRegistrationNo = this.props.vehicleno;
         this.setState({ object });
 
+        let createschedule = this.state.createschedule;
+        createschedule.vehicleRegistrationNo = this.props.vehicleno;
+        createschedule.policyNo = this.props.policynumber;
+        createschedule.vehicleType = this.props.vehiclestype;
+        this.setState({ createschedule })
+
         fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=` + this.props.vehicleno + `&PolicyNo=` + this.props.policynumber + ``, {
             //fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=KA01EQ9767&PolicyNo=750000109` , {
             method: 'GET',
@@ -224,6 +243,12 @@ class Dashboard extends React.Component {
         }).then(response => response.json())
             .then(data => {
                 console.log('response: ', data);
+                if (data.status == 4) {
+                    this.setState({ hidepage: true });
+                }
+                else {
+                    this.setState({ hidepage: false });
+                }
                 this.setState({ schedule: data.getSchedule });
             });
 
@@ -231,6 +256,31 @@ class Dashboard extends React.Component {
 
     handleOpen = () => {
         this.setState({ openschedule: true });
+    }
+
+    handlecreateSchedule = () => {
+        console.log("scheduleDTO: ", this.state.createschedule);
+        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/CreateUpdateSchedule`, {
+            method: 'Post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('edelweisstoken')
+            },
+            body: JSON.stringify(this.state.createschedule)
+        }).then(response => response.json())
+            .then(data => {
+                swal({
+                    text: "Schedule Created Successfully!",
+                    icon: "success",
+                    buttons: [false, "OK"],
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        this.handlepagereload();
+                    }
+                });
+                console.log("dddd", data);
+            })
     }
 
     handleClose = () => {
@@ -241,154 +291,161 @@ class Dashboard extends React.Component {
         const { classes, loggingIn } = this.props;
         return (
             <div className={classes.container}>
-                <GridContainer xs={6} justify="center">
+                {this.state.hidepage ?
+                    <GridContainer xs={6} justify="center">
+                        <h4>There is no Schedule create for this Vehicle.</h4>
+                        <Button round color="primary" onClick={() => this.handlecreateschedule()}> Create new Schedule </Button>
+                    </GridContainer>
+                    :
+                    <GridContainer xs={6} justify="center">
 
-                    <GridContainer justify="center">
-                        {this.props.vehiclestype == "PC" ?
-                            <img src={Car} style={{ width: "14rem" }} />
-                            :
-                            <img src={Bike} style={{ width: "14rem" }} />
-                        }
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <h4>{this.state.schedule.vehicleRegistrationNo}</h4>
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <Divider style={{ width: '38rem', height: '0.2rem', }} />
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <h4>1 claim on this vehicle</h4>
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <h4>SI balance: {this.props.suminsured}</h4>
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <Divider style={{ width: '38rem', height: '0.2rem', }} />
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <h4> Insurance Cover </h4>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <GridContainer justify="center">
+                            {this.props.vehiclestype == "PC" ?
+                                <img src={Car} style={{ width: "14rem" }} />
+                                :
+                                <img src={Bike} style={{ width: "14rem" }} />
+                            }
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <h4>{this.state.schedule.vehicleRegistrationNo}</h4>
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <Divider style={{ width: '38rem', height: '0.2rem', }} />
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <h4>1 claim on this vehicle</h4>
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <h4>SI balance: {this.props.suminsured}</h4>
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <Divider style={{ width: '38rem', height: '0.2rem', }} />
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <h4> Insurance Cover </h4>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <CustomCheckbox
-                            name="switchStatus"
-                            labelText=""
-                            value={this.state.schedule.switchStatus}
-                            onChange={(e) => this.handleCheckbox(e)}
-                            //disabled={this.state.schedule.switchEnabled == false ? true : false}
-                            checked={this.state.schedule.switchStatus}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <CustomCheckbox
-                            name="mon"
-                            labelText="M"
-                            value={this.state.schedule.mon}
-                            onChange={(e) => this.handleCheckbox(e)}
-                            disabled={true}
-                            checked={this.state.schedule.mon}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                        <CustomCheckbox
-                            name="tue"
-                            labelText="T"
-                            value={this.state.schedule.tue}
-                            onChange={(e) => this.handleCheckbox(e)}
-                            checked={this.state.schedule.tue}
-                            disabled={true}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                        <CustomCheckbox
-                            name="wed"
-                            labelText="W"
-                            value={this.state.schedule.wed}
-                            onChange={(e) => this.handleCheckbox(e)}
-                            checked={this.state.schedule.wed}
-                            disabled={true}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                        <CustomCheckbox
-                            name="thu"
-                            labelText="T"
-                            value={this.state.schedule.thu}
-                            onChange={(e) => this.handleCheckbox(e)}
-                            checked={this.state.schedule.thu}
-                            disabled={true}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                        <CustomCheckbox
-                            name="fri"
-                            labelText="F"
-                            value={this.state.schedule.fri}
-                            checked={this.state.schedule.fri}
-                            onChange={(e) => this.handleCheckbox(e)}
-                            disabled={true}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                        <CustomCheckbox
-                            name="sat"
-                            labelText="S"
-                            value={this.state.schedule.sat}
-                            checked={this.state.schedule.sat}
-                            onChange={(e) => this.handleCheckbox(e)}
-                            disabled={true}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                        <CustomCheckbox
-                            name="sun"
-                            labelText="S"
-                            value={this.state.schedule.sun}
-                            checked={this.state.schedule.sun}
-                            onChange={(e) => this.handleCheckbox(e)}
-                            disabled={true}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                    </GridContainer>
-                    <GridContainer justify="center">
-                        <Button round color="primary" onClick={this.handleOpen}>Show Vehicle Schedular</Button>
-                        <Modal
-                            aria-labelledby="simple-modal-title"
-                            aria-describedby="simple-modal-description"
-                            open={this.state.openschedule}
-                            onClose={this.handleClose}>
-                            <GridContainer justify="center">
-                                <GridItem xs={6}>
-                                    <Card>
-                                        <div >
-                                            <h4 style={{ textAlign: 'center' }}>Select Cover Days</h4>
-                                            <Button
-                                                color="primary"
-                                                round
-                                                style={{ left: '37rem', top: '-2.95rem' }}
-                                                onClick={this.handleClose}>
-                                                &times;
+                                name="switchStatus"
+                                labelText=""
+                                value={this.state.schedule.switchStatus}
+                                onChange={(e) => this.handleCheckbox(e)}
+                                //disabled={this.state.schedule.switchEnabled == false ? true : false}
+                                checked={this.state.schedule.switchStatus}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <CustomCheckbox
+                                name="mon"
+                                labelText="M"
+                                value={this.state.schedule.mon}
+                                onChange={(e) => this.handleCheckbox(e)}
+                                disabled={true}
+                                checked={this.state.schedule.mon}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+                            <CustomCheckbox
+                                name="tue"
+                                labelText="T"
+                                value={this.state.schedule.tue}
+                                onChange={(e) => this.handleCheckbox(e)}
+                                checked={this.state.schedule.tue}
+                                disabled={true}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+                            <CustomCheckbox
+                                name="wed"
+                                labelText="W"
+                                value={this.state.schedule.wed}
+                                onChange={(e) => this.handleCheckbox(e)}
+                                checked={this.state.schedule.wed}
+                                disabled={true}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+                            <CustomCheckbox
+                                name="thu"
+                                labelText="T"
+                                value={this.state.schedule.thu}
+                                onChange={(e) => this.handleCheckbox(e)}
+                                checked={this.state.schedule.thu}
+                                disabled={true}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+                            <CustomCheckbox
+                                name="fri"
+                                labelText="F"
+                                value={this.state.schedule.fri}
+                                checked={this.state.schedule.fri}
+                                onChange={(e) => this.handleCheckbox(e)}
+                                disabled={true}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+                            <CustomCheckbox
+                                name="sat"
+                                labelText="S"
+                                value={this.state.schedule.sat}
+                                checked={this.state.schedule.sat}
+                                onChange={(e) => this.handleCheckbox(e)}
+                                disabled={true}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+                            <CustomCheckbox
+                                name="sun"
+                                labelText="S"
+                                value={this.state.schedule.sun}
+                                checked={this.state.schedule.sun}
+                                onChange={(e) => this.handleCheckbox(e)}
+                                disabled={true}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+                        </GridContainer>
+                        <GridContainer justify="center">
+                            <Button round color="primary" onClick={this.handleOpen}>Show Vehicle Schedular</Button>
+                            <Modal
+                                aria-labelledby="simple-modal-title"
+                                aria-describedby="simple-modal-description"
+                                open={this.state.openschedule}
+                                onClose={this.handleClose}>
+                                <GridContainer justify="center">
+                                    <GridItem xs={6}>
+                                        <Card>
+                                            <div >
+                                                <h4 style={{ textAlign: 'center' }}>Select Cover Days</h4>
+                                                <Button
+                                                    color="primary"
+                                                    round
+                                                    style={{ left: '37rem', top: '-2.95rem' }}
+                                                    onClick={this.handleClose}>
+                                                    &times;
                                                         </Button>
 
-                                        </div>
-                                        <div id='dispschedule'>
-                                            <Scheduler schedule={this.state.schedule} handleSubmit={this.handleSubmit} handleCheckbox={this.handleCheckbox} handleClose={this.state.handleClose} />
-                                        </div>
-                                    </Card>
-                                </GridItem>
-                            </GridContainer>
-                        </Modal>
+                                            </div>
+                                            <div id='dispschedule'>
+                                                <Scheduler schedule={this.state.schedule} handleSubmit={this.handleSubmit} handleCheckbox={this.handleCheckbox} handleClose={this.state.handleClose} />
+                                            </div>
+                                        </Card>
+                                    </GridItem>
+                                </GridContainer>
+                            </Modal>
+                        </GridContainer>
                     </GridContainer>
-                </GridContainer>
+                }
             </div >
         );
     }
