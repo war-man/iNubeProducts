@@ -1,17 +1,14 @@
-﻿import React from "react";
-import GridContainer from "components/Grid/GridContainer.jsx";
-import GridItem from "components/Grid/GridItem.jsx";
-//import SearchProduct from "modules/Partners/Partner/views/_SearchProduct.jsx";
-//import AddProduct from "modules/Partners/Partner/views/_AddProduct.jsx";
-//import bindModel from 'components/ModelBinding/bindModel.js';
-import Button from "../../../../components/CustomButtons/Button";
-import partnerconfig from "modules/Partners/PartnerConfig.js";
-//import swal from 'sweetalert';
-//import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
-import withStyles from "@material-ui/core/styles/withStyles";
+﻿import Icon from "@material-ui/core/Icon";
 //import validationFormsStyle from "assets/jss/material-dashboard-pro-react/views/validationFormsStyle.jsx";
 //import InputAdornment from "@material-ui/core/InputAdornment";
 import Modal from '@material-ui/core/Modal';
+//import swal from 'sweetalert';
+//import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
+import withStyles from "@material-ui/core/styles/withStyles";
+import Check from "@material-ui/icons/Check";
+import Close from "@material-ui/icons/Close";
+import Edit from "@material-ui/icons/Edit";
+import AssignPro from "assets/img/assigned-products.png";
 //import Paper from '@material-ui/core/Paper';
 //import Table from '@material-ui/core/Table';
 //import TableBody from '@material-ui/core/TableBody';
@@ -22,17 +19,23 @@ import Card from "components/Card/Card.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
-import CustomInput from "components/CustomInput/CustomInput.jsx";
-import Icon from "@material-ui/core/Icon";
-import searchproduct from "assets/img/search-product.png";
-import AssignPro from "assets/img/assigned-products.png";
-import AssignProduct from "modules/Partners/Partner/views/AssignProduct.jsx";
-import ReactTable from "react-table";
 import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
-import $ from "jquery";
-import CustomReactTable from 'modules/Products/Micro/views/Others/InlineFormEdit.jsx';
-import { Animated } from "react-animated-css";
+import GridContainer from "components/Grid/GridContainer.jsx";
+import GridItem from "components/Grid/GridItem.jsx";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import $ from "jquery";
+import CommonMessage from "Messages/CommonMessage.jsx";
+import AssignProduct from "modules/Partners/Partner/views/AssignProduct.jsx";
+import partnerconfig from "modules/Partners/PartnerConfig.js";
+import React from "react";
+import { Animated } from "react-animated-css";
+import swal from 'sweetalert';
+//import SearchProduct from "modules/Partners/Partner/views/_SearchProduct.jsx";
+//import AddProduct from "modules/Partners/Partner/views/_AddProduct.jsx";
+//import bindModel from 'components/ModelBinding/bindModel.js';
+import Button from "../../../../components/CustomButtons/Button";
+//import CustomReactTable from 'modules/Products/Micro/views/Others/InlineFormEdit.jsx';
+import CustomReactTable from './AssignProductTable.jsx';
 
 const styles = theme => ({
     paper: {
@@ -50,6 +53,10 @@ class SearchAssignProduct extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            dateFlag: true,
+            temp:[],
+            assignProductList:[],
+            flag:false,
             unupdatedata: [],
             Edit: true,
             columnArray: [
@@ -130,10 +137,12 @@ class SearchAssignProduct extends React.Component {
 
     }
 
-    dataTable = (officelist) => {
-        console.log("officelist in react", officelist);
+    dataTable = () => {
+        debugger;
+        console.log("officelist in react", this.state.assignProductList);
         this.setState({
-            searchassignproductlist: officelist.map((prop, key) => {
+            searchassignproductlist: this.state.assignProductList.map((prop, key) => {
+                console.log("key", key)
                 return {
                     id: key,
                     //agentId: prop.agentId,
@@ -144,11 +153,31 @@ class SearchAssignProduct extends React.Component {
                     productName: prop.productName,
                     policyIssueDate: new Date(prop.createdDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
                     policyStartDate: new Date(prop.policyStartDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
-                    policyEndDate: (this.state.editing == true && key === this.state.rowtable) ? < CustomDatetime labelText="Effective To" id='dtEffectTo' name='effectiveTo' required={true} onChange={(evt) => this.onDateChange('', 'effectiveTo', evt, key)
-                    } value={prop.policyEndDate} formControlProps={{ fullWidth: true }
-                    } /> : new Date(prop.policyEndDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
-                    //radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.agentId)} />
-                    // edit: <Button color="warning" id="addproduct" round onClick={this.editRow}>Edit</Button>
+                    policyEndDate: (this.state.editing == true && key === this.state.rowtable) ?
+                        < CustomDatetime
+                          //  onFocus={this.state.onClick}
+                            labelText="Effective To"
+                            id='policyEndDate'
+                            name='policyEndDate'
+                            required={true}
+                            onChange={(evt) => this.onDateChange('datetime', 'policyEndDate', evt, key)}
+                            value={(((this.state.dateFlag == true) || (this.state.rowtable!=key) ) ? new Date(prop.policyEndDate) : prop.policyEndDate)}
+                            formControlProps={{ fullWidth: true }}
+                        /> :
+                        ((this.state.dateFlag == true) ? new Date(prop.policyEndDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : prop.policyEndDate),//prop.policyEndDate.split('T')[0]-->to remove time
+                    btn: <div>
+                      
+                            {!this.state.flag && <div>
+                                <Button color="info" justIcon round simple className="edit" onClick={(e) => this.handleEdit(e, key)}><Edit /></Button>
+                            {/* <Button color="danger" justIcon round simple className="edit" ><Delete /></Button>*/}
+                            </div>
+                            }     
+                        {this.state.flag && <div>
+                            <Button color="info" justIcon round simple className="edit" onClick={(e) => this.handleSave(e, key)}><Check /></Button>
+                            <Button color="danger" justIcon round simple className="edit" onClick={(e) => this.handleDiscard(e, key)} ><Close /></Button>
+                        </div>
+                        }
+                    </div>
                 };
 
             })
@@ -156,9 +185,107 @@ class SearchAssignProduct extends React.Component {
         console.log("searchassignproductlist", this.state.searchassignproductlist);
     }
 
+    onFormUpdate = (pid,eDate) => {
+        var data = {
+            'policyEndDate': eDate
+            };
+            fetch(`${partnerconfig.partnerconfigUrl}/api/Partner/EditAssignProductDate?PolicyId=` + pid, {
+                method: 'put',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+                .then(data => {
+                    var msg = CommonMessage(data.messageKey, [])
+
+                swal({
+                    //text: data.responseMessage,
+                    text: msg,
+                    icon: "success"
+                });
+                console.log("data save result:", data.responseMessage);
+                this.setState({ SavedData: data });
+            });
+    }
+
+    datechange = (date) => {
+        const _date = date.split('/');
+        const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
+        return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
+    }
+
+    onDateChange = (formate, name, event, key) => {
+        debugger;
+        console.log("event:", event);
+        this.setState({ dateFlag: false });
+        var today = event.toDate();
+        
+        let date = today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
+     
+        if (today.getDate() < 10) {
+            var dt = '0' + today.getDate();
+        }
+        else {
+            var dt = today.getDate();
+        }
+        if (today.getMonth() < 10) {
+            var mm = '0' + (today.getMonth() + 1)
+        }
+        else {
+            var mm = (today.getMonth() + 1);
+        }
+        var dateNew = dt + '/' + mm + '/' + today.getFullYear();
+        this.state.searchassignproductlist[key][name] = dateNew;
+        var date2 = new Date();
+        var date1 = new Date(today);
+        let state = this.state.assignProductList[key];
+        state[name] = dateNew;
+        this.setState({ state });
+    };
+
+    handleSave = (e, index) => {
+        this.state.searchassignproductlist[index] = this.state.temp;
+        this.state.dateFlag = true;//Based on button clicks for different rows
+        this.state.flag = false;
+        this.state.editing = false;//to get back edit and delete buttons
+      
+        this.state.assignProductList[index].policyEndDate = this.datechange(this.state.assignProductList[index].policyEndDate);//date conversion--should not modify other row dates, while modifying one
+        this.dataTable();
+
+        this.onFormUpdate(this.state.assignProductList[index].policyId, this.state.assignProductList[index].policyEndDate);
+         
+    }
+    handleEdit = (e, index) => {
+        console.log("check data", this.state.assignProductList[index], this.state.searchassignproductlist[index]);
+        this.setState({ dateFlag: false });
+
+        var sData = this.state.searchassignproductlist[index];
+        this.state.temp.push(sData);
+        this.dataTable();
+
+        this.state.rowtable = index;
+        this.state.flag = true;
+        this.state.editing = true;
+        this.dataTable();
+
+        console.log("date check", this.state.searchassignproductlist, index, this.state.temp);
+    }
+
+    handleDiscard = (e, index) => {
+        debugger
+        this.state.assignProductList[index].policyEndDate = this.datechange(this.state.temp[index].policyEndDate);//to get old dates after discarding
+        console.log("modified", this.state.assignProductList[index].policyEndDate, this.state.temp[index].policyEndDate);
+
+        this.state.flag = false;
+        this.state.dateFlag = true;
+        this.state.editing = false;//to get back edit and delete buttons
+        this.dataTable();
+    }
 
     componentDidMount = () => {
-
         this.setState({ Tableshow: true });
 
         if (this.props.partid != "") {
@@ -173,11 +300,8 @@ class SearchAssignProduct extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     console.log(" GetAssignProduct", data);
-
-                    this.dataTable(data);
-                    // this.setState({ searchassignproductlist: data }); 
-                    // console.log("coming GetAssignProduct", this.state.searchassignproductlist);
-
+                    this.setState({ assignProductList:data});
+                    this.dataTable();
                 });
         }
     }
@@ -192,7 +316,6 @@ class SearchAssignProduct extends React.Component {
     }
 
     changeRow = (rowNumber, value) => {
-        //debugger;
         let Columns = this.state.searchassignproductlist;
         Columns[rowNumber] = value;
         this.setState(Columns);
@@ -257,7 +380,6 @@ class SearchAssignProduct extends React.Component {
                                 open={this.state.open}
                                 onClose={this.handleClose}
                                 style={{
-                                    //  'max-height': 'calc(100vh - 210px)',
                                     'overflow-y': 'auto'
                                 }}
                             >

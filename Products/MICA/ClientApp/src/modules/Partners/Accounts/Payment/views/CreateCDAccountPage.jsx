@@ -27,6 +27,7 @@ import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 //import Paper from "@material-ui/core/Paper";
 //import sweetAlertStyle from "assets/jss/material-dashboard-pro-react/views/sweetAlertStyle.jsx";
+import CommonMessage from "Messages/CommonMessage.jsx";
 
 const CreateCDAccountPage=(props) => {
     const { classes } = props;
@@ -37,18 +38,21 @@ const CreateCDAccountPage=(props) => {
                     <GridContainer>
                         <GridItem xs={12} sm={12} md={3} >
 
-                    <MasterDropdown labelText="Partner Name" id="ddlstatus" lstObject={props.PartnerData} required={props.required} filterName='Partner' value={props.cdAccountsDTO.partnerId} name='partnerId' onChange={props.setValue} formControlProps={{ fullWidth: true }} />
-                    {props.errormessage && (props.cdAccountsDTO.partnerId == "") ? <p className="error">*Required field cannot be left blank</p>:null}
+                    <MasterDropdown labelText="PartnerName" id="ddlstatus" lstObject={props.PartnerData} required={props.required} filterName='Partner' value={props.cdAccountsDTO.partnerId} name='partnerId' onChange={props.setValue} formControlProps={{ fullWidth: true }} />
+                    {/*   {props.errormessage && (props.cdAccountsDTO.partnerId == "") ? <p className="error">*Required field cannot be left blank</p> : null}*/}
+                    <span className="error">  {props.errormessage && (props.cdAccountsDTO.partnerId == "") ? CommonMessage("RequiredField", []) : null}</span>
+
                 </GridItem>
                         <GridItem xs={12} sm={12} md={3} >
 
-                    <MasterDropdown labelText="Product Name" id="ddlstatus" lstObject={props.ProductData} required={props.required} filterName='Product' value={props.cdAccountsDTO.productId} name='productId' onChange={props.setValue} formControlProps={{ fullWidth: true }} />
-                    {props.errormessage && (props.cdAccountsDTO.productId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                    <MasterDropdown labelText="ProductName" id="ddlstatus" lstObject={props.ProductData} required={props.required} filterName='Product' value={props.cdAccountsDTO.productId} name='productId' onChange={props.setValue} formControlProps={{ fullWidth: true }} />
+                    {/*{props.errormessage && (props.cdAccountsDTO.productId == "") ? <p className="error">*Required field cannot be left blank</p> : null}*/}
+                    <span className="error">  {props.errormessage && (props.cdAccountsDTO.productId == "") ? CommonMessage("RequiredField", []) : null}</span>
                 </GridItem>
                         <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                         required={props.required} 
-                                labelText="Line of Business"
+                                labelText="LineOfBusiness"
                                 name="lob"
                                 value={props.cdAccountsDTO.lob}
                         onChange={props.setValue}
@@ -57,12 +61,13 @@ const CreateCDAccountPage=(props) => {
                                     fullWidth: true
                                 }}
                     />
-                    {props.errormessage && (props.cdAccountsDTO.lob == "") ? <p className="error">*Required field cannot be left blank</p>: null}
+                    {/*{props.errormessage && (props.cdAccountsDTO.lob == "") ? <p className="error">*Required field cannot be left blank</p> : null}*/}
+                    <span className="error">  {props.errormessage && (props.cdAccountsDTO.lob == "") ? CommonMessage("RequiredField", []) : null}</span>
                         </GridItem>
                         <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                         required={props.required} 
-                                labelText="Class of Business"
+                                labelText="ClassOfBusiness"
                                 name="cob"
                                 value={props.cdAccountsDTO.cob}
                                 onChange={props.setValue}
@@ -71,7 +76,8 @@ const CreateCDAccountPage=(props) => {
                                     fullWidth: true
                                 }}
                     />
-                    {props.errormessage && (props.cdAccountsDTO.cob == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                   {/* {props.errormessage && (props.cdAccountsDTO.cob == "") ? <p className="error">*Required field cannot be left blank</p> : null}*/}
+                    <span className="error">  {props.errormessage && (props.cdAccountsDTO.cob == "") ? CommonMessage("RequiredField", []) : null}</span>
                         </GridItem>
                       
                     </GridContainer>

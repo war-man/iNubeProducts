@@ -53,7 +53,7 @@ const RegAddress = (props) => {
     const data = props.componentName;
     //console.log("peops coimng data", data);
     //console.log(regData);
-    console.log('props',props);
+    console.log('propsR',props);
     const { classes } = props;
     var addType;
     var countryValue, stateValue, distValue, cityValue, pinCodeValue, addLine1, addLine2, addLine3;
@@ -64,66 +64,93 @@ const RegAddress = (props) => {
     var District = [];
     var City = [];
     var Pincode = [];
-    //if (data == "cAddress") {
-    //    addType = 'corp';
-    //    lblmsg = 'Corporate Address same as Registered Address';
-    //    countryValue = regData.addressDTO.corp.orgCountryId; 
-    //    stateValue = regData.addressDTO.corp.orgStateId;
-    //    distValue = regData.addressDTO.corp.orgDistrictId;
-    //    cityValue = regData.addressDTO.corp.orgCityId;
-    //    pinCodeValue = regData.addressDTO.corp.orgPincodeId;
-    //    addLine1 = regData.addressDTO.corp.orgAddressLine1;
-    //    addLine2 = regData.addressDTO.corp.orgAddressLine2;
-    //    addLine3 = regData.addressDTO.corp.orgAddressLine3;
 
-    //} else if (data == "mAddress") {
-    //    addType = 'mail';
-    //    countryValue = regData.addressDTO.mail.orgCountryId;
-    //    stateValue = regData.addressDTO.mail.orgStateId;
-    //    distValue = regData.addressDTO.mail.orgDistrictId;
-    //    cityValue = regData.addressDTO.mail.orgCityId;
-    //    pinCodeValue = regData.addressDTO.mail.orgPincodeId;
-    //    addLine1 = regData.addressDTO.mail.orgAddressLine1;
-    //    addLine2 = regData.addressDTO.mail.orgAddressLine2;
-    //    addLine3 = regData.addressDTO.mail.orgAddressLine3;
+    if (data == "cAddress") {
+        addType = 'corp';
+        Country = regData.LocationDTO.Country;
+        State = regData.LocationDTO.State;
+        District = regData.LocationDTO.District;
+        City = regData.LocationDTO.City;
+        Pincode = regData.LocationDTO.Pincode;
+        lblmsg = 'Corporate Address same as Registered Address';
+        countryValue = regData.addressDTO.corp.orgCountryId; 
+        stateValue = regData.addressDTO.corp.orgStateId;
+        distValue = regData.addressDTO.corp.orgDistrictId;
+        cityValue = regData.addressDTO.corp.orgCityId;
+        pinCodeValue = regData.addressDTO.corp.orgPincodeId;
+        addLine1 = regData.addressDTO.corp.orgAddressLine1;
+        addLine2 = regData.addressDTO.corp.orgAddressLine2;
+        addLine3 = regData.addressDTO.corp.orgAddressLine3;
 
-    //} else if (data == "rAddress") {
-    //    addType = 'reg';
-    //    //console.log(regData);
-    //    countryValue = regData.addressDTO.reg.orgCountryId;
-    //    stateValue = regData.addressDTO.reg.orgStateId;
-    //    distValue = regData.addressDTO.reg.orgDistrictId;
-    //    cityValue = regData.addressDTO.reg.orgCityId;
-    //    pinCodeValue = regData.addressDTO.reg.orgPincodeId;
-    //    addLine1 = regData.addressDTO.reg.orgAddressLine1;
-    //    addLine2 = regData.addressDTO.reg.orgAddressLine2;
-    //    addLine3 = regData.addressDTO.reg.orgAddressLine3;
-    //}
-    //else if (data == "offAddress") {
-    //    addType = 'off';
-    //    //console.log("regdata",regData);
-    //    countryValue = regData.addressDTO.off.officeCountryId;
-    //    stateValue = regData.addressDTO.off.officeStateId;
-    //    distValue = regData.addressDTO.off.officeDistrictId;
-    //    cityValue = regData.addressDTO.off.officeCityId;
-    //    pinCodeValue = regData.addressDTO.off.officePincodeId;
-    //    addLine1 = regData.addressDTO.off.officeAddressLine1;
-    //    addLine2 = regData.addressDTO.off.officeAddressLine2;
-    //    addLine3 = regData.addressDTO.off.officeAddressLine3;
-    //    //console.log("value off", countryValue);
-    //}
-    //else if (data == "spocDet") {
-    //    addType = 'spoc';
-    //    //console.log(regData);
-    //    countryValue = regData.addressDTO.spoc.spoccountryId;
-    //    stateValue = regData.addressDTO.spoc.spocstateId;
-    //    distValue = regData.addressDTO.spoc.spocdistrictId;
-    //    cityValue = regData.addressDTO.spoc.spoccityId;
-    //    pinCodeValue = regData.addressDTO.spoc.spocpincodeId;
-    //    addLine1 = regData.addressDTO.spoc.spocaddressLine1;
-    //    addLine2 = regData.addressDTO.spoc.spocaddressLine2;
-    //    addLine3 = regData.addressDTO.spoc.spocaddressLine3;
-    //}
+    } else if (data == "mAddress") {
+        addType = 'mail';
+        Country = regData.LocationDTO.Country;
+        State = regData.LocationDTO.State;
+        District = regData.LocationDTO.District;
+        City = regData.LocationDTO.City;
+        Pincode = regData.LocationDTO.Pincode;
+        countryValue = regData.addressDTO.mail.orgCountryId;
+        stateValue = regData.addressDTO.mail.orgStateId;
+        distValue = regData.addressDTO.mail.orgDistrictId;
+        cityValue = regData.addressDTO.mail.orgCityId;
+        pinCodeValue = regData.addressDTO.mail.orgPincodeId;
+        addLine1 = regData.addressDTO.mail.orgAddressLine1;
+        addLine2 = regData.addressDTO.mail.orgAddressLine2;
+        addLine3 = regData.addressDTO.mail.orgAddressLine3;
+
+    } else if (data == "rAddress") {
+        addType = 'reg';
+        //console.log(regData);
+        Country = regData.LocationDTO.Country;
+        State = regData.LocationDTO.State;
+        District = regData.LocationDTO.District;
+        City = regData.LocationDTO.City;
+        Pincode = regData.LocationDTO.Pincode;
+        countryValue = regData.addressDTO.reg.orgCountryId;
+        stateValue = regData.addressDTO.reg.orgStateId;
+        distValue = regData.addressDTO.reg.orgDistrictId;
+        cityValue = regData.addressDTO.reg.orgCityId;
+        pinCodeValue = regData.addressDTO.reg.orgPincodeId;
+        addLine1 = regData.addressDTO.reg.orgAddressLine1;
+        addLine2 = regData.addressDTO.reg.orgAddressLine2;
+        addLine3 = regData.addressDTO.reg.orgAddressLine3;
+    }
+
+    else if (data == "offAddress") {
+        addType = 'off';
+        //console.log("regdata",regData);
+        Country = regData.LocationDTO.Country;
+        State = regData.LocationDTO.State;
+        District = regData.LocationDTO.District;
+        City = regData.LocationDTO.City;
+        Pincode = regData.LocationDTO.Pincode;
+        countryValue = regData.addressDTO.off.officeCountryId;
+        stateValue = regData.addressDTO.off.officeStateId;
+        distValue = regData.addressDTO.off.officeDistrictId;
+        cityValue = regData.addressDTO.off.officeCityId;
+        pinCodeValue = regData.addressDTO.off.officePincodeId;
+        addLine1 = regData.addressDTO.off.officeAddressLine1;
+        addLine2 = regData.addressDTO.off.officeAddressLine2;
+        addLine3 = regData.addressDTO.off.officeAddressLine3;
+        //console.log("value off", countryValue);
+    }
+    else if (data == "spocDet") {
+        addType = 'spoc';
+        //console.log(regData);
+        Country = regData.LocationDTO.Country;
+        State = regData.LocationDTO.State;
+        District = regData.LocationDTO.District;
+        City = regData.LocationDTO.City;
+        Pincode = regData.LocationDTO.Pincode;
+        countryValue = regData.addressDTO.spoc.spoccountryId;
+        stateValue = regData.addressDTO.spoc.spocstateId;
+        distValue = regData.addressDTO.spoc.spocdistrictId;
+        cityValue = regData.addressDTO.spoc.spoccityId;
+        pinCodeValue = regData.addressDTO.spoc.spocpincodeId;
+        addLine1 = regData.addressDTO.spoc.spocaddressLine1;
+        addLine2 = regData.addressDTO.spoc.spocaddressLine2;
+        addLine3 = regData.addressDTO.spoc.spocaddressLine3;
+    }
     //else if (data == "pCorpAddress") {
     if (data == "pCorpAddress") {
         addType = 'corp';
@@ -159,25 +186,27 @@ const RegAddress = (props) => {
         addLine2 = regData.addressDTO.off.partnerAddressLine2;
         addLine3 = regData.addressDTO.off.partnerAddressLine3;
     }
-    //if (data == "rAddress" || data == "mAddress" || data == "cAddress") {
-    //    countryName = 'orgCountryId';
-    //    stateName = 'orgStateId';
-    //    distName = 'orgDistrictId';
-    //    cityName = 'orgCityId';
-    //    pinCodeName = 'orgPincodeId';
-    //    addLine1Name = 'orgAddressLine1';
-    //    addLine2Name = 'orgAddressLine2';
-    //    addLine3Name = 'orgAddressLine3';
-    //} else if (data == "spocDet") {
-    //    countryName = 'spoccountryId';
-    //    stateName = 'spocstateId';
-    //    distName = 'spocdistrictId';
-    //    cityName = 'spoccityId';
-    //    pinCodeName = 'spocpincodeId';
-    //    addLine1Name = 'spocaddressLine1';
-    //    addLine2Name = 'spocaddressLine2';
-    //    addLine3Name = 'spocaddressLine3';
-    //} else if (data == "pCorpAddress" || data == "pOffAddress") {
+    if (data == "rAddress" || data == "mAddress" || data == "cAddress") {
+        countryName = 'orgCountryId';
+        stateName = 'orgStateId';
+        distName = 'orgDistrictId';
+        cityName = 'orgCityId';
+        pinCodeName = 'orgPincodeId';
+        addLine1Name = 'orgAddressLine1';
+        addLine2Name = 'orgAddressLine2';
+        addLine3Name = 'orgAddressLine3';
+    }
+        else if (data == "spocDet") {
+        countryName = 'spoccountryId';
+        stateName = 'spocstateId';
+        distName = 'spocdistrictId';
+        cityName = 'spoccityId';
+        pinCodeName = 'spocpincodeId';
+        addLine1Name = 'spocaddressLine1';
+        addLine2Name = 'spocaddressLine2';
+        addLine3Name = 'spocaddressLine3';
+    } 
+    //else if (data == "pCorpAddress" || data == "pOffAddress") {
     if (data == "pCorpAddress" || data == "pOffAddress") {
         countryName = 'partnerCountryId';
         stateName = 'partnerStateId';
@@ -426,7 +455,9 @@ const RegAddress = (props) => {
                     </GridItem>
 
                     <GridItem xs={12} sm={12} md={4}>
-                        <Dropdown labelText="Country" id="OrganizationDTO.countryId" required={true} disabled={regData.disabled} lstObject={Country} value={countryValue} name={countryName} onChange={(e) => regData.GetLocation('State', addType, e)} formControlProps={{ fullWidth: true }} />
+                        <Dropdown labelText="Country" id="OrganizationDTO.countryId" required={true} disabled={regData.disabled} lstObject={Country} 
+                            value={countryValue} name={countryName}
+                          onChange={(e) => regData.GetLocation('State', addType, e)} formControlProps={{ fullWidth: true }} />
                         <span className="error">   {regData.errormessage && (countryValue == "") ? CommonMessage("RequiredField", []) : null}</span>
                     </GridItem>
 
@@ -436,7 +467,8 @@ const RegAddress = (props) => {
                     </GridItem>
 
                     <GridItem xs={12} sm={12} md={4}>
-                        <Dropdown labelText="District" id="OrganizationDTO.districtId" required={true} disabled={regData.disabled} lstObject={District} value={distValue} name={distName} onChange={(e) => regData.GetLocation('City', addType, e)} formControlProps={{ fullWidth: true }} />
+                        <Dropdown labelText="District" id="OrganizationDTO.districtId" required={true} disabled={regData.disabled} lstObject={District} value={distValue} name={distName}
+                            onChange={(e) => regData.GetLocation('City', addType, e)} formControlProps={{ fullWidth: true }} />
                         <span className="error">   {regData.errormessage && (distValue == "") ? CommonMessage("RequiredField", []) : null}</span>
                     </GridItem>
 

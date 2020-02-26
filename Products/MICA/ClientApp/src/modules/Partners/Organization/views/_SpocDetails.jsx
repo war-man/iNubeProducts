@@ -95,7 +95,7 @@ const SpocDetails = (props) => {
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomDatetime style="ddl"
                         disabled={spocData.disabled}
-                        labelText="Date of Birth*"
+                        labelText="Date of Birth"
                         required={true}
                         id='dob'
                         name='spocdob'
@@ -106,7 +106,7 @@ const SpocDetails = (props) => {
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomDatetime style="ddl"
                         disabled={spocData.disabled}
-                        labelText="Date of Joining*"
+                        labelText="Date of Joining"
                         required={true}
                         id='doj'
                         name='spocdoj'
@@ -195,7 +195,7 @@ const SpocDetails = (props) => {
                 <GridItem xs={12} sm={4}>
                     <MasterDropdown
                         disabled={spocData.disabled}
-                        labelText="Marital Status*"
+                        labelText="Marital Status"
                         id="MaritalStatus"
                         lstObject={spocData.masterLists}
                         filterName='MaritalStatus'
@@ -209,7 +209,7 @@ const SpocDetails = (props) => {
                 <GridItem xs={12} sm={4}>
                     <MasterDropdown
                         disabled={spocData.disabled}
-                        labelText="Select Gender*"
+                        labelText="Select Gender"
                         id="gender"
                         lstObject={spocData.masterLists}
                         filterName='Gender'
