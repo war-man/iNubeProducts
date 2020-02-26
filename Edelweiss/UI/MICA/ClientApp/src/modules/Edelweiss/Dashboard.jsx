@@ -88,6 +88,11 @@ class Dashboard extends React.Component {
                 switchStatus: false,
                 switchEnabled: false,
             },
+            scheduleobject: {
+                "vehicleRegistrationNo": "",
+                "policyNo": "",
+                "switchState": true
+            },
             openschedule: false,
             getSchedule: {
                 "vehicleRegistrationNo": "KA01W6666",
@@ -125,13 +130,19 @@ class Dashboard extends React.Component {
 
         if (name == "switchStatus") {
             if (scheduler.switchStatus == true) {
-                fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/SwitchOnOFF?VehicleNo=` + this.state.schedule.vehicleRegistrationNo + `&PolicyNo=` + this.state.schedule.policyNo + `&SwitchState=true`, {
+
+                let object = this.state.scheduleobject;
+                object.switchState = scheduler.switchStatus;
+                this.setState({ object });
+
+                fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/SwitchOnOff`, {
                     method: 'post',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                         'Authorization': localStorage.getItem('edelweisstoken')
                     },
+                    body: JSON.stringify(object)
                 }).then(response => response.json())
                     .then(data => {
                         console.log('response: ', data);
@@ -196,6 +207,11 @@ class Dashboard extends React.Component {
         localStorage.setItem('edelweisstoken', edelweisstoken);
 
         console.log("number: ", this.props.vehicleno, this.props.policynumber);
+        let object = this.state.scheduleobject;
+        object.policyNo = this.props.policynumber;
+        object.vehicleRegistrationNo = this.props.vehicleno;
+        this.setState({ object });
+
         fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=` + this.props.vehicleno + `&PolicyNo=` + this.props.policynumber + ``, {
             //fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=KA01EQ9767&PolicyNo=750000109` , {
             method: 'GET',

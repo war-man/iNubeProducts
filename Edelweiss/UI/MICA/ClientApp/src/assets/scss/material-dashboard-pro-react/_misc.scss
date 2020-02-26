@@ -302,18 +302,18 @@ img {
 }
 
 
-#text-field-hero{
-    color:white
+#text-field-hero {
+    color: white
     //visibility:hidden;
 }
 
 .MuiInputLabel-filled {
     color: #fff !important;
-    font-size:13px !important;
+    font-size: 13px !important;
 }
 
-.Container-padding{
-    position:relative;
+.Container-padding {
+    position: relative;
     bottom: 3rem;
 }
 
@@ -321,27 +321,41 @@ img {
     color: #E7AB37 !important;
 }
 
-.MuiStepLabel-iconContainer{
-    cursor:pointer !important;
+.MuiStepLabel-iconContainer {
+    cursor: pointer !important;
 }
 
 .MuiStepIcon-active {
     color: #9e9e9e !important;
-
 }
 
-.otp-handel{
-    margin-top:-1rem !important;
+.otp-handel {
+    margin-top: -1rem !important;
 }
 
-.MuiAutocomplete-input{
-    color:white !important;
+.MuiAutocomplete-input {
+    color: white !important;
 }
 
 /*.MuiInputLabel-animated {
     color: white !important;
 }*/
 
-.MuiAutocomplete-popupIndicator{
-    color:#fff !important;
+.MuiAutocomplete-popupIndicator {
+    color: #fff !important;
+}
+
+.schedularalign {
+    right: 40px;
+    position: relative;
+}
+
+#disp {
+    left: 3rem;
+    position: relative;
+}
+
+#dispschedule {
+    left: 6rem;
+    position: relative;
 }

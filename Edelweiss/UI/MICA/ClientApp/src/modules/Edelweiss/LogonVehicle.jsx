@@ -318,25 +318,31 @@ class LogonVehicle extends React.Component {
         this.setState({ scheduler });
         console.log("scheduler: ", scheduler);
 
-        if (name == "switchStatus") {
-            if (scheduler.switchStatus == true) {
-                fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/SwitchOnOFF?VehicleNo=` + this.state.schedule.vehicleRegistrationNo + `&PolicyNo=` + this.state.schedule.policyNo + `&SwitchState=true`, {
-                    method: 'post',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': localStorage.getItem('edelweisstoken')
-                    },
-                }).then(response => response.json())
-                    .then(data => {
-                        console.log('response: ', data);
-                        swal({
-                            text: data.responseMessage,
-                            icon: "success"
-                        })
-                    });
-            }
-        }
+        //if (name == "switchStatus") {
+        //    if (scheduler.switchStatus == true) {
+        //        let object = this.state.scheduleobject;
+        //        object.switchState = scheduler.switchStatus;
+        //        object.policyNo = this.state.policynumber;
+        //        object.vehicleRegistrationNo = this.state.vehicleno;
+        //        this.setState({ object });
+        //        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/SwitchOnOff`, {
+        //            method: 'post',
+        //            headers: {
+        //                'Accept': 'application/json',
+        //                'Content-Type': 'application/json',
+        //                'Authorization': localStorage.getItem('edelweisstoken')
+        //            },
+        //            body: JSON.stringify(object)
+        //        }).then(response => response.json())
+        //            .then(data => {
+        //                console.log('response: ', data);
+        //                swal({
+        //                    text: data.responseMessage,
+        //                    icon: "success"
+        //                })
+        //            });
+        //    }
+        //}
     }
 
     handleSubmit = () => {
@@ -403,6 +409,8 @@ class LogonVehicle extends React.Component {
                 console.log("masterList: ", data);
                 this.setState({ masterList: data });
             });
+
+
     }
 
     handlePolicyDetails = (policynum) => {
@@ -558,7 +566,7 @@ class LogonVehicle extends React.Component {
                 }
             })
         this.handleCloseaddvehicle();
-       // this.handlePolicyDetails(this.state.policynumber);
+        // this.handlePolicyDetails(this.state.policynumber);
     }
 
     handleopenDialog = () => {

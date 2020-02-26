@@ -2505,6 +2505,18 @@ img {
 .MuiAutocomplete-popupIndicator {
   color: #fff !important; }
 
+.schedularalign {
+  right: 40px;
+  position: relative; }
+
+#disp {
+  left: 3rem;
+  position: relative; }
+
+#dispschedule {
+  left: 6rem;
+  position: relative; }
+
 .btn-file {
   position: relative;
   overflow: hidden;
