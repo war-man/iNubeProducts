@@ -2344,10 +2344,10 @@ class ProductConfig extends React.Component {
 
                     }
                 } 
-                if (CoverCount == 0) {
-                    this.state.ValidationUI = false; this.state.errormessage = true;
-                    tempmassage = tempmassage + "Cover,";
-                }
+                //if (CoverCount == 0) {
+                //    this.state.ValidationUI = false; this.state.errormessage = true;
+                //    tempmassage = tempmassage + "Cover,";
+                //}
             }
         } else {
             this.state.ValidationUI = false; this.state.errormessage = true;
