@@ -187,7 +187,7 @@ class CoverInterface extends React.Component {
             //this.props.ProductDTO.insurableRcbdetails[Iindex].coverRcbdetails[Cindex].inputId = value;
 
             if (filtertype.length > 0) {
-                //this.GetRiskClaimMaster('Risk', filtertype[0].mID, event.target.value);
+               // this.GetRiskClaimMaster('Risk', filtertype[0].mID, event.target.value);
                 this.GetRiskClaimMaster('Risk', "64", 1000);
 
             }
