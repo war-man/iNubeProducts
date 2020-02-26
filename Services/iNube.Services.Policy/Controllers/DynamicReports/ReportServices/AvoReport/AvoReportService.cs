@@ -14,6 +14,11 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.AvoRep
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
         {
             throw new NotImplementedException();

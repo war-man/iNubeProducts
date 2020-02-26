@@ -19,6 +19,7 @@ namespace iNube.Services.Policy.Entities.DynamicReportEntities
         public virtual DbSet<TblReportConfigParam> TblReportConfigParam { get; set; }
         public virtual DbSet<TblRpmasters> TblRpmasters { get; set; }
 
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

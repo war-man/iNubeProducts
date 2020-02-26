@@ -60,5 +60,12 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
             var objectval = await _reportService.GetReportConfigName(lMasterlist, Context);
             return Ok(objectval);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetParameters(int ReportConfigId)
+        {
+            var eventDetails = await _reportService.GetParameters(ReportConfigId, Context);
+            return Ok(eventDetails);
+        }
     }
 }

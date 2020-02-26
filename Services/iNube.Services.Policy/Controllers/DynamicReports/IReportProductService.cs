@@ -12,5 +12,6 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext);
         Task<ReportConfigResonse> SaveConfigParameters(ReportConfigDTO reportConfigDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext);
+        Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext);
     }
 }

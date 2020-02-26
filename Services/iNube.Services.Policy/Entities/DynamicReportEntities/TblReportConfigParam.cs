@@ -15,3 +15,5 @@ namespace iNube.Services.Policy.Entities.DynamicReportEntities
         public virtual TblReportConfig ReportConfig { get; set; }
     }
 }
+
+

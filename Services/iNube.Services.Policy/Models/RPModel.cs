@@ -54,4 +54,11 @@ namespace iNube.Services.Policy.Models
         //public string TypeCode { get; set; }
         public string Value { get; set; }
     }
+
+    public partial class ReportParamsDTO
+    {
+        public string ParameterName { get; set; }
+        public string RangeType { get; set; }
+        public string DataType { get; set; }
+    }
 }
