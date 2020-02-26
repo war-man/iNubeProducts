@@ -12,6 +12,10 @@ import ModelTestddl from "views/Test/ModelTestDropdown.jsx";
 import HomePage from "modules/Edelweiss/HomePage.jsx";
 import DriverPage from "modules/Edelweiss/DriverPage.jsx";
 import DriverDetails from "modules/Edelweiss/DriverDetails.jsx";
+import Dashboard from "modules/Edelweiss/Dashboard.jsx";
+import Vehicles from "modules/Edelweiss/Vehicles.jsx";
+import LogonVehicle from "modules/Edelweiss/LogonVehicle.jsx";
+import Logon from "modules/Edelweiss/Logon.jsx";
 // @material-ui/icons
 import PersonAdd from "@material-ui/icons/PersonAdd";
 import Fingerprint from "@material-ui/icons/Fingerprint";
@@ -25,22 +29,24 @@ import Payment from "modules/Edelweiss/Payment.jsx";
 import ProposalPage from "../modules/Edelweiss/ProposalPage";
 import AddVehicle from "../modules/Edelweiss/AddVehicle.jsx";
 import AddDriver from "../modules/Edelweiss/AddDriver.jsx";
+import ClaimIntimate from "../modules/Edelweiss/ClaimIntimate.jsx";
+
 const pagesRoutes = [
-  {
-    path: "/pages/register-page",
-    name: "Register Page",
-    short: "Register",
-    mini: "RP",
-    icon: PersonAdd,
-    component: RegisterPage
-  },
-  {
-    path: "/pages/login-page",
-    name: "Login Page",
-    short: "Login",
-    mini: "LP",
-    icon: Fingerprint,
-    component: LoginPage
+    {
+        path: "/pages/register-page",
+        name: "Register Page",
+        short: "Register",
+        mini: "RP",
+        icon: PersonAdd,
+        component: RegisterPage
+    },
+    {
+        path: "/pages/login-page",
+        name: "Login Page",
+        short: "Login",
+        mini: "LP",
+        icon: Fingerprint,
+        component: LoginPage
     },
     {
         path: "/pages/password-page",
@@ -50,13 +56,13 @@ const pagesRoutes = [
         icon: PersonAdd,
         component: PasswordPage
     },
-  {
-    path: "/pages/pricing-page",
-    name: "Pricing Page",
-    short: "Pricing",
-    mini: "PP",
-    icon: MonetizationOn,
-    component: PricingPage
+    {
+        path: "/pages/pricing-page",
+        name: "Pricing Page",
+        short: "Pricing",
+        mini: "PP",
+        icon: MonetizationOn,
+        component: PricingPage
     },
     {
         path: "/pages/test-page",
@@ -91,6 +97,38 @@ const pagesRoutes = [
         component: DriverPage
     },
     {
+        path: "/pages/Dashboard",
+        name: "Dashboard",
+        short: "Dashboard",
+        mini: "DH",
+        icon: MonetizationOn,
+        component: Dashboard
+    },
+    {
+        path: "/pages/Logon",
+        name: "Logon",
+        short: "Logon",
+        mini: "LO",
+        icon: MonetizationOn,
+        component: Logon
+    },
+    {
+        path: "/pages/Vehicles",
+        name: "Vehicles",
+        short: "Vehicles",
+        mini: "VH",
+        icon: MonetizationOn,
+        component: Vehicles
+    },
+    {
+        path: "/pages/LogonVehicle",
+        name: "LogonVehicle",
+        short: "LogonVehicle",
+        mini: "LV",
+        icon: MonetizationOn,
+        component: LogonVehicle
+    },
+    {
         path: "/pages/Driverdetails",
         name: "Driverdetails",
         short: "Driverdetails",
@@ -98,13 +136,13 @@ const pagesRoutes = [
         icon: MonetizationOn,
         component: DriverDetails
     },
-  {
-    path: "/pages/lock-screen-page",
-    name: "Lock Screen Page",
-    short: "Lock",
-    mini: "LSP",
-    icon: LockOpen,
-    component: LockScreenPage
+    {
+        path: "/pages/lock-screen-page",
+        name: "Lock Screen Page",
+        short: "Lock",
+        mini: "LSP",
+        icon: LockOpen,
+        component: LockScreenPage
     },
     {
         path: "/pages/TPPolicy",
@@ -171,11 +209,19 @@ const pagesRoutes = [
         component: AddDriver
     },
     {
-    redirect: true,
-    path: "/pages",
+        path: "/pages/ClaimIntimate",
+        name: "ClaimIntimate",
+        short: "ClaimIntimate",
+        mini: "DD",
+        icon: MonetizationOn,
+        component: ClaimIntimate
+    },
+    {
+        redirect: true,
+        path: "/pages",
         pathTo: "/pages/Homepage",
         name: "Homepage"
-  }
+    }
 ];
 
 export default pagesRoutes;
