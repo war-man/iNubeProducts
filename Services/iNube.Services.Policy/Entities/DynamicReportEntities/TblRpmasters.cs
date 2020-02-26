@@ -12,3 +12,4 @@ namespace iNube.Services.Policy.Entities.DynamicReportEntities
     }
 }
 
+

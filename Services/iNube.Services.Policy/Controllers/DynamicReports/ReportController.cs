@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using iNube.Services.Policy.Models;
+using iNube.Services.Policy.RPModels;
 using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Authorization;

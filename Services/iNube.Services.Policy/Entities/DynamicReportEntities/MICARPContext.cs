@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace iNube.Services.Policy.Entities.DynamicReportEntities
 {
+    
     public partial class MICARPContext : DbContext
     {
         public MICARPContext()

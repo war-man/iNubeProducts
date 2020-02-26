@@ -156,7 +156,9 @@ export const TRANSLATIONS = {
         SearchMapping: 'Search Mapping',
         ModifyMapping: 'Modify Mapping',
         DynamicProduct: 'Dynamic Product',
-        DynamicProd:'Dynamic Product',
+        DynamicProd: 'Dynamic Product',
+        //Dynamic Reports
+        ReportConfig: 'Report Config',
         /**********************************************************************/
 
         //UserManagement
@@ -673,7 +675,19 @@ export const TRANSLATIONS = {
         RetentionLogic: 'Retention Logic',
         Percentage: 'Percentage',
         Limit: 'Limit',
-        ListOfRetention:'List Of Retention'
+        ListOfRetention: 'List Of Retention'
+
+         /***********************************************************************/
+        //Dynamic Reports
+        ReportConfiguration: 'Report Configuration',
+        ReportName: 'Report Name',
+        DBSchema: 'DB Schema',
+        RangeType: 'Range Type',
+        DataType: 'Data Type',
+
+        //Buttons
+        AddParameter: 'Add Parameter',
+        Save: 'Save',
     },
     hi_IN: TRANSLATIONS_HN,
     kn_IN: TRANSLATIONS_KN,

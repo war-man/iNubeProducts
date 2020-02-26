@@ -1,7 +1,7 @@
 ﻿using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
-using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -71,12 +71,12 @@ namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
             return dbConnectionString;
         }
 
-        public static async Task<DbContext> GetContextAsync(string product, string connectionKey)
+        public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService());
+            DbHelper dbHelper = new DbHelper(new RPIntegrationService(configuration));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)

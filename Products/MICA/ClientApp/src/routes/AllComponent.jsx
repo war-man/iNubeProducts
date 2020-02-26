@@ -160,6 +160,9 @@ const DefineMapping = AsyncComponent(() => { return import("modules/Reinsurance/
 const SearchMapping = AsyncComponent(() => { return import("modules/Reinsurance/views/SearchMapping.jsx"); });
 const ModifyMapping = AsyncComponent(() => { return import("modules/Reinsurance/views/ModifyMapping.jsx"); });
 
+/*Dynamic Reports*/
+const ReportConfiguration = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportConfiguration.jsx"); });
+const ReportExecution = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportExecution.jsx"); });
 
 export const ComponentsList = {
     Uwdashboard: Uwdashboard,
@@ -268,6 +271,8 @@ export const ComponentsList = {
     CalculationDisplay: CalculationDisplay,
     DynamicProd: DynamicProduct,
     UserDashboard: UserDashboard,
+    ReportConfig: ReportConfiguration,
+    ReportExecution: ReportExecution,
 }
 
 export default ComponentsList

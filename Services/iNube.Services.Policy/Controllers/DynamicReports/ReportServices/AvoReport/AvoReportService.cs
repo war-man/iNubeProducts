@@ -1,4 +1,4 @@
-﻿using iNube.Services.Policy.Models;
+﻿using iNube.Services.Policy.RPModels;
 using iNube.Utility.Framework.Model;
 using System;
 using System.Collections.Generic;
