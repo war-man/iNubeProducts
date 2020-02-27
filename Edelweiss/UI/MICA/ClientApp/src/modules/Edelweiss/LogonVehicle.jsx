@@ -685,7 +685,6 @@ class LogonVehicle extends React.Component {
     }
 
     DeleteEndorsement = (endorsementdto) => {
-        debugger;
         fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/PolicyEndoresemenet`, {
             method: 'PUT',
             headers: {
@@ -774,7 +773,8 @@ class LogonVehicle extends React.Component {
             this.setState({ showvehicles: true, endorsement })
         }
         endorsement.policyNo = this.state.policynumber;
-        endorsement.si = this.state.selectedamount;
+        console.log("suminsured: ", this.state.selectedSI);
+        endorsement.si = this.state.suminsured;
         endorsement.endorsementEffectiveDate = date;
         this.setState({ endorsement })
         this.handleCalculateendorsementpremium();
@@ -785,7 +785,6 @@ class LogonVehicle extends React.Component {
     }
 
     handleDeleteopen = (vehicleno, vehiclestype, key) => {
-        debugger;
         var today = new Date();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
         this.state.vehiclestype = vehiclestype;
@@ -935,9 +934,17 @@ class LogonVehicle extends React.Component {
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
         let premiumendorse = this.state.endorsementPremiumDTO;
         this.state.selectedSI = this.state.suminsuredamount[key].mValue;
-        this.setState({ selectedSI: this.state.suminsuredamount[key].mValue, selectedamount: this.state.suminsuredamount[key].label, premiumendorse, opendialog: false });
         premiumendorse.si = this.state.selectedSI;
         premiumendorse.endorsementEffectiveDate = date;
+        premiumendorse.policyNo = this.state.policynumber;
+        if (this.state.typevehicle == "PC") {
+            premiumendorse.pcCount = 1;
+        }
+        if (this.state.typevehicle == "TW") {
+            premiumendorse.twCount = 1;
+        }
+
+        this.setState({ selectedSI: this.state.suminsuredamount[key].mValue, selectedamount: this.state.suminsuredamount[key].label, premiumendorse, opendialog: false });
         console.log("state.endorsementPremium", this.state.endorsementPremiumDTO);
         this.handleCalculateendorsementpremium();
     }
@@ -1234,28 +1241,6 @@ class LogonVehicle extends React.Component {
                                                             />
                                                         </GridItem>
                                                     </GridContainer>
-                                                    <GridContainer justify="center">
-                                                        <h5>Select Premium here</h5>
-                                                        <GridItem xs={6}>
-                                                            <Button variant="outlined" round size="large" color="warning" onClick={this.handleopenDialog}>{this.state.selectedamount}</Button>
-                                                            <Dialog style={{ textAlign: "center" }} onClose={this.handleaddcloseDialog} aria-labelledby="simple-dialog-title" open={this.state.opendialog} >
-                                                                <DialogTitle id="simple-dialog-title"> <b>Sum Insured Amount</b> </DialogTitle>
-                                                                <DialogContent dividers>
-                                                                    {this.state.suminsuredamount.map(function (item, key) {
-                                                                        return (
-                                                                            <List round button>
-                                                                                <ListItem button id="padding-list-item" selected={this.state.selectedSI === item.mID} onClick={e => this.handleaddselectedSI(e, key)} >
-                                                                                    <ListItemText>
-                                                                                        ₹{item.label}
-                                                                                    </ListItemText>
-                                                                                </ListItem>
-                                                                            </List>
-                                                                        );
-                                                                    }.bind(this))}
-                                                                </DialogContent>
-                                                            </Dialog>
-                                                        </GridItem>
-                                                    </GridContainer>
                                                     <GridContainer>
 
                                                     </GridContainer>
@@ -1281,38 +1266,62 @@ class LogonVehicle extends React.Component {
                                                         <Button color="primary" round onClick={this.EndorsementPremium}> Calculate Premium </Button>
                                                     </GridContainer>
                                                     {this.state.showpremium ?
-                                                        <GridContainer justify="center">
-                                                            <GridItem>
-                                                                <table>
-                                                                    <tbody style={{ lineHeight: "1.18rem" }}>
-                                                                        <h4>Endorsement Premium</h4>
-                                                                        <tr>
-                                                                            <td style={{ fontWeight: "400" }}>per day premium: </td>
-                                                                            <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.premiumperday}</b>/-</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{ fontWeight: "400" }}>Fire & Theft: </td>
-                                                                            <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.firetheft}</b>/-</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            {/* <td style={{ fontWeight: "400" }}>AD for {this.state.fordays} Days: </td>*/}
-                                                                            <td style={{ fontWeight: "400" }}>AD {/* {this.state.ParticipantMaster.isActive} Days:*/} </td>
-                                                                            <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.adprem}</b>/-</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{ fontWeight: "400" }}>GST: </td>
-                                                                            <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.gsttax}</b>/-</td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style={{ fontWeight: "400" }}>Total: </td>
-                                                                            <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.sum}</b>/-</td>
-                                                                            <td> </td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </GridItem>
+                                                        <GridContainer>
                                                             <GridContainer justify="center">
-                                                                <Button color="primary" round onClick={() => this.confirm()}> confirm </Button>
+                                                                <h5>Select Premium here</h5>
+                                                                <GridItem xs={6}>
+                                                                    <Button variant="outlined" round size="large" color="warning" onClick={this.handleopenDialog}>{this.state.selectedamount}</Button>
+                                                                    <Dialog style={{ textAlign: "center" }} onClose={this.handleaddcloseDialog} aria-labelledby="simple-dialog-title" open={this.state.opendialog} >
+                                                                        <DialogTitle id="simple-dialog-title"> <b>Sum Insured Amount</b> </DialogTitle>
+                                                                        <DialogContent dividers>
+                                                                            {this.state.suminsuredamount.map(function (item, key) {
+                                                                                return (
+                                                                                    <List round button>
+                                                                                        <ListItem button id="padding-list-item" selected={this.state.selectedSI === item.mID} onClick={e => this.handleaddselectedSI(e, key)} >
+                                                                                            <ListItemText>
+                                                                                                ₹{item.label}
+                                                                                            </ListItemText>
+                                                                                        </ListItem>
+                                                                                    </List>
+                                                                                );
+                                                                            }.bind(this))}
+                                                                        </DialogContent>
+                                                                    </Dialog>
+                                                                </GridItem>
+                                                            </GridContainer>
+                                                            <GridContainer justify="center">
+                                                                <GridItem>
+                                                                    <table>
+                                                                        <tbody style={{ lineHeight: "1.18rem" }}>
+                                                                            <h4>Endorsement Premium</h4>
+                                                                            <tr>
+                                                                                <td style={{ fontWeight: "400" }}>per day premium: </td>
+                                                                                <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.premiumperday}</b>/-</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{ fontWeight: "400" }}>Fire & Theft: </td>
+                                                                                <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.firetheft}</b>/-</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                {/* <td style={{ fontWeight: "400" }}>AD for {this.state.fordays} Days: </td>*/}
+                                                                                <td style={{ fontWeight: "400" }}>AD {/* {this.state.ParticipantMaster.isActive} Days:*/} </td>
+                                                                                <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.adprem}</b>/-</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{ fontWeight: "400" }}>GST: </td>
+                                                                                <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.gsttax}</b>/-</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td style={{ fontWeight: "400" }}>Total: </td>
+                                                                                <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.sum}</b>/-</td>
+                                                                                <td> </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </GridItem>
+                                                                <GridContainer justify="center">
+                                                                    <Button color="primary" round onClick={() => this.confirm()}> confirm </Button>
+                                                                </GridContainer>
                                                             </GridContainer>
                                                         </GridContainer> : null}
                                                 </GridContainer>
