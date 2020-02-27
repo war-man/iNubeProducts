@@ -58,6 +58,7 @@ class ProductMapping extends React.Component {
         super(props);
         this.state = {
             masterList: [],
+            newmasterList: [],
             open: false,
             dropdowns: [],
             masterdataType: "",
@@ -172,12 +173,10 @@ class ProductMapping extends React.Component {
                     text: "Data saved successfully",
                     icon: "success"
                 })
-
-                this.setState({})
+                this.handlemasterdata();
             });
         this.state.dropdowns = [];
-        this.setState({ showtable: false, lobtable: false, masterType: "", masterdata: "", fields: this.state.resetfields, value:"" });
-
+        this.setState({ showtable: false, lobtable: false, masterType: "", masterdata: "", value: "" });
     }
 
     handleinputvalue = (event) => {
@@ -324,7 +323,26 @@ class ProductMapping extends React.Component {
                 }
                 this.setState({ master });
             });
+
         console.log("MasterDTO: ", this.state.MasterDTO);
+    }
+
+    handlemasterdata = () => {
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetEntityMaster`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({ newmasterList: data });
+                console.log("masterlist ", data);
+                for (let i = 0; i < this.state.newmasterList.length; i++) {
+                    this.state.fields[this.state.newmasterList[i].mType] = '';
+                }
+            });
     }
 
     /*dynamic objects for name and value of dropdown*/
