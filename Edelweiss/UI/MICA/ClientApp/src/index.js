@@ -8,6 +8,7 @@ import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import { rootReducer } from "./rootReducer";
 import thunk from "redux-thunk";
+import * as serviceWorker from './serviceWorker';
 
 import "assets/scss/material-dashboard-pro-react.css?v=1.4.0";
 
@@ -29,3 +30,6 @@ ReactDOM.render(
     </Router>,
     document.getElementById("root")
 );
+
+serviceWorker.register();
+
