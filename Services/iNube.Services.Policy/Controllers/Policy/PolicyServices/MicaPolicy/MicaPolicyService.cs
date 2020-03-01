@@ -254,7 +254,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<PolicyResponse> CreatePolicy(dynamic policyDetail, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
 
@@ -302,7 +302,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
                 logMsg = logMsg + ",3";
-                var mappedPolicy = MapAndValidatePolicy(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors);
+                var mappedPolicy = MapAndValidatePolicy(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, apiContext, "Policy");
 
                 if (Errors.Count == 0)
                 {
@@ -383,7 +383,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
         public async Task<PolicyDTO> ModifyPolicy(string policyNumber, PolicyDTO policyDetail, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             try
             {
@@ -409,7 +409,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<IEnumerable<ddDTOs>> GetMaster(string sMasterlist, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             IEnumerable<ddDTOs> ddDTOs = new List<ddDTOs>();
             // _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -423,7 +423,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return ddDTOs;
         }
 
-        private PolicyDTO MapAndValidatePolicy(dynamic policyDetail, ProductDTO productDTO, PartnersDTO partnersDTO, IEnumerable<ProductRcbdetailsDTO> riskDetails, List<ErrorInfo> Errors)
+        private async Task<PolicyDTO> MapAndValidatePolicy(dynamic policyDetail, ProductDTO productDTO, PartnersDTO partnersDTO, IEnumerable<ProductRcbdetailsDTO> riskDetails, List<ErrorInfo> Errors, ApiContext apiContext, string type)
         {
             PolicyDTO policyDTO = new PolicyDTO();
             // validation of risk details
@@ -478,7 +478,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             policyDTO.PremiumAmount = productDTO.PremiumAmount;
             // policyDTO.MasterPolicyNo = "ABC";//ToDo service req
             policyDTO.PolicyVersion = 1;
-            policyDTO.PolicyNo = GetPolicyNumber(partnersDTO.PartnerId, productDTO.ProductId);
+            policyDTO.PolicyNo = await GetPolicyNumberAsync(partnersDTO.PartnerId, productDTO.ProductId, apiContext, type);
             // policyDTO.CoverEvent = productDTO.ProductInsurableItems.FirstOrDefault().ProductCovers.FirstOrDefault().CoverEvent;
             // policyDTO.CoverName = productDTO.ProductInsurableItems.FirstOrDefault().ProductCovers.FirstOrDefault().Cover;
 
@@ -513,11 +513,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return dicColumns;
         }
 
-        private string GetPolicyNumber(decimal partnerId, decimal productId, string type = "PolicyNo")
+        private async Task<string> GetPolicyNumberAsync(decimal partnerId, decimal productId, ApiContext apiContext, string type = "PolicyNo")
         {
             //  _context = (MICAPOContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
 
-            var connectionString = _configuration.GetConnectionString("PCConnection");
+            // var connectionString = _configuration.GetConnectionString("PCConnection");
+            var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+            var connectionString = dbConnectionString.Dbconnection;
             int nextNumber = 0; string policNumber = "";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -537,6 +539,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             policNumber = nextNumber.ToString();
             return policNumber;
         }
+
 
         private async Task SendNotificationAsync(string policyNumber, string partnerEmail, string customerEmail, string customerNumber, string cover, string coverEvent, string productName)
         {
@@ -582,7 +585,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
         private async Task<List<ErrorInfo>> DoCDTransactionAsync(decimal productId, decimal partnerId, string policyNumber, int Amount, decimal PolicyId, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var cdAccount = string.Concat(productId.ToString().PadLeft(5, '0'), "/" + partnerId.ToString().PadLeft(5, '0'));
@@ -613,7 +616,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<PolicyDTO> GetPolicyById(decimal policyId, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblPolicy = _context.TblPolicy.Find(policyId);
             if (tblPolicy != null)
@@ -626,7 +629,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<PolicyDTO> GetPolicyByNumber(string policyNumber, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyNumber).FirstOrDefault();
             if (tblPolicy != null)
@@ -639,7 +642,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyNumber).FirstOrDefault();
             if (tblPolicy != null)
@@ -731,7 +734,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<IEnumerable<PolicyDTO>> GetPolicyByEventId(string eventId, string policyNumber, ApiContext apiContext)
         {
 
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblPolicy = _context.TblPolicy.Where(item => item.PolicyTypeId == eventId && item.PolicyNo == policyNumber).ToList();
 
@@ -746,7 +749,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<string> PolicyCancellation(PolicycancelDTO policycancel, ApiContext apiContext)
         {
 
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var _tblPolicy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == policycancel.Policynumber);
 
@@ -764,8 +767,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<dynamic> PolicyCancellation1(dynamic endoresementDto, ApiContext apiContext)
         {
-         
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var policyNo = (string)endoresementDto["PolicyNumber"];
             var _tblPolicy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == policyNo);
 
@@ -786,7 +789,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<IEnumerable<PolicyDTO>> PolicySearch(PolicysearchDTO policysearch, ApiContext apiContext)
         {
 
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate)
                           select P;
             if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
@@ -845,7 +848,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<CdTransactionsResponse> CancelPolicy(PolicycancelDTO policycancelDTO, ApiContext apiContext)
         {
 
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //var _tblPolicy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == policycancelDTO.Policynumber);
 
@@ -883,7 +886,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<CdTransactionsDTO> GetcddataAsync(int TxnId, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
 
             var cddetails = await _integrationService.GetcddataAsync(TxnId, apiContext);
@@ -892,7 +895,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<CdTransactionsResponse> ReverseCdAsync(PolicyCancelTransaction transaction, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var data = await _integrationService.ReverseCdAsync(transaction, apiContext);
             return data.FirstOrDefault();
@@ -909,7 +912,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<List<ddDTOs>> PolicyDashboardMaster(ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var PolicyYear = _context.TblPolicy.Select(x => x.CreatedDate.Year).Distinct().ToList();
 
@@ -932,7 +935,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<List<object>> GetGrossWrittenPremium(int productId, string productname, int Year, ApiContext apiContext)
         {
 
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             List<object> ProductDetails = new List<object>();
             List<object> FinalMonthData = new List<object>();
@@ -1140,7 +1143,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<IEnumerable<PolicyDTO>> GetPolicyDetails(ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //List<int> lstParentId = new List<int> { 0, parentID };
             var policy_list = _context.TblPolicy.ToList();
             var policyDTOs = _mapper.Map<List<PolicyDTO>>(policy_list);
@@ -1149,7 +1152,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<IEnumerable<decimal>> GetPolicyByDetails(PolicySearchbyPidDTO policySearchby, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var policy_list = _context.TblPolicy.Select(s => s);
             List<decimal> list = new List<decimal>();
 
@@ -1210,7 +1213,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<ProductDTO> GetProductIdAsync(int id, string productname, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             Dictionary<int, string> ProductDetails = new Dictionary<int, string>();
 
@@ -1428,7 +1431,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         //To get Policy Data 
         public async Task<List<object>> PolicyDetails(decimal PolicyId, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //var DATA = _context.TblPolicyDetails.Where(x => x.PolicyId == PolicyId).Select(x => x.PolicyRequest).ToList();
 
             //JObject json = JObject.Parse(DATA[0]);
@@ -1489,7 +1492,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         //MulticoverInsurable
         public async Task<PolicyInsurableResponse> PolicyInsurableDetails(string PolicyNumber, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             PolicyInsurableResponse insurableResponse = new PolicyInsurableResponse();
             var tblPolicy = _context.TblPolicy.Where(item => item.PolicyNo == PolicyNumber)
                   .Include(add => add.TblPolicyInsurableDetails).FirstOrDefault();
@@ -1513,7 +1516,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //  var id = 18;
             // var ps = await _integrationService.GetCustomerById(id, apiContext);
 
@@ -1571,7 +1574,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
                 logMsg = logMsg + ",3";
-                var mappedPolicy = MapAndValidateInsurablePolicy(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "policy");
+                var mappedPolicy = MapAndValidateInsurablePolicyAsync(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "policy", apiContext);
                 if (Errors.Count == 0)
                 {
 
@@ -1700,7 +1703,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
         public async Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //  var id = 18;
             // var ps = await _integrationService.GetCustomerById(id, apiContext);
 
@@ -1754,7 +1757,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
                 logMsg = logMsg + ",3";
-                var mappedPolicy = MapAndValidateInsurablePolicy(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "policy");
+                var mappedPolicy = MapAndValidateInsurablePolicyAsync(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "policy", apiContext);
                 if (Errors.Count == 0)
                 {
 
@@ -1972,7 +1975,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             policyDTO.PremiumAmount = totalPremiumAmount;
             return lstPolicyInsurableDetailsDto;
         }
-        private PolicyDTO MapAndValidateInsurablePolicy(dynamic policyDetail, ProductDTO productDTO, PartnersDTO partnersDTO, ProductRiskDetailsDTO riskDetails, List<ErrorInfo> Errors, SingleCover singleCover, string type)
+        private async Task<PolicyDTO> MapAndValidateInsurablePolicyAsync(dynamic policyDetail, ProductDTO productDTO, PartnersDTO partnersDTO, ProductRiskDetailsDTO riskDetails, List<ErrorInfo> Errors, SingleCover singleCover, string type, ApiContext apiContext)
         {
             PolicyDTO policyDTO = new PolicyDTO();
             // validation of risk details
@@ -2031,18 +2034,18 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             policyDTO.PolicyVersion = 1;
             if (partnersDTO != null)
             {
-                policyDTO.PolicyNo = GetPolicyNumber(partnersDTO.PartnerId, productDTO.ProductId);
+                policyDTO.PolicyNo = await GetPolicyNumberAsync(partnersDTO.PartnerId, productDTO.ProductId, apiContext, type);
                 // policyDTO.Po = GetPolicyNumber(partnersDTO.PartnerId, productDTO.ProductId);
             }
             else
             {
                 if (type == "Proposal")
                 {
-                    policyDTO.ProposalNo = GetPolicyNumber(0, productDTO.ProductId, type);
+                    policyDTO.ProposalNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
                 }
                 else
                 {
-                    policyDTO.PolicyNo = GetPolicyNumber(0, productDTO.ProductId);
+                    policyDTO.PolicyNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
 
                 }
             }
@@ -2377,7 +2380,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         //MulticoverInsurable
         public async Task<LeadInfoDTO> CustomerPolicy(int customerId, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var leadInfoDetails = await _integrationService.GetLeadInfo(customerId, apiContext);
 
@@ -2386,7 +2389,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<IEnumerable<PolicyCountDTO>> PolicySearchDashboard(PolicySearchDashboardDTO policysearch, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 ProductSearchDTO productSearchDTO = new ProductSearchDTO();
@@ -2507,7 +2510,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
@@ -2735,21 +2738,22 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = ex.InnerException.ToString() };
                 Errors.Add(errorInfo);
                 return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
 
             }
-          
+
         }
-           
-        
+
+
 
         public async Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
         {
 
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             EndorsmentDTO endorsmentDTO = new EndorsmentDTO();
             try
@@ -2860,10 +2864,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 }
 
-               
+
                 return new EndorsmentDTO();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
 
                 ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = ex.InnerException.ToString() };
                 Errors.Add(errorInfo);
@@ -2882,6 +2887,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         //
         public async Task<decimal> GetPolicyDetailsByPolicyNo(string PolicyNO, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var tblpolicydata = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == PolicyNO);
             if (tblpolicydata != null)
             {
@@ -2899,6 +2906,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
             if (productDetails != null)
             {
@@ -2928,6 +2937,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<PolicyDTO> ModifyInsurabableItem(dynamic modifydata, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var policyNo = (string)modifydata["PolicyNumber"];
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
@@ -2966,7 +2976,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             var removeitem = jsoninsurableFields;
                                             insurableName.RiskItems.Remove(removeitem);
                                             insurableName.RiskItems.Add(Adddata);
-                                         
+
                                         }
                                     }
                                 }
@@ -2984,15 +2994,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                 _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
                 _context.SaveChanges();
-               
+
             }
             return null;
         }
-            
+
 
         //GetInsurableItemDetails
         public async Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
             var policyId = tbl_particiant.PolicyId;
             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
@@ -3042,7 +3054,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext)
         {
 
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var policydetails = _context.TblPolicy.FirstOrDefault(s => s.PolicyNo == PolicyNumber);
             if (policydetails != null)
@@ -3064,7 +3076,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         {
 
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
 
 
@@ -3176,7 +3188,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
 
                     logMsg = logMsg + ",3";
-                    var mappedPolicy = MapAndValidateInsurablePolicy(ProposalDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "Proposal");
+                    var mappedPolicy = MapAndValidateInsurablePolicyAsync(ProposalDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "Proposal", apiContext);
                     if (Errors.Count == 0)
                     {
                         if (partnerDetails != null)
@@ -3243,6 +3255,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                             master.AccountNo = policyUpdate.ProposalNo;
+
+
 
                             master.CdTransactionsDTO.Add(transactionsDTO);
 
@@ -3394,6 +3408,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         //Get Risk details By Policy Number not tested data is not present in database.
         public async Task<List<PolicyPremiumDetailsDTO>> GetRiskItemByPolicyNo(string PolicyNO, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             PolicyPremiumDetailsDTO policyPremiumDetailsDTO = new PolicyPremiumDetailsDTO();
             PolicyDetails policydetail = new PolicyDetails();
             var data = "";
@@ -3414,6 +3430,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<dynamic> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             TblPolicy tbl_particiant = null;
             if (!string.IsNullOrEmpty(proposalNo) && !string.IsNullOrEmpty(policyno))
             {
@@ -3450,7 +3468,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 AddProperty(ProposalObj, "PolicyNumber", tbl_particiant.PolicyNo);
                 var Proposaltempobj = JsonConvert.SerializeObject(ProposalObj);
                 dynamic json = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
-           
+
                 return json;
             }
             //List<dynamic> fields = new List<dynamic>();
@@ -3483,6 +3501,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<PolicyResponse> IssuePolicy(dynamic IssuepolicyDTO, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             string proposalNumber = "";
             var proposalNo = (string)IssuepolicyDTO["ProposalNumber"];
@@ -3491,7 +3510,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
             var insurableItem = tblPolicyDetailsdata.PolicyRequest;
             dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-            tblPolicy.PolicyNo = GetPolicyNumber(0, Convert.ToDecimal(tblPolicy.ProductIdPk));
+            tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "Policy");
             foreach (var item in IssuepolicyDTO.InsurableItem)
             {
                 foreach (var insurableName in json.InsurableItem)
@@ -3552,6 +3571,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var proposalNo = (string)modifydata["ProposalNumber"];
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
@@ -3608,6 +3629,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.MobileNumber == MobNo);
 
             var policyId = tbl_particiant.PolicyId;
@@ -3663,6 +3686,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<ProposalResponse> PolicyEndoresemenet(dynamic endoresementDto, ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             ProposalResponse proposalResponse = new ProposalResponse();
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             try
@@ -3748,7 +3773,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
 
         }
-        
+
 
 
     }
