@@ -43,7 +43,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
-
+            RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
         }        
 
 

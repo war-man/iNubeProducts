@@ -798,12 +798,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     if (ScheduleData.VehicleType == "TW")
                     {
                         ActiveTWCount += 1;
-                        activeVehicleStat.ActivePc += 1;
+                        activeVehicleStat.ActiveTw += 1;
                     }
                     else if (ScheduleData.VehicleType == "PC")
                     {
                         ActivePCCount += 1;
-                        activeVehicleStat.ActiveTw += 1;
+                        activeVehicleStat.ActivePc += 1;
                     }
 
                     ////Update Number of Active Vehicle is Daily Active Table
