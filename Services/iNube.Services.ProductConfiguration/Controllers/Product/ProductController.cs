@@ -506,5 +506,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             var MappingData = await _productService.CreateMapping(MapDto, Context);
             return Ok(MappingData);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HC()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
+
     }
 }
