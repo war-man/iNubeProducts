@@ -16,6 +16,7 @@ namespace iNube.Services.Policy.Entities
         }
 
         public virtual DbSet<TblAdditionalDetails> TblAdditionalDetails { get; set; }
+        public virtual DbSet<TblEndorsementDetails> TblEndorsementDetails { get; set; }
         public virtual DbSet<TblNumberingScheme> TblNumberingScheme { get; set; }
         public virtual DbSet<TblPolicy> TblPolicy { get; set; }
         public virtual DbSet<TblPolicyDetails> TblPolicyDetails { get; set; }
@@ -70,6 +71,41 @@ namespace iNube.Services.Policy.Entities
                 entity.Property(e => e.PolicyNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+            modelBuilder.Entity<TblEndorsementDetails>(entity =>
+            {
+                entity.HasKey(e => e.EndorsementId);
+
+                entity.ToTable("tblEndorsementDetails", "PO");
+
+                entity.Property(e => e.EndorsementId)
+                    .HasColumnName("EndorsementID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Action)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AmountBalanced).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.DateOfPayment).HasColumnType("datetime");
+
+                entity.Property(e => e.EndorsementEffectivedate).HasColumnType("datetime");
+
+                entity.Property(e => e.EndorsementNo).HasMaxLength(50);
+
+                entity.Property(e => e.Gst)
+                    .HasColumnName("GST")
+                    .HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.PaymentGatewayReferenceId)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PremiumAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TotalPremiumAmount).HasColumnType("numeric(18, 2)");
             });
 
             modelBuilder.Entity<TblNumberingScheme>(entity =>
