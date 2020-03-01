@@ -66,48 +66,10 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
+            RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
 
         }
 
-
-  //      readonly string RateUrl = "https://inubeservicesrating.azurewebsites.net";
-
-
-  //      readonly string DMSUrl = "https://inubeservicesnotification.azurewebsites.net";
-  //    // readonly string DMSUrl = "http://localhost:53000";
-
-  //      readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-  //      //readonly string partnerUrl = "https://localhost:44315";
-		////readonly string partnerUrl = "http://mica-inube-partner-service.mica-internal.:9005";
-        
-  //     readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-  //     //readonly string productUrl = "https://localhost:44347";
-	 //  //readonly string productUrl = "http://mica-inube-product-service.mica-internal.:9007";
-	   
-  //     readonly string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-  //    // readonly string notificationUrl = "http://localhost:53000";
-	 // //  readonly string notificationUrl = "http://mica-inube-notification-service.mica-internal.:9004";
-	   
-  //      //CHECKING FOR ACCOUNTING
-  //      //readonly string accountApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionMappingDetails";
-  //      //readonly string accountApiUrl = "http://localhost:52166/api/AccountConfig/GetTransactionMappingDetails";
-  //      //readonly string accountApiUrl = "http://mica-inube-accounting-service.mica-internal.:9011/api/AccountConfig/GetTransactionMappingDetails";
-  //      readonly string accountRuleApiUrl = "https://inubeservicesaccounting.azurewebsites.net/api/AccountConfig/GetTransactionConditionDetails";
-
-
-  //      readonly string createTransactionApi = "https://inubeservicesaccounting.azurewebsites.net/";
-  //      //readonly string createTransactionApi = "http://localhost:52166/api/AccountConfig/CreateTransaction";
-		//// readonly string createTransactionApi = "http://mica-inube-accounting-service.mica-internal.:9011/api/AccountConfig/CreateTransaction";
-       
-
-  //      //readonly string UsermanangementUrl = "https://localhost:44367";
-  //      readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-		////readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
-
-
-  //      readonly string billingUrl = "https://inubeservicesbilling.azurewebsites.net/";
-  //      //readonly string billingUrl = "https://localhost:44362";
-		////readonly string billingUrl = "http://mica-inube-billing-service.mica-internal.:9001";
 
   //      //Acccounting Module
   //      //public async Task<IEnumerable<AccountMapDetailsDto>> GetAccountMapAsync(ApiContext apiContext)
