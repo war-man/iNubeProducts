@@ -27,6 +27,7 @@ phases:
       - printf '[{"name":"mica-inube-rule-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - printf '{"ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
       - cat imagedefinitions.json
+      - cat productionimagedefinition.json
       - cat imageDetail.json
     
  
@@ -37,4 +38,5 @@ artifacts:
     - Components/iNube.Components.RuleEngine/appspec.yml
     - Components/iNube.Components.RuleEngine/taskdef.json
     - imagedefinitions.json
+    - productionimagedefinition.json
     - imageDetail.json      
