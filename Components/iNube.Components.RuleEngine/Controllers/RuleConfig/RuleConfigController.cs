@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using iNube.Components.RuleEngine.Models;
 using iNube.Components.RuleEngine.Entities;
 using iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService;
+using iNube.Utility.Framework.Model;
 
 namespace iNube.Components.RuleEngine.Controllers
 {
@@ -273,8 +274,14 @@ namespace iNube.Components.RuleEngine.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpGet("HC")]
+        [AllowAnonymous]
+        public IActionResult HC()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
 
-        
 
 
 
