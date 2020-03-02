@@ -210,8 +210,55 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal FinalAmount { get; set; }
     }
 
+    public partial class WrapperPremiumReturnDto : ResponseStatus
+    {
+        public WrapperPremiumReturnDto()
+        {
+            driverList = new DriverList();
+          
+        }
+        public decimal FTPM { get; set; }
+        public DriverList driverList { get; set; }
+    }
+    public class DriverList
+    {
+        public DriverList()
+        {
+            driver1 = new Driver1();
+            driver2 = new Driver2();
+            driver3 = new Driver3();
+        }
 
+        public Driver1 driver1 { get; set; }
+        public Driver2 driver2 { get; set; }
+        public Driver3 driver3 { get; set; }
+    }
 
+    public class Driver1
+    { 
+        public decimal D1ADPM { get; set; }
+        public decimal D1TotalPM { get; set; }
+    }
+    public class Driver2
+    {
+        public decimal D2ADPM { get; set; }
+        public decimal D2TotalPM { get; set; }
+    }
+    public class Driver3
+    {
+        public decimal D3ADPM { get; set; }
+        public decimal D3TotalPM { get; set; }
+    }
+    public partial class WrapperPremiumRequestDTO
+    {
+       
+        public int SI { get; set; }
+        public int NoOfPC { get; set; }
+        public int NoOfTW { get; set; }
+        public int DriverAge { get; set; }
+        public int DriverExp { get; set; }
+       
+    }
 
     public class PolicyPremiumDetailsDTO
     {

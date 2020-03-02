@@ -43,7 +43,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var premiumValue = await _quotationService.CalCulatePremium(premiumParameter);
             return ServiceResponse(premiumValue);
         }
-
+        [HttpPost]
+        public async Task<IActionResult> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumParameter)
+        {
+            var premiumValue = await _quotationService.WrapperCalculatePremium(premiumParameter);
+            return ServiceResponse(premiumValue);
+        }
+ 
 
         [HttpGet]
         public IActionResult GetSchedule(string VehicleRegistrationNo, string PolicyNo)

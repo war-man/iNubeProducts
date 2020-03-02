@@ -22,6 +22,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         Task<List<PolicyDetailsDTO>> GetPolicyList(string productCode, ApiContext apiContext);
         Task<dynamic> CalculatePremium(SchedulerPremiumDTO premiumDTO, ApiContext apiContext);
         Task<dynamic> GetPolicyDetails(string PolicyNo, ApiContext apiContext);
+        Task<dynamic> WrapperCalculateRatingPremium(SchedulerPremiumDTO dynamicData);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -90,7 +91,17 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             var uri = PolicyUrl + "/api/Policy/CalCulatePremium";
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
         }
-                   
+        public async Task<dynamic> WrapperCalculateRatingPremium(SchedulerPremiumDTO dynamicData)
+        {
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/41";
+            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
+        }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
