@@ -149,7 +149,7 @@ class Dashboard extends React.Component {
                 object.switchState = scheduler.switchStatus;
                 this.setState({ object });
 
-                fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/SwitchOnOff`, {
+                fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/SwitchOnOff`, {
                     method: 'post',
                     headers: {
                         'Accept': 'application/json',
@@ -187,7 +187,7 @@ class Dashboard extends React.Component {
 
     handleSubmit = () => {
         console.log("schedular: ", this.state.schedule);
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/CreateUpdateSchedule`, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/CreateUpdateSchedule`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',
@@ -217,7 +217,9 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg';
+        //const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg';
+        //localStorage.setItem('edelweisstoken', edelweisstoken);
+        const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
         localStorage.setItem('edelweisstoken', edelweisstoken);
 
         console.log("number: ", this.props.vehicleno, this.props.policynumber);
@@ -232,7 +234,7 @@ class Dashboard extends React.Component {
         createschedule.vehicleType = this.props.vehiclestype;
         this.setState({ createschedule })
 
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=` + this.props.vehicleno + `&PolicyNo=` + this.props.policynumber + ``, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=` + this.props.vehicleno + `&PolicyNo=` + this.props.policynumber + ``, {
             //fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=KA01EQ9767&PolicyNo=750000109` , {
             method: 'GET',
             headers: {
@@ -260,7 +262,7 @@ class Dashboard extends React.Component {
 
     handlecreateSchedule = () => {
         console.log("scheduleDTO: ", this.state.createschedule);
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/CreateUpdateSchedule`, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/CreateUpdateSchedule`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',

@@ -169,10 +169,11 @@ class DriverPage extends React.Component {
                             "Licence No.": "333",
                             "Driving Experience": ""
                         }], "Covers": []
-                    }, { "InsurableName": "Vehicle", "RiskItems": [{ "Make": "pks", "Model": "sds", "Vehicle Number": "2323", "Year of Registration": "3", "Vehicle Type": "sdsd" }], "Covers": [{ "CoverName": "Fire & Theft", "CoverFields": [{ "Cover Name": "Fire & Theft", "CEF Value": "3" }] }, { "CoverName": "Accidental Damage", "CoverFields": [{ "Cover Name": "Accidental Damage", "CEF Value": "3" }] }] }], "Identification Number": "233", "Name": "", "Product Code": "7832", "No. Of Risks": "3", "Policy Start Date": "", "Mobile Number": "", "Policy End Date": "2020-2-19", "Email ID": "prasant.k@inubesolutions.com",
+                }, { "InsurableName": "Vehicle", "RiskItems": [{ "Make": "pks", "Model": "sds", "Vehicle Number": "2323", "Year of Registration": "3", "Vehicle Type": "" }], "Covers": [{ "CoverName": "Fire & Theft", "CoverFields": [{ "Cover Name": "Fire & Theft", "CEF Value": "3" }] }, { "CoverName": "Accidental Damage", "CoverFields": [{ "Cover Name": "Accidental Damage", "CEF Value": "3" }] }] }], "Identification Number": "233", "Name": "", "Product Code": "P0001", "No. Of Risks": "3", "Policy Start Date": "", "Mobile Number": "", "Policy End Date": "2020-2-19", "Email ID": "prasant.k@inubesolutions.com",
 
                     "stateCode": "",
                     "si": "",
+                    "PaymentReferenceNumber": "1002",
                     "noOfPC": "1",
                     "noOfTW": "0",
                     "driverAge": "",
@@ -460,7 +461,7 @@ class DriverPage extends React.Component {
 
     quickbuyBilling = () => {
         debugger;
-        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetQuotationbyMobileNo?mobileNo=` + this.state.sendotp.contactNumber, {
+        fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetQuotationbyMobileNo?mobileNo=` + this.state.sendotp.contactNumber, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -473,7 +474,7 @@ class DriverPage extends React.Component {
                 //this.setState({ quotationDto: data });
                 this.state.quotationDto.quoteId = data.quoteId;
                 console.log("qtdata", this.state.quotationDto);
-                fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/UpdateQuotation`, {
+                fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/UpdateQuotation`, {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',
@@ -570,7 +571,7 @@ class DriverPage extends React.Component {
     SendOTP = () => {
         if (this.state.sendotp.contactNumber != "" && this.state.quotationDto.primaryDriverName != "") {
             console.log("console", this.state.sendotp.contactNumber);
-            fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/SendOTP`, {
+            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/SendOTP`, {
                 method: 'Post',
                 headers: {
                     'Accept': 'application/json',
@@ -596,12 +597,12 @@ class DriverPage extends React.Component {
 
     quickbuyProceed = () => {
         console.log("console", this.state.sendotp.contactNumber);
-        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/VerifyingOTP`, {
+        fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/VerifyingOTP`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg'
+                //'authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg'
 
             },
             body: JSON.stringify(this.state.sendotp)
@@ -621,7 +622,7 @@ class DriverPage extends React.Component {
 
         this.state.quotationDto.mobileno = this.state.sendotp.contactNumber;
         console.log("quotationDTO", this.state.quotationDto);
-        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/CreateQuotation`, {
+        fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/CreateQuotation`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',
@@ -641,7 +642,7 @@ class DriverPage extends React.Component {
     ResetOTP = () => {
         console.log("console", this.state.sendotp.contactNumber);
         if (this.state.sendotp.contactNumber != "" && this.state.quotationDto.primaryDriverName != "") {
-            fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/ResetOTP`, {
+            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/ResetOTP`, {
                 method: 'Post',
                 headers: {
                     'Accept': 'application/json',
@@ -750,6 +751,7 @@ class DriverPage extends React.Component {
             headers: {
                 'accept': 'application/json',
                 'content-type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('edelweisstoken')
                 //'authorization': 'Bearer '+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg'
             },
             body: JSON.stringify(this.state.premiumDTO)
@@ -757,7 +759,7 @@ class DriverPage extends React.Component {
             .then(data => {
                 console.log("premdata", data);
                 let premperday = data.perDayPremium;
-                let ft365 = data.fireTheft365;
+                let ft365 = data.fireTheft;
                 let adprem = data.adPremium;
                 let gstt = data.gst;
                 this.state.policyRequest.PaymentInfo[0].Amount = data.total;
@@ -891,8 +893,13 @@ class DriverPage extends React.Component {
         calculateDto.driverExp = this.state.premiumDTO.driverExp;
         calculateDto.additionalDriver = this.state.premiumDTO.additionalDriver;
         calculateDto.billingFrequency = this.state.premiumDTO.billingFrequency;
-        this.setState({ calculateDto });
+        console.log("calculateDto.InsurableItem[1].RiskItems.length", calculateDto.InsurableItem[1].RiskItems.length);
 
+        for (var i = 0; i < calculateDto.InsurableItem[1].RiskItems.length; i++) {
+            calculateDto.InsurableItem[1].RiskItems[i]["Vehicle Type"] = this.state.vehType;
+        }
+        this.setState({ calculateDto });
+        console.log("calculateDto", calculateDto);
         let startDate = this.state.policyRequest["Policy Start Date"];
         if (this.state.policyRequest["Policy Start Date"] != "") {
             this.state.policyRequest["Policy Start Date"] = this.datechange(this.state.policyRequest["Policy Start Date"]);
@@ -903,7 +910,8 @@ class DriverPage extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5NTc4NmM2OS0xNjAxLTQzMGQtODM1Ni01M2RlNDUyZjUxZTYiLCJFbWFpbCI6InZpdGFsQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJEZW1vIFJvbGUiLCJOYW1lIjoidml0aGFsIiwiVXNlck5hbWUiOiJ2aXRhbEBpbnViZXNvbHV0aW9ucy5jb20iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMSIsImV4cCI6MTY3MDY1NDMzMCwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.nZsItQ97TGtSZ-IrZ8SlDeOCIKnaCI4tmeLC953z9qA'
+                'Authorization': 'Bearer ' + localStorage.getItem('edelweisstoken')
+                //'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5NTc4NmM2OS0xNjAxLTQzMGQtODM1Ni01M2RlNDUyZjUxZTYiLCJFbWFpbCI6InZpdGFsQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJEZW1vIFJvbGUiLCJOYW1lIjoidml0aGFsIiwiVXNlck5hbWUiOiJ2aXRhbEBpbnViZXNvbHV0aW9ucy5jb20iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMSIsImV4cCI6MTY3MDY1NDMzMCwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.nZsItQ97TGtSZ-IrZ8SlDeOCIKnaCI4tmeLC953z9qA'
             },
             body: JSON.stringify(this.state.policyRequest)
         }).then(response => response.json())
@@ -959,6 +967,8 @@ class DriverPage extends React.Component {
     //}
 
     componentDidMount() {
+        const edelweisstoken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
+        localStorage.setItem('edelweisstoken', edelweisstoken);
         if (this.props.location.state != undefined) {
 
             this.state.vehType = this.props.location.state.vehicleType;

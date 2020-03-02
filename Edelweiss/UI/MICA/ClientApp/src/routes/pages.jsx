@@ -31,6 +31,8 @@ import AddVehicle from "modules/Edelweiss/AddVehicle.jsx";
 import AddDriver from "modules/Edelweiss/AddDriver.jsx";
 import ClaimIntimate from "modules/Edelweiss/ClaimIntimate.jsx";
 import ClaimReports from "modules/Edelweiss/ClaimReports.jsx";
+import ClaimProcess from "modules/Edelweiss/Claim_Process/views/ClaimProcess.jsx";
+
 
 
 const pagesRoutes = [
@@ -225,6 +227,14 @@ const pagesRoutes = [
         mini: "CR",
         icon: MonetizationOn,
         component: ClaimReports
+    },
+    {
+        path: "/pages/ClaimProcess",
+        name: "ClaimProcess",
+        short: "ClaimProcess",
+        mini: "CR",
+        icon: MonetizationOn,
+        component: ClaimProcess
     },
    
      {

@@ -118,23 +118,21 @@ class Dashboard extends React.Component {
 
     componentDidMount() {
 
-        const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg';
-        localStorage.setItem('edelweisstoke', edelweisstoken);
 
-        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5NTc4NmM2OS0xNjAxLTQzMGQtODM1Ni01M2RlNDUyZjUxZTYiLCJFbWFpbCI6InZpdGFsQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJEZW1vIFJvbGUiLCJOYW1lIjoidml0aGFsIiwiVXNlck5hbWUiOiJ2aXRhbEBpbnViZXNvbHV0aW9ucy5jb20iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMSIsImV4cCI6MTY3MDY1NDMzMCwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.nZsItQ97TGtSZ-IrZ8SlDeOCIKnaCI4tmeLC953z9qA';
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
         localStorage.setItem('Token', token);
 
-        fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/GetProposalPolicyDetail?Mobileno=112233445566`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('Token')
-            },
-        }).then(response => response.json())
-            .then(data => {
-                console.log('response: ', data);
-            });
+        //fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/GetProposalPolicyDetail?Mobileno=112233445566`, {
+        //    method: 'GET',
+        //    headers: {
+        //        'Accept': 'application/json',
+        //        'Content-Type': 'application/json',
+        //        'Authorization': 'Bearer ' + localStorage.getItem('Token')
+        //    },
+        //}).then(response => response.json())
+        //    .then(data => {
+        //        console.log('response: ', data);
+        //    });
     }
 
     handleOpen = () => {
@@ -154,7 +152,7 @@ class Dashboard extends React.Component {
     SendOTP = () => {
         if (this.state.sendotp.contactNumber != "") {
             console.log("console", this.state.sendotp.contactNumber);
-            fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/SendOTP`, {
+            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/SendOTP`, {
                 method: 'Post',
                 headers: {
                     'Accept': 'application/json',
@@ -206,7 +204,7 @@ class Dashboard extends React.Component {
 
     quickbuyProceed = () => {
         console.log("console", this.state.sendotp.contactNumber);
-        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/VerifyingOTP`, {
+        fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/VerifyingOTP`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',

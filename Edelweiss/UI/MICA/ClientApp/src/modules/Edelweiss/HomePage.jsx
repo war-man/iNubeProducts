@@ -166,19 +166,22 @@ class HomePage extends React.Component {
     }
 
     componentDidMount() {
+
         const props = this.props;
         console.log("porpsdat", props)
+        const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
+        localStorage.setItem('edelweisstoken', edelweisstoken);
 
 
         //fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleMaster?isFilter=true `, {
-        fetch(`http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetVehicleMaster?isFilter=true`, {
+     //fetch(`http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetVehicleMaster?isFilter=true`, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleMaster?lMasterlist=asdfgh&isFilter=true`, {
 
             method: 'get',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg'
-
+                'Authorization': localStorage.getItem('edelweisstoken')
             },
         })
             .then(response => response.json())
@@ -188,7 +191,8 @@ class HomePage extends React.Component {
             });
         console.log("data", this.state.masterList);
 
-        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetCityMaster?lMasterlist=rtyu&isFilter=true`, {
+       // fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetCityMaster?lMasterlist=rtyu&isFilter=true`, {
+        fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetCityMaster?lMasterlist=rtyu&isFilter=true`, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -210,7 +214,7 @@ class HomePage extends React.Component {
 
         if (name=="city") {
             let searchKey = event.target.value + event.key;
-            fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/SmartCityMaster?searchString=` + searchKey, {
+            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/SmartCityMaster?searchString=` + searchKey, {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',
@@ -239,7 +243,7 @@ class HomePage extends React.Component {
                this.setState({ vehicleType: vehicletype, makeModel: makemodel })
                console.log("this.state.vehicleType", this.state.vehicleType, this.state.makeModel);
 
-            fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetSIFromMakeModel?VehicleId=` + values.mID, {
+            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetSIFromMakeModel?VehicleId=` + values.mID, {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',
@@ -271,7 +275,7 @@ class HomePage extends React.Component {
         console.log("tags: ", quotation)
         if (values != null) {
             debugger;
-            fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetStateCode?CityName=` + values.cityName, {
+            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetStateCode?CityName=` + values.cityName, {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',

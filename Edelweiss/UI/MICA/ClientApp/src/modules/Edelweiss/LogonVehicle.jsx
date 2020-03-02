@@ -258,7 +258,7 @@ class LogonVehicle extends React.Component {
                 "VehicleNumber": "",
                 "Identification Number": "123",
                 "YearofRegistration": "",
-                "VehicleType": "",
+                "Vehicle Type": "",
                 "Documents": [],
             },
             endorsementPremiumDTO: {
@@ -366,7 +366,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('edelweisstoken')
             },
             body: JSON.stringify(this.state.schedule)
         }).then(response => response.json())
@@ -392,8 +392,11 @@ class LogonVehicle extends React.Component {
 
     componentDidMount() {
 
-        const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg';
-        localStorage.setItem('edelweisstoken', edelweisstoken);
+        //const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg';
+        //localStorage.setItem('edelweisstoken', edelweisstoken);
+
+        //const edelweisstoken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
+        //localStorage.setItem('edelweisstoken', edelweisstoken);
 
         this.setState({ selectedSI: this.state.suminsuredamount[0].mValue })
         if (this.props.location.state != undefined) {
@@ -403,18 +406,21 @@ class LogonVehicle extends React.Component {
                 this.handlePolicyDetails(this.props.location.state.scheduleDTO.policyNo);
             }
 
-            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5NTc4NmM2OS0xNjAxLTQzMGQtODM1Ni01M2RlNDUyZjUxZTYiLCJFbWFpbCI6InZpdGFsQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJEZW1vIFJvbGUiLCJOYW1lIjoidml0aGFsIiwiVXNlck5hbWUiOiJ2aXRhbEBpbnViZXNvbHV0aW9ucy5jb20iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMSIsImV4cCI6MTY3MDY1NDMzMCwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.nZsItQ97TGtSZ-IrZ8SlDeOCIKnaCI4tmeLC953z9qA';
-            localStorage.setItem('Token', token);
+            //const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI5NTc4NmM2OS0xNjAxLTQzMGQtODM1Ni01M2RlNDUyZjUxZTYiLCJFbWFpbCI6InZpdGFsQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJEZW1vIFJvbGUiLCJOYW1lIjoidml0aGFsIiwiVXNlck5hbWUiOiJ2aXRhbEBpbnViZXNvbHV0aW9ucy5jb20iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMSIsImV4cCI6MTY3MDY1NDMzMCwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.nZsItQ97TGtSZ-IrZ8SlDeOCIKnaCI4tmeLC953z9qA';
+            //localStorage.setItem('Token', token);
+
+            //const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
+            //localStorage.setItem('Token', token);
         }
 
-        console.log("extension  ", localStorage.getItem('edelweisstoken'));
+        console.log("extension  ", 'Bearer ' + localStorage.getItem('edelweisstoken'));
         //fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=` + this.props.vehicleno + `&PolicyNo=` + this.props.policynumber + ``, {
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetVehicleMaster?isFilter=true`, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleMaster?isFilter=true`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
         })
             .then(response => response.json())
@@ -438,7 +444,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('Token')
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk'
             },
         }).then(response => response.json())
             .then(data => {
@@ -489,12 +495,12 @@ class LogonVehicle extends React.Component {
 
     handlecreateSchedule = () => {
         console.log("scheduleDTO: ", this.state.createschedule);
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/CreateUpdateSchedule`, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/CreateUpdateSchedule`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk'
             },
             body: JSON.stringify(this.state.createschedule)
         }).then(response => response.json())
@@ -518,13 +524,13 @@ class LogonVehicle extends React.Component {
 
     handleOpen = (item) => {
         console.log("data", item, this.state.policynumber);
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=` + item + `&PolicyNo=` + this.state.policynumber + ``, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=` + item + `&PolicyNo=` + this.state.policynumber + ``, {
             //fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/GetSchedule?VehicleRegistrationNo=KA01EQ9767&PolicyNo=750000109`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk'
             },
         }).then(response => response.json())
             .then(data => {
@@ -589,7 +595,7 @@ class LogonVehicle extends React.Component {
         }
         addvehicle.SI = this.state.suminsured.toString();
         addvehicle.PolicyNumber = this.state.policynumber;
-        addvehicle.InsurableItem[0].RiskItems[0].VehicleType = this.state.typevehicle;
+        addvehicle.InsurableItem[0].RiskItems[0]["Vehicle Type"] = this.state.typevehicle;
         addvehicle.InsurableItem[0].RiskItems[0]["Identification Number"] = (this.state.vehiclecount + 1).toString();
         this.setState({ addvehicle });
 
@@ -604,7 +610,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('Token')
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk'
             },
             body: JSON.stringify(addvehicle)
         }).then(response => response.json())
@@ -690,13 +696,13 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('Token')
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk'
             },
             body: JSON.stringify(endorsementdto)
         }).then(response => response.json())
             .then(data => {
                 console.log("premdata", data);
-                if (data.status == 4) {
+                if (data.status == 5) {
                     swal({
                         text: data.responseMessage,
                         icon: "success",
@@ -731,12 +737,12 @@ class LogonVehicle extends React.Component {
     }
 
     handleCalculateendorsementpremium = () => {
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/EndorsementPremium`, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/EndorsementPremium`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk'
             },
             body: JSON.stringify(this.state.endorsementPremiumDTO)
         }).then(response => response.json())
@@ -785,6 +791,7 @@ class LogonVehicle extends React.Component {
     }
 
     handleDeleteopen = (vehicleno, vehiclestype, key) => {
+        debugger;
         var today = new Date();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
         this.state.vehiclestype = vehiclestype;
@@ -821,42 +828,44 @@ class LogonVehicle extends React.Component {
 
     CalCulateEndorsementPremium(premiumDTO) {
 
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/EndorsementPremium`, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/EndorsementPremium`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk'
             },
             body: JSON.stringify(premiumDTO)
         }).then(response => response.json())
             .then(data => {
                 console.log("premdata", data);
-                //if (data.status == 8) {
-                //    swal({
-                //        text: data.responseMessage,
-                //        icon:"error"
-                //    })
-                //}
-                //this.state.perDayPremium = data.perDayPremium;
-                //this.state.fireTheft = data.fireTheft;
-                //this.state.adPremium = data.adPremium;
-                //this.state.gst = data.gst;
-                //this.state.total = data.total;
-                //this.state.monthlyPremium = data.monthlyPremium;
-                //this.setState({});
-
+                if (data.status == 8) {
+                    swal({
+                        text: data.responseMessage,
+                        icon: "error"
+                    })
+                    this.setState({ deletevehicle: false });
+                } else {
+                    this.setState({
+                        perDayPremium: data.perDayPremium,
+                        fireTheft: data.fireTheft,
+                        adPremium: data.adPremium,
+                        gst: data.gst,
+                        total: data.total,
+                        monthlyPremium: data.monthlyPremium,
+                    });
+                }
                 //let premperday = data.perDayPremium;
                 //let ft365 = data.fireTheft365;
                 //let adprem = data.adPremium;
                 //let gstt = data.gst;
                 //this.state.policyRequest.PaymentInfo[0].Amount = data.total;
-                //this.setState({ premiumperday: premperday, ft365days: ft365, adpremium: adprem, gsttax: gstt});
+                // this.setState({ premiumperday: premperday, ft365days: ft365, adpremium: adprem, gsttax: gstt});
             });
     }
 
     handleCity = (event, values, name) => {
-        if (name == "vehicleMakeModelId") {
+        if (name == "vehicleMakeModelId" && values != null) {
             let vehicletype = this.state.masterList.filter(x => x.mID == values.mID)[0].mType;
             let makemodel = this.state.masterList.filter(x => x.mID == values.mID)[0].mValue;
             this.state.RiskObj.Model = makemodel;
@@ -1010,14 +1019,14 @@ class LogonVehicle extends React.Component {
                                         {this.state.vehicles.map(function (item, key) {
                                             return (
                                                 <GridContainer justify="center">
-                                                    {item.VehicleType == "PC" ?
+                                                    {item['Vehicle Type'] == "PC" ?
                                                         <img src={Car} id="carbikeimage" onClick={() => this.handleOpen(item.VehicleNumber)} />
                                                         : <img src={Bike} id="carbikeimage" onClick={() => this.handleOpen(item.VehicleNumber)} />
                                                     }
                                                     <h4 id="headertag1">{item.Make}&nbsp;&nbsp;{item.Model}</h4>
                                                     <h4 id="headertag2">{item.VehicleNumber}</h4>
-                                                    <IconButton onClick={() => this.handleView(item.VehicleNumber, item.VehicleType)} ><Visibility /></IconButton>
-                                                    <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item.VehicleType, key)}><Delete /></IconButton>
+                                                    <IconButton onClick={() => this.handleView(item.VehicleNumber, item['Vehicle Type'])} ><Visibility /></IconButton>
+                                                    <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item['Vehicle Type'], key)}><Delete /></IconButton>
                                                 </GridContainer>
                                             );
                                         }.bind(this))
@@ -1030,8 +1039,8 @@ class LogonVehicle extends React.Component {
                                                     <img src={Car} style={{ width: "10rem" }} onClick={() => this.handleOpen(item.VehicleNumber)} />
                                                     <h4 style={{ left: '1rem', top: '0.7rem', position: 'relative' }}>{item.Model}</h4>
                                                     <h4 style={{ right: '6rem', top: '2.3rem', position: 'relative' }}>{item.VehicleNumber}</h4>
-                                                    <IconButton onClick={() => this.handleView(item.VehicleNumber, item.VehicleType)} ><Visibility /></IconButton>
-                                                    <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item.VehicleType, key)}><Delete /></IconButton>
+                                                    <IconButton onClick={() => this.handleView(item.VehicleNumber, item['Vehicle Type'])} ><Visibility /></IconButton>
+                                                    <IconButton onClick={() => this.handleDeleteopen(item.VehicleNumber, item['Vehicle Type'], key)}><Delete /></IconButton>
                                                 </GridContainer>
                                             );
                                         }.bind(this))
@@ -1175,7 +1184,7 @@ class LogonVehicle extends React.Component {
                                     </Modal>
 
                                     <GridContainer justify="center">
-                                        <Divider style={{ width: '44rem', height: '0.1rem', }} />
+                                        <Divider style={{ width: '44rem', height: '0.2rem', }} />
                                     </GridContainer>
 
                                     <GridContainer justify="center">

@@ -2532,6 +2532,15 @@ img {
   top: 2.3rem;
   position: relative; }
 
+.dzu-previewImage {
+  width: 8.75rem; }
+
+#frontimage {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  top: 1.2rem;
+  position: relative;
+  left: 1.3rem; }
+
 .btn-file {
   position: relative;
   overflow: hidden;

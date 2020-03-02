@@ -17,6 +17,8 @@ import EdelweissConfig from "./EdelweissConfig.js";
 import Dropzone from 'react-dropzone-uploader';
 import $ from 'jquery';
 import swal from 'sweetalert';
+import IconButton from '@material-ui/core/IconButton';
+import PhotoCamera from '@material-ui/icons/PhotoCamera';
 
 
 
@@ -26,6 +28,7 @@ class AddDriver extends React.Component {
         super(props)
 
         this.state = {
+            showDropZonerear: false,
             showadditionaldriver: false,
             proposalno: "",
             showadddrvflag: true,
@@ -93,6 +96,24 @@ class AddDriver extends React.Component {
             },
             drvvehicleType: "",
             adddrvMakeModel: "",
+            tagName: "",
+            tagValue: "",
+            rtagName: "",
+            rtagValue: "",
+
+            fileUpload: {
+                "fileUploadDTOs": [
+                    {
+                        "fileName": "",
+                        "fileExtension": "",
+                        "fileData": "",
+                        "contentType": "",
+                        "tagname": "",
+                        "tagValue": ""
+                    }
+                ]
+            },
+
         }
     }
 
@@ -117,8 +138,13 @@ class AddDriver extends React.Component {
 
 
     }
-    showOnClick = () => {
-        this.setState({ showDropZone: true })
+    showOnClick = (evt, name, value) => {
+
+        this.setState({ showDropZone: true, tagName: name, tagValue: value });
+    }
+    showrearOnClick = (evt, name, value) => {
+
+        this.setState({ showDropZonerear: true, rtagName: name, rtagValue: value })
     }
     onInputChangepropsal = (event) => {
         let RiskObj = this.state.RiskObj;
@@ -128,9 +154,15 @@ class AddDriver extends React.Component {
     }
 
 
-    getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
+    getUploadParams = ({ meta }) => {
+        debugger;
+        return { url: 'https://httpbin.org/post' }
+    }
 
-    handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
+    handleChangeStatus = ({ meta, file }, status) => {
+        debugger;
+        console.log(status, meta, file)
+    }
     uploadfile = (files) => {
         debugger;
         //var myJSON = JSON.stringify(files); 
@@ -141,7 +173,7 @@ class AddDriver extends React.Component {
                 data.append(files[i].file.name, files[i].file);
             }
         }
-
+        console.log("form data: ", data)
         $.ajax({
             type: "POST",
             //url: `http://localhost:53000/api/DMS/UploadFile`,
@@ -172,7 +204,72 @@ class AddDriver extends React.Component {
 
     }
 
-    uploadfilefront = (files) => {
+    uploadfilefront = (files, evt) => {
+        debugger;
+        let obj = this.state.RiskObj;
+        var data = new FormData();
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                data.append(files[i].file.name, files[i].file, files[i].file.size);
+
+            }
+        }
+        console.log("data set", data)
+        $.ajax({
+            type: "POST",
+            //url: `http://localhost:53000/api/DMS/UploadFile`,
+            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload?tagName=` + this.state.tagName + '&tagValue=' + this.state.tagValue,
+            // url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/MobileDocumentupload/MobileDocumentupload`,
+            contentType: false,
+            processData: false,
+
+            data: data,
+            beforeSend: function (data, xhr) {
+                /* Authorization header */
+                //xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+            },
+            success: function (data, message) {
+                console.log("dddata", data);
+                let docObj = [
+                ]
+                for (var i = 0; i < data.dMSDTOs.length; i++) {
+
+                    docObj.push(data.dMSDTOs[i]);
+                }
+                console.log("docobj", docObj);
+                for (var i = 0; i < docObj.length; i++) {
+                    let x = {};
+                    x.docId = docObj[i].docId;
+                    x.fileName = docObj[i].fileName;
+                    let mainobj = obj.Documents;
+                    mainobj.push(x);
+
+                    console.log("docobj", mainobj);
+                }
+
+                //this.state.documentObj.docId = data.docId;
+                //this.state.documentObj.fileName = data.fileName;
+
+                swal({
+                    text: "Document Uploaded Successful",
+                    icon: "success"
+                });
+
+            },
+            error: function (message) {
+
+                swal({
+                    text: "Document Upload Failed",
+                    icon: "error"
+                });
+            }
+        });
+        this.setState({});
+        console.log("this.state.Riskobj", this.state.RiskObj);
+    }
+
+
+    uploadfilerear = (files, evt) => {
         debugger;
         let obj = this.state.RiskObj;
         var data = new FormData();
@@ -186,7 +283,7 @@ class AddDriver extends React.Component {
         $.ajax({
             type: "POST",
             //url: `http://localhost:53000/api/DMS/UploadFile`,
-            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload`,
+            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload?tagName=` + this.state.rtagName + '&tagValue=' + this.state.rtagValue,
             // url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/MobileDocumentupload/MobileDocumentupload`,
             contentType: false,
             processData: false,
@@ -249,13 +346,14 @@ class AddDriver extends React.Component {
     submitDriverDetails = (e) => {
         this.AddDrv();
         this.state.policyIssueDTO.InsurableItem = this.state.insurableObj;
+        console.log("policyIssueDTOpolicyIssueDTO", this.state.policyIssueDTO);
         this.renderRedirect();
         this.setState({ redirect: true })
     }
     AddDrv = () => {
         debugger;
 
-        if (this.props.location.state.premiumDTO.additionalDriver > 1 && this.props.location.state.premiumDTO.additionalDriver <= 3) {
+        if (this.props.location.state != undefined && this.props.location.state.premiumDTO.additionalDriver > 1 && this.props.location.state.premiumDTO.additionalDriver <= 3) {
 
             for (var i = 0; i < this.state.insurableObj.length; i++) {
                 if (this.state.insurableObj[i].InsurableName == "Driver") {
@@ -271,6 +369,29 @@ class AddDriver extends React.Component {
         this.setState({ showadddrvflag: false, RiskObj: this.state.duplicateRiskObj });
         this.setState({ showadditionaldriver: true })
         console.log(" this.state.policyRqst", this.state.policyRqst);
+    }
+    pressButton = (e) => {
+        debugger;
+        e.preventDefault();
+        // TODO: do something with -> this.state.file
+        console.log('handle uploading-', this.state.file);
+    }
+    getPhoto = (e) => {
+        debugger;
+        e.preventDefault();
+
+        let reader = new FileReader();
+        let file = e.target.files[0];
+
+        reader.onloadend = () => {
+            this.setState({
+                file: file,
+                imagePreviewUrl: reader.result
+            });
+        }
+
+        reader.readAsDataURL(file);
+
     }
 
     render() {
@@ -329,19 +450,46 @@ class AddDriver extends React.Component {
                                     </GridItem>
                                 </GridContainer>
                                 <GridContainer justify="center">
+                                    <h4>Upload Licence</h4>
+                                </GridContainer>
+
+                                <GridContainer justify="center">
                                     {this.state.showDropZone ?
-                                        <GridItem xs={12} sm={12} md={4}>
+                                        <GridItem xs={3}>
                                             <Dropzone
                                                 getUploadParams={this.getUploadParams}
+                                                maxFiles={1}
+                                                name='ImageType'
+                                                value='front'
                                                 onChangeStatus={this.handleChangeStatus}
-                                                onSubmit={this.uploadfilefront}
+                                                onSubmit={(e) => this.uploadfilefront(e)}
+                                                accept="image/*,audio/*,video/*,application/pdf/*,word/*"
+                                            />
+                                        </GridItem> : null}
+
+                                    {this.state.showDropZonerear ?
+                                        <GridItem xs={3}>
+                                            <Dropzone
+                                                getUploadParams={this.getUploadParams}
+                                                maxFiles={1}
+                                                name='ImageType'
+                                                value='front'
+                                                onChangeStatus={this.handleChangeStatus}
+                                                onSubmit={(e) => this.uploadfilerear(e)}
                                                 accept="image/*,audio/*,video/*,application/pdf/*,word/*"
                                             />
                                         </GridItem> : null}
                                 </GridContainer>
-                                <GridContainer justify="center">
 
-                                    <Button color="primary" round onClick={(e) => this.showOnClick(e)}> Upload File </Button>
+                                <GridContainer justify="center">
+                                    <Button color="default" onClick={(e) => this.showOnClick(e, 'ImageType', 'front')}>
+                                        Front
+                                         </Button>
+
+                                    <Button color="default" onClick={(e) => this.showrearOnClick(e, 'ImageType', 'back')}>
+                                        Back
+                                         </Button>
+
                                 </GridContainer>
                                 <GridContainer justify="center">
                                     {this.renderRedirect()}
