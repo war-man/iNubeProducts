@@ -70,7 +70,7 @@ const Styleinput = withStyles({
     },
 })(TextField);
 
-class Dashboard extends React.Component {
+class Logon extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -288,8 +288,8 @@ class Dashboard extends React.Component {
     }
 }
 
-Dashboard.propTypes = {
+Logon.propTypes = {
     classes: PropTypes.object.isRequired
 };
 
-export default withStyles(loginPageStyle)(Dashboard);
+export default withStyles(loginPageStyle)(Logon);

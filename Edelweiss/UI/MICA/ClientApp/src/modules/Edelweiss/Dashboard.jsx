@@ -144,27 +144,55 @@ class Dashboard extends React.Component {
 
         if (name == "switchStatus") {
             if (scheduler.switchStatus == true) {
+                swal({
+                    text: "Are you sure on switching on the schedule?",
+                    icon: "info",
+                    buttons: ["No", "Yes"]
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            //executes only if user click on yes
+                            let object = this.state.scheduleobject;
+                            object.switchState = scheduler.switchStatus;
+                            this.setState({ object });
 
-                let object = this.state.scheduleobject;
-                object.switchState = scheduler.switchStatus;
-                this.setState({ object });
+                            fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/SwitchOnOff`, {
+                                method: 'post',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'Authorization': localStorage.getItem('edelweisstoken')
+                                },
+                                body: JSON.stringify(object)
+                            }).then(response => response.json())
+                                .then(data => {
 
-                fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/SwitchOnOff`, {
-                    method: 'post',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': localStorage.getItem('edelweisstoken')
-                    },
-                    body: JSON.stringify(object)
-                }).then(response => response.json())
-                    .then(data => {
-                        console.log('response: ', data);
-                        swal({
-                            text: data.responseMessage,
-                            icon: "success"
-                        })
+                                    console.log('response: ', data);
+                                    swal({
+                                        text: data.responseMessage,
+                                        icon: "success"
+                                    })
+                                });
+
+                        } else {
+                            scheduler.switchStatus = false;
+                            this.setState({ scheduler });
+                        }
                     });
+            }
+            if (scheduler.switchStatus == false) {
+                debugger;
+                var today = new Date();
+                var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
+                var time = (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
+                if (time >= '09:00:00') {
+                    swal({
+                        text: "You can not change the schedule right now",
+                        icon: "error"
+                    })
+                }
+                scheduler.switchStatus = true;
+                this.setState({ scheduler });
             }
         }
     }
@@ -204,7 +232,7 @@ class Dashboard extends React.Component {
                         text: "Schedule updated  successfully!",
                         icon: "success"
                     })
-                    this.handleClose();
+                    this.props.handleviewClose();
                 }
                 else {
                     swal({
@@ -217,10 +245,6 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        //const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg';
-        //localStorage.setItem('edelweisstoken', edelweisstoken);
-        const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
-        localStorage.setItem('edelweisstoken', edelweisstoken);
 
         console.log("number: ", this.props.vehicleno, this.props.policynumber);
         let object = this.state.scheduleobject;
@@ -275,14 +299,10 @@ class Dashboard extends React.Component {
                 swal({
                     text: "Schedule Created Successfully!",
                     icon: "success",
-                    buttons: [false, "OK"],
-                }).then((willDelete) => {
-                    if (willDelete) {
-                        this.handlepagereload();
-                    }
-                });
+                })
                 console.log("dddd", data);
-            })
+            });
+
     }
 
     handleClose = () => {
@@ -296,7 +316,7 @@ class Dashboard extends React.Component {
                 {this.state.hidepage ?
                     <GridContainer xs={6} justify="center">
                         <h4>There is no Schedule create for this Vehicle.</h4>
-                        <Button round color="primary" onClick={() => this.handlecreateschedule()}> Create new Schedule </Button>
+                        <Button round color="primary" onClick={() => this.handlecreateSchedule()}> Create new Schedule </Button>
                     </GridContainer>
                     :
                     <GridContainer xs={6} justify="center">
