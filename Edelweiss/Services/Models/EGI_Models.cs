@@ -252,7 +252,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
     public partial class WrapperPremiumRequestDTO
     {
        
-        public int SI { get; set; }
+       // public int SI { get; set; }
         public int NoOfPC { get; set; }
         public int NoOfTW { get; set; }
         public int DriverAge { get; set; }

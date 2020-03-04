@@ -239,7 +239,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             PremiumReturnDto response = new PremiumReturnDto();
             if (premiumdata.NoOfPC != 0) {
                 if (premiumdata.DriverAge >= 18 && premiumdata.DriverAge <= 75) { 
-                    if(premiumdata.AdditionalDriver <= (premiumdata.DriverAge - 18)) {
+                    if(premiumdata.DriverExp <= (premiumdata.DriverAge - 18)) {
                         if (premiumdata.BillingFrequency == "" || premiumdata.BillingFrequency == "Monthly" || premiumdata.BillingFrequency == "Yearly") { 
                 SchedulerPremiumDTO prem = new SchedulerPremiumDTO();
             prem.dictionary_rule.SI = premiumdata.SI.ToString();
@@ -382,74 +382,118 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         public async Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata)
         {
             // _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            PremiumReturnDto response = new PremiumReturnDto();
-
-            SchedulerPremiumDTO prem = new SchedulerPremiumDTO();
-            //prem.dictionary_rule.NOOFPC = premiumdata.NoOfPC.ToString();
-            //prem.dictionary_rule.NOOFTW = premiumdata.NoOfTW.ToString();
-            //prem.dictionary_rate.PDAGERT_PAge = premiumdata.DriverAge.ToString();
-            //prem.dictionary_rate.DEXPRT_Exp = premiumdata.DriverExp.ToString();
-
-
-            //prem.dictionary_rate.AVFACTORPC_PC_NOOFPC = premiumdata.NoOfPC.ToString();
-            //prem.dictionary_rate.AVFACTORTW_TW_NOOFPC = premiumdata.NoOfPC.ToString();
-
-            prem.dictionary_rule.SI = premiumdata.SI.ToString();
-            prem.dictionary_rule.NOOFPC = premiumdata.NoOfPC.ToString();
-            prem.dictionary_rule.NOOFTW = premiumdata.NoOfTW.ToString();
-
-
-            prem.dictionary_rate.AVFACTORPC_PC_NOOFPC = premiumdata.NoOfPC.ToString();
-            prem.dictionary_rate.AVFACTORTW_TW_NOOFPC = premiumdata.NoOfPC.ToString();
-            prem.dictionary_rate.AVFACTORTW_TW_NOOFTW = premiumdata.NoOfTW.ToString();
-            prem.dictionary_rate.PDAGERT_PAge = premiumdata.DriverAge.ToString();
-            prem.dictionary_rate.DEXPRT_Exp = premiumdata.DriverExp.ToString();
-            prem.dictionary_rate.ADDRVRT_DRV = "0";
-
-            prem.dictionary_rate.FSTTAX_TAXTYPE = "";
-            prem.dictionary_rate.TSTTAX_TAXTYPE = "";
-
-            var Data = await _integrationService.WrapperCalculateRatingPremium(prem);
-
-            List<CalculationResult> val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
-            if (val != null)
+            WrapperPremiumReturnDto returnobj = new WrapperPremiumReturnDto();
+            if (premiumdata.NoOfPC != 0)
             {
+                if (premiumdata.DriverAge >= 18 && premiumdata.DriverAge <= 75)
+                {
+                    if (premiumdata.DriverExp <= (premiumdata.DriverAge - 18))
+                    {
+                        SchedulerPremiumDTO prem = new SchedulerPremiumDTO();
+                        
 
-                var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
-                var driver1Ad = val.FirstOrDefault(x => x.Entity == "DRIVER1_ADPMPD").EValue;
-                var driver1totalpm = val.FirstOrDefault(x => x.Entity == "DRIVER1_TOTALPMPD").EValue;
-                var driver2Ad = val.FirstOrDefault(x => x.Entity == "DRIVER2_ADPMPD").EValue;
-                var driver2totalpm = val.FirstOrDefault(x => x.Entity == "DRIVER2_TOTALPMPD").EValue;
-                var driver3Ad = val.FirstOrDefault(x => x.Entity == "DRIVER3_ADPMPD").EValue;
-                var driver3totalpm = val.FirstOrDefault(x => x.Entity == "DRIVER3_TOTALPMPD").EValue;
-
-                WrapperPremiumReturnDto returnobj = new WrapperPremiumReturnDto();
-                returnobj.FTPM = Convert.ToDecimal(fire);
-
-                returnobj.driverList.driver1.D1ADPM = Convert.ToDecimal(driver1Ad);
-                returnobj.driverList.driver1.D1TotalPM = Convert.ToDecimal(driver1totalpm);
-
-                returnobj.driverList.driver2.D2ADPM = Convert.ToDecimal(driver2Ad);
-                returnobj.driverList.driver2.D2TotalPM = Convert.ToDecimal(driver2totalpm);
-
-                returnobj.driverList.driver3.D3ADPM = Convert.ToDecimal(driver3Ad);
-                returnobj.driverList.driver3.D3TotalPM = Convert.ToDecimal(driver3totalpm);
-
-                returnobj.Status = BusinessStatus.Ok;
-
-                return returnobj;
+                        prem.dictionary_rule.SI = "";
+                        prem.dictionary_rule.NOOFPC = premiumdata.NoOfPC.ToString();
+                        prem.dictionary_rule.NOOFTW = premiumdata.NoOfTW.ToString();
 
 
+                        prem.dictionary_rate.AVFACTORPC_PC_NOOFPC = premiumdata.NoOfPC.ToString();
+                        prem.dictionary_rate.AVFACTORTW_TW_NOOFPC = premiumdata.NoOfPC.ToString();
+                        prem.dictionary_rate.AVFACTORTW_TW_NOOFTW = premiumdata.NoOfTW.ToString();
+                        prem.dictionary_rate.PDAGERT_PAge = premiumdata.DriverAge.ToString();
+                        prem.dictionary_rate.DEXPRT_Exp = premiumdata.DriverExp.ToString();
+                        prem.dictionary_rate.ADDRVRT_DRV = "0";
 
+                        prem.dictionary_rate.FSTTAX_TAXTYPE = "";
+                        prem.dictionary_rate.TSTTAX_TAXTYPE = "";
+
+                        var Data = await _integrationService.WrapperCalculateRatingPremium(prem);
+
+                        List<CalculationResult> val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
+                        if (val != null)
+                        {
+
+                            var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
+                            var driver1Ad = val.FirstOrDefault(x => x.Entity == "DRIVER1_ADPMPD").EValue;
+                            var driver1totalpm = val.FirstOrDefault(x => x.Entity == "DRIVER1_TOTALPMPD").EValue;
+                            var driver2Ad = val.FirstOrDefault(x => x.Entity == "DRIVER2_ADPMPD").EValue;
+                            var driver2totalpm = val.FirstOrDefault(x => x.Entity == "DRIVER2_TOTALPMPD").EValue;
+                            var driver3Ad = val.FirstOrDefault(x => x.Entity == "DRIVER3_ADPMPD").EValue;
+                            var driver3totalpm = val.FirstOrDefault(x => x.Entity == "DRIVER3_TOTALPMPD").EValue;
+
+
+                            returnobj.FTPM = Convert.ToDecimal(fire);
+
+                            returnobj.driverList.driver1.D1ADPM = Convert.ToDecimal(driver1Ad);
+                            returnobj.driverList.driver1.D1TotalPM = Convert.ToDecimal(driver1totalpm);
+
+                            returnobj.driverList.driver2.D2ADPM = Convert.ToDecimal(driver2Ad);
+                            returnobj.driverList.driver2.D2TotalPM = Convert.ToDecimal(driver2totalpm);
+
+                            returnobj.driverList.driver3.D3ADPM = Convert.ToDecimal(driver3Ad);
+                            returnobj.driverList.driver3.D3TotalPM = Convert.ToDecimal(driver3totalpm);
+
+                            returnobj.Status = BusinessStatus.Ok;
+
+                            return returnobj;
+
+
+
+                        }
+                        else
+                        {
+
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            returnobj.ResponseMessage = "Null/Empty Inputs";
+                            returnobj.Status = BusinessStatus.PreConditionFailed;
+                            errorInfo.ErrorMessage = "Calculate Premium Failed";
+                            errorInfo.ErrorCode = "ExtCP005";
+                            errorInfo.PropertyName = "MandatoryfieldsMissing";
+                            returnobj.Errors.Add(errorInfo);
+                            return returnobj;
+                        }
+                    }
+                    else
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        returnobj.ResponseMessage = "Null/Empty Inputs";
+                        returnobj.Status = BusinessStatus.PreConditionFailed;
+                        errorInfo.ErrorMessage = "Driver Experience should be less than or equal to his age – 18";
+                        errorInfo.ErrorCode = "ExtWCP003";
+                        errorInfo.PropertyName = "MandatoryfieldsMissing";
+                        returnobj.Errors.Add(errorInfo);
+                        return returnobj;
+                    }
+                }
+                else
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    returnobj.ResponseMessage = "Null/Empty Inputs";
+                    returnobj.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Driver age should be between 18 and 75.";
+                    errorInfo.ErrorCode = "ExtWCP002";
+                    errorInfo.PropertyName = "MandatoryfieldsMissing";
+                    returnobj.Errors.Add(errorInfo);
+                    return returnobj;
+                }
             }
             else
             {
-                return null;
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                returnobj.ResponseMessage = "Null/Empty Inputs";
+                returnobj.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Minimum One PC should be their.";
+                errorInfo.ErrorCode = "ExtWCP001";
+                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                returnobj.Errors.Add(errorInfo);
+                return returnobj;
             }
 
-
-
-        }
+            }
         private TaxTypeDTO TaxTypeForStateCode(string stateabbreviation)
         {
 
