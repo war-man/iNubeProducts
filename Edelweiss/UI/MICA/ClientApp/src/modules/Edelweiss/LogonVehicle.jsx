@@ -102,6 +102,8 @@ class LogonVehicle extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            bytestring: "",
+            fbase64: [],
             vehicleMakeModel: "",
             vehiclearray: [],
             vehicles: [],
@@ -314,6 +316,57 @@ class LogonVehicle extends React.Component {
                         "RiskItems": []
                     }
                 ]
+            },
+            imagePreviewUrl: '',
+            profileimage: [],
+            DocumentDTO: {
+                frontimage: "",
+                leftimage: "",
+                backimage: "",
+                rightimage: "",
+            },
+            imagesDTO: {
+                frontfileImage: "",
+                leftfileimage: "",
+                backfileimage: "",
+                rightfileimage: "",
+            },
+            fileUploaddto: {
+                "fileUploadDTOs": [
+
+                ]
+            },
+            frontfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            leftfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            backfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            rightfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
             },
             showvehicles: false,
             scheduledatadto: {},
@@ -994,12 +1047,187 @@ class LogonVehicle extends React.Component {
         }
     }
 
+    Uploadfile = (files, bytes, name) => {
+        console.log("fyles", files, bytes, name);;
+        if (name == "front") {
+            this.state.frontfilestr.fileName = files.frontfileimage.name;
+            this.state.frontfilestr.fileExtension = files.frontfileimage.name.split(".")[1];
+            this.state.frontfilestr.fileData = bytes.frontimage.toString();
+            this.state.frontfilestr.contentType = files.frontfileimage.type;
+            this.state.frontfilestr.tagname = 'ImageType';
+            this.state.frontfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.frontfilestr);
+        }
+
+
+        if (name == "left") {
+            this.state.leftfilestr.fileName = files.leftfileimage.name;
+            this.state.leftfilestr.fileExtension = files.leftfileimage.name.split(".")[1];
+            this.state.leftfilestr.fileData = bytes.leftimage.toString();
+            this.state.leftfilestr.contentType = files.leftfileimage.type;
+            this.state.leftfilestr.tagname = 'ImageType';
+            this.state.leftfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.leftfilestr);
+        }
+        if (name == "back") {
+            this.state.backfilestr.fileName = files.backfileimage.name;
+            this.state.backfilestr.fileExtension = files.backfileimage.name.split(".")[1];
+            this.state.backfilestr.fileData = bytes.backimage.toString().replace('data:image/png;base64,', '');
+            this.state.backfilestr.contentType = files.backfileimage.type;
+            this.state.backfilestr.tagname = 'ImageType';
+            this.state.backfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.backfilestr);
+        }
+        if (name == "right") {
+            this.state.rightfilestr.fileName = files.rightfileimage.name;
+            this.state.rightfilestr.fileExtension = files.rightfileimage.name.split(".")[1];
+            this.state.rightfilestr.fileData = bytes.rightimage.toString().replace('data:image/png;base64,', '');
+            this.state.rightfilestr.contentType = files.rightfileimage.type;
+            this.state.rightfilestr.tagname = 'ImageType';
+            this.state.rightfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.rightfilestr);
+        }
+    }
+
+    FileUploadSubmit = () => {
+        console.log("this.state.fileUploaddto", this.state.fileUploaddto)
+        let obj = this.state.RiskObj;
+        if (this.state.fileUploaddto.fileUploadDTOs.length == 4) {
+            fetch(`http://elwei-publi-1sxquhk82c0h4-688030859.ap-south-1.elb.amazonaws.com:9004/api/DMS/DocumentSimpleupload/DocumentSimpleupload`, {
+                method: 'Post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.state.fileUploaddto)
+            }).then(response => response.json())
+                .then(data => {
+                    console.log("respdata", data);
+                    let docObj = [
+                    ]
+                    for (var i = 0; i < data.length; i++) {
+
+                        docObj.push(data[i].docid);
+                    }
+                    console.log("docobj", docObj.length);
+                    for (var i = 0; i < docObj.length; i++) {
+                        let x = {};
+                        x.docId = docObj[i];
+                        let mainobj = obj.Documents;
+                        mainobj.push(x);
+
+                        console.log("docobjmain", mainobj);
+                    }
+
+                    console.log("docObj", docObj);
+                    swal({
+                        text: "Document uploaded successfully!",
+                        icon: "success"
+                    })
+                    this.setState({ disablesendotp: true, disableresendotp: false })
+                    console.log("dddd", data);
+                })
+        }
+        console.log("thisriskobj", this.state.RiskObj)
+    }
+
+
+
+    fileSelectedHandlerfront = (event, name) => {
+        debugger;
+        let images = this.state.DocumentDTO;
+        let imagefiles = this.state.imagesDTO;
+        let pictures = this.state.imagesDTO;
+        let picture = event.target.files[0];
+        var front = "";
+        var left = "";
+        var back = "";
+        var right = "";
+
+        //let files = this.state.file;
+        let base = this.state.fbase64;
+        let stringbase = this.state.bytestring;
+        this.setState({
+            selectedimage: event.target.files[0]
+        })
+        let reader = new FileReader();
+        reader.onloadend = () => {
+            base.push(reader.result);
+            this.setState({
+                imagePreviewUrl: reader.result
+            });
+
+            //stringbase = base.toString();
+            //this.setState({ bytestring: stringbase})
+            //this.state.bytestring = stringbase;
+            //console.log("d5", this.state.bytestring);
+        }
+        console.log("imagePreviewUrl", this.state.imagePreviewUrl);
+        console.log("b5", this.state.bytestring);
+        //let data = base.toString();
+
+        console.log("baseee", base);
+        if (name == "front") {
+            debugger;
+            this.state.frontimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            front = this.state.frontimage;
+            images.frontimage = front;
+            console.log("image: ", images.frontimage);
+            imagefiles.frontfileimage = event.target.files[0];
+        }
+        if (name == "left") {
+            this.state.leftimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            left = this.state.leftimage;
+            images.leftimage = left;
+            imagefiles.leftfileimage = event.target.files[0];
+        }
+        if (name == "back") {
+            this.state.backimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            back = this.state.backimage;
+            images.backimage = this.state.backimage;
+            imagefiles.backfileimage = event.target.files[0];
+        }
+        if (name == "right") {
+            debugger;
+            this.state.rightimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            right = this.state.rightimage;
+            images.rightimage = this.state.rightimage;
+            imagefiles.rightfileimage = event.target.files[0];
+
+
+        }
+
+        this.setState({ images, imagefiles });
+        this.Uploadfile(imagefiles, images, name);
+        reader.readAsDataURL(event.target.files[0]);
+
+        console.log("filwimage", images.frontimage);
+
+
+
+
+        //console.log("picfiles", this.state.imagesDTO);
+        //var data = new FormData();
+        //data.append('file', event.target.files[0]);
+        //data.append('filename', event.target.files[0].name);
+
+        //console.log("data: ", event.target.files);
+
+        //console.log("datafile", data);
+
+    }
+
+
     render() {
         const { classes, loggingIn } = this.props;
         return (
             <div className={classes.container}>
                 <GridContainer justify="center">
-                    <GridItem xs={8}>
+                    <GridItem xs={9}>
                         <Card>
                             <CardBody>{this.state.Novehicles ?
                                 <GridContainer>
@@ -1195,6 +1423,7 @@ class LogonVehicle extends React.Component {
                                 <h3>There is no Details/Vehicles available with this number.</h3>
                             }
                                 <Modal
+                                    //id="modal-description"
                                     disableScrollLock="true"
                                     aria-labelledby="simple-modal-title"
                                     aria-describedby="simple-modal-description"
@@ -1253,7 +1482,7 @@ class LogonVehicle extends React.Component {
                                                     <GridContainer>
 
                                                     </GridContainer>
-                                                    <GridContainer justify="center">
+                                                    {/*<GridContainer justify="center">
                                                         {this.state.showDropZone ?
                                                             <GridItem>
                                                                 <Dropzone
@@ -1266,9 +1495,11 @@ class LogonVehicle extends React.Component {
                                                                 />
                                                             </GridItem> : null}
 
-                                                    </GridContainer>
+                                                    </GridContainer>*/}
+
                                                     <GridContainer justify="center">
-                                                        <Button color="primary" name="frontCarImage" round onClick={(e) => this.showOnClick(e)}> Upload</Button>
+                                                        {this.renderRedirect()}
+                                                        <Button color="primary" round onClick={this.FileUploadSubmit}> Upload </Button>
                                                     </GridContainer>
                                                     <GridContainer justify="center">
                                                         {this.renderRedirect()}

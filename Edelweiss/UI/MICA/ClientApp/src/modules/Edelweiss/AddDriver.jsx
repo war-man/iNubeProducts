@@ -28,6 +28,10 @@ class AddDriver extends React.Component {
         super(props)
 
         this.state = {
+            showleftDropZone: false,
+            showbtn:true,
+            bytestring: "",
+            fbase64: [],
             showDropZonerear: false,
             showadditionaldriver: false,
             proposalno: "",
@@ -94,12 +98,25 @@ class AddDriver extends React.Component {
 
 
             },
+            DocumentDTO: {
+                frontimage: "",
+                leftimage: "",
+                backimage: "",
+                rightimage: "",
+            },
+            imagesDTO: {
+                frontfileImage: "",
+                leftfileimage: "",
+                backfileimage: "",
+                rightfileimage: "",
+            },
             drvvehicleType: "",
             adddrvMakeModel: "",
             tagName: "",
             tagValue: "",
             rtagName: "",
             rtagValue: "",
+            imagePreviewUrl: '',
 
             fileUpload: {
                 "fileUploadDTOs": [
@@ -111,6 +128,27 @@ class AddDriver extends React.Component {
                         "tagname": "",
                         "tagValue": ""
                     }
+                ]
+            },
+            frontfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            backfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            fileUploaddto: {
+                "fileUploadDTOs": [
+
                 ]
             },
 
@@ -364,6 +402,11 @@ class AddDriver extends React.Component {
 
         } else {
             this.setState({ showadddrvbtn: false });
+            for (var i = 0; i < this.state.insurableObj.length; i++) {
+                if (this.state.insurableObj[i].InsurableName == "Driver") {
+                    this.state.insurableObj[i].RiskItems.push(this.state.RiskObj);
+                }
+            }
         }
 
         this.setState({ showadddrvflag: false, RiskObj: this.state.duplicateRiskObj });
@@ -391,6 +434,130 @@ class AddDriver extends React.Component {
         }
 
         reader.readAsDataURL(file);
+
+    }
+    fileSelectedHandlerfront = (event, name) => {
+        debugger;
+        let images = this.state.DocumentDTO;
+        let imagefiles = this.state.imagesDTO;
+        let pictures = this.state.imagesDTO;
+        let picture = event.target.files[0];
+        var front = "";
+        var left = "";
+        var back = "";
+        var right = "";
+
+        let base = this.state.fbase64;
+        let stringbase = this.state.bytestring;
+        this.setState({
+            selectedimage: event.target.files[0]
+        })
+        let reader = new FileReader();
+        reader.onloadend = () => {
+            base.push(reader.result);
+            this.setState({
+                imagePreviewUrl: reader.result
+            });
+        }
+        console.log("imagePreviewUrl", this.state.imagePreviewUrl);
+        console.log("b5", this.state.bytestring);
+        //let data = base.toString();
+
+        console.log("baseee", base);
+        if (name == "front") {
+            debugger;
+            this.state.frontimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            front = this.state.frontimage;
+            images.frontimage = front;
+            console.log("image: ", images.frontimage);
+            imagefiles.frontfileimage = event.target.files[0];
+        }
+    
+        if (name == "back") {
+            this.state.backimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            back = this.state.backimage;
+            images.backimage = this.state.backimage;
+            imagefiles.backfileimage = event.target.files[0];
+        }
+      
+
+        this.setState({ images, imagefiles });
+        this.Uploadfile(imagefiles, images, name);
+        reader.readAsDataURL(event.target.files[0]);
+
+        console.log("filwimage", images.frontimage);
+
+
+    }
+    Uploadfile = (files, bytes, name) => {
+        console.log("fyles", files, bytes, name);;
+        if (name == "front") {
+            this.state.frontfilestr.fileName = files.frontfileimage.name;
+            this.state.frontfilestr.fileExtension = files.frontfileimage.name.split(".")[1];
+            this.state.frontfilestr.fileData = bytes.frontimage.toString();
+            this.state.frontfilestr.contentType = files.frontfileimage.type;
+            this.state.frontfilestr.tagname = 'ImageType';
+            this.state.frontfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.frontfilestr);
+        }
+
+
+        if (name == "back") {
+            this.state.backfilestr.fileName = files.backfileimage.name;
+            this.state.backfilestr.fileExtension = files.backfileimage.name.split(".")[1];
+            this.state.backfilestr.fileData = bytes.backimage.toString().replace('data:image/png;base64,', '');
+            this.state.backfilestr.contentType = files.backfileimage.type;
+            this.state.backfilestr.tagname = 'ImageType';
+            this.state.backfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.backfilestr);
+        }
+   
+    }
+    FileUploadSubmit = () => {
+        console.log("this.state.fileUploaddto", this.state.fileUploaddto)
+        let obj = this.state.RiskObj;
+        if (this.state.fileUploaddto.fileUploadDTOs.length == 2) {
+            fetch(`http://elwei-publi-1sxquhk82c0h4-688030859.ap-south-1.elb.amazonaws.com:9004/api/DMS/DocumentSimpleupload/DocumentSimpleupload`, {
+                method: 'Post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.state.fileUploaddto)
+            }).then(response => response.json())
+                .then(data => {
+                    console.log("respdata", data);
+                    let docObj = [
+                    ]
+                    for (var i = 0; i < data.length; i++) {
+
+                        docObj.push(data[i].docid);
+                    }
+                    console.log("docobj", docObj.length);
+                    for (var i = 0; i < docObj.length; i++) {
+                        let x = {};
+                        x.docId = docObj[i];
+                        let mainobj = obj.Documents;
+                        mainobj.push(x);
+
+                        console.log("docobjmain", mainobj);
+                    }
+
+                    console.log("docObj", docObj);
+                    swal({
+                        text: "Document uploaded successfully!",
+                        icon: "success"
+                    })
+                    this.setState({ disablesendotp: true, disableresendotp: false })
+                    console.log("dddd", data);
+                })
+        }
+        console.log("thisriskobj", this.state.RiskObj)
+    }
+    showonclick = () => {
+        this.setState({ showleftDropZone: true, showbtn: false })
 
     }
 
@@ -481,16 +648,45 @@ class AddDriver extends React.Component {
                                         </GridItem> : null}
                                 </GridContainer>
 
-                                <GridContainer justify="center">
-                                    <Button color="default" onClick={(e) => this.showOnClick(e, 'ImageType', 'front')}>
-                                        Front
-                                         </Button>
+                                {this.state.showleftDropZone ? <GridContainer justify="center">
+                                    <GridItem xs={3}>
+                                        <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Front</h6>
+                                        <div className="container">
+                                            <div className="avatar-upload">
+                                                <form action="/action_page.php">
+                                                    <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'front')} />
+                                                </form>
+                                                <div className="avatar-preview">
+                                                    <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.frontimage + ")" }} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </GridItem>
 
-                                    <Button color="default" onClick={(e) => this.showrearOnClick(e, 'ImageType', 'back')}>
-                                        Back
-                                         </Button>
 
-                                </GridContainer>
+                                    <GridItem xs={3}>
+                                        <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Back</h6>
+                                        <div className="container">
+                                            <div className="avatar-upload">
+                                                <form action="/action_page.php">
+                                                    <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'back')} />
+                                                </form>
+                                                <div className="avatar-preview">
+                                                    <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.backimage + ")" }} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </GridItem>
+
+                                </GridContainer> : null}
+                                {this.state.showleftDropZone ? <GridContainer justify="center">
+                                    {this.renderRedirect()}
+                                    <Button color="primary" round onClick={this.FileUploadSubmit}> Upload </Button>
+                                </GridContainer> : null}
+                                {this.state.showbtn ? <GridContainer justify="center">
+                                    <Button color="primary" round onClick={this.showonclick}> Upload </Button>
+                                </GridContainer> : null}
+
                                 <GridContainer justify="center">
                                     {this.renderRedirect()}
                                     <Button color="primary" round onClick={this.submitDriverDetails}> Submit </Button>

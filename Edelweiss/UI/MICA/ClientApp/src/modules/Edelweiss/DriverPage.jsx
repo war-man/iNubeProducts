@@ -169,7 +169,7 @@ class DriverPage extends React.Component {
                             "Licence No.": "333",
                             "Driving Experience": ""
                         }], "Covers": []
-                }, { "InsurableName": "Vehicle", "RiskItems": [{ "Make": "pks", "Model": "sds", "Vehicle Number": "2323", "Year of Registration": "3", "Vehicle Type": "" }], "Covers": [{ "CoverName": "Fire & Theft", "CoverFields": [{ "Cover Name": "Fire & Theft", "CEF Value": "3" }] }, { "CoverName": "Accidental Damage", "CoverFields": [{ "Cover Name": "Accidental Damage", "CEF Value": "3" }] }] }], "Identification Number": "233", "Name": "", "Product Code": "P0001", "No. Of Risks": "3", "Policy Start Date": "", "Mobile Number": "", "Policy End Date": "2020-2-19", "Email ID": "prasant.k@inubesolutions.com",
+                }, { "InsurableName": "Vehicle", "RiskItems": [{ "Make": "pks", "Model": "sds", "Vehicle Number": "2323", "Year of Registration": "3", "Vehicle Type": "" }], "Covers": [{ "CoverName": "Fire & Theft", "CoverFields": [{ "Cover Name": "Fire & Theft", "CEF Value": "3" }] }, { "CoverName": "Accidental Damage", "CoverFields": [{ "Cover Name": "Accidental Damage", "CEF Value": "3" }] }] }], "Identification Number": "233", "Name": "", "Product Code": "DBI001", "No. Of Risks": "3", "Policy Start Date": "", "Mobile Number": "", "Policy End Date": "2020-2-19", "Email ID": "prasant.k@inubesolutions.com",
 
                     "stateCode": "",
                     "si": "",

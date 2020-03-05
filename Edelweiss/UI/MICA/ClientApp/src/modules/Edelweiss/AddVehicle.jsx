@@ -27,7 +27,13 @@ class AddVehicle extends React.Component {
         super(props)
 
         this.state = {
-            base64: [],
+            showDropZone:false,
+            showbtn:true,
+            bytestring: "",
+            fbase64: [],
+            lbase64: [],
+            bbase64: [],
+            rbase64: [],
             policyNo: "",
             vehicleModel: "",
             vehicleModel1: "",
@@ -98,11 +104,74 @@ class AddVehicle extends React.Component {
             ftagValue: "",
             btagName: "",
             btagValue: "",
-            frontimage: "",
+            frontimage: [],
             rightimage: "",
             leftimage: "",
             backimage: "",
             imagePreview: "",
+            selectedimage: "",
+            selectedimage1: "",
+            selectedimage2: "",
+            selectedimage3: "",
+            imagePreviewUrl: '',
+            profileimage: [],
+            DocumentDTO: {
+                frontimage: "",
+                leftimage: "",
+                backimage: "",
+                rightimage: "",
+            },
+            imagesDTO: {
+                frontfileImage: "",
+                leftfileimage: "",
+                backfileimage: "",
+                rightfileimage: "",
+            },
+            fileUploaddto: {
+                "fileUploadDTOs": [
+
+                ]
+            },
+            frontfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            leftfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            backfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            rightfilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
+            duplicatefilestr: {
+                "fileName": "",
+                "fileExtension": "",
+                "fileData": "",
+                "contentType": "",
+                "tagname": "",
+                "tagValue": ""
+            },
         }
     }
     AddVehicle = (files) => {
@@ -239,257 +308,95 @@ class AddVehicle extends React.Component {
 
     handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
 
-    uploadfileleft = (files) => {
-        debugger;
-        let obj = this.state.RiskObj;
-        var data = new FormData();
-        if (files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                data.append(files[i].file.name, files[i].file, files[i].file.size);
+    showonclick = () => {
+        this.setState({ showleftDropZone: true,showbtn:false })
 
-            }
-        }
-
-        $.ajax({
-            type: "POST",
-            //url: `http://localhost:53000/api/DMS/UploadFile`,
-            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload?tagName=` + this.state.ltagName + '&tagValue=' + this.state.ltagValue,
-            // url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/MobileDocumentupload/MobileDocumentupload`,
-            contentType: false,
-            processData: false,
-
-            data: data,
-            beforeSend: function (data, xhr) {
-                /* Authorization header */
-                //xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
-            },
-            success: function (data, message) {
-                console.log("dddata", data);
-                let docObj = [
-                ]
-                for (var i = 0; i < data.dMSDTOs.length; i++) {
-
-                    docObj.push(data.dMSDTOs[i]);
-                }
-                console.log("docobj", docObj);
-                for (var i = 0; i < docObj.length; i++) {
-                    let x = {};
-                    x.docId = docObj[i].docId;
-                    x.fileName = docObj[i].fileName;
-                    let mainobj = obj.Documents;
-                    mainobj.push(x);
-
-                    console.log("docobj", mainobj);
-                }
-
-                //this.state.documentObj.docId = data.docId;
-                //this.state.documentObj.fileName = data.fileName;
-
-                swal({
-                    text: "Document Uploaded Successful",
-                    icon: "success"
-                });
-            },
-            error: function (message) {
-
-                swal({
-                    text: "Document Upload Failed",
-                    icon: "error"
-                });
-            }
-        });
-        this.setState({});
-        console.log("this.state.Riskobj", this.state.RiskObj);
     }
 
-    uploadfileright = (files) => {
-        debugger;
-        let obj = this.state.RiskObj;
-        var data = new FormData();
-        if (files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                data.append(files[i].file.name, files[i].file, files[i].file.size);
-
-            }
+    Uploadfile = (files, bytes, name) => {
+        console.log("fyles", files, bytes, name);;
+        if (name == "front") {
+            this.state.frontfilestr.fileName = files.frontfileimage.name;
+            this.state.frontfilestr.fileExtension = files.frontfileimage.name.split(".")[1];
+            this.state.frontfilestr.fileData = bytes.frontimage.toString();
+            this.state.frontfilestr.contentType = files.frontfileimage.type;
+            this.state.frontfilestr.tagname = 'ImageType';
+            this.state.frontfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.frontfilestr);
+         }
+            
+      
+        if (name == "left") {
+            this.state.leftfilestr.fileName = files.leftfileimage.name;
+            this.state.leftfilestr.fileExtension = files.leftfileimage.name.split(".")[1];
+            this.state.leftfilestr.fileData = bytes.leftimage.toString();
+            this.state.leftfilestr.contentType = files.leftfileimage.type;
+            this.state.leftfilestr.tagname = 'ImageType';
+            this.state.leftfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.leftfilestr);
         }
+        if (name == "back") {
+            this.state.backfilestr.fileName = files.backfileimage.name;
+            this.state.backfilestr.fileExtension = files.backfileimage.name.split(".")[1];
+            this.state.backfilestr.fileData = bytes.backimage.toString().replace('data:image/png;base64,', '');
+            this.state.backfilestr.contentType = files.backfileimage.type;
+            this.state.backfilestr.tagname = 'ImageType';
+            this.state.backfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.backfilestr);
+        }
+        if (name == "right") {
+            this.state.rightfilestr.fileName = files.rightfileimage.name;
+            this.state.rightfilestr.fileExtension = files.rightfileimage.name.split(".")[1];
+            this.state.rightfilestr.fileData = bytes.rightimage.toString().replace('data:image/png;base64,','');
+            this.state.rightfilestr.contentType = files.rightfileimage.type;
+            this.state.rightfilestr.tagname = 'ImageType';
+            this.state.rightfilestr.tagValue = name;
+            this.state.fileUploaddto.fileUploadDTOs.push(this.state.rightfilestr);
+        }
+    }
+    FileUploadSubmit = () => {
+        console.log("this.state.fileUploaddto", this.state.fileUploaddto)
+        let obj = this.state.RiskObj;
+        if (this.state.fileUploaddto.fileUploadDTOs.length==4) {
+            fetch(`http://elwei-publi-1sxquhk82c0h4-688030859.ap-south-1.elb.amazonaws.com:9004/api/DMS/DocumentSimpleupload/DocumentSimpleupload`, {
+                method: 'Post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.state.fileUploaddto)
+            }).then(response => response.json())
+                .then(data => {
+                    console.log("respdata", data);
+                    let docObj = [
+                    ]
+                    for (var i = 0; i < data.length; i++) {
 
-        $.ajax({
-            type: "POST",
-            //url: `http://localhost:53000/api/DMS/UploadFile`,
-            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload?tagName=` + this.state.rtagName + '&tagValue=' + this.state.rtagValue,
-            // url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/MobileDocumentupload/MobileDocumentupload`,
-            contentType: false,
-            processData: false,
+                        docObj.push(data[i].docid);
+                    }
+                    console.log("docobj", docObj.length);
+                    for (var i = 0; i < docObj.length; i++) {
+                        let x = {};
+                        x.docId = docObj[i];
+                        let mainobj = obj.Documents;
+                        mainobj.push(x);
 
-            data: data,
-            beforeSend: function (data, xhr) {
-                /* Authorization header */
-                //xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
-            },
-            success: function (data, message) {
-                console.log("dddata", data);
-                let docObj = [
-                ]
-                for (var i = 0; i < data.dMSDTOs.length; i++) {
+                        console.log("docobjmain", mainobj);
+                    }
 
-                    docObj.push(data.dMSDTOs[i]);
-                }
-                console.log("docobj", docObj);
-                for (var i = 0; i < docObj.length; i++) {
-                    let x = {};
-                    x.docId = docObj[i].docId;
-                    x.fileName = docObj[i].fileName;
-                    let mainobj = obj.Documents;
-                    mainobj.push(x);
-
-                    console.log("docobj", mainobj);
-                }
-
-                //this.state.documentObj.docId = data.docId;
-                //this.state.documentObj.fileName = data.fileName;
-
-                swal({
-                    text: "Document Uploaded Successful",
-                    icon: "success"
-                });
-            },
-            error: function (message) {
-
-                swal({
-                    text: "Document Upload Failed",
-                    icon: "error"
-                });
-            }
-        });
-        this.setState({});
-        console.log("this.state.Riskobj", this.state.RiskObj);
+                    console.log("docObj", docObj);
+                        swal({
+                            text: "Document uploaded successfully!",
+                            icon: "success"
+                        })
+                        this.setState({ disablesendotp: true, disableresendotp: false })
+                        console.log("dddd", data);
+                })
+        }
+        console.log("thisriskobj", this.state.RiskObj)
     }
 
-    uploadfilefront = (files) => {
-        debugger;
-        let obj = this.state.RiskObj;
-        var data = new FormData();
-        if (files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                data.append(files[i].file.name, files[i].file, files[i].file.size);
 
-            }
-        }
-
-        $.ajax({
-            type: "POST",
-            //url: `http://localhost:53000/api/DMS/UploadFile`,
-            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload?tagName=` + this.state.ftagName + '&tagValue=' + this.state.ftagValue,
-            // url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/MobileDocumentupload/MobileDocumentupload`,
-            contentType: false,
-            processData: false,
-
-            data: data,
-            beforeSend: function (data, xhr) {
-                /* Authorization header */
-                //xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
-            },
-            success: function (data, message) {
-                console.log("dddata", data);
-                let docObj = [
-                ]
-                for (var i = 0; i < data.dMSDTOs.length; i++) {
-
-                    docObj.push(data.dMSDTOs[i]);
-                }
-                console.log("docobj", docObj);
-                for (var i = 0; i < docObj.length; i++) {
-                    let x = {};
-                    x.docId = docObj[i].docId;
-                    x.fileName = docObj[i].fileName;
-                    let mainobj = obj.Documents;
-                    mainobj.push(x);
-
-                    console.log("docobj", mainobj);
-                }
-
-                //this.state.documentObj.docId = data.docId;
-                //this.state.documentObj.fileName = data.fileName;
-
-                swal({
-                    text: "Document Uploaded Successful",
-                    icon: "success"
-                });
-            },
-            error: function (message) {
-
-                swal({
-                    text: "Document Upload Failed",
-                    icon: "error"
-                });
-            }
-        });
-        this.setState({});
-        console.log("this.state.Riskobj", this.state.RiskObj);
-    }
-
-    uploadfileback = (files) => {
-        debugger;
-        let obj = this.state.RiskObj;
-        var data = new FormData();
-        if (files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                data.append(files[i].file.name, files[i].file, files[i].file.size);
-
-            }
-        }
-        console.log("Data sent", data);
-        $.ajax({
-            type: "POST",
-            //url: `http://localhost:53000/api/DMS/UploadFile`,
-            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload?tagName=` + this.state.btagName + '&tagValue=' + this.state.btagValue,
-            // url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/MobileDocumentupload/MobileDocumentupload`,
-            contentType: false,
-            processData: false,
-
-            data: data,
-            beforeSend: function (data, xhr) {
-                /* Authorization header */
-                //xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
-            },
-            success: function (data, message) {
-                console.log("dddata", data);
-                let docObj = [
-                ]
-                for (var i = 0; i < data.dMSDTOs.length; i++) {
-
-                    docObj.push(data.dMSDTOs[i]);
-                }
-                console.log("docobj", docObj);
-                for (var i = 0; i < docObj.length; i++) {
-                    let x = {};
-                    x.docId = docObj[i].docId;
-                    x.fileName = docObj[i].fileName;
-                    let mainobj = obj.Documents;
-                    mainobj.push(x);
-
-                    console.log("docobj", mainobj);
-                }
-
-                //this.state.documentObj.docId = data.docId;
-                //this.state.documentObj.fileName = data.fileName;
-
-                swal({
-                    text: "Document Uploaded Successful",
-                    icon: "success"
-                });
-            },
-            error: function (message) {
-
-                swal({
-                    text: "Document Upload Failed",
-                    icon: "error"
-                });
-            }
-        });
-        this.setState({});
-        console.log("this.state.Riskobj", this.state.RiskObj);
-    }
 
     renderRedirect = () => {
         if (this.state.redirect === true) {
@@ -500,69 +407,97 @@ class AddVehicle extends React.Component {
         }
     }
 
-    fileSelectedHandler = (event, name) => {
-        let reader = new FileReader();
-        let base = this.state.base64;
-        base = [];
-        let front = this.state.frontimage;
-        let back = this.state.backimage;
-        let right = this.state.rightimage;
-        let left = this.state.leftimage;
 
+    fileSelectedHandlerfront = (event, name) => {
         debugger;
-        let pic = event.target.files[0];
+        let images = this.state.DocumentDTO;
+        let imagefiles = this.state.imagesDTO;
+        let pictures = this.state.imagesDTO;
+        let picture = event.target.files[0];
+        var front = "";
+        var left = "";
+        var back = "";
+        var right = "";
+
+        //let files = this.state.file;
+        let base = this.state.fbase64;
+        let stringbase = this.state.bytestring;
+        this.setState({
+            selectedimage: event.target.files[0]
+        })
+        let reader = new FileReader();
         reader.onloadend = () => {
+            base.push(reader.result);
             this.setState({
-                //image, 
                 imagePreviewUrl: reader.result
             });
+
+            //stringbase = base.toString();
+            //this.setState({ bytestring: stringbase})
+            //this.state.bytestring = stringbase;
+            //console.log("d5", this.state.bytestring);
         }
-        reader.readAsDataURL(pic);
+        console.log("imagePreviewUrl", this.state.imagePreviewUrl);
+        console.log("b5", this.state.bytestring);
+        //let data = base.toString();
 
-        console.log("image info", pic)
-        this.setState({ filename: pic.name });
-        reader.onload = function () {
-            base.push(reader.result);
+        console.log("baseee", base);
+        if (name == "front") {
+            debugger;
+            this.state.frontimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            front = this.state.frontimage;
+            images.frontimage = front;
+            console.log("image: ", images.frontimage);
+            imagefiles.frontfileimage = event.target.files[0];
+        }
+        if (name == "left") {
+            this.state.leftimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            left = this.state.leftimage;
+            images.leftimage = left;
+            imagefiles.leftfileimage = event.target.files[0];
+        }
+        if (name == "back") {
+            this.state.backimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            back = this.state.backimage;
+            images.backimage = this.state.backimage;
+            imagefiles.backfileimage = event.target.files[0];
+        }
+        if (name == "right") {
+            debugger;
+            this.state.rightimage = this.state.fbase64;
+            this.state.fbase64 = [];
+            right = this.state.rightimage;
+            images.rightimage = this.state.rightimage;
+            imagefiles.rightfileimage = event.target.files[0];
 
-            let data = reader.result;
 
-            console.log("base", base[0])
-            if (name == "front") {
-                front = base[0];
-                console.log("base: ", front)
-            }
-            if (name == "back") {
-                back = base[0];
-            }
-            if (name == "right") {
-                right = base[0];
-            }
-            if (name == "left") {
-                left = base[0];
-            }
-            //this.state.imagePreview = base[0];
-            console.log("baselength index: ", data)
-            console.log("baselength: ", data.length);
-        };
-        this.setState({ front, back, right, left });
-        //console.log("base",this.state.base64[0])
+        }
 
-        //if (name == "front") {
-        //    this.setState({ frontimage: array[0] });
-        //    console.log("image: ", array[0]);
-        //    console.log("image: ", this.state.frontimage);
-        //}
-        //if (name == "back") {
-        //    this.setState({ backimage: array[0] });
-        //}
-        //if (name == "right") {
-        //    this.setState({ rightimage: array[0] });
-        //}
-        //if (name == "left") {
-        //    this.setState({ leftimage: array[0] });
-        //}
-        //console.log("base64", this.state.base64)
+        this.setState({ images, imagefiles });
+        this.Uploadfile(imagefiles, images, name);
+        reader.readAsDataURL(event.target.files[0]);
+
+        console.log("filwimage", images.frontimage);
+
+
+
+
+        //console.log("picfiles", this.state.imagesDTO);
+        //var data = new FormData();
+        //data.append('file', event.target.files[0]);
+        //data.append('filename', event.target.files[0].name);
+
+        //console.log("data: ", event.target.files);
+
+        //console.log("datafile", data);
+
     }
+
+
+
 
 
 
@@ -574,7 +509,7 @@ class AddVehicle extends React.Component {
         return (
             <div className={classes.container}>
                 <GridContainer justify="center">
-                    <GridItem xs={8}>
+                    <GridItem xs={10}>
                         <Card>
                             <CardBody>
                                 <GridContainer justify="center">
@@ -613,7 +548,7 @@ class AddVehicle extends React.Component {
                                     </GridItem>
                                 </GridContainer>
                                 <GridContainer justify="center">
-                                    {this.state.showleftDropZone ?
+                                    {this.state.showDropZone ?
                                         <GridItem xs={3}>
                                             <Dropzone
                                                 getUploadParams={this.getUploadParams}
@@ -676,17 +611,20 @@ class AddVehicle extends React.Component {
 
                              
                                 </GridContainer>*/}
-                                <GridContainer >
+                                {this.state.showleftDropZone ? <GridContainer >
                                     <GridItem xs={3}>
                                         <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Front</h6>
                                         <div className="container">
                                             <div className="avatar-upload">
-                                                <div className="avatar-edit">
-                                                    <input type='file' id="imageUpload" onChange={(e) => this.fileSelectedHandler(e, 'front')} accept=".png, .jpg, .jpeg" />
+                                                {/*<div className="avatar-edit">
+                                                    <input type='file' onChange={(e) => this.fileSelectedHandlerfront(e, 'front')} accept=".png, .jpg, .jpeg" />
                                                     <label for="imageUpload"></label>
-                                                </div>
+                                                </div>*/}
+                                                <form action="/action_page.php">
+                                                    <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'front')} />
+                                                </form>
                                                 <div className="avatar-preview">
-                                                    <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.frontimage[0] + ")" }} />
+                                                    <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.frontimage + ")" }} />
                                                 </div>
                                             </div>
                                         </div>
@@ -695,12 +633,15 @@ class AddVehicle extends React.Component {
                                         <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Left</h6>
                                         <div className="container">
                                             <div className="avatar-upload">
-                                                <div className="avatar-edit">
-                                                    <input type='file' id="imageUpload" onChange={(e) => this.fileSelectedHandler(e, 'left')} accept=".png, .jpg, .jpeg" />
+                                                {/*<div className="avatar-edit">
+                                                    <input type='file' onChange={(e) => this.fileSelectedHandlerfront(e, 'left')} accept=".png, .jpg, .jpeg" />
                                                     <label for="imageUpload"></label>
-                                                </div>
+                                                </div>*/}
+                                                <form action="/action_page.php">
+                                                    <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'left')} />
+                                                </form>
                                                 <div className="avatar-preview">
-                                                    <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.leftimage[0] + ")" }} />
+                                                    <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.leftimage + ")" }} />
                                                 </div>
                                             </div>
                                         </div>
@@ -709,10 +650,13 @@ class AddVehicle extends React.Component {
                                         <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Back</h6>
                                         <div className="container">
                                             <div className="avatar-upload">
-                                                <div className="avatar-edit">
-                                                    <input type='file' id="imageUpload" onChange={(e) => this.fileSelectedHandler(e, 'back')} accept=".png, .jpg, .jpeg" />
+                                                {/*<div className="avatar-edit">
+                                                    <input type='file' onChange={(e) => this.fileSelectedHandlerback(e, 'back')} accept=".png, .jpg, .jpeg" />
                                                     <label for="imageUpload"></label>
-                                                </div>
+                                                </div>*/}
+                                                <form action="/action_page.php">
+                                                    <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'back')} />
+                                                </form>
                                                 <div className="avatar-preview">
                                                     <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.backimage + ")" }} />
                                                 </div>
@@ -723,17 +667,28 @@ class AddVehicle extends React.Component {
                                         <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Right</h6>
                                         <div className="container">
                                             <div className="avatar-upload">
-                                                <div className="avatar-edit">
-                                                    <input type='file' id="imageUpload" onChange={(e) => this.fileSelectedHandler(e, 'right')} accept=".png, .jpg, .jpeg" />
+                                                {/*<div className="avatar-edit">
+                                                    <input type='file' onChange={(e) => this.fileSelectedHandlerright(e, 'right')} accept=".png, .jpg, .jpeg" />
                                                     <label for="imageUpload"></label>
-                                                </div>
+                                                </div>*/}
+                                                <form action="/action_page.php">
+                                                    <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'right')} />
+                                                </form>
                                                 <div className="avatar-preview">
                                                     <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.rightimage + ")" }} />
                                                 </div>
                                             </div>
                                         </div>
                                     </GridItem>
-                                </GridContainer>
+
+                                </GridContainer> : null}
+                                {this.state.showleftDropZone ? <GridContainer justify="center">
+                                    {this.renderRedirect()}
+                                    <Button color="primary" round onClick={this.FileUploadSubmit}> Upload </Button>
+                                </GridContainer> : null}
+                                {this.state.showbtn ? <GridContainer justify="center">
+                                    <Button color="primary" round onClick={this.showonclick}> Upload </Button>
+                                </GridContainer> : null}
                                 <GridContainer justify="center">
                                     {this.renderRedirect()}
                                     <Button color="primary" round onClick={this.Issuepolicy}> Issue Policy </Button>
