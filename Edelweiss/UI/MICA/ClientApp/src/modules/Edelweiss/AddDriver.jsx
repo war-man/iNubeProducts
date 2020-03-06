@@ -28,6 +28,7 @@ class AddDriver extends React.Component {
         super(props)
 
         this.state = {
+            drvcount:"1",
             showleftDropZone: false,
             showbtn:true,
             bytestring: "",
@@ -154,8 +155,7 @@ class AddDriver extends React.Component {
 
         }
     }
-
-
+   
     componentDidMount() {
         if (this.props.location.state != undefined) {
             this.state.drvvehicleType = this.props.location.state.vehType;
@@ -390,7 +390,7 @@ class AddDriver extends React.Component {
     }
     AddDrv = () => {
         debugger;
-
+        console.log("additionalDriver", this.props.location.state.premiumDTO.additionalDriver);
         if (this.props.location.state != undefined && this.props.location.state.premiumDTO.additionalDriver > 1 && this.props.location.state.premiumDTO.additionalDriver <= 3) {
 
             for (var i = 0; i < this.state.insurableObj.length; i++) {
@@ -409,8 +409,18 @@ class AddDriver extends React.Component {
             }
         }
 
-        this.setState({ showadddrvflag: false, RiskObj: this.state.duplicateRiskObj });
-        this.setState({ showadditionaldriver: true })
+        //this.setState({ showadddrvflag: false, RiskObj: this.state.duplicateRiskObj });
+      
+                this.state.RiskObj.Name = '';
+                this.state.RiskObj.Age = '';
+                this.state.backimage = '';
+                this.state.frontimage = '';
+                const file = document.querySelector('.file');
+                file.value = '';
+                const bfile = document.querySelector('.fileback');
+                bfile.value = '';
+                this.setState({ showadditionaldriver: true })
+        
         console.log(" this.state.policyRqst", this.state.policyRqst);
     }
     pressButton = (e) => {
@@ -501,6 +511,7 @@ class AddDriver extends React.Component {
             this.state.frontfilestr.tagname = 'ImageType';
             this.state.frontfilestr.tagValue = name;
             this.state.fileUploaddto.fileUploadDTOs.push(this.state.frontfilestr);
+
         }
 
 
@@ -654,7 +665,7 @@ class AddDriver extends React.Component {
                                         <div className="container">
                                             <div className="avatar-upload">
                                                 <form action="/action_page.php">
-                                                    <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'front')} />
+                                                    <input type="file" class="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'front')} />
                                                 </form>
                                                 <div className="avatar-preview">
                                                     <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.frontimage + ")" }} />
@@ -669,7 +680,7 @@ class AddDriver extends React.Component {
                                         <div className="container">
                                             <div className="avatar-upload">
                                                 <form action="/action_page.php">
-                                                    <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'back')} />
+                                                    <input type="file" class="fileback" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'back')} />
                                                 </form>
                                                 <div className="avatar-preview">
                                                     <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.backimage + ")" }} />
