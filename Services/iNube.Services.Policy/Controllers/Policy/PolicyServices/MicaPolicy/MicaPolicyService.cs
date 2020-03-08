@@ -2065,7 +2065,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 }
             }
 
-            policyDTO.PolicyInsurableDetails.AddRange(GetMultiCover(policyDetail, productDTO, policyDTO, singleCover, Errors));
             if (productDTO.ProductInsurableItems.FirstOrDefault().ProductCovers.Count > 0)
             {
                 policyDTO.CoverEvent = productDTO.ProductInsurableItems.FirstOrDefault().ProductCovers.FirstOrDefault().CoverEvent;
@@ -2077,7 +2076,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 policyDTO.MasterPolicyNo = policyDTO.PolicyNo;
             }
             policyDTO.MasterPremium = policyDTO.PremiumAmount;//needs to fetch through rating
-            policyDTO.SumInsured = policyDetail["si"];
+            policyDTO.SumInsured = policyDTO.PremiumAmount;
+            policyDTO.PolicyInsurableDetails.AddRange(GetMultiCover(policyDetail, productDTO, policyDTO, singleCover, Errors));
+
             return policyDTO;
         }
         private async Task<InsuranceCertificateModel> GetInsuranceCertificateModel(dynamic policyDetail, ProductDTO productDTO, TblPolicy tblpolicyDTO, PolicyDTO policyDTO, PartnersDTO partnersDTO, SingleCover singleCover, ApiContext apiContext)
@@ -3224,6 +3225,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                     logMsg = logMsg + ",3";
                     var mappedPolicy =await MapAndValidateInsurablePolicyAsync(ProposalDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "Proposal", apiContext);
+                    mappedPolicy.SumInsured = ProposalDetail["si"];
                     if (Errors.Count == 0)
                     {
                         if (productDetails != null)
