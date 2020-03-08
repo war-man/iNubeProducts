@@ -517,40 +517,40 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             //  _context = (MICAPOContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
 
-            //// var connectionString = _configuration.GetConnectionString("PCConnection");
-            //var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
-            //var connectionString = dbConnectionString.Dbconnection;
-            //int nextNumber = 0; string policNumber = "";
-            //using (SqlConnection connection = new SqlConnection(connectionString))
+            // var connectionString = _configuration.GetConnectionString("PCConnection");
+            var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+            var connectionString = dbConnectionString.Dbconnection;
+            int nextNumber = 0; string policNumber = "";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand("[PO].[usp_GetNextNumber_New]", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@Numberingtype", type);
+                command.Parameters.AddWithValue("@PartnerId", partnerId);
+                command.Parameters.AddWithValue("@ProductId", productId);
+                command.Parameters.Add("@NextNo", SqlDbType.Int);
+                command.Parameters["@NextNo"].Direction = ParameterDirection.Output;
+                command.CommandTimeout = 3600;
+                command.ExecuteNonQuery();
+                nextNumber = (int)command.Parameters["@NextNo"].Value;
+                connection.Close();
+            }
+            //var nextNumber = 0;
+            //var policNumber = "";
+            //Random r = new Random();
+            //if (type == "Proposal")
             //{
-            //    connection.Open();
-            //    SqlCommand command = new SqlCommand("[PO].[usp_GetNextNumber_New]", connection);
-            //    command.CommandType = CommandType.StoredProcedure;
-            //    command.Parameters.AddWithValue("@Numberingtype", type);
-            //    command.Parameters.AddWithValue("@PartnerId", partnerId);
-            //    command.Parameters.AddWithValue("@ProductId", productId);
-            //    command.Parameters.Add("@NextNo", SqlDbType.Int);
-            //    command.Parameters["@NextNo"].Direction = ParameterDirection.Output;
-            //    command.CommandTimeout = 3600;
-            //    command.ExecuteNonQuery();
-            //    nextNumber = (int)command.Parameters["@NextNo"].Value;
-            //    connection.Close();
-            //}
-            var nextNumber = 0;
-            var policNumber = "";
-            Random r = new Random();
-            if (type == "Proposal")
-            {
-                 nextNumber = r.Next(10000, 999999);
-                policNumber = nextNumber.ToString();
+            //     nextNumber = r.Next(10000, 999999);
+            //    policNumber = nextNumber.ToString();
                 
-            }
-            if (type == "Policy")
-            {
-                nextNumber = r.Next(75000, 999999);
-                policNumber = nextNumber.ToString();
+            //}
+            //if (type == "Policy")
+            //{
+            //    nextNumber = r.Next(75000, 999999);
+            //    policNumber = nextNumber.ToString();
 
-            }
+            //}
 
             return policNumber;
         }
@@ -2077,7 +2077,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 policyDTO.MasterPolicyNo = policyDTO.PolicyNo;
             }
             policyDTO.MasterPremium = policyDTO.PremiumAmount;//needs to fetch through rating
-            policyDTO.SumInsured = policyDTO.PremiumAmount;
+            policyDTO.SumInsured = policyDetail["si"];
             return policyDTO;
         }
         private async Task<InsuranceCertificateModel> GetInsuranceCertificateModel(dynamic policyDetail, ProductDTO productDTO, TblPolicy tblpolicyDTO, PolicyDTO policyDTO, PartnersDTO partnersDTO, SingleCover singleCover, ApiContext apiContext)
