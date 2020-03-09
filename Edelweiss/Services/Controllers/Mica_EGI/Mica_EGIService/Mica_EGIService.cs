@@ -680,7 +680,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (verifydata)
                 {
-                    checkLog = _context.TblSwitchLog.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo);
+                    checkLog = _context.TblSwitchLog.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
                     ScheduleData = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo);
 
                 }
@@ -917,23 +917,44 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                          ActivePCCount = activeVehicleStat.ActivePc;
                          ActiveTWCount = activeVehicleStat.ActiveTw;
                     }
-                   
-                        
-                   
+
+
+
 
                     if (ScheduleData.VehicleType == "TW")
                     {
                         ActiveTWCount += 1;
-                        activeVehicleStat.ActiveTw += 1;
+                        if (activeVehicleStat != null)
+                        {
+                            activeVehicleStat.ActiveTw += 1;
+                        }
                     }
                     else if (ScheduleData.VehicleType == "PC")
                     {
                         ActivePCCount += 1;
-                        activeVehicleStat.ActivePc += 1;
+                        if (activeVehicleStat != null)
+                        {
+                            activeVehicleStat.ActivePc += 1;
+                        }
                     }
 
-                    ////Update Number of Active Vehicle is Daily Active Table
-                    //_context.TblDailyActiveVehicles.Update(activeVehicleStat);
+                    ////Insert New Active Vehicle in Daily Active Table if Previous No Active Vehicle was their in It
+                    ///
+                    if (ActivePCCount > 0 || ActiveTWCount > 0)
+                    {
+                        TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+                        tblDailyActive.ActivePc = ActivePCCount;
+                        tblDailyActive.ActiveTw = ActiveTWCount;
+                        tblDailyActive.PolicyNumber = PolicyNo;
+                        tblDailyActive.Premium = 0;
+                        tblDailyActive.TxnDate = IndianTime;
+
+                        _context.TblDailyActiveVehicles.Add(tblDailyActive);
+                        _context.SaveChanges();
+                    }
+
+
+
 
 
                     //Call the Policy Service to Get Policy Details.
