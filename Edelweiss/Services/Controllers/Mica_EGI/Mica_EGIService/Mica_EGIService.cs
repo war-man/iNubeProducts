@@ -906,10 +906,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
 
                     var activeVehicleStat = _context.TblDailyActiveVehicles.FirstOrDefault(x => x.TxnDate.Value.Date == IndianTime.Date &&
-                                                                                            x.PolicyNumber == PolicyNo);
-                    var ActivePCCount = activeVehicleStat.ActivePc;
-                    var ActiveTWCount = activeVehicleStat.ActiveTw;
+                                                                                           x.PolicyNumber == PolicyNo);
 
+
+                    decimal? ActivePCCount = 0;
+                    decimal? ActiveTWCount = 0;
+
+                    if (activeVehicleStat != null)
+                    {
+                         ActivePCCount = activeVehicleStat.ActivePc;
+                         ActiveTWCount = activeVehicleStat.ActiveTw;
+                    }
+                   
+                        
+                   
 
                     if (ScheduleData.VehicleType == "TW")
                     {
