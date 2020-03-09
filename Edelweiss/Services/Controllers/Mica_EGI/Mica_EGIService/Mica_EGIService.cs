@@ -1070,9 +1070,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                                                                 x.PolicyNumber == PolicyNo);
 
                             tblDailyActive.Premium = NewPremium;
-                            //Update Number of Active Vehicle is Daily Active Table
-                            tblDailyActive.ActivePc = activeVehicleStat.ActivePc;
-                            tblDailyActive.ActiveTw = activeVehicleStat.ActiveTw;
+
+                            if(activeVehicleStat != null)
+                            {
+                                //Update Number of Active Vehicle is Daily Active Table
+                                tblDailyActive.ActivePc = activeVehicleStat.ActivePc;
+                                tblDailyActive.ActiveTw = activeVehicleStat.ActiveTw;
+
+                            }
+                         
 
                             _context.TblDailyActiveVehicles.Update(tblDailyActive);
 
@@ -1194,7 +1200,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (verifydata)
                 {
-                    checkLog = _context.TblSwitchLog.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo);
+                    checkLog = _context.TblSwitchLog.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
                     ScheduleData = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo);
 
                 }
@@ -1739,10 +1745,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         private decimal? CheckPremiumUpdate(string PolicyNo)
         {
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
-                       
-            var checkPremium = _context.TblDailyActiveVehicles.FirstOrDefault(x=>x.TxnDate.Value.Date == IndianTime.Date && x.PolicyNumber == PolicyNo);
 
-            var PremiumAmount = checkPremium.Premium;
+            decimal? PremiumAmount = 0;
+
+            var checkPremium = _context.TblDailyActiveVehicles.FirstOrDefault(x=>x.TxnDate.Value.Date == IndianTime.Date && x.PolicyNumber == PolicyNo);
+      
+            if (checkPremium !=null)
+            {
+                 PremiumAmount = checkPremium.Premium;
+            }
 
             return PremiumAmount;
         }
