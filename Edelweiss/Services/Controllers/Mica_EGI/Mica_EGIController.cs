@@ -127,7 +127,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var response = _quotationService.BillingDetails(PolicyNo, Month);
             return ServiceResponse(response);
         }
-
-
+       
+        [HttpGet]
+        public IActionResult TaxTypeForStateCode(string stateabbreviation)
+        {
+            var response = _quotationService.TaxTypeForStateCode(stateabbreviation);
+            return Ok(response);
+        }
     }
 }

@@ -32,6 +32,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         List<ddDTO> GetVehicleMaster(string lMasterlist);
         BillingResponse BillingDetails(string PolicyNo, string Month);
         Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata);
+        TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -494,7 +495,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
             }
-        private TaxTypeDTO TaxTypeForStateCode(string stateabbreviation)
+        public TaxTypeDTO TaxTypeForStateCode(string stateabbreviation)
         {
 
             var statedata = _context.TblMasState.SingleOrDefault(c => c.StateAbbreviation == stateabbreviation);
