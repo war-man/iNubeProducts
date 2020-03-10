@@ -22,8 +22,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         GetScheduleResponse GetSchedule(string VehicleRegistrationNo, string PolicyNo);
         ScheduleResponseDTO CreateSchedule(ScheduleDTO scheduleDTO);
         Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata);
-        Task<bool> NightScheduler();
-        Task<bool> PremiumBookingScheduler();
+        Task<bool> NightScheduler(DateTime? dateTime);
+        Task<bool> PremiumBookingScheduler(DateTime? dateTime);
         Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff);
         ActivityResponse ActivityReport(string PolicyNo, string Month);
         Task<PremiumReturnDto> EndorsementPremium(EndorsementPremiumDTO endorsementPremium);
@@ -1356,11 +1356,22 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
         
-        public async Task<bool> NightScheduler()
+        public async Task<bool> NightScheduler(DateTime? dateTime)
         {
-            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
-            var CurrentDay = IndianTime.DayOfWeek.ToString();
-            var CurrentTimeHour = IndianTime.Hour;
+            DateTime? IndianTime = null;
+
+            IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
+            var CurrentTimeHour = IndianTime.Value.Hour;
+
+            if(dateTime != null)
+            {
+                IndianTime = dateTime;
+                CurrentDay = dateTime.Value.DayOfWeek.ToString();
+                CurrentTimeHour = dateTime.Value.Hour;
+            }
+
 
             TblSwitchLog switchLog = new TblSwitchLog();
             TblDailyActiveVehicles dailyActiveVehicles = new TblDailyActiveVehicles();
@@ -1473,11 +1484,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (ActivePC > 0 || ActiveTW > 0)
                 {
 
-                    var checkactivity = _context.TblDailyActiveVehicles.Any(x=>x.PolicyNumber == policy && x.TxnDate == IndianTime.Date);
+                    var checkactivity = _context.TblDailyActiveVehicles.Any(x=>x.PolicyNumber == policy && x.TxnDate == IndianTime.Value.Date);
 
                     if (checkactivity == true)
                     {
-                        var activitydata = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == policy && x.TxnDate == IndianTime.Date);
+                        var activitydata = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == policy && x.TxnDate == IndianTime.Value.Date);
 
                         activitydata.ActivePc = ActivePC;
                         activitydata.ActiveTw = ActiveTW;
@@ -1510,13 +1521,24 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public async Task<bool> PremiumBookingScheduler()
+        public async Task<bool> PremiumBookingScheduler(DateTime? dateTime)
         {
-            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
-            var CurrentDay = IndianTime.DayOfWeek.ToString();
-            var CurrentTimeHour = IndianTime.Hour;
-            var CurrentDate = IndianTime.Date;
-            
+            DateTime? IndianTime = null;
+            IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
+            var CurrentTimeHour = IndianTime.Value.Hour;
+            var CurrentDate = IndianTime.Value.Date;
+
+
+            if (dateTime != null)
+            {
+                IndianTime = dateTime;
+                CurrentDay = dateTime.Value.DayOfWeek.ToString();
+                CurrentTimeHour = dateTime.Value.Hour;
+                CurrentDate = dateTime.Value.Date;
+            }
+
+
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
             ApiContext apiContext = new ApiContext();
             apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);

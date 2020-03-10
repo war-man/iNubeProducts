@@ -91,17 +91,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
 
         [HttpGet]
-        public async Task<IActionResult> NightScheduler()
+        public async Task<IActionResult> NightScheduler(DateTime? dateTime)
         {
-          var response = await  _quotationService.NightScheduler();
+          var response = await  _quotationService.NightScheduler(dateTime);
 
             return Ok(response);
         }
 
         [HttpGet]
-        public async Task<IActionResult> PremiumBooking()
+        public async Task<IActionResult> PremiumBooking(DateTime? dateTime)
         {
-            var response = await _quotationService.PremiumBookingScheduler();
+            var response = await _quotationService.PremiumBookingScheduler(dateTime);
 
             return Ok(response);
         }
