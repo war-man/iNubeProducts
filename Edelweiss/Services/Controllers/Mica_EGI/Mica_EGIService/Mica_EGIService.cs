@@ -18,7 +18,7 @@ using System.Globalization;
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
     public interface IMicaEGIService
-    {       
+    {
         GetScheduleResponse GetSchedule(string VehicleRegistrationNo, string PolicyNo);
         ScheduleResponseDTO CreateSchedule(ScheduleDTO scheduleDTO);
         Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata);
@@ -45,7 +45,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         private IConfiguration _configuration;
 
 
-        public MicaEGIService(IConfiguration configuration,IIntegrationService integrationService, IMapper mapper, MICAQMContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
+        public MicaEGIService(IConfiguration configuration, IIntegrationService integrationService, IMapper mapper, MICAQMContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
         {
             _mapper = mapper;
             _appSettings = appSettings.Value;
@@ -54,8 +54,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             _integrationService = integrationService;
             _configuration = configuration;
         }
-                       
-       
+
+
         public GetScheduleResponse GetSchedule(string VehicleRegistrationNo, string PolicyNo)
         {
             GetScheduleResponse response = new GetScheduleResponse();
@@ -67,23 +67,23 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 var checkdata = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
 
-                if(checkdata)
+                if (checkdata)
                 {
 
-                    var scheduledata = _context.TblSchedule.FirstOrDefault(x=>x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
-                    
+                    var scheduledata = _context.TblSchedule.FirstOrDefault(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
+
                     response.GetSchedule.PolicyNo = PolicyNo;
                     response.GetSchedule.VehicleRegistrationNo = VehicleRegistrationNo;
                     response.GetSchedule.VehicleType = scheduledata.VehicleType;
                     response.GetSchedule.Mon = scheduledata.Mon;
-                    response.GetSchedule.Tue = scheduledata.Mon; 
+                    response.GetSchedule.Tue = scheduledata.Mon;
                     response.GetSchedule.Wed = scheduledata.Wed;
                     response.GetSchedule.Thu = scheduledata.Thu;
                     response.GetSchedule.Fri = scheduledata.Fri;
                     response.GetSchedule.Sat = scheduledata.Sat;
                     response.GetSchedule.Sun = scheduledata.Sun;
 
-                    var checkstatus = _context.TblSwitchLog.LastOrDefault(x=>x.PolicyNo == PolicyNo 
+                    var checkstatus = _context.TblSwitchLog.LastOrDefault(x => x.PolicyNo == PolicyNo
                                                                   && x.VehicleNumber == VehicleRegistrationNo
                                                                   && x.CreatedDate.Value.Date == IndianTime.Date);
 
@@ -97,9 +97,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         response.GetSchedule.SwitchStatus = checkstatus.SwitchStatus;
                     }
 
-                    if(CurrentTimeHour < Convert.ToDecimal(_configuration["Scheduler_Validation:TimeInHours"]))
+                    if (CurrentTimeHour < Convert.ToDecimal(_configuration["Scheduler_Validation:TimeInHours"]))
                     {
-                        response.GetSchedule.SwitchEnabled = true ;
+                        response.GetSchedule.SwitchEnabled = true;
                     }
                     else
                     {
@@ -131,8 +131,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             else
             {
                 //Return Wrong NUll DATA 
-                response.GetSchedule = null;            
-                
+                response.GetSchedule = null;
+
                 ErrorInfo errorInfo = new ErrorInfo();
 
                 response.ResponseMessage = "Null/Empty Inputs";
@@ -151,7 +151,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
             ScheduleResponseDTO response = new ScheduleResponseDTO();
 
-            if (String.IsNullOrEmpty(scheduleDTO.PolicyNo)) 
+            if (String.IsNullOrEmpty(scheduleDTO.PolicyNo))
             {
                 ErrorInfo errorInfo = new ErrorInfo();
                 response.ResponseMessage = "Null/Empty Inputs";
@@ -162,7 +162,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 response.Errors.Add(errorInfo);
                 return response;
 
-            }else if(String.IsNullOrEmpty(scheduleDTO.VehicleRegistrationNo))
+            }
+            else if (String.IsNullOrEmpty(scheduleDTO.VehicleRegistrationNo))
             {
                 ErrorInfo errorInfo = new ErrorInfo();
                 response.ResponseMessage = "Null/Empty Inputs";
@@ -175,7 +176,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
 
-                if (scheduleDTO.VehicleType == "PC" || scheduleDTO.VehicleType == "TW")
+            if (scheduleDTO.VehicleType == "PC" || scheduleDTO.VehicleType == "TW")
             {
                 var mapData = _mapper.Map<TblSchedule>(scheduleDTO);
 
@@ -194,7 +195,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 else
                 {
                     var tblschedule = _context.TblSchedule.SingleOrDefault(x => x.VehicleRegistrationNo == mapData.VehicleRegistrationNo);
-                                     
+
                     tblschedule.Mon = mapData.Mon;
                     tblschedule.Tue = mapData.Tue;
                     tblschedule.Fri = mapData.Wed;
@@ -232,87 +233,127 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 response.Errors.Add(errorInfo);
                 return response;
             }
-        }  
-             
-     public async Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata)
+        }
+
+        public async Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata)
         {
             // _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             PremiumReturnDto response = new PremiumReturnDto();
-            if (premiumdata.NoOfPC != 0) {
-                if (premiumdata.DriverAge >= 18 && premiumdata.DriverAge <= 75) { 
-                    if(premiumdata.DriverExp <= (premiumdata.DriverAge - 18)) {
-                        if (premiumdata.BillingFrequency == "" || premiumdata.BillingFrequency == "Monthly" || premiumdata.BillingFrequency == "Yearly") { 
-                SchedulerPremiumDTO prem = new SchedulerPremiumDTO();
-            prem.dictionary_rule.SI = premiumdata.SI.ToString();
-            prem.dictionary_rule.NOOFPC = premiumdata.NoOfPC.ToString();
-            prem.dictionary_rule.NOOFTW = premiumdata.NoOfTW.ToString();
-
-
-            prem.dictionary_rate.AVFACTORPC_PC_NOOFPC = premiumdata.NoOfPC.ToString();
-            prem.dictionary_rate.AVFACTORTW_TW_NOOFPC = premiumdata.NoOfPC.ToString(); 
-            prem.dictionary_rate.AVFACTORTW_TW_NOOFTW = premiumdata.NoOfTW.ToString();
-            prem.dictionary_rate.PDAGERT_PAge = premiumdata.DriverAge.ToString();
-            prem.dictionary_rate.DEXPRT_Exp = premiumdata.DriverExp.ToString();
-            prem.dictionary_rate.ADDRVRT_DRV = premiumdata.AdditionalDriver.ToString();
-
-
-           
-
-            TaxTypeDTO taxType = new TaxTypeDTO();
-            taxType = TaxTypeForStateCode(premiumdata.StateCode);
-
-            prem.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
-            prem.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
-
-            var Data = await _integrationService.CalCulateRatingPremium(prem);
-
-            List<CalculationResult> val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
-                            if(val != null) { 
-            var Ftperday = 0.00;
-            var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
-            var theft = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
-            Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(theft);
-
-            var Ft30days = Ftperday * 30;
-            var Ft60days = Ftperday * 60;
-
-            var Ft365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FT365").EValue);
-            var Ad60days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60DAYS").EValue);
-            var Ad365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365DAYS").EValue);
-            var ad60fttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60FTAXAMT").EValue);
-            var ad60ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60TTAXAMT").EValue);
-
-            var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
-            var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
-            var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
-            var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
-
-            var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
-            var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
-
-            var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftfttax;
-            var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftfttax;
-
-
-            PremiumReturnDto returnobj = new PremiumReturnDto();
-            returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
-            returnobj.FireTheft = Convert.ToDecimal(Ft365days);
-            if (premiumdata.BillingFrequency == "Monthly")
+            if (premiumdata.NoOfPC > 0)
             {
-                returnobj.ADPremium = Convert.ToDecimal(Ad60days);
-                returnobj.GST = Convert.ToDecimal(monthlyGST);
-                returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
-            }
-            else if (premiumdata.BillingFrequency == "Yearly")
-            {
-                returnobj.ADPremium =Convert.ToDecimal(Ad365days);
-                returnobj.GST =Convert.ToDecimal(yearlyGST);
-            }
-            returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
+                if (premiumdata.DriverAge >= 18 && premiumdata.DriverAge <= 75)
+                {
+                    if (premiumdata.DriverExp <= (premiumdata.DriverAge - 18))
+                    {
+                        if (premiumdata.BillingFrequency == "" || premiumdata.BillingFrequency == "Monthly" || premiumdata.BillingFrequency == "Yearly")
+                        {
+                            SchedulerPremiumDTO prem = new SchedulerPremiumDTO();
+                            prem.dictionary_rule.SI = premiumdata.SI.ToString();
+                            prem.dictionary_rule.NOOFPC = premiumdata.NoOfPC.ToString();
+                            prem.dictionary_rule.NOOFTW = premiumdata.NoOfTW.ToString();
+
+
+                            prem.dictionary_rate.AVFACTORPC_PC_NOOFPC = premiumdata.NoOfPC.ToString();
+                            prem.dictionary_rate.AVFACTORTW_TW_NOOFPC = premiumdata.NoOfPC.ToString();
+                            prem.dictionary_rate.AVFACTORTW_TW_NOOFTW = premiumdata.NoOfTW.ToString();
+                            prem.dictionary_rate.PDAGERT_PAge = premiumdata.DriverAge.ToString();
+                            prem.dictionary_rate.DEXPRT_Exp = premiumdata.DriverExp.ToString();
+                            prem.dictionary_rate.ADDRVRT_DRV = premiumdata.AdditionalDriver.ToString();
+
+
+
+
+                            TaxTypeDTO taxType = new TaxTypeDTO();
+                            taxType = TaxTypeForStateCode(premiumdata.StateCode);
+
+                            prem.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                            prem.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+
+                            var Data = await _integrationService.CalCulateRatingPremium(prem);
+                            List<CalculationResult> val = null;
+                            if (Data != null)
+                            {
+                                try
+                                {
+                                    val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
+                                }
+                                catch (Exception e)
+                                {
+                                    ErrorInfo errorInfo = new ErrorInfo();
+
+                                    response.ResponseMessage = "Deserialization Failed";
+                                    response.Status = BusinessStatus.PreConditionFailed;
+                                    errorInfo.ErrorMessage = "Mica Calculate Premium Failed";
+                                    errorInfo.ErrorCode = "ExtCP";
+                                    errorInfo.PropertyName = "MicaRating";
+                                    response.Errors.Add(errorInfo);
+                                    return response;
+                                }
+
+
+                            }
+                            else
+                            {
+                                ErrorInfo errorInfo = new ErrorInfo();
+
+                                response.ResponseMessage = "No response from rating";
+                                response.Status = BusinessStatus.PreConditionFailed;
+                                errorInfo.ErrorMessage = "Mica Calculate Premium Failed";
+                                errorInfo.ErrorCode = "ExtCP";
+                                errorInfo.PropertyName = "MicaRating";
+                                response.Errors.Add(errorInfo);
+                                return response;
+
+
+                            }
+
+                            if (val != null)
+                            {
+                                var Ftperday = 0.00;
+                                var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
+                                var theft = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
+                                Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(theft);
+
+                                var Ft30days = Ftperday * 30;
+                                var Ft60days = Ftperday * 60;
+
+                                var Ft365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FT365").EValue);
+                                var Ad60days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60DAYS").EValue);
+                                var Ad365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365DAYS").EValue);
+                                var ad60fttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60FTAXAMT").EValue);
+                                var ad60ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60TTAXAMT").EValue);
+
+                                var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
+                                var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
+                                var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
+                                var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
+
+                                var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
+                                var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
+
+                                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftfttax;
+                                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftfttax;
+
+
+                                PremiumReturnDto returnobj = new PremiumReturnDto();
+                                returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
+                                returnobj.FireTheft = Convert.ToDecimal(Ft365days);
+                                if (premiumdata.BillingFrequency == "Monthly")
+                                {
+                                    returnobj.ADPremium = Convert.ToDecimal(Ad60days);
+                                    returnobj.GST = Convert.ToDecimal(monthlyGST);
+                                    returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
+                                }
+                                else if (premiumdata.BillingFrequency == "Yearly")
+                                {
+                                    returnobj.ADPremium = Convert.ToDecimal(Ad365days);
+                                    returnobj.GST = Convert.ToDecimal(yearlyGST);
+                                }
+                                returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
 
                                 returnobj.FinalAmount = Math.Round(returnobj.Total);
                                 returnobj.Status = BusinessStatus.Ok;
-            return returnobj;
+                                return returnobj;
                             }
                             else
                             {
@@ -391,7 +432,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     if (premiumdata.DriverExp <= (premiumdata.DriverAge - 18))
                     {
                         SchedulerPremiumDTO prem = new SchedulerPremiumDTO();
-                        
+
 
                         prem.dictionary_rule.SI = "";
                         prem.dictionary_rule.NOOFPC = premiumdata.NoOfPC.ToString();
@@ -494,7 +535,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 return returnobj;
             }
 
-            }
+        }
         public TaxTypeDTO TaxTypeForStateCode(string stateabbreviation)
         {
 
@@ -607,14 +648,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return taxType;
 
         }
-        
+
         public async Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff)
         {
 
 
             string VehicleRegistrationNo = switchOnOff.VehicleRegistrationNo;
-            string PolicyNo=switchOnOff.PolicyNo;
-            bool SwitchStatus=switchOnOff.SwitchState;
+            string PolicyNo = switchOnOff.PolicyNo;
+            bool SwitchStatus = switchOnOff.SwitchState;
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
             var CurrentDay = IndianTime.DayOfWeek.ToString();
@@ -639,7 +680,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var verifyPolicy = _context.TblSchedule.Any(x => x.PolicyNo == PolicyNo);
 
-                if(verifyPolicy)
+                if (verifyPolicy)
                 {
                     var verifyVehicle = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == VehicleRegistrationNo);
 
@@ -672,12 +713,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     response.ResponseMessage = "No Records Found for the Sent Inputs";
                     response.Status = BusinessStatus.NotFound;
-                    errorInfo.ErrorMessage = "Not Records Found for this Policy Number: " + PolicyNo +" in Schedule";
+                    errorInfo.ErrorMessage = "Not Records Found for this Policy Number: " + PolicyNo + " in Schedule";
                     errorInfo.ErrorCode = "ExtSWT001";
                     errorInfo.PropertyName = "Policy Number";
                     response.Errors.Add(errorInfo);
                     return response;
-                }          
+                }
 
                 if (verifydata)
                 {
@@ -693,7 +734,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     response.ResponseMessage = "No Records Found for the Sent Inputs";
                     response.Status = BusinessStatus.NotFound;
-                    errorInfo.ErrorMessage = "No Records Found for this Policy Number: " + PolicyNo + " & Vehicle Number: "+ VehicleRegistrationNo  +" in Schedule";
+                    errorInfo.ErrorMessage = "No Records Found for this Policy Number: " + PolicyNo + " & Vehicle Number: " + VehicleRegistrationNo + " in Schedule";
                     errorInfo.ErrorCode = "ExtSWT003";
                     errorInfo.PropertyName = "Policy Number & Vehicle Number";
                     response.Errors.Add(errorInfo);
@@ -915,8 +956,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     if (activeVehicleStat != null)
                     {
-                         ActivePCCount = activeVehicleStat.ActivePc;
-                         ActiveTWCount = activeVehicleStat.ActiveTw;
+                        ActivePCCount = activeVehicleStat.ActivePc;
+                        ActiveTWCount = activeVehicleStat.ActiveTw;
                     }
 
 
@@ -1065,21 +1106,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             _context.TblPremiumBookingLog.Add(bookingLog);
 
-                      
+
 
                             var tblDailyActive = _context.TblDailyActiveVehicles.FirstOrDefault(x => x.TxnDate.Value.Date == IndianTime.Date &&
                                                                                                 x.PolicyNumber == PolicyNo);
 
                             tblDailyActive.Premium = NewPremium;
 
-                            if(activeVehicleStat != null)
+                            if (activeVehicleStat != null)
                             {
                                 //Update Number of Active Vehicle is Daily Active Table
                                 tblDailyActive.ActivePc = activeVehicleStat.ActivePc;
                                 tblDailyActive.ActiveTw = activeVehicleStat.ActiveTw;
 
                             }
-                         
+
 
                             _context.TblDailyActiveVehicles.Update(tblDailyActive);
 
@@ -1197,7 +1238,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     response.Errors.Add(errorInfo);
                     return response;
                 }
-                           
+
 
                 if (verifydata)
                 {
@@ -1237,7 +1278,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             _context.TblSwitchLog.Add(tblSwitchlog);
                             _context.SaveChanges();
-                        }else
+                        }
+                        else
                         {
                             //Return Error for Manually Switched On Before
                             //Already Manual On its Cannot be SwitchedOFF for that Day
@@ -1312,7 +1354,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         else
                         {
                             ///Throw Error
-                           ///Switch ALREADY OFF
+                            ///Switch ALREADY OFF
                             SwitchOnOffResponse response = new SwitchOnOffResponse();
                             ErrorInfo errorInfo = new ErrorInfo();
 
@@ -1349,13 +1391,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 SuccessResponse.ResponseMessage = "Successfully Switch OFF";
                 SuccessResponse.Status = BusinessStatus.Updated;
-                
+
             }
 
             return SuccessResponse;
         }
 
-        
+
         public async Task<bool> NightScheduler(DateTime? dateTime)
         {
             DateTime? IndianTime = null;
@@ -1365,7 +1407,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
             var CurrentTimeHour = IndianTime.Value.Hour;
 
-            if(dateTime != null)
+            if (dateTime != null)
             {
                 IndianTime = dateTime;
                 CurrentDay = dateTime.Value.DayOfWeek.ToString();
@@ -1379,7 +1421,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             var ActivePC = 0;
             var ActiveTW = 0;
 
-            string ProductCode =_configuration["Mica_ApiContext:ProductCode"].ToString();
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
             ApiContext apiContext = new ApiContext();
             apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
             apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
@@ -1399,12 +1441,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 ActivePC = 0;
                 ActiveTW = 0;
 
-                var ScheduleData = _context.TblSchedule.Where(x=>x.PolicyNo == policy && x.IsActive==true).ToList();
-                                
+                var ScheduleData = _context.TblSchedule.Where(x => x.PolicyNo == policy && x.IsActive == true).ToList();
+
                 bool? CurrentDayStat = false;
 
                 foreach (var schedule in ScheduleData)
-                {               
+                {
 
                     switch (CurrentDay)
                     {
@@ -1467,7 +1509,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
 
                     }
-                    else if(CurrentDayStat == false)
+                    else if (CurrentDayStat == false)
                     {
                         switchLog = new TblSwitchLog();
                         switchLog.PolicyNo = policy;
@@ -1484,7 +1526,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (ActivePC > 0 || ActiveTW > 0)
                 {
 
-                    var checkactivity = _context.TblDailyActiveVehicles.Any(x=>x.PolicyNumber == policy && x.TxnDate == IndianTime.Value.Date);
+                    var checkactivity = _context.TblDailyActiveVehicles.Any(x => x.PolicyNumber == policy && x.TxnDate == IndianTime.Value.Date);
 
                     if (checkactivity == true)
                     {
@@ -1562,23 +1604,23 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var tblreport = _context.TblScheduleReport.Add(scheduleReport);
             _context.SaveChanges();
-                   
+
 
             var ReportID = scheduleReport.ReportId;
-          
-            var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x=>x.PolicyNumber).Distinct().ToList();
+
+            var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
 
             foreach (var policy in PolicyNumberList)
             {
 
-                var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x=>x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
+                var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
 
                 var ActivePCCount = getDailyStat.ActivePc;
                 var ActiveTWCount = getDailyStat.ActiveTw;
 
                 schedulerLog.SchedulerDateTime = IndianTime;
                 schedulerLog.SchedulerStatus = "Running";
-               
+
                 _context.TblSchedulerLog.Add(schedulerLog);
                 _context.SaveChanges();
 
@@ -1586,8 +1628,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //Call the Policy Service to Get Policy Details.
                 //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
-                var PolicyData = await _integrationService.GetPolicyDetails(policy,apiContext);
-                                                          
+                var PolicyData = await _integrationService.GetPolicyDetails(policy, apiContext);
+
                 PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
 
                 if (PolicyData != null)
@@ -1685,7 +1727,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         //var tblDailyActive = _context.TblDailyActiveVehicles.FirstOrDefault(x => x.TxnDate == IndianTime &&
                         //                                                                    x.PolicyNumber == policy);
 
-                      //  tblDailyActive.Premium = Premium;
+                        //  tblDailyActive.Premium = Premium;
 
                         _context.TblDailyActiveVehicles.Update(getDailyStat);
 
@@ -1693,7 +1735,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
                         _context.TblSchedulerLog.Update(schedulerLog);
 
-                        var report = _context.TblScheduleReport.FirstOrDefault(x=>x.ReportId == ReportID);
+                        var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
                         report.SuccessCount += 1;
 
@@ -1757,30 +1799,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var Endreport = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
-            Endreport.ScheduleEndDate = System.DateTime.UtcNow.AddMinutes(330); 
+            Endreport.ScheduleEndDate = System.DateTime.UtcNow.AddMinutes(330);
 
             _context.TblScheduleReport.Update(Endreport);
             _context.SaveChanges();
 
             return true;
         }
-               
+
         private decimal? CheckPremiumUpdate(string PolicyNo)
         {
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
             decimal? PremiumAmount = 0;
 
-            var checkPremium = _context.TblDailyActiveVehicles.FirstOrDefault(x=>x.TxnDate.Value.Date == IndianTime.Date && x.PolicyNumber == PolicyNo);
-      
-            if (checkPremium !=null)
+            var checkPremium = _context.TblDailyActiveVehicles.FirstOrDefault(x => x.TxnDate.Value.Date == IndianTime.Date && x.PolicyNumber == PolicyNo);
+
+            if (checkPremium != null)
             {
-                 PremiumAmount = checkPremium.Premium;
+                PremiumAmount = checkPremium.Premium;
             }
 
             return PremiumAmount;
         }
-               
+
         public ActivityResponse ActivityReport(string PolicyNo, string Month)
         {
             var getMonthNumber = 0;
@@ -1912,7 +1954,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
 
-          if (endorsementPremium.TypeOfEndorsement == "Addition")
+            if (endorsementPremium.TypeOfEndorsement == "Addition")
             {
                 //Get the Policy Details by PolicyNumber
                 //In response from Policy
@@ -1963,7 +2005,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return DifferentialPremium;
 
                 }
-               else  if (TotalTWCount > 4 )
+                else if (TotalTWCount > 4)
                 {
                     ErrorInfo errorInfo = new ErrorInfo();
 
@@ -1993,7 +2035,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
 
-               
+
 
                 //Call CalculatePremium for with Endorsment Data MICA
                 var NewPremiumData = await InternalCalculatePremium(premiumDTO);
@@ -2277,7 +2319,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
                 returnobj.FireTheft = Convert.ToDecimal(Ft365days);
                 returnobj.ADPremium = Convert.ToDecimal(Ad60days);
-                returnobj.GST =Convert.ToDecimal(monthlyGST);
+                returnobj.GST = Convert.ToDecimal(monthlyGST);
                 returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
                 returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
                 returnobj.FinalAmount = Math.Round(returnobj.FireTheft + returnobj.ADPremium + returnobj.GST);
@@ -2290,7 +2332,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         public AllScheduleResponse GetAllVehicleSchedule(string PolicyNo)
         {
             AllScheduleResponse response = new AllScheduleResponse();
-           
+
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
             var CurrentTimeHour = IndianTime.Hour;
 
@@ -2312,18 +2354,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 getSchedule.Thu = scheduledata.Thu;
                 getSchedule.Fri = scheduledata.Fri;
                 getSchedule.Sat = scheduledata.Sat;
-               getSchedule.Sun = scheduledata.Sun;
+                getSchedule.Sun = scheduledata.Sun;
                 getSchedule.VehicleType = scheduledata.VehicleType;
                 getSchedule.SwitchStatus = checkstatus.SwitchStatus;
 
-                    if (CurrentTimeHour < Convert.ToDecimal(_configuration["Scheduler_Validation:TimeInHours"]))
-                    {
-                        getSchedule.SwitchEnabled = true;
-                    }
-                    else
-                    {
-                        getSchedule.SwitchEnabled = false;
-                    }
+                if (CurrentTimeHour < Convert.ToDecimal(_configuration["Scheduler_Validation:TimeInHours"]))
+                {
+                    getSchedule.SwitchEnabled = true;
+                }
+                else
+                {
+                    getSchedule.SwitchEnabled = false;
+                }
 
                 response.GetSchedule.Add(getSchedule);
 
@@ -2371,11 +2413,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (checkPolicyNo)
                 {
                     var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
-                                                    
+
                     if (billData != null)
                     {
                         var mapData = _mapper.Map<BillingDTO>(billData);
-                         response.BillingDTO = mapData;
+                        response.BillingDTO = mapData;
                         response.Status = BusinessStatus.Ok;
                         return response;
                     }
