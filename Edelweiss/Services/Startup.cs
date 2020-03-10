@@ -19,6 +19,7 @@ using iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGISer
 using iNube.Services.MicaExtension_EGI.Models;
 using MicaExtension_EGI.Entities;
 using iNube.Services.Controllers.EGI.IntegrationServices;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.MicaExtension_EGI
 {
@@ -64,13 +65,21 @@ namespace iNube.Services.MicaExtension_EGI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        //public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        //{
+        //    app.InitializedCommonConfiguration(env, Configuration);
+        //    // app.ConfigureExceptionHandler(new LoggerManager());
+        //    app.UseAuthentication();
+        //}
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager());
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
             app.UseAuthentication();
+            app.UseHttpsRedirection();
+            app.UseMvc();
         }
-
         private void ConfigureModuleService(IServiceCollection services)
         {
             // configure DI for application services
