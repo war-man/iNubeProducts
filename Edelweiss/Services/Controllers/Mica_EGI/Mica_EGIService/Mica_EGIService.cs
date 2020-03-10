@@ -1431,9 +1431,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, apiContext);
 
-            var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
 
-            //PolicyNumberList.Add("0418/0408/0866/00/000");
+            if(PolicyDetails == null || PolicyDetails.Count == 0)
+            {
+                return false;
+            }
+
+            var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
+                       
             PolicyNumberList.Distinct();
 
             foreach (var policy in PolicyNumberList)
@@ -1613,11 +1618,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             foreach (var policy in PolicyNumberList)
             {
 
+                schedulerLog = new TblSchedulerLog();
+
+
                 var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
 
                 var ActivePCCount = getDailyStat.ActivePc;
                 var ActiveTWCount = getDailyStat.ActiveTw;
 
+              
                 schedulerLog.SchedulerDateTime = IndianTime;
                 schedulerLog.SchedulerStatus = "Running";
 
@@ -1642,6 +1651,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
                     detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
                     detailsDTO.StateCode = PolicyData["stateCode"];
+                }
+                else
+                {
+                    schedulerLog.SchedulerStatus = policy+" - No Record Found for this Policy Number";
+                    _context.TblSchedulerLog.Update(schedulerLog);
+
+                    var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                     report.FailCount += 1;
+                    _context.TblScheduleReport.Update(report);
+                    _context.SaveChanges();
+                    continue;
                 }
 
 
@@ -1678,8 +1699,41 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (CalPremiumResponse != null)
                 {
-                    DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
+                    try
+                    {
+                        DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
+
+                    }
+                    catch (Exception Ex)
+                    {
+                        DeserilizedPremiumData = null;
+
+                        bookingLog = new TblPremiumBookingLog();
+
+                        bookingLog.PolicyNo = policy;
+                        bookingLog.TxnAmount = 0;
+                        bookingLog.TxnDateTime = IndianTime;
+                        bookingLog.TxnDetails = "Auto Schedule Transaction Failed while Calculating Premium";
+
+                        _context.TblPremiumBookingLog.Add(bookingLog);
+
+
+                        schedulerLog.SchedulerStatus = "Deserialized Failed - Calculate Premium Failed";
+                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        _context.TblSchedulerLog.Update(schedulerLog);
+
+                        var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                        report.FailCount += 1;
+
+                        _context.TblScheduleReport.Update(report);
+
+                        _context.SaveChanges();
+
+                        continue;
+                    }
                 }
+
 
 
                 if (DeserilizedPremiumData.Count() > 0)
