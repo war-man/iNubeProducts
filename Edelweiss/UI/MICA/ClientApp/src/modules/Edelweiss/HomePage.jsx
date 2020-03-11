@@ -22,6 +22,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import EdelweissConfig from "./EdelweissConfig.js";
+import validationPage from "./ValidationPage.jsx";
+
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Chip from '@material-ui/core/Chip';
 
@@ -78,6 +80,8 @@ class HomePage extends React.Component {
         super(props)
 
         this.state = {
+            errormessage:false,
+            ageState:"",
             makeModel:"",
             username: "",
             vehicleType:"",
@@ -311,17 +315,54 @@ class HomePage extends React.Component {
     quickbuyRedirect = () => {
         console.log("quotationDTO", this.state.quotationDTO);
         this.renderRedirect();
-        this.setState({ redirect: true })
-       
+        if (this.state.quotationDTO.age < 18) {
+           swal({
+                text: "Driver age cannot be less than 18 years",
+                icon: "error",
+                buttons: [false, "OK"],
+           }).then((willDelete) => {
+               if (willDelete) {
+                   this.handlecheck();
+               }
+           });
+            this.setState({ redirect: false })
+        } else if (this.state.quotationDTO.age>75) {
+            swal({
+                text: "Driver age cannot be greater than 75 years",
+                icon: "error",
+                buttons: [false, "OK"],
+            }).then((willDelete) => {
+                if (willDelete) {
+                    this.handlecheck();
+                }
+            });
+            this.setState({ redirect: false })
+        }
+        else if (this.state.quotationDTO.experience<1) {
+            swal({
+                text: "Driver experience cannot be less than 1 year",
+                icon: "error",
+            })
+        }
+        else if (this.state.quotationDTO.experience > (this.state.quotationDTO.age - 1)) {
+            swal({
+                text: "Driver experience cannot be more than " + (this.state.quotationDTO.age-1),
+                icon: "error",
+                buttons: [false, "OK"],
+            })
+        }
+        else {
+            this.setState({ redirect: true })
+        }
     }
 
-    onInputChange = (event) => {
-        const fields = this.state.quotationDTO;
-        let name = event.target.name;
-        fields[event.target.name] = event.target.value;
-        this.setState({ fields });
-        console.log(this.state.quotationDTO.vehicleMakeModelId, '200')
-    }
+    //onInputChange = (event) => {
+    //    const fields = this.state.quotationDTO;
+    //    let name = event.target.name;
+    //    fields[event.target.name] = event.target.value;
+    //    this.setState({ fields });
+    //    console.log(this.state.quotationDTO.vehicleMakeModelId, '200')
+    //}
 
     handleinput = (event) => {
         this.setState({ [event.target.name]: event.target.value });
@@ -337,13 +378,98 @@ class HomePage extends React.Component {
     //    }
     //}
 
-    onInputChange = (event) => {
+    onInputChange = (event,type) => {
 
         const fields = this.state.quotationDTO;
         let name = event.target.name;
         fields[event.target.name] = event.target.value;
         this.setState({ fields });
         console.log(this.state.quotationDTO.vehicleMakeModelId, '200')
+        this.change(event, name, type);
+      
+    }
+    handlecheck = () => {
+        debugger;
+        if (this.state.quotationDTO.experience < 1) {
+            swal({
+                text: "Driver experience cannot be less than 1 year",
+                icon: "error",
+                buttons: [false, "OK"],
+            })
+            this.setState({ redirect: false })
+        }
+    }
+  
+    change(event, stateName, type, date, maxValue) {
+        switch (type) {
+
+            case "string":
+                if (validationPage.verifyName(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "datetime":
+                if (validationPage.verifydatetime(date)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "pan":
+                if (validationPage.verifyPanNum(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "phoneno":
+                if (validationPage.verifyNumber(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "email":
+                if (validationPage.verifyEmail(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "website":
+                if (validationPage.verifyUrl(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "tan":
+                if (validationPage.verifyTanNum(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "number":
+                if (validationPage.verifyNumeric(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            case "telephone":
+                if (validationPage.verifytelephone(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                }
+                else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     render() {
@@ -351,7 +477,18 @@ class HomePage extends React.Component {
         return (
             <div className={classes.container}>
                 <GridContainer lg={12}>
-                    <h2 className="hero-text">I am a <Styleinput className="label-input" id="text-field-hero" label="Age" variant="filled" value={this.state.quotationDTO.age} onChange={this.onInputChange} name='age' formControlProps={{ fullWidth: true }} /> year old, driving a
+                   
+                    <h2 className="hero-text">I am a
+                      
+                        <Styleinput
+                            success={this.state.ageState === "success"}
+                            error={this.state.ageState === "error"}
+                            className="label-input" id="text-field-hero"
+                            label="Age" variant="filled" value={this.state.quotationDTO.age}
+                            onChange={(e)=>this.onInputChange(e,'number')}
+                            name='age'
+                            formControlProps={{ fullWidth: true }}
+                        />  year old, driving a
                         </h2>  <StyleAutocomplete
                         //className="autocomplete"
                         name="vehicleMakeModelId"
@@ -362,9 +499,11 @@ class HomePage extends React.Component {
                             <Styleinput {...params} variant="filled" style={{ width: "12rem", top: "8px" }} id="text-field-hero" label="Car make model" formControlProps={{ fullWidth: true }} />
                         )}
                     />
-                    <br />
+                        <br />
+                    
                     <h2 className="hero-text">
-                        in </h2>
+                            in </h2>
+                    
                     <StyleAutocomplete
                         //className="autocomplete"
                         name="city"

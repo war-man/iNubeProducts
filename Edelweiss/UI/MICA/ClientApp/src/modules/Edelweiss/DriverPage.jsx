@@ -137,6 +137,8 @@ class DriverPage extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            validdate: true,
+            datediff: 1,
             //button css 
             btn1color: false,
             btn2color: false,
@@ -502,6 +504,10 @@ class DriverPage extends React.Component {
 
     //start date step 3
     onDateChange = (formate, name, event) => {
+        debugger;
+        const { validdate } = this.state;
+        this.setState({ validdate: false });
+       
         var today = event.toDate();
         if (today.getDate() < 10) {
             var dt = '0' + today.getDate();
@@ -1202,6 +1208,7 @@ class DriverPage extends React.Component {
                                                     labelText="EffectiveFromDate"
                                                     id='startDate'
                                                     name='startDate'
+                                                    validdate={this.state.validdate}
                                                     onChange={(event) => this.onDateChange('datetime', 'startDate', event)}
                                                     value={this.state.quotationDto.startDate}
                                                     required={true}
