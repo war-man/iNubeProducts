@@ -62,7 +62,6 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
             ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
             UserUrl = _configuration["Integration_Url:User:UserUrl"];
-            //UserUrl = "http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9009";
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
@@ -97,7 +96,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         {
 
-            var uri = "http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/CalCulatePremium";
+            var uri = ExtensionUrl+ "/api/Mica_EGI/CalCulatePremium";
 
             return await PostApiInvoke<PremiumRequestDTO, PremiumReturnDto>(uri, apiContext, dynamicData);
 
@@ -149,7 +148,6 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         public async Task<IEnumerable<ddDTOs>> GetProductMasterAsync(ApiContext apiContext)
         {
              var uri = ProductUrl + "/api/Product/GetMasterData?sMasterlist=Product&isFilter=false";
-            //var uri ="https://localhost:44347/api/Product/GetMasterData?sMasterlist=Product&isFilter=false";
             var productList = await GetListApiInvoke<ddDTOs>(uri, apiContext);
             return productList;
         }
@@ -233,13 +231,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         public async Task<CdTransactionsResponse> DoTransaction(PolicyBookingTransaction  policyBookingTransaction,ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Accounts/GenerateCDTransaction";
-           // var uri = "https://localhost:44315/api/Accounts/GenerateCDTransaction";
             return await PostApiInvoke<PolicyBookingTransaction, CdTransactionsResponse>(uri,apiContext, policyBookingTransaction);
         }
         public async Task<CdTransactionsResponse> RefundTransaction(PolicyBookingTransaction policyBookingTransaction, ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Accounts/ReverseCDTransaction";
-            // var uri = "https://localhost:44315/api/Accounts/GenerateCDTransaction";
             return await PostApiInvoke<PolicyBookingTransaction, CdTransactionsResponse>(uri,apiContext,policyBookingTransaction);
         }
         public async Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext)
@@ -376,13 +372,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         }
 
-        //public async Task<BillingEventDataDTO> GetProductBillingDetailAsync(policy pDTO, ApiContext apiContext)
-        //{
-        //    var uri = ProductUrl + "/api/Product/GetProductBillingData";
-
-        //    //return await PostApiInvoke<ProductDTO>(uri, apiContext);
-        //    return await PostApiInvoke<PolicyBilingDataDTO,ProductBilingDataDTO>(uri, apiContext, pDTO);
-        //}
+       
 
     }
 }
