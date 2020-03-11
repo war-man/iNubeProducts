@@ -478,18 +478,8 @@ class HomePage extends React.Component {
             <div className={classes.container}>
                 <GridContainer lg={12}>
                    
-                    <h2 className="hero-text">I am a
-                      
-                        <Styleinput
-                            success={this.state.ageState === "success"}
-                            error={this.state.ageState === "error"}
-                            className="label-input" id="text-field-hero"
-                            label="Age" variant="filled" value={this.state.quotationDTO.age}
-                            onChange={(e)=>this.onInputChange(e,'number')}
-                            name='age'
-                            formControlProps={{ fullWidth: true }}
-                        />  year old, driving a
-                        </h2>  <StyleAutocomplete
+                    <h2 className="hero-text">I am a <Styleinput className="label-input" id="text-field-hero" label="Age" variant="filled" value={this.state.quotationDTO.age} onChange={this.onInputChange} name='age' formControlProps={{ fullWidth: true }} /> year old, driving a
+                        </h2><StyleAutocomplete
                         //className="autocomplete"
                         name="vehicleMakeModelId"
                         options={this.state.masterList}
@@ -499,7 +489,7 @@ class HomePage extends React.Component {
                             <Styleinput {...params} variant="filled" style={{ width: "12rem", top: "8px" }} id="text-field-hero" label="Car make model" formControlProps={{ fullWidth: true }} />
                         )}
                     />
-                        <br />
+                    <br />
                     
                     <h2 className="hero-text">
                             in </h2>
