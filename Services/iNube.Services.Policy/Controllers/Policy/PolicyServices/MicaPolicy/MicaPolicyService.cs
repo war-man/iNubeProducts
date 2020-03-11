@@ -2054,9 +2054,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             else
             {
-               
+                if (type == "ProposalNo")
+                {
                     policyDTO.ProposalNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
+                }
+                else
+                {
+                    policyDTO.PolicyNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
 
+                }
 
 
             }
