@@ -1589,7 +1589,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
                 logMsg = logMsg + ",3";
-                var mappedPolicy = MapAndValidateInsurablePolicyAsync(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "policy", apiContext);
+                var mappedPolicy = MapAndValidateInsurablePolicyAsync(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "PolicyNo", apiContext);
                 if (Errors.Count == 0)
                 {
 
@@ -1772,7 +1772,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
                 logMsg = logMsg + ",3";
-                var mappedPolicy = MapAndValidateInsurablePolicyAsync(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "policy", apiContext);
+                var mappedPolicy = MapAndValidateInsurablePolicyAsync(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "PolicyNo", apiContext);
                 if (Errors.Count == 0)
                 {
 
@@ -2054,15 +2054,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             else
             {
-                if (type == "Proposal")
-                {
+               
                     policyDTO.ProposalNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
-                }
-                else
-                {
-                    policyDTO.PolicyNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
 
-                }
+
+
             }
 
             if (productDTO.ProductInsurableItems.FirstOrDefault().ProductCovers.Count > 0)
@@ -3224,7 +3220,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
 
                     logMsg = logMsg + ",3";
-                    var mappedPolicy =await MapAndValidateInsurablePolicyAsync(ProposalDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "Proposal", apiContext);
+                    var mappedPolicy =await MapAndValidateInsurablePolicyAsync(ProposalDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "ProposalNo", apiContext);
                     mappedPolicy.SumInsured = ProposalDetail["si"];
                     if (Errors.Count == 0)
                     {
@@ -3758,7 +3754,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     var data = await AddInsurableItem(endoresementDto, apiContext);
 
                     //Updating json of policyRequest
+                    if (data.Status == BusinessStatus.Updated) {
+                       
 
+                    }
                     proposalResponse.Status = data.Status;
                     proposalResponse.Errors.AddRange(data.Errors);
                     proposalResponse.ResponseMessage = data.ResponseMessage;
