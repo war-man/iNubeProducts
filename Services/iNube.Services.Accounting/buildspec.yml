@@ -38,6 +38,8 @@ artifacts:
     - Services/iNube.Services.Accounting/taskdef.json
     - Services/iNube.Services.Accounting/edappspec.yml
     - Services/iNube.Services.Accounting/edtaskdef.json
+    - Services/iNube.Services.Accounting/demoappspec.yml
+    - Services/iNube.Services.Accounting/demotaskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json      
