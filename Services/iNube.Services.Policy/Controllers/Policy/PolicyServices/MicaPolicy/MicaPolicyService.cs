@@ -302,7 +302,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
                 logMsg = logMsg + ",3";
-                var mappedPolicy = MapAndValidatePolicy(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, apiContext, "Policy");
+                var mappedPolicy = MapAndValidatePolicy(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, apiContext, "PolicyNo");
 
                 if (Errors.Count == 0)
                 {
