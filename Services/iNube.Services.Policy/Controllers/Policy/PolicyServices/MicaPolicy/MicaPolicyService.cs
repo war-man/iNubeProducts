@@ -536,14 +536,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 nextNumber = (int)command.Parameters["@NextNo"].Value;
                 connection.Close();
             }
+            
+                policNumber = nextNumber.ToString();
+
             //var nextNumber = 0;
             //var policNumber = "";
             //Random r = new Random();
             //if (type == "Proposal")
             //{
             //     nextNumber = r.Next(10000, 999999);
-            //    policNumber = nextNumber.ToString();
-                
+
             //}
             //if (type == "Policy")
             //{
@@ -3227,7 +3229,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                     logMsg = logMsg + ",3";
                     var mappedPolicy =await MapAndValidateInsurablePolicyAsync(ProposalDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "ProposalNo", apiContext);
-                    mappedPolicy.SumInsured = ProposalDetail["si"];
+                    mappedPolicy.SumInsured = Convert.ToDecimal(premiumRequestDTO.SI);
                     if (Errors.Count == 0)
                     {
                         if (productDetails != null)
