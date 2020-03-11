@@ -12,6 +12,7 @@ using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.MotorRa
 using iNube.Services.Rating.Entities;
 using iNube.Services.Rating.Helpers;
 using iNube.Utility.Framework.Extensions;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Notification;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -72,11 +73,15 @@ namespace iNube.Services.Rating
         }
 
 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager());
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
             app.UseAuthentication();
+            app.UseHttpsRedirection();
+            app.UseMvc();
         }
         private void ConfigureModuleService(IServiceCollection services)
         {
