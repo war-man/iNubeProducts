@@ -3555,7 +3555,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
             var insurableItem = tblPolicyDetailsdata.PolicyRequest;
             dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-            tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "Policy");
+            tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
             foreach (var item in IssuepolicyDTO.InsurableItem)
             {
                 foreach (var insurableName in json.InsurableItem)
