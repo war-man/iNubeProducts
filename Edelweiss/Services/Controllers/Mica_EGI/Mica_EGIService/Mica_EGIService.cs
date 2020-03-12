@@ -33,6 +33,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         BillingResponse BillingDetails(string PolicyNo, string Month);
         Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata);
         TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
+
+        //CD Method
+        Task<dynamic> CDMapper(dynamic SourceObject, string TxnType);
+
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -1432,13 +1436,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, apiContext);
 
 
-            if(PolicyDetails == null || PolicyDetails.Count == 0)
+            if (PolicyDetails == null || PolicyDetails.Count == 0)
             {
                 return false;
             }
 
             var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
-                       
+
             PolicyNumberList.Distinct();
 
             foreach (var policy in PolicyNumberList)
@@ -1626,7 +1630,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var ActivePCCount = getDailyStat.ActivePc;
                 var ActiveTWCount = getDailyStat.ActiveTw;
 
-              
+
                 schedulerLog.SchedulerDateTime = IndianTime;
                 schedulerLog.SchedulerStatus = "Running";
 
@@ -1654,12 +1658,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 else
                 {
-                    schedulerLog.SchedulerStatus = policy+" - No Record Found for this Policy Number";
+                    schedulerLog.SchedulerStatus = policy + " - No Record Found for this Policy Number";
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
-                     report.FailCount += 1;
+                    report.FailCount += 1;
                     _context.TblScheduleReport.Update(report);
                     _context.SaveChanges();
                     continue;
@@ -2515,6 +2519,377 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
+
+        public async Task<dynamic> CDMapper(dynamic SourceObject,string TxnType)
+        {
+
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+
+
+            var BillingFrequency = SourceObject["billingFrequency"].ToString();
+
+            //CalculatePremiumObject
+            SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
+
+            //RuleObject
+            premiumDTO.dictionary_rule.SI = SourceObject["si"]; //Verify
+            premiumDTO.dictionary_rule.NOOFPC = SourceObject["noOfPC"];
+            premiumDTO.dictionary_rule.NOOFTW = SourceObject["noOfTW"];
+
+
+            //RateObject
+
+            premiumDTO.dictionary_rate.DEXPRT_Exp = SourceObject["driverExp"];
+            premiumDTO.dictionary_rate.PDAGERT_PAge = SourceObject["driverAge"];
+            premiumDTO.dictionary_rate.ADDRVRT_DRV = SourceObject["additionalDriver"]; //Verify
+            premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = SourceObject["noOfPC"];
+            premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = SourceObject["noOfPC"];
+            premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = SourceObject["noOfTW"];
+
+
+            var taxType = TaxTypeForStateCode(SourceObject["stateCode"].ToString());
+
+            premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE; //Call TaxType //Verify
+            premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE; //Call TaxType //Verify
+
+
+            //Call CalculatePremium Policy Module MICA
+            var CalPremiumResponse = await _integrationService.RatingPremium(premiumDTO, apiContext);
+
+            List<CalculationResult> DeserilizedPremiumData = new List<CalculationResult>();
+
+            MicaCDDTO CdModel = new MicaCDDTO();
+            CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
+            CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
+
+            if (CalPremiumResponse != null)
+            {
+                try
+                {
+                    DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
+
+                }
+                catch (Exception Ex)
+                {
+                    throw Ex;
+                }
+            }
+
+
+
+            if (DeserilizedPremiumData.Count() > 0)
+            {
+                //Accidental Damage [AD] - 365DAYS
+                var Ad365days = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "AD365DAYS").EValue);
+               
+                //Accidental Damage [AD] - 60DAYS
+                var Ad60days = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "AD60DAYS").EValue);
+               
+                //FireTheft [FT] - 365Days 
+                var Ft365days = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "FT365").EValue);
+                
+                decimal FinalTaxTotal = 0;
+
+                CDPremiumDTO FTPremium = new CDPremiumDTO();
+
+                CDPremiumDTO ADPremium = new CDPremiumDTO();
+
+                if (BillingFrequency == "Monthly")
+                {                   
+                    switch (TxnType)
+                    {
+                        case "Proposal":
+                            ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
+                            FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                            FinalTaxTotal = FTPremium.TaxAmount.TaxAmount + ADPremium.TaxAmount.TaxAmount;
+                            //AD & FD CREDIT
+                            CdModel.PremiumDTO.Add(ADPremium);
+                            CdModel.PremiumDTO.Add(FTPremium);
+                            CdModel.AccountNo = "";
+                            CdModel.Type = "Proposal";
+                            CdModel.TxnType = "Credit";
+                            CdModel.TxnAmount = Ad60days + Ft365days;
+                            CdModel.TaxAmount = FinalTaxTotal;
+                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+
+                            return CdModel;
+
+                        case "Policy":
+                            FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                            FinalTaxTotal = FTPremium.TaxAmount.TaxAmount;
+                            //FT DEBIT
+                            CdModel.PremiumDTO.Add(FTPremium);
+                            CdModel.AccountNo = "";
+                            CdModel.Type = "Policy";
+                            CdModel.TxnType = "Debit";
+                            CdModel.TxnAmount = Ft365days;
+                            CdModel.TaxAmount = FinalTaxTotal;
+                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            return CdModel;
+
+                        case "EndorementAdd":
+
+                            List<MicaCDDTO> FinalDto = new List<MicaCDDTO>();
+
+                            //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
+                            //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                            //FinalTaxTotal = FTPremium.TaxAmount.TaxAmount + ADPremium.TaxAmount.TaxAmount;
+
+                            ////AD & FT Credit Object
+                            //CdModel.PremiumDTO.Add(ADPremium);
+                            //CdModel.PremiumDTO.Add(FTPremium);
+                            //CdModel.AccountNo = "";
+                            //CdModel.Type = "EndorementAdd";
+                            //CdModel.TxnType = "Credit";
+                            //CdModel.TxnAmount = Ad60days + Ft365days;
+                            //CdModel.TaxAmount = FinalTaxTotal;
+                            //CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            //FinalDto.Add(CdModel);
+
+                            ////FT-DebitObject
+                            //CdModel = new MicaCDDTO();
+                            //CdModel.PremiumDTO.Add(FTPremium);
+                            //CdModel.AccountNo = "";
+                            //CdModel.Type = "EndorementAdd";
+                            //CdModel.TxnType = "Debit";
+                            //CdModel.TxnAmount = Ad60days + Ft365days;
+                            //CdModel.TaxAmount = FinalTaxTotal;
+                            //CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            //FinalDto.Add(CdModel);
+
+                            return FinalDto;
+
+                        case "EndorementDel":
+                            //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
+                            //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                            //FinalTaxTotal = FTPremium.TaxAmount.TaxAmount + ADPremium.TaxAmount.TaxAmount;
+                            ////AD & FD CREDIT
+                            //CdModel.PremiumDTO.Add(ADPremium);
+                            //CdModel.PremiumDTO.Add(FTPremium);
+                            //CdModel.AccountNo = "";
+                            //CdModel.Type = "Proposal";
+                            //CdModel.TxnType = "Credit";
+                            //CdModel.TxnAmount = Ad60days + Ft365days;
+                            //CdModel.TaxAmount = FinalTaxTotal;
+                            //CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+
+                            return CdModel;
+
+                        case "SwitchOnOff":
+                            CdModel.AccountNo = "";
+                            CdModel.Type = "";
+                            CdModel.TxnType = "";
+                            return CdModel;
+
+                        case "Schedule":
+                            CdModel.AccountNo = "";
+                            CdModel.Type = "";
+                            CdModel.TxnType = "";
+                            return CdModel;
+                    }
+
+                }
+                else if (BillingFrequency == "Yearly")
+                {
+                    switch (TxnType)
+                    {
+                        case "Proposal":
+                            ADPremium = ADYearly(DeserilizedPremiumData, taxType);
+                            FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                            FinalTaxTotal = FTPremium.TaxAmount.TaxAmount + ADPremium.TaxAmount.TaxAmount;
+                            //AD & FD CREDIT
+                            CdModel.PremiumDTO.Add(ADPremium);
+                            CdModel.PremiumDTO.Add(FTPremium);
+                            CdModel.AccountNo = "";
+                            CdModel.Type = "Proposal";
+                            CdModel.TxnType = "Credit";
+                            CdModel.TxnAmount = Ad365days + Ft365days;
+                            CdModel.TaxAmount = FinalTaxTotal;
+                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+
+                            return CdModel;
+
+
+                        case "Policy":
+                            FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                            FinalTaxTotal = FTPremium.TaxAmount.TaxAmount;
+                            //FT DEBIT
+                            CdModel.PremiumDTO.Add(FTPremium);
+                            CdModel.AccountNo = "";
+                            CdModel.Type = "Policy";
+                            CdModel.TxnType = "Debit";
+                            CdModel.TxnAmount = Ft365days;
+                            CdModel.TaxAmount = FinalTaxTotal;
+                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            return CdModel;
+
+
+                        case "EndorementAdd":
+
+                            break;
+
+
+                        case "EndorementDel":
+
+                            break;
+
+                        case "SwitchOnOff":
+
+                            break;
+
+                        case "Schedule":
+
+                            break;
+                    }
+
+
+
+
+
+                }
+
+            }
+
+            return false;
+        }
+
+
+        private CDPremiumDTO ADMonthly(List<CalculationResult> RatingObject,TaxTypeDTO taxType)
+        {
+            CDPremiumDTO ADMonthlyObj = new CDPremiumDTO();
+            CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
+            CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
+
+            //Accidental Damage [AD] - 60DAYS
+            var Ad60days = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "AD60DAYS").EValue);
+            var ad60fttax = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "AD60FTAXAMT").EValue);
+            var ad60ttax = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "AD60TTAXAMT").EValue);
+
+            
+            decimal TotalTax = 0;
+            //AD TAX
+            //From State 
+            taxTypeDTO.Type = taxType.FSTTAX_TAXTYPE;
+            taxTypeDTO.TaxAmount = ad60fttax;
+
+            TotalTax = taxTypeDTO.TaxAmount;
+           
+            //ARRAY
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            taxTypeDTO = new CDTaxTypeDTO();
+
+            //TO State
+            taxTypeDTO.Type = taxType.TSTTAX_TAXTYPE;
+            taxTypeDTO.TaxAmount = ad60ttax;
+
+            TotalTax += taxTypeDTO.TaxAmount;
+        
+
+            taxAmountDTO.TaxAmount = TotalTax;
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+            //AD
+            ADMonthlyObj.Type = "AD";
+            ADMonthlyObj.TxnAmount = Ad60days;
+            ADMonthlyObj.TotalAmount = Ad60days + TotalTax;
+            ADMonthlyObj.TaxAmount = taxAmountDTO;
+
+            return ADMonthlyObj;
+
+        }
+
+
+
+        private CDPremiumDTO ADYearly(List<CalculationResult> RatingObject, TaxTypeDTO taxType)
+        {
+            CDPremiumDTO ADYearlyObj = new CDPremiumDTO();
+            CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
+            CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
+
+            //Accidental Damage [AD] - 365DAYS
+            var Ad365days = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "AD365DAYS").EValue);
+            var ad365ftax = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
+            var ad365ttax = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
+
+            decimal TotalTax = 0;
+            //AD TAX
+            //From State 
+            taxTypeDTO.Type = taxType.FSTTAX_TAXTYPE;
+            taxTypeDTO.TaxAmount = ad365ftax;
+
+            TotalTax = taxTypeDTO.TaxAmount;
+
+            //ARRAY
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            taxTypeDTO = new CDTaxTypeDTO();
+
+            //TO State
+            taxTypeDTO.Type = taxType.TSTTAX_TAXTYPE;
+            taxTypeDTO.TaxAmount = ad365ttax;
+
+            TotalTax += taxTypeDTO.TaxAmount;
+
+
+            taxAmountDTO.TaxAmount = TotalTax;
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            //AD 365Days
+            ADYearlyObj.Type = "AD";
+            ADYearlyObj.TxnAmount = Ad365days;
+            ADYearlyObj.TotalAmount = Ad365days + TotalTax;
+            ADYearlyObj.TaxAmount = taxAmountDTO;
+            return ADYearlyObj;
+        }
+
+        private CDPremiumDTO FTYearly(List<CalculationResult> RatingObject, TaxTypeDTO taxType)
+        {
+            CDPremiumDTO FTYearlyObj = new CDPremiumDTO();
+            CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
+            CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
+
+            //FireTheft [FT] - 365Days 
+            var Ft365days = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "FT365").EValue);
+            var ftfttax = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
+            var ftttax = Convert.ToDecimal(RatingObject.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
+                       
+            decimal TotalTax = 0;
+            //AD TAX
+            //From State 
+            taxTypeDTO.Type = taxType.FSTTAX_TAXTYPE;
+            taxTypeDTO.TaxAmount = ftfttax;
+
+            TotalTax = taxTypeDTO.TaxAmount;
+
+            //ARRAY
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            taxTypeDTO = new CDTaxTypeDTO();
+
+            //TO State
+            taxTypeDTO.Type = taxType.TSTTAX_TAXTYPE;
+            taxTypeDTO.TaxAmount = ftttax;
+
+            TotalTax += taxTypeDTO.TaxAmount;
+
+
+            taxAmountDTO.TaxAmount = TotalTax;
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            //FT 365Days
+            FTYearlyObj.Type = "FT";
+            FTYearlyObj.TxnAmount = Ft365days;
+            FTYearlyObj.TotalAmount = Ft365days + TotalTax;
+            FTYearlyObj.TaxAmount = taxAmountDTO;
+            return FTYearlyObj;
+        }
 
 
 

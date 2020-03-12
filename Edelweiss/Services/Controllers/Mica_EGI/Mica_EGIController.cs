@@ -134,5 +134,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var response = _quotationService.TaxTypeForStateCode(stateabbreviation);
             return Ok(response);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CDMapper(dynamic SourceObject, string TxnType)
+        {
+            var response = await _quotationService.CDMapper(SourceObject, TxnType);
+            return Ok(response);
+
+        }
+
     }
 }

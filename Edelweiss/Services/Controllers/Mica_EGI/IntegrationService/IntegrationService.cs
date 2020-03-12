@@ -23,6 +23,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         Task<dynamic> CalculatePremium(SchedulerPremiumDTO premiumDTO, ApiContext apiContext);
         Task<dynamic> GetPolicyDetails(string PolicyNo, ApiContext apiContext);
         Task<dynamic> WrapperCalculateRatingPremium(SchedulerPremiumDTO dynamicData);
+
+        //MICA Rating for CD Mapping
+        Task<dynamic> RatingPremium(SchedulerPremiumDTO dynamicData, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -100,6 +103,12 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
             apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
             var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/41";
+            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
+        }
+
+        public async Task<dynamic> RatingPremium(SchedulerPremiumDTO dynamicData,ApiContext apiContext)
+        {
+            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/37";
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
         }
 

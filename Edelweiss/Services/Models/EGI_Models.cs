@@ -336,7 +336,53 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string PolicyNo { get; set; }
         public bool SwitchState { get; set; }
     }
+       
+    public class CDTaxTypeDTO
+    {
+        public string Type { get; set; }
+        public decimal TaxAmount { get; set; }
+    }
 
+    public class CDTaxAmountDTO
+    {
+        public CDTaxAmountDTO()
+        {
+            Tax = new List<CDTaxTypeDTO>();
+        }
+
+        public decimal TaxAmount { get; set; }
+        public List<CDTaxTypeDTO> Tax { get; set; }
+    }
+
+    public class CDPremiumDTO
+    {
+        public CDPremiumDTO()
+        {
+            TaxAmount = new CDTaxAmountDTO();
+        }
+
+        public string Type { get; set; }
+        public decimal TxnAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public CDTaxAmountDTO TaxAmount { get; set; }
+    }
+
+    public class MicaCDDTO
+    {
+        public MicaCDDTO()
+        {
+            PremiumDTO = new List<CDPremiumDTO>();
+        }
+
+        public string TxnType { get; set; }
+        public string Type { get; set; }
+        public string AccountNo { get; set; }
+        public decimal TxnAmount { get; set; }
+        public decimal TaxAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public List<CDPremiumDTO> PremiumDTO { get; set; }
+
+    }
 
 }
 
