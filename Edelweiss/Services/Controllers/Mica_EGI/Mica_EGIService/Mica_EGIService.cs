@@ -35,7 +35,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
 
         //CD Method
-        Task<dynamic> CDMapper(dynamic SourceObject, string TxnType);
+        Task<dynamic> CDMapper(string TxnType,dynamic SourceObject);
+
+        //Rule Engine 
+        Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject);
 
     }
 
@@ -2520,7 +2523,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<dynamic> CDMapper(dynamic SourceObject,string TxnType)
+        public async Task<dynamic> CDMapper(string TxnType,dynamic SourceObject)
         {
 
             ApiContext apiContext = new ApiContext();
@@ -2757,8 +2760,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return false;
         }
-
-
+        
         private CDPremiumDTO ADMonthly(List<CalculationResult> RatingObject,TaxTypeDTO taxType)
         {
             CDPremiumDTO ADMonthlyObj = new CDPremiumDTO();
@@ -2804,9 +2806,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return ADMonthlyObj;
 
         }
-
-
-
+               
         private CDPremiumDTO ADYearly(List<CalculationResult> RatingObject, TaxTypeDTO taxType)
         {
             CDPremiumDTO ADYearlyObj = new CDPremiumDTO();
@@ -2891,7 +2891,74 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return FTYearlyObj;
         }
 
+        public async Task<List<RuleEngineResponse>> RuleMapper(string TxnType,dynamic SourceObject)
+        {
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
 
+          
+            
+            RuleThreeDTO ruleThreeDTO = new RuleThreeDTO();
+
+            switch (TxnType)
+            {
+                case "Proposal":
+                    RuleOneDTO ruleOneDTO = new RuleOneDTO();
+                    ruleOneDTO.RuleName = "30016";//RuleId Give by Dinkar
+                    ruleOneDTO.DriverAge = SourceObject["driverAge"];
+                    ruleOneDTO.NoofVehicles = SourceObject["noOfPC"];
+                    ruleOneDTO.NoofDrivers = SourceObject["additionalDriver"];
+
+                    dynamic RuleEngine;
+
+                    List<RuleEngineResponse> engineResponses;
+
+
+                    try
+                    {
+                         RuleEngine = await _integrationService.RuleEngine(ruleOneDTO, apiContext);
+                        engineResponses = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(RuleEngine.ToString());
+                    }
+                    catch(Exception Ex)
+                    {
+                        throw Ex;
+                    }
+
+                    return engineResponses;
+
+                //case "Policy":
+                //    RuleTwoDTO ruleTwoDTO = new RuleTwoDTO();
+                //    ruleTwoDTO.RuleName = "30021";
+
+
+                //    return RuleEngine;
+
+                //case "EndorementAdd":
+
+
+                //    return RuleEngine;
+
+                   //case "EndorementDel":
+
+
+                    //    return CdModel;
+
+                    //case "SwitchOnOff":
+
+                    //    return CdModel;
+
+                    //case "Schedule":
+
+                    //    return CdModel;
+            }
+
+            return new List<RuleEngineResponse>();
+          
+        }
 
     }
 }

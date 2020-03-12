@@ -26,6 +26,10 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         //MICA Rating for CD Mapping
         Task<dynamic> RatingPremium(SchedulerPremiumDTO dynamicData, ApiContext apiContext);
+
+        //Rule Engine
+        Task<dynamic> RuleEngine(dynamic dynamicData, ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -45,9 +49,10 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
             UserUrl = _configuration["Integration_Url:User:UserUrl"];
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
-            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:AzureRuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
+           
         }        
 
 
@@ -110,6 +115,14 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         {
             var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/37";
             return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
+        }
+
+        public async Task<dynamic> RuleEngine(dynamic dynamicData, ApiContext apiContext)
+        {
+            var RuleId = dynamicData.RuleName;
+
+            var uri = RuleEngineUrl + "/RuleEngine/CheckRuleSets/"+ RuleId;
+            return await PostApiInvoke<dynamic, dynamic>(uri, apiContext, dynamicData);
         }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()

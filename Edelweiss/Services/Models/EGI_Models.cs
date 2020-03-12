@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace iNube.Services.MicaExtension_EGI.Models
 {
- 
+
     public class ScheduleDTO
     {
         public decimal ScheduleId { get; set; }
@@ -34,7 +34,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public ScheduleDTO ScheduleDTO { get; set; }
     }
 
-    public class GetScheduleDTO 
+    public class GetScheduleDTO
     {
         public string VehicleRegistrationNo { get; set; }
         public string PolicyNo { get; set; }
@@ -71,7 +71,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
     }
 
     public class DynamicData
-    {   
+    {
         public RuleDTO dictionary_rule { get; set; }
         public RateDTO dictionary_rate { get; set; }
     }
@@ -81,7 +81,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string Entity { get; set; }
         public string EValue { get; set; }
     }
- 
+
     public partial class taxDto
     {
         public decimal IGST { get; set; }
@@ -97,10 +97,10 @@ namespace iNube.Services.MicaExtension_EGI.Models
             premiumObj = new DynamicData();
         }
 
-       // public int CityId { get; set; }
+        // public int CityId { get; set; }
         public DynamicData premiumObj { get; set; }
-    }    
-       
+    }
+
     public class InsurableFieldsDTO
     {
         public string Name { get; set; }
@@ -132,7 +132,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public Dictionary<string, string> policy { get; set; }
         public BusinessStatus Status { get; internal set; }
         public int QuotationNumber { get; set; }
-    }  
+    }
 
     public class SchedulerPremiumDTO
     {
@@ -165,8 +165,8 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string TSTTAX_TAXTYPE { get; set; }
 
     }
-    
- 
+
+
     public class CDDTO
     {
         public string AccountNo { get; set; }
@@ -215,7 +215,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public WrapperPremiumReturnDto()
         {
             driverList = new DriverList();
-          
+
         }
         public decimal FTPM { get; set; }
         public DriverList driverList { get; set; }
@@ -235,7 +235,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
     }
 
     public class Driver1
-    { 
+    {
         public decimal D1ADPM { get; set; }
         public decimal D1TotalPM { get; set; }
     }
@@ -251,13 +251,13 @@ namespace iNube.Services.MicaExtension_EGI.Models
     }
     public partial class WrapperPremiumRequestDTO
     {
-       
-       // public int SI { get; set; }
+
+        // public int SI { get; set; }
         public int NoOfPC { get; set; }
         public int NoOfTW { get; set; }
         public int DriverAge { get; set; }
         public int DriverExp { get; set; }
-       
+
     }
 
     public class PolicyPremiumDetailsDTO
@@ -273,7 +273,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     public class SwitchOnOffResponse : ResponseStatus
     {
-       //public bool FinalResponse { get; set; }
+        //public bool FinalResponse { get; set; }
     }
 
     public class EndorsementPremiumDTO
@@ -311,7 +311,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string mType { get; set; }
     }
 
-    public class BillingDTO 
+    public class BillingDTO
     {
         public decimal AutoId { get; set; }
         public string PolicyNumber { get; set; }
@@ -336,7 +336,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string PolicyNo { get; set; }
         public bool SwitchState { get; set; }
     }
-       
+
     public class CDTaxTypeDTO
     {
         public string Type { get; set; }
@@ -382,6 +382,39 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal TotalAmount { get; set; }
         public List<CDPremiumDTO> PremiumDTO { get; set; }
 
+    }
+
+    public class RuleOneDTO
+    {
+        public string RuleName { get; set; }
+        public string DriverAge { get; set; }
+        public string NoofVehicles { get; set; }
+        public string NoofDrivers { get; set; }
+    }
+
+    public class RuleTwoDTO
+    {
+        public string RuleName { get; set; }
+        public string NoofVehiclesDelitionCount { get; set; }
+        public string NoOfVehiclesAdditionCount { get; set; }
+    }
+
+    public class RuleThreeDTO
+    {
+        public string RuleName { get; set; }
+        public string DriverDocumentPage { get; set; }
+        public string RCCopy { get; set; }
+        public string DriverLicence { get; set; }
+        public string UnderBodyImage { get; set; }
+        public string WindScreenGlassImage { get; set; }
+    }
+
+    public class RuleEngineResponse
+    {
+        public string ValidatorName { get; set; }
+        public string Outcome { get; set; }
+        public string Message { get; set; }
+        public string Code { get; set; }
     }
 
 }

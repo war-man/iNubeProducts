@@ -136,12 +136,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpPost]
-        public async Task<IActionResult> CDMapper(dynamic SourceObject, string TxnType)
+        public async Task<IActionResult> CDMapper(string TxnType, dynamic SourceObject)
         {
-            var response = await _quotationService.CDMapper(SourceObject, TxnType);
+            var response = await _quotationService.CDMapper(TxnType,SourceObject);
             return Ok(response);
 
         }
 
+        [HttpPost]
+        public async Task<IActionResult> RuleMapper (string TxnType, dynamic SourceObject)
+        {
+            var response = await _quotationService.RuleMapper(TxnType, SourceObject);
+            return Ok(response);
+
+        }
     }
 }
