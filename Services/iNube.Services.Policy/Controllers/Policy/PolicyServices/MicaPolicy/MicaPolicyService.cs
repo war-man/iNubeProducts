@@ -3614,10 +3614,67 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
+        //public async Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext)
+        //{
+        //    _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+        //    List<ErrorInfo> Errors = new List<ErrorInfo>();
+        //    var proposalNo = (string)modifydata["ProposalNumber"];
+        //    var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
+        //    if (tbl_particiant != null)
+        //    {
+
+
+
+        //        var policyId = tbl_particiant.PolicyId;
+        //        var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+        //        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+        //        dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+        //        foreach (var item in modifydata.InsurableItem)
+        //        {
+        //            foreach (var insurableName in json.InsurableItem)
+        //            {
+        //                if (item.InsurableName == insurableName.InsurableName)
+        //                {
+        //                    foreach (var fields in item.RiskItems)
+        //                    {
+        //                        foreach (var jsoninsurableFields in insurableName.RiskItems)
+        //                        {
+        //                            var InputidentificationNumber = (string)fields["Identification Number"];
+        //                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+        //                            if (InputidentificationNumber == TblIdentificationNo)
+        //                            {
+        //                                insurableName.RiskItems = item.RiskItems;
+        //                            }
+        //                        }
+        //                    }
+        //                }
+
+        //            }
+
+        //        }
+        //        tblPolicyDetailsdata.PolicyRequest = json.ToString();
+        //        _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+        //        _context.SaveChanges();
+        //    }
+        //    else
+        //    {
+
+        //        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProposalNumber", PropertyName = "ProposalNumber", ErrorMessage = $"No Records found for this Proposal Number {proposalNo}" };
+        //        Errors.Add(errorInfo);
+        //        return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+
+        //    }
+
+        //    return new ProposalResponse { Status = BusinessStatus.Updated, Id = proposalNo, ResponseMessage = $"RiskItem Updated for this Proposal Number { proposalNo }" };
+
+        //}
+
+        //Get Proposa By MobNumber
+
+
         public async Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext)
         {
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var proposalNo = (string)modifydata["ProposalNumber"];
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
@@ -3630,30 +3687,49 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
                 var insurableItem = tblPolicyDetailsdata.PolicyRequest;
                 dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                foreach (var item in modifydata.InsurableItem)
+                dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+
+                foreach (var insurableName in json.InsurableItem)
                 {
-                    foreach (var insurableName in json.InsurableItem)
+                    foreach (var insurableName1 in json1.InsurableItem)
                     {
-                        if (item.InsurableName == insurableName.InsurableName)
+                        foreach (var item in modifydata.InsurableItem)
                         {
-                            foreach (var fields in item.RiskItems)
+
+                            if (item.InsurableName == insurableName1.InsurableName)
                             {
-                                foreach (var jsoninsurableFields in insurableName.RiskItems)
+                                foreach (var fields in item.RiskItems)
                                 {
-                                    var InputidentificationNumber = (string)fields["Identification Number"];
-                                    var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                                    if (InputidentificationNumber == TblIdentificationNo)
+                                    try
                                     {
-                                        insurableName.RiskItems = item.RiskItems;
+                                        foreach (var jsoninsurableFields in insurableName.RiskItems)
+                                        {
+                                            var InputidentificationNumber = (string)fields["Identification Number"];
+                                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                                            if (InputidentificationNumber == TblIdentificationNo)
+                                            {
+                                                var Adddata = fields;
+                                                var removeitem = jsoninsurableFields;
+                                                insurableName.RiskItems.Remove(removeitem);
+                                                insurableName.RiskItems.Add(Adddata);
+
+                                            }
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                        insurableName1.RiskItems = insurableName.RiskItems;
                                     }
                                 }
                             }
+
                         }
 
                     }
-
                 }
-                tblPolicyDetailsdata.PolicyRequest = json.ToString();
+                tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                 _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
                 _context.SaveChanges();
             }
@@ -3670,7 +3746,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         }
 
-        //Get Proposa By MobNumber
 
         public async Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext)
         {
