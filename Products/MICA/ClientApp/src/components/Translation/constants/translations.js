@@ -722,7 +722,7 @@ export const TRANSLATIONS = {
         Limit: 'Limit',
         ListOfRetention: 'List Of Retention',
 
-         /***********************************************************************/
+        /***********************************************************************/
         //Dynamic Reports
         ReportConfiguration: 'Report Configuration',
         ReportName: 'Report Name',

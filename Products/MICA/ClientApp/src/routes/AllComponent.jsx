@@ -160,7 +160,7 @@ const DefineMapping = AsyncComponent(() => { return import("modules/Reinsurance/
 const SearchMapping = AsyncComponent(() => { return import("modules/Reinsurance/views/SearchMapping.jsx"); });
 const ModifyMapping = AsyncComponent(() => { return import("modules/Reinsurance/views/ModifyMapping.jsx"); });
 
-/*Dynamic Reports*/
+//Dynamic Reports
 const ReportConfiguration = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportConfiguration.jsx"); });
 const ReportExecution = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportExecution.jsx"); });
 
