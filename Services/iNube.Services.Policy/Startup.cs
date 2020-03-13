@@ -3,12 +3,18 @@ using System.Text;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using HealthChecks.UI.Client;
+using iNube.Services.Policy.Controllers.DynamicReports;
+using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
+using iNube.Services.Policy.Controllers.DynamicReports.ReportServices.AvoReport;
+using iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaReport;
+using iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MotorReport;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.Policy.Controllers.Policy.PolicyServices;
 using iNube.Services.Policy.Controllers.Proposal.IntegrationService.iNube.Services.Proposal.Controllers.ProposalConfig.IntegrationService;
 using iNube.Services.Policy.Controllers.Proposal.ProposalService;
 using iNube.Services.Policy.Entities;
 using iNube.Services.Policy.Entities.AvoEntities;
+using iNube.Services.Policy.Entities.DynamicReportEntities;
 using iNube.Services.Policy.Helpers;
 using iNube.Utility.Framework.Extensions;
 using iNube.Utility.Framework.Filters.Attribute;
@@ -41,6 +47,8 @@ namespace iNube.Services.Policy
         {
             services.AddDbContext<MICAPOContext>();
             services.AddDbContext<ProposalContext>();
+
+            services.AddDbContext<MICARPContext>();
             //var connectionstring = Configuration.GetConnectionString("PCConnection");
 
             // configure strongly typed settings objects
@@ -95,11 +103,34 @@ namespace iNube.Services.Policy
                 }
             });
 
+            services.AddTransient<MicaReportService>();
+            services.AddTransient<MotorReportService>();
+            services.AddTransient<AvoReportService>();
+
+            services.AddTransient<Func<string, IReportProductService>>(serviceProvider => pkey =>
+            {
+                switch (pkey)
+                {
+                    case "Mica":
+                        return serviceProvider.GetService<MicaReportService>();
+                    case "Motor":
+                        return serviceProvider.GetService<MotorReportService>();
+                    case "Avo":
+                        return serviceProvider.GetService<AvoReportService>();
+                    default:
+                        return serviceProvider.GetService<MicaReportService>();
+
+                }
+            });
+
             services.AddScoped<IPolicyService, PolicyService>();
             services.AddScoped<IIntegrationService, IntegrationService>();
 
             services.AddScoped<IProposalService, ProposalService>();
             services.AddScoped<IPOIntegrationService, POIntegrationService>();
+
+            services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IRPIntegrationService, RPIntegrationService>();
 
         }
     }

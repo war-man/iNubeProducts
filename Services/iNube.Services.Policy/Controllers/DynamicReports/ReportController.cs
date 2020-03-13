@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using iNube.Services.Policy.RPModels;
+using iNube.Services.Policy.Models;
 using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace iNube.Services.Policy.Controllers.DynamicReports
 {
@@ -66,6 +68,25 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         {
             var eventDetails = await _reportService.GetParameters(ReportConfigId, Context);
             return Ok(eventDetails);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetQueryById(int ReportConfigId)
+        {
+            var Qdetails = await _reportService.GetQueryById(ReportConfigId, Context);
+            return Ok(Qdetails);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult>QueryExecution([FromBody]QueryDTO queryDTO)
+        {
+            //List<Params> ParamList = new List<Params>() ;
+            //Params p1 = new Params() { ParameterName = "ClaimId", ParameterValue = "335" };
+            //ParamList.Add(p1);
+            //p1 = new Params() { ParameterName = "Name", ParameterValue = "Ashish" };
+            //ParamList.Add(p1);
+            var query = await _reportService.QueryExecution(queryDTO, Context);
+            return Ok(query);
         }
     }
 }

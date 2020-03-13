@@ -11,5 +11,3 @@ namespace iNube.Services.Policy.Entities.DynamicReportEntities
         public string Value { get; set; }
     }
 }
-
-

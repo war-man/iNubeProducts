@@ -15,7 +15,7 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import $ from 'jquery';
 import swal from 'sweetalert';
-import money from "assets/img/money.png"; 
+import money from "assets/img/money.png";
 import Visibility from "@material-ui/icons/Visibility";
 import GetApp from "@material-ui/icons/GetApp";
 import Edit from "@material-ui/icons/Edit";
@@ -51,22 +51,23 @@ class ReportConfiguration extends React.Component {
             nodata: false,
             masterList: [],
             ReportConfigDto: {
-                ReportName:"",
+                ReportName: "",
                 DBSchemaId: "",
                 RangeTypeId: "",
                 DataTypeId: "",
-                ParameterName:"",
+                ParameterName: "",
             },
             QueryDto: {
-                Select: "Select",
-                Parameter: "",
-                From: "From",
-                Table:"",
+                //Select: "Select",
+                //Parameter: "",
+                //From: "From",
+                //Table:"",
+                Query: "",
             },
-            ReportObjParam:[],
+            ReportObjParam: [],
             errormessage: false,
             displayReportObejectGrid: false,
-            newParamData:[],
+            newParamData: [],
         };
     }
 
@@ -129,11 +130,11 @@ class ReportConfiguration extends React.Component {
     addConfigParameter() {
         debugger;
         console.log(this.state.nodata, 'ReportName');
-        if (this.state.ReportConfigDto.ReportName != "" && this.state.ReportConfigDto.DBSchemaId!="" && this.state.ReportConfigDto.ParameterName!="" ) {
-            
+        if (this.state.ReportConfigDto.ReportName != "" && this.state.ReportConfigDto.DBSchemaId != "" && this.state.ReportConfigDto.ParameterName != "") {
+
             //if (dataCheck.length == 0) {
-                //Showing Grid
-                this.setState({ displayReportObejectGrid: true });
+            //Showing Grid
+            this.setState({ displayReportObejectGrid: true });
 
             //To get name from Id for Master Drop down
             let dbContents = (this.state.masterList.filter((e) => e.mType === "DBSchema")[0]) === undefined
@@ -145,41 +146,41 @@ class ReportConfiguration extends React.Component {
             let dataTypeContents = (this.state.masterList.filter((e) => e.mType === "DataType")[0]) === undefined
                 ? []
                 : this.state.masterList.filter((e) => e.mType === "DataType")[0].mdata;
-                
+
 
             var dbData = dbContents.filter(item => item.mID == this.state.ReportConfigDto.DBSchemaId);
             var rangeData = rangeContents.filter(item => item.mID == this.state.ReportConfigDto.RangeTypeId);
             var dataTypeData = dataTypeContents.filter(item => item.mID == this.state.ReportConfigDto.DataTypeId);
-            
-                //Array Part
-                let pReportObjParam = this.state.ReportObjParam;
-                this.setState({ ReportObjParam: pReportObjParam });
 
-                pReportObjParam.push({
-                    'reportName': this.state.ReportConfigDto.ReportName,
-                    'dbSchema': dbData[0].mValue,
-                    'parameterName': this.state.ReportConfigDto.ParameterName,
-                    'rangeType': rangeData[0].mValue,
-                    'dataType': dataTypeData[0].mValue,
+            //Array Part
+            let pReportObjParam = this.state.ReportObjParam;
+            this.setState({ ReportObjParam: pReportObjParam });
+
+            pReportObjParam.push({
+                'reportName': this.state.ReportConfigDto.ReportName,
+                'dbSchema': dbData[0].mValue,
+                'parameterName': this.state.ReportConfigDto.ParameterName,
+                'rangeType': rangeData[0].mValue,
+                'dataType': dataTypeData[0].mValue,
+            });
+
+            // State Set After Selecting
+            console.log(this.state.ReportObjParam, 'RateParamArray');
+
+            if (this.state.ReportObjParam.length > 0) {
+                this.setState({
+                    newParamData: this.state.ReportObjParam.map((prop, key) => {
+
+                        return {
+                            ReportName: prop.reportName,
+                            DBSchemaId: prop.dbSchema,
+                            ParameterName: prop.parameterName,
+                            RangeTypeId: prop.rangeType,
+                            DataTypeId: prop.dataType,
+                        };
+                    })
                 });
-
-                // State Set After Selecting
-                console.log(this.state.ReportObjParam, 'RateParamArray');
-
-                if (this.state.ReportObjParam.length > 0) {
-                    this.setState({
-                        newParamData: this.state.ReportObjParam.map((prop, key) => {
-
-                            return {
-                                ReportName: prop.reportName,
-                                DBSchemaId: prop.dbSchema,
-                                ParameterName: prop.parameterName,
-                                RangeTypeId: prop.rangeType,
-                                DataTypeId: prop.dataType,
-                            };
-                        })
-                    });
-                    this.reset();
+                this.reset();
             }
 
             //}
@@ -199,7 +200,7 @@ class ReportConfiguration extends React.Component {
         resetFields['DataTypeId'] = "";
         resetFields['ParameterName'] = "";
         resetFields['RangeTypeId'] = "";
-        this.setState({resetFields});
+        this.setState({ resetFields });
     }
 
     onFormSubmit = (evt) => {
@@ -213,7 +214,7 @@ class ReportConfiguration extends React.Component {
                 'rangeType': this.state.ReportObjParam[i].rangeType,
             });
         }
-        console.log(sendArray,'Sending Array');
+        console.log(sendArray, 'Sending Array');
         if (this.state.ReportObjParam.length > 0) {
             let isActive = 1;
             var data = {
@@ -221,7 +222,8 @@ class ReportConfiguration extends React.Component {
                 'dbschema': this.state.ReportConfigDto.DBSchemaId,
                 'isActive': isActive,
                 'createdDate': date(),
-                'query': this.state.QueryDto.Select +" "+ this.state.QueryDto.Parameter +" "+ this.state.QueryDto.From +" "+ this.state.QueryDto.Table,
+                // 'query': this.state.QueryDto.Select +" "+ this.state.QueryDto.Parameter +" "+ this.state.QueryDto.From +" "+ this.state.QueryDto.Table,
+                'query': this.state.QueryDto.Query,
                 'TblreportConfigParam': sendArray,
             };
             fetch(`${ReportConfig.ReportConfigUrl}/api/Report/SaveConfigParameters`, {
@@ -348,9 +350,9 @@ class ReportConfiguration extends React.Component {
                                             />
                                         </GridItem>
 
-                                            <GridItem>
+                                        <GridItem>
                                             <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.addConfigParameter()}> <TranslationContainer translationKey="AddParameter" />  </Button>
-                                            </GridItem>
+                                        </GridItem>
 
                                     </GridContainer>
                                 </div>
@@ -414,12 +416,12 @@ class ReportConfiguration extends React.Component {
                             <CardBody>
                                 <GridContainer xl={12}>
                                     <GridItem xs={12}>
-                                                <CardHeader>
-                                                    <h3> <small>Query</small> </h3>
-                                                </CardHeader>
+                                        <CardHeader>
+                                            <h3> <small>Query</small> </h3>
+                                        </CardHeader>
                                     </GridItem>
 
-                                    <GridItem xs={12} sm={12} md={2}>
+                                    {/*   <GridItem xs={12} sm={12} md={2}>
                                         <CustomInput
                                             labelText="Select"
                                             disabled="true"
@@ -427,20 +429,20 @@ class ReportConfiguration extends React.Component {
                                             name='ParameterName'
                                             onChange={(e) => this.onInputQueryChange("string", e)}
                                             formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
+                                    </GridItem>*/}
 
-                                    <GridItem xs={12} sm={12} md={2}>
+                                    <GridItem xs={12} sm={12} md={12}>
                                         <CustomInput
-                                            labelText="Parameters"
+                                            labelText="Query"
                                             required={true}
                                             //disabled="true"
-                                            value={this.state.QueryDto.Parameter}
-                                            name='Parameter'
+                                            value={this.state.QueryDto.Query}
+                                            name='Query'
                                             onChange={(e) => this.onInputQueryChange("string", e)}
                                             formControlProps={{ fullWidth: true }} />
                                     </GridItem>
 
-                                    <GridItem xs={12} sm={12} md={2}>
+                                    {/* <GridItem xs={12} sm={12} md={2}>
                                         <CustomInput
                                             labelText="From"
                                             disabled="true"
@@ -458,13 +460,13 @@ class ReportConfiguration extends React.Component {
                                             name='Table'
                                             onChange={(e) => this.onInputQueryChange("string", e)}
                                             formControlProps={{ fullWidth: true }} />
-                                        </GridItem>
+                                        </GridItem>*/}
                                 </GridContainer>
                             </CardBody>
                         </Card>
                     </div>
                 }
-        
+
                 {this.state.displayReportObejectGrid &&
                     <GridContainer justify="center">
                         <GridItem>
@@ -475,8 +477,8 @@ class ReportConfiguration extends React.Component {
                     </GridContainer>
                 }
             </div>
-            
-            );
+
+        );
     }
 }
 export default ReportConfiguration;

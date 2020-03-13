@@ -40,13 +40,16 @@ class ReportExecution extends React.Component {
             ReportConfigDto: {
                 ReportName: "",
             },
-            //CheckCondition: {
-                parameterList: [],
-                dateList:[],
-            //},
-            flagParam: false,
-            fields: {
+            parameterList: [],
+            CheckCondition: {
+                //paramList:[],
             },
+            paramList:[],
+            result: [],
+            flagParam: false,
+            fields: [],
+            TableDataList: [],
+            tableFlag:false,
         };
     }
 
@@ -86,9 +89,24 @@ class ReportExecution extends React.Component {
     };
 
     onInputParamListChange = (evt) => {
-        let fields = this.state.fields;
+        const fields = this.state.CheckCondition;
         fields[evt.target.name] = evt.target.value;
         this.setState({ fields });
+        console.log("fields", fields);
+        //let paramindex = this.state.paramList.findIndex(s => s.parameterName == evt.target.name);
+        ///*Create obj*/
+        //if (paramindex == -1) {
+        //    let pArray = this.state.paramList; 
+        //  //  this.setState({ paramList: pArray });
+        //    pArray.push({
+        //        "parameterName": evt.target.name,
+        //        "parameterValue": evt.target.value,
+        //    });
+        //} else {
+        //    this.state.paramList[paramindex].parameterName = evt.target.name;
+        //    this.state.paramList[paramindex].parameterValue = evt.target.value;
+        //}
+        console.log(this.state.paramList,"Array List");
     };
 
     onDateChange = (formate, name, event) => {
@@ -136,6 +154,76 @@ class ReportExecution extends React.Component {
                 this.setState({ parameterList: data });
                 console.log(this.state.parameterList, data, 'CheckConditions');
             });
+    }
+
+    queryExecution = event => {
+        let val = this.state.CheckCondition;
+        let pArray = this.state.paramList;
+        this.setState({
+            paramList: Object.keys(this.state.CheckCondition).map((prop, key) => {
+                pArray.push({
+                    "parameterName": prop,
+                    "parameterValue": val[prop],
+                });
+                this.setState({ paramList: pArray});
+                console.log("Table", prop,val[prop]);
+            })
+        });
+
+        var data = {
+            'ReportConfigId': this.state.ReportConfigDto.ReportName,
+            'paramList': this.state.paramList,
+        };
+
+        fetch(`${ReportConfig.ReportConfigUrl}/api/Report/QueryExecution`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(data)
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({ result: data });
+                console.log(this.state.result, 'Result');
+                if (this.state.result.length > 0) {
+                    this.setState({ tableFlag: false });
+                    this.tabledata();
+                    this.reset();
+                }
+                else {
+                    setTimeout(
+                        function () {
+                            this.setState({ loader: true, searchTableSec: false, nodata: true });
+                        }.bind(this), 2000
+                    );
+                }
+            });
+    }
+
+    reset = () => {
+        let param = this.state.paramList;
+        param['parameterValue'] = "";
+        this.setState({ param});
+        let resetField = this.state.ReportConfigDto;
+        resetField['ReportName'] = "";
+        this.setState({ resetField});
+    }
+
+    tabledata = () => {
+        this.setState({ tableFlag:true});
+        console.log("prop data", this.state.result);
+        this.setState({
+            TableDataList: Object.keys(this.state.result[0]).map((prop, key) => {
+                return {
+                    Header: prop,
+                    accessor: prop,
+                };
+                this.setState({});
+            })
+        });
+        console.log("table data", this.state.TableDataList);
     }
 
     render() {
@@ -203,17 +291,10 @@ class ReportExecution extends React.Component {
                                                                             formControlProps={{ fullWidth: true }} />
                                                                     </GridItem>
                                                             )}
-                                                            {this.state.dateList.map((item, index) =>
-                                                                <GridItem xs={12} sm={12} md={3} key={index}>
-                                                                    <CustomDatetime
-                                                                        labelText={item}
-                                                                        name={item}
-                                                                        onChange={(evt) => this.onDateChange('datetime', 'date', evt)}
-                                                                        //value={this.state.InvoiceData.invoiceEffectiveDate}
-                                                                        formControlProps={{ fullWidth: true }} />
 
-                                                                </GridItem>
-                                                            )}
+                                                            <GridItem>
+                                                                <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={(e)=>this.queryExecution(e)}> <TranslationContainer translationKey="Execute" />  </Button>
+                                                            </GridItem>
 
                                                             </GridContainer>
 
@@ -231,6 +312,28 @@ class ReportExecution extends React.Component {
                         </Animated>
                     </Card>
                     : <PageContentLoader />}
+
+                {this.state.tableFlag &&
+                <GridContainer xl={12}>
+                    <GridItem lg={12}>
+                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                            <ReactTable
+                                data={this.state.result}
+                                filterable
+
+                                columns={this.state.TableDataList}
+
+
+                                defaultPageSize={5}
+                                showPaginationTop={false}
+
+                                showPaginationBottom
+                                className="-striped -highlight discription-tab"
+                            />
+                        </Animated>
+                    </GridItem>
+                </GridContainer>
+                }
             </div>
 
             );

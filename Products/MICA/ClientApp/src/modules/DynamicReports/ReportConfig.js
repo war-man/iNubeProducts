@@ -5,9 +5,7 @@ if (config.env === "dev") {
 }
 else {
     //ReportConfigUrl = 'https://localhost:44351';
-    //ReportConfigUrl = 'https://inubeservicespolicy.azurewebsites.net';
-    ReportConfigUrl='http://ed-mica-policy.ed.internal.:9006';
-    //ReportConfigUrl = 'http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9006/swagger/index.html';
+    ReportConfigUrl = 'https://inubeservicespolicy.azurewebsites.net';
 }
 export const ReportConfig = {
     ReportConfigUrl,

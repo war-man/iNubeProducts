@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace iNube.Services.Policy.Entities.DynamicReportEntities
 {
-    
     public partial class MICARPContext : DbContext
     {
         public MICARPContext()
@@ -19,7 +18,6 @@ namespace iNube.Services.Policy.Entities.DynamicReportEntities
         public virtual DbSet<TblReportConfig> TblReportConfig { get; set; }
         public virtual DbSet<TblReportConfigParam> TblReportConfigParam { get; set; }
         public virtual DbSet<TblRpmasters> TblRpmasters { get; set; }
-
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

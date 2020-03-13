@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
-using iNube.Services.Policy.RPModels;
+using iNube.Services.Policy.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

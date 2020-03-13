@@ -8,10 +8,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
-using iNube.Services.Policy.RPModels;
+using iNube.Services.Policy.Models;
 //using iNube.Services.UserManagement.Helpers;
 using iNube.Services.Policy.Helpers.DynamicReportHelpers;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
+using System.Data.SqlClient;
+using System.Data;
+using System.Data.Common;
+using iNube.Services.Policy.Helpers;
 
 namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaReport
 {
@@ -32,7 +36,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
 
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             IEnumerable<ddDTO> ddDTOs;
 
             ddDTOs = _context.TblRpmasters
@@ -49,7 +53,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
         {
             try
             {
-                _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+                _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
                 var dto = _mapper.Map<TblReportConfig>(reportConfigDTO);
                 _context.TblReportConfig.Add(dto);
@@ -65,7 +69,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
 
         public async Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
             IEnumerable<ddDTO> obj;
             obj = from pr in _context.TblReportConfig.OrderByDescending(p => p.CreatedDate)
                   select new ddDTO
@@ -78,9 +82,10 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
             return obj;
         }
 
-        public async Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
+        public async Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext)
         {
-            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            // HandleEvent objEvent = new HandleEvent();
 
             var reportparamList = from tblreportConfig in _context.TblReportConfig
                                   join tblconfigParam in _context.TblReportConfigParam on tblreportConfig.ReportConfigId equals tblconfigParam.ReportConfigId
@@ -91,24 +96,69 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
                                       RangeType = tblconfigParam.RangeType,
                                       DataType = tblconfigParam.DataType
                                   };
-            List<ReportParamsDTO> AddparamList = new List<ReportParamsDTO>();
-            //List<string> typeList = new List<string>();
+            //List<ReportParamsDTO> AddparamList = new List<ReportParamsDTO>();
+            List<string> typeList = new List<string>();
             foreach(var i in reportparamList)
             {
                 if(i.RangeType =="Yes")
                 {
-                    AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName + "" + "From", DataType = i.DataType });
-                    AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName + "" + "To", DataType = i.DataType });
+                    //AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName + "" + "From", DataType = i.DataType });
+                    //AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName + "" + "To", DataType = i.DataType });
+
+                     typeList.Add(i.ParameterName + "From");
+                      typeList.Add(i.ParameterName + "To");
                 }
 
                 else
                 {
-                    AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName , DataType = i.DataType });
-                    //typeList.Add(i.ParameterName);
+                   // AddparamList.Add(new ReportParamsDTO { ParameterName = i.ParameterName , DataType = i.DataType });
+                    typeList.Add(i.ParameterName);
                 }
 
             }
-            return AddparamList;
+            //return AddparamList;
+            return typeList;
+        }
+
+        public async Task<string> GetQueryById (int ReportConfigId,ApiContext apiContext)
+        {
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+
+            var queryData = _context.TblReportConfig.SingleOrDefault(x => x.ReportConfigId == ReportConfigId).Query;
+            return queryData;
+        }
+
+        public async Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext)
+        {
+            //_context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            var connectionString = _configuration.GetConnectionString("PCConnection");
+            var query = await GetQueryById(queryDTO.ReportConfigId,apiContext);
+            //var query = "select * from [CM].[tblClaimInsurable] where ClaimId=@ClaimId and Name=@Name";
+           // var query = "select * from [CM].[tblClaimInsurable] where ClaimId='335' ";
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    //connection.Open();
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.CommandType = CommandType.Text;
+                    foreach (var item in queryDTO.paramList)
+                    {
+                        command.Parameters.AddWithValue("@" + item.ParameterName, item.ParameterValue);
+                    }
+
+                    DataSet ds = new DataSet();
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    adapter.Fill(ds,"Query");
+                    connection.Close();
+                    return ds.Tables[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                return new DataTable();
+            }
         }
     }
 }

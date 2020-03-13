@@ -2,10 +2,11 @@
 using AutoMapper.Configuration;
 using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
-using iNube.Services.Policy.RPModels;
+using iNube.Services.Policy.Models;
 using iNube.Utility.Framework.Model;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,7 +17,9 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext);
         Task<ReportConfigResonse> SaveConfigParameters(ReportConfigDTO reportConfigDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext);
-        Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext);
+        Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext);
+        Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
+        Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext);
     }
 
     public class ReportService : IReportService
@@ -48,9 +51,17 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         {
             return await _productService(apiContext.ProductType).GetReportConfigName(lMasterlist, apiContext);
         }
-        public async Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
+        public async Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).GetParameters(ReportConfigId, apiContext);
+        }
+        public async Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).GetQueryById(ReportConfigId, apiContext);
+        }
+        public async Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).QueryExecution(queryDTO,apiContext);
         }
     }
 }

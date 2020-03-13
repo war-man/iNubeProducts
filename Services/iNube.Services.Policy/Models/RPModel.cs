@@ -4,18 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace iNube.Services.Policy.RPModels
+namespace iNube.Services.Policy.Models
 {
     public partial class ddDTO
     {
         public int mID { get; set; }
         public string mValue { get; set; }
         public string mType { get; set; }
-    }
-
-    public class EnvironmentResponse : ResponseStatus
-    {
-        public string Dbconnection { get; set; }
     }
 
     public class ReportConfigResonse : ResponseStatus
@@ -65,5 +60,21 @@ namespace iNube.Services.Policy.RPModels
         public string ParameterName { get; set; }
         public string RangeType { get; set; }
         public string DataType { get; set; }
+    }
+
+    public partial class QueryDTO
+    {
+        public QueryDTO()
+        {
+            paramList = new List<Params>();
+        }
+        public int ReportConfigId { get; set; }
+        public List<Params> paramList { get; set; }
+    }
+
+    public partial class Params
+    {
+        public string ParameterName { get; set; }
+        public string ParameterValue { get; set; }
     }
 }

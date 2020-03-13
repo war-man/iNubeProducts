@@ -1,13 +1,16 @@
-﻿using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
-using iNube.Services.Policy.Entities.DynamicReportEntities;
+﻿using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
+using iNube.Services.Policy.Entities;
+using iNube.Services.Policy.Helpers;
+using iNube.Utility.Framework.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using iNube.Services.Policy.Entities.DynamicReportEntities;
 
 namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
 {
@@ -76,7 +79,7 @@ namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new RPIntegrationService(configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)
@@ -106,4 +109,3 @@ namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
         }
     }
 }
-
