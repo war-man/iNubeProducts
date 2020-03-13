@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 namespace inube.Services.Notification.Models
 {
     [BsonIgnoreExtraElements]
-    public class DMSDTO 
+    public class DMSDTO
     {
         public DMSDTO()
         {
             tagDTOs = new List<TagDTO>();
         }
-      
+
         public string docId { get; set; }
         public string fileName { get; set; }
         public long length { get; set; }
@@ -40,5 +40,16 @@ namespace inube.Services.Notification.Models
         public List<DMSDTO> dMSDTOs { get; set; }
 
     }
+
+    public class DocumentResp
+    {
+
+        public byte[] data { get; set; }
+        public string fileExtension { get; set; }
+
+
+    }
+
+
 
 }

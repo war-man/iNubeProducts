@@ -1,5 +1,4 @@
-﻿
-using inube.Services.Notification.Controllers.DMS.DMSService;
+﻿using inube.Services.Notification.Controllers.DMS.DMSService;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
@@ -33,10 +32,10 @@ namespace inube.Services.Notification.Controllers.DMS
     public class DMSController : BaseApiController
     {
         private readonly IDMSService _dMSService;
-       private readonly IEmailService _emailService;
-       private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
 
-        public DMSController(IDMSService dMSService ,IEmailService emailService,
+        public DMSController(IDMSService dMSService, IEmailService emailService,
         IConfiguration configuration)
         {
             _dMSService = dMSService;
@@ -46,9 +45,9 @@ namespace inube.Services.Notification.Controllers.DMS
         [HttpPost("[action]")]
         public IActionResult Documentupload(string tagName, string tagValue)
         {
-           var response= _dMSService.Documentupload(Request,tagName,tagValue);
+            var response = _dMSService.Documentupload(Request, tagName, tagValue);
             return ServiceResponse(response);
-           // return Ok();
+            // return Ok();
         }
         [AllowAnonymous]
         [HttpPost("[action]")]
@@ -62,13 +61,13 @@ namespace inube.Services.Notification.Controllers.DMS
         [HttpPost("[action]")]
         public List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO)
         {
-           var response= _dMSService.DocumentSimpleupload(fileUploadDTO);
+            var response = _dMSService.DocumentSimpleupload(fileUploadDTO);
 
             return response;
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchParam(string tagName,string tagValue)
+        public async Task<IActionResult> SearchParam(string tagName, string tagValue)
         {
             var resp = await _dMSService.SearchParam(tagName, tagValue);
             return Ok(resp);
@@ -94,17 +93,23 @@ namespace inube.Services.Notification.Controllers.DMS
         [HttpGet]
         public async Task<IActionResult> GetDocumentById(string id)
         {
-            var bytes = await _dMSService.DownloadFile(id);
-            var result = new HttpResponseMessage(HttpStatusCode.OK);
-            var filememstream = new MemoryStream(bytes.data);
-            result.Content = new StreamContent(filememstream);
-            var headers = result.Content.Headers;
-            headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-            headers.ContentDisposition.FileName = "DmsDoc.pdf";
-            headers.ContentType = new MediaTypeHeaderValue("application/pdf");
-            headers.ContentLength = filememstream.Length;
-            return File(filememstream, "application/octet-stream", bytes.fileName);
-            
+            var response = await _dMSService.DownloadFile(id);
+
+
+            //var result = new HttpResponseMessage(HttpStatusCode.OK);
+            //var filememstream = new MemoryStream(bytes.data);
+            //result.Content = new StreamContent(filememstream);
+            //var headers = result.Content.Headers;
+            //headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+            //headers.ContentDisposition.FileName = "DmsDoc.pdf";
+            //headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+            //headers.ContentLength = filememstream.Length;
+            //headers.Extension=extension;
+            //return File(filememstream, "application/octet-stream", bytes.fileName);
+            // return null;
+            // var response = await _dMSService.DownloadFile(id);
+            return Ok(response);
+
 
         }
 
@@ -120,9 +125,9 @@ namespace inube.Services.Notification.Controllers.DMS
             var resp = await _dMSService.AddTags(id, tagName, tagvalue);
             return Ok(resp);
         }
-  
+
         [HttpGet]
-        public Dictionary<string,string>  PaytmPayment(decimal policyId,decimal Amount,string mobileNumber)
+        public Dictionary<string, string> PaytmPayment(decimal policyId, decimal Amount, string mobileNumber)
         {
             Dictionary<String, String> paytmParams = new Dictionary<String, String>();
 
@@ -137,7 +142,7 @@ namespace inube.Services.Notification.Controllers.DMS
             paytmParams.Add("CHANNEL_ID", "WEB");
 
             Random r = new Random();
-            int rInt = r.Next(0, 100); 
+            int rInt = r.Next(0, 100);
 
             //var orderId = rInt.ToString();
 
@@ -159,7 +164,7 @@ namespace inube.Services.Notification.Controllers.DMS
 
             //  var url = "https://inubeservicesnotification.azurewebsites.net/api/DMS/recievechecksum";
             //var url ="http://localhost:53000/api/DMS/recievechecksum"
-            
+
             String checksum = CheckSum.GenerateCheckSum("8UYwJj@2JCJBTYR3", paytmParams);
 
             paytmParams.Add("CHECKSUMHASH", checksum);
@@ -168,7 +173,7 @@ namespace inube.Services.Notification.Controllers.DMS
 
             /* for Staging */
 
-           // String url = "https://securegw-stage.paytm.in/order/process";
+            // String url = "https://securegw-stage.paytm.in/order/process";
 
             paytmParams.Add("URL", "https://securegw-stage.paytm.in/order/process");
             return paytmParams;
@@ -177,7 +182,7 @@ namespace inube.Services.Notification.Controllers.DMS
         [HttpPost]
         public Dictionary<String, String> recievechecksum()
         {
-           var orderid = 10;
+            var orderid = 10;
             var cutomerid = 20;
             EmailRequest emailTest = new EmailRequest();
             emailTest.Message = "HI";

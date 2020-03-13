@@ -8,7 +8,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace inube.Services.Notification.Controllers.DMS.DMSService
 {
@@ -17,25 +17,44 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
         DMSResponse Documentupload(HttpRequest httpRequest, string tagName, string tagValue);
         List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO);
         Task<List<string>> SearchParam(string tagName, string tagvalue);
-        Task<DMSDTO> DownloadFile(string id);
+        Task<DocumentResp> DownloadFile(string id);
+        Task<FileUploadDTO> DownloadFile1(string id);
         void DeleteDocument(string id);
         Task<List<DMSDTO>> AddTags(string id, string tagName, string tagvalue);
         Task<DMSDTO> DownloadView(string id);
     }
-    public class DMSService1: IDMSService
+    public class DMSService1 : IDMSService
     {
         IDMSDatabaseSettings _settings;
         public DMSService1(IDMSDatabaseSettings settings)
         {
             _settings = settings;
         }
-        public async Task<DMSDTO> DownloadFile(string id)
+        public async Task<DocumentResp> DownloadFile(string id)
         {
+            DocumentResp documentResp = new DocumentResp();
             var client = new MongoClient(_settings.ConnectionString);
             var database = client.GetDatabase(_settings.DatabaseName);
             var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
             DMSDTO dMSDTO = new DMSDTO();
             var item = await collection.FindSync(Builders<DMSDTO>.Filter.Eq("docId", id)).FirstOrDefaultAsync();
+            // documentResp.data=item.data;
+            var itemstring1 = item.fileName;
+            String[] strlist1 = itemstring1.Split('.', StringSplitOptions.None);
+            var count1 = strlist1.Count();
+            string extension = strlist1[count1 - 1];
+            documentResp.fileExtension = extension;
+            documentResp.data = item.data;
+            return documentResp;
+
+        }
+        public async Task<FileUploadDTO> DownloadFile1(string id)
+        {
+            var client = new MongoClient(_settings.ConnectionString);
+            var database = client.GetDatabase(_settings.DatabaseName);
+            var collection = database.GetCollection<FileUploadDTO>(_settings.CollectionName);
+            FileUploadDTO dMSDTO = new FileUploadDTO();
+            var item = await collection.FindSync(Builders<FileUploadDTO>.Filter.Eq("docId", id)).FirstOrDefaultAsync();
             return item;
 
         }
@@ -53,7 +72,7 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
 
         public DMSResponse Documentupload(HttpRequest httpRequest, string tagName, string tagValue)
         {
-            
+
 
 
             if (httpRequest.Form.Files != null)
@@ -75,7 +94,7 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
 
                 foreach (var file in files)
                 {
-                  
+
                     dMSDTO = new DMSDTO();
                     string guid = System.Guid.NewGuid().ToString();
                     dMSDTO.docId = guid;
@@ -101,14 +120,14 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
                     var document = BsonSerializer.Deserialize<BsonDocument>(jsonDocument);
                     var collection = database.GetCollection<BsonDocument>(_settings.CollectionName);
                     collection.InsertOneAsync(document);
-                   
+
 
                     //return dMSDTO;
 
 
 
                 }
-                foreach(var id in dMSDTOList)
+                foreach (var id in dMSDTOList)
                 {
                     var docid = id.docId;
 
@@ -137,8 +156,8 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
             //var db=ConnectionInfo()
             var database = client.GetDatabase(_settings.DatabaseName);
             DMSDTO dMSDTO = new DMSDTO();
-           
-           // dMSDTO.docId = guid;
+
+            // dMSDTO.docId = guid;
             DMSResponse dMSResponse = new DMSResponse();
 
             List<DMSResponse> dMSResponselist = new List<DMSResponse>();
@@ -173,47 +192,47 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
                 dMSResponselist.Add(dMSResponse);
 
             }
-          
+
             // var files = httpRequest.Form.Files;
 
 
 
 
 
-           // DMSResponse dMSResponse = new DMSResponse();
-           // dMSResponse.Docid = docid;
+            // DMSResponse dMSResponse = new DMSResponse();
+            // dMSResponse.Docid = docid;
 
-            
+
             // dMSDTO.docId =guid;
             return dMSResponselist;
-         //   return new DMSResponse { Docid = dMSDTO.docId , Status=iNube.Utility.Framework.Model.BusinessStatus.Ok};
+            //   return new DMSResponse { Docid = dMSDTO.docId , Status=iNube.Utility.Framework.Model.BusinessStatus.Ok};
 
 
         }
 
         public async Task<List<string>> SearchParam(string tagName, string tagvalue)
         {
-                var client = new MongoClient(_settings.ConnectionString);
-                var database = client.GetDatabase(_settings.DatabaseName);
-                var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
-                DMSDTO dMSDTO = new DMSDTO();
-                var totaldoc = await collection.CountAsync(new BsonDocument());               
-                List<string> documetId = new List<string>();
-                var filter = Builders<DMSDTO>.Filter.ElemMatch(x => x.tagDTOs, x => x.tagName == tagName) & Builders<DMSDTO>.Filter.ElemMatch(x => x.tagDTOs, x => x.tagValue == tagvalue);
-                var res = await collection.Find(filter).ToListAsync();
-                foreach (var i in res)
-                {
-                    documetId.Add(i.docId);
-                }
-                return documetId;
-           
+            var client = new MongoClient(_settings.ConnectionString);
+            var database = client.GetDatabase(_settings.DatabaseName);
+            var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
+            DMSDTO dMSDTO = new DMSDTO();
+            var totaldoc = await collection.CountAsync(new BsonDocument());
+            List<string> documetId = new List<string>();
+            var filter = Builders<DMSDTO>.Filter.ElemMatch(x => x.tagDTOs, x => x.tagName == tagName) & Builders<DMSDTO>.Filter.ElemMatch(x => x.tagDTOs, x => x.tagValue == tagvalue);
+            var res = await collection.Find(filter).ToListAsync();
+            foreach (var i in res)
+            {
+                documetId.Add(i.docId);
+            }
+            return documetId;
+
         }
         public void DeleteDocument(string id)
         {
             var client = new MongoClient(_settings.ConnectionString);
             var database = client.GetDatabase(_settings.DatabaseName);
             var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
-            collection.DeleteOne(x=>x.docId == id);
+            collection.DeleteOne(x => x.docId == id);
         }
         public async Task<List<DMSDTO>> AddTags(string id, string tagName, string tagvalue)
         {
@@ -235,3 +254,4 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
 
     }
 }
+
