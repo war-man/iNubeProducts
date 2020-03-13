@@ -16,6 +16,8 @@ namespace iNube.Services.Policy.Helpers
         {
             CreateMap<PolicyInsurableDetailsDTO, TblPolicyInsurableDetails>();
             CreateMap<TblPolicyInsurableDetails, PolicyInsurableDetailsDTO>();
+            CreateMap<EndorsementDetailsDTO, TblEndorsementDetails>();
+            CreateMap<TblEndorsementDetails, EndorsementDetailsDTO>();
 
             CreateMap<PolicyDTO, Entities.TblPolicy>()
             .ForMember(dest => dest.TblPolicyInsurableDetails, opt => opt.MapFrom(src => src.PolicyInsurableDetails)).ReverseMap();

@@ -26,12 +26,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<object>> DownloadPolicy(int ProductId, int PartnerId, ApiContext apiContext);
         Task<IEnumerable<PolicyDTO>> GetPolicyDetails(ApiContext apiContext);
         Task<IEnumerable<decimal>> GetPolicyByDetails(PolicySearchbyPidDTO policySearchby, ApiContext apiContext);
-        Task<List<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext);
+        Task<List<BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext);
         void WriteToExcel(string path);
         Task<List<object>> PolicyDetails(decimal PolicyId, ApiContext apiContext);
-        Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext);
+        Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest pDTO, ApiContext apiContext);
         Task<PolicyInsurableResponse> PolicyInsurableDetails(string PolicyNumber, ApiContext apiContext);
-        Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequest, ApiContext apiContext);
+        Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(Models.BillingEventRequest EventRequest, ApiContext apiContext);
         Task<List<ddDTOs>> PolicyDashboardMaster(ApiContext apiContext);
         Task<LeadInfoDTO> CustomerPolicy(int CustomerId, ApiContext apiContext);
         Task<IEnumerable<PolicyCountDTO>> PolicySearchDashboard(PolicySearchDashboardDTO policysearch, ApiContext apiContext);
@@ -50,7 +50,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
 
         Task<decimal> UpdateSumInsured (string PolicyNumber, decimal amount,ApiContext apiContext);
+        Task<PolicyResponse> UpdateBalanceSumInsured(string PolicyNumber, decimal amount,ApiContext apiContext);
         Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext);
+        Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext);
 
         Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
 
@@ -59,5 +61,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<ProposalResponse> CreateProposal(dynamic ProposalDetail, ApiContext apiContext);
         Task<dynamic> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext);
         Task<ProposalResponse> PolicyEndoresemenet(dynamic endoresementDto, ApiContext apiContext);
+        Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext);
+
     }
 }

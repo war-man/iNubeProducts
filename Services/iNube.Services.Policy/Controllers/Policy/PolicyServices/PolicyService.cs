@@ -27,7 +27,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext);
         Task<ProposalResponse> CreateProposal(dynamic policyDetail, ApiContext apiContext);
         Task<PolicyResponse> CreatePolicyWithPayment(dynamic policyDetail, ApiContext apiContext);
-        Task<PolicyDTO> ModifyPolicy(string policyNumber,PolicyDTO policyDetail, ApiContext apiContext);
+        Task<PolicyDTO> ModifyPolicy(string policyNumber, PolicyDTO policyDetail, ApiContext apiContext);
         Task<dynamic> IssuePolicy(dynamic IssuepolicyDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetMaster(string sMasterlist, ApiContext apiContext);
         Task<PolicyDTO> GetPolicyById(decimal policyId, ApiContext apiContext);
@@ -36,33 +36,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<IEnumerable<PolicyDTO>> PolicySearch(PolicysearchDTO policysearch, ApiContext apiContext);
         Task<CdTransactionsResponse> CancelPolicy(PolicycancelDTO policycancelDTO, ApiContext apiContext);
         Task<IEnumerable<PolicyDTO>> GetPolicyByEventId(string eventId, string policyNumber, ApiContext apiContext);
-        Task<List<object>> GetGrossWrittenPremium(int productId, string productname,int Year, ApiContext apiContext);
+        Task<List<object>> GetGrossWrittenPremium(int productId, string productname, int Year, ApiContext apiContext);
         Task<List<object>> DownloadPolicy(int ProductId, int PartnerId, ApiContext apiContext);
         Task<IEnumerable<PolicyDTO>> GetPolicyDetails(ApiContext apiContext);
         Task<List<object>> PolicyDetails(decimal PolicyId, ApiContext apiContext);
         Task<IEnumerable<decimal>> GetPolicyByDetails(PolicySearchbyPidDTO policySearchby, ApiContext apiContext);
         void WriteToExcel(string path);
-        Task<List<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext);
-        Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext);
+        Task<List<BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext);
+        Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest pDTO, ApiContext apiContext);
         Task<PolicyInsurableResponse> PolicyInsurableDetails(string PolicyNumber, ApiContext apiContext);
-        Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequet, ApiContext apiContext);
+        Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(Models.BillingEventRequest EventRequet, ApiContext apiContext);
         Task<List<ddDTOs>> PolicyDashboardMaster(ApiContext apiContext);
         Task<LeadInfoDTO> CustomerPolicy(int CustomerId, ApiContext apiContext);
         Task<IEnumerable<PolicyCountDTO>> PolicySearchDashboard(PolicySearchDashboardDTO policysearch, ApiContext apiContext);
-        Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest,ApiContext apiContext);
+        Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext);
         Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext);
         Task<EndorsmentDTO> SwitchOnOff(dynamic switchOnOffRequest, ApiContext apiContext);
         //Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string policyNumber, ApiContext apiContext);
-        Task<decimal> GetPolicyDetailsByPolicyNo(string PolicyNO,ApiContext apiContext);
+        Task<decimal> GetPolicyDetailsByPolicyNo(string PolicyNO, ApiContext apiContext);
         Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext);
         Task<object> CalCulatePremium(DynamicData premiumParameter, ApiContext apiContext);
         Task<PolicyDTO> ModifyInsurabableItem(dynamic modifydata, ApiContext apiContext);
-     
+
         Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
         Task<dynamic> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext);
         Task<List<PolicyPremiumDetailsDTO>> GetRiskItemByPolicyNo(string PolicyNO, ApiContext apiContext);
-       // Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
-        Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount ,ApiContext apiContext);
+        // Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
+        Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext);
+        Task<PolicyResponse> UpdateBalanceSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext);
         Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext);
         Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
 
@@ -71,6 +72,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext);
         Task<ProposalResponse> PolicyEndoresemenet(dynamic endoresementDto, ApiContext apiContext);
+        Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputmodel, string mappingname, ApiContext apiContext);
+        Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext);
 
     }
     public class PolicyService : IPolicyService
@@ -643,11 +646,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             throw new NotImplementedException();
         }
 
-        public Task<List<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext)
+        public Task<List<BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             return _policyProductService(apiContext.ProductType).BillingEventData(pDTO, apiContext);
         }
-        public Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext)
+        public Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             return _policyProductService(apiContext.ProductType).BillingEventResponse(pDTO, apiContext);
         }
@@ -657,7 +660,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return await _policyProductService(apiContext.ProductType).PolicyInsurableDetails(PolicyNumber, apiContext);
         }
 
-        public Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequet, ApiContext apiContext)
+        public Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(Models.BillingEventRequest EventRequet, ApiContext apiContext)
         {
             return _policyProductService(apiContext.ProductType).GetPolicyForClaimsInvoice(EventRequet, apiContext);
         }
@@ -694,10 +697,18 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).UpdateSumInsured(PolicyNumber, amount, apiContext);
         }
+        public async Task<PolicyResponse> UpdateBalanceSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).UpdateBalanceSumInsured(PolicyNumber, amount, apiContext);
+        }
 
         public async Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).GetProposalByMobileNo(MobNo, apiContext);
+        }
+        public async Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).ProposalValidation(proposalDto, apiContext);
         }
 
         
@@ -712,6 +723,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<ProposalResponse> PolicyEndoresemenet(dynamic endoresementDto, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).PolicyEndoresemenet(endoresementDto, apiContext);
+        }
+        public async Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).DynamicMapper(inputModel,mappingname, apiContext);
         }
 
 

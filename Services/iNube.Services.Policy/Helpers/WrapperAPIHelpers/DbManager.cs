@@ -10,8 +10,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using iNube.Services.Policy.Entities.DynamicReportEntities;
 
-namespace iNube.Services.UserManagement.Helpers
+namespace iNube.Services.Policy.Helpers.WrapperAPIHelpers
 {
     public class DbConnection
     {
@@ -84,10 +85,10 @@ namespace iNube.Services.UserManagement.Helpers
             switch (product)
             {
                 case "Mica":
-                    var optionsBuilder = new DbContextOptionsBuilder<MICAPOContext>();
+                    var optionsBuilder = new DbContextOptionsBuilder<MICARPContext>();
                     optionsBuilder.UseSqlServer(dbConnectionString);
                     //DbContextOptions<MICAUMContext> dbContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                    context = new MICAPOContext(optionsBuilder.Options);
+                    context = new MICARPContext(optionsBuilder.Options);
                     break;
                 //case "Avo":
                 //    DbContextOptions<AVOUMContext> dbAvoContextOption = (DbContextOptions<AVOUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
@@ -97,10 +98,10 @@ namespace iNube.Services.UserManagement.Helpers
                     dbConnectionString = DbConnectionManager.GetConnectionString("Prod");
                     break;
                 default:
-                    var optionsBuilderDefault = new DbContextOptionsBuilder<MICAPOContext>();
+                    var optionsBuilderDefault = new DbContextOptionsBuilder<MICARPContext>();
                     optionsBuilderDefault.UseSqlServer(dbConnectionString);
                     // DbContextOptions<MICAUMContext> dbDefaultContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                    context = new MICAPOContext(optionsBuilderDefault.Options);
+                    context = new MICARPContext(optionsBuilderDefault.Options);
                     break;
             }
 

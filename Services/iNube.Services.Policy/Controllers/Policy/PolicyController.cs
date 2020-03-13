@@ -213,20 +213,20 @@ namespace iNube.Services.Policy.Controllers.Policy
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> GetPolicyForClaimsInvoice(BillingEventRequest EventRequet)
+        public async Task<IActionResult> GetPolicyForClaimsInvoice(Models.BillingEventRequest EventRequet)
         {
             var _searchResult = await _policyService.GetPolicyForClaimsInvoice(EventRequet, Context);
             return Ok(_searchResult);
         }
         [HttpPost]
-        public async Task<IActionResult> BillingEventResponse(BillingEventRequest EventRequet)
+        public async Task<IActionResult> BillingEventResponse(Models.BillingEventRequest EventRequet)
         {
             var _searchResult = await _policyService.BillingEventResponse(EventRequet, Context);
             return Ok(_searchResult);
         }
 
         [HttpPost]
-        public async Task<IActionResult> BillingEventData(BillingEventRequest EventRequet)
+        public async Task<IActionResult> BillingEventData(Models.BillingEventRequest EventRequet)
         {
             var _searchResult = await _policyService.BillingEventData(EventRequet, Context);
             return Ok(_searchResult);
@@ -511,31 +511,47 @@ namespace iNube.Services.Policy.Controllers.Policy
         public async Task<IActionResult> PolicyEndoresemenet(dynamic endoresementDto)
         {
             var response = await _policyService.PolicyEndoresemenet(endoresementDto, Context);
-            switch (response.Status)
-            {
-                case BusinessStatus.InputValidationFailed:
-                    return Ok(response);
-                case BusinessStatus.Created:
-                    return Ok(response);
-                case BusinessStatus.UnAuthorized:
-                    return Unauthorized();
-                case BusinessStatus.Ok:
-                    return Ok(response);
-                case BusinessStatus.Updated:
-                    return Ok(response);
-                case BusinessStatus.Deleted:
-                    return Ok(response);
-                case BusinessStatus.NotFound:
-                    return Ok(response);
+            return ServiceResponse(response);
+        }
 
-                default:
-                    return Forbid();
-            }
-
-           // return ServiceResponse(response);
+        [HttpPost]
+        public async Task<IActionResult> DynamicMapper(dynamic inputModel, string mappingname)
+        {
+            var response = await _policyService.DynamicMapper(inputModel,mappingname, Context);
+            return Ok(response);
         }
 
 
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateBalanceSumInsured(string PolicyNumber, decimal amount)
+        {
+            var response = await _policyService.UpdateBalanceSumInsured(PolicyNumber, amount, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return BadRequest(response);
+                case BusinessStatus.Updated:
+                    return Ok(response);
+                case BusinessStatus.Error:
+                    return BadRequest(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized(response);
+                case BusinessStatus.PreConditionFailed:
+                    return Ok(response);
+
+                default:
+                    return NotFound(response);
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ProposalValidation(dynamic proposalDto)
+        {
+            var response = await _policyService.ProposalValidation(proposalDto, Context);
+            return ServiceResponse(response);
+        }
 
 
 

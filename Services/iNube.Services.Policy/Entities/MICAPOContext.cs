@@ -17,11 +17,14 @@ namespace iNube.Services.Policy.Entities
 
         public virtual DbSet<TblAdditionalDetails> TblAdditionalDetails { get; set; }
         public virtual DbSet<TblEndorsementDetails> TblEndorsementDetails { get; set; }
+        public virtual DbSet<TblMapper> TblMapper { get; set; }
+        public virtual DbSet<TblMappingDetails> TblMappingDetails { get; set; }
         public virtual DbSet<TblNumberingScheme> TblNumberingScheme { get; set; }
         public virtual DbSet<TblPolicy> TblPolicy { get; set; }
         public virtual DbSet<TblPolicyDetails> TblPolicyDetails { get; set; }
         public virtual DbSet<TblPolicyInsurableDetails> TblPolicyInsurableDetails { get; set; }
         public virtual DbSet<TblPolicyPayment> TblPolicyPayment { get; set; }
+        public virtual DbSet<TblPremiumDetails> TblPremiumDetails { get; set; }
         public virtual DbSet<TblmasPocommonTypes> TblmasPocommonTypes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -72,6 +75,7 @@ namespace iNube.Services.Policy.Entities
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
+
             modelBuilder.Entity<TblEndorsementDetails>(entity =>
             {
                 entity.HasKey(e => e.EndorsementId);
@@ -106,6 +110,34 @@ namespace iNube.Services.Policy.Entities
                 entity.Property(e => e.PremiumAmount).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.TotalPremiumAmount).HasColumnType("numeric(18, 2)");
+            });
+
+            modelBuilder.Entity<TblMapper>(entity =>
+            {
+                entity.HasKey(e => e.MapperId)
+                    .HasName("Pk_tblMapper");
+
+                entity.ToTable("tblMapper", "PO");
+
+                entity.Property(e => e.MapperId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<TblMappingDetails>(entity =>
+            {
+                entity.ToTable("tblMappingDetails", "PO");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.MappingDetailsId).HasColumnType("numeric(18, 0)");
+
+                entity.HasOne(d => d.MappingDetails)
+                    .WithMany(p => p.TblMappingDetails)
+                    .HasForeignKey(d => d.MappingDetailsId)
+                    .HasConstraintName("FK_tblMappingDetails");
             });
 
             modelBuilder.Entity<TblNumberingScheme>(entity =>
@@ -183,6 +215,11 @@ namespace iNube.Services.Policy.Entities
                     .HasColumnName("BundleTxnID")
                     .IsUnicode(false);
 
+                entity.Property(e => e.CdaccountNumber)
+                    .HasColumnName("CDAccountNumber")
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Channel)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -233,6 +270,10 @@ namespace iNube.Services.Policy.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.MasterPremium).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.MasterType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.MobileNumber)
                     .HasMaxLength(15)
@@ -391,6 +432,28 @@ namespace iNube.Services.Policy.Entities
                     .WithMany(p => p.TblPolicyPayment)
                     .HasForeignKey(d => d.PolicyId)
                     .HasConstraintName("FK_tblPolicyPayment_tblPolicy");
+            });
+
+            modelBuilder.Entity<TblPremiumDetails>(entity =>
+            {
+                entity.HasKey(e => e.PremiumDetailsId)
+                    .HasName("PK_tbPremiumDetails");
+
+                entity.ToTable("tblPremiumDetails", "PO");
+
+                entity.Property(e => e.PremiumDetailsId)
+                    .HasColumnName("PremiumDetailsID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.RefrenceId)
+                    .HasColumnName("RefrenceID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(1)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<TblmasPocommonTypes>(entity =>

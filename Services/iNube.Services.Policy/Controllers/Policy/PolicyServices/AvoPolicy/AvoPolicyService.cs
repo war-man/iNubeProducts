@@ -93,7 +93,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             throw new NotImplementedException();
         }
 
-        public Task<List<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext)
+        public Task<List<BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -103,7 +103,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             throw new NotImplementedException();
         }
 
-        public Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext)
+        public Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -122,7 +122,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             throw new NotImplementedException();
         }
 
-        public Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequet, ApiContext apiContext)
+        public Task<List<PolicyDataForClaims>> GetPolicyForClaimsInvoice(Models.BillingEventRequest EventRequet, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -259,6 +259,31 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
 
         public Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<dynamic> DynamicMapper(dynamic SourceComp, dynamic TargetComp, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<dynamic> DynamicMapper(dynamic SourceComp, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PolicyResponse> UpdateBalanceSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

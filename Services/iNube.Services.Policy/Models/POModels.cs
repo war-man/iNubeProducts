@@ -22,6 +22,22 @@ namespace iNube.Services.Policy.Models
         public int? PartnerId { get; set; }
         public bool? IsPayment { get; set; }
     }
+
+    public partial class EndorsementDetailsDTO
+    {
+        public decimal EndorsementId { get; set; }
+        public string EndorsementNo { get; set; }
+        public string Action { get; set; }
+        public string EnddorsementRequest { get; set; }
+        public DateTime? EndorsementEffectivedate { get; set; }
+        public decimal? PremiumAmount { get; set; }
+        public decimal? Gst { get; set; }
+        public decimal? TotalPremiumAmount { get; set; }
+        public decimal? AmountBalanced { get; set; }
+        public string PaymentGatewayReferenceId { get; set; }
+        public DateTime? DateOfPayment { get; set; }
+    }
+
     public class PolicyPremiumDetailsDTO
     {
         public string SumInsured { get; set; }
@@ -91,6 +107,8 @@ namespace iNube.Services.Policy.Models
         public string CoverName { get; set; }
         public decimal? MasterPremium { get; set; }
         public decimal? PremiumAmount { get; set; }
+        public string CdaccountNumber { get; set; }
+        public string MasterType { get; set; }
 
         public List<PolicyInsurableDetailsDTO> PolicyInsurableDetails { get; set; }
     }
@@ -129,6 +147,7 @@ namespace iNube.Services.Policy.Models
         {
             InsurableRcbdetails = new List<InsurableRcbdetailsDTO>();
             ProductSwitchOnDetails = new List<ProductSwitchOnDetailsDTO>();
+            ProductBasicConfiguration = new List<ProductBasicConfigurationDTO>();
         }
         public int ProductId { get; set; }
         public decimal RateingId { get; set; }
@@ -166,11 +185,23 @@ namespace iNube.Services.Policy.Models
         public virtual ICollection<ProductPremiumDTO> ProductPremium { get; set; }
         public virtual ICollection<ddDTOs> RiskDetails { get; set; }
         public virtual ICollection<ddDTOs> ClaimDetails { get; set; }
+        public virtual ICollection<ddDTOs> ProductBasicConfigurationDetails { get; set; }
         public virtual ICollection<ddDTOs> ProductSwitchOnProperty { get; set; }
         public virtual ICollection<ProductSwitchOnDetailsDTO> ProductSwitchOnDetails { get; set; }
         public virtual ICollection<ProductRatingMapping> CalculateConfig { get; set; }
+        public virtual ICollection<ProductBasicConfigurationDTO> ProductBasicConfiguration { get; set; }
     }
-
+    public partial class ProductBasicConfigurationDTO
+    {
+        public decimal ProductBasicConfigurationId { get; set; }
+        public int? ProductId { get; set; }
+        public string InputType { get; set; }
+        public bool? IsReqired { get; set; }
+        public int InputId { get; set; }
+        public bool? mIsRequired { get; set; }
+        public string mValue { get; set; }
+        public bool? disable { get; set; }
+    }
     public partial class ProductRatingMapping
     {
         public int MappingId { get; set; }
@@ -693,15 +724,15 @@ namespace iNube.Services.Policy.Models
         public decimal EvtId { get; set; }
     }
 
-    public class BillingEventDataDTO
-    {
-        public int Count { get; set; }
-        public string ProductCode { get; set; }
-        public string ProductName { get; set; }
-        public decimal SumInsured { get; set; }
-        public int? ProductId { get; set; }
-        public decimal Premium { get; set; }
-    }
+    //public class BillingEventDataDTO
+    //{
+    //    public int Count { get; set; }
+    //    public string ProductCode { get; set; }
+    //    public string ProductName { get; set; }
+    //    public decimal SumInsured { get; set; }
+    //    public int? ProductId { get; set; }
+    //    public decimal Premium { get; set; }
+    //}
     public class BillingEventResponseDTO
     {
         public BillingEventResponseDTO()
@@ -880,6 +911,8 @@ namespace iNube.Services.Policy.Models
         public decimal PolicyId { get; set; }
         public decimal? BenefitAmount { get; set; }
         public bool? IsActive { get; set; }
+
+        public List<Dictionary<string, string>> coverDynamic { get; set; }
     }
 
     #region MultiCover
@@ -1240,12 +1273,38 @@ namespace iNube.Services.Policy.Models
         public string TxnType { get; set; }
         public decimal Amount { get; set; }
         public string PaymentReferenceNo { get; set; }
+        public Dictionary<string, decimal> RatingConfig { get;set; }
 
     }
     public class DynamicData
     {
+        public DynamicData()
+        {
+            dictionary_rule = new RuleDTO();
+            dictionary_rate = new RateDTO();
+        }
+
         public dynamic dictionary_rule { get; set; }
         public dynamic dictionary_rate { get; set; }
+    }
+    public class RuleDTO
+    {
+        public string SI { get; set; }
+        public string NOOFTW { get; set; }
+        public string NOOFPC { get; set; }
+    }
+
+    public class RateDTO
+    {
+        public string DEXPRT_Exp { get; set; }
+        public string PDAGERT_PAge { get; set; }
+        public string ADDRVRT_DRV { get; set; }
+        public string AVFACTORPC_PC_NOOFPC { get; set; }
+        public string AVFACTORTW_TW_NOOFPC { get; set; }
+        public string AVFACTORTW_TW_NOOFTW { get; set; }
+        public string FSTTAX_TAXTYPE { get; set; }
+        public string TSTTAX_TAXTYPE { get; set; }
+
     }
 
     public class CalculationResult
@@ -1283,61 +1342,137 @@ namespace iNube.Services.Policy.Models
 
 
     }
-    public partial class PremiumReturnDto
+    //public partial class PremiumReturnDto
 
-    {
+    //{
 
-        public decimal PerDayPremium { get; set; }
+    //    public decimal PerDayPremium { get; set; }
 
-        public decimal FireTheft365 { get; set; }
+    //    public decimal FireTheft365 { get; set; }
 
-        public decimal ADPremium { get; set; }
+    //    public decimal ADPremium { get; set; }
 
-        public decimal GST { get; set; }
+    //    public decimal GST { get; set; }
 
-        public decimal Total { get; set; }
+    //    public decimal Total { get; set; }
 
-        public decimal MonthlyPremium { get; set; }
+    //    public decimal MonthlyPremium { get; set; }
 
-    }
-
+    //}
 
 
     public partial class PremiumRequestDTO
-
     {
-
-        public string DriverAge { get; set; }
-
-        public string SI { get; set; }
-
         public string StateCode { get; set; }
-
-        public string DriverExp { get; set; }
-
-        public string NoOfPC { get; set; }
-
-        public string NoOfTW { get; set; }
-
-        public string AdditionalDriver { get; set; }
-
+        public int SI { get; set; }
+        public int NoOfPC { get; set; }
+        public int NoOfTW { get; set; }
+        public int DriverAge { get; set; }
+        public int DriverExp { get; set; }
+        public int AdditionalDriver { get; set; }
         public string BillingFrequency { get; set; }
-
     }
-    public partial class EndorsementDetailsDTO
+    public partial class PremiumReturnDto : ResponseStatus
     {
-        public decimal EndorsementNo { get; set; }
-        public string Action { get; set; }
-        public string EnddorsementRequest { get; set; }
-        public DateTime? EndorsementEffectivedate { get; set; }
-        public decimal? PremiumAmount { get; set; }
-        public decimal? Gst { get; set; }
-        public decimal? TotalPremiumAmount { get; set; }
-        public decimal? AmountBalanced { get; set; }
-        public string PaymentGatewayReferenceId { get; set; }
-        public DateTime? DateOfPayment { get; set; }
+        public decimal PerDayPremium { get; set; }
+        public decimal FireTheft { get; set; }
+        public decimal ADPremium { get; set; }
+        public decimal GST { get; set; }
+        public decimal Total { get; set; }
+        public decimal MonthlyPremium { get; set; }
+        public decimal FinalAmount { get; set; }
+       
+        
+        public decimal FTTax { get; set; }
+        public decimal ADTax { get; set; }
+        public decimal TotalFTAmount { get; set; }
+        public decimal TotalADAmount { get; set; }
+
     }
 
+    public class CdTransactionsMasterDTO
+    {
+        public decimal ProductId { get; set; }
+        public string TxnType { get; set; }
+        public string Type { get; set; }
+        public string AccountNo { get; set; }
+        public string Frequency { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal TotalGSTAmount { get; set; }
+        public Dictionary<string, TxnParameterDTO> PremiumDetails { get; set; }
+
+
+    }
+    public class TxnParameterDTO
+    {
+
+        public decimal Amount { get; set; }
+        public decimal TaxAmount { get; set; }
+        public decimal Total { get; set; }
+
+    }
+
+    public class TaxTypeDTO
+    {
+        public string FSTTAX_TAXTYPE { get; set; }
+        public string TSTTAX_TAXTYPE { get; set; }
+    }
+
+
+    public class CDTaxTypeDTO
+    {
+        public string Type { get; set; }
+        public decimal TaxAmount { get; set; }
+    }
+
+    public class CDTaxAmountDTO
+    {
+        public CDTaxAmountDTO()
+        {
+            Tax = new List<CDTaxTypeDTO>();
+        }
+
+        public decimal TaxAmount { get; set; }
+        public List<CDTaxTypeDTO> Tax { get; set; }
+    }
+
+    public class CDPremiumDTO
+    {
+        public CDPremiumDTO()
+        {
+            TaxAmount = new CDTaxAmountDTO();
+        }
+
+        public string Type { get; set; }
+        public decimal TxnAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public CDTaxAmountDTO TaxAmount { get; set; }
+    }
+
+    public class MicaCDDTO
+    {
+        public MicaCDDTO()
+        {
+            PremiumDTO = new List<CDPremiumDTO>();
+        }
+
+        public string TxnType { get; set; }
+        public string Type { get; set; }
+        public string AccountNo { get; set; }
+        public decimal TxnAmount { get; set; }
+        public decimal TaxAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public List<CDPremiumDTO> PremiumDTO { get; set; }
+
+    }
+
+    public class ErrorDetailsData
+    {
+        public string ValidatorName { get; set; }
+        public string Outcome { get; set; }
+        public string Message { get; set; }
+        public string Code { get; set; }
+    }
 }
 
 

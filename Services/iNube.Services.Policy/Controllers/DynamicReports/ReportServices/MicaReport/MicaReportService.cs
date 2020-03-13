@@ -15,7 +15,6 @@ using iNube.Services.Policy.Entities.DynamicReportEntities;
 using System.Data.SqlClient;
 using System.Data;
 using System.Data.Common;
-using iNube.Services.Policy.Helpers;
 
 namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaReport
 {
@@ -36,7 +35,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
 
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> ddDTOs;
 
             ddDTOs = _context.TblRpmasters
@@ -53,7 +52,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
         {
             try
             {
-                _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+                _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
                 var dto = _mapper.Map<TblReportConfig>(reportConfigDTO);
                 _context.TblReportConfig.Add(dto);
@@ -69,7 +68,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
 
         public async Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> obj;
             obj = from pr in _context.TblReportConfig.OrderByDescending(p => p.CreatedDate)
                   select new ddDTO
@@ -84,7 +83,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
 
         public async Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext)
         {
-            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             // HandleEvent objEvent = new HandleEvent();
 
             var reportparamList = from tblreportConfig in _context.TblReportConfig
@@ -122,7 +121,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
 
         public async Task<string> GetQueryById (int ReportConfigId,ApiContext apiContext)
         {
-            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var queryData = _context.TblReportConfig.SingleOrDefault(x => x.ReportConfigId == ReportConfigId).Query;
             return queryData;

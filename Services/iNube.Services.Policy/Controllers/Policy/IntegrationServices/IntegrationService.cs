@@ -14,11 +14,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
     public interface IIntegrationService
     {
         Task<PremiumReturnDto> PremiumCalCulattion(PremiumRequestDTO dynamicData, ApiContext apiContext);
-        Task<PartnersDTO> GetPartnerDetailAsync(string partnerId,ApiContext apiContext);
+        Task<PartnersDTO> GetPartnerDetailAsync(string partnerId, ApiContext apiContext);
         Task<ProductDTO> GetProductDetailAsync(string productId, ApiContext apiContext);
-        Task<IEnumerable<ProductRcbdetailsDTO>> GetRiskPolicyDetailAsync(string productId,ApiContext apiContext);
+        Task<IEnumerable<ProductRcbdetailsDTO>> GetRiskPolicyDetailAsync(string productId, ApiContext apiContext);
         Task<CdTransactionsResponse> DoTransaction(PolicyBookingTransaction policyBookingTransaction, ApiContext apiContext);
-        Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext);
+        Task<ResponseStatus> SendNotificationAsync(Models.NotificationRequest notificationRequest, ApiContext apiContext);
         Task<CdTransactionsResponse> RefundTransaction(PolicyBookingTransaction policyBookingTransaction, ApiContext apiContext);
 
         Task<CdTransactionsDTO> GetcddataAsync(int Txnid, ApiContext apiContext);
@@ -35,14 +35,21 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(string productId, ApiContext apiContext);
         Task<ProductDTO> GetProductDetailByCodeAsync(string producCode, ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
-        Task<ResponseStatus> SendMultiCoverNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext);
+        Task<ResponseStatus> SendMultiCoverNotificationAsync(Models.NotificationRequest notificationRequest, ApiContext apiContext);
         Task<LeadInfoDTO> GetLeadInfo(int customerid, ApiContext apiContext);
         Task<CustomersDTO> GetCustomerById(decimal Customerid, ApiContext apiContext);
-        Task<Dictionary<string, string>> DoTransactionByPayment(decimal policyId,decimal money,string mobileNumber,ApiContext apiContext);
+        Task<Dictionary<string, string>> DoTransactionByPayment(decimal policyId, decimal money, string mobileNumber, ApiContext apiContext);
         Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(ApiContext apiContext);
         Task<MasterCDDTO> CreateMasterCD(MasterCDDTO masterCDDTO, ApiContext apiContext);
         Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string PolicNo, ApiContext apiContext);
         Task<object> CalCulateRatingPremium(DynamicData dynamicData, ApiContext apiContext);
+        Task<dynamic> GetMappingParams(string mappingname, ApiContext apiContext);
+        Task<MasterCDDTO> CreateMasterCDAccount(MicaCDDTO cdTransactionsMaster, ApiContext apiContext);
+        Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext);
+        Task<MicaCDDTO> CDMapper(dynamic PolicyRequest, string type, ApiContext apiContext);
+        Task<dynamic> RuleMapper(dynamic InputRequest, string type, ApiContext apiContext);
+        Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext);
+        //GetMappingParams(string mappingname, ApiContext apiContext)
     }
     public class IntegrationService : IIntegrationService
     {
@@ -70,21 +77,21 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         }
 
 
-  //      //Acccounting Module
-  //      //public async Task<IEnumerable<AccountMapDetailsDto>> GetAccountMapAsync(ApiContext apiContext)
-  //      //{
-  //      //    var uri = accountApiUrl;
-  //      //    var accountMapList = await GetListApiInvoke<AccountMapDetailsDto>(uri, apiContext);
-  //      //    return accountMapList;
-  //      //}
+        //      //Acccounting Module
+        //      //public async Task<IEnumerable<AccountMapDetailsDto>> GetAccountMapAsync(ApiContext apiContext)
+        //      //{
+        //      //    var uri = accountApiUrl;
+        //      //    var accountMapList = await GetListApiInvoke<AccountMapDetailsDto>(uri, apiContext);
+        //      //    return accountMapList;
+        //      //}
         public async Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext)
         {
-            var uri = AccountingUrl+"/api/AccountConfig/GetTransactionConditionDetails";
+            var uri = AccountingUrl + "/api/AccountConfig/GetTransactionConditionDetails";
             var accountMapListDetails = await GetListApiInvoke<TransactionRuleMappingDto>(uri, apiContext);
             return accountMapListDetails;
         }
         //Accounting CreateTransaction
-        public async Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction ,ApiContext apiContext)
+        public async Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext)
         {
             var uri = AccountingUrl + "/api/AccountConfig/CreateTransaction";
             return await PostApiInvoke<TransactionHeaderDto, TransactionsResponse>(uri, apiContext, transaction);
@@ -96,7 +103,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         {
 
-            var uri = ExtensionUrl+ "/api/Mica_EGI/CalCulatePremium";
+            var uri = ExtensionUrl + "/api/Mica_EGI/CalCulatePremium";
 
             return await PostApiInvoke<PremiumRequestDTO, PremiumReturnDto>(uri, apiContext, dynamicData);
 
@@ -106,7 +113,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         //Calculation Premium for Rating
         public async Task<object> CalCulateRatingPremium(DynamicData dynamicData, ApiContext apiContext)
         {
-            var uri = RatingUrl+ "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/37";
+            var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/37";
             return await PostApiInvoke<DynamicData, object>(uri, apiContext, dynamicData);
         }
 
@@ -124,13 +131,13 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
         }
 
-        public async Task<IEnumerable<CdTransactionsResponse>> ReverseCdAsync(PolicyCancelTransaction transaction,ApiContext apiContext)
+        public async Task<IEnumerable<CdTransactionsResponse>> ReverseCdAsync(PolicyCancelTransaction transaction, ApiContext apiContext)
 
         {
 
             var uri = PartnerUrl + "/api/Accounts/ReverseCDTransaction";
 
-            return await PostListApiInvoke<PolicyCancelTransaction, CdTransactionsResponse>(uri,apiContext, transaction);
+            return await PostListApiInvoke<PolicyCancelTransaction, CdTransactionsResponse>(uri, apiContext, transaction);
 
         }
 
@@ -147,7 +154,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         public async Task<IEnumerable<ddDTOs>> GetProductMasterAsync(ApiContext apiContext)
         {
-             var uri = ProductUrl + "/api/Product/GetMasterData?sMasterlist=Product&isFilter=false";
+            var uri = ProductUrl + "/api/Product/GetMasterData?sMasterlist=Product&isFilter=false";
             var productList = await GetListApiInvoke<ddDTOs>(uri, apiContext);
             return productList;
         }
@@ -155,36 +162,36 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         public async Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Partner/GetPartnerDetailsData";
-            var data=await GetListApiInvoke<PartnerDetailsDTO>(uri, apiContext);
+            var data = await GetListApiInvoke<PartnerDetailsDTO>(uri, apiContext);
             return data;
-            
+
         }
 
-        public async Task<IEnumerable<ProductDTO>> GetProductIdAsync(ProductSearchDTO productSearchDTO,ApiContext apiContext)
+        public async Task<IEnumerable<ProductDTO>> GetProductIdAsync(ProductSearchDTO productSearchDTO, ApiContext apiContext)
         {
             var uri = ProductUrl + "/api/Product/SearchProduct";
 
-            return await PostListApiInvoke<ProductSearchDTO, ProductDTO>(uri,apiContext, productSearchDTO);
+            return await PostListApiInvoke<ProductSearchDTO, ProductDTO>(uri, apiContext, productSearchDTO);
         }
 
 
         public async Task<PartnersDTO> GetPartnerDetailAsync(string partnerId, ApiContext apiContext)
         {
-            var uri = PartnerUrl + "/api/Partner/GetPartnerDetails?partnerId="+ partnerId;
-            return await GetApiInvoke<PartnersDTO>(uri,apiContext);
+            var uri = PartnerUrl + "/api/Partner/GetPartnerDetails?partnerId=" + partnerId;
+            return await GetApiInvoke<PartnersDTO>(uri, apiContext);
         }
 
         //for Customer
         public async Task<CustomersDTO> GetCustomerById(decimal Customerid, ApiContext apiContext)
         {
-            var uri = BillingUrl + "/api/Billing/GetCustomerById?Customerid="+ Customerid;
-           
+            var uri = BillingUrl + "/api/Billing/GetCustomerById?Customerid=" + Customerid;
+
             return await GetApiInvoke<CustomersDTO>(uri, apiContext);
         }
         public async Task<ProductDTO> GetProductDetailAsync(string productId, ApiContext apiContext)
         {
-            var uri = ProductUrl + "/api/Product/GetProductById?productId="+productId;
-            return await GetApiInvoke<ProductDTO>(uri,apiContext);
+            var uri = ProductUrl + "/api/Product/GetProductById?productId=" + productId;
+            return await GetApiInvoke<ProductDTO>(uri, apiContext);
         }
 
         public async Task<LeadInfoDTO> GetLeadInfo(int customerid, ApiContext apiContext)
@@ -193,15 +200,15 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await GetApiInvoke<LeadInfoDTO>(uri, apiContext);
         }
         public async Task<ProductDTO> GetProductDetailByCodeAsync(string productCode, ApiContext apiContext)
-            {
+        {
             var uri = ProductUrl + "/api/Product/GetProductByCode?productCode=" + productCode;
             return await GetApiInvoke<ProductDTO>(uri, apiContext);
         }
-        public async Task<IEnumerable<ProductRcbdetailsDTO>> GetRiskPolicyDetailAsync(string productId,ApiContext apiContext)
+        public async Task<IEnumerable<ProductRcbdetailsDTO>> GetRiskPolicyDetailAsync(string productId, ApiContext apiContext)
         {
-            var uri = ProductUrl + "/api/Product/GetProductRiskDetails?ProductId="+productId;
-            return await GetListApiInvoke<ProductRcbdetailsDTO>(uri,apiContext);
-           
+            var uri = ProductUrl + "/api/Product/GetProductRiskDetails?ProductId=" + productId;
+            return await GetListApiInvoke<ProductRcbdetailsDTO>(uri, apiContext);
+
         }
         public async Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(string productId, ApiContext apiContext)
         {
@@ -212,7 +219,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         public async Task<CdTransactionsDTO> GetcddataAsync(int Txnid, ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Accounts/GetCDTransactionById?txnId=" + Txnid;
-            return await GetApiInvoke<CdTransactionsDTO>(uri,apiContext);
+            return await GetApiInvoke<CdTransactionsDTO>(uri, apiContext);
         }
         public async Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string PolicNo, ApiContext apiContext)
         {
@@ -221,33 +228,33 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         }
 
 
-        public async Task<Dictionary<string,string>> DoTransactionByPayment(decimal policyId,decimal Amount, string mobileNumber, ApiContext apiContext)
+        public async Task<Dictionary<string, string>> DoTransactionByPayment(decimal policyId, decimal Amount, string mobileNumber, ApiContext apiContext)
         {
             var uri = BillingUrl + "/api/DMS/PaytmPayment?policyId=" + policyId + "&Amount=" + Amount + "&mobileNumber=" + mobileNumber;
-            return await GetApiInvoke<Dictionary<string,string>>(uri, apiContext);
+            return await GetApiInvoke<Dictionary<string, string>>(uri, apiContext);
         }
 
 
-        public async Task<CdTransactionsResponse> DoTransaction(PolicyBookingTransaction  policyBookingTransaction,ApiContext apiContext)
+        public async Task<CdTransactionsResponse> DoTransaction(PolicyBookingTransaction policyBookingTransaction, ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Accounts/GenerateCDTransaction";
-            return await PostApiInvoke<PolicyBookingTransaction, CdTransactionsResponse>(uri,apiContext, policyBookingTransaction);
+            return await PostApiInvoke<PolicyBookingTransaction, CdTransactionsResponse>(uri, apiContext, policyBookingTransaction);
         }
         public async Task<CdTransactionsResponse> RefundTransaction(PolicyBookingTransaction policyBookingTransaction, ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Accounts/ReverseCDTransaction";
-            return await PostApiInvoke<PolicyBookingTransaction, CdTransactionsResponse>(uri,apiContext,policyBookingTransaction);
+            return await PostApiInvoke<PolicyBookingTransaction, CdTransactionsResponse>(uri, apiContext, policyBookingTransaction);
         }
-        public async Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext)
+        public async Task<ResponseStatus> SendNotificationAsync(Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendMultiCoverNotificationAsync";
-            return await PostApiInvoke<NotificationRequest, ResponseStatus>(uri,apiContext, notificationRequest);
+            return await PostApiInvoke<Models.NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
         }
 
-        public async Task<ResponseStatus> SendMultiCoverNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext)
+        public async Task<ResponseStatus> SendMultiCoverNotificationAsync(Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendMultiCoverNotificationAsync";
-            return await PostApiInvoke<NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
+            return await PostApiInvoke<Models.NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
         }
         public async Task<ResponseStatus> GeneratePDF(string productId)
         {
@@ -255,7 +262,57 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             //return await GetApiInvoke<ProductDTO>(uri);
             return null;
         }
-        public async Task<TResponse> GetApiInvoke<TResponse>(string url,ApiContext apiContext) where TResponse : new()
+
+
+        //Getmappedparams
+
+        public async Task<dynamic> GetMappingParams(string mappingname, ApiContext apiContext)
+        {
+            var uri = ProductUrl + "/api/Product/GetMappingParams?mappingname=" + mappingname;
+            //api/Product/GetMappingParams?mappingname=
+
+            return await GetApiInvoke<dynamic>(uri, apiContext);
+        }
+        public async Task<MasterCDDTO> CreateMasterCDAccount(MicaCDDTO cdTransactionsMaster, ApiContext apiContext)
+        {
+
+            var uri = PartnerUrl + "/api/Accounts/MasterCDACC";
+
+            return await PostApiInvoke<MicaCDDTO, MasterCDDTO>(uri, apiContext, cdTransactionsMaster);
+
+        }
+        //Get State Code
+        public async Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext)
+        {
+            var uri = "http://elwei-publi-1sxquhk82c0h4-688030859.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/TaxTypeForStateCode?stateabbreviation=" + stateabbreviation;
+            return await GetApiInvoke<TaxTypeDTO>(uri, apiContext);
+        }
+
+        //Get CD Map 
+
+        public async Task<MicaCDDTO> CDMapper(dynamic PolicyRequest, string type, ApiContext apiContext)
+        {
+
+            var uri = ExtensionUrl + "/api/Mica_EGI/CDMapper?TxnType=" + type;
+
+            return await PostApiInvoke<dynamic, MicaCDDTO>(uri, apiContext, PolicyRequest);
+
+        }
+        public async Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)
+        {
+
+            var uri = PartnerUrl + "/api/Accounts/CDAccountCreation?accountnumber=" + accountnumber;
+
+            return await GetApiInvoke<MasterCDDTO>(uri, apiContext);
+
+        }
+        public async Task<dynamic> RuleMapper(dynamic InputRequest, string type, ApiContext apiContext)
+        {
+            var uri = ExtensionUrl + "/api/Mica_EGI/RuleMapper?TxnType=" + type;
+
+            return await PostListApiInvoke<dynamic, dynamic>(uri, apiContext, InputRequest);
+        }
+        public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();
             if (!string.IsNullOrEmpty(apiContext.Token))
@@ -276,29 +333,29 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             }
             return new TResponse();
         }
-        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url , ApiContext apiContext) where TResponse : new()
+        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             try
             {
 
-           
-            HttpClient client = new HttpClient();
+
+                HttpClient client = new HttpClient();
                 //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 //client.BaseAddress = new Uri(url);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-            using (var response = await client.GetAsync(url))
-            using (var content = response.Content)
-            {
-                if (response.IsSuccessStatusCode)
+                using (var response = await client.GetAsync(url))
+                using (var content = response.Content)
                 {
-                    var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
-                    if (serviceResponse != null)
+                    if (response.IsSuccessStatusCode)
                     {
-                        return serviceResponse;
+                        var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
+                        if (serviceResponse != null)
+                        {
+                            return serviceResponse;
+                        }
                     }
                 }
-            }
 
 
             }
@@ -310,12 +367,12 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return new List<TResponse>();
         }
 
-        private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri,ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
         {
             try
             {
                 HttpClient client = new HttpClient();
-               
+
 
                 HttpContent contentPost = null;
                 if (request != null)
@@ -330,7 +387,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
                 {
                     using (var content = response.Content)
                     {
-                            return await content.ReadAsAsync<TResponse>();
+                        return await content.ReadAsAsync<TResponse>();
                     }
                 }
             }
@@ -339,10 +396,10 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
                 return new TResponse();
             }
-           
+
         }
 
-        private async Task<IEnumerable<TResponse>> PostListApiInvoke<TRequest, TResponse>(string requestUri,ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        private async Task<IEnumerable<TResponse>> PostListApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
         {
             try
             {
@@ -372,7 +429,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         }
 
-       
+
 
     }
 }
