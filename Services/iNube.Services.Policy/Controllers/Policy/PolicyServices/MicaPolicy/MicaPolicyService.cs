@@ -3675,6 +3675,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext)
         {
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var proposalNo = (string)modifydata["ProposalNumber"];
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
