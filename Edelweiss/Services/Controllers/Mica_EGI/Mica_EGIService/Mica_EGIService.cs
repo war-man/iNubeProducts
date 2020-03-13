@@ -205,7 +205,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     tblschedule.Mon = mapData.Mon;
                     tblschedule.Tue = mapData.Tue;
-                    tblschedule.Fri = mapData.Wed;
+                    tblschedule.Wed = mapData.Wed;
                     tblschedule.Thu = mapData.Thu;
                     tblschedule.Fri = mapData.Fri;
                     tblschedule.Sat = mapData.Sat;
@@ -2910,14 +2910,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     RuleOneDTO ruleOneDTO = new RuleOneDTO();
                     ruleOneDTO.RuleName = "30016";//RuleId Give by Dinkar
                     ruleOneDTO.DriverAge = SourceObject["driverAge"];
-                    ruleOneDTO.NoofVehicles = SourceObject["noOfPC"];
-                    ruleOneDTO.NoofDrivers = SourceObject["additionalDriver"];
+                    ruleOneDTO.NoofVehicles = Convert.ToString(Convert.ToInt32(SourceObject["noOfPC"]) + Convert.ToInt32(SourceObject["noOfTW"]));
+                    ruleOneDTO.NoofDrivers =Convert.ToString(Convert.ToInt32(SourceObject["additionalDriver"]) + 1);
 
                     dynamic RuleEngine;
 
                     List<RuleEngineResponse> engineResponses;
-
-
                     try
                     {
                          RuleEngine = await _integrationService.RuleEngine(ruleOneDTO, apiContext);
