@@ -70,8 +70,8 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         //For Cusomer_Provisioning
         Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext);
 
-
-
+        Task<dynamic> GetBillingEntries(decimal customerId, String EventType, ApiContext apiContext);
+       
     }
     public class BillingService : IBillingService
     {
@@ -302,6 +302,9 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         {
             return await _productService(context.ProductType).GetObjectParameter(context);
         }
-
+        public async Task<dynamic> GetBillingEntries(decimal customerId, String EventType, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).GetBillingEntries(customerId, EventType, apiContext);
+        }
     }
 }

@@ -68,6 +68,8 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         //For CP
         Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext);
 
+        Task<dynamic> GetBillingEntries(decimal customerId, String EventType, ApiContext apiContext);
+
     }
 
 }

@@ -569,5 +569,13 @@ namespace iNube.Services.Billing.Controllers.Billing
             var response = new ResponseStatus() { Status = BusinessStatus.Ok , ResponseMessage="Working as expected"};
             return Ok(response);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBillingEntries(decimal customerId, String EventType)
+        {
+            var document = await _billingService.GetBillingEntries(customerId, EventType, Context);
+            return Ok(document);
+        }
+        
     }
 }

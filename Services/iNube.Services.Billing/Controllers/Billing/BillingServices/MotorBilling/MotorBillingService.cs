@@ -240,5 +240,9 @@ namespace iNube.Services.Billing.Controllers.Billing.MotorBillingService
         {
             throw new NotImplementedException();
         }
+        public async Task<dynamic> GetBillingEntries(decimal customerId, String EventType, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

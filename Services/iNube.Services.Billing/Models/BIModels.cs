@@ -1384,4 +1384,18 @@ namespace iNube.Services.Billing.Models
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+
+
+    public partial class BillingEntriesDto
+    {
+        public decimal BillingItemId { get; set; }
+        public int? Categoty { get; set; }
+        public int? ValueFactor { get; set; }
+        public int? RateCategory { get; set; }
+        public int? RateType { get; set; }
+        public decimal? Rate { get; set; }
+        public int? EventMappingId { get; set; }
+
+        public List<BillingItemDetailDTO> BillingItemDetails { get; set; }
+    }
 }

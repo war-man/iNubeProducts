@@ -566,7 +566,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             _tblCustomer.MailingAddressSameAs = "C";
             // EventRequest.Logo = ;
             //EventRequest.Levels = ;
-
+           
             //InvoiceConfigDTO invoice = new InvoiceConfigDTO();
             //invoice = Customerdto.Contract.TblInvoiceConfig;
 
@@ -2103,5 +2103,57 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             return result;
         }
 
+        public async Task<dynamic> GetBillingEntries(decimal customerId,String EventType, ApiContext apiContext)
+        {
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = (from tblcust in _context.TblCustomers.Where(r => r.CustomerId == customerId)
+                             join tblcontract in _context.TblContract on tblcust.CustomerId equals tblcontract.CustomerId
+                             join tblbilconfig in _context.TblBillingConfig on tblcontract.ContractId equals tblbilconfig.ContractId
+                             join tblbillitem in _context.TblBillingItem on tblbilconfig.BillingConfigId equals tblbillitem.BillingConfigId
+                           //  join tblbillitemdetails in _context.TblBillingItemDetail on tblbillitem.BillingItemId equals tblbillitemdetails.BillingItemId
+                             //where tblrules.RuleName == RuleName
+                             // where words.Contains(tblrate.RatingId.ToString())
+                             select new BillingEntriesDto
+                             {
+                                 BillingItemId = tblbillitem.BillingItemId,
+                                 Categoty = tblbillitem.CategoryTypeId,
+                                 ValueFactor = tblbillitem.ValueFactorId,
+                                 RateCategory = tblbillitem.RateCategoryId,
+                                 RateType = tblbillitem.RateTypeId,
+                                 Rate = tblbillitem.Rate,
+                                 EventMappingId = tblbillitem.EventMappingId,
+                                 
+                             }).ToList();
+
+
+            var eventid = _context.TblObjectEventMapping.Where(c => c.Description == EventType).Select(x => x.EventMappingId).Single();
+
+            var eventdata = data.Where(x => x.EventMappingId == Convert.ToInt32(eventid)).Select(x => x).Single();
+
+            List<BillingItemDetailDTO> ItemdetailsList = _context.TblBillingItemDetail.Where(x => x.BillingItemId == eventdata.BillingItemId)
+                .Select(c => new BillingItemDetailDTO
+                {
+                    From = c.From,
+                    To = c.To,
+                    Amount = c.Amount,
+                    RatePercent = c.RatePercent,
+                }).ToList();
+
+            eventdata.BillingItemDetails = ItemdetailsList;
+
+            return eventdata;
+        }
+
+
+        //public async Task<dynamic> PostBillingEntries(String EventType, BillingEntriesDto billingEntriesDto, ApiContext apiContext)
+        //{
+        //    _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+
+          
+
+        //    return null;
+        //}
     }
 }
