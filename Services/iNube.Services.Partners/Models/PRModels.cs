@@ -1154,6 +1154,7 @@ namespace iNube.Services.Partners.Models
         public List<MasterCdTransactionsDTO> CdTransactionsDTO { get; set; }
         public BusinessStatus Status { get; set; }
         public string ResponseMessage { get; set; }
+        public List<ErrorInfo> ErrorInfo { get; set; }
     }
     public class MasterCdTransactionsDTO
     {

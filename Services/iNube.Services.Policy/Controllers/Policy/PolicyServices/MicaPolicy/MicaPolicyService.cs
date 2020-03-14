@@ -3517,8 +3517,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         //Step9:Post CD Account entries 
 
                         BusinessStatus businessStatus = 0;
-                        if (productDetails.IsMasterPolicy == true)
-                        {
+                        //if (productDetails.IsMasterPolicy == true)
+                        //{
                             //Calling CD mapping API
 
 
@@ -3603,7 +3603,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                         }
-                    }
+                    //}
                     //step10:Push Proposal creation event to dispatcher
 
 
@@ -3743,6 +3743,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<PolicyResponse> IssuePolicy(dynamic IssuepolicyDTO, ApiContext apiContext)
         {
             //Step1:Validate of Request Object
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var res = await _integrationService.RuleMapper(IssuepolicyDTO, "Policy", apiContext);

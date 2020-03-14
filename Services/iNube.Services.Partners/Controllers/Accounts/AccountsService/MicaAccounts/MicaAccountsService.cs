@@ -1534,6 +1534,101 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             return new MasterCDDTO { Status = BusinessStatus.Created, ResponseMessage = $"Account updated Successfully for this AccountNumber{cdaccount.AccountNo}", AccountNo = cdaccount.AccountNo };
 
         }
+        private TblDailyCdtransaction DaliyTransaction(TxnParameterDTO data, string key, CdTransactionsMasterDTO masterCDDTO, string type)
+        {
+            TblDailyCdtransaction tblDailyCdtransaction = new TblDailyCdtransaction();
+            var DailyTanscation = _context.TblDailyCdtransaction.LastOrDefault(s => s.AccountNo == masterCDDTO.AccountNo && s.TxnEventType == key);
+            // var LastCDTanscation = _context.TblDailyCdtransaction.LastOrDefault(s => s.AccountNo == masterCDDTO.AccountNo);
+
+            //check Daily Tranx
+            if (DailyTanscation == null)
+            {
+
+                tblDailyCdtransaction = new TblDailyCdtransaction();
+
+                tblDailyCdtransaction.AccountNo = masterCDDTO.AccountNo;
+                tblDailyCdtransaction.TransactionDateTime = DateTime.Now;
+                tblDailyCdtransaction.TxnEventType = key;
+
+                tblDailyCdtransaction.AvailableBalance = data.Amount + data.TaxAmount;
+                tblDailyCdtransaction.LedgerBalance = data.Amount + data.TaxAmount;
+                tblDailyCdtransaction.AvailableBalance = data.Amount + data.TaxAmount;
+                tblDailyCdtransaction.Frequency = masterCDDTO.Frequency;
+                _context.TblDailyCdtransaction.Add(tblDailyCdtransaction);
+                //  _context.SaveChanges();
+
+            }
+            else if (DailyTanscation != null)
+            {
+                TblDailyCdtransaction DailyData = _context.TblDailyCdtransaction.LastOrDefault(s => s.AccountNo == masterCDDTO.AccountNo);
+                var date = DailyData.TransactionDateTime;
+                if (date.Value.Date == DateTime.Today)
+                {
+
+                    //foreach (var temp in DailyTanscation)
+                    //{
+
+                    if (DailyTanscation.TxnEventType == key)
+                    {
+                        if (type == "Credit")
+                        {
+
+                            DailyTanscation.TransactionDateTime = DateTime.Now;
+                            DailyTanscation.AvailableBalance = DailyTanscation.AvailableBalance + data.Total;
+                            DailyTanscation.LedgerBalance = DailyTanscation.LedgerBalance + data.Total;
+                        }
+                        else if (type == "Debit")
+                        {
+
+                            DailyTanscation.TransactionDateTime = DateTime.Now;
+                            DailyTanscation.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
+                            DailyTanscation.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
+                            //   DailyTanscation.LedgerBalance = DailyTanscation.LedgerBalance - (masterCDDTO.TotalAmount + masterCDDTO.TotalGSTAmount);
+                        }
+                        _context.TblDailyCdtransaction.Update(DailyTanscation);
+                    }
+                    else
+                    {
+                        //Add new Record for Daily tranx
+
+                        tblDailyCdtransaction = new TblDailyCdtransaction();
+
+                        tblDailyCdtransaction.AccountNo = masterCDDTO.AccountNo;
+                        tblDailyCdtransaction.TransactionDateTime = DateTime.Now;
+                        tblDailyCdtransaction.TxnEventType = key;
+                        tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
+                        tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
+                        // cdaccountDetails.TaxAmount = cdaccountDetails.TaxAmount + data.Amount;
+                        _context.TblDailyCdtransaction.Add(tblDailyCdtransaction);
+
+                    }
+                    // _context.SaveChanges();
+                    // }
+
+
+
+                }
+
+                else
+                {
+                    tblDailyCdtransaction = new TblDailyCdtransaction();
+
+                    tblDailyCdtransaction.AccountNo = masterCDDTO.AccountNo;
+                    tblDailyCdtransaction.TransactionDateTime = DateTime.Now;
+                    tblDailyCdtransaction.TxnEventType = key;
+                    tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
+                    tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
+
+                    // tblDailyCdtransaction.AvailableBalance = tblDailyCdtransaction.AvailableBalance + data.Amount;
+                    _context.TblDailyCdtransaction.Add(tblDailyCdtransaction);
+                    //  _context.SaveChanges();
+                }
+            }
+
+            return tblDailyCdtransaction;
+        }
+
+
 
         public async Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)
         {
