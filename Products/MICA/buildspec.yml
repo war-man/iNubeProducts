@@ -23,8 +23,5 @@ phases:
         - echo $CODEBUILD_SRC_DIR
         - aws s3 sync ./build/ s3://micapwa 
 artifacts:
-  commands :
-    - echo $CODEBUILD_SRC_DIR
-    - cd Products/MICA/ClientApp
   files:
-    -  build/
+    -  Products/MICA/ClientApp/build/*
