@@ -29,6 +29,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         //Rule Engine
         Task<dynamic> RuleEngine(dynamic dynamicData, ApiContext apiContext);
+        Task<dynamic> EndorsementCalculator(EndorsementCalDTO endorsementCal,ApiContext apiContext);
 
     }
     public class IntegrationService : IIntegrationService
@@ -85,6 +86,13 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         {
             var uri = PolicyUrl + "/api/Policy/GetPolicyDetailsByNumber?policyNumber=" + PolicyNo;
             return await GetApiInvoke<dynamic>(uri, apiContext);
+        }
+
+        public async Task<dynamic> EndorsementCalculator(EndorsementCalDTO endorsementCal, ApiContext apiContext)
+        {
+            var uri = "https://inubeservicesrating.azurewebsites.net/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/50";
+
+            return await PostApiInvoke<EndorsementCalDTO, dynamic>(uri, apiContext, endorsementCal);
         }
 
         //Calculation Premium for Rating

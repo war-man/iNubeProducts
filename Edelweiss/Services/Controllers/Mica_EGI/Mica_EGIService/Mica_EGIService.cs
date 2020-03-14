@@ -26,7 +26,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> PremiumBookingScheduler(DateTime? dateTime);
         Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff);
         ActivityResponse ActivityReport(string PolicyNo, string Month);
+
         Task<PremiumReturnDto> EndorsementPremium(EndorsementPremiumDTO endorsementPremium);
+
+        Task<dynamic> NewEndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string CallType);
 
         AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
         List<ddDTO> GetVehicleMaster(string lMasterlist);
@@ -2638,7 +2641,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         case "EndorementAdd":
 
                             List<MicaCDDTO> FinalDto = new List<MicaCDDTO>();
+                            EndorsementPremiumDTO endorsementDto = new EndorsementPremiumDTO();
 
+                            var CallNewEndo = NewEndorsementPremium(endorsementDto, SourceObject, "CDUpdate");
                             //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
                             //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
                             //FinalTaxTotal = FTPremium.TaxAmount.TaxAmount + ADPremium.TaxAmount.TaxAmount;
@@ -2956,6 +2961,683 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return new List<RuleEngineResponse>();
           
+        }
+
+
+        public async Task<dynamic> NewEndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string callType)
+        {
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            var CurrentDate = IndianTime.Date;
+
+
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+
+            PremiumReturnDto DifferentialPremium = new PremiumReturnDto();
+
+            if (String.IsNullOrEmpty(endorsementPremium.PolicyNo) && String.IsNullOrEmpty(endorsementPremium.SI))
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                DifferentialPremium.ResponseMessage = "Mandatory Fields missing";
+                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Policy Number or SumInsured is Missing";
+                errorInfo.ErrorCode = "GEN002";
+                errorInfo.PropertyName = "MandatoryFieldsMissing";
+                DifferentialPremium.Errors.Add(errorInfo);
+                return DifferentialPremium;
+
+            }
+            else if (endorsementPremium.PcCount < 0)
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                DifferentialPremium.ResponseMessage = "Private Car Count Cannot be negative";
+                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "PC Count Cannot be negative";
+                errorInfo.ErrorCode = "ExtEP001";
+                errorInfo.PropertyName = "PCCountVerify";
+                DifferentialPremium.Errors.Add(errorInfo);
+                return DifferentialPremium;
+
+            }
+            else if (endorsementPremium.TwCount < 0)
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                DifferentialPremium.ResponseMessage = "Two Wheeler Count Cannot be negative";
+                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Two Wheeler Count Cannot be negative";
+                errorInfo.ErrorCode = "ExtEP004";
+                errorInfo.PropertyName = "TWCountVerify";
+                DifferentialPremium.Errors.Add(errorInfo);
+                return DifferentialPremium;
+
+            }
+
+
+            if (endorsementPremium.TypeOfEndorsement == "Addition")
+            {
+                dynamic PolicyData = null;
+
+                if (PolicyObject == null)
+                {
+                    //Get the Policy Details by PolicyNumber
+                    //In response from Policy
+                    PolicyData = await _integrationService.GetPolicyDetails(endorsementPremium.PolicyNo, apiContext);
+                }
+                else
+                {
+                    PolicyData = PolicyObject;
+                }
+
+                PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
+
+                var BillingFrequency = "";
+                DateTime PolicyStartDate;
+                DateTime PolicyEndDate;
+                double RemainingDays = 0;
+
+                if (PolicyData != null)
+                {
+                    try
+                    {
+                        detailsDTO.SumInsured = PolicyData["si"];
+                        detailsDTO.NoOfPC = PolicyData["noOfPC"];
+                        detailsDTO.NoOfTW = PolicyData["noOfTW"];
+                        detailsDTO.PD_Age = PolicyData["driverAge"];
+                        detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
+                        detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
+                        detailsDTO.StateCode = PolicyData["stateCode"];
+                        BillingFrequency = PolicyData["billingFrequency"];
+                        PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
+                        PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
+                        RemainingDays = (PolicyEndDate - CurrentDate).TotalDays;
+
+                    }
+                    catch (Exception Ex)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        DifferentialPremium.ResponseMessage = "Policy Data Not Parsed";
+                        DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                        errorInfo.ErrorMessage = "Policy Data Not Parsed";
+                        errorInfo.ErrorCode = "ExtEP";
+                        errorInfo.PropertyName = "CheckPolicyObject";
+                        DifferentialPremium.Errors.Add(errorInfo);
+                        return DifferentialPremium;
+                    }
+                }
+
+                TaxTypeDTO taxType = new TaxTypeDTO();
+                taxType = TaxTypeForStateCode(detailsDTO.StateCode);
+
+                string NoADDays = "";
+                string NoFTDays = RemainingDays.ToString();
+
+                if (BillingFrequency == "Monthly")
+                {
+                    if (RemainingDays < 60)
+                    {
+                        NoADDays = NoFTDays;
+                    }
+                    else
+                    {
+                        NoADDays = "60";
+                    }
+                }
+                else if (BillingFrequency == "Yearly")
+                {
+                    NoADDays = NoFTDays;
+                }
+                EndoRateDTO endoRate = new EndoRateDTO
+                {
+                    FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE,
+                    TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE
+                };
+
+
+
+
+                //CalculatePremiumObject as of Endorsement
+                SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
+
+                //RuleObject
+                premiumDTO.dictionary_rule.SI = endorsementPremium.SI;
+                premiumDTO.dictionary_rule.NOOFPC = (detailsDTO.NoOfPC + endorsementPremium.PcCount).ToString();
+                premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW + endorsementPremium.TwCount).ToString();
+
+
+                int TotalPCCount = detailsDTO.NoOfPC + endorsementPremium.PcCount;
+                int TotalTWCount = detailsDTO.NoOfTW + endorsementPremium.TwCount;
+
+                if (TotalPCCount > 4 || TotalPCCount == 0)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Private Car Count Cannot be Zero or Greater than 3";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Private Car Count Cannot be Zero or Greater than 3";
+                    errorInfo.ErrorCode = "ExtEP005";
+                    errorInfo.PropertyName = "PCCountVerify";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+                else if (TotalTWCount > 4)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Two Wheeler Count Cannot be Greater than 3";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Two Wheeler Count Cannot be Greater than 3";
+                    errorInfo.ErrorCode = "ExtEP006";
+                    errorInfo.PropertyName = "TWCountVerify";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+
+
+                //RateObject
+
+                premiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
+                premiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
+                premiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
+                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = TotalPCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = TotalPCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = TotalTWCount.ToString();
+
+
+                premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+
+
+
+
+
+                //Call CalculatePremium for with Endorsment Data MICA
+                var NewPremiumData = await NewInternalCalculatePremium(premiumDTO, BillingFrequency);
+
+
+                if (NewPremiumData == null)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Calculate Premium Failed";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Calculate Premium Failed";
+                    errorInfo.ErrorCode = "ExtEP003";
+                    errorInfo.PropertyName = "PremiumFailed";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+
+
+
+                //CalculatePremiumObject for Getting Old Premium Rate
+                SchedulerPremiumDTO oldPremiumDTO = new SchedulerPremiumDTO();
+
+                //RuleObject
+                oldPremiumDTO.dictionary_rule.SI = detailsDTO.SumInsured.ToString();
+                oldPremiumDTO.dictionary_rule.NOOFPC = detailsDTO.NoOfPC.ToString();
+                oldPremiumDTO.dictionary_rule.NOOFTW = detailsDTO.NoOfTW.ToString();
+
+
+                //RateObject
+                oldPremiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
+                oldPremiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
+                oldPremiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
+                oldPremiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = detailsDTO.NoOfPC.ToString();
+                oldPremiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = detailsDTO.NoOfPC.ToString();
+                oldPremiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = detailsDTO.NoOfTW.ToString();
+
+
+                oldPremiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                oldPremiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+
+
+                //Call CalculatePremium for with Endorsment Data MICA
+                var OldPremiumData = await NewInternalCalculatePremium(oldPremiumDTO, BillingFrequency);
+
+
+
+                if (NewPremiumData.Total > 0 && OldPremiumData.Total > 0)
+                {
+
+                    var DifferentialFireTheft = NewPremiumData.FireTheft - OldPremiumData.FireTheft;
+                    var DifferentialADPremium = NewPremiumData.ADPremium - OldPremiumData.ADPremium;
+
+                    EndoRuleDTO endoRule = new EndoRuleDTO
+                    {
+                        AD = DifferentialADPremium.ToString(),
+                        FT = DifferentialFireTheft.ToString(),
+                        ADDAYS = NoADDays,
+                        FTDAYS = NoFTDays
+                    };
+
+                    EndorsementCalDTO endorsementCal = new EndorsementCalDTO();
+
+                    endorsementCal.dictionary_rule = endoRule;
+                    endorsementCal.dictionary_rate = endoRate;
+
+                    var CallEndorsmentCalculator = await EndorsementCalculator(endorsementCal);
+
+                    if (callType == "CDUpdate")
+                    {
+                        return CallEndorsmentCalculator;
+                    }
+                    else
+                    {
+                        if (CallEndorsmentCalculator.Count > 0)
+                        {
+                            DifferentialPremium.PerDayPremium = NewPremiumData.PerDayPremium - OldPremiumData.PerDayPremium;
+                            DifferentialPremium.FireTheft = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue);
+                            DifferentialPremium.ADPremium = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+
+                            var GSTTotal = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "TSTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FSTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
+
+                            DifferentialPremium.GST = GSTTotal;
+
+                            DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium - OldPremiumData.MonthlyPremium;
+                            DifferentialPremium.Total = DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + GSTTotal;
+                            DifferentialPremium.FinalAmount = Math.Round(DifferentialPremium.Total);
+                        }
+                        else
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            DifferentialPremium.ResponseMessage = "MICA Endorsement Calculation Failed";
+                            DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                            errorInfo.ErrorMessage = "Endorsement Calculation Failed";
+                            errorInfo.ErrorCode = "ExtEP";
+                            errorInfo.PropertyName = "CalculationFailed";
+                            DifferentialPremium.Errors.Add(errorInfo);
+                            return DifferentialPremium;
+                        }
+
+                    }
+
+                    DifferentialPremium.Status = BusinessStatus.Ok;
+                    return DifferentialPremium;
+                }
+            }
+            if (endorsementPremium.TypeOfEndorsement == "Deletion")
+            {
+
+                dynamic PolicyData = null;
+
+                if (PolicyObject == null)
+                {
+                    //Get the Policy Details by PolicyNumber
+                    //In response from Policy
+                    PolicyData = await _integrationService.GetPolicyDetails(endorsementPremium.PolicyNo, apiContext);
+                }
+                else
+                {
+                    PolicyData = PolicyObject;
+                }
+
+
+                PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
+
+                var BillingFrequency = "";
+                DateTime PolicyStartDate;
+                DateTime PolicyEndDate;
+                double RemainingDays = 0;
+
+
+                if (PolicyData != null)
+                {
+
+                    try
+                    {
+                        detailsDTO.SumInsured = PolicyData["si"];
+                        detailsDTO.NoOfPC = PolicyData["noOfPC"];
+                        detailsDTO.NoOfTW = PolicyData["noOfTW"];
+                        detailsDTO.PD_Age = PolicyData["driverAge"];
+                        detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
+                        detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
+                        detailsDTO.StateCode = PolicyData["stateCode"];
+                        BillingFrequency = PolicyData["billingFrequency"];
+                        PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
+                        PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
+                        RemainingDays = (PolicyEndDate - CurrentDate).TotalDays;
+
+                    }
+                    catch (Exception Ex)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        DifferentialPremium.ResponseMessage = "Policy Data Not Parsed";
+                        DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                        errorInfo.ErrorMessage = "Policy Data Not Parsed";
+                        errorInfo.ErrorCode = "ExtEP";
+                        errorInfo.PropertyName = "CheckPolicyObject";
+                        DifferentialPremium.Errors.Add(errorInfo);
+                        return DifferentialPremium;
+                    }
+                }
+
+
+                TaxTypeDTO taxType = new TaxTypeDTO();
+                taxType = TaxTypeForStateCode(detailsDTO.StateCode);
+
+                string NoADDays = "";
+                string NoFTDays = RemainingDays.ToString();
+
+                if (BillingFrequency == "Monthly")
+                {
+                    if (RemainingDays < 60)
+                    {
+                        NoADDays = NoFTDays;
+                    }
+                    else
+                    {
+                        NoADDays = "60";
+                    }
+                }
+                else if (BillingFrequency == "Yearly")
+                {
+                    NoADDays = NoFTDays;
+                }
+                EndoRateDTO endoRate = new EndoRateDTO
+                {
+                    FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE,
+                    TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE
+                };
+
+
+                //CalculatePremiumObject as of Endorsement
+                SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
+
+
+
+
+                //RuleObject
+                premiumDTO.dictionary_rule.SI = endorsementPremium.SI;
+                premiumDTO.dictionary_rule.NOOFPC = (detailsDTO.NoOfPC - endorsementPremium.PcCount).ToString();
+                premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW - endorsementPremium.TwCount).ToString();
+
+
+
+
+                int TotalPCCount = detailsDTO.NoOfPC - endorsementPremium.PcCount;
+                int TotalTWCount = detailsDTO.NoOfTW - endorsementPremium.TwCount;
+
+                if (TotalPCCount > 4 || TotalPCCount == 0)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Private Car Count Cannot be Zero or Greater than 3";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Private Car Count Cannot be Zero or Greater than 3";
+                    errorInfo.ErrorCode = "ExtEP005";
+                    errorInfo.PropertyName = "PCCountVerify";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+                else if (TotalTWCount > 4 || TotalTWCount < 0)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Two Wheeler Count Cannot  Negative or be Greater than 3";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Two Wheeler Count Cannot be Negative or Greater than 3";
+                    errorInfo.ErrorCode = "ExtEP006";
+                    errorInfo.PropertyName = "TWCountVerify";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+
+                //RateObject
+
+                premiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
+                premiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
+                premiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
+                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = TotalPCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = TotalPCCount.ToString();
+                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = TotalTWCount.ToString();
+
+
+                premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+
+                //Call CalculatePremium for with Endorsment Data MICA
+                var NewPremiumData = await NewInternalCalculatePremium(premiumDTO, BillingFrequency);
+
+
+                if (NewPremiumData == null)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    DifferentialPremium.ResponseMessage = "Calculate Premium Failed";
+                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Calculate Premium Failed";
+                    errorInfo.ErrorCode = "ExtEP003";
+                    errorInfo.PropertyName = "PremiumFailed";
+                    DifferentialPremium.Errors.Add(errorInfo);
+                    return DifferentialPremium;
+
+                }
+
+
+
+                //CalculatePremiumObject for Getting Old Premium Rate
+                SchedulerPremiumDTO oldPremiumDTO = new SchedulerPremiumDTO();
+
+                //RuleObject
+                oldPremiumDTO.dictionary_rule.SI = detailsDTO.SumInsured.ToString();
+                oldPremiumDTO.dictionary_rule.NOOFPC = detailsDTO.NoOfPC.ToString();
+                oldPremiumDTO.dictionary_rule.NOOFTW = detailsDTO.NoOfTW.ToString();
+
+
+                //RateObject
+                oldPremiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
+                oldPremiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
+                oldPremiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
+                oldPremiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = detailsDTO.NoOfPC.ToString();
+                oldPremiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = detailsDTO.NoOfPC.ToString();
+                oldPremiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = detailsDTO.NoOfTW.ToString();
+
+
+                oldPremiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                oldPremiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+
+
+                //Call CalculatePremium for with Endorsment Data MICA
+                var OldPremiumData = await NewInternalCalculatePremium(oldPremiumDTO, BillingFrequency);
+
+
+
+                if (NewPremiumData.Total > 0 && OldPremiumData.Total > 0)
+                {
+                    var DifferentialFireTheft = NewPremiumData.FireTheft - OldPremiumData.FireTheft;
+                    var DifferentialADPremium = NewPremiumData.ADPremium - OldPremiumData.ADPremium;
+
+                    EndoRuleDTO endoRule = new EndoRuleDTO
+                    {
+                        AD = DifferentialADPremium.ToString(),
+                        FT = DifferentialFireTheft.ToString(),
+                        ADDAYS = NoADDays,
+                        FTDAYS = NoFTDays
+                    };
+
+                    EndorsementCalDTO endorsementCal = new EndorsementCalDTO();
+
+                    endorsementCal.dictionary_rule = endoRule;
+                    endorsementCal.dictionary_rate = endoRate;
+
+                    var CallEndorsmentCalculator = await EndorsementCalculator(endorsementCal);
+
+                    if (callType == "CDUpdate")
+                    {
+                        return CallEndorsmentCalculator;
+                    }
+                    else
+                    {
+                        if (CallEndorsmentCalculator.Count > 0)
+                        {
+                            DifferentialPremium.PerDayPremium = NewPremiumData.PerDayPremium - OldPremiumData.PerDayPremium;
+                            DifferentialPremium.FireTheft = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue);
+                            DifferentialPremium.ADPremium = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+
+                            var GSTTotal = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "TSTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FSTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
+
+                            DifferentialPremium.GST = GSTTotal;
+
+                            DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium - OldPremiumData.MonthlyPremium;
+                            DifferentialPremium.Total = DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + GSTTotal;
+                            DifferentialPremium.FinalAmount = Math.Round(DifferentialPremium.Total);
+
+                        }
+                    }
+
+                    DifferentialPremium.Status = BusinessStatus.Ok;
+                    return DifferentialPremium;
+                }
+            }
+            else
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                DifferentialPremium.ResponseMessage = "Type of Endorsement Cannot be Different";
+                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Either Addition or Deletion";
+                errorInfo.ErrorCode = "ExtEP002";
+                errorInfo.PropertyName = "TypeOfEndorsement";
+                DifferentialPremium.Errors.Add(errorInfo);
+                return DifferentialPremium;
+            }
+
+            return DifferentialPremium;
+
+        }
+
+
+        private async Task<PremiumReturnDto> NewInternalCalculatePremium(SchedulerPremiumDTO premiumDTO, string BillingFrequency)
+        {
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+
+
+            PremiumReturnDto returnobj = new PremiumReturnDto();
+
+            //Call CalculatePremium Policy Module MICA
+            var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, apiContext);
+
+            List<CalculationResult> val = new List<CalculationResult>();
+            CDDTO CdModel = new CDDTO();
+
+            if (CalPremiumResponse != null)
+            {
+                val = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
+            }
+
+
+            if (val.Count() > 0)
+            {
+
+
+                var Ftperday = 0.00;
+                var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
+                var theft = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
+                Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(theft);
+
+                var Ft30days = Ftperday * 30;
+                var Ft60days = Ftperday * 60;
+
+                var Ft365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FT365").EValue);
+                var Ad60days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60DAYS").EValue);
+                var Ad365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365DAYS").EValue);
+                var ad60fttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60FTAXAMT").EValue);
+                var ad60ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60TTAXAMT").EValue);
+
+                var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
+                var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
+                var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
+                var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
+
+                var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
+                var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
+
+                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftfttax;
+                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftfttax;
+
+                returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
+                returnobj.FireTheft = Convert.ToDecimal(Ft365days);
+                if (BillingFrequency == "Monthly")
+                {
+                    returnobj.ADPremium = Convert.ToDecimal(Ad60days);
+                    returnobj.GST = Convert.ToDecimal(monthlyGST);
+                    returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
+                }
+                else if (BillingFrequency == "Yearly")
+                {
+                    returnobj.ADPremium = Convert.ToDecimal(Ad365days);
+                    returnobj.GST = Convert.ToDecimal(yearlyGST);
+                }
+                returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
+
+                returnobj.FinalAmount = Math.Round(returnobj.Total);
+                returnobj.Status = BusinessStatus.Ok;
+                return returnobj;
+
+                //returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
+                //returnobj.FireTheft = Convert.ToDecimal(Ft365days);
+                //returnobj.ADPremium = Convert.ToDecimal(Ad60days);
+                //returnobj.GST = Convert.ToDecimal(monthlyGST);
+                //returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
+                //returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
+                //returnobj.FinalAmount = Math.Round(returnobj.FireTheft + returnobj.ADPremium + returnobj.GST);
+
+            }
+
+            return returnobj;
+        }
+                  
+
+        private async Task<List<CalculationResult>> EndorsementCalculator(EndorsementCalDTO endorsementCal)
+        {
+
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI1Y2M0ZTFjZi04MzYxLTQwY2QtODVjMC1hMjE3YThiZGEwYTYiLCJFbWFpbCI6ImludWJlYWRtaW5AaW51YmVzb2x1dGlvbnMuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkludWJlIiwiVXNlck5hbWUiOiJpbnViZWFkbWluIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE1ODQxOTI1NTUsImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.jBOqHTNpkpF81FO8i0q-COqTUHrn57184bHFFTrnk3s";
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+
+            var CallEndrosmentRating = await _integrationService.EndorsementCalculator(endorsementCal,apiContext);
+
+            List<CalculationResult> RatingResponnse = new List<CalculationResult>();
+          
+            try
+            {
+                if (CallEndrosmentRating != null)
+                {
+                    RatingResponnse = JsonConvert.DeserializeObject<List<CalculationResult>>(CallEndrosmentRating.ToString());
+                }
+
+            }
+            catch(Exception Ex)
+            {
+                return new List<CalculationResult>();
+            }
+
+
+            return RatingResponnse;
         }
 
     }

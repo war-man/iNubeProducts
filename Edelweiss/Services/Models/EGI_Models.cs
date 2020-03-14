@@ -417,5 +417,32 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string Code { get; set; }
     }
 
+    public class EndorsementCalDTO
+    {
+        public EndorsementCalDTO()
+        {
+            dictionary_rule = new EndoRuleDTO();
+            dictionary_rate = new EndoRateDTO();
+        }
+
+        public EndoRuleDTO dictionary_rule { get; set; }
+        public EndoRateDTO dictionary_rate { get; set; }
+    }
+
+    public class EndoRuleDTO
+    {
+        public string AD { get; set; }
+        public string FT { get; set; }
+        public string ADDAYS { get; set; }        
+        public string FTDAYS { get; set; }
+    }
+
+    public class EndoRateDTO
+    {        
+        public string FSTTAX_TAXTYPE { get; set; }
+        public string TSTTAX_TAXTYPE { get; set; }
+    }
+
+
 }
 

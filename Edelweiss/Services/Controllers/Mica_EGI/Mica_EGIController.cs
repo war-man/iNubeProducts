@@ -49,13 +49,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var premiumValue = await _quotationService.WrapperCalculatePremium(premiumParameter);
             return ServiceResponse(premiumValue);
         }
- 
+
 
         [HttpGet]
         public IActionResult GetSchedule(string VehicleRegistrationNo, string PolicyNo)
         {
 
-            var response = _quotationService.GetSchedule(VehicleRegistrationNo,PolicyNo);
+            var response = _quotationService.GetSchedule(VehicleRegistrationNo, PolicyNo);
             return ServiceResponse(response);
 
         }
@@ -76,7 +76,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpPost]
-        public async Task <IActionResult> EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
+        public async Task<IActionResult> EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
         {
             var response = await _quotationService.EndorsementPremium(endorsementPremium);
             return ServiceResponse(response);
@@ -93,7 +93,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         [HttpGet]
         public async Task<IActionResult> NightScheduler(DateTime? dateTime)
         {
-          var response = await  _quotationService.NightScheduler(dateTime);
+            var response = await _quotationService.NightScheduler(dateTime);
 
             return Ok(response);
         }
@@ -117,7 +117,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         public IActionResult GetVehicleMaster(string lMasterlist, bool isFilter = true)
         {
             var objectval = _quotationService.GetVehicleMaster(lMasterlist);
-            
+
             return Ok(objectval);
         }
 
@@ -127,7 +127,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var response = _quotationService.BillingDetails(PolicyNo, Month);
             return ServiceResponse(response);
         }
-       
+
         [HttpGet]
         public IActionResult TaxTypeForStateCode(string stateabbreviation)
         {
@@ -138,17 +138,25 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         [HttpPost]
         public async Task<IActionResult> CDMapper(string TxnType, dynamic SourceObject)
         {
-            var response = await _quotationService.CDMapper(TxnType,SourceObject);
+            var response = await _quotationService.CDMapper(TxnType, SourceObject);
             return Ok(response);
 
         }
 
         [HttpPost]
-        public async Task<IActionResult> RuleMapper (string TxnType, dynamic SourceObject)
+        public async Task<IActionResult> RuleMapper(string TxnType, dynamic SourceObject)
         {
             var response = await _quotationService.RuleMapper(TxnType, SourceObject);
             return Ok(response);
 
         }
+
+        [HttpPost]
+        public async Task<IActionResult> NewEndorsementPremium(EndorsementPremiumDTO endorsementPremium)
+        {
+            var response = await _quotationService.NewEndorsementPremium(endorsementPremium, null, "EndorsementPremium");
+            return ServiceResponse(response);
+        }
+
     }
 }
