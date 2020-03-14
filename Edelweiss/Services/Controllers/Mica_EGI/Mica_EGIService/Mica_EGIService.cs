@@ -2536,14 +2536,109 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
             apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
 
+            List<CalculationResult> DeserilizedPremiumData = new List<CalculationResult>();
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
-            var BillingFrequency = SourceObject["billingFrequency"].ToString();
+            string PolicyNumber = "";
+            var SumInsured = "";
+            int NoOfPC = 0;
+            int NoOfTW = 0;
+            string BillingFrequency = "";
+
+            //List<EndoAddDTO> Deserilize = JsonConvert.DeserializeObject<List<EndoAddDTO>>(SourceObject.ToSting());
+
+            if (TxnType == "EndorementAdd")
+            {   
+                //Ashish Sir
+                //var modelSerialize = JsonConvert.DeserializeObject<dynamic>(SourceObject);
+                // var DriverRiskItem = PolicyItem["Data"]["InsurableItem"][0]["RiskItems"];
+                var EndorsmentItem = SourceObject[1];
+                var VehicleRiskItem = EndorsmentItem["Data"]["InsurableItem"][0]["RiskItems"];
+
+                //dynamic EndoData = PolicyItem.FirstOrDefault(x=>x.Type == "Endorsement").Data;
+                //dynamic InsureItem = EndoData["InsurableItem"];
+                //dynamic RiskItems = null;                
+
+                //foreach (var item in InsureItem)
+                //{
+                //    if(item["InsurableName"] == "Vehicle")
+                //    {
+                //        RiskItems = item["RiskItems"];
+                //    }
+                //}
+
+                if(VehicleRiskItem != null)
+                {
+                    foreach(var item in VehicleRiskItem)
+                    {
+                        if (item["Vehicle Type"]=="PC")
+                        {
+                            NoOfPC += 1;
+                        }
+                        else if (item["Vehicle Type"] == "TW")
+                        {
+                            NoOfTW += 1;
+                        }
+                    }
+                }
+
+                var PolicyObject = SourceObject[0];
+                var PolicyData = PolicyObject["Data"];
+                SumInsured = PolicyData["si"];
+                PolicyNumber = EndorsmentItem["Data"]["PolicyNumber"];
+                BillingFrequency = PolicyData["billingFrequency"].ToString();
+                //var CheckSI = SourceObject["si"].ToString();
+                //if (CheckSI == null)
+                //    SumInsured = SourceObject["Policy:si"];
+
+                List<MicaCDDTO> FinalDto = new List<MicaCDDTO>();
+                EndorsementPremiumDTO endorsementDto = new EndorsementPremiumDTO();
+
+                endorsementDto.PolicyNo = PolicyNumber;
+                endorsementDto.SI = SumInsured.ToString();
+                endorsementDto.PcCount = NoOfPC;
+                endorsementDto.TwCount = NoOfTW;
+                endorsementDto.TypeOfEndorsement = "Addition";
+                endorsementDto.EndorsementEffectiveDate = IndianTime;
+
+                var CallNewEndo = await NewEndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
+
+
+                try
+                {
+                    //  DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CallNewEndo);
+
+                    DeserilizedPremiumData = CallNewEndo;
+                }
+                catch (Exception Ex)
+                {
+                    throw Ex;
+                }
+                if (DeserilizedPremiumData.Count > 0)
+                {
+                    var CallEndoMap = EndoADFT(DeserilizedPremiumData);
+                    return CallEndoMap;
+                }
+
+                return FinalDto;
+
+            }
+            else
+            {              
+                SumInsured = SourceObject["si"];
+                BillingFrequency = SourceObject["billingFrequency"].ToString();
+
+            }
+
+
+
+          
 
             //CalculatePremiumObject
             SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
 
             //RuleObject
-            premiumDTO.dictionary_rule.SI = SourceObject["si"]; //Verify
+            premiumDTO.dictionary_rule.SI = SumInsured.ToString();//Verify
             premiumDTO.dictionary_rule.NOOFPC = SourceObject["noOfPC"];
             premiumDTO.dictionary_rule.NOOFTW = SourceObject["noOfTW"];
 
@@ -2567,7 +2662,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             //Call CalculatePremium Policy Module MICA
             var CalPremiumResponse = await _integrationService.RatingPremium(premiumDTO, apiContext);
 
-            List<CalculationResult> DeserilizedPremiumData = new List<CalculationResult>();
+         
 
             MicaCDDTO CdModel = new MicaCDDTO();
             CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
@@ -2643,33 +2738,31 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             List<MicaCDDTO> FinalDto = new List<MicaCDDTO>();
                             EndorsementPremiumDTO endorsementDto = new EndorsementPremiumDTO();
 
-                            var CallNewEndo = NewEndorsementPremium(endorsementDto, SourceObject, "CDUpdate");
-                            //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
-                            //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
-                            //FinalTaxTotal = FTPremium.TaxAmount.TaxAmount + ADPremium.TaxAmount.TaxAmount;
+                            endorsementDto.PolicyNo = PolicyNumber;
+                            endorsementDto.SI = SumInsured.ToString();
+                            endorsementDto.PcCount = NoOfPC;
+                            endorsementDto.TwCount = NoOfTW;
+                            endorsementDto.TypeOfEndorsement = "Addition";
+                            endorsementDto.EndorsementEffectiveDate = IndianTime;
 
-                            ////AD & FT Credit Object
-                            //CdModel.PremiumDTO.Add(ADPremium);
-                            //CdModel.PremiumDTO.Add(FTPremium);
-                            //CdModel.AccountNo = "";
-                            //CdModel.Type = "EndorementAdd";
-                            //CdModel.TxnType = "Credit";
-                            //CdModel.TxnAmount = Ad60days + Ft365days;
-                            //CdModel.TaxAmount = FinalTaxTotal;
-                            //CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
-                            //FinalDto.Add(CdModel);
+                            var CallNewEndo = await NewEndorsementPremium(endorsementDto, SourceObject, "CDUpdate");
 
-                            ////FT-DebitObject
-                            //CdModel = new MicaCDDTO();
-                            //CdModel.PremiumDTO.Add(FTPremium);
-                            //CdModel.AccountNo = "";
-                            //CdModel.Type = "EndorementAdd";
-                            //CdModel.TxnType = "Debit";
-                            //CdModel.TxnAmount = Ad60days + Ft365days;
-                            //CdModel.TaxAmount = FinalTaxTotal;
-                            //CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
-                            //FinalDto.Add(CdModel);
+                           
+                                try
+                                {
+                                    DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CallNewEndo.ToString());
 
+                                }
+                                catch (Exception Ex)
+                                {
+                                    throw Ex;
+                                }
+                            if (DeserilizedPremiumData.Count > 0)
+                            {
+                                var CallEndoMap = EndoADFT(DeserilizedPremiumData);
+                                return CallEndoMap;
+                            }
+                            
                             return FinalDto;
 
                         case "EndorementDel":
@@ -2894,6 +2987,110 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             FTYearlyObj.TotalAmount = Ft365days + TotalTax;
             FTYearlyObj.TaxAmount = taxAmountDTO;
             return FTYearlyObj;
+        }
+
+        private List<MicaCDDTO> EndoADFT(List<CalculationResult> EndoRatingObject)
+        {
+            List<MicaCDDTO> FinalDto = new List<MicaCDDTO>();
+            MicaCDDTO CdModel = new MicaCDDTO();
+            CDPremiumDTO ADPremiumDTO = new CDPremiumDTO();
+            CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
+            CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
+            
+            decimal TotalTax = 0;
+            //AD TAX
+            //From State 
+            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x=>x.Entity== "FSTTAX_TAXTYPE").EValue;
+            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+            TotalTax = taxTypeDTO.TaxAmount;
+
+            //ARRAY
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            taxTypeDTO = new CDTaxTypeDTO();
+
+            //TO State
+            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+            TotalTax += taxTypeDTO.TaxAmount;
+
+
+            taxAmountDTO.TaxAmount = TotalTax;
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+            //AD
+            ADPremiumDTO.Type = "AD";
+            ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+            ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+            ADPremiumDTO.TaxAmount = taxAmountDTO;
+
+
+            //FT Objects
+            taxTypeDTO = new CDTaxTypeDTO();
+            TotalTax = 0;
+            CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
+            taxAmountDTO = new CDTaxAmountDTO();
+            //FT TAX
+            //From State 
+            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+            TotalTax = taxTypeDTO.TaxAmount;
+
+            //ARRAY
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            taxTypeDTO = new CDTaxTypeDTO();
+
+            //TO State
+            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+            TotalTax += taxTypeDTO.TaxAmount;
+
+
+            taxAmountDTO.TaxAmount = TotalTax;
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+            //FT
+            FTPremiumDTO.Type = "FT";
+            FTPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+            FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
+            FTPremiumDTO.TaxAmount = taxAmountDTO;
+
+            
+            //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
+            //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+             var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
+
+            ////AD & FT Credit Object
+            CdModel.PremiumDTO.Add(ADPremiumDTO);
+            CdModel.PremiumDTO.Add(FTPremiumDTO);
+            CdModel.AccountNo = "";
+            CdModel.Type = "EndorementAdd";
+            CdModel.TxnType = "Credit";
+            CdModel.TxnAmount = ADPremiumDTO.TotalAmount + FTPremiumDTO.TotalAmount;
+            CdModel.TaxAmount = FinalTaxTotal;
+            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+            FinalDto.Add(CdModel);
+
+            //FT-DebitObject
+            CdModel = new MicaCDDTO();
+            CdModel.PremiumDTO.Add(FTPremiumDTO);
+            CdModel.AccountNo = "";
+            CdModel.Type = "EndorementAdd";
+            CdModel.TxnType = "Debit";
+            CdModel.TxnAmount = FTPremiumDTO.TotalAmount;
+            CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount;
+            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+            FinalDto.Add(CdModel);
+
+            return FinalDto;
+
         }
 
         public async Task<List<RuleEngineResponse>> RuleMapper(string TxnType,dynamic SourceObject)
@@ -3615,7 +3812,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             ApiContext apiContext = new ApiContext();
             apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
             apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI1Y2M0ZTFjZi04MzYxLTQwY2QtODVjMC1hMjE3YThiZGEwYTYiLCJFbWFpbCI6ImludWJlYWRtaW5AaW51YmVzb2x1dGlvbnMuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkludWJlIiwiVXNlck5hbWUiOiJpbnViZWFkbWluIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE1ODQxOTI1NTUsImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.jBOqHTNpkpF81FO8i0q-COqTUHrn57184bHFFTrnk3s";
+            apiContext.Token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI1Y2M0ZTFjZi04MzYxLTQwY2QtODVjMC1hMjE3YThiZGEwYTYiLCJFbWFpbCI6ImludWJlYWRtaW5AaW51YmVzb2x1dGlvbnMuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkludWJlIiwiVXNlck5hbWUiOiJpbnViZWFkbWluIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE1ODQyMjQ0MzEsImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.AvWnOhoXTmvXos_O4rwL5uniSgWUK584b2HySOz7Dak";
             apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
             apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
 
