@@ -1153,7 +1153,7 @@ namespace iNube.Services.Partners.Models
         public string AccountNo { get; set; }
         public List<MasterCdTransactionsDTO> CdTransactionsDTO { get; set; }
         public BusinessStatus Status { get; set; }
-              
+        public string ResponseMessage { get; set; }
     }
     public class MasterCdTransactionsDTO
     {
@@ -1169,7 +1169,81 @@ namespace iNube.Services.Partners.Models
         public DateTime? PolicyEndDate { get; set; }
         public decimal? AgentId { get; set; }
     }
-  
+    public class CdTransactionsMasterDTO
+    {
+        //public CdTransactionsMasterDTO()
+        //{
+        //    PremiumDetails = new List<TxnParameter>();
+
+        //}
+        public decimal ProductId { get; set; }
+        public string TxnType { get; set; }
+        public string CDType { get; set; }
+        public string AccountNo { get; set; }
+        public string Frequency { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal TotalGSTAmount { get; set; }
+        public string PaymentReferenceNo { get; set; }
+        //public List<TxnParameter> RatingConfig { get; set; }
+        //public Dictionary<string, decimal> PremiumDetails { get; set; }
+        public Dictionary<string, TxnParameterDTO> PremiumDetails { get; set; }
+
+
+    }
+    public class TxnParameterDTO
+    {
+        public string Type { get; set; }
+        public decimal Amount { get; set; }
+        public decimal TaxAmount { get; set; }
+        public decimal Total { get; set; }
+
+    }
+    public class CDTaxTypeDTO
+    {
+        public string Type { get; set; }
+        public decimal TaxAmount { get; set; }
+    }
+
+    public class CDTaxAmountDTO
+    {
+        public CDTaxAmountDTO()
+        {
+            Tax = new List<CDTaxTypeDTO>();
+        }
+
+        public decimal TaxAmount { get; set; }
+        public List<CDTaxTypeDTO> Tax { get; set; }
+    }
+
+    public class CDPremiumDTO
+    {
+        public CDPremiumDTO()
+        {
+            TaxAmount = new CDTaxAmountDTO();
+        }
+
+        public string Type { get; set; }
+        public decimal TxnAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public CDTaxAmountDTO TaxAmount { get; set; }
+    }
+
+    public class MicaCDDTO
+    {
+        public MicaCDDTO()
+        {
+            PremiumDTO = new List<CDPremiumDTO>();
+        }
+
+        public string TxnType { get; set; }
+        public string Type { get; set; }
+        public string AccountNo { get; set; }
+        public decimal TxnAmount { get; set; }
+        public decimal TaxAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public List<CDPremiumDTO> PremiumDTO { get; set; }
+
+    }
 
 }
 

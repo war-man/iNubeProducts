@@ -16,8 +16,12 @@ namespace iNube.Services.Partners.Entities
         }
 
         public virtual DbSet<TblAssignProduct> TblAssignProduct { get; set; }
+        public virtual DbSet<TblCdaccountDetails> TblCdaccountDetails { get; set; }
         public virtual DbSet<TblCdaccounts> TblCdaccounts { get; set; }
+        public virtual DbSet<TblCdtransaction> TblCdtransaction { get; set; }
+        public virtual DbSet<TblCdtransactionDetails> TblCdtransactionDetails { get; set; }
         public virtual DbSet<TblCdtransactions> TblCdtransactions { get; set; }
+        public virtual DbSet<TblDailyCdtransaction> TblDailyCdtransaction { get; set; }
         public virtual DbSet<TblMasCity> TblMasCity { get; set; }
         public virtual DbSet<TblMasCountry> TblMasCountry { get; set; }
         public virtual DbSet<TblMasDistrict> TblMasDistrict { get; set; }
@@ -39,13 +43,13 @@ namespace iNube.Services.Partners.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblAssignProduct>(entity =>
             {
@@ -80,6 +84,44 @@ namespace iNube.Services.Partners.Entities
                 entity.Property(e => e.PatnerId).HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.ProductId).HasColumnType("numeric(18, 0)");
+            });
+
+            modelBuilder.Entity<TblCdaccountDetails>(entity =>
+            {
+                entity.HasKey(e => e.TxnId);
+
+                entity.ToTable("tblCDAccountDetails", "PR");
+
+                entity.Property(e => e.TxnId)
+                    .HasColumnName("TxnID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AccountNo)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LedgerBalance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TaxAmountBalance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TotalAvailableBalance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TxnAmountBalance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TxnDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.TxnEventType)
+                    .HasMaxLength(18)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.AccountNoNavigation)
+                    .WithMany(p => p.TblCdaccountDetails)
+                    .HasPrincipalKey(p => p.AccountNo)
+                    .HasForeignKey(d => d.AccountNo)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tblCDAccountDetails_tblCDAccounts");
             });
 
             modelBuilder.Entity<TblCdaccounts>(entity =>
@@ -131,6 +173,86 @@ namespace iNube.Services.Partners.Entities
                 entity.Property(e => e.Remark).IsUnicode(false);
 
                 entity.Property(e => e.ThresholdValue).HasColumnType("numeric(4, 2)");
+            });
+
+            modelBuilder.Entity<TblCdtransaction>(entity =>
+            {
+                entity.HasKey(e => e.TxnId);
+
+                entity.ToTable("tblCDTransaction", "PR");
+
+                entity.Property(e => e.TxnId)
+                    .HasColumnName("TxnID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AccountNo)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Description).IsUnicode(false);
+
+                entity.Property(e => e.FinalBalance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.InitialBalance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TaxAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TotalAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TxnAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TxnDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.TxnType)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.AccountNoNavigation)
+                    .WithMany(p => p.TblCdtransaction)
+                    .HasPrincipalKey(p => p.AccountNo)
+                    .HasForeignKey(d => d.AccountNo)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tblCDTransaction_tblCDAccounts");
+            });
+
+            modelBuilder.Entity<TblCdtransactionDetails>(entity =>
+            {
+                entity.HasKey(e => e.TxnId);
+
+                entity.ToTable("tblCDTransactionDetails", "PR");
+
+                entity.Property(e => e.TxnId)
+                    .HasColumnName("TxnID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CdtransactionId)
+                    .HasColumnName("CDTransactionID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Description).IsUnicode(false);
+
+                entity.Property(e => e.References).IsUnicode(false);
+
+                entity.Property(e => e.TaxAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TotalAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TransactionDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.TxnAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TxnIssuedFor)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Cdtransaction)
+                    .WithMany(p => p.TblCdtransactionDetails)
+                    .HasForeignKey(d => d.CdtransactionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tblCDTransactionDetails_tblCDTransaction");
             });
 
             modelBuilder.Entity<TblCdtransactions>(entity =>
@@ -187,6 +309,46 @@ namespace iNube.Services.Partners.Entities
                     .HasForeignKey(d => d.AccountNo)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tblCDTransactions_tblCDAccounts");
+            });
+
+            modelBuilder.Entity<TblDailyCdtransaction>(entity =>
+            {
+                entity.HasKey(e => e.TxnId);
+
+                entity.ToTable("tblDailyCDTransaction", "PR");
+
+                entity.Property(e => e.TxnId)
+                    .HasColumnName("TxnID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AccountNo)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AvailableBalance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.Frequency)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LedgerBalance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.References).IsUnicode(false);
+
+                entity.Property(e => e.TransactionDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.TxnEventType)
+                    .HasMaxLength(18)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.AccountNoNavigation)
+                    .WithMany(p => p.TblDailyCdtransaction)
+                    .HasPrincipalKey(p => p.AccountNo)
+                    .HasForeignKey(d => d.AccountNo)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tblDailyCDTransaction_tblCDAccounts");
             });
 
             modelBuilder.Entity<TblMasCity>(entity =>

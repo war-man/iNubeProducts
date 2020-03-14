@@ -227,7 +227,23 @@ namespace iNube.Services.Partners.Controllers.Accounts
             return Ok(response);
 
         }
+        [HttpPost]
+        public async Task<IActionResult> MasterCDACC(MicaCDDTO CDDTO)
+        {
+            //MicaCDDTO
+            var response = (await _accountService.MasterCDACC(CDDTO, Context));
+            return Ok(response);
 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CDAccountCreation(string accountnumber)
+        {
+            //MicaCDDTO
+            var response = (await _accountService.CDAccountCreation(accountnumber, Context));
+            return Ok(response);
+
+        }
 
     }
 }

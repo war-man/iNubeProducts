@@ -1127,6 +1127,8 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         private async Task<MasterCDDTO> MasterCD(MasterCDDTO masterCDDTO, ApiContext apiContext)
         {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var cdAccountsDTO = masterCDDTO;
 
             var cdTransactionDTO = masterCDDTO.CdTransactionsDTO;
@@ -1209,6 +1211,370 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
             return response;
         }
-                     
+
+        public async Task<MasterCDDTO> MasterCDACC(MicaCDDTO micaCDDTO, ApiContext apiContext)
+        {
+
+            //Map With Object CD
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+
+
+            CdTransactionsMasterDTO cdTransactionsmasterDTO = new CdTransactionsMasterDTO();
+            cdTransactionsmasterDTO.CDType = micaCDDTO.Type;
+            cdTransactionsmasterDTO.AccountNo = micaCDDTO.AccountNo;
+            cdTransactionsmasterDTO.TotalAmount = micaCDDTO.TotalAmount;
+
+
+            Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
+
+            TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
+
+            foreach (var item in micaCDDTO.PremiumDTO)
+            {
+                txnParameterDTO = new TxnParameterDTO();
+
+                txnParameterDTO.Amount = item.TxnAmount;
+                txnParameterDTO.TaxAmount = item.TaxAmount.TaxAmount;
+                txnParameterDTO.Total = item.TotalAmount;
+                RatingConfig.Add(item.Type, txnParameterDTO);
+            }
+
+            cdTransactionsmasterDTO.TxnType = micaCDDTO.TxnType;
+            cdTransactionsmasterDTO.TotalAmount = micaCDDTO.TxnAmount;
+            cdTransactionsmasterDTO.TotalGSTAmount = micaCDDTO.TaxAmount;
+            cdTransactionsmasterDTO.PremiumDetails = RatingConfig;
+
+
+
+
+            var Response = await CDCommonTransaction(cdTransactionsmasterDTO, apiContext);
+            return Response;
+
+
+        }
+
+        /*common*/
+
+        private async Task<MasterCDDTO> CDCommonTransaction(CdTransactionsMasterDTO CdTransactionsDTO, ApiContext apiContext)
+        {
+
+
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var Errors = new List<ErrorInfo>();
+
+            //Step-1:Create CD:
+
+            var cdaccount = _context.TblCdaccounts.FirstOrDefault(p => p.AccountNo == CdTransactionsDTO.AccountNo);
+            //if (cdaccount != null)
+            //{
+            //    /* CD Account Table*/
+
+
+            //    cdaccount.AccountNo = CdTransactionsDTO.AccountNo;
+            //    cdaccount.OrganizationId = apiContext.OrgId;
+            //    cdaccount.InitialAmount = 0;
+
+            //    cdaccount.AvailableBalance = cdaccount.InitialAmount + (CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount);
+            //    cdaccount.LedgerBalance = cdaccount.InitialAmount + (CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount);
+            //    cdaccount.CreatedBy = apiContext.UserId;
+            //    cdaccount.CreatedDate = DateTime.Now;
+            //    cdaccount.ThresholdValue = 0;
+            //    cdaccount.DropLimit = 0;
+            //    cdaccount.Remark = $"Intial Setup  { CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount}";
+            //    cdaccount.Active = true;
+
+            // //   _context.TblCdaccounts.Add(cdaccount);
+            //}
+
+            // var availableAmount = cdaccount.AvailableBalance != null ? cdaccount.AvailableBalance : 0;
+            try
+            {
+                //foreach (var item in masterCDDTO.CdTransactionsDTO)
+                //{
+                if (CdTransactionsDTO.TxnType == "Credit")
+                {
+
+                    cdaccount.AvailableBalance = cdaccount.InitialAmount + (CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount);
+                    cdaccount.LedgerBalance = cdaccount.InitialAmount + (CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount);
+
+
+
+                    TblCdtransaction tblCdtransaction = new TblCdtransaction();
+                    tblCdtransaction.AccountNo = cdaccount.AccountNo;
+                    tblCdtransaction.TxnDateTime = DateTime.Now;
+                    tblCdtransaction.TxnType = CdTransactionsDTO.TxnType;
+
+                    tblCdtransaction.InitialBalance = 0;
+                    //  tblCdtransaction.TxnAmount = CdTransactionsDTO.TotalAmount - CdTransactionsDTO.TotalGSTAmount;
+                    tblCdtransaction.TotalAmount = CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount;
+                    tblCdtransaction.FinalBalance = CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount;
+                    tblCdtransaction.Description = $"CD Replenish- {CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount}";
+                    tblCdtransaction.TaxAmount = CdTransactionsDTO.TotalGSTAmount;
+                    tblCdtransaction.TxnAmount = CdTransactionsDTO.TotalAmount;
+
+                    //if (cdAccount.InitialAmount == 0)
+                    //{
+                    //    tblCdtransaction.InitialBalance = CdTransactionsDTO.Amount;
+                    //    tblCdtransaction.Description = "Initial Amount-" + cdAccount.InitialAmount;
+                    //}
+
+                    //  await CDAccountTxnTable(CdTransactionsDTO, tblCdtransaction, apiContext);
+
+
+                    //  _context.SaveChanges();
+
+                    List<TblCdtransactionDetails> tblCdtransactionDetails = new List<TblCdtransactionDetails>();
+                    TblCdtransactionDetails cdtransactionDetails = new TblCdtransactionDetails();
+
+                    List<TblCdaccountDetails> tblCdaccountDetails = new List<TblCdaccountDetails>();
+                    TblCdaccountDetails cdAccountDetails = new TblCdaccountDetails();
+
+
+                    foreach (var data in CdTransactionsDTO.PremiumDetails)
+                    {
+                        //CD Transaction Details Table
+                        cdtransactionDetails = new TblCdtransactionDetails();
+                        cdtransactionDetails.TransactionDateTime = DateTime.Now;
+                        cdtransactionDetails.TxnAmount = data.Value.Amount;
+                        cdtransactionDetails.TaxAmount = data.Value.TaxAmount;
+                        cdtransactionDetails.TotalAmount = data.Value.Amount + data.Value.TaxAmount;
+                        cdtransactionDetails.TxnIssuedFor = data.Key;
+                        // cdtransactionDetails.Description ="";
+
+                        tblCdtransactionDetails.Add(cdtransactionDetails);
+
+                        //CD Account Deatils
+
+                        var CDAccData = _context.TblCdaccountDetails.Where(s => s.AccountNo == CdTransactionsDTO.AccountNo).ToList();
+                        if (CDAccData.Count() == 0)
+                        {
+                            cdAccountDetails = new TblCdaccountDetails();
+                            cdAccountDetails.AccountNo = CdTransactionsDTO.AccountNo;
+                            cdAccountDetails.TxnDateTime = DateTime.Now;
+                            cdAccountDetails.TxnEventType = data.Key;
+                            cdAccountDetails.TxnAmountBalance = data.Value.Amount;
+                            cdAccountDetails.TaxAmountBalance = data.Value.TaxAmount;
+                            cdAccountDetails.TotalAvailableBalance = data.Value.TaxAmount + data.Value.Amount;
+                            cdAccountDetails.LedgerBalance = data.Value.TaxAmount + data.Value.Amount;
+
+
+
+
+                            tblCdaccountDetails.Add(cdAccountDetails);
+                            _context.TblCdaccountDetails.AddRange(tblCdaccountDetails);
+                        }
+                        else if (CDAccData.Count() > 0)
+                        {
+                            /* verify it again*/
+                            foreach (var cditem in CDAccData)
+                            {
+                                if (cditem.TxnEventType == data.Key)
+                                {
+                                    cditem.TxnDateTime = DateTime.Now;
+                                    //  cditem.InitialAmount = cditem.InitialAmount+cditem.TotalAvailableBalance;
+                                    cditem.TotalAvailableBalance = cditem.TotalAvailableBalance + data.Value.Amount;
+                                    cditem.LedgerBalance = cditem.LedgerBalance + data.Value.Amount;
+                                    cditem.TaxAmountBalance = cditem.TaxAmountBalance + data.Value.TaxAmount;
+
+                                }
+                                //if new TxnEvent will come
+                            }
+
+                            tblCdaccountDetails = CDAccData;
+                            _context.TblCdaccountDetails.AddRange(tblCdaccountDetails);
+                        }
+
+
+
+                    }
+                    tblCdtransaction.TblCdtransactionDetails = tblCdtransactionDetails;
+                    _context.TblCdtransaction.Add(tblCdtransaction);
+
+                    _context.TblCdaccounts.Update(cdaccount);
+
+
+                    // _context.SaveChanges();
+
+
+                }
+
+                if (CdTransactionsDTO.TxnType == "Debit")
+                {
+
+                    //Step-1:Check CD Account, update Balance and update CD account Details:
+
+
+
+                    if (cdaccount != null)
+                    {
+
+
+                        var initalAmount = cdaccount.AvailableBalance;
+                        // var cdaccountDetails = _context.TblCdaccountDetails.LastOrDefault(p => p.AccountNo == CdTransactionsDTO.AccountNo);
+
+
+                        /*CD Account table */
+                        cdaccount.AvailableBalance = cdaccount.AvailableBalance - (CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount);
+                        cdaccount.LedgerBalance = cdaccount.LedgerBalance - (CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount);
+
+
+                        List<TblCdaccountDetails> tblCdaccountDetails = new List<TblCdaccountDetails>();
+                        TblCdaccountDetails cdAccountDetails = new TblCdaccountDetails();
+
+                        foreach (var data in CdTransactionsDTO.PremiumDetails)
+                        {
+                            //debit
+                            //cdaccount.AvailableBalance = cdaccount.AvailableBalance - data.Value.Total;
+
+                            //cdaccountDetails.TxnDateTime = DateTime.Now;
+                            //cdaccountDetails.TxnAmountBalance = cdaccountDetails.TxnAmountBalance - data.Value.Amount;
+                            //cdaccountDetails.TaxAmountBalance = cdaccountDetails.TaxAmountBalance - data.Value.TaxAmount;
+                            //cdaccountDetails.TotalAvailableBalance = cdaccountDetails.TotalAvailableBalance - data.Value.Total;
+                            //cdaccountDetails.LedgerBalance = cdaccountDetails.LedgerBalance - data.Value.Total;
+
+
+                            /*CD AccountDetails Debit*/
+                            var CDAccData = _context.TblCdaccountDetails.Where(s => s.AccountNo == CdTransactionsDTO.AccountNo).ToList();
+
+                            foreach (var cditem in CDAccData)
+                            {
+                                if (cditem.TxnEventType == data.Key)
+                                {
+                                    //cditem.TxnDateTime = DateTime.Now;
+                                    ////  cditem.InitialAmount = cditem.InitialAmount+cditem.TotalAvailableBalance;
+                                    //cditem.TotalAvailableBalance = cditem.TotalAvailableBalance + data.Value.Amount;
+                                    //cditem.TaxAmountBalance = cditem.TaxAmountBalance + data.Value.TaxAmount;
+
+
+                                    cditem.TxnDateTime = DateTime.Now;
+                                    cditem.TxnAmountBalance = cditem.TxnAmountBalance - data.Value.Amount;
+                                    cditem.TaxAmountBalance = cditem.TaxAmountBalance - data.Value.TaxAmount;
+                                    cditem.TotalAvailableBalance = cditem.TotalAvailableBalance - data.Value.Total;
+                                    cditem.LedgerBalance = cditem.LedgerBalance - data.Value.Total;
+
+                                }
+                            }
+                            tblCdaccountDetails = CDAccData;
+
+
+
+                        }
+
+
+
+                        /*CD Transaction Debit*/
+
+
+                        List<TblCdtransactionDetails> tblCdtransactionDetails = new List<TblCdtransactionDetails>();
+                        TblCdtransactionDetails cdtransactionDetails = new TblCdtransactionDetails();
+
+
+                        TblCdtransaction tblCdtransaction = new TblCdtransaction();
+                        tblCdtransaction.AccountNo = CdTransactionsDTO.AccountNo;
+                        tblCdtransaction.TxnDateTime = DateTime.Now;
+                        tblCdtransaction.TxnType = CdTransactionsDTO.TxnType;
+
+                        tblCdtransaction.InitialBalance = initalAmount;
+
+                        tblCdtransaction.TotalAmount = CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount;
+                        tblCdtransaction.FinalBalance = initalAmount - tblCdtransaction.TotalAmount;
+                        tblCdtransaction.Description = "Debit";// $"Auto Schedule- {CdTransactionsDTO.TotalAmount + CdTransactionsDTO.TotalGSTAmount}";
+                        tblCdtransaction.TaxAmount = CdTransactionsDTO.TotalGSTAmount;
+                        tblCdtransaction.TxnAmount = CdTransactionsDTO.TotalAmount;
+
+                        foreach (var data in CdTransactionsDTO.PremiumDetails)
+                        {
+
+                            cdtransactionDetails = new TblCdtransactionDetails();
+                            cdtransactionDetails.TransactionDateTime = DateTime.Now;
+                            cdtransactionDetails.TxnAmount = data.Value.Amount;
+                            cdtransactionDetails.TaxAmount = data.Value.TaxAmount;
+                            cdtransactionDetails.TotalAmount = data.Value.Amount + data.Value.TaxAmount;
+                            cdtransactionDetails.TxnIssuedFor = data.Key;
+                            //cdtransactionDetails.Description = "Auto Schedule";
+
+                            tblCdtransactionDetails.Add(cdtransactionDetails);
+                            ////if (data.Key == "AD")
+                            ////{
+                            //  var massage = DaliyTransaction(data.Value, data.Key, CdTransactionsDTO, CdTransactionsDTO.TxnType);
+                            ////}
+
+                        }
+                        tblCdtransaction.TblCdtransactionDetails = tblCdtransactionDetails;
+                        _context.TblCdtransaction.Add(tblCdtransaction);
+                        _context.TblCdaccountDetails.UpdateRange(tblCdaccountDetails);
+
+                        _context.TblCdaccounts.Update(cdaccount);
+
+                        //   _context.SaveChanges();
+
+
+
+                    }
+                }
+
+                /*Daily Txn Table*/
+                foreach (var data in CdTransactionsDTO.PremiumDetails)
+                {
+
+                    var tblDailyCdtransaction = DaliyTransaction(data.Value, data.Key, CdTransactionsDTO, CdTransactionsDTO.TxnType);
+
+                }
+                _context.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+
+
+
+            }
+
+            return new MasterCDDTO { Status = BusinessStatus.Created, ResponseMessage = $"Account updated Successfully for this AccountNumber{cdaccount.AccountNo}", AccountNo = cdaccount.AccountNo };
+
+        }
+
+        public async Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)
+        {
+            var Errors = new List<ErrorInfo>();
+
+            var cdaccount = _context.TblCdaccounts.FirstOrDefault(p => p.AccountNo == accountnumber);
+            if (cdaccount != null)
+            {
+                //For Translation
+                List<string> lstErrParameters = new List<string>();
+                lstErrParameters.Add(accountnumber);
+                Errors.Add(new ErrorInfo { ErrorCode = "CdAccount", ErrorMessage = $"CD Account {accountnumber} already exist" });
+               return new MasterCDDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found", ErrorInfo = Errors };
+            }
+
+
+            if (cdaccount == null)
+            {
+                /* CD Account Table*/
+                TblCdaccounts tblCdaccounts = new TblCdaccounts();
+
+                tblCdaccounts.AccountNo = accountnumber;
+                tblCdaccounts.OrganizationId = apiContext.OrgId;
+                tblCdaccounts.InitialAmount = 0;
+
+                tblCdaccounts.AvailableBalance = 0;
+                tblCdaccounts.LedgerBalance = 0;
+                tblCdaccounts.CreatedBy = apiContext.UserId;
+                tblCdaccounts.CreatedDate = DateTime.Now;
+                tblCdaccounts.ThresholdValue = 0;
+                tblCdaccounts.DropLimit = 0;
+                tblCdaccounts.Remark = $"Intial Setup  {0}";
+                tblCdaccounts.Active = true;
+
+                _context.TblCdaccounts.Add(tblCdaccounts);
+                _context.SaveChanges();
+
+            }
+            return new MasterCDDTO { Status = BusinessStatus.Created, ResponseMessage = $"CD Account created successfully for this AccountNumber {accountnumber}" };
+        }
+
+
     }
 }

@@ -7,7 +7,10 @@ namespace iNube.Services.Partners.Entities
     {
         public TblCdaccounts()
         {
+            TblCdaccountDetails = new HashSet<TblCdaccountDetails>();
+            TblCdtransaction = new HashSet<TblCdtransaction>();
             TblCdtransactions = new HashSet<TblCdtransactions>();
+            TblDailyCdtransaction = new HashSet<TblDailyCdtransaction>();
         }
 
         public decimal Cdid { get; set; }
@@ -28,6 +31,9 @@ namespace iNube.Services.Partners.Entities
         public DateTime? ModifiedDate { get; set; }
         public decimal? OrganizationId { get; set; }
 
+        public virtual ICollection<TblCdaccountDetails> TblCdaccountDetails { get; set; }
+        public virtual ICollection<TblCdtransaction> TblCdtransaction { get; set; }
         public virtual ICollection<TblCdtransactions> TblCdtransactions { get; set; }
+        public virtual ICollection<TblDailyCdtransaction> TblDailyCdtransaction { get; set; }
     }
 }

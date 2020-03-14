@@ -533,5 +533,15 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         {
             throw new NotImplementedException();
         }
+
+        public Task<MasterCDDTO> MasterCDACC(MicaCDDTO CDDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
