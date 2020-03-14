@@ -22,3 +22,9 @@ phases:
         - aws s3 rm s3://micapwa
         - echo $CODEBUILD_SRC_DIR
         - aws s3 sync ./build/ s3://micapwa 
+   artifacts:
+
+     files:
+
+     - ./build/
+     discard-paths: yes 
