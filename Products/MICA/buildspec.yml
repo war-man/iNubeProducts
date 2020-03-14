@@ -24,4 +24,4 @@ phases:
         - aws s3 sync ./build/ s3://micapwa 
 artifacts:
   files:
-    - ./build/
+    -  $CODEBUILD_SRC_DIR/Products/MICA/ClientApp/build/
