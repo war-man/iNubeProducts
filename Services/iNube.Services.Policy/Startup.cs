@@ -76,8 +76,11 @@ namespace iNube.Services.Policy
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager());
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
             app.UseAuthentication();
+            app.UseHttpsRedirection();
+            app.UseMvc();
         }
 
         private void ConfigureModuleService(IServiceCollection services)
