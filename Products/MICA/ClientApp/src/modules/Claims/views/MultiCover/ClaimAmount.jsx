@@ -19,7 +19,7 @@ import CardBody from "components/Card/CardBody.jsx";
 import AmountData from "modules/Claims/views/ClaimIntimate/AmountData.json";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 //import ReactTable from "react-table";
-import  ReactTable  from  "components/MuiTable/MuiTable.jsx";
+import ReactTable from "components/MuiTable/MuiTable.jsx";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 import { Animated } from "react-animated-css";
@@ -46,7 +46,7 @@ const ddl = {
 
     marginLeft: "105px"
 
- 
+
 
 }
 
@@ -60,7 +60,7 @@ const CustomTableCell = withStyles(theme => ({
 
         border: "1px solid #eee"
 
-      
+
 
     },
 
@@ -72,27 +72,27 @@ const CustomTableCell = withStyles(theme => ({
 
 }))(TableCell);
 
- 
+
 
 const tableStyle = { borderRadius: '10px  ', width: '100%' }
 
- 
 
- 
+
+
 
 const tableRow = { height: '10px', width: '100%' }
 
- 
 
- 
+
+
 
 const ClaimAmount = (props) => {
 
     console.log('Claims', props);
 
     //const claimAmountData = props;
- 
-   
+
+
 
     return (
 
@@ -108,7 +108,7 @@ const ClaimAmount = (props) => {
 
             <GridContainer>
 
-            <GridItem xs={12} sm={4} md={3}>
+                <GridItem xs={12} sm={4} md={3}>
                     <Dropdown
                         labelText="InsurableItem"
                         id="ddlstatus"
@@ -116,118 +116,126 @@ const ClaimAmount = (props) => {
                         required={true}
                         value={props.DetailsDTO.insurableItems}
                         name='insurableItems'
-                        onChange={(e) => props.handleChange("insurableItems",e)}
+                        onChange={(e) => props.handleChange("insurableItems", e)}
                         formControlProps={{ fullWidth: true }} />
 
                     {props.errormessage && (props.DetailsDTO.insurableItems == "") ? <p className="error">*Required field cannot be left blank</p> : null}
 
                 </GridItem>
             </GridContainer>
-            
-              <GridContainer justify="center" >
+
+            <GridContainer justify="center" >
                 {props.showInsGrid && <GridItem xs={12}>
-                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                    <ReactTable
-                        data={props.TableData}
-                        filterable
-                        columns={[
+                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                        <ReactTable
+                            data={props.TableData}
+                            filterable
+                            columns={[
+                                {
+                            Header: "SerialNo",
+                        accessor: "id",
+                        headerClassName: 'react-table-center',
+                                setCellProps: (value) => ({style: {textAlign: "left" } }),
+                        minWidth: 20,
+                        sortable: false,
+                        //  filterable: false
+                    },
                             {
-                                Header: "SerialNo",
-                                accessor: "id",
-                                headerClassName: 'react-table-center',
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                minWidth: 20,
-                                sortable: false,
-                                //  filterable: false 
-                            },
+                            // Header: "Cover Event Factor - From Value",
+                            Header: "InsurableItem",
+                        accessor: "insurableItem",
+                        minWidth: 40,
+                                setCellProps: (value) => ({style: {textAlign: "left" } }),
+                        headerClassName: 'react-table-center'
+                    },
                             {
-                                // Header: "Cover Event Factor - From Value",
-                                Header: "InsurableItem",
-                                accessor: "insurableItem",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                headerClassName: 'react-table-center'
-                            },
+                            Header: "Name",
+                        accessor: "name",
+                        minWidth: 40,
+                                setCellProps: (value) => ({style: {textAlign: "left" } }),
+                        headerClassName: 'react-table-center'
+                    },
                             {
-                                Header: "Name",
-                                accessor: "name",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                headerClassName: 'react-table-center'
-                            },
+                            Header: "IdentificationNo",
+                        accessor: "identificationNo",
+                        minWidth: 40,
+                                setCellProps: (value) => ({style: {textAlign: "left" } }),
+                        headerClassName: 'react-table-center'
+                    },
                             {
-                                Header: "IdentificationNo",
-                                accessor: "identificationNo",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                headerClassName: 'react-table-center'
-                            },
+                            Header: "TypeOfLoss",
+                        accessor: "typeOfLoss",
+                        minWidth: 40,
+                                setCellProps: (value) => ({style: {textAlign: "left" } }),
+                        headerClassName: 'react-table-center'
+                    },
                             {
-                                Header: "TypeOfLoss",
-                                accessor: "typeOfLoss",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                headerClassName: 'react-table-center'
-                            },
+                            Header: "CoverValue",
+                        accessor: "coverValue",
+                        minWidth: 20,
+                                setCellProps: (value) => ({style: {textAlign: "center" } }),
+                        headerClassName: 'react-table-center'
 
+                    },
+                    //        {
+                    //        Header: "BenefitAmount",
+                    //    accessor: "benefitAmount",
+                    //    minWidth: 40,
+                    //            setCellProps: (value) => ({style: {textAlign: "center" } }),
+                    //    headerClassName: 'react-table-center',
+
+                    //},
                             {
-                                Header: "BenefitAmount",
-                                accessor: "benefitAmount",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "center" } }),
-                                headerClassName: 'react-table-center',
+                            Header: "ClaimAmount",
+                        accessor: "claimAmounts",
+                                setCellProps: (value) => ({style: {textAlign: "right" } }),
+                        minWidth: 40,
+                        headerClassName: 'react-table-center',
+                        //sortable: false,
+                        //filterable: false
 
-                            },
-                            {
-                                Header: "ClaimAmount",
-                                accessor: "claimAmounts",
-                                setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                minWidth: 40,
-                                headerClassName: 'react-table-center',
-                                //sortable: false,
-                                //filterable: false
-
-                            },
+                    },  
+ 
 
 
-                        ]}
-                        defaultPageSize={4}
-                        pageSize={([props.TableData.length + 1] < 4) ? [props.TableData.length + 1] : 4}
-                        showPaginationTop={false}
-                        //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
-                        showPaginationBottom={true}
-                        className="-striped -highlight discription-tab"
+                    ]}
+                            defaultPageSize={4}
+                            pageSize={([props.TableData.length + 1] < 4) ? [props.TableData.length + 1] : 4}
+                            showPaginationTop={false}
+                            //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                            showPaginationBottom={true}
+                            className="-striped -highlight discription-tab"
 
-                    />
-</Animated>
+                        />
+                    </Animated>
                 </GridItem>}
-            </GridContainer>  
+            </GridContainer>
 
-           
+
             <GridContainer lg={12} >
                 <GridContainer lg={12} justify="flex-end">
-                {props.showInsGrid &&  <GridItem xs={5} sm={3} md={3} lg={4}>
-                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                 <CustomInput
+                    {props.showInsGrid && <GridItem xs={5} sm={3} md={3} lg={4}>
+                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                            <CustomInput
                                 //success={props.claimAmountState === "success"}
-                                error={props.claimAmountState }
+                                error={props.claimAmountState}
                                 labelText="TotalClaimAmt"
                                 name="claimAmount"
                                 type="numeric"
                                 inputType="number"
-                    // required={true}
-                    value={props.DetailsDTO.claimAmount}
-                    onChange={(e) => props.handleClaimAmount(e)}
-                            formControlProps={{ fullWidth: true }}
+                                // required={true}
+                                value={props.DetailsDTO.claimAmount}
+                                onChange={(e) => props.handleClaimAmount(e)}
+                                formControlProps={{ fullWidth: true }}
                             />
-                            {props.errormessage && (props.DetailsDTO.claimAmount == "") ? <p className="error">*Enter atleast one Claim Amount</p> : null}
-                    </Animated>
+                            {/* {props.errormessage && (props.DetailsDTO.claimAmount == "") ? <p className="error">*Enter atleast one Claim Amount</p> : null}*/}
+                        </Animated>
                     </GridItem>}
                 </GridContainer>
-                </GridContainer>
-                    
-              
-                    
+            </GridContainer>
+
+
+
 
         </div>
 

@@ -1,0 +1,25 @@
+[
+
+  {
+    "Name": "Vehicle Location",
+    "DataType": "string",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "TextField"
+  },
+  {
+    "Name": "Driver Name",
+    "DataType": "string",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "TextField"
+  },
+  {
+    "Name": "Self-Survey Required",
+    "DataType": "bool",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "DropDown"
+  }
+
+]

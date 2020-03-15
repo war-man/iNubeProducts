@@ -48,16 +48,16 @@ const BankDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                             //success={props.accHolderNameState === "success"}
-                            error={props.accHolderNameState}
+                            error={props.accountHolderNameState}
                             labelText="AccountHolderName"
-                            value={props.DetailsDTO.accHolderName}
-                            name="accHolderName"
+                            value={props.bankDetails.accountHolderName}
+                            name="accountHolderName"
                             
                             required={true}
-                        onChange={(e) => props.handleChange("accHolderName",e)}
+                            onChange={(e) => props.handleChangebank("accountHolderName",e)}
 
                         formControlProps={{ fullWidth: true }} />
-                    {props.errormessage && (props.DetailsDTO.accHolderName == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {props.errormessage && (props.bankDetails.accountHolderName == "") ? <p className="error">*Required field cannot be left blank</p> : null}
                     </GridItem>
 
                     <GridItem xs={12} sm={12} md={3}>
@@ -66,13 +66,28 @@ const BankDetails = (props) => {
                         error={props.accNumberState}
                             labelText="AccountNo"
                             inputType="number"
-                            value={props.DetailsDTO.accNumber}
-                            name="accNumber"
+                            value={props.bankDetails.accountNumber}
+                            name="accountNumber"
                             required={true}
-                        onChange={(e) => props.handleChange("accNumber",e)}
+                            onChange={(e) => props.handleChangebank("accountNumber",e)}
 
                         formControlProps={{ fullWidth: true }} />
-                    {props.errormessage && (props.DetailsDTO.accNumber == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {props.errormessage && (props.bankDetails.accountNumber == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                    </GridItem>
+
+                    <GridItem xs={12} sm={12} md={3}>
+                        <MasterDropdown
+                            labelText="Account Type"
+                            id="ddlstatus"
+                            lstObject={props.AccountTypedata}
+                            filterName='Account Type'
+                            required={true}
+                            value={props.bankDetails.accountType}
+                            name='accountType'
+                            onChange={(e) => props.handleChangebank("accountType", e)}
+                            formControlProps={{ fullWidth: true }}
+                        />
+                        {props.errormessage && (props.bankDetails.accountType == "") ? <p className="error">*Required field cannot be left blank</p> : null}
                     </GridItem>
 
                     <GridItem xs={12} sm={12} md={3}>
@@ -80,13 +95,13 @@ const BankDetails = (props) => {
                         //success={props.bankNameState === "success"}
                         error={props.bankNameState }
                             labelText="BankName"
-                            value={props.DetailsDTO.bankName}
+                            value={props.bankDetails.bankName}
                             name="bankName"
                             required={true}
-                        onChange={(e) => props.handleChange("bankName",e)}
+                            onChange={(e) => props.handleChangebank("bankName",e)}
 
                         formControlProps={{ fullWidth: true }} />
-                    {props.errormessage && (props.DetailsDTO.bankName == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {props.errormessage && (props.bankDetails.bankName == "") ? <p className="error">*Required field cannot be left blank</p> : null}
                     </GridItem>
 
                     <GridItem xs={12} sm={12} md={3}>
@@ -94,30 +109,30 @@ const BankDetails = (props) => {
                         //success={props.ifscCodeState === "success"}
                         error={props.ifscCodeState}
                             labelText="IFSCCode"
-                            value={props.DetailsDTO.ifscCode}
+                            value={props.bankDetails.ifscCode}
                             name="ifscCode"
                             required={true}
-                        onChange={(e) => props.handleChange("ifscCode",e)}
+                            onChange={(e) => props.handleChangebank("ifscCode",e)}
 
                         formControlProps={{ fullWidth: true }} />
-                    {props.errormessage && (props.DetailsDTO.ifscCode == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {props.errormessage && (props.bankDetails.ifscCode == "") ? <p className="error">*Required field cannot be left blank</p> : null}
                     </GridItem>
 
-                    <GridItem xs={12} sm={12} md={12}>
+                    <GridItem xs={12} sm={8} md={9}>
                     <CustomInput
                            // success={props.bankBranchAddState === "success"}
-                            error={props.bankBranchAddState}
+                            error={props.bankBranchAddressState}
                             labelText="BankBranchAddress"
-                            value={props.DetailsDTO.bankBranchAdd}
-                            name="bankBranchAdd"
-                        required={true}
+                            value={props.bankDetails.bankBranchAddress}
+                            name="bankBranchAddress"
+                       // required={true}
                         multiline={true}
-                        onChange={(e) => props.handleChange("bankBranchAdd",e)}
+                            onChange={(e) => props.handleChangebank("bankBranchAddress",e)}
                             inputProps={{
                                 //type: "number"
                             }}
                         formControlProps={{ fullWidth: true }} />
-                    {props.errormessage && (props.DetailsDTO.bankBranchAdd == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {/* {props.errormessage && (props.DetailsDTO.bankBranchAddress == "") ? <p className="error">*Required field cannot be left blank</p> : null}*/}
                     </GridItem>
 
                     

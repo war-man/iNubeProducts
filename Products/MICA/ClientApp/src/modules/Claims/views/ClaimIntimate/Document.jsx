@@ -76,7 +76,7 @@ const MyUploader = (props) => {
                     <h3 >
                         <small><TranslationContainer translationKey="UploadDocument" /></small>
 
-                        <span id="red" style={{ color: 'red' }}>*</span>
+                        {/* <span id="red" style={{ color: 'red' }}>*</span>*/}
                     </h3>
                 }
             </CardHeader>
