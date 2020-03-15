@@ -1,0 +1,61 @@
+[
+
+  {
+    "Name": "Account Holder Name",
+    "DataType": "string",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "TextField"
+  },
+  {
+    "Name": "Account No.",
+    "DataType": "string",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "TextField"
+  },
+  {
+    "Name": "Account Type",
+    "DataType": "bool",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "Dropdown"
+  },
+  {
+    "Name": "Bank Name",
+    "DataType": "string",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "TextField"
+  },
+  {
+    "Name": "IFSC Code",
+    "DataType": "string",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "TextField"
+  },
+  {
+    "Name": "Bank Branch Address",
+    "DataType": "string",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "TextField"
+  },
+  {
+    "Name": "Amount Paid",
+    "DataType": "string",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "TextField"
+  },
+  {
+    "Name": "Date Of Payment",
+    "DataType": "datetime",
+    "Validation": "",
+    "ValidationType": "",
+    "UIControl": "Datetime"
+  }
+
+
+]
