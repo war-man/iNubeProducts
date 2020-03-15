@@ -8,8 +8,8 @@
       "name": "dev2-mica-partner",
       "image": "<IMAGE1_NAME>",
 
-      "cpu": 2048,
-      "memory": 2048,
+      "cpu": 512,
+      "memory": 512,
 
       "portMappings": [
         {
