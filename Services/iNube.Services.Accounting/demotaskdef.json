@@ -16,7 +16,8 @@
           "awslogs-group": "/ecs/demo-mica-accounting",
           "awslogs-region": "ap-south-1",
           "awslogs-stream-prefix": "ecs"
-        },
+        }
+      },
 
         "portMappings": [
           {
