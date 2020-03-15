@@ -907,9 +907,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             if (FieldType != "")
             {
+                var Id=_context.TblmasPccommonTypes.SingleOrDefault(s=>s.Value==FieldType).CommonTypeId;
                 var rcbDetails = (from rc in _context.TblProductRcbdetails
                                   join p in _context.TblmasProductMaster on rc.InputId equals p.ProductMasterId
-                                  where rc.ProductId == ProductId && rc.InputType == type && (bool)rc.IsReqired && p.TypeCode == FieldType
+                                  where rc.ProductId == ProductId && rc.InputType == type && (bool)rc.IsReqired && p.TypeCode == Id.ToString()
                                   orderby p.SortOrder //&& rc.IsReqired
                                   select new ProductRcbdetailsDTO
                                   {

@@ -1678,7 +1678,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 {
                     tblDailyCdtransaction = new TblDailyCdtransaction();
 
-                    tblDailyCdtransaction.AccountNo = masterCDDTO.AccountNo;
+                    tblDailyCdtransaction.AccountNo = accountno;
                     tblDailyCdtransaction.TransactionDateTime = DateTime.Now;
                     tblDailyCdtransaction.TxnEventType = key;
                     tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;

@@ -1482,7 +1482,7 @@ namespace iNube.Services.Policy.Models
     }
     public class CDMapper {
         public string Type { get; set; }
-        public dynamic Data { get; set; }
+        public List<dynamic> Data { get; set; }
     }
 }
 

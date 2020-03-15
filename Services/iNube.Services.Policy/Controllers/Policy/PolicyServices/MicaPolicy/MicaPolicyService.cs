@@ -2230,7 +2230,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 policyDTO.PremiumAmount = Convert.ToDecimal(policyDetail["permiumamount"]);
             }
             policyDTO.MasterPremium = policyDTO.PremiumAmount;//needs to fetch through rating
-            policyDTO.SumInsured = policyDTO.PremiumAmount;
+           // policyDTO.SumInsured = policyDTO.PremiumAmount;
             return policyDTO;
         }
         private async Task<InsuranceCertificateModel> GetInsuranceCertificateModel(dynamic policyDetail, ProductDTO productDTO, TblPolicy tblpolicyDTO, PolicyDTO policyDTO, PartnersDTO partnersDTO, SingleCover singleCover, ApiContext apiContext)
@@ -2692,11 +2692,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 List<CDMapper> cDMappers = new List<CDMapper>();
                                 CDMapper cD = new CDMapper();
                                 cD.Type = "Policy";
-                                cD.Data = json;
+                                cD.Data.Add(json);
                                 cDMappers.Add(cD);
 
                                 cD.Type = "Endorsement";
-                                cD.Data = insurableItemRequest;
+                                cD.Data.Add(insurableItemRequest);
                                 cDMappers.Add(cD);
 
 
@@ -2912,11 +2912,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             List<CDMapper> cDMappers = new List<CDMapper>();
                             CDMapper cD = new CDMapper();
                             cD.Type = "Policy";
-                            cD.Data = insurableItem;
+                            cD.Data.Add(insurableItem);
                             cDMappers.Add(cD);
 
                             cD.Type = "Endorsement";
-                            cD.Data = insurableItem;
+                            cD.Data.Add(insurableItem);
                             cDMappers.Add(cD);
 
 
@@ -3722,7 +3722,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                             policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
 
-                                            policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
+                                            policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
 
 
 
@@ -3933,32 +3933,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 //if (Listofres.Count() > 0)
                 //{
 
-                    var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+                var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
 
-                    if (Listofres != null)
-                    {
-                        foreach (var item in Listofres)
-                        {
+                //if (Listofres != null)
+                //{
+                //    foreach (var item in Listofres)
+                //    {
 
-                            if (item.Outcome == "Fail")
-                            {
+                //        if (item.Outcome == "Fail")
+                //        {
 
-                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
-                                Errors.Add(errorInfo);
+                //            ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+                //            Errors.Add(errorInfo);
 
-                            }
+                //        }
 
-                        }
-                        if (Errors.Count > 0)
-                        {
-                            return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors };
-                        }
-                    }
+                //    }
+                //    if (Errors.Count > 0)
+                //    {
+                //        return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors };
+                //    }
+                //}
 
 
-                    //Step2: Check Policy Exist for this Proposal Number 
+                //Step2: Check Policy Exist for this Proposal Number 
 
-                    string proposalNumber = "";
+                string proposalNumber = "";
+                if (IssuepolicyDTO["ProposalNumber"] != null)
+                {
                     string proposalNo = (string)IssuepolicyDTO["ProposalNumber"];
 
                     var tblPolicy = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
@@ -3969,24 +3971,57 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
                         var insurableItem = tblPolicyDetailsdata.PolicyRequest;
                         dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                        dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                         // var paymentDetails = json["PaymentInfoDeatils"];
 
 
                         tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
-                        foreach (var item in IssuepolicyDTO.InsurableItem)
+                        foreach (var item in IssuepolicyDTO.InsurableItem)//Client
                         {
-                            foreach (var insurableName in json.InsurableItem)
+                            foreach (var insurableName in json.InsurableItem)//table 
                             {
                                 if (item.InsurableName == insurableName.InsurableName)
                                 {
-
-                                    foreach (var fields in item.RiskItems)
+                                    foreach (var insurableName1 in json1.InsurableItem)
                                     {
-                                        foreach (var jsoninsurableFields in insurableName.RiskItems)
+                                        //json-table-insurableName
+                                        //IssuepolicyDTO-request-item
+                                        var riskcount = Convert.ToInt32(insurableName["RiskCount"]);
+                                        var additonalDriverCount = item.RiskItems.Count;
+
+                                        foreach (var fields in item.RiskItems)
                                         {
-                                            var InputidentificationNumber = (string)fields["Identification Number"];
-                                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                                            insurableName.RiskItems = item.RiskItems;
+                                            foreach (var jsoninsurableFields in insurableName.RiskItems)
+                                            {
+                                             
+                                                try
+                                                {
+                                                    if (additonalDriverCount < riskcount)
+                                                    {
+
+
+                                                        var InputidentificationNumber = (string)fields["Identification Number"];
+                                                        var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                                                        if (InputidentificationNumber == TblIdentificationNo)
+                                                        {
+                                                            
+                                                        }
+                                                        //else
+                                                        //{
+                                                        //    insurableName.RiskItems.Add(fields);
+                                                        //}
+                                                    }
+                                                    else
+                                                    {
+                                                        return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = "vehicle cannot be more from additional driver" };
+
+                                                    }
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    insurableName1.RiskItems = insurableName.RiskItems;
+                                                }
+                                            }
                                         }
                                     }
 
@@ -3996,7 +4031,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
 
                         }
-                        tblPolicyDetailsdata.PolicyRequest = json.ToString();
+
+                        tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                         _context.TblPolicy.Update(tblPolicy);
                         _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
                         _context.SaveChanges();
@@ -4005,45 +4041,62 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         //Step:4 Calling CD mapping API
 
 
-                        List<MicaCDDTO> CDmap = await _integrationService.CDMapper(IssuepolicyDTO, "Policy", apiContext);
-
-                        MicaCD micaCD = new MicaCD();
-                        micaCD.AccountNo = tblPolicy.CdaccountNumber;
-                        micaCD.micaCDDTO = CDmap;
-                        BusinessStatus businessStatus = 0;
-
-                        //CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
-                        //Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
-                        //TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
-
-                        //txnParameterDTO.Amount = paymentDetails.FireTheft;
-                        //txnParameterDTO.TaxAmount = paymentDetails.FTTax;
-                        //txnParameterDTO.Total = paymentDetails.TotalFTAmount;
-                        //transactionsDTO.TotalAmount = paymentDetails.FireTheft;
-                        //transactionsDTO.TotalGSTAmount = paymentDetails.FTTax;
-
-                        //RatingConfig.Add("FT", txnParameterDTO);
-                        //transactionsDTO.AccountNo = tblPolicy.CdaccountNumber;
-                        //transactionsDTO.PremiumDetails = RatingConfig;
-                        //transactionsDTO.Type = "Policy";
-                        //transactionsDTO.TxnType = "Debit";
-
-                        //Step5:CD Transaction for the policy
-                        var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
-
-                        businessStatus = transaction.Status;
-
-                        if (businessStatus == BusinessStatus.Created)
+                        List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
+                        if (CDmap.Count > 0)
                         {
-                            //Status for Txn
+                            MicaCD micaCD = new MicaCD();
+                            micaCD.AccountNo = tblPolicy.CdaccountNumber;
+                            micaCD.micaCDDTO = CDmap;
+                            BusinessStatus businessStatus = 0;
+
+                            //CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
+                            //Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
+                            //TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
+
+                            //txnParameterDTO.Amount = paymentDetails.FireTheft;
+                            //txnParameterDTO.TaxAmount = paymentDetails.FTTax;
+                            //txnParameterDTO.Total = paymentDetails.TotalFTAmount;
+                            //transactionsDTO.TotalAmount = paymentDetails.FireTheft;
+                            //transactionsDTO.TotalGSTAmount = paymentDetails.FTTax;
+
+                            //RatingConfig.Add("FT", txnParameterDTO);
+                            //transactionsDTO.AccountNo = tblPolicy.CdaccountNumber;
+                            //transactionsDTO.PremiumDetails = RatingConfig;
+                            //transactionsDTO.Type = "Policy";
+                            //transactionsDTO.TxnType = "Debit";
+
+                            //Step5:CD Transaction for the policy
+                            var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+
+                            businessStatus = transaction.Status;
+                            if (businessStatus == BusinessStatus.Created)
+                            {
+                                //Status for Txn
+                                TblPolicy policyUpdate = _context.TblPolicy.Find(tblPolicy.PolicyId);
+
+
+                                policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
+
+
+
+                                policyUpdate.IsActive = true;
+                                _context.SaveChanges();
+
+                            }
+                            else
+                            {
+
+                                return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
+
+                            }
+                            return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Issued for this Policy Number {tblPolicy.PolicyNo}" };
                         }
                         else
                         {
+                            return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid CD Transaction" };
 
-                            return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
 
                         }
-                        return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Issued for this Policy Number {tblPolicy.PolicyNo}" };
                     }
                     else
                     {
@@ -4051,17 +4104,23 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                     }
-                //}
-                //else
-                //{
-                //    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Input Validation failed" };
+                    //}
+                    //else
+                    //{
+                    //    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Input Validation failed" };
 
-                //}
+                    //}
+                }
+                else {
+                    return new PolicyResponse { Status = BusinessStatus.Error,  ResponseMessage = $"Proposal Number cannot be empty" };
+
+
+                }
             }
             catch (Exception e)
             {
 
-             
+
             }
             return null;
 
