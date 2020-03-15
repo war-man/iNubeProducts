@@ -341,7 +341,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 {
                     return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx file" };
                 }
-
+                
                 bool sms = true;
                 bool email = true;
 
@@ -913,9 +913,15 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                   orderby p.SortOrder //&& rc.IsReqired
                                   select new ProductRcbdetailsDTO
                                   {
+                                      mValue = p.Value,
+                                      mID = p.ProductMasterId,
                                       InputType = p.Value,
                                       InputId = p.ProductMasterId,
                                       RcbdetailsId = rc.RcbdetailsId,
+                                      ProductId = rc.ProductId,
+                                      LevelId = rc.LevelId,
+                                      SubLevelId = rc.SubLevelId,
+                                      mIsRequired = rc.IsReqired,
                                       UserInputType = p.UserInputType
                                   }).ToList();
                 return rcbDetails;
@@ -929,9 +935,15 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                   orderby p.SortOrder //&& rc.IsReqired
                                   select new ProductRcbdetailsDTO
                                   {
+                                      mValue = p.Value,
+                                      mID = p.ProductMasterId,
                                       InputType = p.Value,
                                       InputId = p.ProductMasterId,
                                       RcbdetailsId = rc.RcbdetailsId,
+                                      ProductId = rc.ProductId,
+                                      LevelId = rc.LevelId,
+                                      SubLevelId = rc.SubLevelId,
+                                      mIsRequired = rc.IsReqired,
                                       UserInputType = p.UserInputType
                                   }).ToList();
                 return rcbDetails;

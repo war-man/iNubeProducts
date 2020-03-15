@@ -733,6 +733,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public bool? IsReqired { get; set; }
         public string UserInputType { get; set; }
         public bool? disable { get; set; }
+        public int mID { get; set; }
         public bool? mIsRequired { get; set; }
         public string mValue { get; set; }
         //public string Product { get; set; }

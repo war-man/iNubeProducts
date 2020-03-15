@@ -228,7 +228,7 @@ namespace iNube.Services.Partners.Controllers.Accounts
 
         }
         [HttpPost]
-        public async Task<IActionResult> MasterCDACC(MicaCDDTO CDDTO)
+        public async Task<IActionResult> MasterCDACC(MicaCD CDDTO)
         {
             //MicaCDDTO
             var response = (await _accountService.MasterCDACC(CDDTO, Context));

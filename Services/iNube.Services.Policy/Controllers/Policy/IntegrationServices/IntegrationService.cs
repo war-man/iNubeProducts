@@ -44,9 +44,9 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<CdTransactionsDTO> GetCdBalanceBYPolicyAsync(string PolicNo, ApiContext apiContext);
         Task<object> CalCulateRatingPremium(DynamicData dynamicData, ApiContext apiContext);
         Task<dynamic> GetMappingParams(string mappingname, ApiContext apiContext);
-        Task<MasterCDDTO> CreateMasterCDAccount(MicaCDDTO cdTransactionsMaster, ApiContext apiContext);
+        Task<MasterCDDTO> CreateMasterCDAccount(MicaCD cdTransactionsMaster, ApiContext apiContext);
         Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext);
-        Task<MicaCDDTO> CDMapper(dynamic PolicyRequest, string type, ApiContext apiContext);
+        Task<List<MicaCDDTO>> CDMapper(dynamic PolicyRequest, string type, ApiContext apiContext);
         Task<dynamic> RuleMapper(dynamic InputRequest, string type, ApiContext apiContext);
         Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext);
         //GetMappingParams(string mappingname, ApiContext apiContext)
@@ -273,12 +273,12 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
             return await GetApiInvoke<dynamic>(uri, apiContext);
         }
-        public async Task<MasterCDDTO> CreateMasterCDAccount(MicaCDDTO cdTransactionsMaster, ApiContext apiContext)
+        public async Task<MasterCDDTO> CreateMasterCDAccount(MicaCD cdTransactionsMaster, ApiContext apiContext)
         {
 
             var uri = PartnerUrl + "/api/Accounts/MasterCDACC";
 
-            return await PostApiInvoke<MicaCDDTO, MasterCDDTO>(uri, apiContext, cdTransactionsMaster);
+            return await PostApiInvoke<MicaCD, MasterCDDTO>(uri, apiContext, cdTransactionsMaster);
 
         }
         //Get State Code
@@ -290,12 +290,12 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         //Get CD Map 
 
-        public async Task<MicaCDDTO> CDMapper(dynamic PolicyRequest, string type, ApiContext apiContext)
+        public async Task<List<MicaCDDTO>> CDMapper(dynamic PolicyRequest, string type, ApiContext apiContext)
         {
 
             var uri = ExtensionUrl + "/api/Mica_EGI/CDMapper?TxnType=" + type;
 
-            return await PostApiInvoke<dynamic, MicaCDDTO>(uri, apiContext, PolicyRequest);
+            return await PostApiInvoke<dynamic, List<MicaCDDTO>>(uri, apiContext, PolicyRequest);
 
         }
         public async Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)

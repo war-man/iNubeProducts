@@ -1473,6 +1473,17 @@ namespace iNube.Services.Policy.Models
         public string Message { get; set; }
         public string Code { get; set; }
     }
+    public class MicaCD
+    {
+        public string Description { get; set; }
+        public string Frequency { get; set; }
+        public string AccountNo { get; set; }
+        public List<MicaCDDTO> micaCDDTO { get; set; }
+    }
+    public class CDMapper {
+        public string Type { get; set; }
+        public dynamic Data { get; set; }
+    }
 }
 
 

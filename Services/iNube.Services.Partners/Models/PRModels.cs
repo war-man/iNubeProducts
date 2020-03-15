@@ -1181,7 +1181,6 @@ namespace iNube.Services.Partners.Models
         public string TxnType { get; set; }
         public string CDType { get; set; }
         public string AccountNo { get; set; }
-        public string Frequency { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TotalGSTAmount { get; set; }
         public string PaymentReferenceNo { get; set; }
@@ -1191,7 +1190,8 @@ namespace iNube.Services.Partners.Models
 
 
     }
-    public class TxnParameterDTO
+  
+        public class TxnParameterDTO
     {
         public string Type { get; set; }
         public decimal Amount { get; set; }
@@ -1245,7 +1245,26 @@ namespace iNube.Services.Partners.Models
         public List<CDPremiumDTO> PremiumDTO { get; set; }
 
     }
+    public class CDDTO
+    {
+        public CDDTO()
+        {
+            cdTransactionsMasterDTO = new List<CdTransactionsMasterDTO>();
 
+        }
+        public string AccountNo { get; set; }
+        public string Description { get; set; }
+        public string Frequency { get; set; }
+        public List<CdTransactionsMasterDTO> cdTransactionsMasterDTO { get; set; }
+    }
+    public class MicaCD
+    {
+        public string AccountNo { get; set; }
+        public string Description { get; set; }
+        public string Frequency { get; set; }
+
+        public List<MicaCDDTO> micaCDDTO { get; set; }
+    }
 }
 
 

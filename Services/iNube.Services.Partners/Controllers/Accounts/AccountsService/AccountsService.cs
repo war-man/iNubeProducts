@@ -26,7 +26,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         Task<Dictionary<int, string>> GetProductNameAsync(int partnerid, ApiContext apiContext);
         Task<List<ddDTO>> GetCdAccountMasterAsync(bool isProduct, ApiContext apiContext);
         Task<MasterCDDTO> MasterPolicyCD(MasterCDDTO masterCDDTO, ApiContext apiContext);
-        Task<MasterCDDTO> MasterCDACC(MicaCDDTO CDDTO, ApiContext apiContext);
+        Task<MasterCDDTO> MasterCDACC(MicaCD CDDTO, ApiContext apiContext);
         Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext);
         //Task<List<ddDTO>> GetProductName();
     }
@@ -188,7 +188,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         }
 
-        public async Task<MasterCDDTO> MasterCDACC(MicaCDDTO CDDTO, ApiContext apiContext)
+        public async Task<MasterCDDTO> MasterCDACC(MicaCD CDDTO, ApiContext apiContext)
         {
             return await _accountsProductService(apiContext.ProductType).MasterCDACC(CDDTO, apiContext);
 
