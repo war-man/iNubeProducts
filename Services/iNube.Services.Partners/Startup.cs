@@ -61,6 +61,7 @@ namespace iNube.Services.Partners
         public void Configure(IApplicationBuilder app,IHostingEnvironment env)
         {
             app.InitializedCommonConfiguration(env, Configuration);
+
             app.UseAuthentication();
         }
 
