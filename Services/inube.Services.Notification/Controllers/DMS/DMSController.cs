@@ -59,13 +59,12 @@ namespace inube.Services.Notification.Controllers.DMS
         }
 
         [HttpPost("[action]")]
-        public List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO)
+        public Task<List<DMSResponse>> DocumentSimpleupload(ImageDTO fileUploadDTO)
         {
             var response = _dMSService.DocumentSimpleupload(fileUploadDTO);
 
             return response;
         }
-
         [HttpGet]
         public async Task<IActionResult> SearchParam(string tagName, string tagValue)
         {

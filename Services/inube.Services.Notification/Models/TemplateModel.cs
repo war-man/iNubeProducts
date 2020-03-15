@@ -49,20 +49,31 @@ namespace inube.Services.Notification.Models
         {
             fileUploadDTOs = new List<FileUploadDTO>();
         }
-          
 
-         public  List<FileUploadDTO> fileUploadDTOs { get; set; }
+
+        public List<FileUploadDTO> fileUploadDTOs { get; set; }
     }
 
     public class FileUploadDTO
     {
+
+        public FileUploadDTO()
+        {
+            tagdto = new List<TagDto>();
+        }
         public string FileName { get; set; }
         public string FileExtension { get; set; }
         public byte[] FileData { get; set; }
         public string ContentType { get; set; }
+        public List<TagDto> tagdto { get; set; }
+
+    }
+    public class TagDto
+    {
         public string Tagname { get; set; }
         public string TagValue { get; set; }
     }
+
     public class PartnerEmail
     {
         public string PartnerName { get; set; }

@@ -15,7 +15,8 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
     public interface IDMSService
     {
         DMSResponse Documentupload(HttpRequest httpRequest, string tagName, string tagValue);
-        List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO);
+        //   List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO);
+        Task<List<DMSResponse>> DocumentSimpleupload(ImageDTO fileUploadDTO);
         Task<List<string>> SearchParam(string tagName, string tagvalue);
         Task<DocumentResp> DownloadFile(string id);
         Task<FileUploadDTO> DownloadFile1(string id);
@@ -150,7 +151,67 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
         }
 
 
-        public List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO)
+        //public List<DMSResponse> DocumentSimpleupload(ImageDTO fileUploadDTO)
+        //{
+        //    var client = new MongoClient(_settings.ConnectionString);
+        //    var db = ConnectionInfo()
+        //    var database = client.GetDatabase(_settings.DatabaseName);
+        //    DMSDTO dMSDTO = new DMSDTO();
+
+        //    dMSDTO.docId = guid;
+        //    DMSResponse dMSResponse = new DMSResponse();
+
+        //    List<DMSResponse> dMSResponselist = new List<DMSResponse>();
+
+        //    foreach (var images in fileUploadDTO.fileUploadDTOs)
+        //    {
+        //        string guid = System.Guid.NewGuid().ToString();
+        //        dMSDTO.docId = guid;
+
+        //        dMSDTO.fileName = images.FileName;
+
+        //        dMSDTO.uploadDate = DateTime.Now;
+
+        //        dMSDTO.contentType = images.ContentType;
+        //        dMSDTO.data = images.FileData;
+
+
+
+        //        var bsonDocument = dMSDTO.ToBsonDocument();
+        //        var jsonDocument = bsonDocument.ToJson();
+        //        var document = BsonSerializer.Deserialize<BsonDocument>(jsonDocument);
+        //        var collection = database.GetCollection<BsonDocument>(_settings.CollectionName);
+        //        collection.InsertOneAsync(document);
+
+        //        var docid = dMSDTO.docId;
+        //        var tagname = images.Tagname;
+        //        var tagvalue = images.TagValue;
+        //        AddTags(docid, tagname, tagvalue);
+        //        dMSResponse = new DMSResponse();
+        //        dMSResponse.Docid = docid;
+
+        //        dMSResponselist.Add(dMSResponse);
+
+        //    }
+
+        //    var files = httpRequest.Form.Files;
+
+
+
+
+
+        //    DMSResponse dMSResponse = new DMSResponse();
+        //    dMSResponse.Docid = docid;
+
+
+        //    dMSDTO.docId = guid;
+        //    return dMSResponselist;
+        //    return new DMSResponse { Docid = dMSDTO.docId, Status = iNube.Utility.Framework.Model.BusinessStatus.Ok };
+
+
+        //}
+
+        public async Task<List<DMSResponse>> DocumentSimpleupload(ImageDTO fileUploadDTO)
         {
             var client = new MongoClient(_settings.ConnectionString);
             //var db=ConnectionInfo()
@@ -180,12 +241,18 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
                 var jsonDocument = bsonDocument.ToJson();
                 var document = BsonSerializer.Deserialize<BsonDocument>(jsonDocument);
                 var collection = database.GetCollection<BsonDocument>(_settings.CollectionName);
-                collection.InsertOneAsync(document);
+                await collection.InsertOneAsync(document);
 
                 var docid = dMSDTO.docId;
-                var tagname = images.Tagname;
-                var tagvalue = images.TagValue;
-                AddTags(docid, tagname, tagvalue);
+                // var tagname = images.tagdto.;
+                // var tagvalue = images.TagValue;
+                foreach (var item in images.tagdto)
+                {
+                    var tagname = item.Tagname;
+                    var tagvalue = item.TagValue;
+                    await AddTags(docid, tagname, tagvalue);
+                }
+
                 dMSResponse = new DMSResponse();
                 dMSResponse.Docid = docid;
 
@@ -209,6 +276,7 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
 
 
         }
+
 
         public async Task<List<string>> SearchParam(string tagName, string tagvalue)
         {
