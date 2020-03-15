@@ -2037,12 +2037,27 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     }
                                     foreach (var insurableInsurablefields in item.RiskItems)
                                     {
+                                        dynamic polFields = new ExpandoObject();
+                                        foreach (var insItem in insurableInsurablefields)
+                                        {
+                                           // insItem.ToString()
+                                            if (insItem.Name == "Identification Number" || insItem.Name == "Name")
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                AddProperty(polFields, insItem.Name,insurableInsurablefields[insItem.Name]);
+                                            }
+
+                                        }
                                         policyInsurableDetailsDto = new PolicyInsurableDetailsDTO();
                                         policyInsurableDetailsDto.CoverName = CoverName;
                                         policyInsurableDetailsDto.InsurableItem = InsurableItemName;
                                         policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
                                         policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
                                         policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
+                                        policyInsurableDetailsDto.CoverValue = JsonConvert.SerializeObject(polFields); 
                                         policyInsurableDetailsDto.IsActive = true;
                                         lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
                                         insItemCount++;
@@ -2070,6 +2085,19 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
                             foreach (var insurableInsurablefields in item.RiskItems)
                             {
+                                dynamic polFields = new ExpandoObject();
+                                foreach (var insItem in insurableInsurablefields)
+                                {
+                                    if (insItem.Name == "Identification Number" || insItem.Name == "Name")
+                                    {
+
+                                    }
+                                    else
+                                    {
+                                        AddProperty(polFields, insItem.Name, insurableInsurablefields[insItem.Name]);
+                                    }
+
+                                }
                                 policyInsurableDetailsDto = new PolicyInsurableDetailsDTO();
                                 policyInsurableDetailsDto.CoverName = CoverName;
                                 policyInsurableDetailsDto.InsurableItem = InsurableItemName;
@@ -2085,6 +2113,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                     //}
                                 }
+                                policyInsurableDetailsDto.CoverValue = JsonConvert.SerializeObject(polFields);
                                 policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
                                 policyInsurableDetailsDto.IsActive = true;
                                 lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);

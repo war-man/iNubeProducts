@@ -17,14 +17,11 @@ namespace iNube.Services.Policy.Entities
 
         public virtual DbSet<TblAdditionalDetails> TblAdditionalDetails { get; set; }
         public virtual DbSet<TblEndorsementDetails> TblEndorsementDetails { get; set; }
-        public virtual DbSet<TblMapper> TblMapper { get; set; }
-        public virtual DbSet<TblMappingDetails> TblMappingDetails { get; set; }
         public virtual DbSet<TblNumberingScheme> TblNumberingScheme { get; set; }
         public virtual DbSet<TblPolicy> TblPolicy { get; set; }
         public virtual DbSet<TblPolicyDetails> TblPolicyDetails { get; set; }
         public virtual DbSet<TblPolicyInsurableDetails> TblPolicyInsurableDetails { get; set; }
         public virtual DbSet<TblPolicyPayment> TblPolicyPayment { get; set; }
-        public virtual DbSet<TblPremiumDetails> TblPremiumDetails { get; set; }
         public virtual DbSet<TblmasPocommonTypes> TblmasPocommonTypes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -32,7 +29,7 @@ namespace iNube.Services.Policy.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
@@ -110,34 +107,6 @@ namespace iNube.Services.Policy.Entities
                 entity.Property(e => e.PremiumAmount).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.TotalPremiumAmount).HasColumnType("numeric(18, 2)");
-            });
-
-            modelBuilder.Entity<TblMapper>(entity =>
-            {
-                entity.HasKey(e => e.MapperId)
-                    .HasName("Pk_tblMapper");
-
-                entity.ToTable("tblMapper", "PO");
-
-                entity.Property(e => e.MapperId)
-                    .HasColumnType("numeric(18, 0)")
-                    .ValueGeneratedOnAdd();
-            });
-
-            modelBuilder.Entity<TblMappingDetails>(entity =>
-            {
-                entity.ToTable("tblMappingDetails", "PO");
-
-                entity.Property(e => e.Id)
-                    .HasColumnType("numeric(18, 0)")
-                    .ValueGeneratedOnAdd();
-
-                entity.Property(e => e.MappingDetailsId).HasColumnType("numeric(18, 0)");
-
-                entity.HasOne(d => d.MappingDetails)
-                    .WithMany(p => p.TblMappingDetails)
-                    .HasForeignKey(d => d.MappingDetailsId)
-                    .HasConstraintName("FK_tblMappingDetails");
             });
 
             modelBuilder.Entity<TblNumberingScheme>(entity =>
@@ -371,9 +340,7 @@ namespace iNube.Services.Policy.Entities
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CoverValue)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.CoverValue).IsUnicode(false);
 
                 entity.Property(e => e.IdentificationNo)
                     .HasMaxLength(100)
@@ -399,7 +366,7 @@ namespace iNube.Services.Policy.Entities
             modelBuilder.Entity<TblPolicyPayment>(entity =>
             {
                 entity.HasKey(e => e.PaymentId)
-                    .HasName("PK__tblPolic__9B556A589CF41C2A");
+                    .HasName("PK__tblPolic__9B556A58B030E9AB");
 
                 entity.ToTable("tblPolicyPayment", "PO");
 
@@ -432,28 +399,6 @@ namespace iNube.Services.Policy.Entities
                     .WithMany(p => p.TblPolicyPayment)
                     .HasForeignKey(d => d.PolicyId)
                     .HasConstraintName("FK_tblPolicyPayment_tblPolicy");
-            });
-
-            modelBuilder.Entity<TblPremiumDetails>(entity =>
-            {
-                entity.HasKey(e => e.PremiumDetailsId)
-                    .HasName("PK_tbPremiumDetails");
-
-                entity.ToTable("tblPremiumDetails", "PO");
-
-                entity.Property(e => e.PremiumDetailsId)
-                    .HasColumnName("PremiumDetailsID")
-                    .HasColumnType("numeric(18, 0)")
-                    .ValueGeneratedOnAdd();
-
-                entity.Property(e => e.RefrenceId)
-                    .HasColumnName("RefrenceID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Type)
-                    .HasMaxLength(1)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<TblmasPocommonTypes>(entity =>

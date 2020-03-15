@@ -62,8 +62,8 @@ namespace iNube.Services.Policy.Entities
         public string PolicyStatus { get; set; }
         public decimal? MasterPremium { get; set; }
         public decimal? PremiumAmount { get; set; }
-        public string CdaccountNumber { get; set; }
         public string MasterType { get; set; }
+        public string CdaccountNumber { get; set; }
 
         public virtual ICollection<TblPolicyDetails> TblPolicyDetails { get; set; }
         public virtual ICollection<TblPolicyInsurableDetails> TblPolicyInsurableDetails { get; set; }
