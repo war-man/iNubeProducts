@@ -443,6 +443,11 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string TSTTAX_TAXTYPE { get; set; }
     }
 
+    public class EndoAddDTO
+    {
+        public string Type { get; set; }
+        public List<dynamic> Data { get; set; }
+    }
 
 }
 

@@ -18,10 +18,16 @@ phases:
       
   post_build:
     commands:
-        - echo clearing s3 bucket
+        - echo clearing s3 bucket for MICA PWA
         - aws s3 rm s3://micapwa
         - echo $CODEBUILD_SRC_DIR
         - aws s3 sync ./build/ s3://micapwa 
+        
+        
+        - echo clearing s3 bucket for MICA Edelweiss Screen
+        - aws s3 rm s3://micaedui
+        - echo $CODEBUILD_SRC_DIR
+        - aws s3 sync ./build/ s3://micaedui 
 artifacts:
   files:
     -  Products/MICA/ClientApp/build/*

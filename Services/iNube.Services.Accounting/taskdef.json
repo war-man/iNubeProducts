@@ -10,24 +10,32 @@
 
       "cpu": 512,
       "memory": 512,
-
-      "portMappings": [
-        {
-          "containerPort": 9011,
-          "hostPort": 9011,
-          "protocol": "tcp"
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/dev2-mica-accounting",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs",
         }
-      ],
-      "essential": true
+      },
 
-    }
-  ],
+          "portMappings": [
+            {
+              "containerPort": 9011,
+              "hostPort": 9011,
+              "protocol": "tcp"
+            }
+          ],
+          "essential": true
+
+        },
 
 
-  "requiresCompatibilities": [
-    "EC2"
-  ],
-  "cpu": "512",
-  "memory": "512"
 
-}
+        "requiresCompatibilities": [
+          "EC2"
+        ],
+        "cpu": "512",
+        "memory": "512"
+
+      }

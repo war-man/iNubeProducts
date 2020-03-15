@@ -9,8 +9,16 @@
       "image": "<IMAGE1_NAME>",
 
       "cpu": 512,
-      "memory": 512,
+      "memory": 1024,
 
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/dev2-mica-billing",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
       "portMappings": [
         {
           "containerPort": 9001,
@@ -28,6 +36,15 @@
     "EC2"
   ],
   "cpu": "512",
-  "memory": "512"
+  "memory": "1024",
+
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/dev2-mica-billing",
+      "awslogs-region": "ap-south-1",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
 
 }

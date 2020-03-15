@@ -9,7 +9,16 @@
       "image": "<edtaskdef>",
 
       "cpu": 512,
-      "memory": 512,
+      "memory": 1024,
+
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/ed-mica-billing",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
 
       "portMappings": [
         {
@@ -23,11 +32,17 @@
     }
   ],
 
-
   "requiresCompatibilities": [
     "EC2"
   ],
   "cpu": "512",
-  "memory": "512"
-
+  "memory": "1024",
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/ed-mica-billing",
+      "awslogs-region": "ap-south-1",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
 }

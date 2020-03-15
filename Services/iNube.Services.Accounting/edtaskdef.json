@@ -11,6 +11,14 @@
       "cpu": 512,
       "memory": 512,
 
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/ed-mica-accounting",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
       "portMappings": [
         {
           "containerPort": 9011,
@@ -21,13 +29,19 @@
       "essential": true
 
     }
+
   ],
 
-
-  "requiresCompatibilities": [
-    "EC2"
-  ],
+  "requiresCompatibilities": [ "EC2" ],
   "cpu": "512",
-  "memory": "512"
+  "memory": "512",
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/ed-mica-accounting",
+      "awslogs-region": "ap-south-1",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
 
 }
