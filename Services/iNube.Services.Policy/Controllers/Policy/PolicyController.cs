@@ -553,7 +553,12 @@ namespace iNube.Services.Policy.Controllers.Policy
             return ServiceResponse(response);
         }
 
-
+        [HttpPost]
+        public async Task<IActionResult> InternalGetPolicyDetailsByNumber(string policyNumber)
+        {
+            var response = await _policyService.InternalGetPolicyDetailsByNumber(policyNumber, Context);
+            return Ok(response);
+        }
 
 
 

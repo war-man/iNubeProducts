@@ -4439,6 +4439,27 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return new ProposalResponse { Status = BusinessStatus.NotFound };
 
         }
+
+        public async Task<object> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyNumber).FirstOrDefault();
+            if (tblPolicy != null)
+            {
+                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == tblPolicy.PolicyId);
+                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                var json1 = JsonConvert.DeserializeObject<ExpandoObject>(insurableItem);
+                AddProperty(json1, "CDAccountNumber", tblPolicy.CdaccountNumber);
+                var json = JsonConvert.SerializeObject(json1);
+
+                var json2 = JsonConvert.DeserializeObject<object>(json);
+
+                return json2;
+            }
+            return null;
+
+        }
     }
 
 
