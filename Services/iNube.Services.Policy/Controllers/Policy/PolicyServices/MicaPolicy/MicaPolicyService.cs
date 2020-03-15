@@ -3326,62 +3326,85 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
             var policyId = tbl_particiant.PolicyId;
             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, tbl_particiant, tblPolicyDetailsdata, apiContext);
+            return _mapper.Map<PolicyDTO>(tblPolicy);
+        }
+
+        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var policyNo = (string)modifydata["PolicyNumber"];
+            var policyId = tblPolicy.PolicyId;
+            var insurableItem = tblPolicyDetails.PolicyRequest;
             dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
             dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
-
-            foreach (var insurableName in json.InsurableItem)
+            int rowIndex = 0;
+            int riskCount = 0;
+            //int riskCount = 0;
+            foreach (var item in modifydata.InsurableItem)
             {
-                foreach (var insurableName1 in json1.InsurableItem)
+                rowIndex = 0;
+                foreach (var insurableName in json.InsurableItem)
                 {
-
-                    foreach (var item in modifydata.InsurableItem)
+                    if (item.InsurableName == insurableName.InsurableName)
+                    {
+                        break;
+                    }
+                    rowIndex++;
+                }
+                var oldInsItem = json1["InsurableItem"][rowIndex];///get thd data name
+                riskCount = Convert.ToInt16(oldInsItem["RiskCount"]);
+                var riskIndex = 0;
+                foreach (var fields in item.RiskItems)
+                {
+                    try
                     {
 
-                        if (item.InsurableName == insurableName.InsurableName)
+                        foreach (var risk in oldInsItem.RiskItems)
                         {
-
-                            foreach (var fields in item.RiskItems)
+                            if (fields["Identification Number"] == risk["Identification Number"])
                             {
-                                try
-                                {
-                                    foreach (var jsoninsurableFields in insurableName.RiskItems)
-                                    // for(var i=0;i< insurableName.RiskItems.Countf)
-                                    {
-                                        var InputidentificationNumber = (string)fields["Identification Number"];
-                                        var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                                        if (InputidentificationNumber == TblIdentificationNo)
-                                        {
-                                            //insurableName.RiskItems = item.RiskItems;
-
-                                            var Adddata = fields;
-                                            var removeitem = jsoninsurableFields;
-                                            insurableName.RiskItems.Remove(removeitem);
-                                            insurableName.RiskItems.Add(Adddata);
-
-                                        }
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    insurableName1.RiskItems = insurableName.RiskItems;
-                                }
-
+                                break;
+                            }
+                            riskIndex++;
+                        }
+                        var jsoninsurableFields = oldInsItem["RiskItems"][riskIndex];//identification numbefr
+                        var InputidentificationNumber = (string)fields["Identification Number"];
+                        var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                        var Adddata = fields;
+                        if (InputidentificationNumber == TblIdentificationNo)
+                        {
+                            var removeitem = jsoninsurableFields;
+                            oldInsItem.RiskItems.Remove(removeitem);
+                            oldInsItem.RiskItems.Add(Adddata);
+                        }
+                        else
+                        {
+                            if (oldInsItem.RiskItems.Count < riskCount)
+                            {
+                                oldInsItem.RiskItems.Add(Adddata);
+                            }
+                            else
+                            {
+                                // Error needs to throw
                             }
                         }
-
                     }
-
+                    catch (Exception ex)
+                    {
+                        // insurableName1.RiskItems = insurableName.RiskItems;
+                    }
                 }
-                tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                _context.SaveChanges();
-
             }
-            return null;
-        }
+            _context.TblPolicy.Update(tblPolicy);
+            tblPolicyDetails.PolicyRequest = json1.ToString();
+            _context.TblPolicyDetails.Update(tblPolicyDetails);
+            _context.SaveChanges();
 
+            return tblPolicy;
+        }
 
         //GetInsurableItemDetails
         public async Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext)
@@ -3964,26 +3987,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
 
-                //if (Listofres != null)
-                //{
-                //    foreach (var item in Listofres)
-                //    {
-
-                //        if (item.Outcome == "Fail")
-                //        {
-
-                //            ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
-                //            Errors.Add(errorInfo);
-
-                //        }
-
-                //    }
-                //    if (Errors.Count > 0)
-                //    {
-                //        return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors };
-                //    }
-                //}
-
+               
 
                 //Step2: Check Policy Exist for this Proposal Number 
 
@@ -3998,73 +4002,77 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         var policyId = tblPolicy.PolicyId;
                         var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                        dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                        dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                        // var paymentDetails = json["PaymentInfoDeatils"];
-
-
                         tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
-                        foreach (var item in IssuepolicyDTO.InsurableItem)//Client
-                        {
-                            foreach (var insurableName in json.InsurableItem)//table 
-                            {
-                                if (item.InsurableName == insurableName.InsurableName)
-                                {
-                                    foreach (var insurableName1 in json1.InsurableItem)
-                                    {
-                                        //json-table-insurableName
-                                        //IssuepolicyDTO-request-item
-                                        var riskcount = Convert.ToInt32(insurableName["RiskCount"]);
-                                        var additonalDriverCount = item.RiskItems.Count;
 
-                                        foreach (var fields in item.RiskItems)
-                                        {
-                                            foreach (var jsoninsurableFields in insurableName.RiskItems)
-                                            {
-                                             
-                                                try
-                                                {
-                                                    if (additonalDriverCount < riskcount)
-                                                    {
+                        var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, tblPolicy, tblPolicyDetailsdata, apiContext);
+
+                       var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                        dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                        //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                        //// var paymentDetails = json["PaymentInfoDeatils"];
 
 
-                                                        var InputidentificationNumber = (string)fields["Identification Number"];
-                                                        var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                                                        if (InputidentificationNumber == TblIdentificationNo)
-                                                        {
-                                                            
-                                                        }
-                                                        //else
-                                                        //{
-                                                        //    insurableName.RiskItems.Add(fields);
-                                                        //}
-                                                    }
-                                                    else
-                                                    {
-                                                        return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = "vehicle cannot be more from additional driver" };
+                        //tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
+                        //foreach (var item in IssuepolicyDTO.InsurableItem)//Client
+                        //{
+                        //    foreach (var insurableName in json.InsurableItem)//table 
+                        //    {
+                        //        if (item.InsurableName == insurableName.InsurableName)
+                        //        {
+                        //            foreach (var insurableName1 in json1.InsurableItem)
+                        //            {
+                        //                //json-table-insurableName
+                        //                //IssuepolicyDTO-request-item
+                        //                var riskcount = Convert.ToInt32(insurableName["RiskCount"]);
+                        //                var additonalDriverCount = item.RiskItems.Count;
 
-                                                    }
-                                                }
-                                                catch (Exception e)
-                                                {
-                                                    insurableName1.RiskItems = insurableName.RiskItems;
-                                                }
-                                            }
-                                        }
-                                    }
+                        //                foreach (var fields in item.RiskItems)
+                        //                {
+                        //                    foreach (var jsoninsurableFields in insurableName.RiskItems)
+                        //                    {
+
+                        //                        try
+                        //                        {
+                        //                            if (additonalDriverCount < riskcount)
+                        //                            {
 
 
-                                }
+                        //                                var InputidentificationNumber = (string)fields["Identification Number"];
+                        //                                var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                        //                                if (InputidentificationNumber == TblIdentificationNo)
+                        //                                {
 
-                            }
+                        //                                }
+                        //                                //else
+                        //                                //{
+                        //                                //    insurableName.RiskItems.Add(fields);
+                        //                                //}
+                        //                            }
+                        //                            else
+                        //                            {
+                        //                                return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = "vehicle cannot be more from additional driver" };
 
-                        }
+                        //                            }
+                        //                        }
+                        //                        catch (Exception e)
+                        //                        {
+                        //                            insurableName1.RiskItems = insurableName.RiskItems;
+                        //                        }
+                        //                    }
+                        //                }
+                        //            }
 
-                        tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                        _context.TblPolicy.Update(tblPolicy);
-                        _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                        _context.SaveChanges();
+
+                        //        }
+
+                        //    }
+
+                        //}
+
+                        //tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+                        //_context.TblPolicy.Update(tblPolicy);
+                        //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+                        //_context.SaveChanges();
 
 
                         //Step:4 Calling CD mapping API
@@ -4191,53 +4199,54 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 var policyId = tbl_particiant.PolicyId;
                 var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, tbl_particiant, tblPolicyDetailsdata, apiContext);
+                //var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                //dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
 
-                foreach (var insurableName in json.InsurableItem)
-                {
-                    foreach (var insurableName1 in json1.InsurableItem)
-                    {
-                        foreach (var item in modifydata.InsurableItem)
-                        {
+                //foreach (var insurableName in json.InsurableItem)
+                //{
+                //    foreach (var insurableName1 in json1.InsurableItem)
+                //    {
+                //        foreach (var item in modifydata.InsurableItem)
+                //        {
 
-                            if (item.InsurableName == insurableName1.InsurableName)
-                            {
-                                foreach (var fields in item.RiskItems)
-                                {
-                                    try
-                                    {
-                                        foreach (var jsoninsurableFields in insurableName.RiskItems)
-                                        {
-                                            var InputidentificationNumber = (string)fields["Identification Number"];
-                                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                                            if (InputidentificationNumber == TblIdentificationNo)
-                                            {
-                                                var Adddata = fields;
-                                                var removeitem = jsoninsurableFields;
-                                                insurableName.RiskItems.Remove(removeitem);
-                                                insurableName.RiskItems.Add(Adddata);
+                //            if (item.InsurableName == insurableName1.InsurableName)
+                //            {
+                //                foreach (var fields in item.RiskItems)
+                //                {
+                //                    try
+                //                    {
+                //                        foreach (var jsoninsurableFields in insurableName.RiskItems)
+                //                        {
+                //                            var InputidentificationNumber = (string)fields["Identification Number"];
+                //                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                //                            if (InputidentificationNumber == TblIdentificationNo)
+                //                            {
+                //                                var Adddata = fields;
+                //                                var removeitem = jsoninsurableFields;
+                //                                insurableName.RiskItems.Remove(removeitem);
+                //                                insurableName.RiskItems.Add(Adddata);
 
-                                            }
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                       
-                                        insurableName1.RiskItems = insurableName.RiskItems;
-                                    }
-                                }
-                            }
+                //                            }
+                //                        }
+                //                    }
+                //                    catch (Exception e)
+                //                    {
 
-                        }
+                //                        insurableName1.RiskItems = insurableName.RiskItems;
+                //                    }
+                //                }
+                //            }
 
-                    }
-                }
-                tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                _context.SaveChanges();
+                //        }
+
+                //    }
+                //}
+                //tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+                //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+                //_context.SaveChanges();
             }
             else
             {
