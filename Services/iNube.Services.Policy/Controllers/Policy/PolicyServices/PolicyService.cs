@@ -74,7 +74,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<ProposalResponse> PolicyEndoresemenet(dynamic endoresementDto, ApiContext apiContext);
         Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputmodel, string mappingname, ApiContext apiContext);
         Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext);
-        Task<object> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
+        Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
 
     }
     public class PolicyService : IPolicyService
@@ -730,7 +730,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return await _policyProductService(apiContext.ProductType).DynamicMapper(inputModel,mappingname, apiContext);
         }
 
-        public async Task<object> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
+        public async Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).InternalGetPolicyDetailsByNumber(policyNumber, apiContext);
         }

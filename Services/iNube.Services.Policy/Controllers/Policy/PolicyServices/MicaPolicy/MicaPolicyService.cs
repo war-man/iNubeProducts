@@ -4662,7 +4662,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         }
 
-        public async Task<object> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
+        public async Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
