@@ -20,6 +20,7 @@ namespace iNube.Services.Claims.Entities
         public virtual DbSet<TblBankDocument> TblBankDocument { get; set; }
         public virtual DbSet<TblBankFile> TblBankFile { get; set; }
         public virtual DbSet<TblClaim> TblClaim { get; set; }
+        public virtual DbSet<TblClaimAllocationDetails> TblClaimAllocationDetails { get; set; }
         public virtual DbSet<TblClaimDetails> TblClaimDetails { get; set; }
         public virtual DbSet<TblClaimHistory> TblClaimHistory { get; set; }
         public virtual DbSet<TblClaimInsurable> TblClaimInsurable { get; set; }
@@ -30,22 +31,20 @@ namespace iNube.Services.Claims.Entities
         public virtual DbSet<TblPayment> TblPayment { get; set; }
         public virtual DbSet<TblmasCmcommonTypes> TblmasCmcommonTypes { get; set; }
 
-        // Unable to generate entity type for table 'CM.tblclaims_copy'. Please see the warning messages.
         // Unable to generate entity type for table 'CM.tblBankFileArchive'. Please see the warning messages.
-        // Unable to generate entity type for table 'CM.tblPayment_copy'. Please see the warning messages.
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<TblBank>(entity =>
             {
@@ -97,8 +96,6 @@ namespace iNube.Services.Claims.Entities
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.Property(e => e.AccountType).HasMaxLength(50);
-
                 entity.Property(e => e.BankBranchAddress)
                     .HasMaxLength(100)
                     .IsUnicode(false);
@@ -120,11 +117,21 @@ namespace iNube.Services.Claims.Entities
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
+                entity.HasOne(d => d.AccountTypeNavigation)
+                    .WithMany(p => p.TblBankAccountsAccountTypeNavigation)
+                    .HasForeignKey(d => d.AccountType)
+                    .HasConstraintName("FK__tblBankAc__Accou__150615B5");
+
                 entity.HasOne(d => d.Claim)
                     .WithMany(p => p.TblBankAccounts)
                     .HasForeignKey(d => d.ClaimId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tblBankAccounts_tblClaims");
+
+                entity.HasOne(d => d.PayeeType)
+                    .WithMany(p => p.TblBankAccountsPayeeType)
+                    .HasForeignKey(d => d.PayeeTypeId)
+                    .HasConstraintName("FK__tblBankAc__Payee__15FA39EE");
             });
 
             modelBuilder.Entity<TblBankDocument>(entity =>
@@ -390,6 +397,32 @@ namespace iNube.Services.Claims.Entities
                     .HasColumnType("numeric(10, 0)");
             });
 
+            modelBuilder.Entity<TblClaimAllocationDetails>(entity =>
+            {
+                entity.HasKey(e => e.AllocationId)
+                    .HasName("PK__tblClaim__B3C6D64B31DF7BAE");
+
+                entity.ToTable("tblClaimAllocationDetails", "CM");
+
+                entity.Property(e => e.AllocatedTo).HasMaxLength(100);
+
+                entity.Property(e => e.AllocationType).HasMaxLength(50);
+
+                entity.Property(e => e.EmailId).HasMaxLength(200);
+
+                entity.Property(e => e.MobileNumber).HasMaxLength(100);
+
+                entity.Property(e => e.StepId).HasMaxLength(150);
+
+                entity.Property(e => e.WorkFlowId).HasMaxLength(100);
+
+                entity.HasOne(d => d.Claim)
+                    .WithMany(p => p.TblClaimAllocationDetails)
+                    .HasForeignKey(d => d.ClaimId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__tblClaimA__Claim__76818E95");
+            });
+
             modelBuilder.Entity<TblClaimDetails>(entity =>
             {
                 entity.HasKey(e => e.ClaimDetailsId)
@@ -486,7 +519,7 @@ namespace iNube.Services.Claims.Entities
             modelBuilder.Entity<TblClaimInsurable>(entity =>
             {
                 entity.HasKey(e => e.ClaimInsurableId)
-                    .HasName("PK__tblClaim__06DF17349305A535");
+                    .HasName("PK__tblClaim__06DF1734326BC8A3");
 
                 entity.ToTable("tblClaimInsurable", "CM");
 
@@ -495,6 +528,10 @@ namespace iNube.Services.Claims.Entities
                 entity.Property(e => e.BenefitAmount).HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.ClaimAmounts).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.CoverValue)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.IdentificationNo)
                     .HasMaxLength(100)
@@ -652,13 +689,13 @@ namespace iNube.Services.Claims.Entities
                     .WithMany(p => p.TblClaimTransactionNew)
                     .HasForeignKey(d => d.BankId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__tblClaimT__BankI__5614BF03");
+                    .HasConstraintName("FK__tblClaimT__BankI__025D5595");
 
                 entity.HasOne(d => d.ClaimDoc)
                     .WithMany(p => p.TblClaimTransactionNew)
                     .HasForeignKey(d => d.ClaimDocId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__tblClaimT__Claim__542C7691");
+                    .HasConstraintName("FK__tblClaimT__Claim__035179CE");
 
                 entity.HasOne(d => d.Claim)
                     .WithMany(p => p.TblClaimTransactionNew)
@@ -675,7 +712,7 @@ namespace iNube.Services.Claims.Entities
                     .WithMany(p => p.TblClaimTransactionNew)
                     .HasForeignKey(d => d.PaymentId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__tblClaimT__Payme__57FD0775");
+                    .HasConstraintName("FK__tblClaimT__Payme__0539C240");
             });
 
             modelBuilder.Entity<TblClaimdoc>(entity =>
@@ -812,7 +849,7 @@ namespace iNube.Services.Claims.Entities
             modelBuilder.Entity<TblmasCmcommonTypes>(entity =>
             {
                 entity.HasKey(e => e.CommonTypeId)
-                    .HasName("PK__tblmasCM__40508372231BA7C3");
+                    .HasName("PK__tblmasCM__40508372AED6FF74");
 
                 entity.ToTable("tblmasCMCommonTypes", "CM");
 

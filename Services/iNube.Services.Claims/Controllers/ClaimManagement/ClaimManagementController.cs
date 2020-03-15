@@ -201,14 +201,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
         }
 
         [HttpPost]
-        public async Task<IActionResult> BillingEventResponse(BillingEventRequest cDTO)
+        public async Task<IActionResult> BillingEventResponse(Models.BillingEventRequest cDTO)
         {
             var _searchResult = await _claimService.BillingEventResponse(cDTO, Context);
             return Ok(_searchResult);
         }
 
         [HttpPost]
-        public async Task<IActionResult> BillingEventData([FromBody]BillingEventRequest productdto)
+        public async Task<IActionResult> BillingEventData([FromBody]Models.BillingEventRequest productdto)
         {
             var response = await _claimService.BillingEventData(productdto, Context);
             return Ok(response);
@@ -250,6 +250,17 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
         public async Task<IActionResult> SearchClaim([FromBody]SearchClaimDTO searchclaim)
         {
             var response = await _claimService.SearchClaim(searchclaim, Context);
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SearchClaimByUserid([FromBody]SearchClaimDTO searchclaim)
+        {
+            var response = await _claimService.SearchClaimByUserid(searchclaim, Context);
             if (response != null)
             {
                 return Ok(response);
@@ -379,6 +390,19 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
 
         var res= await _claimService.GetBalanceSumInsured(policyNo, Context);
             return Ok(res);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetClaimCount()
+        {
+            var response = await _claimService.GetClaimCount(Context);
+            return Ok(response);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetMasterForVehicleLocation(string sMasterlist)
+        {
+            var commonTypesDTOs = await _claimService.GetMasterForVehicleLocation(sMasterlist, Context);
+            return Ok(commonTypesDTOs);
         }
 
 

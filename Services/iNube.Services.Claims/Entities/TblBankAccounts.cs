@@ -13,11 +13,14 @@ namespace iNube.Services.Claims.Entities
         public string Ifsccode { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int ClaimId { get; set; }
-        public string AccountType { get; set; }
+        public int? AccountType { get; set; }
         public string CreatedBy { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public int? PayeeTypeId { get; set; }
 
+        public virtual TblmasCmcommonTypes AccountTypeNavigation { get; set; }
         public virtual TblClaims Claim { get; set; }
+        public virtual TblmasCmcommonTypes PayeeType { get; set; }
     }
 }

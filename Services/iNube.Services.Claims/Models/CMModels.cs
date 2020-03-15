@@ -95,6 +95,7 @@ namespace iNube.Services.Claims.Models
             ClaimInsurable = new List<ClaimInsurableDTO>();
             ClaimHistory = new List<ClaimsHistoryDTO>();
             Alldoc = new List<Alldoc>();
+            BankAccounts = new List<BankAccountsDTO>();
 
         }
         public int ClaimId { get; set; }
@@ -104,15 +105,18 @@ namespace iNube.Services.Claims.Models
         public int? ApprovedClaimAmount { get; set; }
         public string EmailId { get; set; }
         public string PolicyNumber { get; set; }
-       // public string InsuredName { get; set; }
-       // public decimal? ApprovedClaimAmounts { get; set; }
-       // public string DmsdocId { get; set; }
-       // public string DocumentName { get; set; }
+        public int? PayeeTypeId { get; set; }
+        public dynamic DataModelDTO { get; set; }
+        // public string InsuredName { get; set; }
+        // public decimal? ApprovedClaimAmounts { get; set; }
+        // public string DmsdocId { get; set; }
+        // public string DocumentName { get; set; }
 
 
         public virtual List<ClaimInsurableDTO> ClaimInsurable { get; set; }
         public virtual List<ClaimsHistoryDTO> ClaimHistory { get; set; }
         public virtual List<Alldoc> Alldoc { get; set; }
+        public virtual List<BankAccountsDTO> BankAccounts { get; set; }
     }
 
     public partial class SearchClaimDTO
@@ -137,6 +141,7 @@ namespace iNube.Services.Claims.Models
         public string ClaimStatus { get; set; }
         public string CoverEvent { get; set; }
         public string CoverName { get; set; }
+        public string TypeOfLoss { get; set; }
         public string InsuredReference { get; set; }
         public string InsuredEmail { get; set; }
         public string InsuredMobileNo { get; set; }
@@ -146,7 +151,7 @@ namespace iNube.Services.Claims.Models
         public int ClaimStatusId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string InsuredName { get; set; }
-
+        public int? ProductIdPk { get; set; }
     }
 
     public partial class ClaimResponseDTO
@@ -295,6 +300,7 @@ namespace iNube.Services.Claims.Models
             TblPayment = new HashSet<PaymentDTO>();
             ClaimInsurable = new HashSet<ClaimInsurableDTO>();
             ClaimsHistory = new HashSet<ClaimsHistoryDTO>();
+            ClaimAllocationDetails = new HashSet<ClaimAllocationDetailsDTO>();
         }
 
         public int ClaimId { get; set; }
@@ -329,6 +335,7 @@ namespace iNube.Services.Claims.Models
         public virtual ICollection<PaymentDTO> TblPayment { get; set; }
         public virtual ICollection<ClaimInsurableDTO> ClaimInsurable { get; set; }
         public virtual ICollection<ClaimsHistoryDTO> ClaimsHistory { get; set; }
+        public virtual ICollection<ClaimAllocationDetailsDTO> ClaimAllocationDetails { get; set; }
     }
 
     
@@ -352,6 +359,16 @@ namespace iNube.Services.Claims.Models
         public DateTime? PaymentDate { get; set; }
         public decimal? PaymentAmount { get; set; }
     }
+
+    public partial class ClaimCounts
+    {
+        public int Intimated { get; set; }
+        public int Approved { get; set; }
+        public int Document { get; set; }
+        public int Rejected { get; set; }
+        public int Setteled { get; set; }
+    }
+
 
     public partial class ClaimTransactionNewDTOs
     {
@@ -607,10 +624,11 @@ namespace iNube.Services.Claims.Models
         public string Ifsccode { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int ClaimId { get; set; }
-        public string AccountType { get; set; }
+        public int? AccountType { get; set; }
         public string CreatedBy { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public int? PayeeTypeId { get; set; }
 
         //public virtual ClaimsDTO Claim { get; set; }
     }
@@ -665,59 +683,102 @@ namespace iNube.Services.Claims.Models
 
     public partial class ClaimDataDTO
     {
-            public ClaimDataDTO()
-            {
-                ClaimInsurable = new List<ClaimInsurableDTO>();
-               // Claimdocument = new List<ClaimdocDTO>();
-                TblBankAccounts = new List<BankAccountsDTO>();
-                Alldoc = new List<Alldoc>();
-                
-
-            }
-            public string PolicyNumber { get; set; }
-           
-            public DateTime? lossDateTime { get; set; }
-            public string locationOfLoss { get; set; }
-            public int lossIntimatedBy { get; set; }
-            public string lossDescription { get; set; }
-            public int? ClaimAmount { get; set; }
-            public string AccHolderName { get; set; }
-            public string AccNumber { get; set; }
-            public string BankName { get; set; }
-            public string BankBranchAdd { get; set; }
-            public string IfscCode { get; set; }
-            public string EmailId { get; set; }
-            public string DocumentType { get; set; }
-            public string AccType { get; set; }
-            public int ClaimStatusId { get; set; }
-            public bool? Active { get; set; }
-            public decimal? PolicyId { get; set; }
-            public int ClaimInsurableId { get; set; }
-            public string InsurableItem { get; set; }
-            public string Name { get; set; }
-            public string IdentificationNo { get; set; }
-            public string TypeOfLoss { get; set; }
-            public decimal? BenefitAmount { get; set; }
-            public int? ClaimAmounts { get; set; }
-            public DateTime? CreatedDate { get; set; }
-            public string CreatedBy { get; set; }
-            public decimal? PartnerId { get; set; }
-            public decimal? OrganizationId { get; set; }
-            public int? ProductIdPk { get; set; }
-            public string ClaimNumber { get; set; }
-            public virtual List<BankAccountsDTO> TblBankAccounts { get; set; }
-            public virtual List<ClaimInsurableDTO> ClaimInsurable { get; set; }
-           // public virtual List<ClaimdocDTO> Claimdocument { get; set; }
-            public virtual List<Alldoc> Alldoc { get; set; }
-            public dynamic DataModelDTO { get; set; }
+        public ClaimDataDTO()
+        {
+            ClaimInsurable = new List<ClaimInsurable>();
+            BankAccounts = new List<BankAccounts>();
+            Alldoc = new List<Alldoc>();
+            ClaimAllocationDetails = new HashSet<ClaimAllocationDetailsDTO>();
+        }
+        public string PolicyNumber { get; set; }
+        public DateTime? lossDateTime { get; set; }
+        public string locationOfLoss { get; set; }
+        public int lossIntimatedBy { get; set; }
+        public string lossDescription { get; set; }
+        public int? ClaimAmount { get; set; }
+        //public string AccHolderName { get; set; }
+        //public string AccNumber { get; set; }
+        //public string BankName { get; set; }
+        //public string BankBranchAdd { get; set; }
+        //public string IfscCode { get; set; }
+        // public string EmailId { get; set; }
+        // public int? AccType { get; set; }
+        public int ClaimStatusId { get; set; }
+        // public bool? Active { get; set; }
+        //public decimal? PolicyId { get; set; }
+        //public int ClaimInsurableId { get; set; }
+        //public string InsurableItem { get; set; }
+        //public string Name { get; set; }
+        //public string IdentificationNo { get; set; }
+        //public string TypeOfLoss { get; set; }
+        //public decimal? BenefitAmount { get; set; }
+        //public int? ClaimAmounts { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+        public decimal? PartnerId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public int? ProductIdPk { get; set; }
+        public string ClaimNumber { get; set; }
+        public virtual ICollection<ClaimAllocationDetailsDTO> ClaimAllocationDetails { get; set; }
+        public virtual List<BankAccounts> BankAccounts { get; set; }
+        public virtual List<ClaimInsurable> ClaimInsurable { get; set; }
+        // public virtual List<ClaimdocDTO> Claimdocument { get; set; }
+        public virtual List<Alldoc> Alldoc { get; set; }
+        public dynamic AdditionalDetails { get; set; }
     }
-
     public partial class Alldoc
     {
-        public string DmsdocId { get; set; }
-        public string DocumentName { get; set; }
+        public string DocumentID { get; set; }
+        public string FileName { get; set; }
+        public string DocumentType { get; set; }
+    }
+    public partial class BankAccounts
+    {
+        public string AccountHolderName { get; set; }
+        public string AccountNumber { get; set; }
+        public string BankName { get; set; }
+        public string BankBranchAddress { get; set; }
+        public string IfscCode { get; set; }
+        public int? AccountType { get; set; }
+        public DateTime? CreatedDate { get; set; }
+    }
+    public partial class ClaimInsurable
+    {
+        public string InsurableItem { get; set; }
+        public string Name { get; set; }
+        public string IdentificationNo { get; set; }
+        public string CoverName { get; set; }
+        //public decimal? BenefitAmount { get; set; }
+        public decimal? ClaimAmounts { get; set; }
+        public string CoverValue { get; set; }
+    }
+    public partial class AllocDTO
+    {
+        public string State { get; set; }
     }
 
+    public class SMSRequest
+    {
+        public string APIKey { get; set; }
+        public string SenderId { get; set; }
+        public string Channel { get; set; }
+        public string RecipientNumber { get; set; }
+        public string PolicyNumber { get; set; }
+        public string SMSMessage { get; set; }
+    }
+
+    public partial class ClaimAllocationDetailsDTO
+    {
+        public int AllocationId { get; set; }
+        public string AllocatedTo { get; set; }
+        public string AllocationType { get; set; }
+        public string AllocationDetails { get; set; }
+        public string WorkFlowId { get; set; }
+        public string StepId { get; set; }
+        public string MobileNumber { get; set; }
+        public string EmailId { get; set; }
+        public int ClaimId { get; set; }
+    }
 
     public class DemoResponse<T>
      {
@@ -834,17 +895,24 @@ namespace iNube.Services.Claims.Models
             public string mType { get; set; }
             public bool mIsRequired { get; set; }
         }
-        //public class BillingEventDataDTO
-        //{
-        //    public int Count { get; set; }
-        //    public string ProductCode { get; set; }
-        //    public string PorductName { get; set; }
-        //    public decimal SumInsured { get; set; }
-        //    public int? ProductId { get; set; }
-        //    public decimal Premium { get; set; }
-        //}
 
-        public partial class PartnersDTO
+    public partial class commonddDTO
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+    }
+    //public class BillingEventDataDTO
+    //{
+    //    public int Count { get; set; }
+    //    public string ProductCode { get; set; }
+    //    public string PorductName { get; set; }
+    //    public decimal SumInsured { get; set; }
+    //    public int? ProductId { get; set; }
+    //    public decimal Premium { get; set; }
+    //}
+
+    public partial class PartnersDTO
         {
             public decimal PartnerId { get; set; }
             public int? PartnerTypeId { get; set; }
@@ -1113,22 +1181,20 @@ namespace iNube.Services.Claims.Models
 
         }
 
-        public partial class ClaimInsurableDTO
-        {
-            public int ClaimInsurableId { get; set; }
-            public string InsurableItem { get; set; }
-            public string Name { get; set; }
-            public string IdentificationNo { get; set; }
-            public string CoverName { get; set; }
-            public decimal? BenefitAmount { get; set; }
-            public decimal? ClaimAmounts { get; set; }
-            public decimal? ApprovedClaimAmounts { get; set; }
-            public int ClaimId { get; set; }
-
-           // public virtual ICollection<ClaimsDTO> Claim { get; set; }
-
-        }
-   
+    public partial class ClaimInsurableDTO
+    {
+        public int ClaimInsurableId { get; set; }
+        public string InsurableItem { get; set; }
+        public string Name { get; set; }
+        public string IdentificationNo { get; set; }
+        public string CoverName { get; set; }
+        public decimal? BenefitAmount { get; set; }
+        public decimal? ClaimAmounts { get; set; }
+        public decimal? ApprovedClaimAmounts { get; set; }
+        public int ClaimId { get; set; }
+        public string CoverValue { get; set; }
+        public List<Dictionary<string, string>> coverDynamic { get; set; }
+    }
 
     public class EnvironmentResponse : ResponseStatus
     {

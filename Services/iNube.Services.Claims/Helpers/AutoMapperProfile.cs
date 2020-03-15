@@ -22,6 +22,10 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<TblClaims, ClaimsDTO>();
             CreateMap<ClaimsDTO, TblClaims>();
 
+            CreateMap<TblClaims, ClaimsDTO>()
+                .ForMember(dest => dest.PolicyId, opt => opt.MapFrom(src => src.PolicyId)).ReverseMap();
+
+
             CreateMap<TblClaims, ClaimResponses>();
             CreateMap<ClaimResponses, TblClaims>();
 
@@ -58,17 +62,38 @@ namespace iNube.Services.Claims.Helpers
             //.ForMember(dest => dest.TblClaimDetails, opt => opt.MapFrom(src => src.ClaimDetails))
             //.ForMember(dest => dest.TblClaimTransaction, opt => opt.MapFrom(src => src.ClaimTransaction)).ReverseMap();
 
+            CreateMap<TblClaimAllocationDetails, ClaimAllocationDetailsDTO>();
+            CreateMap<ClaimAllocationDetailsDTO, TblClaimAllocationDetails>();
+
+
             CreateMap<ClaimDataDTO, TblClaims>()
             .ForMember(dest => dest.TblClaimInsurable, opt => opt.MapFrom(src => src.ClaimInsurable))
-            .ForMember(dest => dest.TblBankAccounts, opt => opt.MapFrom(src => src.TblBankAccounts))
+            .ForMember(dest => dest.TblBankAccounts, opt => opt.MapFrom(src => src.BankAccounts))
             .ForMember(dest => dest.TblClaimdoc, opt => opt.MapFrom(src => src.Alldoc))
             .ForMember(dest => dest.LossId, opt => opt.MapFrom(src => src.lossIntimatedBy))
             .ForMember(dest => dest.LocationOfEvent, opt => opt.MapFrom(src => src.locationOfLoss))
             .ForMember(dest => dest.LossOfDescription, opt => opt.MapFrom(src => src.lossDescription))
             .ForMember(dest => dest.PolicyNo, opt => opt.MapFrom(src => src.PolicyNumber))
-            .ForMember(dest => dest.ClaimFields, opt => opt.MapFrom(src => src.DataModelDTO))
+            .ForMember(dest => dest.ClaimFields, opt => opt.MapFrom(src => src.AdditionalDetails))
             // .ForMember(dest => dest.TblClaimHistory, opt => opt.MapFrom(src => src.ClaimsHistory))
             .ReverseMap();
+
+            CreateMap<BankAccounts, TblBankAccounts>();
+            CreateMap<TblBankAccounts, BankAccounts>();
+
+            CreateMap<ClaimInsurable, TblClaimInsurable>()
+            .ForMember(dest => dest.TypeOfLoss, opt => opt.MapFrom(src => src.CoverName)).ReverseMap();
+
+            CreateMap<ClaimInsurableDTO, TblClaimInsurable>()
+                .ForMember(dest => dest.TypeOfLoss, opt => opt.MapFrom(src => src.CoverName)).ReverseMap();
+
+            CreateMap<Alldoc, TblClaimdoc>()
+                .ForMember(dest => dest.DmsdocId, opt => opt.MapFrom(src => src.DocumentID))
+                .ForMember(dest => dest.DocumentName, opt => opt.MapFrom(src => src.FileName))
+                .ForMember(dest => dest.DocumentType, opt => opt.MapFrom(src => src.DocumentType)).ReverseMap();
+
+            CreateMap<TblBankAccounts, BankAccountsDTO>();
+            CreateMap<BankAccountsDTO, TblBankAccounts>();
 
             CreateMap<Alldoc, TblClaimdoc>();
             CreateMap<TblClaimdoc, Alldoc>();
@@ -81,6 +106,7 @@ namespace iNube.Services.Claims.Helpers
             .ForMember(dest => dest.TblClaimInsurable, opt => opt.MapFrom(src => src.ClaimInsurable))
             .ForMember(dest => dest.TblClaimHistory, opt => opt.MapFrom(src => src.ClaimHistory))
             .ForMember(dest => dest.TblClaimdoc, opt => opt.MapFrom(src => src.Alldoc))
+            .ForMember(dest => dest.TblBankAccounts, opt => opt.MapFrom(src => src.BankAccounts))
             .ReverseMap();
 
 

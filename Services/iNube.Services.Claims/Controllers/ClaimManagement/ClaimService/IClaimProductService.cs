@@ -40,6 +40,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext);
+        Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext);
+        Task<ClaimCounts> GetClaimCount(ApiContext apiContext);
+        Task<IEnumerable<commonddDTO>> GetMasterForVehicleLocation(string lMasterlist, ApiContext apiContext);
     }
 
 }

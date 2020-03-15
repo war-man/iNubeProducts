@@ -37,11 +37,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext);
         Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext);
         Task<decimal> UpdatePolicySumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
+        Task<List<dynamic>> CheckRuleSets(string EventId, AllocDTO allocDTO, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl,AllocRuleEngineUrl;
 
         public IntegrationService(IConfiguration configuration)
         {
@@ -58,6 +59,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
+            AllocRuleEngineUrl = _configuration["Integration_Url:AllocRuleEngine:AllocRuleEngineUrl"];
 
         }
 
@@ -80,6 +82,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         {
             var uri = AccountingUrl;
             return await PostApiInvoke<TransactionHeaderDto, TransactionsResponse>(uri, transaction,apiContext);
+        }
+
+        public async Task<List<dynamic>> CheckRuleSets(String EventId, AllocDTO allocDTO, ApiContext apiContext)
+        {
+            var uri = AllocRuleEngineUrl + "/CheckRuleSets/CheckRuleSets/" + EventId;
+            return await PostApiInvoke<AllocDTO, List<dynamic>>(uri, allocDTO, apiContext);
         }
 
         public async Task<PartnersDTO> GetPartnerDetailAsync(string partnerId)

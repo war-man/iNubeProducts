@@ -171,5 +171,20 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         {
             throw new NotImplementedException();
         }
+
+        public Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ClaimCounts> GetClaimCount(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<commonddDTO>> GetMasterForVehicleLocation(string lMasterlist, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

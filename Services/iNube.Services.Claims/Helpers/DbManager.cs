@@ -1,5 +1,6 @@
 ﻿using iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices;
 using iNube.Services.Claims.Entities;
+using iNube.Services.Claims.Entities.CNEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -100,6 +101,40 @@ namespace iNube.Services.Claims.Helpers
                     optionsBuilderDefault.UseSqlServer(dbConnectionString);
                     // DbContextOptions<MICAUMContext> dbDefaultContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
                     context = new MICACMContext(optionsBuilderDefault.Options);
+                    break;
+            }
+
+            return context;
+        }
+
+        public static async Task<DbContext> GetNewContextAsync(string product, string connectionKey, IConfiguration configuration)
+        {
+            DbContext context = null;
+            //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
+
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
+
+            switch (product)
+            {
+                case "Mica":
+                    var optionsBuilder = new DbContextOptionsBuilder<MICACNContext>();
+                    optionsBuilder.UseSqlServer(dbConnectionString);
+                    //DbContextOptions<MICAUMContext> dbContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                    context = new MICACNContext(optionsBuilder.Options);
+                    break;
+                //case "Avo":
+                //    DbContextOptions<> dbAvoContextOption = (DbContextOptions<AVOCMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                //    context = new AVOUMContext(dbAvoContextOption);
+                //    break;
+                //case "Motor":
+                //    dbConnectionString = DbConnectionManager.GetConnectionString("Prod");
+                //    break;AVOCMContext
+                default:
+                    var optionsBuilderDefault = new DbContextOptionsBuilder<MICACNContext>();
+                    optionsBuilderDefault.UseSqlServer(dbConnectionString);
+                    // DbContextOptions<MICAUMContext> dbDefaultContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                    context = new MICACNContext(optionsBuilderDefault.Options);
                     break;
             }
 

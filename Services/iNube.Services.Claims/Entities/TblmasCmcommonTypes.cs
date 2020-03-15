@@ -7,6 +7,8 @@ namespace iNube.Services.Claims.Entities
     {
         public TblmasCmcommonTypes()
         {
+            TblBankAccountsAccountTypeNavigation = new HashSet<TblBankAccounts>();
+            TblBankAccountsPayeeType = new HashSet<TblBankAccounts>();
             TblClaimHistory = new HashSet<TblClaimHistory>();
             TblClaimTransactionNew = new HashSet<TblClaimTransactionNew>();
             TblClaimsClaimStatus = new HashSet<TblClaims>();
@@ -18,6 +20,8 @@ namespace iNube.Services.Claims.Entities
         public string TypeCode { get; set; }
         public string Value { get; set; }
 
+        public virtual ICollection<TblBankAccounts> TblBankAccountsAccountTypeNavigation { get; set; }
+        public virtual ICollection<TblBankAccounts> TblBankAccountsPayeeType { get; set; }
         public virtual ICollection<TblClaimHistory> TblClaimHistory { get; set; }
         public virtual ICollection<TblClaimTransactionNew> TblClaimTransactionNew { get; set; }
         public virtual ICollection<TblClaims> TblClaimsClaimStatus { get; set; }

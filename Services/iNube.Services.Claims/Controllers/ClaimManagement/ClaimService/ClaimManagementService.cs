@@ -43,6 +43,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext);
+        Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext);
+        Task<ClaimCounts> GetClaimCount(ApiContext apiContext);
+        Task<IEnumerable<commonddDTO>> GetMasterForVehicleLocation(string lMasterlist, ApiContext apiContext);
     }
     public class ClaimManagementService : IClaimManagementService
     {
@@ -93,7 +96,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
 
         public async Task<BankDocumentDTO> GetDocumentId(string filename, ApiContext apiContext)
         {
-            return await _productService(apiContext.ProductType).GetDocumentId(filename,apiContext);
+            return await _productService(apiContext.ProductType).GetDocumentId(filename, apiContext);
         }
 
         public async Task<IEnumerable<SearchDTO>> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext)
@@ -197,7 +200,21 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
 
         public async Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext)
         {
-            return await _productService(apiContext.ProductType).GetBalanceSumInsured(policyNo,apiContext);
+            return await _productService(apiContext.ProductType).GetBalanceSumInsured(policyNo, apiContext);
         }
+
+        public async Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).SearchClaimByUserid(searchclaim, apiContext);
+        }
+        public async Task<ClaimCounts> GetClaimCount(ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).GetClaimCount(apiContext);
+        }
+        public async Task<IEnumerable<commonddDTO>> GetMasterForVehicleLocation(string lMasterlist, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).GetMasterForVehicleLocation(lMasterlist,apiContext);
+        }
+
     }
 }

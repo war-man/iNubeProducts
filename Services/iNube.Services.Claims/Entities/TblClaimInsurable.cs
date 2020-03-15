@@ -14,6 +14,7 @@ namespace iNube.Services.Claims.Entities
         public decimal? ClaimAmounts { get; set; }
         public decimal? ApprovedClaimAmounts { get; set; }
         public int ClaimId { get; set; }
+        public string CoverValue { get; set; }
 
         public virtual TblClaims Claim { get; set; }
     }
