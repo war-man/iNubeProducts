@@ -54,6 +54,7 @@ namespace inube.Services.Notification.Models
         public List<FileUploadDTO> fileUploadDTOs { get; set; }
     }
 
+
     public class FileUploadDTO
     {
 
