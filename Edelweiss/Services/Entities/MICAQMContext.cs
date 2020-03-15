@@ -63,7 +63,13 @@ namespace MicaExtension_EGI.Entities
                     .HasColumnName("ActiveTW")
                     .HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.Premium).HasColumnType("numeric(18, 2)");
+                entity.Property(e => e.BasePremium).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.FromTax).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.ToTax).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TotalPremium).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.TxnDate).HasColumnType("datetime");
             });
@@ -179,6 +185,12 @@ namespace MicaExtension_EGI.Entities
                     .HasName("PK__TblPremi__5E548648443CE55B");
 
                 entity.ToTable("TblPremiumBookingLog", "QM");
+
+                entity.Property(e => e.BasePremium).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.FromTax).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.ToTax).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.TxnAmount).HasColumnType("numeric(18, 0)");
 

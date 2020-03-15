@@ -375,8 +375,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         }
 
         public string TxnType { get; set; }
-        public string Type { get; set; }
-        public string AccountNo { get; set; }
+        public string Type { get; set; }     
         public decimal TxnAmount { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal TotalAmount { get; set; }
@@ -447,6 +446,19 @@ namespace iNube.Services.MicaExtension_EGI.Models
     {
         public string Type { get; set; }
         public List<dynamic> Data { get; set; }
+    }
+
+    public class ExtCDDTO
+    {
+        public ExtCDDTO()
+        {
+            MicaCD = new List<MicaCDDTO>();
+        }
+
+        public string AccountNo { get; set; }
+        public string Description { get; set; }
+        public string Frequency { get; set; }
+        public List<MicaCDDTO> MicaCD { get; set; }
     }
 
 }

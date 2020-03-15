@@ -62,6 +62,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<dynamic> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext);
         Task<ProposalResponse> PolicyEndoresemenet(dynamic endoresementDto, ApiContext apiContext);
         Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext);
-        Task<object> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
+        Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
     }
 }

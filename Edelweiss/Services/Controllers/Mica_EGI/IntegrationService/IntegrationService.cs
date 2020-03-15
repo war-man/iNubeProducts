@@ -31,6 +31,12 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         Task<dynamic> RuleEngine(dynamic dynamicData, ApiContext apiContext);
         Task<dynamic> EndorsementCalculator(EndorsementCalDTO endorsementCal,ApiContext apiContext);
 
+
+        //NEW CD METHOD
+        Task<dynamic> MasterCDACC(ExtCDDTO extCDDTO, ApiContext apiContext);
+
+        //NEW Internal Policy Method for Account Number
+        Task<dynamic> InternalGetPolicyDetailsByNumber(string PolicyNo, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -132,6 +138,19 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             var uri = RuleEngineUrl + "/RuleEngine/CheckRuleSets/"+ RuleId;
             return await PostApiInvoke<dynamic, dynamic>(uri, apiContext, dynamicData);
         }
+
+        public async Task<dynamic> MasterCDACC(ExtCDDTO extCDDTO, ApiContext apiContext)
+        {
+            var uri = PartnerUrl + "/api/Accounts/MasterCDACC";
+            return await PostApiInvoke<ExtCDDTO, dynamic>(uri, apiContext, extCDDTO);
+        }
+
+        public async Task<dynamic> InternalGetPolicyDetailsByNumber(string PolicyNo, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/InternalGetPolicyDetailsByNumber?policyNumber=" + PolicyNo;
+            return await GetApiInvoke<dynamic>(uri, apiContext);
+        }
+
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
