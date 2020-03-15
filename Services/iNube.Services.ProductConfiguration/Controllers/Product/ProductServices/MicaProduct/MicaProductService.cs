@@ -952,6 +952,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         }
 
+
         public async Task<List<ProductClausesWarrentiesExclusionsDTO>> CWEDetails(int LOBId, int CWETypeID, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
