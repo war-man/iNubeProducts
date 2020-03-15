@@ -5024,6 +5024,34 @@ img {
   position: relative;
   color: #e9f3e8; }
 
+.h4center {
+  text-align: center;
+  font-weight: 600 !important;
+  font-size: 2rem !important;
+  color: #fff !important; }
+
+#card-bg1 {
+  background-color: #B721FF; }
+
+#card-bg2 {
+  /*background-color: #31fd9f;*/
+  background-color: #00d070; }
+
+#card-bg3 {
+  /*background-color: #FFBF00;*/
+  background-color: #eab000; }
+
+#card-bg4 {
+  background-color: #f74946;
+  /*background: linear-gradient(to left, #e53935, #e35d5b);*/ }
+
+#card-bg5 {
+  background-color: #33b5a3;
+  /*background-image: linear-gradient(210deg, #74EBD5 0%, #9FACE6 100%);*/ }
+
+#white {
+  color: #fff !important; }
+
 .btn-file {
   position: relative;
   overflow: hidden;

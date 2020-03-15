@@ -266,7 +266,7 @@ namespace iNube.Services.Partners.Controllers.Partner
         [AllowAnonymous]
         public IActionResult HC()
         {
-            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok , ResponseMessage ="testing" };
             return Ok(response);
         }
     }
