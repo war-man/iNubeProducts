@@ -101,6 +101,8 @@ const ClaimEnquiry = AsyncComponent(() => { return import("modules/Claims/views/
 const ClaimIntimate = AsyncComponent(() => { return import("modules/Claims/views/ClaimIntimate/ClaimIntimate.jsx"); });
 const ClaimProcess = AsyncComponent(() => { return import("modules/Claims/views/ClaimProcess/ClaimProcess.jsx"); });
 const ClaimReports = AsyncComponent(() => { return import("modules/Claims/views/ClaimReports/ClaimReports.jsx"); });
+const ClaimInbox = AsyncComponent(() => { return import("modules/Claims/views/ClaimInbox/ClaimInbox.jsx"); });
+
 //const FinanceProcess = AsyncComponent(() => { return import("modules/Claims/views/FinanceClaim/FinanceProcess.jsx"); });
 const SearchClaim = AsyncComponent(() => { return import("modules/Claims/views/SearchClaim.jsx"); });
 const UploadBankFile = AsyncComponent(() => { return import("modules/Claims/views/FinanceClaim/_FailureTransaction.jsx"); });
@@ -273,6 +275,7 @@ export const ComponentsList = {
     UserDashboard: UserDashboard,
     ReportConfig: ReportConfiguration,
     ReportExecution: ReportExecution,
+    ClaimInbox: ClaimInbox,
 }
 
 export default ComponentsList
