@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using iNube.Services.DynamicReports.model;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
 using iNube.Services.Policy.Models;
 using System;

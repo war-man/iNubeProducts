@@ -2,7 +2,7 @@
 using AutoMapper.Configuration;
 using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
-using iNube.Services.Policy.Models;
+using iNube.Services.DynamicReports.model;
 using iNube.Utility.Framework.Model;
 using System;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace iNube.Services.Policy.Models
+namespace iNube.Services.DynamicReports.model
 {
     public partial class ddDTO
     {
@@ -76,5 +76,9 @@ namespace iNube.Services.Policy.Models
     {
         public string ParameterName { get; set; }
         public string ParameterValue { get; set; }
+    }
+    public class EnvironmentResponse : ResponseStatus
+    {
+        public string Dbconnection { get; set; }
     }
 }
