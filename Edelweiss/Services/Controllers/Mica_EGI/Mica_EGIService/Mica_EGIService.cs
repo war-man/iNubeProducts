@@ -3310,7 +3310,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         RuleEngineResponse resobj = new RuleEngineResponse();
-                        if (SourceObject["driverExp"] < 1 || SourceObject["driverExp"] > SourceObject["driverAge"])
+                        if (SourceObject["driverExp"] < 1 && SourceObject["driverExp"] > SourceObject["driverAge"])
                         {
 
                             resobj.ValidatorName = "driverExp";
