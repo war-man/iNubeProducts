@@ -15,6 +15,7 @@ using iNube.Services.Policy.Entities.DynamicReportEntities;
 using System.Data.SqlClient;
 using System.Data;
 using System.Data.Common;
+using iNube.Services.DynamicReports.model;
 
 namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaReport
 {
@@ -129,9 +130,11 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
 
         public async Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext)
         {
-            //_context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            //_context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
-            var connectionString = _configuration.GetConnectionString("PCConnection");
+            //var connectionString = _configuration.GetConnectionString("PCConnection");
+            var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+            var connectionString = dbConnectionString.Dbconnection;
             var query = await GetQueryById(queryDTO.ReportConfigId,apiContext);
             //var query = "select * from [CM].[tblClaimInsurable] where ClaimId=@ClaimId and Name=@Name";
            // var query = "select * from [CM].[tblClaimInsurable] where ClaimId='335' ";

@@ -130,7 +130,7 @@ class ReportConfiguration extends React.Component {
     addConfigParameter() {
         debugger;
         console.log(this.state.nodata, 'ReportName');
-        if (this.state.ReportConfigDto.ReportName != "" && this.state.ReportConfigDto.DBSchemaId != "" && this.state.ReportConfigDto.ParameterName != "") {
+        if (this.state.ReportConfigDto.ReportName != "" && this.state.ReportConfigDto.DBSchemaId != "" ) {
 
             //if (dataCheck.length == 0) {
             //Showing Grid

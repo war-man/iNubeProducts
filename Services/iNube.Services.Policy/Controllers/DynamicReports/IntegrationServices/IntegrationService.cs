@@ -1,4 +1,6 @@
-﻿using iNube.Utility.Framework.Model;
+﻿using iNube.Services.DynamicReports.model;
+using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,37 +14,38 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices
 {
     public interface IRPIntegrationService
     {
-        //
+        Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
     }
 
     public class RPIntegrationService : IRPIntegrationService
     {
-        readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-        //readonly string productUrl = "https://localhost:44347";
-        //readonly string productUrl = "http://mica-inube-product-service.mica-internal.:9007";
+        private IConfiguration _configuration;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
 
-        readonly string claimUrl = "https://inubeservicesclaims.azurewebsites.net";
-        //readonly string claimUrl = "https://localhost:44344";
-        // readonly string claimUrl = "http://mica-inube-claim-service.mica-internal.:9002";
+        public RPIntegrationService(IConfiguration configuration)
+        {
 
-        readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
-        //readonly string policyUrl = "https://localhost:44351";
-        // readonly string policyUrl = "http://mica-inube-policy-service.mica-internal.:9006";
+            _configuration = configuration;
+            PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
+            BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
+            ClaimUrl = _configuration["Integration_Url:Claim:ClaimUrl"];
+            NotificationUrl = _configuration["Integration_Url:Notification:NotificationUrl"];
+            PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
+            ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
+            ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
+            RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
 
-        string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-        //string notificationUrl = "http://localhost:53000";
-        //readonly string notificationUrl = "http://mica-inube-notification-service.mica-internal.:9004";
+        }
 
+        public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
+        {
+            var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+        }
 
-        readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-        //readonly string partnerUrl = "https://localhost:44315";
-        //readonly string partnerUrl = "http://mica-inube-partner-service.mica-internal.:9005";
-
-        //readonly string UsermanangementUrl = "https://localhost:44367";
-        readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        //readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
-
-        //
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();

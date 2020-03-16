@@ -203,9 +203,7 @@ class ReportExecution extends React.Component {
     }
 
     reset = () => {
-        let param = this.state.paramList;
-        param['parameterValue'] = "";
-        this.setState({ param});
+        this.state.CheckCondition = "";;
         let resetField = this.state.ReportConfigDto;
         resetField['ReportName'] = "";
         this.setState({ resetField});

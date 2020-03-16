@@ -10,6 +10,7 @@ using System.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using iNube.Services.DynamicReports.model;
 
 namespace iNube.Services.Policy.Controllers.DynamicReports
 {

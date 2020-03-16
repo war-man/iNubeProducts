@@ -52,25 +52,26 @@ namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
 
         public static string GetDbConnectionString(string dbName)
         {
-            var dbConnectionString = "";
-            switch (dbName)
-            {
-                case "Dev":
-                    dbConnectionString = DbConnectionManager.GetConnectionString("Dev");
-                    break;
-                case "Mica":
-                    dbConnectionString = DbConnectionManager.GetConnectionString("Mica");
-                    break;
-                case "Prod":
-                    dbConnectionString = DbConnectionManager.GetConnectionString("Prod");
-                    break;
-                case "Test":
-                    dbConnectionString = DbConnectionManager.GetConnectionString("Test");
-                    break;
-                default:
-                    dbConnectionString = DbConnectionManager.GetConnectionString("Mica");
-                    break;
-            }
+            var dbConnectionString = DbConnectionManager.GetConnectionString(dbName);
+
+            //switch (dbName)
+            //{
+            //    case "Dev":
+            //        dbConnectionString = DbConnectionManager.GetConnectionString("Dev");
+            //        break;
+            //    case "Mica":
+            //        dbConnectionString = DbConnectionManager.GetConnectionString("Mica");
+            //        break;
+            //    case "Prod":
+            //        dbConnectionString = DbConnectionManager.GetConnectionString("Prod");
+            //        break;
+            //    case "Test":
+            //        dbConnectionString = DbConnectionManager.GetConnectionString("Test");
+            //        break;
+            //    default:
+            //        dbConnectionString = DbConnectionManager.GetConnectionString("Mica");
+            //        break;
+            //}
             return dbConnectionString;
         }
 
@@ -87,12 +88,14 @@ namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
                 case "Mica":
                     var optionsBuilder = new DbContextOptionsBuilder<MICARPContext>();
                     optionsBuilder.UseSqlServer(dbConnectionString);
-                    //DbContextOptions<MICAUMContext> dbContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                    //DbContextOptions<MICAPCContext> dbContextOption = (DbContextOptions<MICAPCContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
                     context = new MICARPContext(optionsBuilder.Options);
                     break;
                 //case "Avo":
-                //    DbContextOptions<AVOUMContext> dbAvoContextOption = (DbContextOptions<AVOUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                //    context = new AVOUMContext(dbAvoContextOption);
+                //    var optionBuilder = new DbContextOptionsBuilder<AVORPContext>();
+                //    //DbContextOptions<AVOPRContext> dbAvoContextOption = (DbContextOptions<AVOPRContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                //    optionBuilder.UseSqlServer(dbConnectionString);
+                //    context = new AVORPContext(optionBuilder.Options);
                 //    break;
                 case "Motor":
                     dbConnectionString = DbConnectionManager.GetConnectionString("Prod");
@@ -100,7 +103,7 @@ namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
                 default:
                     var optionsBuilderDefault = new DbContextOptionsBuilder<MICARPContext>();
                     optionsBuilderDefault.UseSqlServer(dbConnectionString);
-                    // DbContextOptions<MICAUMContext> dbDefaultContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                    // DbContextOptions<MICAPCContext> dbDefaultContextOption = (DbContextOptions<MICAPCContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
                     context = new MICARPContext(optionsBuilderDefault.Options);
                     break;
             }
