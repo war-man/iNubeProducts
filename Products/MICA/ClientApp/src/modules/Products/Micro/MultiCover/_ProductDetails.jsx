@@ -22,6 +22,7 @@ import Channels from "./Others/_Channels.jsx";
 import Claims from "./Others/_Claims.jsx";
 import Risks from "./Others/_Risks.jsx";
 import Payment from "./Others/Payment.jsx";
+import Account from "./Others/_Account.jsx";
 import SwitchONParameter from "./Others/_SwtichPage.jsx";
 
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -161,11 +162,11 @@ const ProductDetails = (props) => {
                                 aria-label="Vertical tabs example"
                             //className={classes.tabs}
                             >
-                                <MyTab label="Coverage"
+                                <MyTab label="CWE & Premium"
                                     icon={<Cover />}
                                     {...a11yProps(0)}
                                 />
-                                <MyTab label="Clauses"
+                                <MyTab label="Parameters"
                                     icon={<ChromeReader />}
                                     {...a11yProps(1)}
                                 />
@@ -183,7 +184,7 @@ const ProductDetails = (props) => {
                                     steps={[
 
                                         { stepName: "C/W/E", stepComponent: ProductClauses, stepId: "ProductClauses", stepData: props },
-                                     
+
                                         { stepName: "Premium", stepComponent: Premium, stepId: "premium", stepData: props },
 
                                     ]}
@@ -196,7 +197,7 @@ const ProductDetails = (props) => {
                                 <Wizard
                                     validate
                                     steps={[
-                                        { stepName: "Channels", stepComponent: Channels, stepId: "Channels", stepData: props },
+
                                         { stepName: "Risk Parameters", stepComponent: Risks, stepId: "Risk", stepData: props },
                                         { stepName: "Claim Parameters", stepComponent: Claims, stepId: "Claims", stepData: props },
                                     ]}
@@ -205,26 +206,33 @@ const ProductDetails = (props) => {
                                 />
                             </TabPanel>
                             <TabPanel value={value} index={2}>
-                          
-                                    <Wizard
-                                        validate
-                                    steps={(props.ProductDTO.ProductDTO.isMasterPolicy == true) ? [
-                                        { stepName: "Payment", stepComponent: Payment, stepId: "Risk", stepData: props },
-                                        { stepName: "Policy Basic Feature", stepComponent: Claims, stepId: "Claims", stepData: props },
-                                      //  { stepName: "SwitchONParameter", stepComponent: SwitchONParameter, stepId: "SwitchONParameter", stepData: props },
 
-                                        ]: [
-                                            { stepName: "Payment", stepComponent: Payment, stepId: "Risk", stepData: props },
-                                            { stepName: "Policy Basic Feature", stepComponent: Claims, stepId: "Claims", stepData: props },
-                                             
+                                <Wizard
+                                    validate
 
-                             ]}
-                                        title=""
-                                        subtitle=""
-                                    />
-                           
+                                    steps={[
+
+                                        //(props.ProductDTO.ProductDTO.isMasterPolicy == true) ? [
+                                        //    
+                                        //    { stepName: "Payment", stepComponent: Payment, stepId: "Risk", stepData: props },
+                                        //    //{ stepName: "Policy Basic Feature", stepComponent: Claims, stepId: "Claims", stepData: props },
+                                        //    //  { stepName: "SwitchONParameter", stepComponent: SwitchONParameter, stepId: "SwitchONParameter", stepData: props },
+
+                                        //] : [
+                                        //        { stepName: "Channels", stepComponent: Channels, stepId: "Channels", stepData: props },
+                                        //        { stepName: "Payment", stepComponent: Payment, stepId: "Risk", stepData: props },
+                                        //        //  { stepName: "Policy Basic Feature", stepComponent: Claims, stepId: "Claims", stepData: props },
+                                        //    ],
+                                        { stepName: "Channels", stepComponent: Channels, stepId: "Channels", stepData: props },
+                                        //{ stepName: "Payment", stepComponent: Payment, stepId: "Risk", stepData: props },
+                                        //{ stepName: "Account", stepComponent: Account, stepId: "Risk", stepData: props },
+                                ]}
+                                title=""
+                                subtitle=""
+                            />
+
                             </TabPanel>
-                           
+
                         </GridItem>
                     </GridContainer>
 
@@ -232,7 +240,7 @@ const ProductDetails = (props) => {
                 </CardBody>
 
             </Card>
-      
+
 
 
             {/* <div >
@@ -272,7 +280,7 @@ const ProductDetails = (props) => {
 
             </Card>
         </div>*/}
-</div >
+        </div >
     );
 
 }

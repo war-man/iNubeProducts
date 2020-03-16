@@ -421,26 +421,26 @@ class BenefitInterface extends React.Component {
         //  this.FilterCWEType();
 
         if (level == "Insurable Item") {
-            if (this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].InsurablesTableList.length > 0) {
+          //  if (this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].InsurablesTableList.length > 0) {
 
                 this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].ptable = true;
 
-            }
+            //}
         }
         if (level === "Cover") {
 
-            if (this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].CoversTableList.length > 0) {
+            //if (this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].CoversTableList.length > 0) {
 
                 this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].ptable = true;
 
-            }
+            //}
         }
         if (level === "Benefit") {
-            if (this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.BenefitTableList.length > 0) {
+//            if (this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.BenefitTableList.length > 0) {
 
                 this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.ptable = true;
 
-            }
+  //          }
 
         }
         
@@ -502,6 +502,8 @@ class BenefitInterface extends React.Component {
                     />,
                     btn: <div><Button color="info" justIcon round simple className="view" onClick={this.handleOpenCWE.bind(this, level, Iindex, Cindex, key)}><Visibility /></Button>
                         {!this.props.props.props.props.state.viewdisable && <Button color="info" justIcon round simple className="edit" onClick={this.handleEditCWE.bind(this, level, Iindex, Cindex, key)}><Edit /></Button>}
+                        {!this.props.props.props.props.state.viewdisable && <Button justIcon round simple color="danger" className="remove" onClick={() => this.deleteCWE(level, Iindex, Cindex, key)} ><Delete /> </Button >}
+
                     </div>
                 };
 
@@ -530,6 +532,8 @@ class BenefitInterface extends React.Component {
                     />,
                     btn: <div><Button color="info" justIcon round simple className="view" onClick={this.handleOpenCWE.bind(this, level, Iindex, Cindex, key)}><Visibility /></Button>
                         {!this.props.props.props.props.state.viewdisable && <Button color="info" justIcon round simple className="edit" onClick={this.handleEditCWE.bind(this, level, Iindex, Cindex, key)}><Edit /></Button>}
+                        {!this.props.props.props.props.state.viewdisable && <Button justIcon round simple color="danger" className="remove" onClick={() => this.deleteCWE(level, Iindex, Cindex, key)} ><Delete /> </Button >}
+
                     </div>
                 };
 
@@ -539,6 +543,24 @@ class BenefitInterface extends React.Component {
         }
     }
 
+
+    deleteCWE = (level, Iindex, Cindex, key) => {
+
+        if (level === "Insurable Item") {
+            this.props.props.props.props.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].InsurablesTableDataList.splice(key, 1);
+        }
+        if (level === "Cover") {
+          
+            this.props.props.props.props.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Cindex].CoversTableDataList.splice(key, 1);
+            this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].CoversTableList.splice(key, 1);
+        }
+        if (level === "Benefit") {
+            this.props.props.props.props.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Cindex].tableBenefitdata.BenefitTableDataList.splice(key, 1);
+            this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.BenefitTableList.splice(key, 1);
+
+        }
+        this.dataCWETable(level, Iindex, Cindex);
+    }
     handledescriptionCWE = (level, Iindex, Cindex = 0) => {
         if (level == "Insurable Item") {
             let editdescription = [...this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].InsurablesTableList];
@@ -625,6 +647,9 @@ class BenefitInterface extends React.Component {
         }
     };
     handleCloseCWE = (level, Iindex, Cindex) => {
+        this.props.props.props.props.state.CustomClause.typeName = "";
+        this.props.props.props.props.state.CustomClause.description = "";
+        this.props.props.props.props.state.CustomClause.cwetypeId = "";
         if (level == "Insurable Item") {
             this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].open = false;
             this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].mshow = false;
@@ -687,34 +712,42 @@ class BenefitInterface extends React.Component {
         }
         else if (mvalue[0].mValue === 'Exclusions') {
             cvalue = 'E';
+        } else if (mvalue[0].mValue === 'Policy Wording') {
+            cvalue = 'PW';
         }
         CustomClause['cwetypes'] = cvalue;
         this.setState({ CustomClause });
         let customInputClause = Object.assign({},this.props.props.props.props.state.CustomClause);
 
+        const filterCWEcoverid = this.props.props.props.props.state.TypeList.filter(s => s.mValue == level)[0].mID;
+        if (filterCWEcoverid != undefined) {
+            customInputClause.levelId = filterCWEcoverid;
 
-      
-        if (level == "Cover") {
-           
-            let productCoverClause = this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].CoversTableList;
-            const list = [...productCoverClause, customInputClause];
-          // this.props.props.props.props.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].InsurablesTableDataList = list;
-           this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].CoversTableList = list;
-            this.setState({ productCoverClause });
+            if (level == "Cover") {
+                customInputClause.subLevelId = this.props.ProductDTO.productInsurableItem[Iindex].productCovers[Cindex].coverTypeId;
 
+                let productCoverClause = this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].CoversTableList;
+                const list = [...productCoverClause, customInputClause];
+                // this.props.props.props.props.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].InsurablesTableDataList = list;
+                this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].CoversTableList = list;
+                this.setState({ productCoverClause });
+
+            }
+
+            if (level == "Benefit") {
+                customInputClause.subLevelId = this.props.ProductDTO.productInsurableItem[Iindex].productCovers[Cindex].coverTypeId;
+                let productCoverClause = this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.BenefitTableList;
+                const list = [...productCoverClause, customInputClause];
+                //this.props.props.props.props.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Cindex].tableBenefitdata.BenefitTableDataList = list;
+                this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.BenefitTableList = list;
+                this.setState({ productCoverClause });
+
+            }
         }
-
-        if (level == "Benefit") {
-          
-            let productCoverClause = this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.BenefitTableList;
-            const list = [...productCoverClause, customInputClause];
-           //this.props.props.props.props.state.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Cindex].tableBenefitdata.BenefitTableDataList = list;
-           this.props.props.props.props.state.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].BenefitTable.BenefitTableList = list;
-            this.setState({ productCoverClause });
-
-        }
+        console.log("customInputClause", customInputClause);
         this.handleCloseCWE(level, Iindex, Cindex);
         this.dataCWETable(level, Iindex, Cindex);
+        this.setState({ customInputClause});
     }
     handleShowCWE = (level, Iindex, Cindex = 0) => {
         
@@ -734,6 +767,7 @@ class BenefitInterface extends React.Component {
 
             this.setState({});
         }
+        this.AddCWEClauses(level, Iindex, Cindex);
     };
 
     SetValue = (type, event) => {

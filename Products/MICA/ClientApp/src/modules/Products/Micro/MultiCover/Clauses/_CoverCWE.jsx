@@ -168,6 +168,7 @@ const CoverClauses = (props) => {
                             
                         </GridItem>
                     </GridContainer>
+                    {!clauseData.viewdisable && <Button id="top" color="info" onClick={() => propFun.handleShowCWE("Cover", Iindex, Cindex)}>Custom Clause</Button>}
                     <GridContainer>
                         {/*
                         <GridItem xs={3} sm={4}>
@@ -183,7 +184,7 @@ const CoverClauses = (props) => {
                        <GridContainer >
                        <GridItem xs={12}>
                                 <br />
-                            {clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].ptable && <div>
+                            {clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Cindex].ptable && clauseData.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Cindex].CoversTableDataList.length>0&& <div>
                                 
                                 <GridContainer justify="center">
                                      
@@ -257,6 +258,9 @@ const CoverClauses = (props) => {
                                 </Animated>
                                 </GridItem>
                                 </GridContainer>
+                            </div> }
+                            </GridItem>
+                        </GridContainer>
                                     {/*
                                     <Table style={tableStyle} id="clauseTable">
                                         <TableHead>
@@ -352,7 +356,7 @@ const CoverClauses = (props) => {
                                
                                 <GridContainer xs={12} sm={12} md={12}>
                   
-                                    {!clauseData.viewdisable && <Button id="top" color="info" onClick={() => propFun.handleShowCWE("Cover", Iindex,Cindex)}>Custom Clause</Button>}
+                                    
                             <Modal
                                 aria-labelledby="simple-modal-title"
                                 aria-describedby="simple-modal-description"
@@ -416,10 +420,8 @@ const CoverClauses = (props) => {
                                                    
                            
                                 </GridContainer>
-                                </div>
-                                }
-                            </GridItem>
-                        </GridContainer>
+                        
+                               
                     
                 </div>
             );

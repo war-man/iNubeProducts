@@ -31,6 +31,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Dropdown from "components/Dropdown/Dropdown.jsx";
+import SwitchONParameter from "./_SwtichPage.jsx";
 
 const style = {
     infoText: {
@@ -80,24 +81,30 @@ function handleToggle(value) {
 }
 const Risk = (props) => {
     // debugger;
-   console.log('Risks props data', props.componentData);
+    console.log('Risks props data', props.componentData);
     console.log('Risks demo data', props.componentData.insurableRcbdetails);
     const { model } = bindModel(props.componentData.MasterDTO.Risk);
     let truedata = props.componentData.MasterDTO.Risk.filter(item => item.disable == true);
     let insurablelen = props.componentData.insurableRcbdetails.length - 1;
-    
+
     let falsedata = props.componentData.MasterDTO.Risk.filter(item => item.disable == false);
+
+    let truepaymentdata = props.componentData.MasterDTO.Payment.filter(item => item.disable == true);
+    let falsepaymentpdata = props.componentData.MasterDTO.Payment.filter(item => item.disable == false);
     // const filterRisk = props.componentData.MasterDTO.Risk.filter(item => item.levelId == "");
     console.log("truedata", truedata);
     console.log("truedata", props.componentData.RiskList);
     const titleLen = props.componentData.Insurabletitle.length;
     return (
-        (props.componentData.RiskList.length > 0) ? (
-            props.componentData.RiskList.map((m, id) => (
 
-                ((truedata.length > 0 || falsedata.length > 0)) ? (
-                    <div>
-                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+        (props.componentData.RiskList.length > 0) ? (
+            <div>
+                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>{
+                    props.componentData.RiskList.map((m, id) => (
+
+                        ((truedata.length > 0 || falsedata.length > 0)) ? (
+
+
 
                             <CardBody>
 
@@ -146,39 +153,34 @@ const Risk = (props) => {
                                                 />
                                             </GridItem> : null)
                                     ))}
-
                                 </GridContainer>
-                            
-
-
-
-                                <GridContainer style={{'position': 'relative', 'left': '46px'}}>
+                                <GridContainer style={{ 'position': 'relative', 'left': '46px' }}>
                                     {(props.componentData.insurableRcbdetails.length > 1) ?
 
-                                        (props.componentData.insurableRcbdetails.map((list,index )=> (
+                                        (props.componentData.insurableRcbdetails.map((list, index) => (
 
-                                           
+
                                             <GridContainer>
-                                                {(list.levelId == m.mID) ?
+                                                {(list.levelId == m.mID && (list.insurableChildRcbdetails.length > 0)) ?
                                                     <GridContainer> <p className="bold-font">{list.inputType}</p></GridContainer> : null}
 
-                                                {(list.levelId == m.mID && list.insurableChildRcbdetails.length > 1) ? <GridContainer><GridItem xs={12} sm={12} md={4}>
-                                                    <Dropdown required={true} disabled={props.viewdisable} required={true} labelText="Identification Number" lstObject={list.insurableChildRcbdetails}  onChange={(e) => props.componentData.SetIdentification(e, index)} name='IdentificationNumber' formControlProps={{ fullWidth: true }} />
-                                                </GridItem>  </GridContainer>:null}
+                                                {/*(list.levelId == m.mID && list.insurableChildRcbdetails.length > 1) ? <GridContainer><GridItem xs={12} sm={12} md={4}>
+                                                    <Dropdown required={true} disabled={props.viewdisable} required={true} labelText="Identification Number" lstObject={list.insurableChildRcbdetails} onChange={(e) => props.componentData.SetIdentification(e, index)} name='IdentificationNumber' formControlProps={{ fullWidth: true }} />
+                                                </GridItem>  </GridContainer> : null*/}
 
-                                                {((list.insurableChildRcbdetails.length > 1) ? (
+                                                {((list.insurableChildRcbdetails.length > 0) ? (
 
                                                     (list.insurableChildRcbdetails.map((prop, k) => (
                                                         ((prop.levelId == m.mID) ?
-                                                  
+
                                                             <GridItem xs={12} sm={12} md={3} className="downlevel">
 
                                                                 <CustomCheckbox key={k}
                                                                     name={prop.mValue}
                                                                     labelText={prop.mValue}
                                                                     value={prop.mIsRequired}
-                                                                    onChange={(e) => props.componentData.SetInsurableRiskClaimsDetailsValue(e,index)}
-                                                                   // disabled={(props.componentData.viewdisable == true) ? true : false}
+                                                                    onChange={(e) => props.componentData.SetInsurableRiskClaimsDetailsValue(e, index)}
+                                                                    // disabled={(props.componentData.viewdisable == true) ? true : false}
                                                                     disabled={(prop.disable == true) ? true : null}
                                                                     checked={prop.mIsRequired}
                                                                     formControlProps={{
@@ -188,51 +190,47 @@ const Risk = (props) => {
                                                                 />
 
                                                             </GridItem>
-                                                            
+
                                                             : null)
                                                     )))) : null)}
-                                                {(list.levelId == m.mID && list.coverRcbdetails.length >0) ? <GridContainer> <h5 className="bold-font">Cover</h5>   </GridContainer> : null}
+                                                {(list.levelId == m.mID && list.coverRcbdetails.length > 0) ? <GridContainer> <h5 className="bold-font">Cover</h5>   </GridContainer> : null}
                                                 {((list.coverRcbdetails.length > 0) ? (
                                                     (list.coverRcbdetails.map((Clist, pos) => (
                                                         <GridContainer style={{ 'position': 'relative', 'left': '46px' }}>
                                                             {(Clist.levelId == m.mID) ?
                                                                 <GridContainer>
-                                                                    <GridContainer> <p className="bold-font">{Clist.inputType}</p>   </GridContainer> 
-                                                           
-                                                            {((Clist.coverChildRcbdetails.length > 1) ? (
+                                                                    {(Clist.coverChildRcbdetails.length > 0) ? <GridContainer> <p className="bold-font">{Clist.inputType}</p>   </GridContainer>:null}
 
-                                                                (Clist.coverChildRcbdetails.map((pr, lineno) => (
+                                                                    {((Clist.coverChildRcbdetails.length > 0) ? (
 
-                                                                   //  ((pr.levelId == m.mID) ?
-                                                                    <GridItem xs={12} sm={12} md={3} className="downlevel">
+                                                                        (Clist.coverChildRcbdetails.map((pr, lineno) => (
 
-                                                                        <CustomCheckbox key={lineno}
-                                                                            name={pr.mValue}
-                                                                            labelText={pr.mValue}
+                                                                            //  ((pr.levelId == m.mID) ?
+                                                                            <GridItem xs={12} sm={12} md={3} className="downlevel">
+
+                                                                                <CustomCheckbox key={lineno}
+                                                                                    name={pr.mValue}
+                                                                                    labelText={pr.mValue}
                                                                                     value={pr.mIsRequired}
                                                                                     onChange={(e) => props.componentData.SetCoverRiskClaimsDetailsValue(e, index, pos)}
-                                                                            //disabled={(props.componentData.viewdisable == true) ? true : false}
-                                                                            disabled={(pr.disable == true) ? true : null}
-                                                                            checked={pr.mIsRequired}
-                                                                            formControlProps={{
-                                                                                fullWidth: true
-                                                                            }}
+                                                                                    //disabled={(props.componentData.viewdisable == true) ? true : false}
+                                                                                    disabled={(pr.disable == true) ? true : null}
+                                                                                    checked={pr.mIsRequired}
+                                                                                    formControlProps={{
+                                                                                        fullWidth: true
+                                                                                    }}
 
-                                                                        />
+                                                                                />
 
-                                                                    </GridItem>
-                                                                    //:
-                                                                    //null)
-
-                                                                )))) : null)}
-                                                                    </GridContainer>
-                                                                    : null}
-
+                                                                            </GridItem>
+                                                                            //:
+                                                                            //null)
+                                                                        )))) : null)}
+                                                                </GridContainer>
+                                                                : null}
                                                         </GridContainer>
-                                                        )))
-
+                                                    )))
                                                 ) : null)}
-
                                                 {/*  {
                                                 truedata.map((item, i) => (
                                                     ((truedata[i].levelId == m.mID) ?
@@ -247,13 +245,10 @@ const Risk = (props) => {
                                                                 formControlProps={{
                                                                     fullWidth: true
                                                                 }}
-
                                                             />
                                                         </GridItem> : null)
                                                 ))
                                             }
-                                           
-
                                             {
                                                 falsedata.map((item, i) => (
 
@@ -275,26 +270,67 @@ const Risk = (props) => {
                                                 ))
                                             }
                                              */}
-
-                                                </GridContainer> )  )
-
+                                            </GridContainer>))
                                         ) : null}
+
                                 </GridContainer>
-                              
-
-
                             </CardBody>
-                        </Animated>
-                    </div>) : null
 
 
-            )
+                        ) : null
 
-            )
 
-            
+                    )
+                    )
 
-        ) : null);
+
+
+                } {props.componentData.ProductDTO.ProductDTO.isMasterPolicy == true ? < SwitchONParameter {...props} /> : ""}
+                    {
+                        (truepaymentdata.length > 0 || falsepaymentpdata.length > 0) ? (
+                            <div>
+                                <GridContainer> <h5 className="bold-font">Payment</h5></GridContainer>
+                                <GridContainer>
+
+                                    {truepaymentdata.map((item, j) => (
+
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <CustomCheckbox key={j}
+                                                name={item.mValue}
+                                                labelText={item.mValue}
+                                                value={item.mIsRequired}
+                                                checked={item.mIsRequired}
+                                                onChange={(e) => props.componentData.SetRiskClaimsDetailsValue('Claim', e)}
+                                                disabled={(item.disable == true) ? true : null}
+                                                //onChange={}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }} />
+                                        </GridItem>
+                                    ))}
+                                </GridContainer>
+                                <GridContainer>
+                                    {falsepaymentpdata.map((item, j) => (
+                                        <GridItem xs={12} sm={12} md={3} >
+                                            <CustomCheckbox key={j}
+                                                name={item.mValue}
+                                                labelText={item.mValue}
+                                                value={item.mIsRequired}
+                                                checked={item.mIsRequired}
+                                                onChange={(e) => props.componentData.SetRiskClaimsDetailsValue('Claim', e)}
+                                                disabled={(props.componentData.viewdisable == true) ? true : false}
+                                                //onChange={}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }} />
+                                        </GridItem>
+                                    ))}
+
+                                </GridContainer>
+
+                            </div>) : null
+                    }
+                </Animated> </div>) : null);
     //  }
 }
 export default Risk;

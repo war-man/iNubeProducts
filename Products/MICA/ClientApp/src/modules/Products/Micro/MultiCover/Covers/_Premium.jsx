@@ -96,11 +96,13 @@ const Premium = (props) => {
             {(premiumData.hidepremiumAmount && !premiumData.viewdisable) ? <p className="error">*Please fill Premium Amount in Benefit Level</p> : ""}
             {premiumData.RatingCheckBox && premiumData.hideRatingCheckBox && <GridItem xs={12} >
                 <CalCulationResult />
+
+
+                {premiumData.hideRatingCheckBox && <GridContainer>
+                    <Button id="submitBtn" color="info" round onClick={premiumData.mappingPopUp}> Mapping  </Button>
+                </GridContainer>}
             </GridItem>}
-            
-            {premiumData.hideRatingCheckBox && <GridContainer>
-                <Button id="submitBtn" color="info" round onClick={premiumData.mappingPopUp}> Mapping  </Button>
-            </GridContainer>}
+           
 
             </GridContainer>
            

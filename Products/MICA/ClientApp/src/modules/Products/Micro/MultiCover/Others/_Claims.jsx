@@ -13,7 +13,7 @@ import GridItem from "components/Grid/GridItem.jsx";
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import regularFormsStyle from "assets/jss/material-dashboard-pro-react/views/regularFormsStyle";
 import ProductConfig from "modules/Products/Micro/views/ProductConfig.jsx";
-import {Animated} from "react-animated-css";
+import { Animated } from "react-animated-css";
 import SwitchONParameter from "./_SwtichPage.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 const style = {
@@ -36,26 +36,26 @@ const style = {
 //        this.handleChange = this.handleChange.bind(this);
 //        this.handleChangeEnabled = this.handleChangeEnabled.bind(this);
 //    }
-    ////handleChange(event) {
-    ////    this.setState({ selectedValue: event.target.value });
-    ////}
-    ////handleChangeEnabled(event) {
-    ////    this.setState({ selectedEnabled: event.target.value });
-    ////}
-    ////handleToggle(value) {
-    ////    const { checked } = this.state;
-    ////    const currentIndex = checked.indexOf(value);
-    ////    const newChecked = [...checked];
+////handleChange(event) {
+////    this.setState({ selectedValue: event.target.value });
+////}
+////handleChangeEnabled(event) {
+////    this.setState({ selectedEnabled: event.target.value });
+////}
+////handleToggle(value) {
+////    const { checked } = this.state;
+////    const currentIndex = checked.indexOf(value);
+////    const newChecked = [...checked];
 
-    ////    if (currentIndex === -1) {
-    ////        newChecked.push(value);
-    ////    } else {
-    ////        newChecked.splice(currentIndex, 1);
-    ////    }
+////    if (currentIndex === -1) {
+////        newChecked.push(value);
+////    } else {
+////        newChecked.splice(currentIndex, 1);
+////    }
 
-    ////    this.setState({
-    ////        checked: newChecked
-    ////    });
+////    this.setState({
+////        checked: newChecked
+////    });
 function handleChange(event) {
     this.setState({ selectedValue: event.target.value });
 };
@@ -86,7 +86,7 @@ const Claims = (props) => {
     let falsedata = props.componentData.MasterDTO.Claim.filter(item => item.disable == false);
 
     return (
-       
+
         (props.componentData.ClaimList.length > 0) ? (<div>{
             props.componentData.ClaimList.map((m, id) => (
 
@@ -147,11 +147,11 @@ const Claims = (props) => {
 
             )
 
-        } {props.componentData.ProductDTO.ProductDTO.isMasterPolicy == true? < SwitchONParameter {...props} />:"" }</div>) : null
-          
-    
+        } {/*{props.componentData.ProductDTO.ProductDTO.isMasterPolicy == true ? < SwitchONParameter {...props} /> : ""}*/}</div>) : null
+
+
     );
-            }
-        
-        export default Claims;
+}
+
+export default Claims;
 //export default withStyles(regularFormsStyle)(Claims);

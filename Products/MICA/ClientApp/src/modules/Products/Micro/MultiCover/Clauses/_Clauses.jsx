@@ -165,6 +165,7 @@ const Clauses = (props) => {
                             
                         </GridItem>
                     </GridContainer>
+                    {!clauseData.viewdisable && <Button id="top" color="info" onClick={() => propFun.handleShowCWE("Insurable Item", props.componentData.Iindex)}>Custom Clause</Button>}
                     <GridContainer>
                         {/*
                         <GridItem xs={3} sm={4}>
@@ -180,7 +181,7 @@ const Clauses = (props) => {
                        <GridContainer >
                        <GridItem xs={12}>
                                 <br />
-                            {clauseData.MasterDTO.TableList.InsurablesTable[props.componentData.Iindex].ptable && <div>
+                            {clauseData.MasterDTO.TableList.InsurablesTable[props.componentData.Iindex].ptable && clauseData.MasterDTO.ChangeTableList.tableInsurabledata[props.componentData.Iindex].InsurablesTableDataList.length>0 && <div>
                                 
                                 <GridContainer justify="center">
                                      
@@ -254,6 +255,11 @@ const Clauses = (props) => {
                                 </Animated>
                                 </GridItem>
                                 </GridContainer>
+                            </div>
+                            }
+                        </GridItem>
+                    </GridContainer>
+
                                     {/*
                                     <Table style={tableStyle} id="clauseTable">
                                         <TableHead>
@@ -346,7 +352,7 @@ const Clauses = (props) => {
                                
                                 <GridContainer xs={12} sm={12} md={12}>
                   
-                                    {!clauseData.viewdisable && <Button id="top" color="info" onClick={() => propFun.handleShowCWE("Insurable Item", props.componentData.Iindex)}>Custom Clause</Button>}
+                                    
                             <Modal
                                 aria-labelledby="simple-modal-title"
                                 aria-describedby="simple-modal-description"
@@ -413,11 +419,7 @@ const Clauses = (props) => {
                                                    
                            
                                 </GridContainer>
-                                </div>
-                                }
-                            </GridItem>
-                        </GridContainer>
-                    
+                           
                 </div>
             );
 }

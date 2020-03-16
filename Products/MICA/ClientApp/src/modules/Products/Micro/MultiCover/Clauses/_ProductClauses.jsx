@@ -100,12 +100,12 @@ const searchClose = {
     fontSize: "larger",
     padding: "0px",
     right: '10px',
-    
+
 }
 const tableStyle = { borderRadius: '10px  ', width: '170%' }
 
 
-const tableRow = { height: 'Auto', width: 'Auto' , }
+const tableRow = { height: 'Auto', width: 'Auto', }
 
 
 const textAlign = {
@@ -126,42 +126,44 @@ const createButton = {
 const container = { marginLeft: '110px' }
 
 const ProductClauses = (props) => {
-       const { classes } = props;
+    const { classes } = props;
     const clauseData = props.componentData;
     console.log("props data ", props);
     console.log("prduct Cluses", clauseData.clauses);
-            let contents = props.componentData.masClausesWarrentiesExclusionsDTO === undefined
-                ? []
-                : props.componentData.masClausesWarrentiesExclusionsDTO
-                ;
-            console.log('clauseData ', clauseData);
-            return (
-                <div>
-                       
-                    <GridContainer id="clauseSection">
-                        <GridItem xs={12} sm={4}>
-                            <MasterDropdown labelText="Select C/W/E" id="ProductDTO.cweid" lstObject={clauseData.masterList}
-                                
-                                filterName='CWEType'
-                              // value={clauseData.ProductDTO.productCover[0].cweid}
-                                model="ProductDTO" name='cweid'
-                                onChange={(e) => clauseData.GetClausesMasterData('Clauses', 'productCovers', e,'')}
-                                disabled={clauseData.viewdisable}
-                                formControlProps={{ fullWidth: true }} />
-                            {//clauseData.errormessage && (clauseData.ProductDTO.productCover.cweid == "") ? <p className="error">*Required field cannot be left blank</p> : null
-                            }
-                        </GridItem>
-                        <br />
-                        <GridItem xs={12} sm={6} className="dropdowntree">
-                            
-                            <CustomDropDownTree 
-                                data={clauseData.clauses}
-                                onChange={props.componentData.handleddlChange}
-                            />
-                        </GridItem>
-                    </GridContainer>
-                    <GridContainer>
-                        {/*
+    let contents = props.componentData.masClausesWarrentiesExclusionsDTO === undefined
+        ? []
+        : props.componentData.masClausesWarrentiesExclusionsDTO
+        ;
+    console.log('clauseData ', clauseData);
+    return (
+        <div>
+
+            <GridContainer id="clauseSection">
+                <GridItem xs={12} sm={4}>
+                    <MasterDropdown labelText="Select C/W/E" id="ProductDTO.cweid" lstObject={clauseData.masterList}
+
+                        filterName='CWEType'
+                        // value={clauseData.ProductDTO.productCover[0].cweid}
+                        model="ProductDTO" name='cweid'
+                        onChange={(e) => clauseData.GetClausesMasterData('Clauses', 'productCovers', e, '')}
+                        disabled={clauseData.viewdisable}
+                        formControlProps={{ fullWidth: true }} />
+                    {//clauseData.errormessage && (clauseData.ProductDTO.productCover.cweid == "") ? <p className="error">*Required field cannot be left blank</p> : null
+                    }
+                </GridItem>
+                <br />
+                <GridItem xs={12} sm={6} className="dropdowntree">
+
+                    <CustomDropDownTree
+                        data={clauseData.clauses}
+                        onChange={props.componentData.handleddlChange}
+                    />
+                </GridItem>
+            </GridContainer>
+            {!clauseData.viewdisable &&
+                <Button id="top" color="info" onClick={props.componentData.handleShow}>Custom Clause</Button>}
+            <GridContainer>
+                {/*
                         <GridItem xs={3} sm={4}>
                        
                         <Button color="info" round onClick={props.componentData.AddClauses}>
@@ -170,19 +172,19 @@ const ProductClauses = (props) => {
 
                        </GridItem>
                        */}
-                       </GridContainer>
-                       <GridContainer >
-                       <GridItem xs={12}>
-                                <br />
-                                {props.componentData.ctable && <div>
-                                
-                                <GridContainer justify="center">
-                                     
-                                     <GridItem xs={12}>
-                                       
+            </GridContainer>
+            <GridContainer >
+                <GridItem xs={12}>
+                    <br />
+                    {props.componentData.ctable && clauseData.tabledata.length>0 && <div>
 
-                                           <CardBody className="react-tab-width-clauses">
-                               
+                        <GridContainer justify="center">
+
+                            <GridItem xs={12}>
+
+
+                                <CardBody className="react-tab-width-clauses">
+
 
                                     <ReactTable
                                         data={clauseData.tabledata}
@@ -243,12 +245,16 @@ const ProductClauses = (props) => {
                                     //loading={this.state.newdata}
                                     //   loadingText="coming"
                                     />
-                                
+
                                 </CardBody>
-                                
-                                </GridItem>
-                                </GridContainer>
-                                    {/*
+
+                            </GridItem>
+                        </GridContainer>
+                    </div>
+                    }
+                </GridItem>
+            </GridContainer>
+                        {/*
                                     <Table style={tableStyle} id="clauseTable">
                                         <TableHead>
                                             <TableRow className="table-row" style={tableRow}>
@@ -285,132 +291,128 @@ const ProductClauses = (props) => {
                                         </TableBody>
                                     </Table>
                                     */}
-                                    <Modal
-                                        aria-labelledby="simple-modal-title"
-                                        aria-describedby="simple-modal-description"
-                                        open={props.componentData.open}
-                                        onClose={props.componentData.handleClose}>
-                                        <div className={classes.paper} id="modal-description">
-                                        <GridItem xs={12}>
-                                                <h4> <small>Description</small>  </h4> 
-                                                
-                                                <Button color="info" className={classes.marginRight} style={searchClose} onClick={props.componentData.handleClose}>
-                                                    &times;
-                                           </Button>
-                                               
-                                            </GridItem>
-                                            <GridItem>
-                                                <p id="description-paragraph">{props.componentData.description}</p>
-                                            </GridItem>
-                                        </div>
-                                    </Modal>
-                                    <Modal
-                                        aria-labelledby="simple-modal-title"
-                                        aria-describedby="simple-modal-description"
-                                        open={props.componentData.opendescription}
-                                        onClose={props.componentData.handleClose}>
-                                        <div className={classes.paper} id="modal-description">
-                                        <GridItem xs={12}>
-                                                <h4> <small>Description</small> </h4> <Button color="info" className={classes.marginRight} style={searchClose} onClick={props.componentData.handleClose}>
-                                                    &times;
-                                           </Button>
-                                                
-                                            </GridItem>
-                                            <GridItem xs={12}   >
+                        <Modal
+                            aria-labelledby="simple-modal-title"
+                            aria-describedby="simple-modal-description"
+                            open={props.componentData.open}
+                            onClose={props.componentData.handleClose}>
+                            <div className={classes.paper} id="modal-description">
+                                <GridItem xs={12}>
+                                    <h4> <small>Description</small>  </h4>
 
-                                                <CustomInput
-                                               
-                                                    id="gstnumber"
-                                                    value={props.componentData.description}
-                                                    name="description"
-                                                    multiline={true}
-                                                onChange={(e) => props.componentData.SetValue('clauseDescription', e)}
-                                                disabled={clauseData.viewdisable}
-                                                    formControlProps={{
-                                                        fullWidth: true
+                                    <Button color="info" className={classes.marginRight} style={searchClose} onClick={props.componentData.handleClose}>
+                                        &times;
+                                           </Button>
 
-                                                    }}
-                                                />
-                                            </GridItem>
-                                            <GridItem>
-                                                <Button id="margin-left-40" color="info" onClick={props.componentData.handledescription.bind(this)}>Save Description</Button>
-                                            </GridItem>
-                                        </div>
-                                    </Modal>
-                               
-                                <GridContainer xs={12} sm={12} md={12}>
-                                    {!clauseData.viewdisable &&
-                                        <Button id="top" color="info" onClick={props.componentData.handleShow}>Custom Clause</Button>}
+                                </GridItem>
+                                <GridItem>
+                                    <p id="description-paragraph">{props.componentData.description}</p>
+                                </GridItem>
+                            </div>
+                        </Modal>
+                        <Modal
+                            aria-labelledby="simple-modal-title"
+                            aria-describedby="simple-modal-description"
+                            open={props.componentData.opendescription}
+                            onClose={props.componentData.handleClose}>
+                            <div className={classes.paper} id="modal-description">
+                                <GridItem xs={12}>
+                                    <h4> <small>Description</small> </h4> <Button color="info" className={classes.marginRight} style={searchClose} onClick={props.componentData.handleClose}>
+                                        &times;
+                                           </Button>
+
+                                </GridItem>
+                                <GridItem xs={12}   >
+
+                                    <CustomInput
+
+                                        id="gstnumber"
+                                        value={props.componentData.description}
+                                        name="description"
+                                        multiline={true}
+                                        onChange={(e) => props.componentData.SetValue('clauseDescription', e)}
+                                        disabled={clauseData.viewdisable}
+                                        formControlProps={{
+                                            fullWidth: true
+
+                                        }}
+                                    />
+                                </GridItem>
+                                <GridItem>
+                                    <Button id="margin-left-40" color="info" onClick={props.componentData.handledescription.bind(this)}>Save Description</Button>
+                                </GridItem>
+                            </div>
+                        </Modal>
+
+                        <GridContainer xs={12} sm={12} md={12}>
+
                             <Modal
                                 aria-labelledby="simple-modal-title"
                                 aria-describedby="simple-modal-description"
                                 open={props.componentData.mshow}
                                 onClose={props.componentData.handleClose}>
                                 <div className={classes.paper} id="modal">
-                                        <h4> <small>Custom C/W/E</small> </h4>
-                                            <Button color="info" className={classes.marginRight} style={searchClose} onClick={props.componentData.handleClose}>
+                                    <h4> <small>Custom C/W/E</small> </h4>
+                                    <Button color="info" className={classes.marginRight} style={searchClose} onClick={props.componentData.handleClose}>
                                         &times;
                                                             </Button>
-                                                            <GridContainer justify="center">
-                                                            <GridItem xs={12} sm={4} md={4}>
-                                    <MasterDropdown labelText="Select Type"
-                                                            id="ProductDTO.cwetypeId.cweid"
-                                        lstObject={clauseData.masterList}
-                                        filterName='CWEType'
-                                                            value={clauseData.ProductDTO.CustomClause.cwetypeId}
-                                        model="ProductDTO"
-                                                            name='cwetypeId'
-                                                    onChange={(e) => props.componentData.SetValue('CustomClause', e)}
-                                                    disabled={clauseData.viewdisable}
+                                    <GridContainer justify="center">
+                                        <GridItem xs={12} sm={4} md={4}>
+                                            <MasterDropdown labelText="Select Type"
+                                                id="ProductDTO.cwetypeId.cweid"
+                                                lstObject={clauseData.masterList}
+                                                filterName='CWEType'
+                                                value={clauseData.ProductDTO.CustomClause.cwetypeId}
+                                                model="ProductDTO"
+                                                name='cwetypeId'
+                                                onChange={(e) => props.componentData.SetValue('CustomClause', e)}
+                                                disabled={clauseData.viewdisable}
                                                 formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={4} md={4}>
-                                    <CustomInput
-                                                    labelText="Type Name"
-                                                    
-                                        id="gstnumber"
-                                        value={clauseData.ProductDTO.CustomClause.typeName}
-                                        name="typeName"
-                                                    onChange={(e) => props.componentData.SetValue('CustomClause', e)}
-                                                    disabled={clauseData.viewdisable}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={4} md={4}>
-                                    <CustomInput
-                                                    labelText="Description:"
-                                                    
-                                        id="gstnumber"
-                                        value={clauseData.ProductDTO.CustomClause.description}
-                                        name="description"
-                                                    onChange={(e) => props.componentData.SetValue('CustomClause', e)}
-                                                    disabled={clauseData.viewdisable}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                                        />
-                                    </GridItem>
+                                        </GridItem>
+                                        <GridItem xs={12} sm={4} md={4}>
+                                            <CustomInput
+                                                labelText="Type Name"
+
+                                                id="gstnumber"
+                                                value={clauseData.ProductDTO.CustomClause.typeName}
+                                                name="typeName"
+                                                onChange={(e) => props.componentData.SetValue('CustomClause', e)}
+                                                disabled={clauseData.viewdisable}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+                                            />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={4} md={4}>
+                                            <CustomInput
+                                                labelText="Description:"
+
+                                                id="gstnumber"
+                                                value={clauseData.ProductDTO.CustomClause.description}
+                                                name="description"
+                                                onChange={(e) => props.componentData.SetValue('CustomClause', e)}
+                                                disabled={clauseData.viewdisable}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+                                            />
+                                        </GridItem>
                                     </GridContainer>
                                     <GridContainer justify="center">
-                                    <GridItem xs={3} sm={3} md={3}>           
-                                        <Button id="margin-left-180" color="info" onClick={props.componentData.handledata}>Add Clause</Button>
-                                    </GridItem>
+                                        <GridItem xs={3} sm={3} md={3}>
+                                            <Button id="margin-left-180" color="info" onClick={props.componentData.handledata}>Add Clause</Button>
+                                        </GridItem>
                                     </GridContainer>
-                               </div>
-                                        </Modal>
-                                         
-                                                   
-                           
-                                </GridContainer>
                                 </div>
-                                }
-                            </GridItem>
+                            </Modal>
+
+
+
                         </GridContainer>
-                    
-                </div>
-            );
+                 
+
+        </div>
+    );
 }
 
 

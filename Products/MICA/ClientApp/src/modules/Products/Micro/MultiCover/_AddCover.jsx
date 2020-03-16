@@ -49,7 +49,7 @@ const AddCover = (props) => {
 
                             //{ stepName: "Benefits", stepComponent: Benefits, stepId: "benefits", stepData: props },
                             //{ stepName: "Premium", stepComponent: Premium, stepId: "premium", stepData: props },
-                            { stepName: "Insurable C/W/E", stepComponent: Clauses, stepId: "Clauses", stepData: props },
+                            { stepName: "Insurable Item C/W/E", stepComponent: Clauses, stepId: "Clauses", stepData: props },
                           //  { stepName: "Risks", stepComponent: Risks, stepId: "Risks", stepData: props },
                             //{ stepName: "Claims", stepComponent: Claims, stepId: "Claims", stepData: props }
 

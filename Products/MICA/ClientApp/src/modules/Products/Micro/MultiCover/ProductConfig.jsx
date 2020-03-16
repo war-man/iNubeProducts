@@ -72,7 +72,7 @@ class ProductConfig extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            ClaimSIlabel:"ClaimSI",
+            ClaimSIlabel:"Sum Insured",
             PaymentList:[],
             CoverEventShow:false,
             premiumerror:false,
@@ -340,6 +340,7 @@ class ProductConfig extends React.Component {
                 "cwetypes": "",
                 "levelId": 0,
                 "subLevelId": 0,
+                "refId":0
 
             },
             masClausesWarrentiesExclusionsDTO:
@@ -594,17 +595,20 @@ class ProductConfig extends React.Component {
 
 
             let productDTO = this.state.ProductDTO;
+            console.log("insurableRcbdetails1", this.ProductDetails.insurableRcbdetails, this.ProductDetails.productInsurableItem);
 
             let Inlen = this.ProductDetails.insurableRcbdetails.length - 1;
             while (Inlen >= 0) {
-                this.ProductDetails.insurableRcbdetails[Inlen].coverRcbdetails = this.ProductDetails.insurableRcbdetails[Inlen].coverRcbdetails.filter(item => item.inputId !== 0);
+             this.ProductDetails.insurableRcbdetails[Inlen].coverRcbdetails = this.ProductDetails.insurableRcbdetails[Inlen].coverRcbdetails.filter(item => item.inputId !== 0);
+             //   this.ProductDetails.insurableRcbdetails[Inlen].coverRcbdetails = this.ProductDetails.insurableRcbdetails[Inlen].coverRcbdetails.filter(item => item.mIsRequired == true);
                 Inlen--;
             }
 
 
 
 
-            this.ProductDetails.insurableRcbdetails = this.ProductDetails.insurableRcbdetails.filter(item => item.inputId !== 0);
+            this.ProductDetails.insurableRcbdetails = this.ProductDetails.insurableRcbdetails.filter(item => item.inputId !== 0  );
+            //this.ProductDetails.insurableRcbdetails = this.ProductDetails.insurableRcbdetails.filter(item => item.mIsRequired == true );
 
             console.log("insurableRcbdetails", this.ProductDetails.insurableRcbdetails, this.ProductDetails.productInsurableItem);
 
@@ -639,9 +643,9 @@ class ProductConfig extends React.Component {
                 productDTO.premiumAmount = this.ProductDetails.productPremium[0].premiumAmount;
             }
             // For Risk
-            productDTO['riskDetails'] = this.state.MasterDTO.Risk;
+            productDTO['riskDetails'] = this.state.MasterDTO.Risk.filter(s => s.mIsRequired==true);
             //For claims
-            productDTO['claimDetails'] = this.state.MasterDTO.Claim;
+            productDTO['claimDetails'] = this.state.MasterDTO.Claim.filter(s => s.mIsRequired == true);
             //Clauses
             productDTO['productClausesWarrentiesExclusions'] = this.ProductDetails.productClausesWarrentiesExclusion;
             //insurableitem
@@ -666,9 +670,18 @@ class ProductConfig extends React.Component {
             productDTO['productSwitchOnProperty'] = this.state.MasterDTO.Switchon;
 
 
-            productDTO['insurableRcbdetails'] = this.ProductDetails.insurableRcbdetails;
+            productDTO['insurableRcbdetails'] = [...[],...this.ProductDetails.insurableRcbdetails];
+            let Inlen1 = productDTO['insurableRcbdetails'].length - 1;
+            while (Inlen1 >= 0) {
+                productDTO.insurableRcbdetails[Inlen1].insurableChildRcbdetails = productDTO.insurableRcbdetails[Inlen1].insurableChildRcbdetails.filter(item => item.mIsRequired == true);
 
-
+                for (var i = 0; i < productDTO.insurableRcbdetails[Inlen1].coverRcbdetails.length; i++) {
+                    productDTO.insurableRcbdetails[Inlen1].coverRcbdetails[i].coverChildRcbdetails = productDTO.insurableRcbdetails[Inlen1].coverRcbdetails[i].coverChildRcbdetails.filter(item => item.mIsRequired == true);
+                }
+                Inlen1--;
+              
+            }
+            console.log("   productDTO.insurableRcbdetails", productDTO.insurableRcbdetails);
             // if (this.ProductDetails.productChannel.channelName) {
             //Channels
 
@@ -1146,8 +1159,8 @@ class ProductConfig extends React.Component {
 
 
     handleShow() {
-        this.setState({ mshow: true });
-
+        this.setState({ mshow: true, ctable: true  });
+       
     };
     handleShowCWE = (level, Iindex, Cindex = 0) => {
         if (level == "Insurable Item") {
@@ -1163,12 +1176,16 @@ class ProductConfig extends React.Component {
 
     };
     handleClose() {
-        this.setState({ open: false });
-        this.setState({ mshow: false });
-        this.setState({ opendescription: false });
-        this.setState({ mappingPop: false });
+        this.state.CustomClause.typeName = "";
+        this.state.CustomClause.description = "";
+        this.state.CustomClause.cwetypeId = "";
+        this.setState({ open: false, mshow: false, opendescription: false, mappingPop: false});
+     
     };
     handleCloseCWE(level, Iindex, Cindex) {
+        this.state.CustomClause.typeName = "";
+        this.state.CustomClause.description = "";
+        this.state.CustomClause.cwetypeId = "";
         if (level == "Insurable Item") {
             this.state.MasterDTO.TableList.InsurablesTable[Iindex].open = false;
             this.state.MasterDTO.TableList.InsurablesTable[Iindex].mshow = false;
@@ -1913,7 +1930,7 @@ class ProductConfig extends React.Component {
                 console.log("data  server", data);
                 if (type === "Risk") {
 
-                    data = data.filter(s => s.mValue != "Identification Number");
+                   // data = data.filter(s => s.mValue != "Identification Number");
                     if (typeId == "0") {
 
                         const masterDTO = this.state.MasterDTO;
@@ -2343,21 +2360,22 @@ class ProductConfig extends React.Component {
 
 
                     }
-                } 
-                //if (CoverCount == 0) {
-                //    this.state.ValidationUI = false; this.state.errormessage = true;
-                //    tempmassage = tempmassage + "Cover,";
-                //}
+                } else {
+                    //if (CoverCount == 0) {
+                    //    this.state.ValidationUI = false; this.state.errormessage = true;
+                    //    tempmassage = tempmassage+"Cover,";
+                    //}
+                }
             }
         } else {
             this.state.ValidationUI = false; this.state.errormessage = true;
             tempmassage = tempmassage+"Insurable Item,";
         }
-        if (productDetails.productClausesWarrentiesExclusion.length == 0) {
-            this.state.ValidationUI = false; this.state.errormessage = true;
-            tempmassage = tempmassage + "C/W/E,";
+        //if (productDetails.productClausesWarrentiesExclusion.length == 0) {
+        //    this.state.ValidationUI = false; this.state.errormessage = true;
+        //    tempmassage = tempmassage + "C/W/E,";
 
-        }
+        //}
 
 
 
@@ -2617,7 +2635,16 @@ class ProductConfig extends React.Component {
                     .then(response => response.json())
                     .then(data => {
                         console.log("product data from server", data);
-                     
+
+                        if (data.productBasicConfiguration.length > 0) {
+
+                            this.state.MasterDTO['AllowPayment'] = data.productBasicConfiguration.filter(s => s.inputType == "AllowPayment");
+                            this.state.MasterDTO['CDCreation'] = data.productBasicConfiguration.filter(s => s.inputType == "CDCreation");
+                            this.state.MasterDTO['PremiumBreakup'] = data.productBasicConfiguration.filter(s => s.inputType == "PremiumBreakup");
+                            this.state.MasterDTO['ProductType'] = data.productBasicConfiguration.filter(s => s.inputType == "ProductType");
+                            this.state.MasterDTO['ClaimSI'] = data.productBasicConfiguration.filter(s => s.inputType == "ClaimSI");
+
+                        }
                         if (data.productSwitchOnDetails.length > 0) {
                             this.state.MasterDTO.Switchon = data.productSwitchOnDetails;
                         }
@@ -3178,6 +3205,7 @@ class ProductConfig extends React.Component {
         //this.dataCWETable(level, Iindex, Cindex);
     }
     handledata() {
+
         this.state.CustomClause.label = this.state.CustomClause.typeName;
 
         let productDTO = this.ProductDetails;
@@ -3200,6 +3228,8 @@ class ProductConfig extends React.Component {
         }
         else if (mvalue[0].mValue === 'Exclusions') {
             cvalue = 'E';
+        } else if (mvalue[0].mValue === 'Policy Wording') {
+            cvalue = 'PW';
         }
         CustomClause['cwetypes'] = cvalue;
         this.setState({ CustomClause });
@@ -3212,6 +3242,7 @@ class ProductConfig extends React.Component {
 
         this.setState({ mshow: false });
         this.dataTable();
+        this.handleClose();
     }
 
     handleRadioChange = (event, Iindex, Cindex) => {
@@ -3275,6 +3306,7 @@ class ProductConfig extends React.Component {
 
     }
     dataTable = () => {
+        console.log("PRoduct CWE", this.ProductDetails.productClausesWarrentiesExclusion);
         this.setState({
             tabledata: this.ProductDetails.productClausesWarrentiesExclusion.map((prop, key) => {
 
@@ -3285,6 +3317,7 @@ class ProductConfig extends React.Component {
                     isPrint: <CustomCheckbox key={key}
                         name="isPrint"
                         value={prop.isPrint}
+                        checked={prop.isPrint}
                         onChange={(e) => this.SetclauseValue(key, e)}
                         disabled={this.state.viewdisable}
                         formControlProps={{
@@ -3294,12 +3327,19 @@ class ProductConfig extends React.Component {
                     />,
                     btn: <div><Button color="info" justIcon round simple className="view" onClick={this.handleOpen.bind(this, key)}><Visibility /></Button>
                         {!this.state.viewdisable && <Button color="info" justIcon round simple className="edit" onClick={this.handleEdit.bind(this, key)}><Edit /></Button>}
+                        {!this.state.viewdisable && <Button justIcon round simple color="danger" className="remove" onClick={() => this.deleteCWE(key)} ><Delete /> </Button >}
+
                     </div>
                 };
 
             })
 
         });
+    }
+    deleteCWE = (index) => {
+        this.ProductDetails.productClausesWarrentiesExclusion.splice(index, 1);
+        this.state.tabledata.splice(index, 1);
+        this.setState({});
     }
 
     dataCWETable = (level, Iindex, Cindex) => {

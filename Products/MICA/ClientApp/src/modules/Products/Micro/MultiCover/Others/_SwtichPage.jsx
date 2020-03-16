@@ -11,7 +11,7 @@ const SwitchONParameter = (props) => {
 
     return (
         <GridContainer>
-            <h5>Switch ON/OFF:</h5>
+            <h5 className="bold-font">Switch ON/OFF:</h5>
             <GridContainer>
             {props.componentData.MasterDTO.Switchon.map((item, id) => (
                 <GridItem xs={12} sm={12} md={3} className="uplevel">

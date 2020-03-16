@@ -132,7 +132,7 @@ const ProductBasic = (props) => {
                             <CustomDatetime success={props.activeToState === "success"} disabled={props.viewdisable} required={true} error={props.activeToState === "error"} validdate={false} datediff={props.datediff} labelText="Active To" id='dtActiveFrom' name='activeTo' onChange={(evt) => props.onDateChange('datetime', 'ProductDTO', 'activeTo', evt)} value={props.ProductDTO.activeTo} formControlProps={{ fullWidth: true }} />
                             {props.errormessage && (props.ProductDTO.activeTo == "") ? <p className="error">This Field is Required</p> : null}
                         </GridItem>
-                        <GridItem className="dropPro" xs={12} sm={12} md={4}>
+                        <GridItem  xs={12} sm={12} md={4}>
                             <MasterDropdown success={props.productStatusIdState === "success"} disabled={props.viewdisable} required={true} error={props.productStatusIdState === "error"} labelText="Product Status" id="ddlstatus" lstObject={props.masterList} filterName='ProductStatus' value={props.ProductDTO.productStatusId} name='productStatusId' onChange={(event) => props.SetValue("string", event)} formControlProps={{ fullWidth: true }} />
                             {props.errormessage && (props.ProductDTO.productStatusId == "") ? <p className="error">This Field is Required</p> : null}
                         </GridItem>
@@ -144,7 +144,8 @@ const ProductBasic = (props) => {
                         <GridItem className="dropPro" xs={12} sm={12} md={4}>
                             <CustomCheckbox
                                 name="isMasterPolicy"
-                                labelText="Is Master Policy"
+                                disabled={props.viewdisable} 
+                                labelText="Cover OnDemand"
                                 value={props.ProductDTO.isMasterPolicy}
                                 onChange={(e) => props.SetMasterPolicyCheckBox(e)}
                                 //disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}

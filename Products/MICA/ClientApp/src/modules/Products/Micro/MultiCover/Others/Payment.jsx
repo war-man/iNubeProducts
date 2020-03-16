@@ -83,8 +83,8 @@ const Payment = (props) => {
 
     //console.log('Risks demo data', props.componentData.MasterDTO.Risk[0]);
     console.log('Claims demo data', props.componentData.MasterDTO, props.componentData.ClaimList);
-    let truedata = props.componentData.MasterDTO.Payment.filter(item => item.disable == true);
-    let falsedata = props.componentData.MasterDTO.Payment.filter(item => item.disable == false);
+    //let truedata = props.componentData.MasterDTO.Payment.filter(item => item.disable == true);
+    //let falsedata = props.componentData.MasterDTO.Payment.filter(item => item.disable == false);
 
     return (
         <GridContainer>
@@ -94,93 +94,7 @@ const Payment = (props) => {
 
                 <CustomRadioButton disabled={props.componentData.viewdisable} radiolist={props.componentData.MasterDTO.AllowPayment} onChange={(e) => props.componentData.onChangePaymentradio(e, 'AllowPayment')} />
 
-
-                {props.componentData.MasterDTO.CDCreation.length > 0 ? <GridContainer> <h5 className="bold-font">CD/AC Configuration</h5></GridContainer> : null}
-                <CustomRadioButton disabled={props.componentData.viewdisable} radiolist={props.componentData.MasterDTO.CDCreation} onChange={(e) => props.componentData.onChangePaymentradio(e, 'CDCreation')} />
-       
-                {props.componentData.MasterDTO.PremiumBreakup.length > 0 ? <GridContainer> <h5 className="bold-font">A/C Entry Breakup</h5></GridContainer> : null}
-                <CustomRadioButton disabled={props.componentData.viewdisable} radiolist={props.componentData.MasterDTO.PremiumBreakup} onChange={(e) => props.componentData.onChangePaymentradio(e, 'PremiumBreakup')} />
-                {props.componentData.MasterDTO.Tax.map(item => (
-                    <GridItem xs={12} sm={12} md={3}>
-                        <CustomCheckbox
-                            name={item.mValue}
-                            labelText={item.mValue}
-                            value={item.mIsRequired}
-                            checked={item.mIsRequired}
-                            onChange={(e) => props.componentData.SetRiskClaimsDetailsValue('Tax',e)}
-                            disabled={(item.disable == true) ? true : null}
-                            //onChange={}
-                            formControlProps={{
-                                fullWidth: true
-                            }} />
-                    </GridItem>
-                ))}
-
-                {props.componentData.MasterDTO.ClaimSI.length > 0 ? <GridContainer> <h5 className="bold-font">{props.componentData.ClaimSIlabel}</h5></GridContainer> : null}
-
-                <CustomRadioButton disabled={props.componentData.viewdisable} radiolist={props.componentData.MasterDTO.ClaimSI} onChange={(e) => props.componentData.onChangePaymentradio(e, 'ClaimSI')} />
-
-
-                <div>{
-                    
-                        (truedata.length > 0 || falsedata.length > 0) ? (
-                            <div>
-                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-
-                                  
-
-
-                                        <GridContainer> <h5 className="bold-font">Payment</h5></GridContainer>
-                                        <GridContainer>
-
-                                            {truedata.map((item, i) => (
-                                               
-                                                    <GridItem xs={12} sm={12} md={3}>
-                                                        <CustomCheckbox key={i}
-                                                            name={item.mValue}
-                                                            labelText={item.mValue}
-                                                            value={item.mIsRequired}
-                                                            checked={item.mIsRequired}
-                                                            onChange={(e) => props.componentData.SetRiskClaimsDetailsValue('Claim', e)}
-                                                            disabled={(item.disable == true) ? true : null}
-                                                            //onChange={}
-                                                            formControlProps={{
-                                                                fullWidth: true
-                                                            }} />
-                                                    </GridItem> 
-                                            ))}
-                                        </GridContainer>
-                                        <GridContainer>
-
-                                            {falsedata.map((item, i) => (
-
-                                              
-                                                    <GridItem xs={12} sm={12} md={3} >
-                                                        <CustomCheckbox key={i}
-                                                            name={item.mValue}
-                                                            labelText={item.mValue}
-                                                            value={item.mIsRequired}
-                                                            checked={item.mIsRequired}
-                                                            onChange={(e) => props.componentData.SetRiskClaimsDetailsValue('Claim', e)}
-                                                            disabled={(props.componentData.viewdisable == true) ? true : false}
-                                                            //onChange={}
-                                                            formControlProps={{
-                                                                fullWidth: true
-                                                            }} />
-                                                    </GridItem> 
-                                            ))}
-
-                                        </GridContainer>
-                              
-                                </Animated>
-                            </div>) : null
-
-
-                    
-
-
-                }
-                </div>
+                
            
             </CardBody>
         

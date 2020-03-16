@@ -40,7 +40,7 @@ import CustomCheckbox from "components/Checkbox/CustomCheckbox";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 import ProductConfig from "modules/Products/Micro/views/ProductConfig.jsx";
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
-import {Animated} from "react-animated-css";
+import { Animated } from "react-animated-css";
 const style = {
     infoText: {
         fontWeight: "300",
@@ -100,12 +100,12 @@ const searchClose = {
     fontSize: "larger",
     padding: "0px",
     right: '10px',
-    
+
 }
 const tableStyle = { borderRadius: '10px  ', width: '170%' }
 
 
-const tableRow = { height: 'Auto', width: 'Auto' , }
+const tableRow = { height: 'Auto', width: 'Auto', }
 
 
 const textAlign = {
@@ -134,40 +134,41 @@ const BenefitClauses = (props) => {
     const Bindex = props.props.props.Bindex
     const Iindex = props.props.props.Iindex;
     console.log("props data ", props);
-            let contents = clauseData.masClausesWarrentiesExclusionsDTO === undefined
-                ? []
-                : clauseData.masClausesWarrentiesExclusionsDTO
-                ;
-            console.log('clauseData ', clauseData);
-            return (
-                <div>
-                   
-                    <GridContainer id="clauseSection">
-                        <GridItem xs={12} sm={6}>
-                         
-                            <MasterDropdown labelText="Select C/W/E" id="ProductDTO.cweid" lstObject={clauseData.masterList}
-                                
-                                filterName='CWEType'
-                                value={ProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].cweid}
-                                model="ProductDTO" name='cweid'
-                                onChange={(e) => propFun.GetClausesData('Clauses', 'productCovers', e, "Benefit",Iindex, Bindex)}
-                                disabled={clauseData.viewdisable}
-                                formControlProps={{ fullWidth: true }} />
-                        </GridItem>
-                        <br />
-                        
-                        <GridItem xs={12} sm={6} className="dropdowntree">
-                          
-                            <CustomDropDownTree 
-                                data={clauseData.MasterDTO.MasterList.InsurablesClause[Iindex].CoversClause[Bindex].BenefitList}
-                                onChange={(e) => propFun.handleTreeChange(e, "Benefit", Iindex, Bindex)}
+    let contents = clauseData.masClausesWarrentiesExclusionsDTO === undefined
+        ? []
+        : clauseData.masClausesWarrentiesExclusionsDTO
+        ;
+    console.log('clauseData ', clauseData);
+    return (
+        <div>
 
-                            />
-                            
-                        </GridItem>
-                    </GridContainer>
-                    <GridContainer>
-                        {/*
+            <GridContainer id="clauseSection">
+                <GridItem xs={12} sm={6}>
+
+                    <MasterDropdown labelText="Select C/W/E" id="ProductDTO.cweid" lstObject={clauseData.masterList}
+
+                        filterName='CWEType'
+                        value={ProductDetails.ProductDTO.productInsurableItem[Iindex].productCovers[Bindex].productBenefits[0].cweid}
+                        model="ProductDTO" name='cweid'
+                        onChange={(e) => propFun.GetClausesData('Clauses', 'productCovers', e, "Benefit", Iindex, Bindex)}
+                        disabled={clauseData.viewdisable}
+                        formControlProps={{ fullWidth: true }} />
+                </GridItem>
+                <br />
+
+                <GridItem xs={12} sm={6} className="dropdowntree">
+
+                    <CustomDropDownTree
+                        data={clauseData.MasterDTO.MasterList.InsurablesClause[Iindex].CoversClause[Bindex].BenefitList}
+                        onChange={(e) => propFun.handleTreeChange(e, "Benefit", Iindex, Bindex)}
+
+                    />
+
+                </GridItem>
+            </GridContainer>
+            {!clauseData.viewdisable && <Button id="top" color="info" onClick={() => propFun.handleShowCWE("Benefit", Iindex, Bindex)}>Custom Clause</Button>}
+            <GridContainer>
+                {/*
                         <GridItem xs={3} sm={4}>
                        
                         <Button color="info" round onClick={clauseData.AddClauses}>
@@ -176,86 +177,90 @@ const BenefitClauses = (props) => {
 
                        </GridItem>
                        */}
-                       </GridContainer>
-                       
-                       <GridContainer >
-                       <GridItem xs={12}>
-                              
-                            {clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.ptable && <div>
-                                
-                                <GridContainer justify="center">
-                                     
-                                     <GridItem xs={12}>
-                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>    
+            </GridContainer>
 
-                                           <CardBody className="react-tab-width-clauses">
-                               
+            <GridContainer >
+                <GridItem xs={12}>
 
-                                    <ReactTable
-                                                    data={clauseData.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Bindex].tableBenefitdata.BenefitTableDataList}
-                                        filterable
-                                        columns={[
-                                            //{
-                                            //    Header: "S-No",
-                                            //    accessor: "id",
-                                            //    //style: { textAlign: "right" }
-                                            //    // width: '50'
-                                            //    minWidth: 50
-                                            //},
+                    {clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.ptable && clauseData.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Bindex].tableBenefitdata.BenefitTableDataList.length > 0 && <div>
 
-                                            {
-                                                Header: "C/W/E NAME",
-                                                accessor: "typeName",
-                                                style: { textAlign: "left" },
-                                                headerClassName: 'react-table-center',
-                                                //width: '50'
-                                                // minWidth: 100
-                                                resizable: false,
-                                            },
-                                            {
-                                                Header: "C/W/E",
-                                                accessor: "cwetypes",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                //width: '50'
-                                                // minWidth: 200
-                                                resizable: false,
-                                            },
-                                            {
-                                                Header: "C/W/E Full Text",
-                                                accessor: "btn",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                //width: '50'
-                                                resizable: false,
-                                            },
-                                            {
-                                                Header: "Print",
-                                                accessor: "isPrint",
-                                                style: { textAlign: "center" },
-                                                headerClassName: 'react-table-center',
-                                                //width: '50' 
-                                                resizable: false,
+                        <GridContainer justify="center">
 
-                                            },
+                            <GridItem xs={12}>
+                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+
+                                    <CardBody className="react-tab-width-clauses">
 
 
+                                        <ReactTable
+                                            data={clauseData.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Bindex].tableBenefitdata.BenefitTableDataList}
+                                            filterable
+                                            columns={[
+                                                //{
+                                                //    Header: "S-No",
+                                                //    accessor: "id",
+                                                //    //style: { textAlign: "right" }
+                                                //    // width: '50'
+                                                //    minWidth: 50
+                                                //},
 
-                                        ]}
-                                        defaultPageSize={5}
-                                                    pageSize={([clauseData.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Bindex].tableBenefitdata.BenefitTableDataList.length + 1] < 6) ? [clauseData.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Bindex].tableBenefitdata.BenefitTableDataList.length + 1] : 6}
-                                        showPaginationTop={false}
-                                        showPaginationBottom
-                                        className="-striped -highlight short-tab"
-                                    //loading={this.state.newdata}
-                                    //   loadingText="coming"
-                                    />
-                                
-                                </CardBody>
+                                                {
+                                                    Header: "C/W/E NAME",
+                                                    accessor: "typeName",
+                                                    style: { textAlign: "left" },
+                                                    headerClassName: 'react-table-center',
+                                                    //width: '50'
+                                                    // minWidth: 100
+                                                    resizable: false,
+                                                },
+                                                {
+                                                    Header: "C/W/E",
+                                                    accessor: "cwetypes",
+                                                    style: { textAlign: "center" },
+                                                    headerClassName: 'react-table-center',
+                                                    //width: '50'
+                                                    // minWidth: 200
+                                                    resizable: false,
+                                                },
+                                                {
+                                                    Header: "C/W/E Full Text",
+                                                    accessor: "btn",
+                                                    style: { textAlign: "center" },
+                                                    headerClassName: 'react-table-center',
+                                                    //width: '50'
+                                                    resizable: false,
+                                                },
+                                                {
+                                                    Header: "Print",
+                                                    accessor: "isPrint",
+                                                    style: { textAlign: "center" },
+                                                    headerClassName: 'react-table-center',
+                                                    //width: '50' 
+                                                    resizable: false,
+
+                                                },
+
+
+
+                                            ]}
+                                            defaultPageSize={5}
+                                            pageSize={([clauseData.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Bindex].tableBenefitdata.BenefitTableDataList.length + 1] < 6) ? [clauseData.MasterDTO.ChangeTableList.tableInsurabledata[Iindex].tableCoversdata[Bindex].tableBenefitdata.BenefitTableDataList.length + 1] : 6}
+                                            showPaginationTop={false}
+                                            showPaginationBottom
+                                            className="-striped -highlight short-tab"
+                                        //loading={this.state.newdata}
+                                        //   loadingText="coming"
+                                        />
+
+                                    </CardBody>
                                 </Animated>
-                                </GridItem>
-                                </GridContainer>
-                                    {/*
+                            </GridItem>
+                        </GridContainer>
+                    </div>
+                    }
+                </GridItem>
+            </GridContainer>
+            {/*
                                     <Table style={tableStyle} id="clauseTable">
                                         <TableHead>
                                             <TableRow className="table-row" style={tableRow}>
@@ -292,134 +297,131 @@ const BenefitClauses = (props) => {
                                         </TableBody>
                                     </Table>
                                     */}
-                                <Modal
-                                    aria-labelledby="simple-modal-title"
-                                    aria-describedby="simple-modal-description"
-                                    open={clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.open}
-                                    onClose={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
-                                    <div className={classes.paper} id="modal-description">
-                                        <GridItem xs={12}>
-                                            <h4> <small>Description</small>  </h4>
+            <Modal
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
+                open={clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.open}
+                onClose={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
+                <div className={classes.paper} id="modal-description">
+                    <GridItem xs={12}>
+                        <h4> <small>Description</small>  </h4>
 
-                                            <Button color="info" className={classes.marginRight} style={searchClose} onClick={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
-                                                &times;
+                        <Button color="info" className={classes.marginRight} style={searchClose} onClick={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
+                            &times;
                                            </Button>
 
-                                        </GridItem>
-                                        <GridItem>
-                                            <p id="description-paragraph">{clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.description}</p>
-                                        </GridItem>
-                                    </div>
-                                </Modal>
-                                <Modal
-                                    aria-labelledby="simple-modal-title"
-                                    aria-describedby="simple-modal-description"
+                    </GridItem>
+                    <GridItem>
+                        <p id="description-paragraph">{clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.description}</p>
+                    </GridItem>
+                </div>
+            </Modal>
+            <Modal
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
 
-                                    open={clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.opendespcription}
-                                    onClose={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
-                                    <div className={classes.paper} id="modal-description">
-                                        <GridItem xs={12}>
-                                            <h4> <small>Description</small> </h4> <Button color="info" className={classes.marginRight} style={searchClose} onClick={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
-                                                &times;
+                open={clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.opendespcription}
+                onClose={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
+                <div className={classes.paper} id="modal-description">
+                    <GridItem xs={12}>
+                        <h4> <small>Description</small> </h4> <Button color="info" className={classes.marginRight} style={searchClose} onClick={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
+                            &times;
                                            </Button>
 
-                                        </GridItem>
-                                        <GridItem xs={12}   >
+                    </GridItem>
+                    <GridItem xs={12}   >
 
-                                            <CustomInput
+                        <CustomInput
 
-                                                id="gstnumber"
-                                                value={clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.description}
-                                                name="description"
-                                                multiline={true}
-                                                onChange={(e) => propFun.SetValueCWE(e, "Benefit", Iindex, Bindex)}
-                                                disabled={clauseData.viewdisable}
-                                                formControlProps={{
-                                                    fullWidth: true
+                            id="gstnumber"
+                            value={clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.description}
+                            name="description"
+                            multiline={true}
+                            onChange={(e) => propFun.SetValueCWE(e, "Benefit", Iindex, Bindex)}
+                            disabled={clauseData.viewdisable}
+                            formControlProps={{
+                                fullWidth: true
 
-                                                }}
-                                            />
-                                        </GridItem>
-                                        <GridItem>
-                                            <Button id="margin-left-40" color="info" onClick={()=>propFun.handledescriptionCWE("Benefit", Iindex, Bindex)}>Save</Button>
-                                        </GridItem>
-                                    </div>
-                                </Modal>
+                            }}
+                        />
+                    </GridItem>
+                    <GridItem>
+                        <Button id="margin-left-40" color="info" onClick={() => propFun.handledescriptionCWE("Benefit", Iindex, Bindex)}>Save</Button>
+                    </GridItem>
+                </div>
+            </Modal>
 
-                               
-                                <GridContainer xs={12} sm={12} md={12}>
-                  
-                                    {!clauseData.viewdisable && <Button id="top" color="info" onClick={() => propFun.handleShowCWE("Benefit", Iindex, Bindex)}>Custom Clause</Button>}
-                            <Modal
-                                aria-labelledby="simple-modal-title"
-                                aria-describedby="simple-modal-description"
-                                        open={clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.mshow}
-                                onClose={propFun.handleClose}>
-                                <div className={classes.paper} id="modal">
-                                        <h4> <small>Custom C/W/E</small> </h4>
-                                            <Button color="info" className={classes.marginRight} style={searchClose} onClick={propFun.handleClose}>
-                                        &times;
+
+            <GridContainer xs={12} sm={12} md={12}>
+
+
+                <Modal
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                    open={clauseData.MasterDTO.TableList.InsurablesTable[Iindex].CoversTable[Bindex].BenefitTable.mshow}
+                    onClose={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
+                    <div className={classes.paper} id="modal">
+                        <h4> <small>Custom C/W/E</small> </h4>
+                        <Button color="info" className={classes.marginRight} style={searchClose} onClick={() => propFun.handleCloseCWE("Benefit", Iindex, Bindex)}>
+                            &times;
                                                             </Button>
-                                                            <GridContainer justify="center">
-                                                            <GridItem xs={12} sm={4} md={4}>
-                                    <MasterDropdown labelText="Select Type"
-                                                            id="ProductDTO.cwetypeId.cweid"
-                                        lstObject={clauseData.masterList}
-                                        filterName='CWEType'
-                                                        value={ProductDetails.ProductDTO.CustomClause.cwetypeId}
-                                        model="ProductDTO"
-                                                            name='cwetypeId'
-                                                    onChange={(e) => propFun.SetValue('CustomClause', e)}
-                                                    disabled={clauseData.viewdisable}
-                                                formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={4} md={4}>
-                                    <CustomInput
-                                                    labelText="Type Name"
-                                                    
-                                        id="gstnumber"
-                                                        value={ProductDetails.ProductDTO.CustomClause.typeName}
-                                        name="typeName"
-                                                    onChange={(e) => propFun.SetValue('CustomClause', e)}
-                                                    disabled={clauseData.viewdisable}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={4} md={4}>
-                                    <CustomInput
-                                                    labelText="Description:"
-                                                    
-                                        id="gstnumber"
-                                                        value={ProductDetails.ProductDTO.CustomClause.description}
-                                        name="description"
-                                                    onChange={(e) => propFun.SetValue('CustomClause', e)}
-                                                    disabled={clauseData.viewdisable}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                                        />
-                                    </GridItem>
-                                    </GridContainer>
-                                    <GridContainer justify="center">
-                                    <GridItem xs={3} sm={3} md={3}>           
-                                                    <Button id="margin-left-180" color="info" onClick={(e) => propFun.handledataCWE(e, "Benefit", Iindex,Bindex)}>Add Clause</Button>
-                                    </GridItem>
-                                    </GridContainer>
-                               </div>
-                                        </Modal>
-                                         
-                                                   
-                           
-                                </GridContainer>
-                                </div>
-                                }
+                        <GridContainer justify="center">
+                            <GridItem xs={12} sm={4} md={4}>
+                                <MasterDropdown labelText="Select Type"
+                                    id="ProductDTO.cwetypeId.cweid"
+                                    lstObject={clauseData.masterList}
+                                    filterName='CWEType'
+                                    value={ProductDetails.ProductDTO.CustomClause.cwetypeId}
+                                    model="ProductDTO"
+                                    name='cwetypeId'
+                                    onChange={(e) => propFun.SetValue('CustomClause', e)}
+                                    disabled={clauseData.viewdisable}
+                                    formControlProps={{ fullWidth: true }} />
+                            </GridItem>
+                            <GridItem xs={12} sm={4} md={4}>
+                                <CustomInput
+                                    labelText="Type Name"
+
+                                    id="gstnumber"
+                                    value={ProductDetails.ProductDTO.CustomClause.typeName}
+                                    name="typeName"
+                                    onChange={(e) => propFun.SetValue('CustomClause', e)}
+                                    disabled={clauseData.viewdisable}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
+                            </GridItem>
+                            <GridItem xs={12} sm={4} md={4}>
+                                <CustomInput
+                                    labelText="Description:"
+
+                                    id="gstnumber"
+                                    value={ProductDetails.ProductDTO.CustomClause.description}
+                                    name="description"
+                                    onChange={(e) => propFun.SetValue('CustomClause', e)}
+                                    disabled={clauseData.viewdisable}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
                             </GridItem>
                         </GridContainer>
-                    
-                </div>
-            );
+                        <GridContainer justify="center">
+                            <GridItem xs={3} sm={3} md={3}>
+                                <Button id="margin-left-180" color="info" onClick={(e) => propFun.handledataCWE(e, "Benefit", Iindex, Bindex)}>Add Clause</Button>
+                            </GridItem>
+                        </GridContainer>
+                    </div>
+                </Modal>
+
+
+
+            </GridContainer>
+
+
+        </div>
+    );
 }
 
 
