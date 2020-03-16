@@ -3326,11 +3326,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
             var policyId = tbl_particiant.PolicyId;
             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, tbl_particiant, tblPolicyDetailsdata, apiContext);
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
             return _mapper.Map<PolicyDTO>(tblPolicy);
         }
 
-        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails, ApiContext apiContext)
+        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails, List<ErrorInfo> Errors, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -3370,15 +3371,30 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
                             riskIndex++;
                         }
-                        var jsoninsurableFields = oldInsItem["RiskItems"][riskIndex];//identification numbefr
-                        var InputidentificationNumber = (string)fields["Identification Number"];
-                        var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
                         var Adddata = fields;
-                        if (InputidentificationNumber == TblIdentificationNo)
+                        if (oldInsItem["RiskItems"].Count > riskIndex)
                         {
-                            var removeitem = jsoninsurableFields;
-                            oldInsItem.RiskItems.Remove(removeitem);
-                            oldInsItem.RiskItems.Add(Adddata);
+                            var jsoninsurableFields = oldInsItem["RiskItems"][riskIndex];//identification numbefr
+                            var InputidentificationNumber = (string)fields["Identification Number"];
+                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                            
+                            if (InputidentificationNumber == TblIdentificationNo)
+                            {
+                                var removeitem = jsoninsurableFields;
+                                oldInsItem.RiskItems.Remove(removeitem);
+                                oldInsItem.RiskItems.Add(Adddata);
+                            }
+                            else
+                            {
+                                if (oldInsItem.RiskItems.Count < riskCount)
+                                {
+                                    oldInsItem.RiskItems.Add(Adddata);
+                                }
+                                else
+                                {
+                                    // Error needs to throw
+                                }
+                            }
                         }
                         else
                         {
@@ -3388,15 +3404,21 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
                             else
                             {
-                                // Error needs to throw
+                                ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "RiskItems data is mismatch", ErrorCode = "RiskCount" };
+                                Errors.Add(errorInfo);
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        // insurableName1.RiskItems = insurableName.RiskItems;
+                        ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = ex.Message, ErrorCode = "" };
+                        Errors.Add(errorInfo);
                     }
                 }
+            }
+            if(Errors.Count> 0)
+            {
+                return null;
             }
             _context.TblPolicy.Update(tblPolicy);
             tblPolicyDetails.PolicyRequest = json1.ToString();
@@ -4004,8 +4026,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
                         tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
 
-                        var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, tblPolicy, tblPolicyDetailsdata, apiContext);
-
+                        var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, tblPolicy, tblPolicyDetailsdata,Errors, apiContext);
+                        if(tblPolicy1 == null && Errors.Count > 0)
+                        {
+                            return new PolicyResponse { Status = BusinessStatus.Error, Errors= Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                        }
                        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
                         dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                         //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
@@ -4199,7 +4224,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 var policyId = tbl_particiant.PolicyId;
                 var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, tbl_particiant, tblPolicyDetailsdata, apiContext);
+                var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
+                if (tblPolicy1 == null && Errors.Count > 0)
+                {
+                    return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                }
                 //var insurableItem = tblPolicyDetailsdata.PolicyRequest;
                 //dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                 //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
