@@ -409,12 +409,12 @@ class ClaimIntimate extends React.Component {
 
                 for (var i = 0; i < this.state.ClaimsAmountData.length; i++) {
                     console.log("amt:", this.state.ClaimsAmountData[i].claimAmounts);
-                    if (this.state.ClaimsAmountData[i].claimAmounts != null) {
+                    //if (this.state.ClaimsAmountData[i].claimAmounts != null) {
                         this.state.DataAmount.push(this.state.ClaimsAmountData[i]);
-                    }
-                    else {
+                    //}
+                    //else {
 
-                    }
+                    //}
                 }
 
 
@@ -631,8 +631,6 @@ class ClaimIntimate extends React.Component {
 
         console.log(" ClaimIntimationDetails claimAmount ", this.state.DetailsDTO.claimAmount);
         this.claimAmountTable();
-
-
         this.change(event, name, type);
 
     }
