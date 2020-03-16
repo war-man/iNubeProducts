@@ -2117,10 +2117,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                              select new BillingEntriesDto
                              {
                                  BillingItemId = tblbillitem.BillingItemId,
-                                 Categoty = tblbillitem.CategoryTypeId,
-                                 ValueFactor = tblbillitem.ValueFactorId,
-                                 RateCategory = tblbillitem.RateCategoryId,
-                                 RateType = tblbillitem.RateTypeId,
+                                 CategoryTypeId = tblbillitem.CategoryTypeId,
+                                 ValueFactorId = tblbillitem.ValueFactorId,
+                                 RateCategoryId = tblbillitem.RateCategoryId,
+                                 RateTypeId = tblbillitem.RateTypeId,
                                  Rate = tblbillitem.Rate,
                                  EventMappingId = tblbillitem.EventMappingId,
                                  

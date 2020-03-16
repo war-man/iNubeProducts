@@ -1389,10 +1389,10 @@ namespace iNube.Services.Billing.Models
     public partial class BillingEntriesDto
     {
         public decimal BillingItemId { get; set; }
-        public int? Categoty { get; set; }
-        public int? ValueFactor { get; set; }
-        public int? RateCategory { get; set; }
-        public int? RateType { get; set; }
+        public int? CategoryTypeId { get; set; }
+        public int? ValueFactorId { get; set; }
+        public int? RateCategoryId { get; set; }
+        public int? RateTypeId { get; set; }
         public decimal? Rate { get; set; }
         public int? EventMappingId { get; set; }
 
