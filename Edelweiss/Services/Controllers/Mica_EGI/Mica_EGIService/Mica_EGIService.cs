@@ -341,8 +341,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
                                 var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
 
-                                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftfttax;
-                                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftfttax;
+                                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftttax;
+                                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftttax;
 
 
                                 PremiumReturnDto returnobj = new PremiumReturnDto();
