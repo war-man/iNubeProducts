@@ -50,61 +50,73 @@ const PolicyDetails = (props) => {
     //console.log('Insurable data props ', props);
 
     return (
-            <div>
-                <GridContainer>
+        <div>
+            <GridContainer>
 
 
-                    <GridItem xs={12} sm={4} md={3}>
+                <GridItem xs={12} sm={4} md={3}>
 
 
-                        <CustomInput
+                    <CustomInput
 
-                            labelText="InsuredReferenceNo"
-                           
+                        labelText="InsuredReferenceNo"
+
                         value={policyDetailsprops.policyDetailsData.customerId}
-                            name='customerId'
-                           
+                        name='customerId'
+
                         disabled={policyDetailsprops.disabled}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                    </GridItem>
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                </GridItem>
 
 
-                    <GridItem xs={12} sm={4} md={3}>
-
-
-                        <CustomInput
+                <GridItem xs={12} sm={4} md={3}>
+                    <CustomInput
+                        labelText="Insured Name"
+                        value={policyDetailsprops.policyDetailsData.coverNoteNo}
+                        name='coverNoteNo'
                         disabled={policyDetailsprops.disabled}
-                            labelText="InsuredMobileNo"
-                            value={policyDetailsprops.policyDetailsData.mobileNumber}
-                            name='mobileNumber'
-                           
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                    </GridItem>
-
-                    <GridItem xs={12} sm={4} md={6}>
-
-
-                        <CustomInput
-                        disabled={policyDetailsprops.disabled}
-                            
-                            labelText="InsuredEmailID"
-                            
-                            value={policyDetailsprops.policyDetailsData.email}
-                            name='email'
-                        
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
                 </GridItem>
 
                 <GridItem xs={12} sm={4} md={3}>
+
+
+                    <CustomInput
+                        disabled={policyDetailsprops.disabled}
+                        labelText="InsuredMobileNo"
+                        value={policyDetailsprops.policyDetailsData.mobileNumber}
+                        name='mobileNumber'
+
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                </GridItem>
+
+                <GridItem xs={12} sm={4} md={3}>
+
+
+                    <CustomInput
+                        disabled={policyDetailsprops.disabled}
+
+                        labelText="InsuredEmailID"
+
+                        value={policyDetailsprops.policyDetailsData.email}
+                        name='email'
+
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                </GridItem>
+
+                {/*  <GridItem xs={12} sm={4} md={3}>
 
 
                     <CustomInput
@@ -136,7 +148,7 @@ const PolicyDetails = (props) => {
                             fullWidth: true
                         }}
                     />
-                </GridItem>
+                </GridItem>*/}
 
 
                 <GridItem xs={12} sm={4} md={3}>
@@ -147,7 +159,7 @@ const PolicyDetails = (props) => {
 
                         labelText="PolicyStartDate"
 
-                         value={policyDetailsprops.policyDetailsData.sDate}
+                        value={policyDetailsprops.policyDetailsData.sDate}
                         name='sDate'
 
                         formControlProps={{
@@ -174,8 +186,32 @@ const PolicyDetails = (props) => {
                     />
                 </GridItem>
 
+                <GridItem xs={12} sm={4} md={3}>
+                    <CustomInput
+                        labelText="Total Sum Insured"
+                        //value={policyDetailsprops.policyDetailsData.customerId}
+                        // name='customerId'
+                        disabled={policyDetailsprops.disabled}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                </GridItem>
 
-                </GridContainer>
+                <GridItem xs={12} sm={4} md={3}>
+                    <CustomInput
+                        labelText="Balance Sum Insured"
+                        //value={policyDetailsprops.policyDetailsData.customerId}
+                        // name='customerId'
+                        disabled={policyDetailsprops.disabled}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                </GridItem>
+
+
+            </GridContainer>
         </div>
     );
 

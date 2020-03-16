@@ -618,8 +618,12 @@ class ClaimIntimate extends React.Component {
 
         this.setState({ claim });
         let amt = 0;
-        for (let i = 0; i <= index; i++) {
-            amt = amt + Number(this.state.ClaimsAmountData[i].claimAmounts);
+        for (let i = 0; i < this.state.ClaimsAmountData.length; i++) {
+            console.log(Number(this.state.ClaimsAmountData[i].claimAmounts), i);
+            var valuen = Number(this.state.ClaimsAmountData[i].claimAmounts);
+            if (!isNaN(valuen)) {
+                amt = amt + valuen;
+            }
             console.log("ClaimIntimationDetails ", this.state.ClaimsAmountData[i]);
         }
         this.state.DetailsDTO.claimAmount = amt;
@@ -628,21 +632,6 @@ class ClaimIntimate extends React.Component {
         console.log(" ClaimIntimationDetails claimAmount ", this.state.DetailsDTO.claimAmount);
         this.claimAmountTable();
 
-
-
-        // if (this.state.ClaimsAmountData[index].claimAmounts > this.state.ClaimsAmountData[index].benefitAmount) {
-
-        //    this.state.ValidationUI = false;
-        //    this.state.errorstatus = true;
-        //    this.setState({});
-
-
-        //} else {
-        //    this.state.ValidationUI = false;
-        //    this.state.errorstatus = false;
-        //    this.setState({});
-
-        //}
 
         this.change(event, name, type);
 

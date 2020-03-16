@@ -113,7 +113,7 @@ const DocDetails = (props) => {
                 </GridItem>
             </GridContainer>  
 
-            <MyUploader claimId={docDetailsprops.claimId} docidfunc={docDetailsprops.docidfunc} dmsdocId={docDetailsprops.dmsdocId} documentName={docDetailsprops.documentName} />
+            <MyUploader claimId={docDetailsprops.claimId} dmsdocId={docDetailsprops.dmsdocId} docidfunc={docDetailsprops.docidfunc} documentName={docDetailsprops.documentName} />
 
         </div>
     );
