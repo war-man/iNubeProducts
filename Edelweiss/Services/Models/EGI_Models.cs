@@ -452,13 +452,13 @@ namespace iNube.Services.MicaExtension_EGI.Models
     {
         public ExtCDDTO()
         {
-            MicaCD = new List<MicaCDDTO>();
+            micaCDDTO = new List<MicaCDDTO>();
         }
 
         public string AccountNo { get; set; }
         public string Description { get; set; }
         public string Frequency { get; set; }
-        public List<MicaCDDTO> MicaCD { get; set; }
+        public List<MicaCDDTO> micaCDDTO { get; set; }
     }
 
 }

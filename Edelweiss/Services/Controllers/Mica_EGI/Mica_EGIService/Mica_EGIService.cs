@@ -374,6 +374,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                 var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
                                 var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
+                                var ad30days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30DAYS").EValue);
                                 var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
                                 var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
 
@@ -391,7 +392,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 {
                                     returnobj.ADPremium = Convert.ToDecimal(Ad60days);
                                     returnobj.GST = Convert.ToDecimal(monthlyGST);
-                                    returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
+                                    returnobj.MonthlyPremium = ad30days + Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
                                 }
                                 else if (premiumdata.BillingFrequency == "Yearly")
                                 {
@@ -1179,7 +1180,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         micaCDDTO.TaxAmount = TOTALPMPD + taxAmountDTO.TaxAmount;
                         micaCDDTO.TotalAmount = micaCDDTO.TxnAmount + micaCDDTO.TaxAmount;
 
-                        ExtCdModel.MicaCD.Add(micaCDDTO);
+                        ExtCdModel.micaCDDTO.Add(micaCDDTO);
                         ExtCdModel.AccountNo = AccountNumber;
                         ExtCdModel.Description = "Switch On - Revised Premium for Policy - " + PolicyNo;
                         ExtCdModel.Frequency = BillingFrequency;
@@ -1909,7 +1910,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     micaCDDTO.TaxAmount = TOTALPMPD + taxAmountDTO.TaxAmount;
                     micaCDDTO.TotalAmount = micaCDDTO.TxnAmount + micaCDDTO.TaxAmount;
 
-                    ExtCdModel.MicaCD.Add(micaCDDTO);
+                    ExtCdModel.micaCDDTO.Add(micaCDDTO);
                     ExtCdModel.AccountNo = AccountNumber;
                     ExtCdModel.Description = "Auto Schedule Premium for Policy - " + policy;
                     ExtCdModel.Frequency = BillingFrequency;
@@ -2529,6 +2530,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
                 var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
+                var ad30days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30DAYS").EValue);
                 var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
                 var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
 
@@ -2542,7 +2544,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 returnobj.FireTheft = Convert.ToDecimal(Ft365days);
                 returnobj.ADPremium = Convert.ToDecimal(Ad60days);
                 returnobj.GST = Convert.ToDecimal(monthlyGST);
-                returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
+                returnobj.MonthlyPremium = ad30days + Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
                 returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
                 returnobj.FinalAmount = Math.Round(returnobj.FireTheft + returnobj.ADPremium + returnobj.GST);
 
