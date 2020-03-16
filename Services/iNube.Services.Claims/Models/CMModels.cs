@@ -751,6 +751,7 @@ namespace iNube.Services.Claims.Models
         //public decimal? BenefitAmount { get; set; }
         public decimal? ClaimAmounts { get; set; }
         public dynamic CoverValue { get; set; }
+
     }
     public partial class AllocDTO
     {

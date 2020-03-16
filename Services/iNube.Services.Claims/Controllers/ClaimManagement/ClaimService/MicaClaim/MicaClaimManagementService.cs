@@ -2141,15 +2141,15 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             if (!string.IsNullOrEmpty(searchclaim.PolicyNo))
             {
-                _claims = _claims.Where(x => x.PolicyId == _policydata.PolicyId);
+                _claims = _claims.Where(x => x.PolicyNo == _policydata.PolicyNo);
             }
 
             if (!string.IsNullOrEmpty(searchclaim.InsuredReference))
             {
                 //var policyID = policyDetails.FirstOrDefault(x => x.CustomerId == searchclaim.InsuredReference).PolicyId;
                 //_claims = _claims.Where(x => x.PolicyId == policyID);
-                var policyIdDetails = policyDetails.Select(p => p.PolicyId);
-                _claims = _claims.Where(x => policyIdDetails.Contains((decimal)x.PolicyId));
+                var policyIdDetails = policyDetails.Select(p => p.PolicyNo);
+                _claims = _claims.Where(x => policyIdDetails.Contains(x.PolicyNo));
 
 
             }
@@ -2158,8 +2158,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 //var policyID = policyDetails.FirstOrDefault(x => x.MobileNumber == searchclaim.InsuredMobileNo).PolicyId;
                 //_claims = _claims.Where(x => x.PolicyId == policyID);
-                var policyIdDetails = policyDetails.Select(p => p.PolicyId);
-                _claims = _claims.Where(x => policyIdDetails.Contains((decimal)x.PolicyId));
+                var policyIdDetails = policyDetails.Select(p => p.PolicyNo);
+                _claims = _claims.Where(x => policyIdDetails.Contains(x.PolicyNo));
 
             }
 
@@ -2167,16 +2167,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 //var policyID = policyDetails.FirstOrDefault(x => x.Email == searchclaim.InsuredEmail).PolicyId;
                 //_claims = _claims.Where(x => x.PolicyId == policyID);
-                var policyIdDetails = policyDetails.Select(p => p.PolicyId);
-                _claims = _claims.Where(x => policyIdDetails.Contains((decimal)x.PolicyId));
+                var policyIdDetails = policyDetails.Select(p => p.PolicyNo);
+                _claims = _claims.Where(x => policyIdDetails.Contains(x.PolicyNo));
             }
 
             if (searchclaim.EventDate != null)
             {
                 //var policyID = policyDetails.FirstOrDefault(x => x.CreatedDate.Equals(searchclaim.EventDate)).PolicyId;
                 //_claims = _claims.Where(x => x.PolicyId == policyID);
-                var policyIdDetails = policyDetails.Select(p => p.PolicyId);
-                _claims = _claims.Where(x => policyIdDetails.Contains((decimal)x.PolicyId));
+                var policyIdDetails = policyDetails.Select(p => p.PolicyNo);
+                _claims = _claims.Where(x => policyIdDetails.Contains(x.PolicyNo));
             }
 
             if (searchclaim.lossDateTime != null)
@@ -2203,7 +2203,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 try
                 {
-                    var pk = policyDetails.Where(s => s.PolicyId == item.PolicyId).ToList();
+                    var pk = policyDetails.Where(s => s.PolicyNo == item.PolicyNo).ToList();
                     var data = (from a in _context.TblClaims.Where(x => x.ClaimId == item.ClaimId)
                                 join c in _context.TblmasCmcommonTypes on a.ClaimStatusId equals c.CommonTypeId
                                 select c).FirstOrDefault();
