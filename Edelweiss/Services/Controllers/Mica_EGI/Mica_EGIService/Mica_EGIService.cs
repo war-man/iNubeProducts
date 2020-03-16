@@ -71,6 +71,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             GetScheduleResponse response = new GetScheduleResponse();
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
             var CurrentTimeHour = IndianTime.Hour;
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
 
 
             if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo))
@@ -99,7 +100,45 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     if (checkstatus == null)
                     {
-                        response.GetSchedule.SwitchStatus = false;
+                        //response.GetSchedule.SwitchStatus = false;
+                        switch (CurrentDay)
+                        {
+                            case "Monday":
+                                response.GetSchedule.SwitchStatus = scheduledata.Mon;
+                                break;
+
+                            case "Tuesday":
+                                response.GetSchedule.SwitchStatus = scheduledata.Tue;
+                                break;
+
+
+                            case "Wednesday":
+                                response.GetSchedule.SwitchStatus = scheduledata.Wed;
+                                break;
+
+
+                            case "Thursday":
+                                response.GetSchedule.SwitchStatus = scheduledata.Thu;
+                                break;
+
+
+                            case "Friday":
+                                response.GetSchedule.SwitchStatus = scheduledata.Fri;
+                                break;
+
+
+                            case "Saturday":
+                                response.GetSchedule.SwitchStatus = scheduledata.Sat;
+                                break;
+
+
+
+                            case "Sunday":
+                                response.GetSchedule.SwitchStatus = scheduledata.Sun;
+                                break;
+                                                                                              
+                        }
+
                     }
                     else
                     {
@@ -1091,7 +1130,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         var TOTALPMPDTTTAX = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "TOTALPMPDTTTAX").EValue);
 
-                        var NewPremium = Math.Round(TOTALPMPD + TOTALPMPDFTTAX + TOTALPMPDTTTAX);                        
+                        var NewPremium = TOTALPMPD + TOTALPMPDFTTAX + TOTALPMPDTTTAX;                        
                         
                         TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
 
@@ -1840,7 +1879,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     var TOTALPMPDTTTAX = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "TOTALPMPDTTTAX").EValue);
 
-                    var Premium = Math.Round(TOTALPMPD + TOTALPMPDFTTAX + TOTALPMPDTTTAX);
+                    var Premium = TOTALPMPD + TOTALPMPDFTTAX + TOTALPMPDTTTAX;
                                         
                     schedulerLog.SchedulerStatus = "Calculate Premium Success";
                     schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
@@ -2496,8 +2535,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
                 var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
 
-                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftfttax;
-                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftfttax;
+                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftttax;
+                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftttax;
 
                 returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
                 returnobj.FireTheft = Convert.ToDecimal(Ft365days);
@@ -3913,8 +3952,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
                 var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
 
-                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftfttax;
-                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftfttax;
+                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftttax;
+                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftttax;
 
                 returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
                 returnobj.FireTheft = Convert.ToDecimal(Ft365days);
