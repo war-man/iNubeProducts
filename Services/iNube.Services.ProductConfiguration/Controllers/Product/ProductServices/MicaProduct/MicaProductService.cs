@@ -733,7 +733,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             var masterList = _context.TblmasPccommonTypes.Where(p => masterFilter.Contains(p.MasterType))
                               .ToDictionary(m => m.CommonTypeId, n => n.Value);
 
-            string[] masProductMasterFilter = new string[] { "Risk", "Claim", "InsurableCategory", "BenefitCriteria", "InsuranceType", "Cover", "CoverEvent", "CoverEventFactor", "CoverEventFactorValue", "LOB", "COB", "Switchon" };
+            string[] masProductMasterFilter = new string[] { "Risk", "Claim", "InsurableCategory", "BenefitCriteria", "InsuranceType", "Cover", "CoverEvent", "CoverEventFactor", "CoverEventFactorValue", "LOB", "COB", "Switchon", "Payment", "ProductType", "AllowPayment", "CDCreation", "PremiumBreakup", "ClaimSI" };
             var masProductMaster = _context.TblmasProductMaster.Where(p => masProductMasterFilter.Contains(p.MasterType))
                               .ToDictionary(m => m.ProductMasterId, n => n.Value);
 
@@ -785,6 +785,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             foreach (var item in productDTO.ProductRcbdetails)
             {
+                item.mID = item.InputId;
                 item.disable = item.IsReqired;
                 item.mIsRequired = item.IsReqired;
                 item.mValue = masProductMaster.FirstOrDefault(p => p.Key == item.InputId).Value;
@@ -798,7 +799,15 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 item.mValue = masProductMaster.FirstOrDefault(p => p.Key == item.InputId).Value;
 
             }
+            foreach (var item in productDTO.ProductBasicConfiguration)
+            {
+                item.mID = item.InputId;
+                item.disable = item.IsReqired;
+                item.mIsRequired = item.IsReqired;
+                item.selectedValue = (item.IsReqired==true) ? item.InputId.ToString() : "0";
+                item.mValue = masProductMaster.FirstOrDefault(p => p.Key == item.InputId).Value;
 
+            }
 
             foreach (var item in productDTO.InsurableRcbdetails)
             {
@@ -806,7 +815,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 // item.mIsRequired = item.IsReqired;
                 //item.mValue = masProductMaster.FirstOrDefault(p => p.Key == item.InputId).Value;
 
-                foreach (var s in item.InsurableChildRcbdetail)
+                foreach (var s in item.InsurableChildRcbdetail) 
                 {
                     s.mID = s.InputId;
                     s.disable = s.IsReqired;

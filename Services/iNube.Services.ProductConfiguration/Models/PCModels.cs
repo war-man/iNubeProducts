@@ -593,6 +593,11 @@ namespace iNube.Services.ProductConfiguration.Models
         public string InputType { get; set; }
         public bool? IsReqired { get; set; }
         public int InputId { get; set; }
+        public bool? mIsRequired { get; set; }
+        public string mValue { get; set; }
+        public string selectedValue { get; set; }
+        public int mID { get; set; }
+        public bool? disable { get; set; }
     }
         public partial class ProductRatingMapping
     {
