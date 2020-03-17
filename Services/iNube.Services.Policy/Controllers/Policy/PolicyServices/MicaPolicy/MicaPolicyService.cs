@@ -9,6 +9,7 @@ using iNube.Utility.Framework.Notification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using NodaTime;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -4429,25 +4430,26 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         //Get Proposal By proposal No
 
-        public async Task<dynamic> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
+        public async Task<PolicyProposalResponse> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
         {
+            PolicyProposalResponse policyResponse = new PolicyProposalResponse();
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             TblPolicy tbl_particiant = null;
             if (!string.IsNullOrEmpty(proposalNo) && !string.IsNullOrEmpty(policyno))
             {
-                tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo && x.PolicyNo == policyno);
+                tbl_particiant = _context.TblPolicy.LastOrDefault(x => x.ProposalNo == proposalNo && x.PolicyNo == policyno);
 
 
             }
             else if (proposalNo != null && proposalNo != "")
             {
-                tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
+                tbl_particiant = _context.TblPolicy.LastOrDefault(x => x.ProposalNo == proposalNo);
 
             }
             else if (Mobileno != null && Mobileno != "")
             {
-                tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.MobileNumber == Mobileno);
+                tbl_particiant = _context.TblPolicy.LastOrDefault(x => x.MobileNumber == Mobileno);
 
             }
 
@@ -4469,8 +4471,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 AddProperty(ProposalObj, "PolicyNumber", tbl_particiant.PolicyNo);
                 var Proposaltempobj = JsonConvert.SerializeObject(ProposalObj);
                 dynamic json = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
-
-                return json;
+                policyResponse.ProposalPolicyDetail = json;
+                return new PolicyProposalResponse  { Status = BusinessStatus.Ok, ProposalPolicyDetail = json};
+            
             }
             //List<dynamic> fields = new List<dynamic>();
             //// List<dynamic> fields1 = new List<dynamic>();
@@ -4491,8 +4494,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //{
             //    return null;
             //}
+            return new PolicyProposalResponse { Status = BusinessStatus.NotFound, ProposalPolicyDetail = null, ResponseMessage= "Data not found" };
 
-            return "Data not found";
+            //return "Data not found";
             //tblPolicyDetailsdata.PolicyRequest = json.ToString();
             //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
             //_context.SaveChanges();
@@ -4650,6 +4654,24 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                                 policyUpdate.IsActive = true;
+                                //string[] Separate = (policyUpdate.PolicyStartDate.ToString()).Split(' ');
+                                //string desiredDate = Separate[1];
+
+                                //string[] SeparateTime = (desiredDate.ToString()).Split(':');
+                                //var hour = Convert.ToInt32(SeparateTime[0]);
+                                //var minute= Convert.ToInt32(SeparateTime[1]);
+                                //var second = Convert.ToInt32(SeparateTime[2];
+
+
+
+
+                                policyUpdate.PolicyStartDate = Convert.ToDateTime(IssuepolicyDTO["StartDate"]);
+                                System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
+                                DateTime dateTime = Convert.ToDateTime(policyUpdate.PolicyStartDate).Date;
+                                
+                                policyUpdate.PolicyEndDate = dateTime.Add(duration); 
+
+
                                 _context.SaveChanges();
 
                             }
@@ -4659,7 +4681,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
 
                             }
-                            return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number {tblPolicy.PolicyNo} Issued for the this Proposal Number {tblPolicy.ProposalNo} Successfully" };
+                            return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number  {tblPolicy.PolicyNo}Issued for the this Proposal Number {tblPolicy.ProposalNo} Successfully" };
                         }
                         else
                         {
@@ -5290,6 +5312,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return null;
 
         }
+
     }
 
 

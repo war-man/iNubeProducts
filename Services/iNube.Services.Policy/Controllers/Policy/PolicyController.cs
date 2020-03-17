@@ -475,11 +475,7 @@ namespace iNube.Services.Policy.Controllers.Policy
         {
             var response = await _policyService.GetProposalDetails(proposalNo, Mobileno, policyno, Context);
             // var txnId = response.BundleTxnId;
-            if (response != null)
-            {
-                return Ok(response);
-            }
-            return NotFound();
+            return ServiceResponse(response);
         }
 
         //IssuePolicy

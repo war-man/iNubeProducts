@@ -59,7 +59,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<PolicyDTO> ModifyInsurabableItem(dynamic modifydata, ApiContext apiContext);
 
         Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
-        Task<dynamic> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext);
+        Task<PolicyProposalResponse> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext);
         Task<List<PolicyPremiumDetailsDTO>> GetRiskItemByPolicyNo(string PolicyNO, ApiContext apiContext);
         // Task<dynamic> GetInsurableItemDetails(string policyNo, string insurableItemName, ApiContext apiContext);
         Task<decimal> UpdateSumInsured(string PolicyNumber, decimal amount, ApiContext apiContext);
@@ -126,7 +126,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).GetInsurableItemDetails(policyNo, insurableItemName,apiContext);
         }
-        public async Task<dynamic> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
+        public async Task<PolicyProposalResponse> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
         {
             //
             return await _policyProductService(apiContext.ProductType).GetProposalDetails(proposalNo, Mobileno,policyno, apiContext);

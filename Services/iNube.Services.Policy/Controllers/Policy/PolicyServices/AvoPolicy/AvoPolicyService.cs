@@ -253,7 +253,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             throw new NotImplementedException();
         }
 
-        Task<dynamic> IPolicyProductService.GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
+        Task<PolicyProposalResponse> IPolicyProductService.GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

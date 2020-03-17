@@ -478,6 +478,10 @@ namespace iNube.Services.Policy.Models
     {
         public Dictionary<string,string> policy { get; set; }
     }
+    public class PolicyProposalResponse : ResponseStatus
+    {
+        public dynamic ProposalPolicyDetail { get; set; }
+    }
 
     public class ProposalResponse : ResponseStatus
     {

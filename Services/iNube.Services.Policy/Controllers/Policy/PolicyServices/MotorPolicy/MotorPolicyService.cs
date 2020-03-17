@@ -229,15 +229,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             throw new NotImplementedException();
         }
 
-        public Task<List<dynamic>> GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
-        {
-            throw new NotImplementedException();
-        }
+      
 
-        Task<dynamic> IPolicyProductService.GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         public Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
         {
@@ -270,6 +264,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
 
         public Task<object> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<PolicyProposalResponse> IPolicyProductService.GetProposalDetails(string proposalNo, string Mobileno, string policyno, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
