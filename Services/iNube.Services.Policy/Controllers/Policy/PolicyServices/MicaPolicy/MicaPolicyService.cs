@@ -4659,11 +4659,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
 
                             }
-                            return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Issued for this Policy Number {tblPolicy.PolicyNo}" };
+                            return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number Issued {tblPolicy.PolicyNo} for the this Proposal Number {tblPolicy.ProposalNo} Successfully" };
                         }
                         else
                         {
-                            return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid CD Transaction" };
+                            return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
 
 
                         }
