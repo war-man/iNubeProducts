@@ -98,61 +98,25 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                                   && x.VehicleNumber == VehicleRegistrationNo
                                                                   && x.CreatedDate.Value.Date == IndianTime.Date);
 
-                    if (checkstatus == null)
-                    {
-                        //response.GetSchedule.SwitchStatus = false;
-                        switch (CurrentDay)
-                        {
-                            case "Monday":
-                                response.GetSchedule.SwitchStatus = scheduledata.Mon;
-                                break;
-
-                            case "Tuesday":
-                                response.GetSchedule.SwitchStatus = scheduledata.Tue;
-                                break;
 
 
-                            case "Wednesday":
-                                response.GetSchedule.SwitchStatus = scheduledata.Wed;
-                                break;
-
-
-                            case "Thursday":
-                                response.GetSchedule.SwitchStatus = scheduledata.Thu;
-                                break;
-
-
-                            case "Friday":
-                                response.GetSchedule.SwitchStatus = scheduledata.Fri;
-                                break;
-
-
-                            case "Saturday":
-                                response.GetSchedule.SwitchStatus = scheduledata.Sat;
-                                break;
-
-
-
-                            case "Sunday":
-                                response.GetSchedule.SwitchStatus = scheduledata.Sun;
-                                break;
-                                                                                              
-                        }
-
-                    }
-                    else
-                    {
-
-                        response.GetSchedule.SwitchStatus = checkstatus.SwitchStatus;
-                    }
-
+                    response.GetSchedule.SwitchStatus = checkstatus.SwitchStatus;
+                  
                     if (CurrentTimeHour < Convert.ToDecimal(_configuration["Scheduler_Validation:TimeInHours"]))
-                    {
+                    {  
                         response.GetSchedule.SwitchEnabled = true;
                     }
                     else
                     {
-                        response.GetSchedule.SwitchEnabled = false;
+                        if (checkstatus.SwitchStatus == true)
+                        {
+                            response.GetSchedule.SwitchEnabled = false;
+                        }
+                        else
+                        {
+                            response.GetSchedule.SwitchEnabled = true;
+                        }
+                       
                     }
 
                     response.Status = BusinessStatus.Ok;
@@ -240,6 +204,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     mapData.IsActive = true;
 
                     _context.TblSchedule.Add(mapData);
+
+                    TblSwitchLog tblSwitchLog = new TblSwitchLog();
+
+                    tblSwitchLog.PolicyNo = mapData.PolicyNo;
+                    tblSwitchLog.VehicleNumber = mapData.VehicleRegistrationNo;
+                    tblSwitchLog.SwitchStatus = false;
+                    tblSwitchLog.CreatedDate = indianTime;
+                    tblSwitchLog.SwitchType = "Auto";
+
+                    _context.TblSwitchLog.Add(tblSwitchLog);
+
                 }
                 else
                 {
