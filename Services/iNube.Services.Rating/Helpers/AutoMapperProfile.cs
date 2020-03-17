@@ -36,6 +36,15 @@ namespace iNube.Services.Rating.Helpers
                 .ForMember(dest => dest.CalculationConfigExpression, opt => opt.MapFrom(src => src.TblCalculationConfigExpression))
                 .ForMember(dest => dest.CalculationConfigParam, opt => opt.MapFrom(src => src.TblCalculationConfigParam)).ReverseMap();
 
+            
+            CreateMap<TblIllustrationConfig, IllustrationConfigDTO>()
+                .ForMember(dest => dest.IllustrationMapping, opt => opt.MapFrom(src => src.TblIllustrationMapping))
+                .ForMember(dest => dest.IllustrationConfigParam, opt => opt.MapFrom(src => src.TblIllustrationConfigParam)).ReverseMap();
+            CreateMap<TblIllustrationConfigParam, IllustrationConfigParamDTO>().ReverseMap();
+            CreateMap<TblIllustrationMapping, IllustrationMappingDTO>().ReverseMap();
+
+
+
             CreateMap<TblCalculationHeader, CalculationHeaderDTO>().ReverseMap();
             CreateMap<TblCalculationResult, CalculationResultDTO>().ReverseMap();
             CreateMap<TblParameterSet, ParameterSetDataDTO>().ReverseMap();

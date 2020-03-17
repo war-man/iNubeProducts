@@ -115,5 +115,22 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mot
         {
             throw new NotImplementedException();
         }
+
+        public async Task<EllConfigResponse> CreateIllustrationRules(IllustrationConfigDTO ellConfigDto, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -161,6 +161,9 @@ class CalculationConfig extends React.Component {
             //Showing Grid
             //For Displaying into Grid
             //this.setState({ displayCalculationParameterGrid: true });
+            debugger
+            //Removing Space
+            this.state.fields.CalConfigParam = this.state.fields.CalConfigParam.split(' ').join('');
             var isActive = 1;
             let pCalParameterArray = this.state.CalParameterArray;
             this.setState({ CalParameterArray: pCalParameterArray });
@@ -197,8 +200,11 @@ class CalculationConfig extends React.Component {
     }
 
     addExpression() {
+        debugger
         if (this.state.fields.ExpressionResult != "" && this.state.fields.Expression != "") {
             //For Steps
+            // Remove Space
+            this.state.fields.ExpressionResult = this.state.fields.ExpressionResult.split(' ').join('');
             this.state.fields.Steps = this.state.fields.Steps + 1;
             //Showing Grid
             this.setState({ displayExpressionGrid: true });

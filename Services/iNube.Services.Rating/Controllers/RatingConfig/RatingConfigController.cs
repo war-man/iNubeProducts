@@ -101,6 +101,23 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateIllustrationRules([FromBody]IllustrationConfigDTO tblIllustration)
+        {
+            var response = await _rateService.CreateIllustrationRules(tblIllustration, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                default:
+                    return Forbid();
+            }
+        }
+
         [HttpPost("CheckRuleSets/{RuleId}")]
         public async Task<IActionResult> CheckRuleSets(String RuleId, [FromBody]dynamic dictionary_rule)
         {
@@ -112,6 +129,13 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
         public async Task<IActionResult> CheckCalculationRate(String CalcualtionId, [FromBody]DynamicData dynamic)
         {
             var response = await _rateService.CheckCalculationRate(CalcualtionId, dynamic, Context);
+            return Ok(response);
+        }
+
+        [HttpPost("CheckIllustration/{IllustrationId}")]
+        public async Task<IActionResult> CheckIllustration(String IllustrationId, [FromBody]dynamic dynamic_param)
+        {
+            var response = await _rateService.CheckIllustration(IllustrationId, dynamic_param, Context);
             return Ok(response);
         }
 
@@ -139,7 +163,13 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
             var eventDetails = await _rateService.GetHandleEvents(EventId,Context);
             return Ok(eventDetails);
         }
-       [HttpGet]
+        [HttpGet]
+        public async Task<IActionResult> GetHandleEventsIllustration(String EventIllustrationId)
+        {
+            var eventDetails = await _rateService.GetHandleEventsIllustration(EventIllustrationId, Context);
+            return Ok(eventDetails);
+        }
+        [HttpGet]
         public async Task<IActionResult> GetHandleEventsMaster(string lMasterlist)
         {
             var objectval = await _rateService.GetHandleEventsMaster(lMasterlist, Context);
@@ -155,6 +185,12 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
         public async Task<IActionResult> GetCalculationConfig()
         {
             var rateCalDtos = await _rateService.GetCalculationConfig(Context);
+            return Ok(rateCalDtos);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetIllustrationConfig()
+        {
+            var rateCalDtos = await _rateService.GetIllustrationConfig(Context);
             return Ok(rateCalDtos);
         }
         [HttpGet]

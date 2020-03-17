@@ -20,6 +20,9 @@ namespace iNube.Services.Rating.Entities
         public virtual DbSet<TblCalculationConfigParam> TblCalculationConfigParam { get; set; }
         public virtual DbSet<TblCalculationHeader> TblCalculationHeader { get; set; }
         public virtual DbSet<TblCalculationResult> TblCalculationResult { get; set; }
+        public virtual DbSet<TblIllustrationConfig> TblIllustrationConfig { get; set; }
+        public virtual DbSet<TblIllustrationConfigParam> TblIllustrationConfigParam { get; set; }
+        public virtual DbSet<TblIllustrationMapping> TblIllustrationMapping { get; set; }
         public virtual DbSet<TblParameterSet> TblParameterSet { get; set; }
         public virtual DbSet<TblParameterSetDetails> TblParameterSetDetails { get; set; }
         public virtual DbSet<TblRating> TblRating { get; set; }
@@ -89,6 +92,9 @@ namespace iNube.Services.Rating.Entities
                 entity.HasKey(e => e.CalculationConfigParamId);
 
                 entity.ToTable("tblCalculationConfigParam", "RT");
+
+                entity.HasIndex(e => new { e.CalculationConfigParamName, e.CreatedDate, e.IsActive, e.Type, e.CalculationConfigId })
+                    .HasName("missing_index_191_190");
 
                 entity.Property(e => e.CalculationConfigParamId)
                     .HasColumnName("CalculationConfigParamID")
@@ -160,6 +166,85 @@ namespace iNube.Services.Rating.Entities
                     .WithMany(p => p.TblCalculationResult)
                     .HasForeignKey(d => d.CalculationHeaderId)
                     .HasConstraintName("FK_tblCalculationHeader_tblCalculationResult");
+            });
+
+            modelBuilder.Entity<TblIllustrationConfig>(entity =>
+            {
+                entity.HasKey(e => e.IllustrationConfigId);
+
+                entity.ToTable("tblIllustrationConfig", "RT");
+
+                entity.Property(e => e.IllustrationConfigId)
+                    .HasColumnName("IllustrationConfigID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.From).IsUnicode(false);
+
+                entity.Property(e => e.IllustrationConfigName).IsUnicode(false);
+
+                entity.Property(e => e.To).IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblIllustrationConfigParam>(entity =>
+            {
+                entity.HasKey(e => e.IllustrationConfigParamId);
+
+                entity.ToTable("tblIllustrationConfigParam", "RT");
+
+                entity.Property(e => e.IllustrationConfigParamId)
+                    .HasColumnName("IllustrationConfigParamID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.IllustrationConfigId)
+                    .HasColumnName("IllustrationConfigID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.IllustrationConfigParamName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.IllustrationConfig)
+                    .WithMany(p => p.TblIllustrationConfigParam)
+                    .HasForeignKey(d => d.IllustrationConfigId)
+                    .HasConstraintName("FK_tblIllustrationConfigtblIllustrationConfigParam");
+            });
+
+            modelBuilder.Entity<TblIllustrationMapping>(entity =>
+            {
+                entity.HasKey(e => e.IllustrationMappingId)
+                    .HasName("PK_IllustrationMapping");
+
+                entity.ToTable("tblIllustrationMapping", "RT");
+
+                entity.Property(e => e.IllustrationMappingId)
+                    .HasColumnName("IllustrationMappingID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.IllustrationConfigId)
+                    .HasColumnName("IllustrationConfigID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.IllustrationInputParam).IsUnicode(false);
+
+                entity.Property(e => e.IllustrationOutputParam).IsUnicode(false);
+
+                entity.HasOne(d => d.IllustrationConfig)
+                    .WithMany(p => p.TblIllustrationMapping)
+                    .HasForeignKey(d => d.IllustrationConfigId)
+                    .HasConstraintName("FK_tblIllustrationConfigtblIllustrationMapping");
             });
 
             modelBuilder.Entity<TblParameterSet>(entity =>

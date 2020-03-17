@@ -25,6 +25,11 @@ namespace iNube.Components.RuleEngine.Entities
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string Dobconditions { get; set; }
+        public string ValidatorName { get; set; }
+        public string SuccessMsg { get; set; }
+        public string FailureMsg { get; set; }
+        public string SuccessCode { get; set; }
+        public string FailureCode { get; set; }
 
         public virtual TblRules Rule { get; set; }
         public virtual ICollection<TblRuleConditionValues> TblRuleConditionValues { get; set; }

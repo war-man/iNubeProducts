@@ -13,6 +13,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<ParamSetResponce> CreateParamSet(ParameterSetDTO paramSetDto, ApiContext apiContext);
         Task<RatingRulesResponse> CreateRatingRules(RatingDTO ratingDto, ApiContext apiContext);
         Task<CalConfigResponse> CreateCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext);
+        Task<EllConfigResponse> CreateIllustrationRules(IllustrationConfigDTO ellConfigDto, ApiContext apiContext);
         Task<IEnumerable<RatingParametersDTO>> GetParameterName(ApiContext apiContext);
         Task<IEnumerable<RuleConditionsDetailsDTO>> GetRateConditions(ApiContext apiContext);
         Task<IEnumerable<RatingDTO>> GetRules(ApiContext apiContext);
@@ -37,5 +38,11 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<IEnumerable<CalConfigExpression>> GetCalConfigExpressions(decimal CalculationConfigId, ApiContext apiContext);
         Task<IEnumerable<CalConfigParam>> GetCalConfigParam(decimal CalculationConfigId, ApiContext apiContext);
         Task<CalConfigResponse> EditCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext);
+        Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext);
+        Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext);
+        Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext);
+
+
+
     }
 }

@@ -23,7 +23,9 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import ruleconfig from 'modules/RuleEngine/RuleConfig.js';
 import "react-table/react-table.css";
 import $ from 'jquery';
-import ReactTable from "react-table";
+//import ReactTable from "react-table";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
+import { Animated } from "react-animated-css";
 import { Redirect } from 'react-router-dom'
 // For RuleMapping
 //import RuleMapping from 'modules/RuleEngine/views/RuleMapping';
@@ -47,7 +49,9 @@ class RuleExecution extends React.Component {
             RuleConditionName: [],
             Rules:[],
             tblRuleConditionArray: [],
-            result:"",
+            displayOutputGrid: false,
+            newData: [],
+            result:[],
             fields: {
                 RuleName: ""
             },
@@ -123,6 +127,7 @@ class RuleExecution extends React.Component {
 
     onFormSubmit = (evt) => {
         var rst;
+        this.setState({ displayOutputGrid: true });
         fetch(`${ruleconfig.ruleEngineUrl}/RuleEngine/CheckRuleSets/` + this.state.fields.RuleName, {
 
             method: 'post',
@@ -131,13 +136,27 @@ class RuleExecution extends React.Component {
                 'Content-Type':'application/json',
             },    
             body: JSON.stringify(this.state.fields)
-        }).then(function (response) {
-            return response.json();
-            }).then(data => {
-                alert(data.responseMessage);
+        }).then(response => response.json())
+            .then(data => {
+                console.log(data,'Data')
+                //alert(data.responseMessage);
                 this.setState({ result: data });
                 console.log(this.state.result, 'Results');
+                if (this.state.result.length > 0) {
+                    this.setState({
+                        newData: this.state.result.map((prop, key) => {
+
+                            return {
+                                ValidatorName: prop.validatorName,
+                                Outcome: prop.outcome,
+                                Message: prop.message,
+                                Code: prop.code,
+                            };
+                        })
+                    });
+                }
             });
+        
 
     }
     // For Rendering To the New Page
@@ -273,6 +292,61 @@ class RuleExecution extends React.Component {
 
                         </GridItem>
                     </GridContainer>
+                    {this.state.displayOutputGrid &&
+
+                        <GridContainer>
+                            <GridItem xs={4} sm={12} md={12}>
+                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                    <CardBody className="product-search-tab">
+                                        <ReactTable
+                                        data={this.state.newData}
+                                            filterable
+                                            columns={[
+                                                {
+                                                    Header: "Validator Name",
+                                                    accessor: "ValidatorName",
+                                                    minWidth: 30,
+                                                    style: { textAlign: "center" },
+                                                    headerClassName: 'react-table-center',
+                                                    resizable: false,
+                                                },
+                                                {
+                                                    Header: "Outcome",
+                                                    accessor: "Outcome",
+                                                    minWidth: 30,
+                                                    style: { textAlign: "center" },
+                                                    headerClassName: 'react-table-center',
+                                                    resizable: false,
+                                                },
+                                                {
+                                                    Header: "Message",
+                                                    accessor: "Message",
+                                                    minWidth: 30,
+                                                    style: { textAlign: "center" },
+                                                    headerClassName: 'react-table-center',
+                                                    resizable: false,
+                                                },
+                                                {
+                                                    Header: "Code",
+                                                    accessor: "Code",
+                                                    minWidth: 30,
+                                                    style: { textAlign: "center" },
+                                                    headerClassName: 'react-table-center',
+                                                    resizable: false,
+                                                }
+
+                                            ]}
+                                            defaultPageSize={5}
+                                        showPaginationTop={false}
+                                        //pageSize={([this.state.result.length + 1] < 5) ? [this.state.length.length + 1] : 5}
+                                            showPaginationBottom
+                                            className="-striped -highlight"
+                                        />
+                                    </CardBody>
+                                </Animated>
+                            </GridItem>
+                        </GridContainer>
+                    }
 
                 </form>
                 {//<h4>

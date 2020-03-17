@@ -499,8 +499,7 @@ class CalculationResult extends React.Component {
                 {this.state.loader ?
                     <GridContainer xl={12}>
                         {this.state.searchTableSec ?
-                            <GridContainer>
-                            <GridItem xs={12}>
+                            <GridItem lg={12}>
                                     <ReactTable
                                         title={"Calculation Result"}
                                         data={this.state.resultDetails}
@@ -536,7 +535,6 @@ class CalculationResult extends React.Component {
                                 />
                             </GridItem>
                             
-                            </GridContainer>
                             : <GridItem lg={12}>{
                             this.state.nodata ?
                                 <Card>

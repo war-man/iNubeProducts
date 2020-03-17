@@ -82,11 +82,13 @@ namespace iNube.Components.RuleEngine.Controllers
         // Generic Rule Conditions
         //RuleConfigCondition/Check_Rule_Condition/Veh_mm
         [HttpPost("CheckRuleSets/{RuleId}")]
-        public ResponseStatus CheckRuleSets(String RuleId, [FromBody]dynamic dictionary_rule)
+        public List<ErrorDetailsData> CheckRuleSets(String RuleId, [FromBody]dynamic dictionary_rule)
         {
             ResponseStatus response = new ResponseStatus();
-
             List<ErrorInfo> errorMsg = new List<ErrorInfo>();
+            //List for Error and Response Value
+            List<ErrorDetailsData> errorList = new List<ErrorDetailsData>();
+
             string[] words = RuleId.Split(',');
             var main_rule = from tblrules in _context_rule.TblRules
                             join tblrulecondition in _context_rule.TblRuleConditions on tblrules.RuleId equals tblrulecondition.RuleId
@@ -110,6 +112,12 @@ namespace iNube.Components.RuleEngine.Controllers
                                 condition_value_fromDate = tblrulecondition.FromDate,
                                 condition_value_toDate = tblrulecondition.ToDate,
                                 dobConditions = tblrulecondition.Dobconditions,
+                                validatorName = tblrulecondition.ValidatorName,
+                                successMsg = tblrulecondition.SuccessMsg,
+                                successCode = tblrulecondition.SuccessCode,
+                                failureMsg = tblrulecondition.FailureMsg,
+                                failureCode = tblrulecondition.FailureCode
+
                             };
             
             var result = false;
@@ -133,9 +141,22 @@ namespace iNube.Components.RuleEngine.Controllers
                     {
                         if (rule.condition_opr == "InBetween")
                         {
-                            int X = Convert.ToInt16(paramvalue);
-                            int Y = Convert.ToInt16(rule.condition_valuefrom);
-                            int Z = Convert.ToInt16(rule.condition_valueto);
+                            int X=0, Y=0, Z=0;
+                            if (Regex.IsMatch(rule.condition_valuefrom, @"^\d+$") && Regex.IsMatch(rule.condition_valueto, @"^\d+$"))
+                            {
+                                X = Convert.ToInt16(paramvalue);
+                                Y = Convert.ToInt16(rule.condition_valuefrom);
+                                Z = Convert.ToInt16(rule.condition_valueto);
+                            }
+                            else
+                            {
+                                var conditionValueFrom = Convert.ToInt16(dictionary_rule[rule.condition_valuefrom]);
+                                var conditionValueTo = Convert.ToInt16(dictionary_rule[rule.condition_valueto]);
+                                X = Convert.ToInt16(paramvalue);
+                                Y = Convert.ToInt16(conditionValueFrom);
+                                Z = Convert.ToInt16(conditionValueTo);
+                            }
+                            
 
                             if ((X >= Y) && (X <= Z))
                             {
@@ -143,10 +164,12 @@ namespace iNube.Components.RuleEngine.Controllers
                                 if (!result)
                                 {
                                     response.ResponseMessage = "Fail";
+                                    errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail" ,Message = rule.failureMsg+" "+ paramvalue + " where "+X+ " InBetwen "+"("+Y+","+Z+")",Code =rule.failureCode });
                                 }
                                 else
                                 {
                                     response.ResponseMessage = "True";
+                                    errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName, Outcome = "Success", Message = rule.successMsg+" " + paramvalue + " where " + X + " InBetwen " + "( " + Y + " , " + Z + ")", Code = rule.successCode });
                                 }
                             }
                             else
@@ -155,27 +178,45 @@ namespace iNube.Components.RuleEngine.Controllers
                                 if (!result)
                                 {
                                     response.ResponseMessage = "Fail";
+                                    errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail", Message = rule.failureMsg+" "+paramvalue + " where " + X + " "+ rule.condition_opr+" " + "(" + Y + "," + Z + ")", Code =rule.failureCode });
+
                                 }
                                 else
                                 {
                                     response.ResponseMessage = "True";
+                                    errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Success", Message = rule.successMsg+" "+paramvalue + " where " + X + " " + rule.condition_opr + " " + "(" + Y + "," + Z + ")", Code= rule.successCode });
+
                                 }
                             }
 
                         }
                         else {
-                            expandoObject.X = Convert.ToInt16(paramvalue);
-                            expandoObject.Y = rule.condition_opr == "=" ? "==" : rule.condition_opr;
-                            expandoObject.Z = Convert.ToInt16(rule.condition_valuefrom);
-
+                            
+                            if (Regex.IsMatch(rule.condition_valuefrom, @"^\d+$"))
+                            {
+                                expandoObject.X = Convert.ToInt16(paramvalue);
+                                expandoObject.Y = rule.condition_opr == "=" ? "==" : rule.condition_opr;
+                                expandoObject.Z = Convert.ToInt16(rule.condition_valuefrom);
+                            }
+                            else
+                            {
+                                var conditionValueFrom = Convert.ToInt16(dictionary_rule[rule.condition_valuefrom]);
+                                expandoObject.X = Convert.ToInt16(paramvalue);
+                                expandoObject.Y = rule.condition_opr == "=" ? "==" : rule.condition_opr;
+                                expandoObject.Z = Convert.ToInt16(conditionValueFrom);
+                            }
                             result = Eval.Execute<bool>("X " + expandoObject.Y + " Z", expandoObject);
                             if (!result)
                             {
                                 response.ResponseMessage = "Fail";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail", Message = rule.failureMsg +" "+paramvalue+ " where " + expandoObject.X + " " + expandoObject.Y + " " + expandoObject.Z ,Code = rule.failureCode });
+
                             }
                             else
                             {
                                 response.ResponseMessage = "True";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Success", Message = rule.successMsg +" "+paramvalue + " where " + expandoObject.X + " " + expandoObject.Y + " " + expandoObject.Z, Code = rule.successCode });
+
                             }
                         }
                     }
@@ -187,10 +228,14 @@ namespace iNube.Components.RuleEngine.Controllers
                         if (!result)
                         {
                             response.ResponseMessage = "Invalid";
+                            errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Fail" ,Message = rule.failureMsg +" "+ paramvalue+ " where " + paramvalDate + " " + rule.condition_opr + " in " + rule.condition_value_fromDate+" and " + rule.condition_valueto, Code = rule.failureCode});
+
                         }
                         else
                         {
                             response.ResponseMessage = "Validation Done";
+                            errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Success", Message = rule.successMsg +" "+paramvalue+ " where " + paramvalDate + " " + rule.condition_opr + " in " + rule.condition_value_fromDate + " and " + rule.condition_valueto, Code =rule.successCode });
+
                         }
                     }
 
@@ -206,10 +251,14 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!result)
                             {
                                 response.ResponseMessage = "Invalid";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail", Message = rule.failureMsg+" "+paramvalue + " where " + age + " > " + rule.condition_value_fromDate , Code=rule.failureCode });
+
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Success", Message = rule.successMsg+" "+paramvalue + " where " + age + " > " + rule.condition_value_fromDate, Code = rule.successCode });
+
                             }
                         }
                         else
@@ -229,10 +278,14 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!result)
                             {
                                 response.ResponseMessage = "Invalid";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail", Message = rule.failureMsg+" " +paramvalue+ " where " + paramValData + " > " + rule.condition_value_fromDate, Code =rule.failureCode });
+
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Success", Message = rule.successMsg +" "+paramvalue + " where " + paramValData + " > " + rule.condition_value_fromDate, Code = rule.successCode });
+
                             }
                         }
                     }
@@ -285,18 +338,22 @@ namespace iNube.Components.RuleEngine.Controllers
 
                             var regex = @"^(?:(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$";
                             result = Regex.IsMatch(paramvalue, regex);
+                            int count = paramvalue.Count();
                             if (!result)
                             {
                                 response.ResponseMessage = "Invalid ";
                                 //For Error Message 
-                                ErrorInfo errMessage1 = new ErrorInfo();
-                                errMessage1.ErrorMessage = "Mobile Validation Fail";
-                                errorMsg.Add(errMessage1);
-                                response.Errors = errorMsg;
+                                //ErrorInfo errMessage1 = new ErrorInfo();
+                                //errMessage1.ErrorMessage = "Mobile Validation Fail";
+                                //errorMsg.Add(errMessage1);
+                                //response.Errors = errorMsg;
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Fail", Message = rule.failureMsg+" "+paramvalue +" as length is "+count,Code= rule.failureCode });
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Success", Message = rule.successMsg+" "+paramvalue , Code = rule.successCode });
+
                             }
 
                         }       
@@ -307,14 +364,18 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!result) {
                                 response.ResponseMessage = "Invalid";
                                 //For Error Message 
-                                ErrorInfo errMessage2 = new ErrorInfo();
-                                errMessage2.ErrorMessage = "Passport Validation Fail";
-                                errorMsg.Add(errMessage2);
-                                response.Errors = errorMsg;
+                                //ErrorInfo errMessage2 = new ErrorInfo();
+                                //errMessage2.ErrorMessage = "Passport Validation Fail";
+                                //errorMsg.Add(errMessage2);
+                                //response.Errors = errorMsg;
+
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail", Message = rule.failureMsg+" for "+paramvalue , Code=rule.failureCode });
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Success", Message = rule.successMsg+" for "+paramvalue , Code =rule.successCode });
+
                             }
 
                         }
@@ -325,10 +386,14 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!result)
                             {
                                 response.ResponseMessage = "Invalid";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Fail", Message = rule.failureMsg+" "+paramvalue + " Validation Failed",Code = rule.failureCode });
+
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Success", Message = rule.successMsg +" "+paramvalue+ " Validation Success",Code=rule.successCode });
+
                             }
                         }
                     }
@@ -340,11 +405,15 @@ namespace iNube.Components.RuleEngine.Controllers
                             result = CheckRecordExistInMaster(rule.masterTableName, rule.masterColumnName, paramvalue);
                             if (!result)
                             {
-                                response.ResponseMessage = "Record Doesn't Exit";
+                                response.ResponseMessage = "Record Doesn't Exist";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail", Message = rule.failureMsg +" "+paramvalue + " Record Doesn't Exist",Code =rule.failureCode });
+
                             }
                             else
                             {
                                 response.ResponseMessage = "Record Exists";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Success", Message = rule.successMsg +" "+paramvalue +" Record Exists",Code = rule.successCode });
+
                             }
                         }
                         else if (rule.condition_opr == "StartsWith")
@@ -353,10 +422,14 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!result)
                             {
                                 response.ResponseMessage = "Invalid";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail", Message = rule.failureMsg +" "+paramvalue+ " Validation Failed",Code =rule.failureCode });
+
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Success", Message = rule.successMsg +" "+paramvalue+ " Validation Success",Code = rule.successCode });
+
                             }
 
                         }
@@ -366,10 +439,14 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!result)
                             {
                                 response.ResponseMessage = "Invalid";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Fail", Message = rule.failureMsg+" "+paramvalue + " Validation Failed" ,Code  =rule.failureCode});
+
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Success", Message = rule.successMsg +" "+paramvalue+ " Validation Success",Code =rule.successCode });
+
                             }
 
                         }
@@ -379,10 +456,14 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!result)
                             {
                                 response.ResponseMessage = "Invalid";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Fail", Message = rule.failureMsg +" "+paramvalue +" Validation Failed" ,Code=rule.failureCode});
+
                             }
                             else
                             {
                                 response.ResponseMessage = "Validation Done";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Success", Message = rule.successMsg +" "+paramvalue+ " Validation Success",Code =rule.successCode });
+
                             }
                         }
 
@@ -396,10 +477,14 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!result)
                             {
                                 response.ResponseMessage = "Fail";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome ="Fail", Message = rule.failureMsg +" "+paramvalue+ " Validation Failed for "+ expandoObject.X +" " + expandoObject.Y +" " +expandoObject.Z ,Code=rule.failureCode});
+
                             }
                             else
                             {
                                 response.ResponseMessage = "True";
+                                errorList.Add(new ErrorDetailsData { ValidatorName = rule.validatorName,Outcome="Success" ,Message = rule.successMsg +" "+paramvalue+ " Validation Success " + expandoObject.X + " " + expandoObject.Y + " " + expandoObject.Z, Code =rule.successCode });
+
                             }
                         }
                     }
@@ -420,10 +505,14 @@ namespace iNube.Components.RuleEngine.Controllers
                             if (!finalResult)
                             {
                                 response.ResponseMessage = "False";
+                                //errorList.Add(new ErrorDetailsData { ValidatorName = "Final Result", ErrorMessage = " False" });
+
                             }
                             else
                             {
                                 response.ResponseMessage = "True";
+                                //errorList.Add(new ErrorDetailsData { ValidatorName = "Final Result", ErrorMessage = " True" });
+
                             }
 
                         }
@@ -434,15 +523,19 @@ namespace iNube.Components.RuleEngine.Controllers
                             response.Status = BusinessStatus.InputValidationFailed;
                             ///response.ResponseMessage = "False";
                             response.ResponseMessage = "Invalid";
-                            
+                            //errorList.Add(new ErrorDetailsData { ValidatorName = "Final Result", ErrorMessage = " Invalid" });
+
                         }
                         else
                         {
                             response.Status = BusinessStatus.Ok;
                             response.ResponseMessage = "Validation Done";
+                            //errorList.Add(new ErrorDetailsData { ValidatorName = "Final Result", ErrorMessage = " Validation Done" });
                         }
                         // return finalResult;
                     }
+
+                    
 
                     //else if (i == 1)
                     //{
@@ -470,8 +563,16 @@ namespace iNube.Components.RuleEngine.Controllers
                     //}
                 }
             }
-            return response;
-
+            //Returning Final Result Value 
+            if (response.ResponseMessage == "Invalid" || response.ResponseMessage == "False")
+            {
+                errorList.Add(new ErrorDetailsData { ValidatorName = "Final Result",Outcome="Fail", Message = " Invalid",Code="10001" });
+            }
+            else
+            {
+                errorList.Add(new ErrorDetailsData { ValidatorName = "Final Result",Outcome="Success", Message = " Validation Done",Code="10002" });
+            }
+            return errorList;
 
         }
 

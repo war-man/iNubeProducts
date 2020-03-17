@@ -21,9 +21,11 @@ import extendedFormsStyle from "assets/jss/material-dashboard-pro-react/views/ex
 import withStyles from "@material-ui/core/styles/withStyles";
 import "react-table/react-table.css";
 import $ from 'jquery';
-import ReactTable from "react-table";
+//import ReactTable from "react-table";
+import ReactTable from "components/MuiTable/MuiTable.jsx";
 import ruleconfig from 'modules/RuleEngine/RuleConfig.js';
 import { Animated } from "react-animated-css";
+import swal from 'sweetalert';
 //import config from '../../../config.js';
 
 function date() {
@@ -64,22 +66,42 @@ class GeneralParameter extends React.Component {
         this.setState({ tags: regularTags });
     }
     onFormSubmit = (evt) => {
+        if (this.state.fields.ParamName != "" && this.state.fields.ParamType != "") {
+            this.state.fields.IsActive = 1;
+            this.state.fields.CreatedDate = date();
+            fetch(`${ruleconfig.ruleEngineUrl}/RuleConfig/CreateParameters`, {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.state.fields)
+            }).then(data => {  
+                console.log(data);
+                this.reset();
+                swal({
+                    text: "Parameter Saved",
+                    icon: "success"
+                });
 
-        this.state.fields.IsActive = 1;
-        this.state.fields.CreatedDate = date();
-        fetch(`${ruleconfig.ruleEngineUrl}/RuleConfig/CreateParameters/`, {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(this.state.fields)
-        }).then(function (data) {
-            console.log(data);
-            alert("Parameter Saved");
-
-        });
+                });
+            
+        }
+        else {
+            swal({
+                text: "Some fields are missing",
+                icon: "error"
+            });
+        }
     }
+    reset() {
+        let fields = this.state.fields;
+        fields['ParamName'] = "";
+        fields['ParamType'] = "";
+        fields['ParamMasterLink'] = "";
+        this.setState({ fields });
+    }
+
 
     // For Grid View
     onGrid() {
@@ -112,23 +134,23 @@ class GeneralParameter extends React.Component {
             });
     }
 
-    addRow() {
-        var table = document.getElementById('benefitTable');
-        var row = table.insertRow(-1);
-        row.className = 'tableClassRow';
-        var cell1 = row.insertCell(-1);
-        var cell2 = row.insertCell(-1);
-        var cell3 = row.insertCell(-1);
-        var cell4 = row.insertCell(-1);
+    //addRow() {
+    //    var table = document.getElementById('benefitTable');
+    //    var row = table.insertRow(-1);
+    //    row.className = 'tableClassRow';
+    //    var cell1 = row.insertCell(-1);
+    //    var cell2 = row.insertCell(-1);
+    //    var cell3 = row.insertCell(-1);
+    //    var cell4 = row.insertCell(-1);
 
-        cell1.innerHTML = this.state.fields.ParamName;
-        cell2.innerHTML = this.state.fields.ParamType;
-        cell3.innerHTML = this.state.fields.ParamMasterLink;
-        //cell4.innerHTML = '<span class="delete"><i class="fa fa-trash" style="margin-left: 12px; padding: 3px; margin - top: 3px; border: none; background-color: transparent; color:red;zoom: 1.6; box-shadow: none; border-radius:4px;" aria-hidden="true"></i><span/>';
-        //$(".delete").on('click', function () {
-        //    $(this).parent().parent().remove();
-        //});
-    }
+    //    cell1.innerHTML = this.state.fields.ParamName;
+    //    cell2.innerHTML = this.state.fields.ParamType;
+    //    cell3.innerHTML = this.state.fields.ParamMasterLink;
+    //    //cell4.innerHTML = '<span class="delete"><i class="fa fa-trash" style="margin-left: 12px; padding: 3px; margin - top: 3px; border: none; background-color: transparent; color:red;zoom: 1.6; box-shadow: none; border-radius:4px;" aria-hidden="true"></i><span/>';
+    //    //$(".delete").on('click', function () {
+    //    //    $(this).parent().parent().remove();
+    //    //});
+    //}
 
     onInputChange = (evt) => {
         const fields = this.state.fields;
@@ -282,113 +304,124 @@ class GeneralParameter extends React.Component {
 
                                     </GridItem>
                                 </GridContainer>
-                                <Button onClick={() => this.addRow()}
-                                    color="info"
-                                    size="sm"
-                                >
-                                    ADD
-                </Button>
-                               
-                                    <div>
-                                        <table id="benefitTable">
-                                            <tbody>
-                                                <td>ParamID   </td>
-                                                <td>Parameter  </td>
-                                                <td>ParamType   </td>
-                                            </tbody>
-                                        </table>
+                                {
+                //                    <Button onClick={() => this.addRow()}
+                //                        color="info"
+                //                        size="sm"
+                //                    >
+                //                        ADD
+                //</Button>
 
-                                    </div>
-                                
-                                <Button onClick={() => this.onFormSubmit()}
-                                    color="info"
-                                    size="sm"
-                                >
-                                    SAVE
-                </Button>
-                                {this.state.show &&
-                                    <GridContainer>
+                //                    <div>
+                //                        <table id="benefitTable">
+                //                            <tbody>
+                //                                <td>ParamID   </td>
+                //                                <td>Parameter  </td>
+                //                                <td>ParamType   </td>
+                //                            </tbody>
+                //                        </table>
 
-                                        <GridItem xs={12}>
-
-                                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                <CardBody className="product-search-tab">
-                                                    <ReactTable
-                                                        data={this.state.newdata}
-                                                        filterable
-                                                        columns={[
-                                                            {
-                                                                Header: "Param Id",
-                                                                accessor: "PramId",
-                                                                minWidth: 30,
-                                                                style: { textAlign: "center" },
-                                                                headerClassName: 'react-table-center',
-                                                                resizable: false,
-
-                                                            },
-                                                            {
-                                                                Header: "Param Name",
-                                                                accessor: "ParamName",
-                                                                minWidth: 30,
-                                                                style: { textAlign: "center" },
-                                                                headerClassName: 'react-table-center',
-                                                                resizable: false,
-
-                                                            },
-                                                            {
-                                                                Header: "Param Type",
-                                                                accessor: "ParamType",
-                                                                minWidth: 30,
-                                                                style: { textAlign: "center" },
-                                                                headerClassName: 'react-table-center',
-                                                                resizable: false,
-
-                                                            },
-                                                            {
-                                                                Header: "Param Master Link",
-                                                                accessor: "ParamMasterLink",
-                                                                minWidth: 30,
-                                                                style: { textAlign: "center" },
-                                                                headerClassName: 'react-table-center',
-                                                                resizable: false,
-                                                            },
-                                                            {
-                                                                Header: "IsActive",
-                                                                accessor: "IsActive",
-                                                                minWidth: 30,
-                                                                style: { textAlign: "center" },
-                                                                headerClassName: 'react-table-center',
-                                                                resizable: false,
-                                                            },
-                                                            {
-                                                                Header: "CreatedDate",
-                                                                accessor: "CreatedDate",
-                                                                minWidth: 30,
-                                                                style: { textAlign: "center" },
-                                                                headerClassName: 'react-table-center',
-                                                                resizable: false,
-                                                            },
-                                                        ]}
-                                                        defaultPageSize={5}
-                                                        showPaginationTop={false}
-                                                    pageSize={([this.state.gridObj.length + 1] < 5) ? [this.state.gridObj.length + 1] : 5}
-                                                        showPaginationBottom
-                                                        className="-striped -highlight"
-                                                    />
-                                                </CardBody>
-                                            </Animated>
-                                        </GridItem>
-                                    </GridContainer>
+                //                    </div>
                                 }
-                                <Button onClick={() => this.onGrid()}
-                                    color="info"
-                                    size="sm"
-                                >
-                                    GRID
-                </Button>
+                                {
+                //                    <Button onClick={() => this.onFormSubmit()}
+                //                        color="info"
+                //                        size="sm"
+                //                    >
+                //                        SAVE
+                //</Button>
+                                }
+                                <GridContainer justify="center">
+                                    <GridItem>
+                                        <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormSubmit()}> Save  </Button>
+
+                                    </GridItem>
+                                    <GridItem>
+                                        <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onGrid()}> Grid  </Button>
+
+                                    </GridItem>
+                                </GridContainer>
+                                {
+                //                    <Button onClick={() => this.onGrid()}
+                //                        color="info"
+                //                        size="sm"
+                //                    >
+                //                        GRID
+                //</Button>
+                                }
                             </CardBody>
                         </Card>
+                        {this.state.show &&
+                            <GridContainer xl={12}>
 
+                            <GridItem lg={12}>
+
+                                <ReactTable
+                                    title={"Parameter Details"}
+                                    data={this.state.newdata}
+                                    filterable
+                                                columns={[
+                                                    //{
+                                                    //    Header: "Param Id",
+                                                    //    accessor: "PramId",
+                                                    //    minWidth: 30,
+                                                    //    style: { textAlign: "center" },
+                                                    //    headerClassName: 'react-table-center',
+                                                    //    resizable: false,
+
+                                                    //},
+                                                    {
+                                                        Header: "Param Name",
+                                                        accessor: "ParamName",
+                                                        //minWidth: 30,
+                                                        style: { textAlign: "center" },
+                                                        headerClassName: 'react-table-center',
+                                                        resizable: false,
+
+                                                    },
+                                                    {
+                                                        Header: "Param Type",
+                                                        accessor: "ParamType",
+                                                        //minWidth: 30,
+                                                        style: { textAlign: "center" },
+                                                        headerClassName: 'react-table-center',
+                                                        resizable: false,
+
+                                                    },
+                                                    {
+                                                        Header: "Param Master Link",
+                                                        accessor: "ParamMasterLink",
+                                                        //minWidth: 30,
+                                                        style: { textAlign: "center" },
+                                                        headerClassName: 'react-table-center',
+                                                        resizable: false,
+                                                    },
+                                                    //{
+                                                    //    Header: "IsActive",
+                                                    //    accessor: "IsActive",
+                                                    //    minWidth: 30,
+                                                    //    style: { textAlign: "center" },
+                                                    //    headerClassName: 'react-table-center',
+                                                    //    resizable: false,
+                                                    //},
+                                                    //{
+                                                    //    Header: "CreatedDate",
+                                                    //    accessor: "CreatedDate",
+                                                    //    minWidth: 30,
+                                                    //    style: { textAlign: "center" },
+                                                    //    headerClassName: 'react-table-center',
+                                                    //    resizable: false,
+                                                    //},
+                                                ]}
+                                                defaultPageSize={5}
+                                                showPaginationTop={false}
+                                                pageSize={([this.state.gridObj.length + 1] < 5) ? [this.state.gridObj.length + 1] : 5}
+                                                showPaginationBottom
+                                                className="-striped -highlight discription-tab"
+                                            />
+                                </GridItem>
+                            </GridContainer>
+                        }
                     </GridItem>
                 </GridContainer>
             </div>

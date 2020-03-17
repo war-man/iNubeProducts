@@ -12,6 +12,7 @@ using iNube.Components.RuleEngine.Entities;
 using iNube.Components.RuleEngine.Entities.AllocationEntities;
 using iNube.Components.RuleEngine.Helpers;
 using iNube.Utility.Framework.Extensions;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -55,8 +56,14 @@ namespace iNube.Components.RuleEngine
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            //app.InitializedCommonConfiguration(env, Configuration);
+            //app.UseAuthentication();
+            
             app.InitializedCommonConfiguration(env, Configuration);
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
             app.UseAuthentication();
+            app.UseHttpsRedirection();
+            app.UseMvc();
         }
 
         public void ConfigureModuleService(IServiceCollection services)

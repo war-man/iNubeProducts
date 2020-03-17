@@ -17,6 +17,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<ParamSetResponce> CreateParamSet(ParameterSetDTO paramSetDto, ApiContext apiContext);
         Task<RatingRulesResponse> CreateRatingRules(RatingDTO ratingDto, ApiContext apiContext);
         Task<CalConfigResponse> CreateCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext);
+        Task<EllConfigResponse> CreateIllustrationRules(IllustrationConfigDTO ellConfigDto, ApiContext apiContext);
         Task<IEnumerable<RatingParametersDTO>> GetParameterName(ApiContext apiContext);
         Task<IEnumerable<GetParamSetDetailDTO>> GetRateRule(ApiContext apiContext);
         Task<IEnumerable<RuleConditionsDetailsDTO>> GetRateConditions(ApiContext apiContext);
@@ -37,6 +38,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<IEnumerable<CalConfigExpression>> GetCalConfigExpressions(decimal CalculationConfigId, ApiContext apiContext);
         Task<IEnumerable<CalConfigParam>> GetCalConfigParam(decimal CalculationConfigId, ApiContext apiContext);
         Task<CalConfigResponse> EditCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext);
+        Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext);
+        Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext);
+        Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext);
     }
 
     public class RatingConfigService : IRateConfigService
@@ -70,6 +74,10 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         public async Task<CalConfigResponse> CreateCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext)
         {
             return await _ratesService(apiContext.ProductType).CreateCalConfigRules(calConfigDto, apiContext);
+        }
+        public async Task<EllConfigResponse> CreateIllustrationRules(IllustrationConfigDTO ellConfigDto, ApiContext apiContext)
+        {
+            return await _ratesService(apiContext.ProductType).CreateIllustrationRules(ellConfigDto, apiContext);
         }
         public async Task<IEnumerable<RatingParametersDTO>> GetParameterName(ApiContext apiContext)
         {
@@ -157,6 +165,18 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         public async Task<CalConfigResponse> EditCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext)
         {
             return await _ratesService(apiContext.ProductType).EditCalConfigRules(calConfigDto, apiContext);
+        }
+        public async Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext)
+        {
+            return await _ratesService(apiContext.ProductType).GetHandleEventsIllustration(EventIllutrationId, apiContext);
+        }
+        public async Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext)
+        {
+            return await _ratesService(apiContext.ProductType).CheckIllustration(IllustrationConfigId, illustration_Param, apiContext);
+        }
+        public async Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext)
+        {
+            return await _ratesService(apiContext.ProductType).GetIllustrationConfig(apiContext);
         }
     }
 }

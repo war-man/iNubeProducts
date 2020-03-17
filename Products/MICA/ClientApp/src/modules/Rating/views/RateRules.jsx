@@ -40,7 +40,7 @@ import swal from 'sweetalert';
 import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 import data_Not_found from "assets/img/data-not-found-new.png";
-
+import validationPage from "modules/Partners/Organization/views/ValidationPage.jsx";
 
 const style = {
     infoText: {
@@ -104,6 +104,7 @@ class RateRules extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            RateRuleData:[],
             count: 0,
             copyrate: {},
             copyrateList: [],
@@ -123,18 +124,7 @@ class RateRules extends React.Component {
             parameterId: "",
             EmptyField1: [],
 
-            EmptyField: [{
-                name: "",
-                rateName: "",
-                rate: "",
-                rateType: "",
-                startDate: "",
-                endDate: "",
-                ConditionOperator: "",
-                rateObj: "",
-                isParameter: "",
-                dynamicList: [],
-            }],
+            
             fields: [{
                 name: "",
                 rateName: "",
@@ -148,7 +138,24 @@ class RateRules extends React.Component {
                
                 dynamicList: [],
               
-            }],
+            }], rateNameState: "",
+            StartDateState: "",
+            EndDateState: "",
+            rateTypeState: "",
+
+
+            //EmptyFieldz: [{
+            //    name: "",
+            //    rateName: "",
+            //    rate: "",
+            //    rateType: "",
+            //    startDate: "",
+            //    endDate: "",
+            //    ConditionOperator: "",
+            //    rateObj: "",
+            //    isParameter: "",
+            //    //dynamicList: [],
+            //}],
             ParameterSet: [],
             pageloader: false,
             nodata: false,
@@ -191,7 +198,7 @@ class RateRules extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                this.setState({ RateRule: data });
+                this.setState({ RateRuleData: data });
                 console.log("RateRule", data);
             });
         //loader
@@ -202,13 +209,15 @@ class RateRules extends React.Component {
         );
     }
 
-    onInputChange = (evt) => {
+    onInputChange = (type,event) => {
         const fields = this.state.fields;
-        fields[0][evt.target.name] = evt.target.value;
+        fields[0][event.target.name] = event.target.value;
         this.setState({ fields });
+        this.change(event, event.target.name, type);
+
     };
 
-    onDateChange = (formate, name, event) => {
+    onDateChange = (formate, name, event,type) => {
         const { validdate } = this.state.fields;
         this.setState({ validdate: false });
         var today = event.toDate();
@@ -229,72 +238,99 @@ class RateRules extends React.Component {
         const state = this.state.fields;
         state[0][name] = date;
         this.setState({ state });
-
+        this.change(event, name, type);
     };
     
+    change(event, stateName, type, date, maxValue) {
+
+        switch (type) {
+
+            case "string":
+                if (validationPage.verifyName(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
 
 
-    handleRadioOnChange = (event) => {
-        const fields = this.state.fields;
-        this.state.singleValueIsParameter = event.target.value;
-        if (event.target.value == 0) {
-            //this.setState({ IsParameterGrid: true });
-            //this.setState({ IsParameterRate: false });
-            
-            if (this.state.RateRule.length > 0) {
-                this.setState({ IsParameterGrid: true });
-                this.setState({ IsParameterRate: false });
-            } else {
-                this.setState({ IsParameterGrid: false });
-            }
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
 
-            this.state.fields[0].isParameter = true;
+
+                }
+                break;
+            case "datetime":
+                if (validationPage.verifydatetime(date)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
+           
+            case "number":
+                if (validationPage.verifyNumeric(event.target.value)) {
+                    this.setState({ [stateName + "State"]: "success" });
+                } else {
+                    this.setState({ [stateName + "State"]: "error" });
+                }
+                break;
           
-            // this.addRule();
-            this.ratetabledata();
-            this.setState({});
-        }
-        else {
-            this.setState({ IsParameterGrid: false });
-            this.setState({ IsParameterRate: true });
-            
-            this.state.fields[0].isParameter = false;
 
+            default:
+                break;
         }
+
 
     }
 
 
-    onChageRateObj = (evt) => {
+    onChageRateObj = (event) => {
         
         this.state.TableList = [];
         this.state.copyrateList = [];
         this.state.RateObjNew = {};
         this.state.copyrate = {};
+        
         const fields = this.state.fields;
-        //   fields[evt.target.name] = evt.target.value;
-        fields[0][evt.target.name] = evt.target.value;
+      
+        fields[0][event.target.name] = event.target.value;
         this.setState({ fields });
         //Filter through Element 
-
-        const Rule = this.state.RateRule.filter(item => item.parameterSetID == evt.target.value);
-        this.setState({ RateRule: Rule });
-        this.setState({ parameterId: evt.target.value });
-        this.commonFunRate(0, evt.target.value);
-
+        this.state.RateRule = this.state.RateRuleData.filter(item => item.parameterSetID == event.target.value);
+      this.setState({});
+     //   this.setState({ RateRule: Rule });
+        this.setState({ parameterId: event.target.value });
+      
+        //radioChange
+             if (this.state.RateRule.length > 0) {
+                 console.log("abcd", this.state.RateRule)
+            this.state.IsParameterGrid = true;
+           this.state.IsParameterRate = false;
+                 this.commonFunRate(0, event.target.value);
+                 this.setState({});
+                 
+        } else {
+                 this.setState({ IsParameterGrid: false });
+                 this.setState({ IsParameterRate: true });
+        }
+        this.state.fields[0].isParameter = true;
+        this.ratetabledata();
+        //this.setState({});
+        //this.setState({ fields });
+        
+        this.change(event, event.target.name);
     }
 
     commonFunRate = (index, value) => {
+        debugger;
         let filter = [];
         if (value != "") {
-            filter = this.state.RateRule.filter(item => item.parameterSetID == value);
+            filter = this.state.RateRuleData.filter(item => item.parameterSetID == value);
         } else {
-            filter = this.state.RateRule.filter(item => item.parameterSetID == this.state.parameterId);
+            filter = this.state.RateRuleData.filter(item => item.parameterSetID == this.state.parameterId);
         }
         console.log("Ratefilter", filter);
-        this.setState({ productRateObj: filter });
+        this.state.productRateObj = filter;
+        //this.setState({ productRateObj: filter });
         this.setState({ copyrateList: filter });
-
+        console.log("productRateObj", this.state.productRateObj);
         let lenrate = this.state.TableList.length;
 
 
@@ -315,6 +351,9 @@ class RateRules extends React.Component {
         this.state.TableDbSave.push(this.state.RateClassObj);
         console.log("RateObjNew", this.state.RateObjNew, this.state.TableList.length, index);
         console.log("RateConcatT", this.state.TableDbSave);
+     
+            
+       
 
     }
 
@@ -350,14 +389,22 @@ class RateRules extends React.Component {
     }
     reset = () => {
         debugger;
-        const obj = this.state.EmptyField;
-        this.state.fields = obj;
+        //const obj = this.state.EmptyFieldz;
+        //this.state.fields = obj;
 
-        this.setState({ obj });
+      //  this.setState({ obj });
         this.state.TableDbSave = [];
       
         this.state.TableDataList = [];
-           //this.state.fields[0].dynamicList = [];
+        this.state.fields[0].rateName = "";
+        this.state.fields[0].rateType = "";
+        this.state.fields[0].startDate = "";
+        this.state.fields[0].endDate = "";
+        this.state.fields[0].rate = "";
+        this.state.fields[0].rateObj = "";
+        this.state.fields[0].isParameter  = "";
+
+
             //const obj1 = this.state.EmptyField1;
            //this.state.fields[0].dynamicList = obj1;
         let state = this.state.fields[0];
@@ -365,7 +412,7 @@ class RateRules extends React.Component {
 
         this.setState({ state });
         console.log("dynamicList", this.state.fields[0].dynamicList);
-        this.setState({ IsParameterRate: false });
+        this.setState({ IsParameterRate: true });
         this.setState({ IsParameterGrid: false });
         //singleValueIsParameter = [];
     }
@@ -377,7 +424,7 @@ class RateRules extends React.Component {
     //   this.state.fields[0].dynamicList=this.state.TableDbSave;
         console.log("fields", this.state.fields);
 
-        console.log("abc", this.state.ratingRules, this.state.ratingRuleConditions, this.state.TableDbSave);
+        console.log("SaveRa", this.state.ratingRules, this.state.ratingRuleConditions, this.state.TableDbSave);
 
         let stDate = "";
         let edDate = "";
@@ -389,6 +436,7 @@ class RateRules extends React.Component {
                 edDate = this.state.fields[0].endDate;
                 this.state.fields[0].startDate = this.datechange(this.state.fields[0].startDate)
                 this.state.fields[0].endDate = this.datechange(this.state.fields[0].endDate)
+               // this.state.fields[0].dynamicList.pop();
             }
   
             var data = {
@@ -398,7 +446,7 @@ class RateRules extends React.Component {
                 'createdDate': date(),  //'isActive': isActive, 'parameterSetDetails': sendArray,
 
             };
-            //  delete fields[0].att[0];
+            
             fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateRateRulesSet`, {
                 method: 'post',
                 headers: {
@@ -481,11 +529,16 @@ class RateRules extends React.Component {
                                 <GridContainer>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
+                                        success={this.state.rateNameState === "success"}
+                                        error={this.state.rateNameState === "error"}
+                                          required={true}
                                         labelText=" Rate Rule Name"
                                         id="rateName"
                                         value={this.state.fields[0].rateName}
                                         name='rateName'
-                                        onChange={this.onInputChange}
+                                       // onChange={this.onInputChange}
+                                        onChange={(event) => this.onInputChange("string", event)}
+                                       
                                         formControlProps={{
                                             fullWidth: true
                                         }}
@@ -504,7 +557,9 @@ class RateRules extends React.Component {
                                            </InputLabel>
                                             <Select
                                                 value={this.state.fields[0].rateObj}
-                                                onChange={this.onChageRateObj}
+                                            
+                                            onChange={(event) => this.onChageRateObj(event)}
+
                                                 MenuProps={{
                                                     className: classes.selectMenu
                                                 }}
@@ -537,14 +592,14 @@ class RateRules extends React.Component {
 
 
                                         <CustomDatetime
-                                            //  success={this.state.StartDateState === "success"}
-                                            //  error={this.state.StartDateState === "error"}
-                                            // required={true}
+                                             success={this.state.StartDateState === "success"}
+                                              error={this.state.StartDateState === "error"}
+                                            required={true}
                                             onFocus={this.state.onClick}
                                             labelText="Start Date"
                                             id='startDate'
                                             name='startDate'
-                                            onChange={(evt) => this.onDateChange('datetime', 'startDate', evt)}
+                                        onChange={(event) => this.onDateChange('datetime', 'startDate', event)}
                                             value={this.state.fields[0].startDate}
                                             formControlProps={{ fullWidth: true }} />
 
@@ -553,106 +608,38 @@ class RateRules extends React.Component {
 
 
                                         <CustomDatetime
-                                            //  success={this.state.EndDateState === "success"}
-                                            //  error={this.state.EndDateState === "error"}
-                                            // required={true}
+                                             success={this.state.EndDateState === "success"}
+                                             error={this.state.EndDateState === "error"}
+                                             required={true}
                                             onFocus={this.state.onClick}
                                             labelText="EndDate"
                                             id='endDate'
                                             name='endDate'
-                                            onChange={(evt) => this.onDateChange('datetime', 'endDate', evt)}
+                                        onChange={(event) => this.onDateChange('datetime', 'endDate', event)}
                                             value={this.state.fields[0].endDate}
                                             formControlProps={{ fullWidth: true }} />
 
                                     </GridItem>
 
+                                {
+                                //    <GridItem xs={12} sm={12} md={3}>
+                                //    <CustomInput
+                                //        success={this.state.rateTypeState === "success"}
+                                //        error={this.state.rateTypeState === "error"}
+                                //        required={true}
+                                //            labelText=" Rate Type"
+                                //            id="rateType"
+                                //            value={this.state.fields[0].rateType}
+                                //            name='rateType'
+                                //       // onChange={this.onInputChange}
+                                //        onChange={(event) => this.onInputChange("string", event)}
+                                //            formControlProps={{
+                                //                fullWidth: true
+                                //            }}
+                                //        />
+                                //</GridItem>
+                                }
 
-                                    <GridItem xs={12} sm={12} md={3}>
-                                        <CustomInput
-                                            labelText=" Rate Type"
-                                            id="rateType"
-                                            value={this.state.fields[0].rateType}
-                                            name='rateType'
-                                            onChange={this.onInputChange}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                    </GridItem>
-
-
-                                    <GridItem>
-                                        <h5 id="radio-bnt-text"> IsParameter</h5>
-                                        {/*       <CustomRadioButton radiolist={props.radiolist1} onChange={(e) => props.onChangeradio(e, 'radiolist1')} />
-                        */}
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}>
-                                        <div style={{ marginTop: "24px" }}>
-                                            <FormControlLabel
-                                                control={
-                                                    <Radio
-
-                                                        checked={this.state.singleValueIsParameter === "0"}
-                                                        onChange={this.handleRadioOnChange}
-                                                        disabled={this.state.viewdisable}
-                                                        value={0}
-                                                        name="singleValueIsParameter"
-                                                        aria-label="B"
-                                                        icon={
-                                                            <FiberManualRecord
-                                                                className={classes.radioUnchecked}
-                                                            />
-                                                        }
-                                                        checkedIcon={
-                                                            <FiberManualRecord
-                                                                className={classes.radioChecked}
-                                                            />
-                                                        }
-                                                        classes={{
-                                                            checked: classes.radio,
-                                                            root: classes.radioRoot
-                                                        }}
-                                                    />
-                                                }
-                                                classes={{
-                                                    label: classes.label
-                                                }}
-                                                label="Yes"
-                                            />
-
-                                            <FormControlLabel
-                                                control={
-                                                    <Radio
-                                                        checked={this.state.singleValueIsParameter === "1"}
-                                                        onChange={this.handleRadioOnChange}
-                                                        disabled={this.state.viewdisable}
-                                                        value={1}
-                                                        name="singleValueIsParameter"
-                                                        aria-label="B"
-                                                        icon={
-                                                            <FiberManualRecord
-                                                                className={classes.radioUnchecked}
-                                                            />
-                                                        }
-                                                        checkedIcon={
-                                                            <FiberManualRecord
-                                                                className={classes.radioChecked}
-                                                            />
-                                                        }
-                                                        classes={{
-                                                            checked: classes.radio,
-                                                            root: classes.radioRoot
-                                                        }}
-                                                    />
-                                                }
-                                                classes={{
-                                                    label: classes.label
-                                                }}
-                                                label="No"
-                                            />
-                                        </div>
-
-                                    </GridItem>
                                 {this.state.IsParameterRate &&
                                   
                                         <GridItem xs={12} sm={12} md={3}>
@@ -661,13 +648,12 @@ class RateRules extends React.Component {
                                                 id="rate"
                                                 value={this.state.fields[0].rate}
                                                 name='rate'
-                                                onChange={this.onInputChange}
+                                        onChange={(event) => this.onInputChange("number", event)}
                                                 formControlProps={{
                                                     fullWidth: true
                                                 }}
                                         />
                                     </GridItem>
-                                   
                                    
                                 }
                                 {this.state.IsParameterRate &&

@@ -31,7 +31,7 @@ namespace iNube.Components.RuleEngine.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;");
             }
         }
 
@@ -188,11 +188,19 @@ namespace iNube.Components.RuleEngine.Entities
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.FailureCode).IsUnicode(false);
+
+                entity.Property(e => e.FailureMsg).IsUnicode(false);
+
                 entity.Property(e => e.FromDate).HasColumnType("date");
 
                 entity.Property(e => e.RuleId)
                     .HasColumnName("RuleID")
                     .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.SuccessCode).IsUnicode(false);
+
+                entity.Property(e => e.SuccessMsg).IsUnicode(false);
 
                 entity.Property(e => e.TableName)
                     .HasColumnName("tableName")
@@ -200,6 +208,8 @@ namespace iNube.Components.RuleEngine.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.ToDate).HasColumnType("date");
+
+                entity.Property(e => e.ValidatorName).IsUnicode(false);
 
                 entity.HasOne(d => d.Rule)
                     .WithMany(p => p.TblRuleConditions)

@@ -139,10 +139,24 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                             }
 
                                             var spl = property.Name.Split(' ')[0];
-                                            ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName.Remove(it.RatingParamName.Length - 1) == spl.ToString()).RatingParameterId;//add
+                                            //foreach(var i in parameterDetails)
+                                            //{
+                                            //    if(i.RatingParamName == spl.ToString())
+                                            //    {
+                                            //        ruleConditionsDTO.RatingParameters = i.RatingParameterId;
 
-
-                                            ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
+                                            //    }
+                                            //}
+                                            try
+                                            {
+                                                ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName.Remove(it.RatingParamName.Length - 1) == spl.ToString()).RatingParameterId;//add
+                                                ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
+                                            }
+                                            catch(Exception ex)
+                                            {
+                                                ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName == spl.ToString()).RatingParameterId;//add
+                                                ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
+                                            }
                                         }
                                     }
                                     ratingDto.RatingRules.Add(ratingRulesDTO);
@@ -214,6 +228,25 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             }
             return null;
         }
+        public async Task<EllConfigResponse> CreateIllustrationRules(IllustrationConfigDTO ellConfigDto, ApiContext apiContext)
+        {
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            try
+            {
+                var dto = _mapper.Map<TblIllustrationConfig>(ellConfigDto);
+                _context.TblIllustrationConfig.Add(dto);
+                _context.SaveChanges();
+                var acntDTO = _mapper.Map<IllustrationConfigDTO>(dto);
+                return new EllConfigResponse { Status = BusinessStatus.Created, ResponseMessage = $"Illustration Configuration Succesfully Done! \n Cal Ellustration Name: {acntDTO.IllustrationConfigName}" };
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+
         public async Task<IEnumerable<RatingDTO>> GetRules(ApiContext apiContext)
         {
             _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
@@ -412,7 +445,6 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                         //{
                             if (itemParamRange.IsRange == "Yes")
                             {
-                                checkCount = checkCount + 1;
                                 if (checkCount < count - 1)
                                 {
                                     paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " " + "and" + " ";
@@ -421,6 +453,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                 {
                                     paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " ";
                                 }
+                                checkCount = checkCount + 1;
                                 condition = String.Concat(condition, paramvalue);
                             }
                             else
@@ -489,7 +522,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             ResponseStatus response = new ResponseStatus();
             ResponseStatus rateresponse = new ResponseStatus();
             _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId));
+            var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId)).OrderBy(it =>it.Steps);
             //For ODSI RUles
             var CalculationConigParam = _context.TblCalculationConfigParam.Where(item => item.Type == "Rate" && item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId));
 
@@ -618,7 +651,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     expression = rateitem.ExpressionValue;
                     resultExpression = Replace(expression, json_Dictionary);
                     double result = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
-                    calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = Math.Round((Convert.ToDecimal(result)), 2).ToString() });
+                    calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = (Math.Round((Convert.ToDecimal(result)), 2)).ToString("0.00") });
                     json_Dictionary.Add(rateitem.ExpressionResult, result.ToString());
                    // calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = result.ToString() });
                     //foreach(var tr in calcultion)
@@ -657,6 +690,45 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             //return reslt.ToList();
         }
 
+        //Illustration Execution 
+        public async Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext)
+        {
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            //Fetching Value from dynamic IllustrationParam that is available for that ID
+            var illustrationDetails = from tblIllConfig in _context.TblIllustrationConfigParam.Where(i => i.Type == "Param" && i.IllustrationConfigId == Convert.ToDecimal(IllustrationConfigId))
+                                      select new
+                                      {
+                                          Parameter = tblIllConfig.IllustrationConfigParamName
+                                      };
+            long Year = 0;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            foreach (var item in illustrationDetails)
+            {
+                var paramValue = illustration_Param[item.Parameter];
+                dict.Add(item.Parameter.ToString(), paramValue);
+                if(item.Parameter == "Year")
+                {
+                    Year = Convert.ToInt64(illustration_Param[item.Parameter]);
+                }
+            }
+            //Mapping Details Availbale for That Particular IllustrationConfigID
+            var illustrationMappingDetails = from tblIllMap in _context.TblIllustrationMapping.Where(i => i.IllustrationConfigId == Convert.ToDecimal(IllustrationConfigId))
+                                             select new 
+                                             {
+                                                 Input = tblIllMap.IllustrationInputParam,
+                                                 Output = tblIllMap.IllustrationOutputParam
+                                             };
+            Dictionary<string, string> mappingDict = new Dictionary<string, string>();
+            foreach (var item in illustrationMappingDetails)
+            {
+                mappingDict.Add(item.Input, item.Output);
+            }
+            //Calling for CalYear Function
+            var result = CalYear(dict, Year, mappingDict);
+            
+            return result;
+        }
+
         public void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
         {
             // ExpandoObject supports IDictionary so we can extend it like this
@@ -680,34 +752,59 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             });
         }
         //For Year Calculation (Ellustration)
-        public static Dictionary<string,object> CalYear(string Year,string Principle ,string RateInterest,string EMI)
+        public static List<IllustrationModel> CalYear(Dictionary<string,object> json, long Year, Dictionary<string, string> mappingDict)
         {
             Dictionary<string, object> resultValue = new Dictionary<string, object>();
-            Dictionary<string, object> json = new Dictionary<string, object>();
+            List<IllustrationModel> illModel = new List<IllustrationModel>();
             try
             {
-                json.Add("Year", Year);
-                json.Add("Principle", Principle);
-                json.Add("RateInterest", RateInterest);
-                json.Add("EMI", EMI);
                 var resultExpression = "";
-                string yearExpression = "{EMI}-({Principle}*{RateInterest}/100)/12";
+                string yearExpression = "{EMI}-({Principle}*{Interest}/100)/12";
                 for (int i = 1; i <= Convert.ToInt64(Year); i++)
                 {
                     resultExpression = Replace(yearExpression, json);
                     double calResult = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
-                    resultValue.Add("Balance"+i, calResult);
+                    resultValue.Add("Balance"+i, Math.Round((Convert.ToDecimal(calResult)), 2).ToString());
                     foreach (var it in json)
                     {
-                        resultValue.Add(it.Key+i, it.Value);
+                        resultValue.Add(it.Key+i, Math.Round((Convert.ToDecimal(it.Value)), 2).ToString());
+                    }
+                    foreach(var item in mappingDict)
+                    {
+                        if(item.Key != item.Value)
+                        {
+                            json[item.Key] = resultValue[item.Value + i];
+                        }
                     }
                 }
+
+                // Saving
+                Dictionary<string, string> dt = new Dictionary<string, string>();
+                foreach (var it in resultValue)
+                {
+                    dt.Add(it.Key, it.Value.ToString());
+                }
+                
+                int count = resultValue.Count();
+                for (int j = 1; j <= count / 5; j++)
+                {
+                    IllustrationModel obj = new IllustrationModel();
+                    obj.Balance = dt["Balance" + j];
+                    obj.Year = j.ToString();
+                    obj.Duration = dt["Year" + j];
+                    obj.Interest = dt["Interest" + j];
+                    obj.EMI = dt["EMI" + j];
+                    obj.Principle = dt["Principle" + j];
+
+                    illModel.Add(obj);
+                }
+
             }
             catch (Exception ex)
             {
 
             }
-            return resultValue;
+            return illModel;
         }
         //RateRule
         public async Task<IEnumerable<GetParamSetDetailDTO>> GetRateRule(ApiContext apiContext)
@@ -739,7 +836,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     {
                         ParameterSetID = item.ParameterSetID,
                         ParametersID = item.ParametersID,
-                        ParameterName = item.ParameterName + "From",
+                        ParameterName = item.ParameterName + " From",
                         ParameterSetName = item.ParameterSetName,
                         ParameterType = item.ParameterType,
                         RangeType = item.RangeType
@@ -748,7 +845,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     {
                         ParameterSetID = item.ParameterSetID,
                         ParametersID = item.ParametersID,
-                        ParameterName = item.ParameterName + "To",
+                        ParameterName = item.ParameterName + " To",
                         ParameterSetName = item.ParameterSetName,
                         ParameterType = item.ParameterType,
                         RangeType = item.RangeType
@@ -798,6 +895,16 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             var coaDTO = _mapper.Map<IList<CalculationConfigDTO>>(tblCalConfig);
             return coaDTO;
         }
+        public async Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext)
+        {
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            var tblCalConfig = _context.TblIllustrationConfig.OrderBy(item => item.CreatedDate);
+            var coaDTO = _mapper.Map<IList<IllustrationConfigDTO>>(tblCalConfig);
+            return coaDTO;
+        }
+
+
         public async Task<IEnumerable<CalculationConfigParamDTO>> GetCalculationParam(ApiContext apiContext)
         {
             _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
@@ -878,6 +985,22 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             }
             //var dtos = _mapper.Map<IList<HandleEvent>>(objEvent);
             return objEvent;
+        }
+
+        //HandleEvent for Illustration Config
+        public async Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext)
+        {
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            var illustrationList = from tblIllConfigParam in _context.TblIllustrationConfigParam.Where(i => i.IllustrationConfigId == Convert.ToDecimal(EventIllutrationId) && i.Type == "Param")
+                                   select new HandleEventIllustration
+                                   {
+                                        Parameter = tblIllConfigParam.IllustrationConfigParamName
+                                   };
+
+
+            var dto = _mapper.Map<IList<HandleEventIllustration>>(illustrationList);
+            //var dtos = _mapper.Map<IList<HandleEvent>>(objEvent);
+            return dto;
         }
 
         public async Task<IEnumerable<ddDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
@@ -1046,14 +1169,17 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             try
             {
-                var calData = from t1 in _context.TblCalculationConfigExpression
+                var calData = from t1 in _context.TblCalculationConfigExpression.OrderBy(i=>i.Steps)
                               where (t1.CalculationConfigId == CalculationConfigId)
                               select new CalConfigExpression
                               {
+                                  Steps = t1.Steps,
                                   ExpressionValue = t1.ExpressionValue,
                                   ExpressionResult = t1.ExpressionResult,
                                   CalculationConfigExpressionId = t1.CalculationConfigExpressionId,
-                                  CalculationConfigId = t1.CalculationConfigId
+                                  CalculationConfigId = t1.CalculationConfigId,
+                                  CreatedDate = t1.CreatedDate,
+                                  IsActive = t1.IsActive
                               };
                 var calItemData = calData.ToList();
                 foreach (var i in calItemData)
@@ -1078,7 +1204,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                             select new CalConfigParam
                             {
                                 CalculationConfigParamName = t1.CalculationConfigParamName,
-                                Type = t1.Type
+                                Type = t1.Type,
+                                CreatedDate = t1.CreatedDate,
+                                IsActive = t1.IsActive
                             };
             return paramData;
         }
@@ -1098,7 +1226,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 _context.TblCalculationConfig.Update(dto);
                 _context.SaveChanges();
                 var modifydata = _mapper.Map<CalculationConfigDTO>(dto);
-                return new CalConfigResponse { Status = BusinessStatus.Created, ResponseMessage = $"Update is successful! \n Cal Config Name: {modifydata.CalculationConfigName}" };
+                return new CalConfigResponse { Status = BusinessStatus.Created, ResponseMessage = $"Updation is successful for! \n Cal Config Name: {modifydata.CalculationConfigName}" };
                 
                 }
             catch (Exception ex)

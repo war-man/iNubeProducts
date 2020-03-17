@@ -20,6 +20,7 @@ namespace iNube.Services.Rating.Models
         public DateTime? CreatedDate { get; set; }
 
         public virtual ICollection<ParameterSetDetailsDTO> ParameterSetDetails { get; set; }
+
     }
     public class ParameterSetDataDTO
     {
@@ -153,6 +154,10 @@ namespace iNube.Services.Rating.Models
     {
         public CalculationConfigDTO CalConfig { get; set; }
     }
+    public class EllConfigResponse : ResponseStatus
+    {
+        public IllustrationConfigDTO IllConfig { get; set; }
+    }
     public class ParamSetResponce : ResponseStatus
     {
         public ParameterSetDTO CreatParam { get; set; }
@@ -230,6 +235,46 @@ namespace iNube.Services.Rating.Models
         public virtual ICollection<CalculationConfigParamDTO> CalculationConfigParam { get; set; }
     }
 
+    public partial class IllustrationConfigDTO
+    {
+        public IllustrationConfigDTO()
+        {
+            IllustrationConfigParam = new HashSet<IllustrationConfigParamDTO>();
+            IllustrationMapping = new HashSet<IllustrationMappingDTO>();
+        }
+
+        public decimal IllustrationConfigId { get; set; }
+        public string IllustrationConfigName { get; set; }
+        public string From { get; set; }
+        public string To { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public bool? IsActive { get; set; }
+
+        public virtual ICollection<IllustrationConfigParamDTO> IllustrationConfigParam { get; set; }
+        public virtual ICollection<IllustrationMappingDTO> IllustrationMapping { get; set; }
+    }
+
+    public class IllustrationConfigParamDTO
+    {
+        public decimal IllustrationConfigParamId { get; set; }
+        public decimal? IllustrationConfigId { get; set; }
+        public string IllustrationConfigParamName { get; set; }
+        public string Type { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public bool? IsActive { get; set; }
+    }
+
+    public  class IllustrationMappingDTO
+    {
+        public decimal IllustrationMappingId { get; set; }
+        public decimal? IllustrationConfigId { get; set; }
+        public string IllustrationInputParam { get; set; }
+        public string IllustrationOutputParam { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public bool? IsActive { get; set; }
+        
+    }
+
     public partial class Expressions
     {
         public string ExpressionResults { get; set; }
@@ -299,6 +344,11 @@ namespace iNube.Services.Rating.Models
         public List<string> ParameterList { get; set; }
         public List<string> RateList { get; set; }
     }
+    
+    public class HandleEventIllustration
+    {
+        public string Parameter { get; set; }
+    }
 
     public class HandleExecEvent
     {
@@ -321,10 +371,27 @@ namespace iNube.Services.Rating.Models
         public string ExpressionResult { get; set; }
         public decimal CalculationConfigExpressionId { get; set; }
         public decimal? CalculationConfigId { get; set; }
+        public int? Steps { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public bool? IsActive { get; set; }
     }
     public partial class CalConfigParam
     {
         public string CalculationConfigParamName { get; set; }
         public string Type { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public bool? IsActive { get; set; }
     }
+
+    public partial class IllustrationModel
+    {
+        public string Balance { get; set; }
+        public string EMI { get; set; }
+        public string Interest { get; set; }
+        public string Principle { get; set; }
+        public string Year { get; set; }
+        public string Duration { get; set; }
+    }
+
+
 }

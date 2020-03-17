@@ -3,6 +3,8 @@ using AutoMapper.Mappers;
 
 using iNube.Components.RuleEngine.Models;
 using iNube.Components.RuleEngine.Entities;
+using iNube.Components.RuleEngine.Entities.AllocationEntities;
+using static iNube.Components.RuleEngine.Models.ALModels;
 
 namespace iNube.Components.RuleEngine.Helpers
 {
@@ -34,6 +36,29 @@ namespace iNube.Components.RuleEngine.Helpers
 
             CreateMap<TblRuleMapping, RuleMappingDto>();
             CreateMap<RuleMappingDto, TblRuleMapping>();
+
+            CreateMap<TblAllocationParameters, ParameterSetDTO>();
+            CreateMap<ParameterSetDTO, TblAllocationParameters>();
+
+            CreateMap<TblAllocParameterSet, ParameterSetDetailsDTO>();
+            CreateMap<ParameterSetDetailsDTO, TblAllocParameterSet>();
+
+            CreateMap<TblAllocParameterSetDetails, ParamSetDetailsDTO>();
+            CreateMap<ParamSetDetailsDTO, TblAllocParameterSetDetails>();
+
+            CreateMap<TblAllocation, AllocationDTO>();
+            CreateMap<AllocationDTO, TblAllocation>();
+
+            CreateMap<TblAllocationRules, AllocationRulesDTO>();
+            CreateMap<AllocationRulesDTO, TblAllocationRules>();
+
+            CreateMap<TblAllocationRuleConditions, AllocationRuleConditionsDTO>();
+            CreateMap<AllocationRuleConditionsDTO, TblAllocationRuleConditions>();
+
+
+
+
+
         }
     }
 }

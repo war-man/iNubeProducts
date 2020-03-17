@@ -14,6 +14,7 @@ using iNube.Utility.Framework;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Microsoft.Extensions.Options;
+using static iNube.Components.RuleEngine.Models.ALModels;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -72,18 +73,48 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig
             return Ok(paramDtos);
         }
         [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> CreateParamSet(ParameterSetDTO tblAllocParameterSet)
+        {
+            var response = await _allocationConfigService.CreateParamSet(tblAllocParameterSet, Context);
+            return Ok(response);
+        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateRateRulesSet(AllocationDTO tblRateRuleSet)
+        //{
+        //    var response = await _allocationConfigService.CreateRatingRules(tblRateRuleSet, Context);
+        //    return Ok(response);
+        //}
+
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetParameterSet()
+        {
+            var Param_list = await _allocationConfigService.GetParameterSet(Context);
+            return Ok(Param_list);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetRateRule(decimal paramid)
+        {
+            var Rate_list = await _allocationConfigService.GetRateRule(paramid,Context);
+            return Ok(Rate_list);
+        }
+
+        [AllowAnonymous]
         [HttpPost("CheckRuleSets/{EventId}")]
         public IActionResult CheckRuleSets(String EventId, dynamic expression)
         {
             var eventDetails =  _allocationConfigService.CheckRuleSets(EventId, expression,Context);
             return Ok(eventDetails);
         }
-        //[HttpPost("CheckRuleSets/{RuleId}")]
-        //public async Task<IActionResult> CheckRuleSets(String RuleId, [FromBody]dynamic dictionary_rule)
-        //{
-        //    var response = await _rateService.CheckRuleSets(RuleId, dictionary_rule, Context);
-        //    return Ok(response);
-        //}
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> CreateAllocationRules(AllocationDTO allocDto)
+        {
+            var response = await _allocationConfigService.CreateAllocationRules(allocDto, Context);
+            return Ok(response);
+        }
 
     }
 }

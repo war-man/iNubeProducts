@@ -59,6 +59,11 @@ namespace iNube.Components.RuleEngine.Models
         public string FromDate { get; set; }
         public string ToDate { get; set; }
         public string Dobconditions { get; set; }
+        public string ValidatorName { get; set; }
+        public string SuccessMsg { get; set; }
+        public string FailureMsg { get; set; }
+        public string SuccessCode { get; set; }
+        public string FailureCode { get; set; }
 
         public RulesDto Rule { get; set; }
     }
@@ -116,6 +121,14 @@ namespace iNube.Components.RuleEngine.Models
         public string Action { get; set; }
         public DateTime? CreatedBy { get; set; }
         public string ModelName { get; set; }
+    }
+
+    public class ErrorDetailsData
+    {
+        public string ValidatorName { get; set; }
+        public string Outcome { get; set; }
+        public string Message { get; set; }
+        public string Code { get; set; }
     }
 
 }

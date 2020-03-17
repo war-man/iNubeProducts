@@ -15,7 +15,10 @@ namespace iNube.Components.RuleEngine.Entities.AllocationEntities
         {
         }
 
+        public virtual DbSet<TblAllocParameterSet> TblAllocParameterSet { get; set; }
+        public virtual DbSet<TblAllocParameterSetDetails> TblAllocParameterSetDetails { get; set; }
         public virtual DbSet<TblAllocation> TblAllocation { get; set; }
+        public virtual DbSet<TblAllocationParameters> TblAllocationParameters { get; set; }
         public virtual DbSet<TblAllocationRuleConditions> TblAllocationRuleConditions { get; set; }
         public virtual DbSet<TblAllocationRules> TblAllocationRules { get; set; }
 
@@ -32,6 +35,60 @@ namespace iNube.Components.RuleEngine.Entities.AllocationEntities
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
+            modelBuilder.Entity<TblAllocParameterSet>(entity =>
+            {
+                entity.HasKey(e => e.AllocParamSetId);
+
+                entity.ToTable("tblAllocParameterSet", "AL");
+
+                entity.Property(e => e.AllocParamSetId)
+                    .HasColumnName("AllocParamSetID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AllocParametersId)
+                    .HasColumnName("AllocParametersID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.DataType)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Input).IsUnicode(false);
+
+                entity.Property(e => e.ParamType)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.AllocParameters)
+                    .WithMany(p => p.TblAllocParameterSet)
+                    .HasForeignKey(d => d.AllocParametersId)
+                    .HasConstraintName("FK_tblAllocParameterSet");
+            });
+
+            modelBuilder.Entity<TblAllocParameterSetDetails>(entity =>
+            {
+                entity.HasKey(e => e.AllocParamSetDetId);
+
+                entity.ToTable("tblAllocParameterSetDetails", "AL");
+
+                entity.Property(e => e.AllocParamSetDetId)
+                    .HasColumnName("AllocParamSetDetID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AllocParamSetId)
+                    .HasColumnName("AllocParamSetID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Output).IsUnicode(false);
+
+                entity.HasOne(d => d.AllocParamSet)
+                    .WithMany(p => p.TblAllocParameterSetDetails)
+                    .HasForeignKey(d => d.AllocParamSetId)
+                    .HasConstraintName("FK_tblAllocParameterSettblAllocParameterSetDetails");
+            });
+
             modelBuilder.Entity<TblAllocation>(entity =>
             {
                 entity.HasKey(e => e.AllocationId);
@@ -46,6 +103,24 @@ namespace iNube.Components.RuleEngine.Entities.AllocationEntities
                 entity.Property(e => e.AllocationName).IsUnicode(false);
 
                 entity.Property(e => e.AllocationObj).IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblAllocationParameters>(entity =>
+            {
+                entity.HasKey(e => e.AllocParametersId);
+
+                entity.ToTable("tblAllocationParameters", "AL");
+
+                entity.Property(e => e.AllocParametersId)
+                    .HasColumnName("AllocParametersID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AllocParamName)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type).IsUnicode(false);
             });
 
             modelBuilder.Entity<TblAllocationRuleConditions>(entity =>

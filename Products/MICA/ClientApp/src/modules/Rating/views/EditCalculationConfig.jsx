@@ -43,6 +43,7 @@ import TranslationContainer from "components/Translation/TranslationContainer.js
 import Modal from '@material-ui/core/Modal';
 import SearchCalculationConfig from "./SearchCalculationConfig.jsx";
 import Edit from "@material-ui/icons/Edit";
+import { parse } from "filepond";
 
 function date() {
 
@@ -161,7 +162,7 @@ class EditCalculationConfig extends React.Component {
             .then(data => {
                 this.setState({ RateParam: data });
                 this.state.RateArr = this.state.RateParam.filter(x => x.type == "Rate");
-                this.state.ParamArr = this.state.RateParam.filter(x => x.type == "Param");
+                this.state.ParamArr = this.state.RateParam.filter(x => x.type != "Rate");
                 this.state.CalParameterArray = this.state.ParamArr;//Parameter
 
                 //ForRate
@@ -190,6 +191,7 @@ class EditCalculationConfig extends React.Component {
                     SNo: key + 1,
                     ExpressionId: prop.calculationConfigExpressionId,
                     ConfigId: prop.calculationConfigId,
+                    Steps : prop.steps,
                     ExpressionValue: prop.expressionValue,
                     ExpressionResult: prop.expressionResult,
                     btn: <div><Button color="info" justIcon round simple className="edit" onClick={(e) => this.expressionFun(e, key,prop.calculationConfigExpressionId, prop.expressionValue,prop.expressionResult)}><Edit /></Button>
@@ -308,11 +310,17 @@ class EditCalculationConfig extends React.Component {
     }
 
     addExpression() {
+        debugger
         let expRes = this.state.fields.ExpressionResult;
         let expVal = this.state.fields.Expression;
         console.log('newExp', this.state.fields.ExpressionResult, this.state.fields.Expression);
         if (this.state.fields.ExpressionResult != "" && this.state.fields.Expression != "") {
             console.log('expId', this.state.expId);
+            var value = this.state.RateRulesdata.length;
+            var stepsValue = this.state.RateRulesdata[this.state.RateRulesdata.length - 1];
+            var stsValue = parseInt(stepsValue.steps) + 1;
+            var abc = parseInt((this.state.RateRulesdata[this.state.RateRulesdata.length - 1]).steps) + 1;
+            console.log(stepsValue, value, 'Check');
             if (this.state.expId == "") {
                 //push newly added expression into grid
                 let newExp = this.state.RateRulesdata;
@@ -320,6 +328,7 @@ class EditCalculationConfig extends React.Component {
                 newExp.push({
                     'expressionResult': this.state.fields.ExpressionResult,
                     'expressionValue': this.state.gridArray,
+                    'steps': parseInt((this.state.RateRulesdata[this.state.RateRulesdata.length - 1]).steps) + 1,
                 });
                 console.log('newExp', this.state.fields.ExpressionResult, this.state.fields.Expression);
                 console.log(this.state.RateRulesdata, 'CHeck');
@@ -378,6 +387,17 @@ class EditCalculationConfig extends React.Component {
                 this.state.fields.Expression = "";
                 this.setState({ sendingExpression: '' });
                 this.state.sendingExpression = "";
+                //State Set
+                let fields = this.state.fields;
+                fields['ExpressionResult'] = "";
+                fields['Expression'] = "";
+                this.setState({ fields });
+                let state = this.state;
+                state['gridArray'] = "";
+                this.setState({ state });
+                expRes = "";
+                expVal = "";
+                this.setState({});
                 console.log(this.state.ExpressionArray, 'CalParamArray');
                 debugger
                 console.log(this.state.RateRulesdata, this.state.sendingArray, 'RateRulesData/SendingRules');
@@ -413,7 +433,14 @@ class EditCalculationConfig extends React.Component {
                 //console.log('modifydata', modifyData, this.state.sendingExpression);
                 //rule[index].expressionResult = this.state.fields.ExpressionResult;
                 rule[index].expressionResult = this.state.fields.ExpressionResult;
-                rule[index].expressionValue = this.state.gridArray;
+
+                //Check when Grid array is null means modificatio of formula is not done 
+                if (this.state.gridArray != "") {
+                    rule[index].expressionValue = this.state.gridArray;
+                }
+                else {
+                    rule[index].expressionValue = expVal;
+                }
                 console.log('Aftermodifydata', this.state.RateRulesdata, this.state.fields.Expression);
                 this.setState({ rule });
                 this.tabledata();
@@ -423,10 +450,24 @@ class EditCalculationConfig extends React.Component {
 
                 //pExpressionArray[this.state.expId]['expressionResult'] = this.state.fields.ExpressionResult;
                 //pExpressionArray[this.state.expId]['expressionValue'] = this.state.sendingExpression;
+                let fields = this.state.fields;
+                fields['ExpressionResult'] = "";
+                fields['Expression'] = "";
+                this.setState({ fields });
+                let state = this.state;
+                state['expId'] = "";
+                state['gridArray'] = "";
+                this.setState({ state });
+                expRes = "";
+                expVal = "";
+                this.setState({});
+                debugger 
+
+                console.log(this.state.fields.ExpressionResult, this.state.fields.Expression, 'ExpressionValues');
                
             }
         }
-            else {
+        else {
                 swal("", "Some fields are missing", "error");
                 this.setState({ errormessage: true });
             }
@@ -450,28 +491,16 @@ class EditCalculationConfig extends React.Component {
         debugger;
         let isActive = 1;
         //Merging Both Array With Rate Values Also 
+        console.log(this.state.CalParameterArray, 'CalParamArray');
+        console.log(this.state.CalRateArray, 'CalRate');
         this.state.CalParameterArray = this.state.CalParameterArray.concat(this.state.CalRateArray);
         console.log(this.state.CalParameterArray, 'CalCUlationConfig');
         //Distinct ConfigParam
         let calData = this.state.CalParameterArray;
-        //let calculationParameterDistinct = calData.filter(function (item, pos) {
-        //    return calData.indexOf(item.calculationConfigParamName) == pos;
-        //});
-        let uniqueParameter = [];
-        for (var i = 0; i < calData.length; i++) {
-            if (uniqueParameter.length == 0) {
-                uniqueParameter.push(calData[i]);
-            }
-            else {
-                for (var j = 0; j < uniqueParameter.length; j++) {
-                    if (uniqueParameter[j].calculationConfigParamName != calData[i].calculationConfigParamName) {
-                        uniqueParameter.push(calData[i]);
-                    }
-                }
-            }
-        }
-        //Previous
-        //'CalculationConfigExpression': this.state.RateRulesdata
+        const uniqueParameter = calData.filter((val, id, array) => array.indexOf(val) == id);
+        
+        debugger
+        console.log(uniqueParameter, 'UniqueParam');
         var data = {
             'calculationConfigId': this.props.RateID, 'calculationConfigName': this.props.RateVal, 'createdDate': date(), 'isActive': isActive, 'calculationConfigExpression': this.state.RateRulesdata, 'calculationConfigParam': uniqueParameter 
         };
@@ -842,6 +871,14 @@ class EditCalculationConfig extends React.Component {
                                 data={this.state.RateRulesdataDetails}
                                 filterable
                                 columns={[
+                                    {
+                                        Header: "Steps",
+                                        accessor: "Steps",
+                                        minWidth: 30,
+                                        style: { textAlign: "center" },
+                                        headerClassName: 'react-table-center',
+                                        resizable: false,
+                                    },
                                     {
                                         Header: "Expression Value",
                                         accessor: "ExpressionValue",
