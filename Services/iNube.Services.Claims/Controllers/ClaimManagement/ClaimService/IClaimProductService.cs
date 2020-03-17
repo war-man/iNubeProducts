@@ -21,7 +21,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext);
         Task<ClaimProcessDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext);
         Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext);
-        Task<IEnumerable<SearchDTO>> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext);
+        Task<ClaimSearchResponseDTO> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext);
         Task<List<object>> ClaimStatusAsync(decimal claimId, decimal statusId, ApiContext apiContext);
         Task<List<object>> ClaimDetailsAsync(decimal ClaimId, ApiContext apiContext);
         Task<List<object>> PaymentDetailsAsync(decimal ClaimId, ApiContext apiContext);

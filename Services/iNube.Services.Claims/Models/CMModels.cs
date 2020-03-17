@@ -132,22 +132,33 @@ namespace iNube.Services.Claims.Models
         public DateTime? lossDateTime { get; set; }
     }
 
-    public partial class SearchDTO
+    public partial class ClaimSearchResponseDTO : ResponseStatus
+    {
+        public ClaimSearchResponseDTO()
+        {
+            ClaimSearch = new List<SearchDTO>();
+        }
+        public  List<SearchDTO> ClaimSearch { get; set; }
+
+        // public SearchDTO ClaimSearch { get; set; }
+    }
+
+        public partial class SearchDTO
     {
         public int ClaimId { get; set; }
-        public decimal? PolicyId { get; set; }
+       // public decimal? PolicyId { get; set; }
         public string PolicyNo { get; set; }
         public string ClaimNumber { get; set; }
         public string ClaimStatus { get; set; }
-        public string CoverEvent { get; set; }
-        public string CoverName { get; set; }
+       // public string CoverEvent { get; set; }
+        public dynamic CoverValue { get; set; }
         public string TypeOfLoss { get; set; }
         public string InsuredReference { get; set; }
         public string InsuredEmail { get; set; }
         public string InsuredMobileNo { get; set; }
         public DateTime EventDate { get; set; }
         public DateTime? lossDateTime { get; set; }
-        public string AccountHolderName { get; set; }
+       // public string AccountHolderName { get; set; }
         public int ClaimStatusId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string InsuredName { get; set; }

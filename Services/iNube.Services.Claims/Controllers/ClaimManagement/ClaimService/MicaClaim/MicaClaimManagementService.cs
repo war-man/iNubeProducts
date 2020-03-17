@@ -2106,7 +2106,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             return "Sucess";
         }
 
-        public async Task<IEnumerable<SearchDTO>> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext)
+        public async Task<ClaimSearchResponseDTO> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext)
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -2137,8 +2137,6 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             sdto.Email = searchclaim.InsuredEmail;
             var policyDetails = await _integrationService.PolicySearch(sdto, apiContext);
 
-           // var _policy = await _integrationService.GetPolicyDetails(apiContext);
-
             if (!string.IsNullOrEmpty(searchclaim.PolicyNo))
             {
                 _claims = _claims.Where(x => x.PolicyNo == _policydata.PolicyNo);
@@ -2146,18 +2144,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             if (!string.IsNullOrEmpty(searchclaim.InsuredReference))
             {
-                //var policyID = policyDetails.FirstOrDefault(x => x.CustomerId == searchclaim.InsuredReference).PolicyId;
-                //_claims = _claims.Where(x => x.PolicyId == policyID);
                 var policyIdDetails = policyDetails.Select(p => p.PolicyNo);
                 _claims = _claims.Where(x => policyIdDetails.Contains(x.PolicyNo));
-
-
             }
 
             if (!string.IsNullOrEmpty(searchclaim.InsuredMobileNo))
             {
-                //var policyID = policyDetails.FirstOrDefault(x => x.MobileNumber == searchclaim.InsuredMobileNo).PolicyId;
-                //_claims = _claims.Where(x => x.PolicyId == policyID);
                 var policyIdDetails = policyDetails.Select(p => p.PolicyNo);
                 _claims = _claims.Where(x => policyIdDetails.Contains(x.PolicyNo));
 
@@ -2165,16 +2157,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             if (!string.IsNullOrEmpty(searchclaim.InsuredEmail))
             {
-                //var policyID = policyDetails.FirstOrDefault(x => x.Email == searchclaim.InsuredEmail).PolicyId;
-                //_claims = _claims.Where(x => x.PolicyId == policyID);
                 var policyIdDetails = policyDetails.Select(p => p.PolicyNo);
                 _claims = _claims.Where(x => policyIdDetails.Contains(x.PolicyNo));
             }
 
             if (searchclaim.EventDate != null)
             {
-                //var policyID = policyDetails.FirstOrDefault(x => x.CreatedDate.Equals(searchclaim.EventDate)).PolicyId;
-                //_claims = _claims.Where(x => x.PolicyId == policyID);
                 var policyIdDetails = policyDetails.Select(p => p.PolicyNo);
                 _claims = _claims.Where(x => policyIdDetails.Contains(x.PolicyNo));
             }
@@ -2194,8 +2182,6 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 _claims = _claims.Where(p => p.ClaimNumber.Contains(searchclaim.ClaimNumber));
             }
 
-            //  var _ClaimSearchData = _mapper.Map<SearchDTO>(_claims.OrderByDescending(p => p.CreatedDate).Select(x => x).FirstOrDefault());
-
             var _ClaimSearchData = _mapper.Map<List<SearchDTO>>(_claims);
 
             List<SearchDTO> claimlist = new List<SearchDTO>();
@@ -2208,14 +2194,17 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                                 join c in _context.TblmasCmcommonTypes on a.ClaimStatusId equals c.CommonTypeId
                                 select c).FirstOrDefault();
 
-                    var data1 = _context.TblClaimInsurable.SingleOrDefault(x => x.ClaimId == item.ClaimId);
+                    var insurabledata = _context.TblClaimInsurable.SingleOrDefault(x => x.ClaimId == item.ClaimId);
+
+                    var covervalue = JsonConvert.DeserializeObject<dynamic>(insurabledata.CoverValue);
 
                     item.ClaimStatus = data.Value;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
-                    item.CoverEvent = pk[0].CoverEvent;
-                    item.TypeOfLoss = data1.TypeOfLoss;
+                   // item.CoverEvent = pk[0].CoverEvent;
+                    item.CoverValue = covervalue;
+                    item.TypeOfLoss = insurabledata.TypeOfLoss;
                     item.EventDate = pk[0].CreatedDate;
                     item.InsuredEmail = pk[0].Email;
                     item.InsuredMobileNo = pk[0].MobileNumber;
@@ -2226,7 +2215,20 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 catch (Exception ex) { }
             }
 
-            return _ClaimSearchData;
+            var _claimsearchDTOs = new ClaimSearchResponseDTO();
+            if (_ClaimSearchData.Count > 0)
+            {
+                _claimsearchDTOs.ClaimSearch.AddRange(_ClaimSearchData);
+                _claimsearchDTOs.Status = BusinessStatus.Ok;
+            }
+            else
+            {
+                _claimsearchDTOs.Status = BusinessStatus.Error;
+                _claimsearchDTOs.ResponseMessage = "No record found";
+            }
+            return _claimsearchDTOs;
+
+
         }
 
         public async Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext)
@@ -2280,7 +2282,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 try
                 {
-                    var pk = policyDetails.Where(s => s.PolicyId == item.PolicyId).ToList();
+                    var pk = policyDetails.Where(s => s.PolicyNo == item.PolicyNo).ToList();
                     var data = (from a in _context.TblClaims.Where(x => x.ClaimId == item.ClaimId)
                                 join c in _context.TblmasCmcommonTypes on a.ClaimStatusId equals c.CommonTypeId
                                 select c).FirstOrDefault();
@@ -2291,7 +2293,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
-                    item.CoverEvent = pk[0].CoverEvent;
+                   // item.CoverEvent = pk[0].CoverEvent;
                     item.TypeOfLoss = data1.TypeOfLoss;
                     item.EventDate = pk[0].CreatedDate;
                     item.InsuredEmail = pk[0].Email;
