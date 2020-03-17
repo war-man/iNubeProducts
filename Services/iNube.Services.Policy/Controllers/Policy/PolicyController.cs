@@ -511,7 +511,31 @@ namespace iNube.Services.Policy.Controllers.Policy
         public async Task<IActionResult> PolicyEndoresemenet(dynamic endoresementDto)
         {
             var response = await _policyService.PolicyEndoresemenet(endoresementDto, Context);
-            return ServiceResponse(response);
+
+
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return BadRequest(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.Deleted:
+                    return Ok(response);
+                case BusinessStatus.Updated:
+                    return Ok(response);
+                case BusinessStatus.Error:
+                    return BadRequest(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized(response);
+                case BusinessStatus.None:
+                    return BadRequest(response);
+                case BusinessStatus.PreConditionFailed:
+                    return Ok(response);
+
+                default:
+                    return NotFound(response);
+            }
+            // return ServiceResponse(response);
         }
 
         [HttpPost]

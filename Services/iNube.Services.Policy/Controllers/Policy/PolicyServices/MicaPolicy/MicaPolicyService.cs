@@ -2648,6 +2648,615 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
         }
 
+        //public async Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
+        //{
+        //    _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+        //    List<ErrorInfo> Errors = new List<ErrorInfo>();
+        //    string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
+        //    if (PolicyNo == "")
+        //    {
+        //        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PolicyNumber can not be empty" };
+        //        Errors.Add(errorInfo);
+        //        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
+
+        //    }
+        //    try
+        //    {
+        //        string EndorsementNo = "";
+        //        var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
+        //        if (policy != null)
+        //        {
+        //            policy.PolicyVersion++;
+        //            EndorsementNo = policy.PolicyNo + "" + "_" + (policy.PolicyVersion).ToString();
+
+        //            if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
+        //            {
+        //                List<TblPolicyInsurableDetails> lstPolicyInsurableDetailsDto = new List<TblPolicyInsurableDetails>();
+
+        //                foreach (var item in insurableItemRequest.InsurableItem)
+        //                {
+        //                    var InsurableItemName = item.InsurableName;
+
+        //                    TblPolicyInsurableDetails policyInsurableDetailsDto = null;
+
+
+
+        //                    foreach (var insurableInsurablefields in item.RiskItems)
+        //                    {
+        //                        policyInsurableDetailsDto = new TblPolicyInsurableDetails();
+        //                        policyInsurableDetailsDto.PolicyId = policy.PolicyId;
+        //                        policyInsurableDetailsDto.InsurableItem = InsurableItemName;
+        //                        policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
+        //                        policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
+        //                        policyInsurableDetailsDto.BenefitAmount = 0;
+        //                        policyInsurableDetailsDto.IsActive = true;
+        //                        lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
+        //                    }
+
+        //                }
+
+        //                _context.TblPolicyInsurableDetails.AddRange(lstPolicyInsurableDetailsDto);
+
+
+        //                var EndorsmentType = (string)insurableItemRequest["EndorsementType"];
+
+        //                if (EndorsmentType == "Addition of vehicle")
+        //                {
+        //                    //step:1 Get Details of Policy & Endorsement
+
+        //                    var policyNo = (string)insurableItemRequest["PolicyNumber"];
+        //                    var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
+        //                    var policyId = tbl_particiant.PolicyId;
+        //                    var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+
+        //                    if (tblPolicyDetailsdata != null)
+        //                    {
+        //                        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+        //                        dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+        //                        dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+
+        //                        //Step2:Validate of Request Object
+        //                        List<CDMapper> cDMappers = new List<CDMapper>();
+        //                        CDMapper cD = new CDMapper();
+        //                        cD.Type = "Policy";
+        //                        cD.Data.Add(json);
+        //                        cDMappers.Add(cD);
+
+        //                        cD.Type = "Endorsement";
+        //                        cD.Data.Add(insurableItemRequest);
+        //                        cDMappers.Add(cD);
+
+
+        //                        var res = await _integrationService.RuleMapper(cDMappers, "EndorementAdd", apiContext);
+
+        //                        var seriaizeListofres = JsonConvert.SerializeObject(res);
+        //                        List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
+
+
+        //                            var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+
+        //                            if (Listofres != null)
+        //                            {
+        //                                foreach (var item in Listofres)
+        //                                {
+
+        //                                    if (item.Outcome == "Fail")
+        //                                    {
+
+        //                                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+        //                                        Errors.Add(errorInfo);
+
+        //                                    }
+
+        //                                }
+        //                                if (Errors.Count > 0)
+        //                                {
+        //                                    return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
+        //                                }
+        //                            }
+
+        //                        //step:3 Call CD mapper
+        //                        var CDmap = await _integrationService.CDMapper(cDMappers, "EndorementAdd", apiContext);
+
+
+        //                        MicaCD micaCD = new MicaCD();
+        //                        micaCD.AccountNo = policy.CdaccountNumber;
+        //                        micaCD.micaCDDTO = CDmap;
+
+
+
+
+
+        //                        foreach (var insurableName in json.InsurableItem)
+        //                        {
+        //                            foreach (var item in insurableItemRequest.InsurableItem)
+        //                            {
+        //                                var name1 = insurableName.InsurableName;
+        //                                if (name1 == "Vehicle" && item.InsurableName == "Vehicle")
+        //                                {
+        //                                    foreach (var insurableName1 in json1.InsurableItem)
+        //                                    {
+        //                                        var count = insurableName.RiskItems.Count;
+        //                                        if (insurableName.InsurableName == "Vehicle")
+        //                                        {
+        //                                            if (count < 3)
+        //                                            {
+        //                                                if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
+        //                                                {
+        //                                                    json1.si = insurableItemRequest.SI;
+        //                                                }
+        //                                                foreach (var fields in item.RiskItems)
+        //                                                {
+        //                                                    try
+        //                                                    {
+        //                                                        //Note validation has to come vechile addition count can not be greater then 3
+
+        //                                                        if (insurableName1.InsurableName == "Vehicle" && insurableName.InsurableName == "Vehicle")
+        //                                                        {
+        //                                                            insurableName1.RiskItems.Add(fields);
+        //                                                            insurableName1.RiskCount = insurableName1.RiskItems.Count;
+        //                                                            if (fields["Vehicle Type"] == "PC")
+        //                                                            {
+        //                                                                json1.noOfPC = (Convert.ToInt32(json1.noOfPC) + 1).ToString();
+        //                                                            }
+        //                                                            if (fields["Vehicle Type"] == "TW")
+        //                                                            {
+        //                                                                json1.noOfTW = (Convert.ToInt32(json1.noOfTW) + 1).ToString();
+
+        //                                                            }
+        //                                                            //insurableName1.RiskItems = insurableName.RiskItems;
+        //                                                        }
+        //                                                    }
+        //                                                    catch (Exception e)
+        //                                                    {
+        //                                                    }
+
+        //                                                }
+        //                                            }
+        //                                            else
+        //                                            {
+        //                                                ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Vehicle can not be added" };
+
+        //                                                Errors.Add(errorInfo);
+        //                                                return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of vehicle can not more than Three." };
+        //                                            }
+
+        //                                        }
+        //                                    }
+
+        //                                }
+        //                            }
+
+        //                        }
+        //                        tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+        //                        _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+        //                        _context.SaveChanges();
+
+        //                        //Step2:CalCulate Premium
+        //                        //CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
+        //                        //BusinessStatus businessStatus = 0;
+        //                        ////OLD Premium
+        //                        //PremiumRequestDTO premiumRequestDTO = new PremiumRequestDTO();
+        //                        //premiumRequestDTO.SI = json["si"];
+        //                        //premiumRequestDTO.StateCode = json["stateCode"];
+        //                        //premiumRequestDTO.NoOfPC = json["noOfPC"];
+        //                        //premiumRequestDTO.NoOfTW = json["noOfTW"];
+        //                        //premiumRequestDTO.DriverAge = json["driverAge"];
+        //                        //premiumRequestDTO.DriverExp = json["driverExp"];
+        //                        //premiumRequestDTO.AdditionalDriver = json["additionalDriver"];
+        //                        //premiumRequestDTO.BillingFrequency = json["billingFrequency"];
+
+        //                        //var CalculatePremiumResponseOld = await PremiumCalCulation(premiumRequestDTO, apiContext);
+
+
+        //                        ////New Premium
+        //                        //PremiumRequestDTO premiumRequestDTONew = new PremiumRequestDTO();
+        //                        //premiumRequestDTONew.SI = json1["si"];
+        //                        //premiumRequestDTONew.StateCode = json1["stateCode"];
+        //                        //premiumRequestDTONew.NoOfPC = json1["noOfPC"];
+        //                        //premiumRequestDTONew.NoOfTW = json1["noOfTW"];
+        //                        //premiumRequestDTONew.DriverAge = json1["driverAge"];
+        //                        //premiumRequestDTONew.DriverExp = json1["driverExp"];
+        //                        //premiumRequestDTONew.AdditionalDriver = json1["additionalDriver"];
+        //                        //premiumRequestDTONew.BillingFrequency = json1["billingFrequency"];
+        //                        //var CalculatePremiumResponseNew = await PremiumCalCulation(premiumRequestDTONew, apiContext);
+
+
+        //                        //PremiumReturnDto CalculatePremiumResponse = new PremiumReturnDto();
+        //                        //CalculatePremiumResponse.FireTheft = CalculatePremiumResponseNew.FireTheft - CalculatePremiumResponseOld.FireTheft;
+        //                        //CalculatePremiumResponse.ADPremium = CalculatePremiumResponseNew.ADPremium - CalculatePremiumResponseOld.ADPremium;
+        //                        //CalculatePremiumResponse.FTTax = CalculatePremiumResponseNew.FTTax - CalculatePremiumResponseOld.FTTax;
+        //                        //CalculatePremiumResponse.ADTax = CalculatePremiumResponseNew.ADTax - CalculatePremiumResponseOld.ADTax;
+        //                        //CalculatePremiumResponse.TotalADAmount = CalculatePremiumResponseNew.TotalADAmount - CalculatePremiumResponseOld.TotalADAmount;
+        //                        //CalculatePremiumResponse.TotalFTAmount = CalculatePremiumResponseNew.TotalFTAmount - CalculatePremiumResponseOld.TotalFTAmount;
+
+        //                        //Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
+
+        //                        //TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
+        //                        //txnParameterDTO.Amount = CalculatePremiumResponse.FireTheft;
+        //                        //txnParameterDTO.TaxAmount = CalculatePremiumResponse.FTTax;
+        //                        //txnParameterDTO.Total = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.FTTax;
+
+        //                        //RatingConfig.Add("FT", txnParameterDTO);
+        //                        //txnParameterDTO = new TxnParameterDTO();
+        //                        //txnParameterDTO.Amount = CalculatePremiumResponse.ADPremium;
+        //                        //txnParameterDTO.TaxAmount = CalculatePremiumResponse.ADTax;
+        //                        //txnParameterDTO.Total = CalculatePremiumResponse.ADPremium + CalculatePremiumResponse.ADTax;
+        //                        //RatingConfig.Add("AD", txnParameterDTO);
+        //                        //transactionsDTO.TotalAmount = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.ADPremium;
+        //                        //transactionsDTO.TotalGSTAmount = CalculatePremiumResponse.FTTax + CalculatePremiumResponse.ADTax;
+        //                        //transactionsDTO.PremiumDetails = RatingConfig;
+        //                        //transactionsDTO.Type = "Endorsement-Addition";
+        //                        ////    transactionsDTO.ProductId = Convert.ToDecimal(productId);
+        //                        //transactionsDTO.TxnType = "Credit";
+        //                        //transactionsDTO.AccountNo = policy.CdaccountNumber;
+        //                        ////  transactionsDTO.Frequency = premiumRequestDTO.BillingFrequency;
+        //                        ////Step3:CD Account Txn 
+        //                        //// var transaction = await _integrationService.CreateMasterCDAccount(transactionsDTO, apiContext);
+
+        //                        ////businessStatus = transaction.Status;
+
+        //                        //Step5:CD Transaction for the policy
+        //                        var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+        //                        BusinessStatus businessStatus = 0;
+        //                        businessStatus = transaction.Status;
+
+        //                        if (businessStatus == BusinessStatus.Created)
+        //                        {
+        //                            //Status for Txn
+        //                        }
+        //                        else
+        //                        {
+
+        //                            return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
+
+        //                        }
+
+
+
+        //                    }
+        //                    else
+        //                    {
+        //                        return new EndorsmentDTO { Status = BusinessStatus.NotFound, Id = policy.PolicyNo, ResponseMessage = $"No Record Found for this Policy Number {policy.PolicyNo}" };
+
+        //                    }
+        //                }
+        //                //Add Driver
+
+        //                    if (EndorsmentType == "Addition of driver")
+        //                    {
+
+
+        //                        var policyNo = (string)insurableItemRequest["PolicyNumber"];
+        //                        var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
+        //                        var policyId = tbl_particiant.PolicyId;
+        //                        var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+        //                        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+
+
+
+        //                    //Step2:Validate of Request Object
+        //                    List<CDMapper> cDMappers = new List<CDMapper>();
+        //                    CDMapper cD = new CDMapper();
+        //                    cD.Type = "Policy";
+        //                    cD.Data.Add(insurableItem);
+        //                    cDMappers.Add(cD);
+
+        //                    cD.Type = "Endorsement";
+        //                    cD.Data.Add(insurableItem);
+        //                    cDMappers.Add(cD);
+
+
+        //                    var res = await _integrationService.RuleMapper(cDMappers, "EndorementAdd", apiContext);
+
+        //                    var seriaizeListofres = JsonConvert.SerializeObject(res);
+        //                    List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
+
+
+        //                    var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+
+        //                    if (Listofres != null)
+        //                    {
+        //                        foreach (var item in Listofres)
+        //                        {
+
+        //                            if (item.Outcome == "Fail")
+        //                            {
+
+        //                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+        //                                Errors.Add(errorInfo);
+
+        //                            }
+
+        //                        }
+        //                        if (Errors.Count > 0)
+        //                        {
+        //                            return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
+        //                        }
+        //                    }
+
+        //                    //step:3 Call CD mapper
+        //                    var CDmap = await _integrationService.CDMapper(cDMappers, "EndorementAdd", apiContext);
+
+
+        //                    MicaCD micaCD = new MicaCD();
+        //                    micaCD.AccountNo = policy.CdaccountNumber;
+        //                    micaCD.micaCDDTO = CDmap;
+
+
+
+
+
+
+
+        //                    dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+        //                        dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+        //                        foreach (var insurableName in json.InsurableItem)
+        //                        {
+        //                            foreach (var item in insurableItemRequest.InsurableItem)
+        //                            {
+        //                                var name1 = insurableName.InsurableName;
+        //                                if (name1 == "Driver" && item.InsurableName == "Driver")
+        //                                {
+        //                                    foreach (var insurableName1 in json1.InsurableItem)
+        //                                    {
+
+        //                                        // var name2 = insurableName1.InsurableName;
+
+        //                                        var count = insurableName.RiskItems.Count;
+
+        //                                        //var additiondrivercount = json.additionalDriver + 1;
+        //                                        // var addtionaldriver = Convert.ToInt32(additiondrivercount);
+        //                                        if (insurableName.InsurableName == "Driver")
+        //                                        {
+
+        //                                            if (count < 3)
+        //                                            {
+
+        //                                                if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
+        //                                                {
+        //                                                    json1.si = insurableItemRequest.SI.ToString();
+        //                                                }
+        //                                                foreach (var fields in item.RiskItems)
+        //                                                {
+        //                                                    try
+        //                                                    {
+        //                                                        //Note validation has to come vechile addition count can not be greater then 3
+
+        //                                                        if (insurableName1.InsurableName == "Driver" && insurableName.InsurableName == "Driver")
+        //                                                        {
+        //                                                            insurableName1.RiskItems.Add(fields);
+        //                                                            //insurableName1.RiskItems = insurableName.RiskItems;
+        //                                                            insurableName1.RiskCount = insurableName1.RiskItems.Count;
+
+        //                                                        }
+        //                                                    }
+        //                                                    catch (Exception e)
+        //                                                    {
+        //                                                    }
+
+        //                                                }
+        //                                            }
+        //                                            else
+        //                                            {
+        //                                                var data = await ModifyInsurabableItem(insurableItemRequest, apiContext);
+        //                                                if (data != null)
+        //                                                {
+        //                                                    return new EndorsmentDTO() { ResponseMessage = "Driver updated successful" }; ;
+        //                                                }
+        //                                                ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Driver can not be added" };
+        //                                                Errors.Add(errorInfo);
+        //                                                return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of Driver can not be changed." };
+        //                                            }
+
+        //                                        }
+        //                                    }
+
+        //                                }
+        //                            }
+
+        //                        }
+        //                        tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+        //                        _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+        //                        _context.SaveChanges();
+
+
+        //                    //Step5:CD Transaction for the policy
+        //                    var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+        //                    BusinessStatus businessStatus = 0;
+        //                    businessStatus = transaction.Status;
+
+        //                    if (businessStatus == BusinessStatus.Created)
+        //                    {
+        //                        //Status for Txn
+
+        //                    }
+        //                    else
+        //                    {
+
+        //                        return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
+
+        //                    }
+
+
+
+        //                }
+
+
+        //                }
+
+
+        //                _context.SaveChanges();
+        //                return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo };
+
+        //            }
+        //            else
+        //            {
+
+        //                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"No Record Found for this PolicyNumber{PolicyNo}" };
+        //                Errors.Add(errorInfo);
+        //                return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
+
+        //            }
+        //        }
+
+        //    catch (Exception ex)
+        //    {
+        //        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = ex.InnerException.ToString() };
+        //        Errors.Add(errorInfo);
+        //        return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
+
+        //    }
+
+        //}
+
+
+
+
+        //public async Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
+        //{
+
+        //    _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+        //    List<ErrorInfo> Errors = new List<ErrorInfo>();
+        //    string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
+        //    if (PolicyNo == "")
+        //    {
+        //        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PolicyNumber can not be empty" };
+        //        Errors.Add(errorInfo);
+        //        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
+
+        //    }
+
+        //    string EndorsementNo = "";
+        //    var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
+        //    if (policy != null)
+        //    {
+        //        EndorsementNo = policy.PolicyNo + "" + "_" + (policy.PolicyVersion).ToString();
+        //        if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
+        //        {
+
+        //            foreach (var item in insurableItemRequest.InsurableItem)
+        //            {
+
+
+        //                foreach (var insurableInsurablefields in item.RiskItems)
+        //                {
+
+        //                    string IdentificationNo = insurableInsurablefields["Identification Number"].ToString();
+
+        //                    var verify = _context.TblPolicyInsurableDetails.Where(x => x.IdentificationNo == IdentificationNo && x.PolicyId == policy.PolicyId);
+
+        //                    foreach (var insureditem in verify)
+        //                    {
+        //                        insureditem.IsActive = false;
+
+        //                    }
+
+        //                }
+
+        //            }
+
+
+
+        //            var policyNo = (string)insurableItemRequest["PolicyNumber"];
+        //            var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
+        //            var policyId = tbl_particiant.PolicyId;
+        //            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+        //            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+        //            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+        //            dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+        //            foreach (var item in insurableItemRequest.InsurableItem)
+        //            {
+
+        //                foreach (var insurableName in json.InsurableItem)
+        //                {
+        //                    foreach (var insurableName1 in json1.InsurableItem)
+        //                    {
+        //                        if (item.InsurableName == "Vehicle" && insurableName.InsurableName == "Vehicle" && insurableName1.InsurableName == "Vehicle")
+        //                        {
+        //                            foreach (var fields in item.RiskItems)
+        //                            {
+        //                                if (insurableName.RiskItems.Count > 0)
+        //                                {
+        //                                    try
+        //                                    {
+        //                                        foreach (var jsoninsurableFields in insurableName.RiskItems)
+        //                                        {
+
+        //                                            var InputidentificationNumber = (string)fields["Identification Number"];
+        //                                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+        //                                            if (InputidentificationNumber == TblIdentificationNo)
+        //                                            {
+        //                                                var removeitem = jsoninsurableFields;
+        //                                                insurableName.RiskItems.Remove(removeitem);
+
+        //                                            }
+        //                                        }
+
+        //                                    }
+        //                                    catch (Exception e)
+        //                                    {
+
+        //                                        insurableName1.RiskItems = insurableName.RiskItems;
+        //                                        if (insurableName1.InsurableName == "Vehicle")
+        //                                        {
+        //                                            insurableName1.RiskCount = insurableName1.RiskItems.Count;
+        //                                            if (fields["Vehicle Type"] == "PC")
+        //                                            {
+        //                                                json1.noOfPC = (Convert.ToInt32(json1.noOfPC) - 1).ToString();
+        //                                            }
+        //                                            if (fields["Vehicle Type"] == "TW")
+        //                                            {
+        //                                                json1.noOfTW = (Convert.ToInt32(json1.noOfTW) - 1).ToString();
+
+        //                                            }
+        //                                        }
+        //                                    }
+
+        //                                }
+        //                            }
+        //                        }
+
+        //                    }
+        //                }
+
+        //            }
+        //            tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+        //            _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+        //            await _context.SaveChangesAsync();
+        //            return new EndorsmentDTO() { Status = BusinessStatus.Ok, ResponseMessage = "Deleted Successfully" };
+
+        //        }
+
+
+        //    }
+
+
+
+        //    else
+        //    {
+        //        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"No records found for this policyNumber {PolicyNo}" };
+        //        Errors.Add(errorInfo);
+        //        return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
+
+        //    }
+        //    EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
+        //    tblEndorsementDetails.EnddorsementRequest = insurableItemRequest.ToString();
+
+        //    TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
+
+        //    _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+        //    _context.SaveChanges();
+
+        //    return new EndorsmentDTO();
+
+
+        //}
+
         public async Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -2703,7 +3312,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         if (EndorsmentType == "Addition of vehicle")
                         {
-                            //step:1 Get Details of Policy & Endorsement
 
                             var policyNo = (string)insurableItemRequest["PolicyNumber"];
                             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
@@ -2716,59 +3324,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                                 dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
-
-                                //Step2:Validate of Request Object
-                                List<CDMapper> cDMappers = new List<CDMapper>();
-                                CDMapper cD = new CDMapper();
-                                cD.Type = "Policy";
-                                cD.Data.Add(json);
-                                cDMappers.Add(cD);
-
-                                cD.Type = "Endorsement";
-                                cD.Data.Add(insurableItemRequest);
-                                cDMappers.Add(cD);
-
-
-                                var res = await _integrationService.RuleMapper(cDMappers, "EndorementAdd", apiContext);
-                              
-                                var seriaizeListofres = JsonConvert.SerializeObject(res);
-                                List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
-
-
-                                    var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
-
-                                    if (Listofres != null)
-                                    {
-                                        foreach (var item in Listofres)
-                                        {
-
-                                            if (item.Outcome == "Fail")
-                                            {
-
-                                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
-                                                Errors.Add(errorInfo);
-
-                                            }
-
-                                        }
-                                        if (Errors.Count > 0)
-                                        {
-                                            return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
-                                        }
-                                    }
-
-                                //step:3 Call CD mapper
-                                var CDmap = await _integrationService.CDMapper(cDMappers, "EndorementAdd", apiContext);
-
-
-                                MicaCD micaCD = new MicaCD();
-                                micaCD.AccountNo = policy.CdaccountNumber;
-                                micaCD.micaCDDTO = CDmap;
-
-
-
-
-                                
                                 foreach (var insurableName in json.InsurableItem)
                                 {
                                     foreach (var item in insurableItemRequest.InsurableItem)
@@ -2820,7 +3375,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                         ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Vehicle can not be added" };
 
                                                         Errors.Add(errorInfo);
-                                                        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of vehicle can not more than Three." };
+                                                        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
                                                     }
 
                                                 }
@@ -2830,279 +3385,217 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     }
 
                                 }
+
                                 tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                                 _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+
+                                //Endorsement Details data saving for the addition of vehicle
+
+                                //  PolicyEndoresemenet policyEndoresemenet=new 
+
+                                EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
+                                endorsementDetailsDTO.Action = EndorsmentType;
+                                endorsementDetailsDTO.EndorsementNo = EndorsementNo;
+                                endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                                endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
+
+                                TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
+
+                                _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+
                                 _context.SaveChanges();
 
-                                //Step2:CalCulate Premium
-                                //CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
-                                //BusinessStatus businessStatus = 0;
-                                ////OLD Premium
-                                //PremiumRequestDTO premiumRequestDTO = new PremiumRequestDTO();
-                                //premiumRequestDTO.SI = json["si"];
-                                //premiumRequestDTO.StateCode = json["stateCode"];
-                                //premiumRequestDTO.NoOfPC = json["noOfPC"];
-                                //premiumRequestDTO.NoOfTW = json["noOfTW"];
-                                //premiumRequestDTO.DriverAge = json["driverAge"];
-                                //premiumRequestDTO.DriverExp = json["driverExp"];
-                                //premiumRequestDTO.AdditionalDriver = json["additionalDriver"];
-                                //premiumRequestDTO.BillingFrequency = json["billingFrequency"];
-
-                                //var CalculatePremiumResponseOld = await PremiumCalCulation(premiumRequestDTO, apiContext);
+                                return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = "Added Successfully" };
 
 
-                                ////New Premium
-                                //PremiumRequestDTO premiumRequestDTONew = new PremiumRequestDTO();
-                                //premiumRequestDTONew.SI = json1["si"];
-                                //premiumRequestDTONew.StateCode = json1["stateCode"];
-                                //premiumRequestDTONew.NoOfPC = json1["noOfPC"];
-                                //premiumRequestDTONew.NoOfTW = json1["noOfTW"];
-                                //premiumRequestDTONew.DriverAge = json1["driverAge"];
-                                //premiumRequestDTONew.DriverExp = json1["driverExp"];
-                                //premiumRequestDTONew.AdditionalDriver = json1["additionalDriver"];
-                                //premiumRequestDTONew.BillingFrequency = json1["billingFrequency"];
-                                //var CalculatePremiumResponseNew = await PremiumCalCulation(premiumRequestDTONew, apiContext);
+
+                                //    CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
+                                //    BusinessStatus businessStatus = 0;
+                                //    //OLD Premium
+                                //    PremiumRequestDTO premiumRequestDTO = new PremiumRequestDTO();
+                                //    premiumRequestDTO.SI = json["si"];
+                                //    premiumRequestDTO.StateCode = json["stateCode"];
+                                //    premiumRequestDTO.NoOfPC = json["noOfPC"];
+                                //    premiumRequestDTO.NoOfTW = json["noOfTW"];
+                                //    premiumRequestDTO.DriverAge = json["driverAge"];
+                                //    premiumRequestDTO.DriverExp = json["driverExp"];
+                                //    premiumRequestDTO.AdditionalDriver = json["additionalDriver"];
+                                //    premiumRequestDTO.BillingFrequency = json["billingFrequency"];
+
+                                //    var CalculatePremiumResponseOld = await PremiumCalCulation(premiumRequestDTO, apiContext);
 
 
-                                //PremiumReturnDto CalculatePremiumResponse = new PremiumReturnDto();
-                                //CalculatePremiumResponse.FireTheft = CalculatePremiumResponseNew.FireTheft - CalculatePremiumResponseOld.FireTheft;
-                                //CalculatePremiumResponse.ADPremium = CalculatePremiumResponseNew.ADPremium - CalculatePremiumResponseOld.ADPremium;
-                                //CalculatePremiumResponse.FTTax = CalculatePremiumResponseNew.FTTax - CalculatePremiumResponseOld.FTTax;
-                                //CalculatePremiumResponse.ADTax = CalculatePremiumResponseNew.ADTax - CalculatePremiumResponseOld.ADTax;
-                                //CalculatePremiumResponse.TotalADAmount = CalculatePremiumResponseNew.TotalADAmount - CalculatePremiumResponseOld.TotalADAmount;
-                                //CalculatePremiumResponse.TotalFTAmount = CalculatePremiumResponseNew.TotalFTAmount - CalculatePremiumResponseOld.TotalFTAmount;
-
-                                //Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
-
-                                //TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
-                                //txnParameterDTO.Amount = CalculatePremiumResponse.FireTheft;
-                                //txnParameterDTO.TaxAmount = CalculatePremiumResponse.FTTax;
-                                //txnParameterDTO.Total = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.FTTax;
-
-                                //RatingConfig.Add("FT", txnParameterDTO);
-                                //txnParameterDTO = new TxnParameterDTO();
-                                //txnParameterDTO.Amount = CalculatePremiumResponse.ADPremium;
-                                //txnParameterDTO.TaxAmount = CalculatePremiumResponse.ADTax;
-                                //txnParameterDTO.Total = CalculatePremiumResponse.ADPremium + CalculatePremiumResponse.ADTax;
-                                //RatingConfig.Add("AD", txnParameterDTO);
-                                //transactionsDTO.TotalAmount = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.ADPremium;
-                                //transactionsDTO.TotalGSTAmount = CalculatePremiumResponse.FTTax + CalculatePremiumResponse.ADTax;
-                                //transactionsDTO.PremiumDetails = RatingConfig;
-                                //transactionsDTO.Type = "Endorsement-Addition";
-                                ////    transactionsDTO.ProductId = Convert.ToDecimal(productId);
-                                //transactionsDTO.TxnType = "Credit";
-                                //transactionsDTO.AccountNo = policy.CdaccountNumber;
-                                ////  transactionsDTO.Frequency = premiumRequestDTO.BillingFrequency;
-                                ////Step3:CD Account Txn 
-                                //// var transaction = await _integrationService.CreateMasterCDAccount(transactionsDTO, apiContext);
-
-                                ////businessStatus = transaction.Status;
-
-                                //Step5:CD Transaction for the policy
-                                var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
-                                BusinessStatus businessStatus = 0;
-                                businessStatus = transaction.Status;
-
-                                if (businessStatus == BusinessStatus.Created)
-                                {
-                                    //Status for Txn
-                                }
-                                else
-                                {
-
-                                    return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
-
-                                }
+                                //    //New Premium
+                                //    PremiumRequestDTO premiumRequestDTONew = new PremiumRequestDTO();
+                                //    premiumRequestDTONew.SI = json1["si"];
+                                //    premiumRequestDTONew.StateCode = json1["stateCode"];
+                                //    premiumRequestDTONew.NoOfPC = json1["noOfPC"];
+                                //    premiumRequestDTONew.NoOfTW = json1["noOfTW"];
+                                //    premiumRequestDTONew.DriverAge = json1["driverAge"];
+                                //    premiumRequestDTONew.DriverExp = json1["driverExp"];
+                                //    premiumRequestDTONew.AdditionalDriver = json1["additionalDriver"];
+                                //    premiumRequestDTONew.BillingFrequency = json1["billingFrequency"];
+                                //    var CalculatePremiumResponseNew = await PremiumCalCulation(premiumRequestDTONew, apiContext);
 
 
+                                //    PremiumReturnDto CalculatePremiumResponse = new PremiumReturnDto();
+                                //    CalculatePremiumResponse.FireTheft = CalculatePremiumResponseNew.FireTheft - CalculatePremiumResponseOld.FireTheft;
+                                //    CalculatePremiumResponse.ADPremium = CalculatePremiumResponseNew.ADPremium - CalculatePremiumResponseOld.ADPremium;
+                                //    CalculatePremiumResponse.FTTax = CalculatePremiumResponseNew.FTTax - CalculatePremiumResponseOld.FTTax;
+                                //    CalculatePremiumResponse.ADTax = CalculatePremiumResponseNew.ADTax - CalculatePremiumResponseOld.ADTax;
+                                //    CalculatePremiumResponse.TotalADAmount = CalculatePremiumResponseNew.TotalADAmount - CalculatePremiumResponseOld.TotalADAmount;
+                                //    CalculatePremiumResponse.TotalFTAmount = CalculatePremiumResponseNew.TotalFTAmount - CalculatePremiumResponseOld.TotalFTAmount;
+
+                                //    Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
+
+                                //    TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
+                                //    txnParameterDTO.Amount = CalculatePremiumResponse.FireTheft;
+                                //    txnParameterDTO.TaxAmount = CalculatePremiumResponse.FTTax;
+                                //    txnParameterDTO.Total = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.FTTax;
+
+                                //    RatingConfig.Add("FT", txnParameterDTO);
+                                //    txnParameterDTO = new TxnParameterDTO();
+                                //    txnParameterDTO.Amount = CalculatePremiumResponse.ADPremium;
+                                //    txnParameterDTO.TaxAmount = CalculatePremiumResponse.ADTax;
+                                //    txnParameterDTO.Total = CalculatePremiumResponse.ADPremium + CalculatePremiumResponse.ADTax;
+                                //    RatingConfig.Add("AD", txnParameterDTO);
+                                //    transactionsDTO.TotalAmount = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.ADPremium;
+                                //    transactionsDTO.TotalGSTAmount = CalculatePremiumResponse.FTTax + CalculatePremiumResponse.ADTax;
+                                //    transactionsDTO.PremiumDetails = RatingConfig;
+                                //    transactionsDTO.Type = "Endorsement-Addition";
+                                //    //    transactionsDTO.ProductId = Convert.ToDecimal(productId);
+                                //    transactionsDTO.TxnType = "Credit";
+                                //    transactionsDTO.AccountNo = policy.CdaccountNumber;
+                                //    //  transactionsDTO.Frequency = premiumRequestDTO.BillingFrequency;
+
+                                //    var transaction = await _integrationService.CreateMasterCDAccount(transactionsDTO, apiContext);
+
+                                //    businessStatus = transaction.Status;
 
                             }
                             else
                             {
-                                return new EndorsmentDTO { Status = BusinessStatus.NotFound, Id = policy.PolicyNo, ResponseMessage = $"No Record Found for this Policy Number {policy.PolicyNo}" };
+                                ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "No record found for this policy Number" };
 
+                                Errors.Add(errorInfo);
+                                return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
                             }
                         }
                         //Add Driver
 
-                            if (EndorsmentType == "Addition of driver")
-                            {
+                        if (EndorsmentType == "Addition of driver")
+                        {
 
-
-                                var policyNo = (string)insurableItemRequest["PolicyNumber"];
-                                var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
-                                var policyId = tbl_particiant.PolicyId;
-                                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-
-
-
-                            //Step2:Validate of Request Object
-                            List<CDMapper> cDMappers = new List<CDMapper>();
-                            CDMapper cD = new CDMapper();
-                            cD.Type = "Policy";
-                            cD.Data.Add(insurableItem);
-                            cDMappers.Add(cD);
-
-                            cD.Type = "Endorsement";
-                            cD.Data.Add(insurableItem);
-                            cDMappers.Add(cD);
-
-
-                            var res = await _integrationService.RuleMapper(cDMappers, "EndorementAdd", apiContext);
-
-                            var seriaizeListofres = JsonConvert.SerializeObject(res);
-                            List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
-
-
-                            var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
-
-                            if (Listofres != null)
-                            {
-                                foreach (var item in Listofres)
-                                {
-
-                                    if (item.Outcome == "Fail")
-                                    {
-
-                                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
-                                        Errors.Add(errorInfo);
-
-                                    }
-
-                                }
-                                if (Errors.Count > 0)
-                                {
-                                    return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
-                                }
-                            }
-
-                            //step:3 Call CD mapper
-                            var CDmap = await _integrationService.CDMapper(cDMappers, "EndorementAdd", apiContext);
-
-
-                            MicaCD micaCD = new MicaCD();
-                            micaCD.AccountNo = policy.CdaccountNumber;
-                            micaCD.micaCDDTO = CDmap;
-
-
-
-
-
-
-
+                            var policyNo = (string)insurableItemRequest["PolicyNumber"];
+                            var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
+                            var policyId = tbl_particiant.PolicyId;
+                            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+                            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
                             dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                                dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                            dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
-                                foreach (var insurableName in json.InsurableItem)
+                            foreach (var insurableName in json.InsurableItem)
+                            {
+                                foreach (var item in insurableItemRequest.InsurableItem)
                                 {
-                                    foreach (var item in insurableItemRequest.InsurableItem)
+                                    var name1 = insurableName.InsurableName;
+                                    if (name1 == "Driver" && item.InsurableName == "Driver")
                                     {
-                                        var name1 = insurableName.InsurableName;
-                                        if (name1 == "Driver" && item.InsurableName == "Driver")
+                                        foreach (var insurableName1 in json1.InsurableItem)
                                         {
-                                            foreach (var insurableName1 in json1.InsurableItem)
+
+                                            // var name2 = insurableName1.InsurableName;
+
+                                            var count = insurableName.RiskItems.Count;
+
+                                            //var additiondrivercount = json.additionalDriver + 1;
+                                            // var addtionaldriver = Convert.ToInt32(additiondrivercount);
+                                            if (insurableName.InsurableName == "Driver")
                                             {
 
-                                                // var name2 = insurableName1.InsurableName;
-
-                                                var count = insurableName.RiskItems.Count;
-
-                                                //var additiondrivercount = json.additionalDriver + 1;
-                                                // var addtionaldriver = Convert.ToInt32(additiondrivercount);
-                                                if (insurableName.InsurableName == "Driver")
+                                                if (count < 3)
                                                 {
 
-                                                    if (count < 3)
+                                                    if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
                                                     {
-
-                                                        if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
-                                                        {
-                                                            json1.si = insurableItemRequest.SI.ToString();
-                                                        }
-                                                        foreach (var fields in item.RiskItems)
-                                                        {
-                                                            try
-                                                            {
-                                                                //Note validation has to come vechile addition count can not be greater then 3
-
-                                                                if (insurableName1.InsurableName == "Driver" && insurableName.InsurableName == "Driver")
-                                                                {
-                                                                    insurableName1.RiskItems.Add(fields);
-                                                                    //insurableName1.RiskItems = insurableName.RiskItems;
-                                                                    insurableName1.RiskCount = insurableName1.RiskItems.Count;
-
-                                                                }
-                                                            }
-                                                            catch (Exception e)
-                                                            {
-                                                            }
-
-                                                        }
+                                                        json1.si = insurableItemRequest.SI.ToString();
                                                     }
-                                                    else
+                                                    foreach (var fields in item.RiskItems)
                                                     {
-                                                        var data = await ModifyInsurabableItem(insurableItemRequest, apiContext);
-                                                        if (data != null)
+                                                        try
                                                         {
-                                                            return new EndorsmentDTO() { ResponseMessage = "Driver updated successful" }; ;
-                                                        }
-                                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Driver can not be added" };
-                                                        Errors.Add(errorInfo);
-                                                        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of Driver can not be changed." };
-                                                    }
+                                                            //Note validation has to come vechile addition count can not be greater then 3
 
+                                                            if (insurableName1.InsurableName == "Driver" && insurableName.InsurableName == "Driver")
+                                                            {
+                                                                insurableName1.RiskItems.Add(fields);
+                                                                //insurableName1.RiskItems = insurableName.RiskItems;
+                                                                insurableName1.RiskCount = insurableName1.RiskItems.Count;
+
+                                                            }
+                                                        }
+                                                        catch (Exception e)
+                                                        {
+                                                        }
+
+                                                    }
                                                 }
+                                                else
+                                                {
+                                                    var data = await ModifyInsurabableItem(insurableItemRequest, apiContext);
+                                                    if (data != null)
+                                                    {
+                                                        return new EndorsmentDTO() { Status = BusinessStatus.Updated, ResponseMessage = "Driver updated successful" }; ;
+                                                    }
+                                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Driver can not be added" };
+                                                    Errors.Add(errorInfo);
+                                                    return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of Driver can not be changed." };
+                                                }
+
                                             }
-
                                         }
+
                                     }
-
                                 }
-                                tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                                _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                                _context.SaveChanges();
-
-
-                            //Step5:CD Transaction for the policy
-                            var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
-                            BusinessStatus businessStatus = 0;
-                            businessStatus = transaction.Status;
-
-                            if (businessStatus == BusinessStatus.Created)
-                            {
-                                //Status for Txn
-                                
-                            }
-                            else
-                            {
-
-                                return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
 
                             }
+                            tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+                            _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+
+                            //endorsement details saveing 
 
 
+                            EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
+                            endorsementDetailsDTO.Action = EndorsmentType;
+                            endorsementDetailsDTO.EndorsementNo = EndorsementNo;
+                            endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                            endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
+                            TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
+                            _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+
+                            _context.SaveChanges();
+                            return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = "Driver Added Successfully" };
 
                         }
 
 
-                        }
-
-
-                        _context.SaveChanges();
-                        return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo };
-
                     }
-                    else
-                    {
 
-                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"No Record Found for this PolicyNumber{PolicyNo}" };
-                        Errors.Add(errorInfo);
-                        return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
 
-                    }
+                    _context.SaveChanges();
+                    return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = "" };
+
                 }
-            
+                else
+                {
+
+                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"No Record Found for this PolicyNumber{PolicyNo}" };
+                    Errors.Add(errorInfo);
+                    return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
+
+                }
+            }
+
             catch (Exception ex)
             {
                 ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = ex.InnerException.ToString() };
@@ -3112,16 +3605,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
 
         }
-    
-
-
 
         public async Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
         {
 
+            //_context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
+            string endoresementtype = insurableItemRequest["EndorsementType"];
             if (PolicyNo == "")
             {
                 ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PolicyNumber can not be empty" };
@@ -3229,10 +3722,27 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                     }
                     tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                    _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                    await _context.SaveChangesAsync();
-                    return new EndorsmentDTO() { Status = BusinessStatus.Ok, ResponseMessage = "Deleted Successfully" };
+                    var x1 = _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
 
+                    EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
+                    endorsementDetailsDTO.Action = endoresementtype;
+                    endorsementDetailsDTO.EndorsementNo = EndorsementNo;
+                    endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                    endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
+                    TblEndorsementDetails tblEndorsement_mapper1 = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
+                    _context.TblEndorsementDetails.Add(tblEndorsement_mapper1);
+
+
+
+                    var x2 = await _context.SaveChangesAsync();
+                    if (x2 > 0)
+                    {
+                        return new EndorsmentDTO() { Status = BusinessStatus.Ok, ResponseMessage = "Deleted Successfully" };
+                    }
+                    else
+                    {
+                        return new EndorsmentDTO() { Status = BusinessStatus.Error, ResponseMessage = "Somthing went wrong while deleting" };
+                    }
                 }
 
 
@@ -3247,20 +3757,18 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
 
             }
-            EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
-            tblEndorsementDetails.EnddorsementRequest = insurableItemRequest.ToString();
+            //EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
+            //tblEndorsementDetails.EnddorsementRequest = insurableItemRequest.ToString();
 
-            TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
+            //TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
 
-            _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
-            _context.SaveChanges();
+            //_context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+            //_context.SaveChanges();
 
             return new EndorsmentDTO();
 
 
         }
-
-
         public async Task<EndorsmentDTO> SwitchOnOff(dynamic switchOnOffRequest, ApiContext apiContext)
         {
             return new EndorsmentDTO();
@@ -3591,10 +4099,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         foreach (var item in Listofres)
                         {
 
-                            if (item.Outcome == "Fail")
+                            if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
                             {
 
-                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message,PropertyName=item.ValidatorName };
                                 Errors.Add(errorInfo);
 
                             }
@@ -4002,12 +4510,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 List<ErrorInfo> Errors = new List<ErrorInfo>();
                 var res = await _integrationService.RuleMapper(IssuepolicyDTO, "Policy", apiContext);
 
-                var seriaizeListofres = JsonConvert.SerializeObject(res);
-                List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
+               // var seriaizeListofres = JsonConvert.SerializeObject(res);
+               // List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
                 //if (Listofres.Count() > 0)
                 //{
 
-                var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+               // var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
 
                
 
@@ -4388,14 +4896,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         //Add insurable item and updating json of Polic Request 
                         var data = await AddInsurableItem(endoresementDto, apiContext);
 
-                        //Updating json of policyRequest
+                    //Updating json of policyRequest
 
-                        proposalResponse.Status = data.Status;
-                        proposalResponse.Errors.AddRange(data.Errors);
-                        proposalResponse.ResponseMessage = data.ResponseMessage;
-                        proposalResponse.Id = data.Id;
-                        return proposalResponse;
-                    }
+                    proposalResponse.Status = data.Status;
+                    proposalResponse.Errors.AddRange(data.Errors);
+                    proposalResponse.ResponseMessage = data.ResponseMessage;
+                    proposalResponse.Id = data.Id;
+                    //return proposalResponse;
+                    return new ProposalResponse { Status = BusinessStatus.Updated, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
+              
+                }
 
 
                     if (endorsementType == "Addition of driver")
@@ -4403,16 +4913,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         //Add insurable item and updating json of Polic Request 
                         var data = await AddInsurableItem(endoresementDto, apiContext);
 
-                        //Updating json of policyRequest
+                    //Updating json of policyRequest
 
+                    proposalResponse.Status = data.Status;
+                    proposalResponse.Errors.AddRange(data.Errors);
+                    proposalResponse.ResponseMessage = data.ResponseMessage;
+                    proposalResponse.Id = data.Id;
+                    //return proposalResponse;
+                    return new ProposalResponse { Status = BusinessStatus.Updated, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
 
-                        proposalResponse.Status = data.Status;
-                        proposalResponse.Errors.AddRange(data.Errors);
-                        proposalResponse.ResponseMessage = data.ResponseMessage;
-                        proposalResponse.Id = data.Id;
-                        return proposalResponse;
-                    }
-                
+                }
+
                 //For that row isActive will be false
 
                 //Note tested but ruturn type have to handle the return type
