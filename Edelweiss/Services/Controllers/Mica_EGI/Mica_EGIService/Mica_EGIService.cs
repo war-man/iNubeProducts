@@ -875,7 +875,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             ErrorInfo errorInfo = new ErrorInfo();
 
                             response.ResponseMessage = "The Switch is Already On";
-                            response.Status = BusinessStatus.PreConditionFailed;
+                            response.Status = BusinessStatus.Ok;
                             errorInfo.ErrorMessage = "The Vehicle Number: " + VehicleRegistrationNo + " is already ON";
                             errorInfo.ErrorCode = "ExtSWT004";
                             errorInfo.PropertyName = "Already SwitchON";
@@ -912,7 +912,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             ErrorInfo errorInfo = new ErrorInfo();
 
                             response.ResponseMessage = "The Switch is Already AUTO ON";
-                            response.Status = BusinessStatus.PreConditionFailed;
+                            response.Status = BusinessStatus.Ok;
                             errorInfo.ErrorMessage = "The Vehicle Number:  " + VehicleRegistrationNo + "  is already Auto ON Due to Schedule";
                             errorInfo.ErrorCode = "ExtSWT010";
                             errorInfo.PropertyName = "AUTOSwitchON";
@@ -986,7 +986,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             ErrorInfo errorInfo = new ErrorInfo();
 
                             response.ResponseMessage = "The Switch is Already On";
-                            response.Status = BusinessStatus.PreConditionFailed;
+                            response.Status = BusinessStatus.Ok;
                             errorInfo.ErrorMessage = "The Vehicle Number: " + VehicleRegistrationNo + " is already ON";
                             errorInfo.ErrorCode = "ExtSWT004";
                             errorInfo.PropertyName = "Already SwitchON";
@@ -1402,7 +1402,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             ErrorInfo errorInfo = new ErrorInfo();
 
                             response.ResponseMessage = "Manual Switch is On Already";
-                            response.Status = BusinessStatus.InputValidationFailed;
+                            response.Status = BusinessStatus.Ok;
                             errorInfo.ErrorMessage = "Vehicle Number: " + VehicleRegistrationNo + " is already On for the Day cannot be turned OFF";
                             errorInfo.ErrorCode = "ExtSWT005";
                             errorInfo.PropertyName = "ManualOFF";
@@ -1474,7 +1474,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             ErrorInfo errorInfo = new ErrorInfo();
 
                             response.ResponseMessage = "The Switch is Already On";
-                            response.Status = BusinessStatus.PreConditionFailed;
+                            response.Status = BusinessStatus.Ok;
                             errorInfo.ErrorMessage = "The Vehicle Number: " + VehicleRegistrationNo + " is already OFF";
                             errorInfo.ErrorCode = "ExtSWT006";
                             errorInfo.PropertyName = "Already SwitchOFF";
@@ -1494,7 +1494,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     ErrorInfo errorInfo = new ErrorInfo();
 
                     response.ResponseMessage = "The Switch Cannot be Off for the Day as Premium is Charged";
-                    response.Status = BusinessStatus.PreConditionFailed;
+                    response.Status = BusinessStatus.Ok;
                     errorInfo.ErrorMessage = "The Vehicle Number: " + VehicleRegistrationNo + " Cannot be Switched OFF Now";
                     errorInfo.ErrorCode = "ExtSWT007";
                     errorInfo.PropertyName = "NoSwitchOff";
