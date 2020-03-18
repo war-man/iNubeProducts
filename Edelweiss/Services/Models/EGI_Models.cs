@@ -461,5 +461,17 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public List<MicaCDDTO> micaCDDTO { get; set; }
     }
 
+    public partial class EndoPremiumReturnDto : ResponseStatus
+    {
+        public decimal PerDayPremium { get; set; }
+        public decimal FireTheft { get; set; }
+        public decimal ADPremium { get; set; }
+        public decimal GST { get; set; }
+        public decimal Total { get; set; }
+        public decimal MonthlyPremium { get; set; }
+        public decimal FinalAmount { get; set; }
+        public decimal FtPerDay { get; set; }
+        public decimal AdPerDay { get; set; }
+    }
 }
 

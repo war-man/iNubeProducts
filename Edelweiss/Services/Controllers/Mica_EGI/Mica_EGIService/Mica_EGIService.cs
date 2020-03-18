@@ -26,10 +26,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> PremiumBookingScheduler(DateTime? dateTime);
         Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff);
         ActivityResponse ActivityReport(string PolicyNo, string Month);
-
-        Task<PremiumReturnDto> EndorsementPremium(EndorsementPremiumDTO endorsementPremium);
-
-        Task<dynamic> NewEndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string CallType);
+                
+        Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string CallType);
 
         AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
         List<ddDTO> GetVehicleMaster(string lMasterlist);
@@ -2099,368 +2097,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
         }
-
-        public async Task<PremiumReturnDto> EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
-        {
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
-            PremiumReturnDto DifferentialPremium = new PremiumReturnDto();
-
-            if (String.IsNullOrEmpty(endorsementPremium.PolicyNo) && String.IsNullOrEmpty(endorsementPremium.SI))
-            {
-                ErrorInfo errorInfo = new ErrorInfo();
-
-                DifferentialPremium.ResponseMessage = "Mandatory Fields missing";
-                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Policy Number or SumInsured is Missing";
-                errorInfo.ErrorCode = "GEN002";
-                errorInfo.PropertyName = "MandatoryFieldsMissing";
-                DifferentialPremium.Errors.Add(errorInfo);
-                return DifferentialPremium;
-
-            }
-            else if (endorsementPremium.PcCount < 0)
-            {
-                ErrorInfo errorInfo = new ErrorInfo();
-
-                DifferentialPremium.ResponseMessage = "Private Car Count Cannot be negative";
-                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "PC Count Cannot be negative";
-                errorInfo.ErrorCode = "ExtEP001";
-                errorInfo.PropertyName = "PCCountVerify";
-                DifferentialPremium.Errors.Add(errorInfo);
-                return DifferentialPremium;
-
-            }
-            else if (endorsementPremium.TwCount < 0)
-            {
-                ErrorInfo errorInfo = new ErrorInfo();
-
-                DifferentialPremium.ResponseMessage = "Two Wheeler Count Cannot be negative";
-                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Two Wheeler Count Cannot be negative";
-                errorInfo.ErrorCode = "ExtEP004";
-                errorInfo.PropertyName = "TWCountVerify";
-                DifferentialPremium.Errors.Add(errorInfo);
-                return DifferentialPremium;
-
-            }
-
-
-            if (endorsementPremium.TypeOfEndorsement == "Addition")
-            {
-                //Get the Policy Details by PolicyNumber
-                //In response from Policy
-                var PolicyData = await _integrationService.GetPolicyDetails(endorsementPremium.PolicyNo, apiContext);
-
-                PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
-
-                if (PolicyData != null)
-                {
-
-                    detailsDTO.SumInsured = PolicyData["si"];
-                    detailsDTO.NoOfPC = PolicyData["noOfPC"];
-                    detailsDTO.NoOfTW = PolicyData["noOfTW"];
-                    detailsDTO.PD_Age = PolicyData["driverAge"];
-                    detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
-                    detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
-                    detailsDTO.StateCode = PolicyData["stateCode"];
-                }
-
-
-                TaxTypeDTO taxType = new TaxTypeDTO();
-                taxType = TaxTypeForStateCode(detailsDTO.StateCode);
-
-
-
-                //CalculatePremiumObject as of Endorsement
-                SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
-
-                //RuleObject
-                premiumDTO.dictionary_rule.SI = endorsementPremium.SI;
-                premiumDTO.dictionary_rule.NOOFPC = (detailsDTO.NoOfPC + endorsementPremium.PcCount).ToString();
-                premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW + endorsementPremium.TwCount).ToString();
-
-
-                int TotalPCCount = detailsDTO.NoOfPC + endorsementPremium.PcCount;
-                int TotalTWCount = detailsDTO.NoOfTW + endorsementPremium.TwCount;
-
-                if (TotalPCCount > 4 || TotalPCCount == 0)
-                {
-                    ErrorInfo errorInfo = new ErrorInfo();
-
-                    DifferentialPremium.ResponseMessage = "Private Car Count Cannot be Zero or Greater than 3";
-                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "Private Car Count Cannot be Zero or Greater than 3";
-                    errorInfo.ErrorCode = "ExtEP005";
-                    errorInfo.PropertyName = "PCCountVerify";
-                    DifferentialPremium.Errors.Add(errorInfo);
-                    return DifferentialPremium;
-
-                }
-                else if (TotalTWCount > 4)
-                {
-                    ErrorInfo errorInfo = new ErrorInfo();
-
-                    DifferentialPremium.ResponseMessage = "Two Wheeler Count Cannot be Greater than 3";
-                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "Two Wheeler Count Cannot be Greater than 3";
-                    errorInfo.ErrorCode = "ExtEP006";
-                    errorInfo.PropertyName = "TWCountVerify";
-                    DifferentialPremium.Errors.Add(errorInfo);
-                    return DifferentialPremium;
-
-                }
-
-
-                //RateObject
-
-                premiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
-                premiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
-                premiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
-                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = TotalPCCount.ToString();
-                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = TotalPCCount.ToString();
-                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = TotalTWCount.ToString();
-
-
-                premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
-                premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
-
-
-
-
-
-                //Call CalculatePremium for with Endorsment Data MICA
-                var NewPremiumData = await InternalCalculatePremium(premiumDTO);
-
-
-                if (NewPremiumData == null)
-                {
-                    ErrorInfo errorInfo = new ErrorInfo();
-
-                    DifferentialPremium.ResponseMessage = "Calculate Premium Failed";
-                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "Calculate Premium Failed";
-                    errorInfo.ErrorCode = "ExtEP003";
-                    errorInfo.PropertyName = "PremiumFailed";
-                    DifferentialPremium.Errors.Add(errorInfo);
-                    return DifferentialPremium;
-
-                }
-
-
-
-                //CalculatePremiumObject for Getting Old Premium Rate
-                SchedulerPremiumDTO oldPremiumDTO = new SchedulerPremiumDTO();
-
-                //RuleObject
-                oldPremiumDTO.dictionary_rule.SI = detailsDTO.SumInsured.ToString();
-                oldPremiumDTO.dictionary_rule.NOOFPC = detailsDTO.NoOfPC.ToString();
-                oldPremiumDTO.dictionary_rule.NOOFTW = detailsDTO.NoOfTW.ToString();
-
-
-                //RateObject
-                oldPremiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
-                oldPremiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
-                oldPremiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
-                oldPremiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = detailsDTO.NoOfPC.ToString();
-                oldPremiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = detailsDTO.NoOfPC.ToString();
-                oldPremiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = detailsDTO.NoOfTW.ToString();
-
-
-                oldPremiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
-                oldPremiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
-
-
-                //Call CalculatePremium for with Endorsment Data MICA
-                var OldPremiumData = await InternalCalculatePremium(oldPremiumDTO);
-
-
-
-                if (NewPremiumData.Total > 0 && OldPremiumData.Total > 0)
-                {
-                    DifferentialPremium.PerDayPremium = NewPremiumData.PerDayPremium - OldPremiumData.PerDayPremium;
-                    DifferentialPremium.FireTheft = NewPremiumData.FireTheft - OldPremiumData.FireTheft;
-                    DifferentialPremium.ADPremium = NewPremiumData.ADPremium - OldPremiumData.ADPremium;
-                    DifferentialPremium.GST = NewPremiumData.GST - OldPremiumData.GST;
-                    DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium - OldPremiumData.MonthlyPremium;
-                    DifferentialPremium.Total = NewPremiumData.Total - OldPremiumData.Total;
-                    DifferentialPremium.FinalAmount = NewPremiumData.FinalAmount - OldPremiumData.FinalAmount;
-
-
-                    DifferentialPremium.Status = BusinessStatus.Ok;
-                    return DifferentialPremium;
-                }
-            }
-            if (endorsementPremium.TypeOfEndorsement == "Deletion")
-            {
-
-                //Get the Policy Details by PolicyNumber
-                //In response from Policy
-                var PolicyData = await _integrationService.GetPolicyDetails(endorsementPremium.PolicyNo, apiContext);
-
-                PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
-
-                if (PolicyData != null)
-                {
-
-                    detailsDTO.SumInsured = PolicyData["si"];
-                    detailsDTO.NoOfPC = PolicyData["noOfPC"];
-                    detailsDTO.NoOfTW = PolicyData["noOfTW"];
-                    detailsDTO.PD_Age = PolicyData["driverAge"];
-                    detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
-                    detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
-                    detailsDTO.StateCode = PolicyData["stateCode"];
-                }
-
-
-                TaxTypeDTO taxType = new TaxTypeDTO();
-                taxType = TaxTypeForStateCode(detailsDTO.StateCode);
-
-
-
-                //CalculatePremiumObject as of Endorsement
-                SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
-
-
-
-
-                //RuleObject
-                premiumDTO.dictionary_rule.SI = endorsementPremium.SI;
-                premiumDTO.dictionary_rule.NOOFPC = (detailsDTO.NoOfPC - endorsementPremium.PcCount).ToString();
-                premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW - endorsementPremium.TwCount).ToString();
-
-
-
-
-                int TotalPCCount = detailsDTO.NoOfPC - endorsementPremium.PcCount;
-                int TotalTWCount = detailsDTO.NoOfTW - endorsementPremium.TwCount;
-
-                if (TotalPCCount > 4 || TotalPCCount == 0)
-                {
-                    ErrorInfo errorInfo = new ErrorInfo();
-
-                    DifferentialPremium.ResponseMessage = "Private Car Count Cannot be Zero or Greater than 3";
-                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "Private Car Count Cannot be Zero or Greater than 3";
-                    errorInfo.ErrorCode = "ExtEP005";
-                    errorInfo.PropertyName = "PCCountVerify";
-                    DifferentialPremium.Errors.Add(errorInfo);
-                    return DifferentialPremium;
-
-                }
-                else if (TotalTWCount > 4 || TotalTWCount < 0)
-                {
-                    ErrorInfo errorInfo = new ErrorInfo();
-
-                    DifferentialPremium.ResponseMessage = "Two Wheeler Count Cannot  Negative or be Greater than 3";
-                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "Two Wheeler Count Cannot be Negative or Greater than 3";
-                    errorInfo.ErrorCode = "ExtEP006";
-                    errorInfo.PropertyName = "TWCountVerify";
-                    DifferentialPremium.Errors.Add(errorInfo);
-                    return DifferentialPremium;
-
-                }
-
-                //RateObject
-
-                premiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
-                premiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
-                premiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
-                premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = TotalPCCount.ToString();
-                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = TotalPCCount.ToString();
-                premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = TotalTWCount.ToString();
-
-
-                premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
-                premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
-
-                //Call CalculatePremium for with Endorsment Data MICA
-                var NewPremiumData = await InternalCalculatePremium(premiumDTO);
-
-
-                if (NewPremiumData == null)
-                {
-                    ErrorInfo errorInfo = new ErrorInfo();
-
-                    DifferentialPremium.ResponseMessage = "Calculate Premium Failed";
-                    DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "Calculate Premium Failed";
-                    errorInfo.ErrorCode = "ExtEP003";
-                    errorInfo.PropertyName = "PremiumFailed";
-                    DifferentialPremium.Errors.Add(errorInfo);
-                    return DifferentialPremium;
-
-                }
-
-
-
-                //CalculatePremiumObject for Getting Old Premium Rate
-                SchedulerPremiumDTO oldPremiumDTO = new SchedulerPremiumDTO();
-
-                //RuleObject
-                oldPremiumDTO.dictionary_rule.SI = detailsDTO.SumInsured.ToString();
-                oldPremiumDTO.dictionary_rule.NOOFPC = detailsDTO.NoOfPC.ToString();
-                oldPremiumDTO.dictionary_rule.NOOFTW = detailsDTO.NoOfTW.ToString();
-
-
-                //RateObject
-                oldPremiumDTO.dictionary_rate.DEXPRT_Exp = detailsDTO.PD_DriveExperince.ToString();
-                oldPremiumDTO.dictionary_rate.PDAGERT_PAge = detailsDTO.PD_Age.ToString();
-                oldPremiumDTO.dictionary_rate.ADDRVRT_DRV = detailsDTO.AdditionalDriver.ToString();
-                oldPremiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = detailsDTO.NoOfPC.ToString();
-                oldPremiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = detailsDTO.NoOfPC.ToString();
-                oldPremiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = detailsDTO.NoOfTW.ToString();
-
-
-                oldPremiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
-                oldPremiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
-
-
-                //Call CalculatePremium for with Endorsment Data MICA
-                var OldPremiumData = await InternalCalculatePremium(oldPremiumDTO);
-
-
-
-                if (NewPremiumData.Total > 0 && OldPremiumData.Total > 0)
-                {
-                    DifferentialPremium.PerDayPremium = NewPremiumData.PerDayPremium - OldPremiumData.PerDayPremium;
-                    DifferentialPremium.FireTheft = NewPremiumData.FireTheft - OldPremiumData.FireTheft;
-                    DifferentialPremium.ADPremium = NewPremiumData.ADPremium - OldPremiumData.ADPremium;
-                    DifferentialPremium.GST = NewPremiumData.GST - OldPremiumData.GST;
-                    DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium - OldPremiumData.MonthlyPremium;
-                    DifferentialPremium.Total = NewPremiumData.Total - OldPremiumData.Total;
-                    DifferentialPremium.FinalAmount = NewPremiumData.FinalAmount - OldPremiumData.FinalAmount;
-
-
-                    DifferentialPremium.Status = BusinessStatus.Ok;
-                    return DifferentialPremium;
-                }
-            }
-            else
-            {
-                ErrorInfo errorInfo = new ErrorInfo();
-
-                DifferentialPremium.ResponseMessage = "Type of Endorsement Cannot be Different";
-                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Either Addition or Deletion";
-                errorInfo.ErrorCode = "ExtEP002";
-                errorInfo.PropertyName = "TypeOfEndorsement";
-                DifferentialPremium.Errors.Add(errorInfo);
-                return DifferentialPremium;
-            }
-
-            return DifferentialPremium;
-
-        }
-
-
+        
         private async Task<PremiumReturnDto> InternalCalculatePremium(SchedulerPremiumDTO premiumDTO)
         {
             ApiContext apiContext = new ApiContext();
@@ -2682,7 +2319,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             //List<EndoAddDTO> Deserilize = JsonConvert.DeserializeObject<List<EndoAddDTO>>(SourceObject.ToSting());
 
-            if (TxnType == "EndorementAdd")
+            if (TxnType == "EndorsementAdd")
             {   
                 //Ashish Sir
                 //var modelSerialize = JsonConvert.DeserializeObject<dynamic>(SourceObject);
@@ -2736,7 +2373,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 endorsementDto.TypeOfEndorsement = "Addition";
                 endorsementDto.EndorsementEffectiveDate = IndianTime;
 
-                var CallNewEndo = await NewEndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
+                var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
 
 
                 try
@@ -2758,7 +2395,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 return FinalDto;
 
             }
-            else if (TxnType == "EndorementDel")
+            else if (TxnType == "EndorsementDel")
             {
                 //Ashish Sir
                 var EndorsmentItem = SourceObject[1];
@@ -2798,7 +2435,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 endorsementDto.TypeOfEndorsement = "Deletion";
                 endorsementDto.EndorsementEffectiveDate = IndianTime;
 
-                var CallNewEndo = await NewEndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
+                var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
 
 
                 try
@@ -3472,7 +3109,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<dynamic> NewEndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string callType)
+        public async Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string callType)
         {
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
@@ -3565,7 +3202,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         BillingFrequency = PolicyData["billingFrequency"];
                         PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
                         PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
-                        RemainingDays = (PolicyEndDate - CurrentDate).TotalDays;
+
+                        //Adding 1 because it should give in between days.
+                        RemainingDays = (PolicyEndDate - CurrentDate).TotalDays + 1;
 
                     }
                     catch (Exception Ex)
@@ -3719,8 +3358,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (NewPremiumData.Total > 0 && OldPremiumData.Total > 0)
                 {
 
-                    var DifferentialFireTheft = NewPremiumData.FireTheft - OldPremiumData.FireTheft;
-                    var DifferentialADPremium = NewPremiumData.ADPremium - OldPremiumData.ADPremium;
+                    var DifferentialFireTheft = NewPremiumData.FtPerDay - OldPremiumData.FtPerDay;
+                    var DifferentialADPremium = NewPremiumData.AdPerDay - OldPremiumData.AdPerDay;
 
                     EndoRuleDTO endoRule = new EndoRuleDTO
                     {
@@ -3749,7 +3388,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             DifferentialPremium.FireTheft = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue);
                             DifferentialPremium.ADPremium = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
 
-                            var GSTTotal = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "TSTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FSTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
+                            var GSTTotal = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
 
                             DifferentialPremium.GST = GSTTotal;
 
@@ -3968,8 +3607,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (NewPremiumData.Total > 0 && OldPremiumData.Total > 0)
                 {
-                    var DifferentialFireTheft = NewPremiumData.FireTheft - OldPremiumData.FireTheft;
-                    var DifferentialADPremium = NewPremiumData.ADPremium - OldPremiumData.ADPremium;
+                    var DifferentialFireTheft = NewPremiumData.FtPerDay - OldPremiumData.FtPerDay;
+                    var DifferentialADPremium = NewPremiumData.AdPerDay - OldPremiumData.AdPerDay;
 
                     EndoRuleDTO endoRule = new EndoRuleDTO
                     {
@@ -3994,15 +3633,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         if (CallEndorsmentCalculator.Count > 0)
                         {
-                            DifferentialPremium.PerDayPremium = NewPremiumData.PerDayPremium - OldPremiumData.PerDayPremium;
+                            DifferentialPremium.PerDayPremium = NewPremiumData.PerDayPremium;
                             DifferentialPremium.FireTheft = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue);
                             DifferentialPremium.ADPremium = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
 
-                            var GSTTotal = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "TSTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FSTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
+                            var GSTTotal = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
 
                             DifferentialPremium.GST = GSTTotal;
 
-                            DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium - OldPremiumData.MonthlyPremium;
+                            DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium;
                             DifferentialPremium.Total = DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + GSTTotal;
                             DifferentialPremium.FinalAmount = Math.Round(DifferentialPremium.Total);
 
@@ -4031,7 +3670,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        private async Task<PremiumReturnDto> NewInternalCalculatePremium(SchedulerPremiumDTO premiumDTO, string BillingFrequency)
+        private async Task<EndoPremiumReturnDto> NewInternalCalculatePremium(SchedulerPremiumDTO premiumDTO, string BillingFrequency)
         {
             ApiContext apiContext = new ApiContext();
             apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
@@ -4041,7 +3680,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
 
 
-            PremiumReturnDto returnobj = new PremiumReturnDto();
+            EndoPremiumReturnDto returnobj = new EndoPremiumReturnDto();
 
             //Call CalculatePremium Policy Module MICA
             var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, apiContext);
@@ -4061,8 +3700,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var Ftperday = 0.00;
                 var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
-                var theft = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
-                Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(theft);
+                var AD = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
+                Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(AD);
 
                 var Ft30days = Ftperday * 30;
                 var Ft60days = Ftperday * 60;
@@ -4084,8 +3723,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftttax;
                 var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftttax;
 
+
+                returnobj.FtPerDay = Convert.ToDecimal(fire);
+                returnobj.AdPerDay = Convert.ToDecimal(AD);
                 returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
                 returnobj.FireTheft = Convert.ToDecimal(Ft365days);
+
                 if (BillingFrequency == "Monthly")
                 {
                     returnobj.ADPremium = Convert.ToDecimal(Ad60days);
@@ -4102,15 +3745,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 returnobj.FinalAmount = Math.Round(returnobj.Total);
                 returnobj.Status = BusinessStatus.Ok;
                 return returnobj;
-
-                //returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
-                //returnobj.FireTheft = Convert.ToDecimal(Ft365days);
-                //returnobj.ADPremium = Convert.ToDecimal(Ad60days);
-                //returnobj.GST = Convert.ToDecimal(monthlyGST);
-                //returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
-                //returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
-                //returnobj.FinalAmount = Math.Round(returnobj.FireTheft + returnobj.ADPremium + returnobj.GST);
-
+                              
             }
 
             return returnobj;
