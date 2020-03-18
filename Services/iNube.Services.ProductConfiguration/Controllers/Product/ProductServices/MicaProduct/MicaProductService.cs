@@ -919,7 +919,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 var Id=_context.TblmasPccommonTypes.SingleOrDefault(s=>s.Value==FieldType).CommonTypeId;
                 var rcbDetails = (from rc in _context.TblProductRcbdetails
                                   join p in _context.TblmasProductMaster on rc.InputId equals p.ProductMasterId
-                                  where rc.ProductId == ProductId && rc.InputType == type && (bool)rc.IsReqired && p.TypeCode == Id.ToString()
+                                  where rc.ProductId == ProductId && rc.InputType == type && p.TypeCode == Id.ToString()
                                   orderby p.SortOrder //&& rc.IsReqired
                                   select new ProductRcbdetailsDTO
                                   {
@@ -932,6 +932,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                       LevelId = rc.LevelId,
                                       SubLevelId = rc.SubLevelId,
                                       mIsRequired = rc.IsReqired,
+                                      disable = rc.IsReqired,
                                       UserInputType = p.UserInputType
                                   }).ToList();
                 return rcbDetails;

@@ -964,8 +964,8 @@ class ClaimProcess extends React.Component {
                 this.state.policyDetailsData.email = data[3][1];
                 //this.state.policyDetailsData.eventdate = new Date(data[3][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
                 //this.state.policyDetailsData.coverEvent = data[4][1];
-                this.state.policyDetailsData.sDate = new Date(data[4][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                this.state.policyDetailsData.eDate = new Date(data[5][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                this.state.policyDetailsData.sDate = new Date(data[6][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                this.state.policyDetailsData.eDate = new Date(data[7][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
 
                 console.log("abcdddddd", this.state.policyDetailsData);
@@ -1263,18 +1263,59 @@ class ClaimProcess extends React.Component {
         } else {
             const index = this.state.ProductClaimData.findIndex(item => item.inputType === name);
             if (index != -1) {
+            
+
                 let data = [...this.state.ProductClaimData];
                 data[index].mIsRequired = event.target.checked;
+             
+                let searchname = "";
+                if (name == "Workshop") {
+                    searchname = "Customer";
+                    this.state.displaybank = true;
+                    this.setState({});
+
+                } else {
+                    searchname = "Workshop";
+                    this.state.displaybank = true;
+                    this.setState({});
+                }
+             
+            
+                const key = this.state.ProductClaimData.findIndex(item => item.inputType === searchname);
+                if (key != -1) {
+                    data[key].disable = true;
+
+                    if (event.target.checked == false) {
+                        data[key].disable = false;
+                        this.state.displaybank = false;
+                        this.setState({});
+                    }
+                }
                 this.setState({ data });
             }
+           
+            
 
-            if (event.target.checked === true) {
-                this.state.displaybank = true;
-                this.setState({});
-            }
-            else {
-                this.setState({ displaybank: false });
-            }
+
+            //if (event.target.checked === true) {
+            //    this.state.displaybank = true;
+            //    this.setState({});
+            //}
+            //else {
+            //   this.state.displaybank = false;
+            //    this.setState({});
+            //}
+
+            //debugger;
+            //var eventname = document.getElementsByName(event.target.name); 
+            //console.log("event.target.name", eventname);
+            //for (var i = 0; i < eventname.length; i++) {
+            //    if (!eventname[i].mIsRequired==true) {
+            //        eventname[i].disable = true;
+            //    } else {
+            //        eventname[i].disable = false;
+            //    }
+            //} 
 
             console.log("values: ", this.state.ProductClaimData);
         }
