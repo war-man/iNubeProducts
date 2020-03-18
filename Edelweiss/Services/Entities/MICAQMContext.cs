@@ -192,7 +192,7 @@ namespace MicaExtension_EGI.Entities
 
                 entity.Property(e => e.ToTax).HasColumnType("numeric(18, 2)");
 
-                entity.Property(e => e.TxnAmount).HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.TxnAmount).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.TxnDateTime).HasColumnType("datetime");
             });
