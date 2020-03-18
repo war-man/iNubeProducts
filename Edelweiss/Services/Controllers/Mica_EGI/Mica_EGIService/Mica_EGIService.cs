@@ -1175,7 +1175,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         {
                             //bookingLog = new TblPremiumBookingLog();
                             //bookingLog.PolicyNo = PolicyNo;
-                                                       
+
                             bookingLog.TxnAmount = FinalPremium;
                             bookingLog.BasePremium = NewBasePremium;
                             bookingLog.FromTax = NewFromTax;
@@ -2330,7 +2330,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //Ashish Sir
                 //var modelSerialize = JsonConvert.DeserializeObject<dynamic>(SourceObject);
                 // var DriverRiskItem = PolicyItem["Data"]["InsurableItem"][0]["RiskItems"];
-                
+
                 var EndorsmentItem = SourceObject[1];
                 var VehicleRiskItem = EndorsmentItem["Data"]["InsurableItem"][0]["RiskItems"];
 
@@ -2366,7 +2366,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 SumInsured = PolicyData["si"];
                 PolicyNumber = EndorsmentItem["Data"]["PolicyNumber"];
                 BillingFrequency = PolicyData["billingFrequency"].ToString();
-              
+
                 EndorsementPremiumDTO endorsementDto = new EndorsementPremiumDTO();
 
                 endorsementDto.PolicyNo = PolicyNumber;
@@ -2379,7 +2379,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
 
                 DeserilizedPremiumData = CallNewEndo;
-               
+
                 if (DeserilizedPremiumData.Count > 0)
                 {
                     var CallEndoMap = EndoADFT(DeserilizedPremiumData, "Addition");
@@ -2430,9 +2430,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 endorsementDto.EndorsementEffectiveDate = IndianTime;
 
                 var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
-                
+
                 DeserilizedPremiumData = CallNewEndo;
-                
+
                 if (DeserilizedPremiumData.Count > 0)
                 {
                     var CallEndoMap = EndoADFT(DeserilizedPremiumData, "Deletion");
@@ -2467,7 +2467,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             premiumDTO.dictionary_rate.DEXPRT_Exp = SourceObject["driverExp"];
             premiumDTO.dictionary_rate.PDAGERT_PAge = SourceObject["driverAge"];
-            premiumDTO.dictionary_rate.ADDRVRT_DRV = SourceObject["additionalDriver"]; 
+            premiumDTO.dictionary_rate.ADDRVRT_DRV = SourceObject["additionalDriver"];
             premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = SourceObject["noOfPC"];
             premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = SourceObject["noOfPC"];
             premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = SourceObject["noOfTW"];
@@ -2737,111 +2737,183 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
             CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
 
-            decimal TotalTax = 0;
-            //AD TAX
-            //From State 
-            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
-            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
-
-            TotalTax = taxTypeDTO.TaxAmount;
-
-            //ARRAY
-            taxAmountDTO.Tax.Add(taxTypeDTO);
-
-            taxTypeDTO = new CDTaxTypeDTO();
-
-            //TO State
-            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
-            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
-
-            TotalTax += taxTypeDTO.TaxAmount;
-
-
-            taxAmountDTO.TaxAmount = TotalTax;
-            taxAmountDTO.Tax.Add(taxTypeDTO);
-
-
-            //AD
-            ADPremiumDTO.Type = "AD";
-            ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
-            ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
-            ADPremiumDTO.TaxAmount = taxAmountDTO;
-
-
-            //FT Objects
-            taxTypeDTO = new CDTaxTypeDTO();
-            TotalTax = 0;
-            CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
-            taxAmountDTO = new CDTaxAmountDTO();
-            //FT TAX
-            //From State 
-            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
-            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
-
-            TotalTax = taxTypeDTO.TaxAmount;
-
-            //ARRAY
-            taxAmountDTO.Tax.Add(taxTypeDTO);
-
-            taxTypeDTO = new CDTaxTypeDTO();
-
-            //TO State
-            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
-            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
-
-            TotalTax += taxTypeDTO.TaxAmount;
-
-
-            taxAmountDTO.TaxAmount = TotalTax;
-            taxAmountDTO.Tax.Add(taxTypeDTO);
-
-
-            //FT
-            FTPremiumDTO.Type = "FT";
-            FTPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
-            FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
-            FTPremiumDTO.TaxAmount = taxAmountDTO;
-
-
-            //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
-            //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
-            var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
-
-            ////AD & FT Credit Object
-
-            CdModel.PremiumDTO.Add(ADPremiumDTO);
-            CdModel.PremiumDTO.Add(FTPremiumDTO);
-            CdModel.Type = "EndorementAdd";
-            CdModel.TxnType = "Credit";
-            CdModel.TxnAmount = ADPremiumDTO.TotalAmount + FTPremiumDTO.TotalAmount;
-            CdModel.TaxAmount = FinalTaxTotal;
-            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
-            FinalDto.Add(CdModel);
-
-            //FT-DebitObject
-            CdModel = new MicaCDDTO();
-            CdModel.PremiumDTO.Add(FTPremiumDTO);
-            CdModel.Type = "EndorementAdd";
-            CdModel.TxnType = "Debit";
-            CdModel.TxnAmount = FTPremiumDTO.TotalAmount;
-            CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount;
-            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
-            FinalDto.Add(CdModel);
-
-            if (TxnType == "Deletion")
+            if (TxnType == "Addition")
             {
+                decimal TotalTax = 0;
+                //AD TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //AD
+                ADPremiumDTO.Type = "AD";
+                ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+                ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                ADPremiumDTO.TaxAmount = taxAmountDTO;
+
+
+                //FT Objects
+                taxTypeDTO = new CDTaxTypeDTO();
+                TotalTax = 0;
+                CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
+                taxAmountDTO = new CDTaxAmountDTO();
+                //FT TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //FT
+                FTPremiumDTO.Type = "FT";
+                FTPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTPREM").EValue);
+                FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
+                FTPremiumDTO.TaxAmount = taxAmountDTO;
+
+
+                //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
+                //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
+
+                ////AD & FT Credit Object
+
+                CdModel.PremiumDTO.Add(ADPremiumDTO);
+                CdModel.PremiumDTO.Add(FTPremiumDTO);
+                CdModel.Type = "EndorsementAdd";
+                CdModel.TxnType = "Credit";
+                CdModel.TxnAmount = ADPremiumDTO.TxnAmount + FTPremiumDTO.TxnAmount;
+                CdModel.TaxAmount = FinalTaxTotal;
+                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                FinalDto.Add(CdModel);
+
                 //FT-DebitObject
                 CdModel = new MicaCDDTO();
                 CdModel.PremiumDTO.Add(FTPremiumDTO);
-                CdModel.Type = "EndorementAdd";
+                CdModel.Type = "EndorsementAdd";
                 CdModel.TxnType = "Debit";
-                CdModel.TxnAmount = FTPremiumDTO.TotalAmount;
+                CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount;
+                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                FinalDto.Add(CdModel);
+            }
+
+            if (TxnType == "Deletion")
+            {
+                decimal TotalTax = 0;
+                //AD TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue)) * (-1);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue)) * (-1);
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //AD
+                ADPremiumDTO.Type = "AD";
+                ADPremiumDTO.TxnAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue)) * (-1);
+                ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                ADPremiumDTO.TaxAmount = taxAmountDTO;
+
+
+                //FT Objects
+                taxTypeDTO = new CDTaxTypeDTO();
+                TotalTax = 0;
+                CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
+                taxAmountDTO = new CDTaxAmountDTO();
+                //FT TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue)) * (-1);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue)) * (-1);
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //FT
+                FTPremiumDTO.Type = "FT";
+                FTPremiumDTO.TxnAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTPREM").EValue)) * (-1);
+                FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
+                FTPremiumDTO.TaxAmount = taxAmountDTO;
+
+                var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
+
+                //FT and AD - REFUND CREDIT Object
+                CdModel.PremiumDTO.Add(FTPremiumDTO);
+                CdModel.PremiumDTO.Add(ADPremiumDTO);
+                CdModel.Type = "EndorsementDel";
+                CdModel.TxnType = "Credit";
+                CdModel.TxnAmount = FTPremiumDTO.TxnAmount + ADPremiumDTO.TxnAmount;
+                CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount + ADPremiumDTO.TaxAmount.TaxAmount;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
                 FinalDto.Add(CdModel);
 
                 return FinalDto;
             }
+
+
 
             return FinalDto;
 
