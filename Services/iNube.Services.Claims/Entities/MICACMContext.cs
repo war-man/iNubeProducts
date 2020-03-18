@@ -529,10 +529,6 @@ namespace iNube.Services.Claims.Entities
 
                 entity.Property(e => e.ClaimAmounts).HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.CoverValue)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.IdentificationNo)
                     .HasMaxLength(100)
                     .IsUnicode(false);

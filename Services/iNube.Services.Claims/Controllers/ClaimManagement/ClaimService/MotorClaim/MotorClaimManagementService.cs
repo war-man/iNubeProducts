@@ -27,7 +27,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         //    throw new NotImplementedException();
         //}
 
-        public async Task<IEnumerable<SearchDTO>> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext)
+        public async Task<ClaimSearchResponseDTO> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

@@ -27,7 +27,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<ClaimProcessDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext);
         Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext);
         Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext);
-        Task<IEnumerable<SearchDTO>> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext);
+        Task<ClaimSearchResponseDTO> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext);
         Task<List<object>> ClaimDetails(decimal ClaimId, ApiContext apiContext);
         Task<List<object>> PaymentDetails(decimal ClaimId, ApiContext apiContext);
         Task<List<object>> ClaimEnquiry(decimal ClaimId, ApiContext apiContext);
@@ -99,7 +99,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             return await _productService(apiContext.ProductType).GetDocumentId(filename, apiContext);
         }
 
-        public async Task<IEnumerable<SearchDTO>> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext)
+        public async Task<ClaimSearchResponseDTO> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).SearchClaim(searchclaim, apiContext);
         }

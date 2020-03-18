@@ -74,14 +74,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
             return ServiceResponse(response);
         }
-
-        [HttpPost]
-        public async Task<IActionResult> EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
-        {
-            var response = await _quotationService.EndorsementPremium(endorsementPremium);
-            return ServiceResponse(response);
-        }
-
+     
         [HttpGet]
         public IActionResult ActivityLog(string PolicyNo, string Month)
         {
@@ -152,9 +145,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpPost]
-        public async Task<IActionResult> NewEndorsementPremium(EndorsementPremiumDTO endorsementPremium)
+        public async Task<IActionResult> EndorsementPremium(EndorsementPremiumDTO endorsementPremium)
         {
-            var response = await _quotationService.NewEndorsementPremium(endorsementPremium, null, "EndorsementPremium");
+            var response = await _quotationService.EndorsementPremium(endorsementPremium, null, "EndorsementPremium");
             return ServiceResponse(response);
         }
 
