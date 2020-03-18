@@ -14,7 +14,7 @@ import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import $ from 'jquery';
-import money from "assets/img/money.png"; 
+import money from "assets/img/money.png";
 import swal from 'sweetalert';
 import Visibility from "@material-ui/icons/Visibility";
 import GetApp from "@material-ui/icons/GetApp";
@@ -44,12 +44,13 @@ class ReportExecution extends React.Component {
             CheckCondition: {
                 //paramList:[],
             },
-            paramList:[],
+            paramList: [],
+            otFlag: false,
             result: [],
             flagParam: false,
             fields: [],
             TableDataList: [],
-            tableFlag:false,
+            tableFlag: false,
         };
     }
 
@@ -106,7 +107,7 @@ class ReportExecution extends React.Component {
         //    this.state.paramList[paramindex].parameterName = evt.target.name;
         //    this.state.paramList[paramindex].parameterValue = evt.target.value;
         //}
-        console.log(this.state.paramList,"Array List");
+        console.log(this.state.paramList, "Array List");
     };
 
     onDateChange = (formate, name, event) => {
@@ -138,7 +139,7 @@ class ReportExecution extends React.Component {
         ReportConfigDto[event.target.name] = event.target.value;
         this.setState({ ReportConfigDto });
         this.setState({ [event.target.name]: event.target.value });
-        console.log(ReportConfigDto[event.target.name], event.target.value ,"reportdto");
+        console.log(ReportConfigDto[event.target.name], event.target.value, "reportdto");
 
         this.setState({ flagParam: true });
         fetch(`${ReportConfig.ReportConfigUrl}/api/Report/GetParameters?ReportConfigId=` + event.target.value, {
@@ -153,6 +154,7 @@ class ReportExecution extends React.Component {
             .then(data => {
                 this.setState({ parameterList: data });
                 console.log(this.state.parameterList, data, 'CheckConditions');
+                this.setState({ otFlag: true });
             });
     }
 
@@ -165,8 +167,8 @@ class ReportExecution extends React.Component {
                     "parameterName": prop,
                     "parameterValue": val[prop],
                 });
-                this.setState({ paramList: pArray});
-                console.log("Table", prop,val[prop]);
+                this.setState({ paramList: pArray });
+                console.log("Table", prop, val[prop]);
             })
         });
 
@@ -191,6 +193,7 @@ class ReportExecution extends React.Component {
                     this.setState({ tableFlag: false });
                     this.tabledata();
                     this.reset();
+                    this.setState({ otFlag: false });
                 }
                 else {
                     setTimeout(
@@ -203,14 +206,14 @@ class ReportExecution extends React.Component {
     }
 
     reset = () => {
-        this.state.CheckCondition = "";;
+        this.state.CheckCondition = {};
         let resetField = this.state.ReportConfigDto;
         resetField['ReportName'] = "";
-        this.setState({ resetField});
+        this.setState({ resetField });
     }
 
     tabledata = () => {
-        this.setState({ tableFlag:true});
+        this.setState({ tableFlag: true });
         console.log("prop data", this.state.result);
         this.setState({
             TableDataList: Object.keys(this.state.result[0]).map((prop, key) => {
@@ -275,24 +278,27 @@ class ReportExecution extends React.Component {
                                                             }
                                                         </CardHeader>
                                                         <CardBody>
+                                                            {this.state.otFlag &&
+                                                                <GridContainer>
+                                                                    {this.state.parameterList.map((item, index) =>
+                                                                        <GridItem xs={12} sm={12} md={3} key={index}>
+                                                                            <CustomInput labelText={item}
+                                                                                // value={item.paramName}
+                                                                                name={item}
+                                                                                onChange={this.onInputParamListChange}
+                                                                                inputProps={{
+                                                                                    //type: "number"
+                                                                                }}
+                                                                                formControlProps={{ fullWidth: true }} />
+                                                                        </GridItem>
+                                                                    )}
+                                                                </GridContainer>
+                                                            }
+                                                            <GridContainer>
 
-                                                        <GridContainer>
-                                                            {this.state.parameterList.map((item, index) =>
-                                                                    <GridItem xs={12} sm={12} md={3} key={index}>
-                                                                        <CustomInput labelText={item}
-                                                                            // value={item.paramName}
-                                                                            name={item}
-                                                                            onChange={this.onInputParamListChange}
-                                                                            inputProps={{
-                                                                                //type: "number"
-                                                                            }}
-                                                                            formControlProps={{ fullWidth: true }} />
-                                                                    </GridItem>
-                                                            )}
-
-                                                            <GridItem>
-                                                                <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={(e)=>this.queryExecution(e)}> <TranslationContainer translationKey="Execute" />  </Button>
-                                                            </GridItem>
+                                                                <GridItem>
+                                                                    <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={(e) => this.queryExecution(e)}> <TranslationContainer translationKey="Execute" />  </Button>
+                                                                </GridItem>
 
                                                             </GridContainer>
 
@@ -312,29 +318,29 @@ class ReportExecution extends React.Component {
                     : <PageContentLoader />}
 
                 {this.state.tableFlag &&
-                <GridContainer xl={12}>
-                    <GridItem lg={12}>
-                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                            <ReactTable
-                                data={this.state.result}
-                                filterable
+                    <GridContainer xl={12}>
+                        <GridItem lg={12}>
+                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                <ReactTable
+                                    data={this.state.result}
+                                    filterable
 
-                                columns={this.state.TableDataList}
+                                    columns={this.state.TableDataList}
 
 
-                                defaultPageSize={5}
-                                showPaginationTop={false}
+                                    defaultPageSize={5}
+                                    showPaginationTop={false}
 
-                                showPaginationBottom
-                                className="-striped -highlight discription-tab"
-                            />
-                        </Animated>
-                    </GridItem>
-                </GridContainer>
+                                    showPaginationBottom
+                                    className="-striped -highlight discription-tab"
+                                />
+                            </Animated>
+                        </GridItem>
+                    </GridContainer>
                 }
             </div>
 
-            );
+        );
     }
 }
 export default ReportExecution;
