@@ -1173,9 +1173,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         if (CallMicaCd != null)
                         {
-                            bookingLog = new TblPremiumBookingLog();
-
-                            bookingLog.PolicyNo = PolicyNo;
+                            //bookingLog = new TblPremiumBookingLog();
+                            //bookingLog.PolicyNo = PolicyNo;
+                                                       
                             bookingLog.TxnAmount = FinalPremium;
                             bookingLog.BasePremium = NewBasePremium;
                             bookingLog.FromTax = NewFromTax;
@@ -1183,7 +1183,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             bookingLog.TxnDateTime = IndianTime;
                             bookingLog.TxnDetails = "Revised Premium - CD Transaction Successfully Updated in MICA";
 
-                            _context.TblPremiumBookingLog.Add(bookingLog);
+                            _context.TblPremiumBookingLog.Update(bookingLog);
 
 
 
@@ -1213,9 +1213,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
                         else
                         {
-                            bookingLog = new TblPremiumBookingLog();
+                            //bookingLog = new TblPremiumBookingLog();
+                            //bookingLog.PolicyNo = PolicyNo;
 
-                            bookingLog.PolicyNo = PolicyNo;
                             bookingLog.TxnAmount = FinalPremium;
                             bookingLog.BasePremium = NewBasePremium;
                             bookingLog.FromTax = NewFromTax;
@@ -1223,7 +1223,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             bookingLog.TxnDateTime = IndianTime;
                             bookingLog.TxnDetails = "Revised Premium - Transaction Failed while Updating CD Balance MICA";
 
-                            _context.TblPremiumBookingLog.Add(bookingLog);
+                            _context.TblPremiumBookingLog.Update(bookingLog);
                             _context.SaveChanges();
 
                             SwitchOnOffResponse response = new SwitchOnOffResponse();
