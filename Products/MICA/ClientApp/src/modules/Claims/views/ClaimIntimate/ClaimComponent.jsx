@@ -118,7 +118,7 @@ const ClaimComponent = (props) => {
 
                 {props.ProductClaimData.map(m =>
 
-                    <GridItem xs={12} sm={12} md={4}>
+                    <GridItem xs={12} sm={12} md={3}>
                         {props.renderPage(m)}
 
                     </GridItem>
