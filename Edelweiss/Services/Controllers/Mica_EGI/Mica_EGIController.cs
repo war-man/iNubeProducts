@@ -76,7 +76,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
      
         [HttpGet]
-        public IActionResult ActivityLog(string PolicyNo, string Month)
+        public IActionResult ActivityLog(string PolicyNo, string Month,string Year)
         {
             var response = _quotationService.ActivityReport(PolicyNo, Month);
             return ServiceResponse(response);
@@ -115,9 +115,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpGet]
-        public IActionResult BillingDetails(string PolicyNo, string Month)
+        public IActionResult BillingDetails(string PolicyNo, string Month,int Year)
         {
-            var response = _quotationService.BillingDetails(PolicyNo, Month);
+            var response = _quotationService.BillingDetails(PolicyNo, Month,Year);
             return ServiceResponse(response);
         }
 

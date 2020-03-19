@@ -31,7 +31,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
         List<ddDTO> GetVehicleMaster(string lMasterlist);
-        BillingResponse BillingDetails(string PolicyNo, string Month);
+        BillingResponse BillingDetails(string PolicyNo, string Month,int Year);
         Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata);
         TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
 
@@ -212,7 +212,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     tblSwitchLog.SwitchType = "Auto";
 
                     _context.TblSwitchLog.Add(tblSwitchLog);
-
+                    response.ResponseMessage = "Schedule Created Successfully";
+                    response.Status = BusinessStatus.Created;
                 }
                 else
                 {
@@ -235,13 +236,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     tblschedule.ModifiedDate = indianTime;
                     _context.TblSchedule.Update(tblschedule);
+                    response.ResponseMessage = "Schedule Updated Successfully";
+                    response.Status = BusinessStatus.Updated;
                 }
                 _context.SaveChanges();
 
-                response.ScheduleDTO = scheduleDTO;
-                response.Status = BusinessStatus.Ok;
-
-                return response;
+                response.ScheduleDTO = scheduleDTO;                
+                 return response;
             }
             else
             {
@@ -745,7 +746,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (verifydata)
                 {
-                    checkLog = _context.TblSwitchLog.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
+                    checkLog = _context.TblSwitchLog.LastOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
                     ScheduleData = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo);
 
                 }
@@ -781,6 +782,23 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             tblSwitchlog.SwitchType = "Manual";
                             _context.TblSwitchLog.Add(tblSwitchlog);
                             _context.SaveChanges();
+                        }
+                        else if (checkLog.SwitchStatus == true)
+                        {
+                            ///Throw Error
+                            ///Switch ALREADY ON
+                            SwitchOnOffResponse response = new SwitchOnOffResponse();
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            response.ResponseMessage = "The Switch is Already AUTO ON";
+                            response.Status = BusinessStatus.Ok;
+                            errorInfo.ErrorMessage = "The Vehicle Number:  " + VehicleRegistrationNo + "  is already Auto ON Due to Schedule";
+                            errorInfo.ErrorCode = "ExtSWT010";
+                            errorInfo.PropertyName = "AUTOSwitchON";
+                            response.Errors.Add(errorInfo);
+
+                            return response;
+
                         }
                     }
                     else
@@ -1115,6 +1133,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         bookingLog.ToTax = TOTALPMPDTTTAX;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnDetails = "Revised Total Premium for Policy - " + PolicyNo;
+                        bookingLog.TxnStatus = true;
 
                         _context.TblPremiumBookingLog.Add(bookingLog);
                         _context.SaveChanges();
@@ -1182,7 +1201,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             bookingLog.ToTax = NewToTax;
                             bookingLog.TxnDateTime = IndianTime;
                             bookingLog.TxnDetails = "Revised Premium - CD Transaction Successfully Updated in MICA";
-
+                            bookingLog.TxnStatus = true;
                             _context.TblPremiumBookingLog.Update(bookingLog);
 
 
@@ -1222,7 +1241,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             bookingLog.ToTax = NewToTax;
                             bookingLog.TxnDateTime = IndianTime;
                             bookingLog.TxnDetails = "Revised Premium - Transaction Failed while Updating CD Balance MICA";
-
+                            bookingLog.TxnStatus = false;
                             _context.TblPremiumBookingLog.Update(bookingLog);
                             _context.SaveChanges();
 
@@ -1253,7 +1272,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         bookingLog.ToTax = 0;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnDetails = "Transaction Failed while Calculating Premium";
-
+                        bookingLog.TxnStatus = false;
                         _context.TblPremiumBookingLog.Add(bookingLog);
                         _context.SaveChanges();
 
@@ -1330,7 +1349,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (verifydata)
                 {
-                    checkLog = _context.TblSwitchLog.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
+                    checkLog = _context.TblSwitchLog.LastOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
                     ScheduleData = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo);
 
                 }
@@ -1822,7 +1841,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         bookingLog.ToTax = 0;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnDetails = "Auto Schedule Transaction Failed while Calculating Premium";
-
+                        bookingLog.TxnStatus = false;
                         _context.TblPremiumBookingLog.Add(bookingLog);
 
 
@@ -2221,7 +2240,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return obj;
         }
 
-        public BillingResponse BillingDetails(string PolicyNo, string Month)
+        public BillingResponse BillingDetails(string PolicyNo, string Month,int Year)
         {
             var getMonthNumber = 0;
             BillingResponse response = new BillingResponse();
@@ -2246,14 +2265,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var checkPolicyNo = _context.TblMonthlyBalance.Any(x => x.PolicyNumber == PolicyNo);
 
-                if (checkPolicyNo)
+                var checkswitchLog = _context.TblSwitchLog.Any(x=>x.PolicyNo == PolicyNo && x.CreatedDate.Value.Date.Year == Year);
+
+                if (checkPolicyNo && checkswitchLog)
                 {
                     var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
 
+                    //var switchLog = _context.TblSwitchLog.Where(x => x.PolicyNo == PolicyNo && x.CreatedDate.Value.Date.Month == getMonthNumber && x.SwitchStatus == true)
+                    //                                     .GroupBy(x => new { x.CreatedDate.Value.Date.Month, x.PolicyNo }).Distinct();
+                                                         
+
+
                     if (billData != null)
                     {
-                        var mapData = _mapper.Map<BillingDTO>(billData);
-                        response.BillingDTO = mapData;
+                     //   var mapData = _mapper.Map<BillingDTO>(billData);
+                       // response.BillingDTO = mapData;
                         response.Status = BusinessStatus.Ok;
                         return response;
                     }
@@ -2370,7 +2396,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 EndorsementPremiumDTO endorsementDto = new EndorsementPremiumDTO();
 
                 endorsementDto.PolicyNo = PolicyNumber;
-                endorsementDto.SI = SumInsured.ToString();
+                endorsementDto.SI = Convert.ToInt32(SumInsured);
                 endorsementDto.PcCount = NoOfPC;
                 endorsementDto.TwCount = NoOfTW;
                 endorsementDto.TypeOfEndorsement = "Addition";
@@ -2423,7 +2449,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 EndorsementPremiumDTO endorsementDto = new EndorsementPremiumDTO();
 
                 endorsementDto.PolicyNo = PolicyNumber;
-                endorsementDto.SI = SumInsured.ToString();
+                endorsementDto.SI = Convert.ToInt32(SumInsured);
                 endorsementDto.PcCount = NoOfPC;
                 endorsementDto.TwCount = NoOfTW;
                 endorsementDto.TypeOfEndorsement = "Deletion";
@@ -3154,7 +3180,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             PremiumReturnDto DifferentialPremium = new PremiumReturnDto();
 
-            if (String.IsNullOrEmpty(endorsementPremium.PolicyNo) && String.IsNullOrEmpty(endorsementPremium.SI))
+            if (String.IsNullOrEmpty(endorsementPremium.PolicyNo) && endorsementPremium.SI > 0)
             {
                 ErrorInfo errorInfo = new ErrorInfo();
 
@@ -3284,7 +3310,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
 
                 //RuleObject
-                premiumDTO.dictionary_rule.SI = endorsementPremium.SI;
+                premiumDTO.dictionary_rule.SI = endorsementPremium.SI.ToString();
                 premiumDTO.dictionary_rule.NOOFPC = (detailsDTO.NoOfPC + endorsementPremium.PcCount).ToString();
                 premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW + endorsementPremium.TwCount).ToString();
 
@@ -3541,7 +3567,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 //RuleObject
-                premiumDTO.dictionary_rule.SI = endorsementPremium.SI;
+                premiumDTO.dictionary_rule.SI = endorsementPremium.SI.ToString();
                 premiumDTO.dictionary_rule.NOOFPC = (detailsDTO.NoOfPC - endorsementPremium.PcCount).ToString();
                 premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW - endorsementPremium.TwCount).ToString();
 
