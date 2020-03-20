@@ -23,6 +23,8 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         Task<MasterCDDTO> MasterPolicyCD(MasterCDDTO masterCDDTO, ApiContext apiContext);
         Task<MasterCDDTO> MasterCDACC(MicaCD CDDTO, ApiContext apiContext);
         Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext);
+        Task<DailyDTO> GetDailyTransaction(string accountnumber, int month, int year, string TxnEventType, ApiContext apiContext);
+
         //Task<List<ddDTO>> GetProductName();
 
     }

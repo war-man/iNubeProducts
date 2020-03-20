@@ -244,6 +244,14 @@ namespace iNube.Services.Partners.Controllers.Accounts
             return Ok(response);
 
         }
+        [HttpGet]
+        public async Task<IActionResult> GetDailyTransaction(string accountnumber,int month,int year,string TxnEventType)
+        {
+            //MicaCDDTO
+            var response = (await _accountService.GetDailyTransaction(accountnumber, month, year, TxnEventType, Context));
+            return Ok(response);
+
+        }
 
     }
 }

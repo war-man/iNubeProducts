@@ -9,6 +9,7 @@ using iNube.Utility.Framework.Notification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -1552,7 +1553,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var _policySearchDTOs = _mapper.Map<IEnumerable<PolicyInsurableDetailsDTO>>(tblPolicy.TblPolicyInsurableDetails);
 
             var data = _policySearchDTOs.ToList();
-            
+
             for (int i = 0; i < data.Count(); i++)
             {
                 List<Dictionary<string, string>> dict1 = new List<Dictionary<string, string>>();
@@ -1564,7 +1565,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     var json = JsonConvert.SerializeObject(data[i].CoverValue);
                     var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(m);
 
-                   
+
                     foreach (KeyValuePair<string, string> each in dictionary)
                     {
                         var dict = new Dictionary<string, string>();
@@ -1660,7 +1661,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                 }
                 logMsg = logMsg + ",3";
-                var mappedPolicy =await MapAndValidateInsurablePolicyAsync(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "PolicyNo", apiContext);
+                var mappedPolicy = await MapAndValidateInsurablePolicyAsync(policyDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "PolicyNo", apiContext);
                 if (Errors.Count == 0)
                 {
 
@@ -2040,14 +2041,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         dynamic polFields = new ExpandoObject();
                                         foreach (var insItem in insurableInsurablefields)
                                         {
-                                           // insItem.ToString()
+                                            // insItem.ToString()
                                             if (insItem.Name == "Identification Number" || insItem.Name == "Name")
                                             {
 
                                             }
                                             else
                                             {
-                                                AddProperty(polFields, insItem.Name,insurableInsurablefields[insItem.Name]);
+                                                AddProperty(polFields, insItem.Name, insurableInsurablefields[insItem.Name]);
                                             }
 
                                         }
@@ -2057,7 +2058,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
                                         policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
                                         policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
-                                        policyInsurableDetailsDto.CoverValue = JsonConvert.SerializeObject(polFields); 
+                                        policyInsurableDetailsDto.CoverValue = JsonConvert.SerializeObject(polFields);
                                         policyInsurableDetailsDto.IsActive = true;
                                         lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
                                         insItemCount++;
@@ -2259,7 +2260,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 policyDTO.PremiumAmount = Convert.ToDecimal(policyDetail["permiumamount"]);
             }
             policyDTO.MasterPremium = policyDTO.PremiumAmount;//needs to fetch through rating
-           // policyDTO.SumInsured = policyDTO.PremiumAmount;
+                                                              // policyDTO.SumInsured = policyDTO.PremiumAmount;
             return policyDTO;
         }
         private async Task<InsuranceCertificateModel> GetInsuranceCertificateModel(dynamic policyDetail, ProductDTO productDTO, TblPolicy tblpolicyDTO, PolicyDTO policyDTO, PartnersDTO partnersDTO, SingleCover singleCover, ApiContext apiContext)
@@ -2648,620 +2649,98 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
         }
 
-        //public async Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
-        //{
-        //    _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+       
+
+
+
+
+
+
+
+        private async Task<EndorsmentDTO> InternalCallPolicyInsurableDetails(dynamic insurableItemRequest, string PolicyNo, ApiContext apiContext)
+        {
+
+            var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
+
+            var CoverName = "";
+            var BenefitAmount = 0;
+            var productDTO = await _integrationService.GetProductDetailByIdAsync(policy.ProductIdPk.ToString(), apiContext);
+            TblPolicyInsurableDetails policyInsurableDetailsDto = new TblPolicyInsurableDetails();
+            List<TblPolicyInsurableDetails> policyInsurableDetailsList = new List<TblPolicyInsurableDetails>();
+            try
+            {
+                if (productDTO.ProductInsurableItems.Count > 0)
+                {
+                    foreach (var item in insurableItemRequest.InsurableItem)
+                    {
+                        var InsurableItemName = item.InsurableName;
+
+                        foreach (var insurableInsurablefields in item.RiskItems)
+                        {
+                            var InsurableItem = productDTO.ProductInsurableItems.FirstOrDefault();
+                            if (InsurableItem != null)
+                            {
+                                var CoverItem = InsurableItem.ProductCovers.FirstOrDefault();
+                                if (CoverItem != null)
+                                {
+                                    CoverName = CoverItem.Cover;
+                                    if (InsurableItemName == InsurableItem.InsurableItem)
+                                    {
+
+                                        var BenefitItem = CoverItem.ProductBenefits.FirstOrDefault();
+                                        if (BenefitItem != null)
+                                        {
+                                            if (BenefitItem.MaxBenefitAmount != null && BenefitItem.MaxBenefitAmount > 0)
+                                            {
+                                                BenefitAmount = (int)BenefitItem.MaxBenefitAmount;
+                                            }
+                                            else
+                                            {
+                                                BenefitAmount = (int)BenefitItem.BenefitCriteriaValue;
+                                            }
+                                        }
+
+                                        policyInsurableDetailsDto = new TblPolicyInsurableDetails();
+                                        policyInsurableDetailsDto.PolicyId = policy.PolicyId;
+                                        policyInsurableDetailsDto.CoverName = CoverName;
+                                        policyInsurableDetailsDto.InsurableItem = InsurableItem.InsurableItem;
+                                        policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
+                                        policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
+                                        policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
+                                        policyInsurableDetailsDto.CoverValue = insurableInsurablefields.toString;
+                                        policyInsurableDetailsDto.IsActive = true;
+                                        policyInsurableDetailsList.Add(policyInsurableDetailsDto);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    _context.TblPolicyInsurableDetails.AddRange(policyInsurableDetailsList);
+                    _context.SaveChanges();
+
+                    return new EndorsmentDTO() { Status = BusinessStatus.Created, ResponseMessage = "Save Successfully" };
+
+                }
+                else
+                {
+                    //need to handle error
+                    return new EndorsmentDTO() { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this productCode {productDTO.ProductCode}" };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new EndorsmentDTO { Status = BusinessStatus.Error, ResponseMessage = ex.InnerException.ToString() };
+            }
+        }
 
-        //    List<ErrorInfo> Errors = new List<ErrorInfo>();
-        //    string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
-        //    if (PolicyNo == "")
-        //    {
-        //        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PolicyNumber can not be empty" };
-        //        Errors.Add(errorInfo);
-        //        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
-
-        //    }
-        //    try
-        //    {
-        //        string EndorsementNo = "";
-        //        var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
-        //        if (policy != null)
-        //        {
-        //            policy.PolicyVersion++;
-        //            EndorsementNo = policy.PolicyNo + "" + "_" + (policy.PolicyVersion).ToString();
-
-        //            if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
-        //            {
-        //                List<TblPolicyInsurableDetails> lstPolicyInsurableDetailsDto = new List<TblPolicyInsurableDetails>();
-
-        //                foreach (var item in insurableItemRequest.InsurableItem)
-        //                {
-        //                    var InsurableItemName = item.InsurableName;
-
-        //                    TblPolicyInsurableDetails policyInsurableDetailsDto = null;
-
-
-
-        //                    foreach (var insurableInsurablefields in item.RiskItems)
-        //                    {
-        //                        policyInsurableDetailsDto = new TblPolicyInsurableDetails();
-        //                        policyInsurableDetailsDto.PolicyId = policy.PolicyId;
-        //                        policyInsurableDetailsDto.InsurableItem = InsurableItemName;
-        //                        policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
-        //                        policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
-        //                        policyInsurableDetailsDto.BenefitAmount = 0;
-        //                        policyInsurableDetailsDto.IsActive = true;
-        //                        lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
-        //                    }
-
-        //                }
-
-        //                _context.TblPolicyInsurableDetails.AddRange(lstPolicyInsurableDetailsDto);
-
-
-        //                var EndorsmentType = (string)insurableItemRequest["EndorsementType"];
-
-        //                if (EndorsmentType == "Addition of vehicle")
-        //                {
-        //                    //step:1 Get Details of Policy & Endorsement
-
-        //                    var policyNo = (string)insurableItemRequest["PolicyNumber"];
-        //                    var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
-        //                    var policyId = tbl_particiant.PolicyId;
-        //                    var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-
-        //                    if (tblPolicyDetailsdata != null)
-        //                    {
-        //                        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-        //                        dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-        //                        dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-
-
-        //                        //Step2:Validate of Request Object
-        //                        List<CDMapper> cDMappers = new List<CDMapper>();
-        //                        CDMapper cD = new CDMapper();
-        //                        cD.Type = "Policy";
-        //                        cD.Data.Add(json);
-        //                        cDMappers.Add(cD);
-
-        //                        cD.Type = "Endorsement";
-        //                        cD.Data.Add(insurableItemRequest);
-        //                        cDMappers.Add(cD);
-
-
-        //                        var res = await _integrationService.RuleMapper(cDMappers, "EndorementAdd", apiContext);
-
-        //                        var seriaizeListofres = JsonConvert.SerializeObject(res);
-        //                        List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
-
-
-        //                            var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
-
-        //                            if (Listofres != null)
-        //                            {
-        //                                foreach (var item in Listofres)
-        //                                {
-
-        //                                    if (item.Outcome == "Fail")
-        //                                    {
-
-        //                                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
-        //                                        Errors.Add(errorInfo);
-
-        //                                    }
-
-        //                                }
-        //                                if (Errors.Count > 0)
-        //                                {
-        //                                    return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
-        //                                }
-        //                            }
-
-        //                        //step:3 Call CD mapper
-        //                        var CDmap = await _integrationService.CDMapper(cDMappers, "EndorementAdd", apiContext);
-
-
-        //                        MicaCD micaCD = new MicaCD();
-        //                        micaCD.AccountNo = policy.CdaccountNumber;
-        //                        micaCD.micaCDDTO = CDmap;
-
-
-
-
-
-        //                        foreach (var insurableName in json.InsurableItem)
-        //                        {
-        //                            foreach (var item in insurableItemRequest.InsurableItem)
-        //                            {
-        //                                var name1 = insurableName.InsurableName;
-        //                                if (name1 == "Vehicle" && item.InsurableName == "Vehicle")
-        //                                {
-        //                                    foreach (var insurableName1 in json1.InsurableItem)
-        //                                    {
-        //                                        var count = insurableName.RiskItems.Count;
-        //                                        if (insurableName.InsurableName == "Vehicle")
-        //                                        {
-        //                                            if (count < 3)
-        //                                            {
-        //                                                if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
-        //                                                {
-        //                                                    json1.si = insurableItemRequest.SI;
-        //                                                }
-        //                                                foreach (var fields in item.RiskItems)
-        //                                                {
-        //                                                    try
-        //                                                    {
-        //                                                        //Note validation has to come vechile addition count can not be greater then 3
-
-        //                                                        if (insurableName1.InsurableName == "Vehicle" && insurableName.InsurableName == "Vehicle")
-        //                                                        {
-        //                                                            insurableName1.RiskItems.Add(fields);
-        //                                                            insurableName1.RiskCount = insurableName1.RiskItems.Count;
-        //                                                            if (fields["Vehicle Type"] == "PC")
-        //                                                            {
-        //                                                                json1.noOfPC = (Convert.ToInt32(json1.noOfPC) + 1).ToString();
-        //                                                            }
-        //                                                            if (fields["Vehicle Type"] == "TW")
-        //                                                            {
-        //                                                                json1.noOfTW = (Convert.ToInt32(json1.noOfTW) + 1).ToString();
-
-        //                                                            }
-        //                                                            //insurableName1.RiskItems = insurableName.RiskItems;
-        //                                                        }
-        //                                                    }
-        //                                                    catch (Exception e)
-        //                                                    {
-        //                                                    }
-
-        //                                                }
-        //                                            }
-        //                                            else
-        //                                            {
-        //                                                ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Vehicle can not be added" };
-
-        //                                                Errors.Add(errorInfo);
-        //                                                return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of vehicle can not more than Three." };
-        //                                            }
-
-        //                                        }
-        //                                    }
-
-        //                                }
-        //                            }
-
-        //                        }
-        //                        tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-        //                        _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-        //                        _context.SaveChanges();
-
-        //                        //Step2:CalCulate Premium
-        //                        //CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
-        //                        //BusinessStatus businessStatus = 0;
-        //                        ////OLD Premium
-        //                        //PremiumRequestDTO premiumRequestDTO = new PremiumRequestDTO();
-        //                        //premiumRequestDTO.SI = json["si"];
-        //                        //premiumRequestDTO.StateCode = json["stateCode"];
-        //                        //premiumRequestDTO.NoOfPC = json["noOfPC"];
-        //                        //premiumRequestDTO.NoOfTW = json["noOfTW"];
-        //                        //premiumRequestDTO.DriverAge = json["driverAge"];
-        //                        //premiumRequestDTO.DriverExp = json["driverExp"];
-        //                        //premiumRequestDTO.AdditionalDriver = json["additionalDriver"];
-        //                        //premiumRequestDTO.BillingFrequency = json["billingFrequency"];
-
-        //                        //var CalculatePremiumResponseOld = await PremiumCalCulation(premiumRequestDTO, apiContext);
-
-
-        //                        ////New Premium
-        //                        //PremiumRequestDTO premiumRequestDTONew = new PremiumRequestDTO();
-        //                        //premiumRequestDTONew.SI = json1["si"];
-        //                        //premiumRequestDTONew.StateCode = json1["stateCode"];
-        //                        //premiumRequestDTONew.NoOfPC = json1["noOfPC"];
-        //                        //premiumRequestDTONew.NoOfTW = json1["noOfTW"];
-        //                        //premiumRequestDTONew.DriverAge = json1["driverAge"];
-        //                        //premiumRequestDTONew.DriverExp = json1["driverExp"];
-        //                        //premiumRequestDTONew.AdditionalDriver = json1["additionalDriver"];
-        //                        //premiumRequestDTONew.BillingFrequency = json1["billingFrequency"];
-        //                        //var CalculatePremiumResponseNew = await PremiumCalCulation(premiumRequestDTONew, apiContext);
-
-
-        //                        //PremiumReturnDto CalculatePremiumResponse = new PremiumReturnDto();
-        //                        //CalculatePremiumResponse.FireTheft = CalculatePremiumResponseNew.FireTheft - CalculatePremiumResponseOld.FireTheft;
-        //                        //CalculatePremiumResponse.ADPremium = CalculatePremiumResponseNew.ADPremium - CalculatePremiumResponseOld.ADPremium;
-        //                        //CalculatePremiumResponse.FTTax = CalculatePremiumResponseNew.FTTax - CalculatePremiumResponseOld.FTTax;
-        //                        //CalculatePremiumResponse.ADTax = CalculatePremiumResponseNew.ADTax - CalculatePremiumResponseOld.ADTax;
-        //                        //CalculatePremiumResponse.TotalADAmount = CalculatePremiumResponseNew.TotalADAmount - CalculatePremiumResponseOld.TotalADAmount;
-        //                        //CalculatePremiumResponse.TotalFTAmount = CalculatePremiumResponseNew.TotalFTAmount - CalculatePremiumResponseOld.TotalFTAmount;
-
-        //                        //Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
-
-        //                        //TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
-        //                        //txnParameterDTO.Amount = CalculatePremiumResponse.FireTheft;
-        //                        //txnParameterDTO.TaxAmount = CalculatePremiumResponse.FTTax;
-        //                        //txnParameterDTO.Total = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.FTTax;
-
-        //                        //RatingConfig.Add("FT", txnParameterDTO);
-        //                        //txnParameterDTO = new TxnParameterDTO();
-        //                        //txnParameterDTO.Amount = CalculatePremiumResponse.ADPremium;
-        //                        //txnParameterDTO.TaxAmount = CalculatePremiumResponse.ADTax;
-        //                        //txnParameterDTO.Total = CalculatePremiumResponse.ADPremium + CalculatePremiumResponse.ADTax;
-        //                        //RatingConfig.Add("AD", txnParameterDTO);
-        //                        //transactionsDTO.TotalAmount = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.ADPremium;
-        //                        //transactionsDTO.TotalGSTAmount = CalculatePremiumResponse.FTTax + CalculatePremiumResponse.ADTax;
-        //                        //transactionsDTO.PremiumDetails = RatingConfig;
-        //                        //transactionsDTO.Type = "Endorsement-Addition";
-        //                        ////    transactionsDTO.ProductId = Convert.ToDecimal(productId);
-        //                        //transactionsDTO.TxnType = "Credit";
-        //                        //transactionsDTO.AccountNo = policy.CdaccountNumber;
-        //                        ////  transactionsDTO.Frequency = premiumRequestDTO.BillingFrequency;
-        //                        ////Step3:CD Account Txn 
-        //                        //// var transaction = await _integrationService.CreateMasterCDAccount(transactionsDTO, apiContext);
-
-        //                        ////businessStatus = transaction.Status;
-
-        //                        //Step5:CD Transaction for the policy
-        //                        var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
-        //                        BusinessStatus businessStatus = 0;
-        //                        businessStatus = transaction.Status;
-
-        //                        if (businessStatus == BusinessStatus.Created)
-        //                        {
-        //                            //Status for Txn
-        //                        }
-        //                        else
-        //                        {
-
-        //                            return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
-
-        //                        }
-
-
-
-        //                    }
-        //                    else
-        //                    {
-        //                        return new EndorsmentDTO { Status = BusinessStatus.NotFound, Id = policy.PolicyNo, ResponseMessage = $"No Record Found for this Policy Number {policy.PolicyNo}" };
-
-        //                    }
-        //                }
-        //                //Add Driver
-
-        //                    if (EndorsmentType == "Addition of driver")
-        //                    {
-
-
-        //                        var policyNo = (string)insurableItemRequest["PolicyNumber"];
-        //                        var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
-        //                        var policyId = tbl_particiant.PolicyId;
-        //                        var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-        //                        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-
-
-
-        //                    //Step2:Validate of Request Object
-        //                    List<CDMapper> cDMappers = new List<CDMapper>();
-        //                    CDMapper cD = new CDMapper();
-        //                    cD.Type = "Policy";
-        //                    cD.Data.Add(insurableItem);
-        //                    cDMappers.Add(cD);
-
-        //                    cD.Type = "Endorsement";
-        //                    cD.Data.Add(insurableItem);
-        //                    cDMappers.Add(cD);
-
-
-        //                    var res = await _integrationService.RuleMapper(cDMappers, "EndorementAdd", apiContext);
-
-        //                    var seriaizeListofres = JsonConvert.SerializeObject(res);
-        //                    List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
-
-
-        //                    var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
-
-        //                    if (Listofres != null)
-        //                    {
-        //                        foreach (var item in Listofres)
-        //                        {
-
-        //                            if (item.Outcome == "Fail")
-        //                            {
-
-        //                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
-        //                                Errors.Add(errorInfo);
-
-        //                            }
-
-        //                        }
-        //                        if (Errors.Count > 0)
-        //                        {
-        //                            return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
-        //                        }
-        //                    }
-
-        //                    //step:3 Call CD mapper
-        //                    var CDmap = await _integrationService.CDMapper(cDMappers, "EndorementAdd", apiContext);
-
-
-        //                    MicaCD micaCD = new MicaCD();
-        //                    micaCD.AccountNo = policy.CdaccountNumber;
-        //                    micaCD.micaCDDTO = CDmap;
-
-
-
-
-
-
-
-        //                    dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-        //                        dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-
-        //                        foreach (var insurableName in json.InsurableItem)
-        //                        {
-        //                            foreach (var item in insurableItemRequest.InsurableItem)
-        //                            {
-        //                                var name1 = insurableName.InsurableName;
-        //                                if (name1 == "Driver" && item.InsurableName == "Driver")
-        //                                {
-        //                                    foreach (var insurableName1 in json1.InsurableItem)
-        //                                    {
-
-        //                                        // var name2 = insurableName1.InsurableName;
-
-        //                                        var count = insurableName.RiskItems.Count;
-
-        //                                        //var additiondrivercount = json.additionalDriver + 1;
-        //                                        // var addtionaldriver = Convert.ToInt32(additiondrivercount);
-        //                                        if (insurableName.InsurableName == "Driver")
-        //                                        {
-
-        //                                            if (count < 3)
-        //                                            {
-
-        //                                                if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
-        //                                                {
-        //                                                    json1.si = insurableItemRequest.SI.ToString();
-        //                                                }
-        //                                                foreach (var fields in item.RiskItems)
-        //                                                {
-        //                                                    try
-        //                                                    {
-        //                                                        //Note validation has to come vechile addition count can not be greater then 3
-
-        //                                                        if (insurableName1.InsurableName == "Driver" && insurableName.InsurableName == "Driver")
-        //                                                        {
-        //                                                            insurableName1.RiskItems.Add(fields);
-        //                                                            //insurableName1.RiskItems = insurableName.RiskItems;
-        //                                                            insurableName1.RiskCount = insurableName1.RiskItems.Count;
-
-        //                                                        }
-        //                                                    }
-        //                                                    catch (Exception e)
-        //                                                    {
-        //                                                    }
-
-        //                                                }
-        //                                            }
-        //                                            else
-        //                                            {
-        //                                                var data = await ModifyInsurabableItem(insurableItemRequest, apiContext);
-        //                                                if (data != null)
-        //                                                {
-        //                                                    return new EndorsmentDTO() { ResponseMessage = "Driver updated successful" }; ;
-        //                                                }
-        //                                                ErrorInfo errorInfo = new ErrorInfo() { ErrorCode = "", ErrorMessage = "Driver can not be added" };
-        //                                                Errors.Add(errorInfo);
-        //                                                return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors, ResponseMessage = "Number of Driver can not be changed." };
-        //                                            }
-
-        //                                        }
-        //                                    }
-
-        //                                }
-        //                            }
-
-        //                        }
-        //                        tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-        //                        _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-        //                        _context.SaveChanges();
-
-
-        //                    //Step5:CD Transaction for the policy
-        //                    var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
-        //                    BusinessStatus businessStatus = 0;
-        //                    businessStatus = transaction.Status;
-
-        //                    if (businessStatus == BusinessStatus.Created)
-        //                    {
-        //                        //Status for Txn
-
-        //                    }
-        //                    else
-        //                    {
-
-        //                        return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
-
-        //                    }
-
-
-
-        //                }
-
-
-        //                }
-
-
-        //                _context.SaveChanges();
-        //                return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo };
-
-        //            }
-        //            else
-        //            {
-
-        //                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"No Record Found for this PolicyNumber{PolicyNo}" };
-        //                Errors.Add(errorInfo);
-        //                return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
-
-        //            }
-        //        }
-
-        //    catch (Exception ex)
-        //    {
-        //        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = ex.InnerException.ToString() };
-        //        Errors.Add(errorInfo);
-        //        return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
-
-        //    }
-
-        //}
-
-
-
-
-        //public async Task<EndorsmentDTO> RemoveInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
-        //{
-
-        //    _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-        //    List<ErrorInfo> Errors = new List<ErrorInfo>();
-        //    string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
-        //    if (PolicyNo == "")
-        //    {
-        //        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PolicyNumber can not be empty" };
-        //        Errors.Add(errorInfo);
-        //        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
-
-        //    }
-
-        //    string EndorsementNo = "";
-        //    var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
-        //    if (policy != null)
-        //    {
-        //        EndorsementNo = policy.PolicyNo + "" + "_" + (policy.PolicyVersion).ToString();
-        //        if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
-        //        {
-
-        //            foreach (var item in insurableItemRequest.InsurableItem)
-        //            {
-
-
-        //                foreach (var insurableInsurablefields in item.RiskItems)
-        //                {
-
-        //                    string IdentificationNo = insurableInsurablefields["Identification Number"].ToString();
-
-        //                    var verify = _context.TblPolicyInsurableDetails.Where(x => x.IdentificationNo == IdentificationNo && x.PolicyId == policy.PolicyId);
-
-        //                    foreach (var insureditem in verify)
-        //                    {
-        //                        insureditem.IsActive = false;
-
-        //                    }
-
-        //                }
-
-        //            }
-
-
-
-        //            var policyNo = (string)insurableItemRequest["PolicyNumber"];
-        //            var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
-        //            var policyId = tbl_particiant.PolicyId;
-        //            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-        //            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-        //            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-        //            dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-
-        //            foreach (var item in insurableItemRequest.InsurableItem)
-        //            {
-
-        //                foreach (var insurableName in json.InsurableItem)
-        //                {
-        //                    foreach (var insurableName1 in json1.InsurableItem)
-        //                    {
-        //                        if (item.InsurableName == "Vehicle" && insurableName.InsurableName == "Vehicle" && insurableName1.InsurableName == "Vehicle")
-        //                        {
-        //                            foreach (var fields in item.RiskItems)
-        //                            {
-        //                                if (insurableName.RiskItems.Count > 0)
-        //                                {
-        //                                    try
-        //                                    {
-        //                                        foreach (var jsoninsurableFields in insurableName.RiskItems)
-        //                                        {
-
-        //                                            var InputidentificationNumber = (string)fields["Identification Number"];
-        //                                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-        //                                            if (InputidentificationNumber == TblIdentificationNo)
-        //                                            {
-        //                                                var removeitem = jsoninsurableFields;
-        //                                                insurableName.RiskItems.Remove(removeitem);
-
-        //                                            }
-        //                                        }
-
-        //                                    }
-        //                                    catch (Exception e)
-        //                                    {
-
-        //                                        insurableName1.RiskItems = insurableName.RiskItems;
-        //                                        if (insurableName1.InsurableName == "Vehicle")
-        //                                        {
-        //                                            insurableName1.RiskCount = insurableName1.RiskItems.Count;
-        //                                            if (fields["Vehicle Type"] == "PC")
-        //                                            {
-        //                                                json1.noOfPC = (Convert.ToInt32(json1.noOfPC) - 1).ToString();
-        //                                            }
-        //                                            if (fields["Vehicle Type"] == "TW")
-        //                                            {
-        //                                                json1.noOfTW = (Convert.ToInt32(json1.noOfTW) - 1).ToString();
-
-        //                                            }
-        //                                        }
-        //                                    }
-
-        //                                }
-        //                            }
-        //                        }
-
-        //                    }
-        //                }
-
-        //            }
-        //            tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-        //            _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-        //            await _context.SaveChangesAsync();
-        //            return new EndorsmentDTO() { Status = BusinessStatus.Ok, ResponseMessage = "Deleted Successfully" };
-
-        //        }
-
-
-        //    }
-
-
-
-        //    else
-        //    {
-        //        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"No records found for this policyNumber {PolicyNo}" };
-        //        Errors.Add(errorInfo);
-        //        return new EndorsmentDTO() { Status = BusinessStatus.NotFound, Errors = Errors };
-
-        //    }
-        //    EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
-        //    tblEndorsementDetails.EnddorsementRequest = insurableItemRequest.ToString();
-
-        //    TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
-
-        //    _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
-        //    _context.SaveChanges();
-
-        //    return new EndorsmentDTO();
-
-
-        //}
 
         public async Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
+          
             string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
             if (PolicyNo == "")
             {
@@ -3270,6 +2749,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
 
             }
+          
             try
             {
                 string EndorsementNo = "";
@@ -3281,31 +2761,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                     if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
                     {
-                        List<TblPolicyInsurableDetails> lstPolicyInsurableDetailsDto = new List<TblPolicyInsurableDetails>();
 
-                        foreach (var item in insurableItemRequest.InsurableItem)
-                        {
-                            var InsurableItemName = item.InsurableName;
-
-                            TblPolicyInsurableDetails policyInsurableDetailsDto = null;
+                        var lstPolicyInsurableDetailsDto = await InternalCallPolicyInsurableDetails(insurableItemRequest, PolicyNo, apiContext);
 
 
 
-                            foreach (var insurableInsurablefields in item.RiskItems)
-                            {
-                                policyInsurableDetailsDto = new TblPolicyInsurableDetails();
-                                policyInsurableDetailsDto.PolicyId = policy.PolicyId;
-                                policyInsurableDetailsDto.InsurableItem = InsurableItemName;
-                                policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
-                                policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
-                                policyInsurableDetailsDto.BenefitAmount = 0;
-                                policyInsurableDetailsDto.IsActive = true;
-                                lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
-                            }
 
-                        }
-
-                        _context.TblPolicyInsurableDetails.AddRange(lstPolicyInsurableDetailsDto);
 
 
                         var EndorsmentType = (string)insurableItemRequest["EndorsementType"];
@@ -3324,6 +2785,60 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                                 dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
+
+                                //Step2:Validate of Request Object
+                                List<CDMapper> cDMappers = new List<CDMapper>();
+                                CDMapper cD = new CDMapper();
+                                cD.Type = "Policy";
+                                cD.Data = json;
+                                cDMappers.Add(cD);
+                                cD = new CDMapper();
+                                cD.Type = "Endorsement";
+                                cD.Data = insurableItemRequest;
+                                cDMappers.Add(cD);
+
+
+                                var res = await _integrationService.RuleMapper(cDMappers, "EndorsementAdd", apiContext);
+
+                                var seriaizeListofres = JsonConvert.SerializeObject(res);
+                                List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
+
+                                var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+
+                                if (Listofres != null)
+                                {
+                                    foreach (var item in Listofres)
+                                    {
+
+                                        if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
+                                        {
+
+                                            ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+                                            Errors.Add(errorInfo);
+
+                                        }
+
+                                    }
+                                    if (Errors.Count > 0)
+                                    {
+                                        return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
+                                    }
+                                }
+
+                                //step:3 Call CD mapper
+                                var CDmap = await _integrationService.CDMapperList(cDMappers, "EndorsementAdd", apiContext);
+
+
+                                MicaCD micaCD = new MicaCD();
+                                micaCD.AccountNo = policy.CdaccountNumber;
+                                micaCD.micaCDDTO = CDmap;
+
+
+
+
+
+
+
                                 foreach (var insurableName in json.InsurableItem)
                                 {
                                     foreach (var item in insurableItemRequest.InsurableItem)
@@ -3338,9 +2853,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                 {
                                                     if (count < 3)
                                                     {
-                                                        if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
+                                                        if (insurableItemRequest.si != null && insurableItemRequest.si != "")
                                                         {
-                                                            json1.si = insurableItemRequest.SI;
+                                                            json1.si = insurableItemRequest.si;
                                                         }
                                                         foreach (var fields in item.RiskItems)
                                                         {
@@ -3405,72 +2920,30 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                 _context.SaveChanges();
 
+
+                                //Step5:CD Transaction for the policy
+                                var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+                                BusinessStatus businessStatus = 0;
+                                businessStatus = transaction.Status;
+
+                                if (businessStatus == BusinessStatus.Created)
+                                {
+                                    //Status for Txn
+                                }
+                                else
+                                {
+
+                                    return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
+
+                                }
+
+
+
                                 return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = "Added Successfully" };
 
 
 
-                                //    CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
-                                //    BusinessStatus businessStatus = 0;
-                                //    //OLD Premium
-                                //    PremiumRequestDTO premiumRequestDTO = new PremiumRequestDTO();
-                                //    premiumRequestDTO.SI = json["si"];
-                                //    premiumRequestDTO.StateCode = json["stateCode"];
-                                //    premiumRequestDTO.NoOfPC = json["noOfPC"];
-                                //    premiumRequestDTO.NoOfTW = json["noOfTW"];
-                                //    premiumRequestDTO.DriverAge = json["driverAge"];
-                                //    premiumRequestDTO.DriverExp = json["driverExp"];
-                                //    premiumRequestDTO.AdditionalDriver = json["additionalDriver"];
-                                //    premiumRequestDTO.BillingFrequency = json["billingFrequency"];
 
-                                //    var CalculatePremiumResponseOld = await PremiumCalCulation(premiumRequestDTO, apiContext);
-
-
-                                //    //New Premium
-                                //    PremiumRequestDTO premiumRequestDTONew = new PremiumRequestDTO();
-                                //    premiumRequestDTONew.SI = json1["si"];
-                                //    premiumRequestDTONew.StateCode = json1["stateCode"];
-                                //    premiumRequestDTONew.NoOfPC = json1["noOfPC"];
-                                //    premiumRequestDTONew.NoOfTW = json1["noOfTW"];
-                                //    premiumRequestDTONew.DriverAge = json1["driverAge"];
-                                //    premiumRequestDTONew.DriverExp = json1["driverExp"];
-                                //    premiumRequestDTONew.AdditionalDriver = json1["additionalDriver"];
-                                //    premiumRequestDTONew.BillingFrequency = json1["billingFrequency"];
-                                //    var CalculatePremiumResponseNew = await PremiumCalCulation(premiumRequestDTONew, apiContext);
-
-
-                                //    PremiumReturnDto CalculatePremiumResponse = new PremiumReturnDto();
-                                //    CalculatePremiumResponse.FireTheft = CalculatePremiumResponseNew.FireTheft - CalculatePremiumResponseOld.FireTheft;
-                                //    CalculatePremiumResponse.ADPremium = CalculatePremiumResponseNew.ADPremium - CalculatePremiumResponseOld.ADPremium;
-                                //    CalculatePremiumResponse.FTTax = CalculatePremiumResponseNew.FTTax - CalculatePremiumResponseOld.FTTax;
-                                //    CalculatePremiumResponse.ADTax = CalculatePremiumResponseNew.ADTax - CalculatePremiumResponseOld.ADTax;
-                                //    CalculatePremiumResponse.TotalADAmount = CalculatePremiumResponseNew.TotalADAmount - CalculatePremiumResponseOld.TotalADAmount;
-                                //    CalculatePremiumResponse.TotalFTAmount = CalculatePremiumResponseNew.TotalFTAmount - CalculatePremiumResponseOld.TotalFTAmount;
-
-                                //    Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
-
-                                //    TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
-                                //    txnParameterDTO.Amount = CalculatePremiumResponse.FireTheft;
-                                //    txnParameterDTO.TaxAmount = CalculatePremiumResponse.FTTax;
-                                //    txnParameterDTO.Total = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.FTTax;
-
-                                //    RatingConfig.Add("FT", txnParameterDTO);
-                                //    txnParameterDTO = new TxnParameterDTO();
-                                //    txnParameterDTO.Amount = CalculatePremiumResponse.ADPremium;
-                                //    txnParameterDTO.TaxAmount = CalculatePremiumResponse.ADTax;
-                                //    txnParameterDTO.Total = CalculatePremiumResponse.ADPremium + CalculatePremiumResponse.ADTax;
-                                //    RatingConfig.Add("AD", txnParameterDTO);
-                                //    transactionsDTO.TotalAmount = CalculatePremiumResponse.FireTheft + CalculatePremiumResponse.ADPremium;
-                                //    transactionsDTO.TotalGSTAmount = CalculatePremiumResponse.FTTax + CalculatePremiumResponse.ADTax;
-                                //    transactionsDTO.PremiumDetails = RatingConfig;
-                                //    transactionsDTO.Type = "Endorsement-Addition";
-                                //    //    transactionsDTO.ProductId = Convert.ToDecimal(productId);
-                                //    transactionsDTO.TxnType = "Credit";
-                                //    transactionsDTO.AccountNo = policy.CdaccountNumber;
-                                //    //  transactionsDTO.Frequency = premiumRequestDTO.BillingFrequency;
-
-                                //    var transaction = await _integrationService.CreateMasterCDAccount(transactionsDTO, apiContext);
-
-                                //    businessStatus = transaction.Status;
 
                             }
                             else
@@ -3494,6 +2967,61 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                             dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
+
+
+                            //Step2:Validate of Request Object
+                            List<CDMapper> cDMappers = new List<CDMapper>();
+                            CDMapper cD = new CDMapper();
+                            cD.Type = "Policy";
+                            cD.Data = json;
+                            cDMappers.Add(cD);
+                            cD = new CDMapper();
+                            cD.Type = "Endorsement";
+                            cD.Data = insurableItemRequest;
+                            cDMappers.Add(cD);
+
+
+                            var res = await _integrationService.RuleMapper(cDMappers, "EndorsementAdd", apiContext);
+
+                            var seriaizeListofres = JsonConvert.SerializeObject(res);
+                            List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
+
+                            var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+
+                            if (Listofres != null)
+                            {
+                                foreach (var item in Listofres)
+                                {
+
+                                    if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
+                                    {
+
+                                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+                                        Errors.Add(errorInfo);
+
+                                    }
+
+                                }
+                                if (Errors.Count > 0)
+                                {
+                                    return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
+                                }
+                            }
+
+                            //step:3 Call CD mapper
+                            var CDmap = await _integrationService.CDMapperList(cDMappers, "EndorsementAdd", apiContext);
+
+
+                            MicaCD micaCD = new MicaCD();
+                            micaCD.AccountNo = policy.CdaccountNumber;
+                            micaCD.micaCDDTO = CDmap;
+
+
+
+
+
+
+
                             foreach (var insurableName in json.InsurableItem)
                             {
                                 foreach (var item in insurableItemRequest.InsurableItem)
@@ -3516,9 +3044,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                 if (count < 3)
                                                 {
 
-                                                    if (insurableItemRequest.SI != null && insurableItemRequest.SI != "")
+                                                    if (insurableItemRequest.si != null && insurableItemRequest.si != "")
                                                     {
-                                                        json1.si = insurableItemRequest.SI.ToString();
+                                                        json1.si = insurableItemRequest.si;
                                                     }
                                                     foreach (var fields in item.RiskItems)
                                                     {
@@ -3574,6 +3102,28 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
 
                             _context.SaveChanges();
+
+
+                            //Step5:CD Transaction for the policy
+                            var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+                            BusinessStatus businessStatus = 0;
+                            businessStatus = transaction.Status;
+
+                            if (businessStatus == BusinessStatus.Created)
+                            {
+                                //Status for Txn
+
+                            }
+                            else
+                            {
+
+                                return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
+
+                            }
+
+
+
+
                             return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = "Driver Added Successfully" };
 
                         }
@@ -3665,6 +3215,57 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                     dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
+
+                    //Step2:Validate of Request Object
+                    List<CDMapper> cDMappers = new List<CDMapper>();
+                    CDMapper cD = new CDMapper();
+                    cD.Type = "Policy";
+                    cD.Data = json;
+                    cDMappers.Add(cD);
+                    cD = new CDMapper();
+                    cD.Type = "Endorsement";
+                    cD.Data = insurableItemRequest;
+                    cDMappers.Add(cD);
+
+
+                    var res = await _integrationService.RuleMapper(cDMappers, "EndorsementDel", apiContext);
+
+                    var seriaizeListofres = JsonConvert.SerializeObject(res);
+                    List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
+                    var seriaizeListofres1 = JsonConvert.SerializeObject(cDMappers);
+
+                    var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+
+                    if (Listofres != null)
+                    {
+                        foreach (var item in Listofres)
+                        {
+
+                            if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
+                            {
+
+                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+                                Errors.Add(errorInfo);
+
+                            }
+
+                        }
+                        if (Errors.Count > 0)
+                        {
+                            return new EndorsmentDTO { Status = BusinessStatus.Error, Errors = Errors };
+                        }
+                    }
+
+                    //step:3 Call CD mapper
+                    var CDmap = await _integrationService.CDMapperList(cDMappers, "EndorsementDel", apiContext);
+
+
+                    MicaCD micaCD = new MicaCD();
+                    micaCD.AccountNo = policy.CdaccountNumber;
+                    micaCD.micaCDDTO = CDmap;
+
+
+
                     foreach (var item in insurableItemRequest.InsurableItem)
                     {
 
@@ -3735,6 +3336,25 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                     var x2 = await _context.SaveChangesAsync();
+
+                    //Step5:CD Transaction for the policy
+                    var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+                    BusinessStatus businessStatus = 0;
+                    businessStatus = transaction.Status;
+
+                    if (businessStatus == BusinessStatus.Created)
+                    {
+                        //Status for Txn
+
+                    }
+                    else
+                    {
+
+                        return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
+
+                    }
+
+
                     if (x2 > 0)
                     {
                         return new EndorsmentDTO() { Status = BusinessStatus.Ok, ResponseMessage = "Deleted Successfully" };
@@ -3885,7 +3505,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             var jsoninsurableFields = oldInsItem["RiskItems"][riskIndex];//identification numbefr
                             var InputidentificationNumber = (string)fields["Identification Number"];
                             var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                            
+
                             if (InputidentificationNumber == TblIdentificationNo)
                             {
                                 var removeitem = jsoninsurableFields;
@@ -3924,7 +3544,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
                 }
             }
-            if(Errors.Count> 0)
+            if (Errors.Count > 0)
             {
                 return null;
             }
@@ -4102,7 +3722,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
                             {
 
-                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message,PropertyName=item.ValidatorName };
+                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message, PropertyName = item.ValidatorName };
                                 Errors.Add(errorInfo);
 
                             }
@@ -4112,273 +3732,273 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         {
                             return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors };
                         }
-                  
-                    //Step2:Premium  calculation 
+
+                        //Step2:Premium  calculation 
 
 
 
-                    Errors = GetPolicyRequestValidation(ProposalDetail);
-                    //PremiumRequestDTO premiumRequestDTO = new PremiumRequestDTO();
-                    //premiumRequestDTO.SI = ProposalDetail["si"];
-                    //premiumRequestDTO.StateCode = ProposalDetail["stateCode"];
-                    //premiumRequestDTO.NoOfPC = ProposalDetail["noOfPC"];
-                    //premiumRequestDTO.NoOfTW = ProposalDetail["noOfTW"];
-                    //premiumRequestDTO.DriverAge = ProposalDetail["driverAge"];
-                    //premiumRequestDTO.DriverExp = ProposalDetail["driverExp"];
-                    //premiumRequestDTO.AdditionalDriver = ProposalDetail["additionalDriver"];
-                    //premiumRequestDTO.BillingFrequency = ProposalDetail["billingFrequency"];
+                        Errors = GetPolicyRequestValidation(ProposalDetail);
+                        //PremiumRequestDTO premiumRequestDTO = new PremiumRequestDTO();
+                        //premiumRequestDTO.SI = ProposalDetail["si"];
+                        //premiumRequestDTO.StateCode = ProposalDetail["stateCode"];
+                        //premiumRequestDTO.NoOfPC = ProposalDetail["noOfPC"];
+                        //premiumRequestDTO.NoOfTW = ProposalDetail["noOfTW"];
+                        //premiumRequestDTO.DriverAge = ProposalDetail["driverAge"];
+                        //premiumRequestDTO.DriverExp = ProposalDetail["driverExp"];
+                        //premiumRequestDTO.AdditionalDriver = ProposalDetail["additionalDriver"];
+                        //premiumRequestDTO.BillingFrequency = ProposalDetail["billingFrequency"];
 
 
 
-                    // var CalculatePremiumResponse = await PremiumCalCulation(premiumRequestDTO, apiContext);
-                    List<MicaCDDTO> CDmap = await _integrationService.CDMapper(ProposalDetail, "Proposal", apiContext);
-                    if (CDmap.Count() > 0)
-                    {
-                        var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
-
-                        //Step3:Check Premium vs Payment Amount
-                        var paymentinfo = ProposalDetail["PaymentInfo"];
-                        if (paymentinfo != null)
+                        // var CalculatePremiumResponse = await PremiumCalCulation(premiumRequestDTO, apiContext);
+                        List<MicaCDDTO> CDmap = await _integrationService.CDMapper(ProposalDetail, "Proposal", apiContext);
+                        if (CDmap.Count() > 0)
                         {
-                            var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
+                            var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
 
-                            if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 || (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                            //Step3:Check Premium vs Payment Amount
+                            var paymentinfo = ProposalDetail["PaymentInfo"];
+                            if (paymentinfo != null)
                             {
-                                var expObj = JsonConvert.DeserializeObject<ExpandoObject>(ProposalDetail.ToString());
+                                var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
 
-                                if (Errors.Count > 0)
+                                if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 || (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
                                 {
-                                    return new ProposalResponse { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
-                                }
-                                var productCode = ProposalDetail["Product Code"].ToString();
+                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(ProposalDetail.ToString());
 
-
-                                var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
-
-                                if (productDetails.ProductId <= 0)
-                                {
-                                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProdcutCode : {productCode} Not Found" };
-                                    Errors.Add(errorInfo);
-                                    return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
-                                }
-                                var productId = productDetails.ProductId.ToString();
-
-                                string cover = "", coverEvent = "", productName = "";
-
-                                productName = productDetails.ProductName;
-
-
-                                logMsg = "1";
-                                logMsg = logMsg + ",2";
-
-                                var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
-                                /*Partner Section*/
-                                var partnerId = "";
-                                if (ProposalDetail["Partner ID"] != null)
-
-                                {
-                                    partnerId = ProposalDetail["Partner ID"].ToString();
-                                }
-                                PartnersDTO partnerDetails = null;
-                                // partnerDetails = await _integrationService.GetPartnerDetailAsync(partnerId, apiContext);
-                                //if (partnerDetails != null)
-                                //{
-                                //    if (partnerDetails.PartnerId <= 0)
-
-                                //    {
-
-                                //        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PartnerID", PropertyName = "PartnerID", ErrorMessage = $"PartnerID : {productCode} Not Found" };
-
-                                //        Errors.Add(errorInfo);
-
-                                //        return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
-
-                                //    }
-                                //}
-                                if (policyRiskDetails.ProductRcbDetails.Count <= 0)
-                                {
-                                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "RiskDetail", PropertyName = "RiskDetail", ErrorMessage = $"RiskDetail for product : {partnerId} Not Found" };
-                                    Errors.Add(errorInfo);
-                                    return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
-                                }
-
-                                //Step4:Genrate Proposal Number
-                                logMsg = logMsg + ",3";
-                                var mappedPolicy = await MapAndValidateInsurablePolicyAsync(ProposalDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "ProposalNo", apiContext);
-
-                                if (Errors.Count == 0)
-                                {
-                                    if (partnerDetails != null)
+                                    if (Errors.Count > 0)
                                     {
-                                        if (partnerDetails.OrganizationId > 0)
-                                        {
-                                            mappedPolicy.CustomerId = Convert.ToInt32(productDetails.OrganizationId).ToString();
-                                        }
-
+                                        return new ProposalResponse { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
                                     }
-                                    else
+                                    var productCode = ProposalDetail["Product Code"].ToString();
+
+
+                                    var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
+
+                                    if (productDetails.ProductId <= 0)
                                     {
-                                        mappedPolicy.CustomerId = Convert.ToInt32(productDetails.OrganizationId).ToString();
+                                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProdcutCode : {productCode} Not Found" };
+                                        Errors.Add(errorInfo);
+                                        return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                                     }
+                                    var productId = productDetails.ProductId.ToString();
+
+                                    string cover = "", coverEvent = "", productName = "";
+
+                                    productName = productDetails.ProductName;
 
 
-                                    var ProposalObj = JsonConvert.DeserializeObject<ExpandoObject>(ProposalDetail.ToString());
-                                    AddProperty(expObj, "ProposalNumber", mappedPolicy.ProposalNo);
-                                    AddProperty(expObj, "Balance SumInsured", ProposalDetail["si"]);
-                                    AddProperty(expObj, "No. of Claim", 0);
+                                    logMsg = "1";
+                                    logMsg = logMsg + ",2";
 
-                                    var Proposaltempobj = JsonConvert.SerializeObject(expObj);
-                                    ProposalDetail = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
+                                    var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
+                                    /*Partner Section*/
+                                    var partnerId = "";
+                                    if (ProposalDetail["Partner ID"] != null)
 
-
-
-                                    //Step5:Create CD account Number 
-                                    proposalNumber = mappedPolicy.ProposalNo;
-                                    Random random = new Random();
-                                    var rnd = random.Next(10000, 99999);
-                                    var CdaccountNumber = proposalNumber + "/" + rnd;
-                                    mappedPolicy.CdaccountNumber = CdaccountNumber;
-
-
-
-                                    //Step6:Based on the Product Type update CDAccountNumber in Policy table
-
-
-                                    //Step7:Add payment section Inside Proposal Json
-                                    logMsg = logMsg + ",4";
-
-                                    AddProperty(expObj, "PaymentInfoDeatils", CalculatePremiumResponse);
-                                    var tempobj = JsonConvert.SerializeObject(expObj);
-                                    ProposalDetail = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
-
-                                    //Step8:Save Proposal in all relevant table
-
-                                    PolicyId = SavePolicyDetails(mappedPolicy, ProposalDetail);
-
-                                    //Step9:Post CD Account entries 
-
-                                    BusinessStatus businessStatus = 0;
-                                    //if (productDetails.IsMasterPolicy == true)
+                                    {
+                                        partnerId = ProposalDetail["Partner ID"].ToString();
+                                    }
+                                    PartnersDTO partnerDetails = null;
+                                    // partnerDetails = await _integrationService.GetPartnerDetailAsync(partnerId, apiContext);
+                                    //if (partnerDetails != null)
                                     //{
-                                    //Calling CD mapping API
+                                    //    if (partnerDetails.PartnerId <= 0)
 
+                                    //    {
 
-                                    // List<MicaCDDTO> CDmap = await _integrationService.CDMapper(ProposalDetail, "Proposal", apiContext);
-                                    MicaCD micaCD = new MicaCD();
-                                    micaCD.AccountNo = CdaccountNumber;
-                                    micaCD.micaCDDTO = CDmap;
+                                    //        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PartnerID", PropertyName = "PartnerID", ErrorMessage = $"PartnerID : {productCode} Not Found" };
 
+                                    //        Errors.Add(errorInfo);
 
-                                    //Create CD Account 
-                                    var TxnResponse = await _integrationService.CDAccountCreation(CdaccountNumber, apiContext);
+                                    //        return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
 
-                                    if (TxnResponse.Status == BusinessStatus.Created)
+                                    //    }
+                                    //}
+                                    if (policyRiskDetails.ProductRcbDetails.Count <= 0)
                                     {
-                                        // CD Txn 
-                                        var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+                                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "RiskDetail", PropertyName = "RiskDetail", ErrorMessage = $"RiskDetail for product : {partnerId} Not Found" };
+                                        Errors.Add(errorInfo);
+                                        return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+                                    }
 
-                                        businessStatus = transaction.Status;
+                                    //Step4:Genrate Proposal Number
+                                    logMsg = logMsg + ",3";
+                                    var mappedPolicy = await MapAndValidateInsurablePolicyAsync(ProposalDetail, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "ProposalNo", apiContext);
 
-                                        TblPolicy policyUpdate = _context.TblPolicy.Find(PolicyId);
-                                        var Amount = paymentinfoRequest[0].Amount;
-
-                                        /*partner Id*/
-                                        var pID = apiContext.PartnerId;
-
-                                        if (partnerDetails != null && partnerDetails.GetType().GetProperty("OrganizationId") != null)
-
+                                    if (Errors.Count == 0)
+                                    {
+                                        if (partnerDetails != null)
                                         {
-
-                                            pID = (decimal)partnerDetails.GetType().GetProperty("OrganizationId").GetValue(partnerDetails, null);
-
-                                        }
-
-
-                                        if (businessStatus == BusinessStatus.Created)
-
-                                        {
-
-
-
-                                            policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
-
-                                            policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
-
-                                            policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
-
-
-
-                                            policyUpdate.IsActive = true;
-
-                                            // Add payment table
-
-                                            TblPolicyPayment policyPayment = new TblPolicyPayment()
-
+                                            if (partnerDetails.OrganizationId > 0)
                                             {
-
-                                                PaidAmount = Amount,
-
-                                                CreatedDate = DateTime.Now,
-
-                                                PolicyId = PolicyId
-
-                                            };
-
-                                            _context.TblPolicyPayment.Add(policyPayment);
-
-                                            _context.SaveChanges();
-
-                                            //  var paytmtransactionResponce = await _integrationService.DoTransactionByPayment(PolicyId, Amount, mappedPolicy.MobileNumber, apiContext);
-
-
-                                            return new ProposalResponse { Status = BusinessStatus.Created, Id = proposalNumber, ResponseMessage = $"Proposal created with proposal number {proposalNumber}" };
+                                                mappedPolicy.CustomerId = Convert.ToInt32(productDetails.OrganizationId).ToString();
+                                            }
 
                                         }
                                         else
                                         {
-
-                                            return new ProposalResponse { Status = BusinessStatus.Error, ResponseMessage = $"CD Transaction failed for this accountnumber {CdaccountNumber}" };
-
+                                            mappedPolicy.CustomerId = Convert.ToInt32(productDetails.OrganizationId).ToString();
                                         }
-                                    }
-                                    else
-                                    {
 
-                                        return new ProposalResponse { Status = BusinessStatus.Error, ResponseMessage = $"Account creation failed for this accountnumber {CdaccountNumber}" };
+
+                                        var ProposalObj = JsonConvert.DeserializeObject<ExpandoObject>(ProposalDetail.ToString());
+                                        AddProperty(expObj, "ProposalNumber", mappedPolicy.ProposalNo);
+                                        AddProperty(expObj, "Balance SumInsured", ProposalDetail["si"]);
+                                        AddProperty(expObj, "No. of Claim", 0);
+
+                                        var Proposaltempobj = JsonConvert.SerializeObject(expObj);
+                                        ProposalDetail = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
+
+
+
+                                        //Step5:Create CD account Number 
+                                        proposalNumber = mappedPolicy.ProposalNo;
+                                        Random random = new Random();
+                                        var rnd = random.Next(10000, 99999);
+                                        var CdaccountNumber = proposalNumber + "/" + rnd;
+                                        mappedPolicy.CdaccountNumber = CdaccountNumber;
+
+
+
+                                        //Step6:Based on the Product Type update CDAccountNumber in Policy table
+
+
+                                        //Step7:Add payment section Inside Proposal Json
+                                        logMsg = logMsg + ",4";
+
+                                        AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                                        var tempobj = JsonConvert.SerializeObject(expObj);
+                                        ProposalDetail = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+
+                                        //Step8:Save Proposal in all relevant table
+
+                                        PolicyId = SavePolicyDetails(mappedPolicy, ProposalDetail);
+
+                                        //Step9:Post CD Account entries 
+
+                                        BusinessStatus businessStatus = 0;
+                                        //if (productDetails.IsMasterPolicy == true)
+                                        //{
+                                        //Calling CD mapping API
+
+
+                                        // List<MicaCDDTO> CDmap = await _integrationService.CDMapper(ProposalDetail, "Proposal", apiContext);
+                                        MicaCD micaCD = new MicaCD();
+                                        micaCD.AccountNo = CdaccountNumber;
+                                        micaCD.micaCDDTO = CDmap;
+
+
+                                        //Create CD Account 
+                                        var TxnResponse = await _integrationService.CDAccountCreation(CdaccountNumber, apiContext);
+
+                                        if (TxnResponse.Status == BusinessStatus.Created)
+                                        {
+                                            // CD Txn 
+                                            var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+
+                                            businessStatus = transaction.Status;
+
+                                            TblPolicy policyUpdate = _context.TblPolicy.Find(PolicyId);
+                                            var Amount = paymentinfoRequest[0].Amount;
+
+                                            /*partner Id*/
+                                            var pID = apiContext.PartnerId;
+
+                                            if (partnerDetails != null && partnerDetails.GetType().GetProperty("OrganizationId") != null)
+
+                                            {
+
+                                                pID = (decimal)partnerDetails.GetType().GetProperty("OrganizationId").GetValue(partnerDetails, null);
+
+                                            }
+
+
+                                            if (businessStatus == BusinessStatus.Created)
+
+                                            {
+
+
+
+                                                policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
+
+                                                policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
+
+                                                policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
+
+
+
+                                                policyUpdate.IsActive = true;
+
+                                                // Add payment table
+
+                                                TblPolicyPayment policyPayment = new TblPolicyPayment()
+
+                                                {
+
+                                                    PaidAmount = Amount,
+
+                                                    CreatedDate = DateTime.Now,
+
+                                                    PolicyId = PolicyId
+
+                                                };
+
+                                                _context.TblPolicyPayment.Add(policyPayment);
+
+                                                _context.SaveChanges();
+
+                                                //  var paytmtransactionResponce = await _integrationService.DoTransactionByPayment(PolicyId, Amount, mappedPolicy.MobileNumber, apiContext);
+
+
+                                                return new ProposalResponse { Status = BusinessStatus.Created, Id = proposalNumber, ResponseMessage = $"Proposal created with proposal number {proposalNumber}" };
+
+                                            }
+                                            else
+                                            {
+
+                                                return new ProposalResponse { Status = BusinessStatus.Error, ResponseMessage = $"CD Transaction failed for this accountnumber {CdaccountNumber}" };
+
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            return new ProposalResponse { Status = BusinessStatus.Error, ResponseMessage = $"Account creation failed for this accountnumber {CdaccountNumber}" };
+                                        }
+
+
                                     }
+                                    //}
+                                    //step10:Push Proposal creation event to dispatcher
+
+
+
+
 
 
                                 }
-                                //}
-                                //step10:Push Proposal creation event to dispatcher
+
+                                else
+
+                                {
 
 
 
+                                    return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Calculate Premium Amount {CalculatePremiumResponse.TotalAmount} differs with payment collected amount {paymentinfoRequest[0].Amount}" };
 
-
+                                }
 
                             }
-
                             else
-
                             {
 
-
-
-                                return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Calculate Premium Amount {CalculatePremiumResponse.TotalAmount} differs with payment collected amount {paymentinfoRequest[0].Amount}" };
+                                return new ProposalResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Payment information is required for Proposal Creation" };
 
                             }
-
                         }
-                        else
-                        {
 
-                            return new ProposalResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Payment information is required for Proposal Creation" };
-
-                        }
                     }
-
-                }
                 }
                 else
                 {
@@ -4471,8 +4091,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var Proposaltempobj = JsonConvert.SerializeObject(ProposalObj);
                 dynamic json = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
                 policyResponse.ProposalPolicyDetail = json;
-                return new PolicyProposalResponse  { Status = BusinessStatus.Ok, ProposalPolicyDetail = json};
-            
+                return new PolicyProposalResponse { Status = BusinessStatus.Ok, ProposalPolicyDetail = json };
+
             }
             //List<dynamic> fields = new List<dynamic>();
             //// List<dynamic> fields1 = new List<dynamic>();
@@ -4493,7 +4113,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //{
             //    return null;
             //}
-            return new PolicyProposalResponse { Status = BusinessStatus.NotFound, ProposalPolicyDetail = null, ResponseMessage= "Data not found" };
+            return new PolicyProposalResponse { Status = BusinessStatus.NotFound, ProposalPolicyDetail = null, ResponseMessage = "Data not found" };
 
             //return "Data not found";
             //tblPolicyDetailsdata.PolicyRequest = json.ToString();
@@ -4513,203 +4133,226 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 List<ErrorInfo> Errors = new List<ErrorInfo>();
                 var res = await _integrationService.RuleMapper(IssuepolicyDTO, "Policy", apiContext);
 
-               // var seriaizeListofres = JsonConvert.SerializeObject(res);
-               // List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
-                //if (Listofres.Count() > 0)
-                //{
-
-               // var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
-
-               
-
-                //Step2: Check Policy Exist for this Proposal Number 
-
-                string proposalNumber = "";
-                if (IssuepolicyDTO["ProposalNumber"] != null)
+                var seriaizeListofres = JsonConvert.SerializeObject(res);
+                List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
+                if (Listofres.Count() > 0)
                 {
-                    string proposalNo = (string)IssuepolicyDTO["ProposalNumber"];
 
-                    var tblPolicy = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
-                    //step:3 update the insurable fileds
-                    if (tblPolicy != null)
+
+                    var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+                    if (Listofres != null)
                     {
-                        var policyId = tblPolicy.PolicyId;
-                        var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                        tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
-
-                        var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, tblPolicy, tblPolicyDetailsdata,Errors, apiContext);
-                        if(tblPolicy1 == null && Errors.Count > 0)
+                        foreach (var item in Listofres)
                         {
-                            return new PolicyResponse { Status = BusinessStatus.Error, Errors= Errors, ResponseMessage = $"RiskItem Count is mismatch" };
-                        }
-                       var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                        dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                        //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                        //// var paymentDetails = json["PaymentInfoDeatils"];
 
-
-                        //tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
-                        //foreach (var item in IssuepolicyDTO.InsurableItem)//Client
-                        //{
-                        //    foreach (var insurableName in json.InsurableItem)//table 
-                        //    {
-                        //        if (item.InsurableName == insurableName.InsurableName)
-                        //        {
-                        //            foreach (var insurableName1 in json1.InsurableItem)
-                        //            {
-                        //                //json-table-insurableName
-                        //                //IssuepolicyDTO-request-item
-                        //                var riskcount = Convert.ToInt32(insurableName["RiskCount"]);
-                        //                var additonalDriverCount = item.RiskItems.Count;
-
-                        //                foreach (var fields in item.RiskItems)
-                        //                {
-                        //                    foreach (var jsoninsurableFields in insurableName.RiskItems)
-                        //                    {
-
-                        //                        try
-                        //                        {
-                        //                            if (additonalDriverCount < riskcount)
-                        //                            {
-
-
-                        //                                var InputidentificationNumber = (string)fields["Identification Number"];
-                        //                                var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                        //                                if (InputidentificationNumber == TblIdentificationNo)
-                        //                                {
-
-                        //                                }
-                        //                                //else
-                        //                                //{
-                        //                                //    insurableName.RiskItems.Add(fields);
-                        //                                //}
-                        //                            }
-                        //                            else
-                        //                            {
-                        //                                return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = "vehicle cannot be more from additional driver" };
-
-                        //                            }
-                        //                        }
-                        //                        catch (Exception e)
-                        //                        {
-                        //                            insurableName1.RiskItems = insurableName.RiskItems;
-                        //                        }
-                        //                    }
-                        //                }
-                        //            }
-
-
-                        //        }
-
-                        //    }
-
-                        //}
-
-                        //tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                        //_context.TblPolicy.Update(tblPolicy);
-                        //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                        //_context.SaveChanges();
-
-
-                        //Step:4 Calling CD mapping API
-
-
-                        List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
-                        if (CDmap.Count > 0)
-                        {
-                            MicaCD micaCD = new MicaCD();
-                            micaCD.AccountNo = tblPolicy.CdaccountNumber;
-                            micaCD.micaCDDTO = CDmap;
-                            BusinessStatus businessStatus = 0;
-
-                            //CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
-                            //Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
-                            //TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
-
-                            //txnParameterDTO.Amount = paymentDetails.FireTheft;
-                            //txnParameterDTO.TaxAmount = paymentDetails.FTTax;
-                            //txnParameterDTO.Total = paymentDetails.TotalFTAmount;
-                            //transactionsDTO.TotalAmount = paymentDetails.FireTheft;
-                            //transactionsDTO.TotalGSTAmount = paymentDetails.FTTax;
-
-                            //RatingConfig.Add("FT", txnParameterDTO);
-                            //transactionsDTO.AccountNo = tblPolicy.CdaccountNumber;
-                            //transactionsDTO.PremiumDetails = RatingConfig;
-                            //transactionsDTO.Type = "Policy";
-                            //transactionsDTO.TxnType = "Debit";
-
-                            //Step5:CD Transaction for the policy
-                            var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
-
-                            businessStatus = transaction.Status;
-                            if (businessStatus == BusinessStatus.Created)
+                            if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
                             {
-                                //Status for Txn
-                                TblPolicy policyUpdate = _context.TblPolicy.Find(tblPolicy.PolicyId);
+
+                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message, PropertyName = item.ValidatorName };
+                                Errors.Add(errorInfo);
+
+                            }
+
+                        }
+                        if (Errors.Count > 0)
+                        {
+                            return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors };
+                        }
+
+                    }
+                        //Step2: Check Policy Exist for this Proposal Number 
+
+                        string proposalNumber = "";
+                        if (IssuepolicyDTO["ProposalNumber"] != null)
+                        {
+                            string proposalNo = (string)IssuepolicyDTO["ProposalNumber"];
+
+                            var tblPolicy = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
+                            //step:3 update the insurable fileds
+                            if (tblPolicy != null)
+                            {
+                                var policyId = tblPolicy.PolicyId;
+                                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+                                tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
+
+                                var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
+                                if (tblPolicy1 == null && Errors.Count > 0)
+                                {
+                                    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                                }
+                                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                                dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                                //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                                //// var paymentDetails = json["PaymentInfoDeatils"];
 
 
-                                policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
+                                //tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
+                                //foreach (var item in IssuepolicyDTO.InsurableItem)//Client
+                                //{
+                                //    foreach (var insurableName in json.InsurableItem)//table 
+                                //    {
+                                //        if (item.InsurableName == insurableName.InsurableName)
+                                //        {
+                                //            foreach (var insurableName1 in json1.InsurableItem)
+                                //            {
+                                //                //json-table-insurableName
+                                //                //IssuepolicyDTO-request-item
+                                //                var riskcount = Convert.ToInt32(insurableName["RiskCount"]);
+                                //                var additonalDriverCount = item.RiskItems.Count;
+
+                                //                foreach (var fields in item.RiskItems)
+                                //                {
+                                //                    foreach (var jsoninsurableFields in insurableName.RiskItems)
+                                //                    {
+
+                                //                        try
+                                //                        {
+                                //                            if (additonalDriverCount < riskcount)
+                                //                            {
+
+
+                                //                                var InputidentificationNumber = (string)fields["Identification Number"];
+                                //                                var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                                //                                if (InputidentificationNumber == TblIdentificationNo)
+                                //                                {
+
+                                //                                }
+                                //                                //else
+                                //                                //{
+                                //                                //    insurableName.RiskItems.Add(fields);
+                                //                                //}
+                                //                            }
+                                //                            else
+                                //                            {
+                                //                                return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = "vehicle cannot be more from additional driver" };
+
+                                //                            }
+                                //                        }
+                                //                        catch (Exception e)
+                                //                        {
+                                //                            insurableName1.RiskItems = insurableName.RiskItems;
+                                //                        }
+                                //                    }
+                                //                }
+                                //            }
+
+
+                                //        }
+
+                                //    }
+
+                                //}
+
+                                //tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+                                //_context.TblPolicy.Update(tblPolicy);
+                                //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+                                //_context.SaveChanges();
+
+
+                                //Step:4 Calling CD mapping API
+
+
+                                List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
+                                if (CDmap.Count > 0)
+                                {
+                                    MicaCD micaCD = new MicaCD();
+                                    micaCD.AccountNo = tblPolicy.CdaccountNumber;
+                                    micaCD.micaCDDTO = CDmap;
+                                    BusinessStatus businessStatus = 0;
+
+                                    //CdTransactionsMasterDTO transactionsDTO = new CdTransactionsMasterDTO();
+                                    //Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
+                                    //TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
+
+                                    //txnParameterDTO.Amount = paymentDetails.FireTheft;
+                                    //txnParameterDTO.TaxAmount = paymentDetails.FTTax;
+                                    //txnParameterDTO.Total = paymentDetails.TotalFTAmount;
+                                    //transactionsDTO.TotalAmount = paymentDetails.FireTheft;
+                                    //transactionsDTO.TotalGSTAmount = paymentDetails.FTTax;
+
+                                    //RatingConfig.Add("FT", txnParameterDTO);
+                                    //transactionsDTO.AccountNo = tblPolicy.CdaccountNumber;
+                                    //transactionsDTO.PremiumDetails = RatingConfig;
+                                    //transactionsDTO.Type = "Policy";
+                                    //transactionsDTO.TxnType = "Debit";
+
+                                    //Step5:CD Transaction for the policy
+                                    var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+
+                                    businessStatus = transaction.Status;
+                                    if (businessStatus == BusinessStatus.Created)
+                                    {
+                                        //Status for Txn
+                                        TblPolicy policyUpdate = _context.TblPolicy.Find(tblPolicy.PolicyId);
+
+
+                                        policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
 
 
 
-                                policyUpdate.IsActive = true;
-                                //string[] Separate = (policyUpdate.PolicyStartDate.ToString()).Split(' ');
-                                //string desiredDate = Separate[1];
+                                        policyUpdate.IsActive = true;
+                                        //string[] Separate = (policyUpdate.PolicyStartDate.ToString()).Split(' ');
+                                        //string desiredDate = Separate[1];
 
-                                //string[] SeparateTime = (desiredDate.ToString()).Split(':');
-                                //var hour = Convert.ToInt32(SeparateTime[0]);
-                                //var minute= Convert.ToInt32(SeparateTime[1]);
-                                //var second = Convert.ToInt32(SeparateTime[2];
-
-
+                                        //string[] SeparateTime = (desiredDate.ToString()).Split(':');
+                                        //var hour = Convert.ToInt32(SeparateTime[0]);
+                                        //var minute= Convert.ToInt32(SeparateTime[1]);
+                                        //var second = Convert.ToInt32(SeparateTime[2];
 
 
-                                policyUpdate.PolicyStartDate = Convert.ToDateTime(IssuepolicyDTO["StartDate"]);
-                                System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
-                                DateTime dateTime = Convert.ToDateTime(policyUpdate.PolicyStartDate).Date;
-                                
-                                policyUpdate.PolicyEndDate = dateTime.Add(duration); 
 
 
-                                _context.SaveChanges();
+                                        policyUpdate.PolicyStartDate = Convert.ToDateTime(IssuepolicyDTO["StartDate"]);
+                                        System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
+                                        DateTime dateTime = Convert.ToDateTime(policyUpdate.PolicyStartDate).Date;
 
+                                        policyUpdate.PolicyEndDate = dateTime.Add(duration);
+
+
+                                        _context.SaveChanges();
+
+                                    }
+                                    else
+                                    {
+
+                                        return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
+
+                                    }
+                                    return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number  {tblPolicy.PolicyNo}Issued for the this Proposal Number {tblPolicy.ProposalNo} Successfully" };
+                                }
+                                else
+                                {
+                                    return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
+
+
+                                }
                             }
                             else
                             {
+                                return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"No Record Found for this Proposal Number {tblPolicy.ProposalNo}" };
 
-                                return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
 
                             }
-                            return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number  {tblPolicy.PolicyNo}Issued for the this Proposal Number {tblPolicy.ProposalNo} Successfully" };
+
                         }
+
                         else
                         {
-                            return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
+                            return new PolicyResponse { Status = BusinessStatus.Error, ResponseMessage = $"Proposal Number cannot be empty" };
 
 
                         }
                     }
-                    else
-                    {
-                        return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"No Record Found for this Proposal Number {tblPolicy.ProposalNo}" };
-
-
-                    }
-                    //}
-                    //else
-                    //{
-                    //    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Input Validation failed" };
-
-                    //}
-                }
-                else {
-                    return new PolicyResponse { Status = BusinessStatus.Error,  ResponseMessage = $"Proposal Number cannot be empty" };
-
+                
+                else
+                {
+                    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Input Validation failed" };
 
                 }
             }
             catch (Exception e)
             {
+                return new PolicyResponse { Status = BusinessStatus.Error, ResponseMessage = e.InnerException.ToString() };
 
 
             }
@@ -4882,8 +4525,20 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
+
+
             ProposalResponse proposalResponse = new ProposalResponse();
             List<ErrorInfo> Errors = new List<ErrorInfo>();
+
+            string PolicyNo = endoresementDto["PolicyNumber"].ToString();
+            if (PolicyNo == "")
+            {
+                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PolicyNumber can not be empty" };
+                Errors.Add(errorInfo);
+                return new ProposalResponse() { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
+
+            }
+
             try
             {
                 string endorsementType = endoresementDto["EndorsementType"].ToString();
@@ -4897,25 +4552,20 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                 }
-
                 string EndorsementNo = "";
 
+                //Addition of vehicle
 
 
-
-
-                    //Addition of vehicle
-
-
-                    if (endorsementType == "Addition of vehicle")
-                    {
+                if (endorsementType == "Addition of vehicle")
+                {
 
 
 
 
 
-                        //Add insurable item and updating json of Polic Request 
-                        var data = await AddInsurableItem(endoresementDto, apiContext);
+                    //Add insurable item and updating json of Polic Request 
+                    var data = await AddInsurableItem(endoresementDto, apiContext);
 
                     //Updating json of policyRequest
 
@@ -4925,14 +4575,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     proposalResponse.Id = data.Id;
                     //return proposalResponse;
                     return new ProposalResponse { Status = BusinessStatus.Updated, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
-              
+
                 }
 
 
-                    if (endorsementType == "Addition of driver")
-                    {
-                        //Add insurable item and updating json of Polic Request 
-                        var data = await AddInsurableItem(endoresementDto, apiContext);
+                if (endorsementType == "Addition of driver")
+                {
+                    //Add insurable item and updating json of Polic Request 
+                    var data = await AddInsurableItem(endoresementDto, apiContext);
 
                     //Updating json of policyRequest
 
@@ -5311,7 +4961,37 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return null;
 
         }
+        public async Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            if (policyNumber != "" && month>0 && year>0 && TxnEventType!="")
+            {
+                var policydetails = _context.TblPolicy.FirstOrDefault(s => s.PolicyNo == policyNumber);
+                if (policydetails != null)
+                {
+                    var accountnumber = policydetails.CdaccountNumber;
+                    if (accountnumber != ""){
+                        var AccDetails = await _integrationService.GetDailyTransaction(accountnumber, month, year, TxnEventType, apiContext);
+                        return AccDetails;
+                    }
+                    else{
+                        return new DailyDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"CD Account not Found for this PolicyNumber {policyNumber}" };
 
+                    }
+                }
+                else {
+                    return new DailyDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No record Found for this PolicyNumber {policyNumber}" };
+
+                }
+
+            }
+            else {
+                return new DailyDTO { Status = BusinessStatus.NotFound,ResponseMessage= "Policy Number or Month or Year or TxnEventType Cannot be empty" };
+            }
+
+        
+
+        }
     }
 
 

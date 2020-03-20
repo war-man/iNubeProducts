@@ -1265,6 +1265,14 @@ namespace iNube.Services.Partners.Models
 
         public List<MicaCDDTO> micaCDDTO { get; set; }
     }
+    public class DailyDTO: ResponseStatus
+    {
+        public string AccountNo { get; set; }
+        public decimal? AvailableAmount { get; set; }
+        public string TxnEventType { get; set; }
+        public CdTransactionsMasterDTO cdTransactionsMasterDTO { get; set; }
+
+    }
 }
 
 

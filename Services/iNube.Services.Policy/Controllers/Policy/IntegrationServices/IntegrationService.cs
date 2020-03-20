@@ -47,8 +47,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<MasterCDDTO> CreateMasterCDAccount(MicaCD cdTransactionsMaster, ApiContext apiContext);
         Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext);
         Task<List<MicaCDDTO>> CDMapper(dynamic PolicyRequest, string type, ApiContext apiContext);
+        Task<List<MicaCDDTO>> CDMapperList(dynamic PolicyRequest, string type, ApiContext apiContext);
         Task<dynamic> RuleMapper(dynamic InputRequest, string type, ApiContext apiContext);
         Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext);
+        Task<ProductDTO> GetProductDetailByIdAsync(string productId, ApiContext apiContext);
+        Task<DailyDTO> GetDailyTransaction(string accountnumber,int month, int year,string TxnEventType, ApiContext apiContext);
         //GetMappingParams(string mappingname, ApiContext apiContext)
     }
     public class IntegrationService : IIntegrationService
@@ -204,6 +207,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             var uri = ProductUrl + "/api/Product/GetProductByCode?productCode=" + productCode;
             return await GetApiInvoke<ProductDTO>(uri, apiContext);
         }
+        public async Task<ProductDTO> GetProductDetailByIdAsync(string productId, ApiContext apiContext)
+        {
+            var uri = ProductUrl + "/api/Product/GetProductById?productId=" + productId;
+            return await GetApiInvoke<ProductDTO>(uri, apiContext);
+        }
         public async Task<IEnumerable<ProductRcbdetailsDTO>> GetRiskPolicyDetailAsync(string productId, ApiContext apiContext)
         {
             var uri = ProductUrl + "/api/Product/GetProductRiskDetails?ProductId=" + productId;
@@ -306,12 +314,30 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await GetApiInvoke<MasterCDDTO>(uri, apiContext);
 
         }
+        public async Task<DailyDTO> GetDailyTransaction(string accountnumber, int month, int year, string TxnEventType, ApiContext apiContext)
+        {
+
+            var uri = PartnerUrl + "/api/Accounts/GetDailyTransaction?accountnumber="+ accountnumber + "&month="+ month + "&year="+ year + "&TxnEventType="+ TxnEventType;
+
+            return await GetApiInvoke<DailyDTO>(uri, apiContext);
+
+        }
         public async Task<dynamic> RuleMapper(dynamic InputRequest, string type, ApiContext apiContext)
         {
             var uri = ExtensionUrl + "/api/Mica_EGI/RuleMapper?TxnType=" + type;
 
             return await PostListApiInvoke<dynamic, dynamic>(uri, apiContext, InputRequest);
         }
+        public async Task<List<MicaCDDTO>> CDMapperList(dynamic PolicyRequest, string type, ApiContext apiContext)
+        {
+
+            var uri = ExtensionUrl + "/api/Mica_EGI/CDMapper?TxnType=" + type;
+
+            return await PostListApiInvoke<dynamic, MicaCDDTO>(uri, apiContext, PolicyRequest);
+
+        }
+
+
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();

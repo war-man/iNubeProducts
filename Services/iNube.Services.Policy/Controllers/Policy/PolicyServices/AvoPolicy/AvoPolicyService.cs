@@ -292,5 +292,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

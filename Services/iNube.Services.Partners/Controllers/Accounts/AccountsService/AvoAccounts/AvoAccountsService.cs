@@ -543,5 +543,10 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         {
             throw new NotImplementedException();
         }
+
+        public Task<DailyDTO> GetDailyTransaction(string accountnumber, int month, int year, string TxnEventType, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

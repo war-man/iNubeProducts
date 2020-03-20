@@ -75,6 +75,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputmodel, string mappingname, ApiContext apiContext);
         Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext);
         Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
+        Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext);
 
     }
     public class PolicyService : IPolicyService
@@ -733,6 +734,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).InternalGetPolicyDetailsByNumber(policyNumber, apiContext);
+        }
+        public async Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetDailyAccountDetails(policyNumber, month, year, TxnEventType, apiContext);
         }
     }
 }

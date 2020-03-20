@@ -1704,7 +1704,21 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             }
             return new MasterCDDTO { Status = BusinessStatus.Created, ResponseMessage = $"CD Account created successfully for this AccountNumber {accountnumber}" };
         }
+        public async Task<DailyDTO> GetDailyTransaction(string accountnumber, int month, int year, string TxnEventType, ApiContext apiContext)
+        {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            TblDailyCdtransaction DailyData = _context.TblDailyCdtransaction.LastOrDefault(s => s.AccountNo == accountnumber);
+            var date = DailyData.TransactionDateTime;
 
+            var accountdetails = _context.TblDailyCdtransaction.LastOrDefault(s => s.AccountNo == accountnumber && s.TransactionDateTime.Value.Month == month && s.TransactionDateTime.Value.Year == year && s.TxnEventType== TxnEventType);
+            if (accountdetails != null)
+            {
+              
+                return new DailyDTO { Status = BusinessStatus.Ok, ResponseMessage = $"Daily Transaction Account Details for this Account Number {accountnumber}", AvailableAmount = accountdetails.AvailableBalance,AccountNo=accountnumber,TxnEventType=accountdetails.TxnEventType};
 
+            }
+            return new DailyDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this Account Number {accountnumber}" };
+        
+        }
     }
 }

@@ -1486,7 +1486,15 @@ namespace iNube.Services.Policy.Models
     }
     public class CDMapper {
         public string Type { get; set; }
-        public List<dynamic> Data { get; set; }
+        public dynamic Data { get; set; }
+    }
+    public class DailyDTO : ResponseStatus
+    {
+        public string AccountNo { get; set; }
+        public decimal? AvailableAmount { get; set; }
+        public string TxnEventType { get; set; }
+        public CdTransactionsMasterDTO cdTransactionsMasterDTO { get; set; }
+
     }
 }
 
