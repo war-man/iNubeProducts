@@ -87,16 +87,14 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<ClaimInsurableDTO, TblClaimInsurable>()
                 .ForMember(dest => dest.TypeOfLoss, opt => opt.MapFrom(src => src.CoverName)).ReverseMap();
 
-            CreateMap<Alldoc, TblClaimdoc>()
-                .ForMember(dest => dest.DmsdocId, opt => opt.MapFrom(src => src.DocumentID))
-                .ForMember(dest => dest.DocumentName, opt => opt.MapFrom(src => src.FileName))
+            
+            CreateMap<TblClaimdoc, Alldoc>()
+                .ForMember(dest => dest.DocumentID, opt => opt.MapFrom(src => src.DmsdocId))
+                .ForMember(dest => dest.FileName, opt => opt.MapFrom(src => src.DocumentName))
                 .ForMember(dest => dest.DocumentType, opt => opt.MapFrom(src => src.DocumentType)).ReverseMap();
 
             CreateMap<TblBankAccounts, BankAccountsDTO>();
             CreateMap<BankAccountsDTO, TblBankAccounts>();
-
-            CreateMap<Alldoc, TblClaimdoc>();
-            CreateMap<TblClaimdoc, Alldoc>();
 
             CreateMap<ClaimDataDTO, Alldoc>();
             CreateMap<Alldoc, ClaimDataDTO>();
