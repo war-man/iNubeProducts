@@ -75,7 +75,7 @@ const ClaimDetails = (props) => {
 
     //console.log('claimDetailsprops.typeList', claimDetailsprops.typeList);
 
-    console.log("claimDetailsprops.Payee", claimDetailsprops.Payee);
+    console.log("claimDetailsprops.ClaimStatusData", claimDetailsprops.ClaimStatusData);
 
     // const claimAmountData = props;
 
@@ -366,7 +366,7 @@ const ClaimDetails = (props) => {
             <ClaimsDecision claimStatusIdState={claimDetailsprops.claimStatusIdState} claimManagerRemarksState={claimDetailsprops.claimManagerRemarksState}
                 fields={claimDetailsprops.fields} ClaimsDecisionData={claimDetailsprops.ClaimsDecisionData} handleChange={claimDetailsprops.handleChange} onFormSubmit={claimDetailsprops.onFormSubmit}
                 approved={claimDetailsprops.approved} onInputParamChange={claimDetailsprops.onInputParamChange} fields={claimDetailsprops.fields} errormessage={claimDetailsprops.errormessage}
-                ValidationUI={claimDetailsprops.ValidationUI} classes={claimDetailsprops.classes} errorstatus={claimDetailsprops.errorstatus} DecisionType={claimDetailsprops.DecisionType} />
+                ValidationUI={claimDetailsprops.ValidationUI} classes={claimDetailsprops.classes} errorstatus={claimDetailsprops.errorstatus} DecisionType={claimDetailsprops.DecisionType} ClaimStatusData={claimDetailsprops.ClaimStatusData}/>
 
 
 

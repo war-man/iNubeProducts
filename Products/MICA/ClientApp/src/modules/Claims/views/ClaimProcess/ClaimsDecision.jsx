@@ -36,7 +36,7 @@ import TranslationContainer from "components/Translation/TranslationContainer.js
 
 
 const ClaimsDecision = (props) => {
-    console.log("ClaimsDecisionData", props.DecisionType);
+    console.log("props.ClaimStatusData", props.ClaimStatusData);
 
     return (
 
@@ -57,13 +57,13 @@ const ClaimsDecision = (props) => {
                     <GridContainer lg={12}>
                         <GridItem xs={12} sm={4} md={3}>
 
-                            <Dropdown
+                            <MasterDropdown
                            // success={props.claimStatusIdState === "success"}
                             error={props.claimStatusIdState}
                             labelText="ClaimStatus"
                             id="ddlstatus"
-                            lstObject={props.DecisionType}
-                            filterName='Claims Decision'
+                            lstObject={props.ClaimStatusData}
+                            filterName='Claim Status'
                             required={true}
                             value={props.fields.claimStatusId}
                             name='claimStatusId'
