@@ -33,7 +33,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
         List<ddDTO> GetVehicleMaster(string lMasterlist);
-        BillingResponse BillingDetails(string PolicyNo, string Month,int Year);
+        Task<BillingResponse> BillingDetails(string PolicyNo, string Month,int Year);
         Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata);
         TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
 
@@ -193,7 +193,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 var mapData = _mapper.Map<TblSchedule>(scheduleDTO);
 
-                var carCheck = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == mapData.VehicleRegistrationNo);
+                var carCheck = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == mapData.VehicleRegistrationNo && x.PolicyNo == mapData.PolicyNo);
 
                 if (carCheck == false)
                 {
@@ -219,7 +219,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 else
                 {
-                    var tblschedule = _context.TblSchedule.SingleOrDefault(x => x.VehicleRegistrationNo == mapData.VehicleRegistrationNo);
+                    var tblschedule = _context.TblSchedule.SingleOrDefault(x => x.VehicleRegistrationNo == mapData.VehicleRegistrationNo && x.PolicyNo == mapData.PolicyNo);
 
                     tblschedule.Mon = mapData.Mon;
                     tblschedule.Tue = mapData.Tue;
@@ -228,9 +228,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     tblschedule.Fri = mapData.Fri;
                     tblschedule.Sat = mapData.Sat;
                     tblschedule.Sun = mapData.Sun;
-                    tblschedule.PolicyNo = mapData.PolicyNo;
-                    tblschedule.VehicleRegistrationNo = mapData.VehicleRegistrationNo;
-
+                    //tblschedule.VehicleType = mapData.VehicleType;
+                    //tblschedule.PolicyNo = mapData.PolicyNo;
+                    //tblschedule.VehicleRegistrationNo = mapData.VehicleRegistrationNo;
 
                     tblschedule.ModifyCount += 1;
 
@@ -2242,8 +2242,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return obj;
         }
 
-        public BillingResponse BillingDetails(string PolicyNo, string Month,int Year)
+        public async Task<BillingResponse> BillingDetails(string PolicyNo, string Month,int Year)
         {
+           
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            var CurrentMonth = IndianTime.Month;
+
+
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+
             var getMonthNumber = 0;
             BillingResponse response = new BillingResponse();
             ErrorInfo errorInfo = new ErrorInfo();
@@ -2275,12 +2288,23 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (checkswitchLog && checkPremiumLog)
                 {
                     BillingDTO billingDTO = new BillingDTO();
+                    CDDailyDTO CdDailyDTO = new CDDailyDTO();
 
-                   // var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
-                    
-                    //Integration Call for Balance 
-                    //var callPartnerMica = await _integrationService.DailyBalancePartner(, apiContext);
+                    // var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
 
+                    if (getMonthNumber > CurrentMonth)
+                    {
+                        //Integration Call for Balance 
+                        CdDailyDTO = await _integrationService.GetDailyAccountDetails(PolicyNo, getMonthNumber, Year, apiContext);
+                    }
+                    if(CdDailyDTO.Status !=0)
+                    {
+                        billingDTO.BalanceCarryForward = CdDailyDTO.AvailableAmount;
+                    }
+                    else if (CurrentMonth == getMonthNumber)
+                    {
+                        billingDTO.BalanceCarryForward = 0;
+                    }
 
                     var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
 
@@ -2325,7 +2349,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             billingDTO.Billing = Convert.ToDecimal(Billing);
                             billingDTO.Gst = Convert.ToDecimal(GST);
                             billingDTO.Total = Convert.ToDecimal(Total);
-                            billingDTO.BalanceCarryForward = 0;
+                            
                             response.BillingDTO = billingDTO;
                             response.Status = BusinessStatus.Ok;
                             return response;

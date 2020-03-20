@@ -34,7 +34,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         //NEW CD METHOD
         Task<dynamic> MasterCDACC(ExtCDDTO extCDDTO, ApiContext apiContext);
-      //  Task<dynamic> DailyBalancePartner(ApiContext apiContext);
+        Task<CDDailyDTO> GetDailyAccountDetails(string PolicyNo,int Month,int Year,ApiContext apiContext);
 
         //NEW Internal Policy Method for Account Number
         Task<dynamic> InternalGetPolicyDetailsByNumber(string PolicyNo, ApiContext apiContext);
@@ -151,11 +151,11 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             return await GetApiInvoke<dynamic>(uri, apiContext);
         }
 
-        //public async Task<dynamic> DailyBalancePartner(ApiContext apiContext)
-        //{
-        //    var uri = PartnerUrl + "/api/Accounts/DailyBalancePartner";
-        //    return await PostApiInvoke<ExtCDDTO, dynamic>(uri, apiContext, extCDDTO);
-        //}
+        public async Task<CDDailyDTO> GetDailyAccountDetails(string PolicyNo, int Month, int Year, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/GetDailyAccountDetails?policyNumber="+ PolicyNo +"&month=" + Month + "&year="+ Year +"&TxnEventType=AD";
+            return await GetApiInvoke<CDDailyDTO>(uri, apiContext);
+        }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {

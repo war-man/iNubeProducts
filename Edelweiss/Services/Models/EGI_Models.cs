@@ -312,7 +312,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal? Billing { get; set; }
         public decimal? Gst { get; set; }
         public decimal? Total { get; set; }
-        public decimal BalanceCarryForward { get; set; }
+        public decimal? BalanceCarryForward { get; set; }
     }
 
     public class BillingResponse : ResponseStatus
@@ -466,6 +466,15 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal FinalAmount { get; set; }
         public decimal FtPerDay { get; set; }
         public decimal AdPerDay { get; set; }
-    }   
+    }
+
+    public class CDDailyDTO : ResponseStatus
+    {
+        public string AccountNo { get; set; }
+        public decimal? AvailableAmount { get; set; }
+        public string TxnEventType { get; set; }
+        //public CdTransactionsMasterDTO cdTransactionsMasterDTO { get; set; }
+
+    }
 }
 
