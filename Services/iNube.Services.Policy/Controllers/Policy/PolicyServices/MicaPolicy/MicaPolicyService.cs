@@ -610,8 +610,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail)
         {
             TblPolicy policy = _mapper.Map<TblPolicy>(mappedPolicy);
-            policy.PolicyStageId = ModuleConstants.PolicyStageQuote;
-            policy.PolicyStatusId = ModuleConstants.PolicyStatusInActive;
+           
 
 
             TblPolicyDetails policyRequest = new TblPolicyDetails();
@@ -822,7 +821,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var policyNo = (string)endoresementDto["PolicyNumber"];
+            string EndorsementNo = "";
             var _tblPolicy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == policyNo);
+            EndorsementNo = _tblPolicy.PolicyNo + "" + "_" + (_tblPolicy.PolicyVersion).ToString();
 
             // _tblPolicy.PolicyRemarks = policycancel.Remarks;
             _tblPolicy.IsActive = false;
@@ -833,7 +834,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-            return "Policy cancelled Successfully for this " + policyNo;
+            return "Policy cancelled Successfully for this " + policyNo  + "With Endoresement Number"+ EndorsementNo;
         }
 
 
@@ -2216,29 +2217,35 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             policyDTO.CreatedBy = new Guid();
             policyDTO.CreatedDate = DateTime.Now;
-            policyDTO.PolicyIssueDate = DateTime.Now;
+            //policyDTO.PolicyIssueDate = DateTime.Now;
             policyDTO.IsUploadedToIcm = 0;
             //policyDTO.SumInsured = productDTO.PremiumAmount;
             // policyDTO.MasterPolicyNo = "ABC";//ToDo service req
-            policyDTO.PolicyVersion = 1;
-            if (partnersDTO != null)
-            {
-                policyDTO.PolicyNo = await GetPolicyNumberAsync(partnersDTO.PartnerId, productDTO.ProductId, apiContext, type);
-                // policyDTO.Po = GetPolicyNumber(partnersDTO.PartnerId, productDTO.ProductId);
-            }
-            else
-            {
+            
+            
                 if (type == "ProposalNo")
                 {
                     policyDTO.ProposalNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
+                    policyDTO.ProposalDate = DateTime.Now;
+                policyDTO.PolicyStageId = ModuleConstants.PolicyStageQuote;
+                policyDTO.PolicyStatusId = ModuleConstants.PolicyStatusInActive;
+            }
+                else
+                {
+                if (partnersDTO != null)
+                {
+                    policyDTO.PolicyNo = await GetPolicyNumberAsync(partnersDTO.PartnerId, productDTO.ProductId, apiContext, type);
+                    // policyDTO.Po = GetPolicyNumber(partnersDTO.PartnerId, productDTO.ProductId);
+                    policyDTO.PolicyStageId = ModuleConstants.PolicyStageQuote;
+                    policyDTO.PolicyStatusId = ModuleConstants.PolicyStatusInActive;
                 }
                 else
                 {
                     policyDTO.PolicyNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
-
+                    
                 }
-
-
+                policyDTO.PolicyIssueDate = DateTime.Now;
+                policyDTO.PolicyVersion = 1;
             }
 
             policyDTO.PolicyInsurableDetails.AddRange(GetMultiCover(policyDetail, productDTO, policyDTO, singleCover, Errors));
@@ -3405,7 +3412,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                 _context.SaveChanges();
 
-                                return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = "Added Successfully" };
+                                return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = $"Vehicle Added Successfully With this Endorsement Number {EndorsementNo} " };
 
 
 
