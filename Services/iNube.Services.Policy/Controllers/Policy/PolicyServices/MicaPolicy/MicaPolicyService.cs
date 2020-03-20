@@ -2927,8 +2927,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                 _context.SaveChanges();
 
-                                return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = $"Vehicle Added Successfully With this Endorsement Number {EndorsementNo} " };
-
+                                
                                 //Step5:CD Transaction for the policy
                                 var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
                                 BusinessStatus businessStatus = 0;
@@ -2947,7 +2946,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                                return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = "Added Successfully" };
+                                return new EndorsmentDTO() { Status = BusinessStatus.Updated, Id = EndorsementNo, ResponseMessage = $"Vehicle Added Successfully With this Endorsement Number {EndorsementNo} " };
 
 
 
