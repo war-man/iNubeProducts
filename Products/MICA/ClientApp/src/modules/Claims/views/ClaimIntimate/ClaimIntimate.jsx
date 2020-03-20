@@ -641,8 +641,8 @@ class ClaimIntimate extends React.Component {
 
         //this.state.DataModel = Model;
         //this.setState({});
-
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Claim%20Intimated%20By`, {
+        let masterlist = "Claim Intimated By";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + masterlist + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -655,8 +655,8 @@ class ClaimIntimate extends React.Component {
 
                 console.log("LossIntimatedByData", data);
             });
-
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Account%20Type`, {
+        let accounttype = "Account Type";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + accounttype + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -670,8 +670,8 @@ class ClaimIntimate extends React.Component {
                 console.log("AccountTypedata", data);
             });
 
-
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Cause%20Of%20Loss`, {
+        let causeofloss = "Cause Of Loss";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + causeofloss + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -1189,8 +1189,9 @@ class ClaimIntimate extends React.Component {
     }
 
     onGet = () => {
+        let value = "Claim Intimation";
         //fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId, {
-        fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId + `&FieldType=Claim%20Intimation`, {
+        fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId + `&FieldType=` + value + ``, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

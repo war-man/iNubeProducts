@@ -55,7 +55,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             // FOR ACCOUNT MAPPING TRANSACTION
             //var status = AccountingTransactionResponse(apiContext);
             //TO Get the Details of PolicyUpdate as Status
-            
+
             try
             {
                 var Responce = "";
@@ -107,20 +107,20 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                                 transactionDto.TypeOfTransaction = accountMap.TypeofTransaction;
                                 if (accountMap.TypeofTransaction == "Credit")
                                 {
-                                    
-                                       transactionDto.Amount = Convert.ToDecimal(Amount);
-                                    
+
+                                    transactionDto.Amount = Convert.ToDecimal(Amount);
+
                                 }
                                 if (accountMap.TypeofTransaction == "Debit")
                                 {
-                                    
-                                       transactionDto.Amount = Convert.ToDecimal(Amount);
+
+                                    transactionDto.Amount = Convert.ToDecimal(Amount);
 
                                 }
                                 //transactionDto.Amount = (decimal)sumInsured;
                                 transactionDto.Description = accountMap.Description;
                                 transactionDto.IsActive = "Y";
-                                
+
                                 transactionDto.CreatedDate = accountMap.CreatedDate;
                                 transactionDto.RuleName = accountMapCd.RuleName;
                                 transactionDto.Object = accountMapCd.Object;
@@ -209,7 +209,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                                     {
                                         ledgerColName = "PolicyNo";
                                     }
-                                    if (ledgerColName == "Claim Number") 
+                                    if (ledgerColName == "Claim Number")
                                     {
                                         ledgerColName = "ClaimNo";
                                     }
@@ -630,7 +630,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             return null;
         }
 
-        
+
         public async Task<ClaimResponse> CreateClaimAsync(dynamic claimDetail, ApiContext apiContext)
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -959,8 +959,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             UpdateClaimData(claims, apiContext);
 
-            
-       
+
+
             var _tblclaims = _mapper.Map<TblClaims>(claims);
             _context.TblClaims.Add(_tblclaims);
             _context.SaveChanges();
@@ -1056,13 +1056,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             dynamic json = JsonConvert.SerializeObject(claims.AdditionalDetails);
             _claims.ClaimFields = json;
 
-            
+
             return claims;
         }
 
         private async Task<string> GetStateAbbrevation(int StateId, ApiContext apiContext)
         {
-            _CNContext = (MICACNContext)(await DbManager.GetNewContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _CNContext = (MICACNContext)(await DbManager.GetNewContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var statevalue = _CNContext.TblMasState.SingleOrDefault(x => x.StateId == StateId).StateAbbreviation;
             string statevalue1 = statevalue.Trim();
             return statevalue;
@@ -1644,13 +1644,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             //  var hisClaimApproval= Clone.ClaimApproval.
 
             TblClaims claimsprocess = _mapper.Map<TblClaims>(ClaimApproval);
-            
+
             claimsprocess.ModifiedBy = apiContext.UserId;
             claimsprocess.ModifiedDate = DateTime.Now;
             claimsprocess.ClaimStatusId = claimsDTO.ClaimStatusId;
             claimsprocess.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
             claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
-           
+
 
             TblBankAccounts _bankAccounts = new TblBankAccounts();
             _bankAccounts.AccountHolderName = claimsDTO.DataModelDTO["Account Holder Name"];
@@ -1722,9 +1722,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             claimsHistory.Active = true;
 
-            
+
             _context.TblClaimHistory.Add(claimsHistory);
-           
+
             _context.SaveChanges();
 
             var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
@@ -1837,7 +1837,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             List<BillingEventDataDTO> Claimlist = new List<BillingEventDataDTO>();
             BillingEventDataDTO ClaimEvent = new BillingEventDataDTO();
 
-            if(cDTO.FromDate!=null && cDTO.ToDate != null)
+            if (cDTO.FromDate != null && cDTO.ToDate != null)
             {
                 ClaimEvent.Count = _context.TblClaims.Where(ac => ac.OrganizationId == cDTO.CustomerId && ac.CreatedDate.Value.Date >= cDTO.FromDate.Date && ac.CreatedDate.Value.Date <= cDTO.ToDate.Date).Count();
                 Claimlist.Add(ClaimEvent);
@@ -2212,7 +2212,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
-                   // item.CoverEvent = pk[0].CoverEvent;
+                    // item.CoverEvent = pk[0].CoverEvent;
                     item.CoverValue = covervalue;
                     item.TypeOfLoss = insurabledata.TypeOfLoss;
                     item.EventDate = pk[0].CreatedDate;
@@ -2285,6 +2285,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 _claims = _claims.Where(p => p.ClaimStatusId == searchclaim.ClaimStatusId);
             }
 
+            if (searchclaim.ClaimStatusId == 38)
+            {
+                _claims = _claims.Where(p => p.ClaimStatusId == searchclaim.ClaimStatusId);
+            }
+
             var _ClaimSearchData = _mapper.Map<List<SearchDTO>>(_claims);
 
             List<SearchDTO> claimlist = new List<SearchDTO>();
@@ -2303,7 +2308,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
-                   // item.CoverEvent = pk[0].CoverEvent;
+                    // item.CoverEvent = pk[0].CoverEvent;
                     item.TypeOfLoss = data1.TypeOfLoss;
                     item.EventDate = pk[0].CreatedDate;
                     item.InsuredEmail = pk[0].Email;
@@ -2587,7 +2592,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             var _policy = await _integrationService.GetPolicyDetails(apiContext);
 
-            
+
 
 
             // var statusid = _context.TblmasCmcommonTypes.SingleOrDefault(x => x.CommonTypeId == claimsRequest.ClaimStatusId);
@@ -2639,7 +2644,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var _history = _historydata.Select(x => x.ClaimId);
             var _historyClaimdata = _context.TblClaimHistory.Where(c => _history.Contains(c.ClaimId)).Select(x => x).ToList();
 
-            
+
 
 
             ClaimResponseDTO claimResponseDTO = null;
@@ -2843,7 +2848,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             try
             {
-              
+
 
                 // add list to db ..
                 // here just read and return
@@ -2858,9 +2863,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     bulkCopy.BulkCopyTimeout = 600;
                     bulkCopy.DestinationTableName = "[CM].[tblBankFile]";
                     bulkCopy.WriteToServer(dt);
-                    
+
                     await UpdateBankfileAsync(apiContext);
-                    object claimData = await TransactionData(bankDocId,apiContext);
+                    object claimData = await TransactionData(bankDocId, apiContext);
                     var account = AccountMapPayment(apiContext, claimData);
                 }
             }
@@ -2876,13 +2881,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             //return DemoResponse<List<BankFileDTO>>.GetResult(2, "Data still processing");
         }
 
-        private async Task<Object> TransactionData(decimal docId,ApiContext apiContext)
+        private async Task<Object> TransactionData(decimal docId, ApiContext apiContext)
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var data = _context.TblBankFile.Where(a => a.PaymentStatus == "Settled" && a.BankDocId== docId).ToList();
+            var data = _context.TblBankFile.Where(a => a.PaymentStatus == "Settled" && a.BankDocId == docId).ToList();
             AccountCheckDTO objCheck = new AccountCheckDTO();
             var resultdata = _mapper.Map<List<AccountDTO>>(data);
-            foreach(var item in resultdata)
+            foreach (var item in resultdata)
             {
                 objCheck.PolicyNo = item.PolicyNo;
                 objCheck.ClaimNo = item.ClaimNo;
@@ -2896,7 +2901,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             return objCheck;
         }
-        
+
         private async Task<int> UpdateBankfileAsync(ApiContext apiContext)
         {
             //  _context = (MICAPOContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
@@ -2913,16 +2918,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             return res;
         }
-        public async Task<decimal> GetBalanceSumInsured(string policyNo,ApiContext apiContext)
+        public async Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext)
         {
 
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             // var policyDetails = await _integrationService.GetPolicyByNumber(policyNo, apiContext);
 
-            var TotalAmount=_context.TblClaims.Where(s => s.PolicyNo == policyNo && s.ClaimStatusId==22).Sum(p=>p.ApprovedClaimAmount);
+            var TotalAmount = _context.TblClaims.Where(s => s.PolicyNo == policyNo && s.ClaimStatusId == 22).Sum(p => p.ApprovedClaimAmount);
             var amount = (decimal)TotalAmount;
-           var PolicySumInsured= await _integrationService.UpdatePolicySumInsuredAsync(policyNo, amount, apiContext);
+            var PolicySumInsured = await _integrationService.UpdatePolicySumInsuredAsync(policyNo, amount, apiContext);
 
             return PolicySumInsured;
         }
@@ -2954,7 +2959,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             counts.Approved = _ClaimSearchData.Where(g => g.ClaimStatusId == 9).Count();
             counts.Document = _ClaimSearchData.Where(g => g.ClaimStatusId == 17).Count();
             counts.Rejected = _ClaimSearchData.Where(g => g.ClaimStatusId == 11).Count();
-            counts.Setteled = _ClaimSearchData.Where(g => g.ClaimStatusId == 22).Count();
+            counts.Setteled = _ClaimSearchData.Where(g => g.ClaimStatusId == 38).Count();
 
             return counts;
         }
