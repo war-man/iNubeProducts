@@ -152,7 +152,7 @@ class ClaimInbox extends React.Component {
 
     handleSettled = () => {
         let status = this.state.ClaimDTO;
-        status.claimStatusId = 22;
+        status.claimStatusId = 38;
         this.setState({
             status,
             intimate: false,

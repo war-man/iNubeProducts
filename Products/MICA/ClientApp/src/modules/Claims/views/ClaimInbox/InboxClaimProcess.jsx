@@ -381,9 +381,14 @@ class InboxClaimProcess extends React.Component {
                     this.setState({ claimnumber: data.claimNumber });
                     swal({
                         text: "Claim Processed successfully! \n Your Claim Number: " + this.state.claimnumber,
-                        icon: "success"
+                        icon: "success",
+                        buttons: [false, "OK"],
+                    }).then((willDelete) => {
+                        if (willDelete) {
+                            this.handlepagereload();
+                        }
                     });
-                    this.renderRedirect();
+                    //this.renderRedirect();
                 });
         } else {
             this.setState({ errormessage: true });
@@ -391,6 +396,10 @@ class InboxClaimProcess extends React.Component {
         }
 
     };
+
+    handlepagereload = () => {
+        window.location.reload();
+    }
 
     IsValidProductDetails = () => {
         if (this.state.fields.claimStatusId !== "" && this.state.fields.claimManagerRemarks !== "") {
