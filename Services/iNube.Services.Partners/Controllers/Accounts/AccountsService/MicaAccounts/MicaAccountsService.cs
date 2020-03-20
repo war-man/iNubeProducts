@@ -1362,7 +1362,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                     cdtransactionDetails.TaxAmount = data.Value.TaxAmount;
                                     cdtransactionDetails.TotalAmount = data.Value.Amount + data.Value.TaxAmount;
                                     cdtransactionDetails.TxnIssuedFor = data.Key;
-                                    cdtransactionDetails.Description = cDDTO.Description + data.Value.Type;
+                                    cdtransactionDetails.Description = cDDTO.Description +"-"+ data.Value.Type;
 
                                     tblCdtransactionDetails.Add(cdtransactionDetails);
 
@@ -1501,7 +1501,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                         cdtransactionDetails.TaxAmount = data.Value.TaxAmount;
                                         cdtransactionDetails.TotalAmount = data.Value.Amount + data.Value.TaxAmount;
                                         cdtransactionDetails.TxnIssuedFor = data.Key;
-                                        cdtransactionDetails.Description = cDDTO.Description + data.Value.Type;
+                                        cdtransactionDetails.Description = cDDTO.Description +"-"+ data.Value.Type;
 
                                         tblCdtransactionDetails.Add(cdtransactionDetails);
 

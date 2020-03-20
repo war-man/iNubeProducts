@@ -1270,7 +1270,7 @@ namespace iNube.Services.Partners.Models
         public string AccountNo { get; set; }
         public decimal? AvailableAmount { get; set; }
         public string TxnEventType { get; set; }
-        public CdTransactionsMasterDTO cdTransactionsMasterDTO { get; set; }
+       
 
     }
 }
