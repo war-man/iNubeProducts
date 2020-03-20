@@ -2862,7 +2862,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                     {
                                                         if (count < 3)
                                                         {
-                                                            if (insurableItemRequest.si != null && insurableItemRequest.si > 0)
+                                                            if (insurableItemRequest["si"] != null && Convert.ToInt64(insurableItemRequest["si"]) > 0)
                                                             {
                                                                 json1.si = insurableItemRequest.si;
                                                             }
@@ -3062,7 +3062,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                     if (count < 3)
                                                     {
 
-                                                        if (insurableItemRequest.si != null && insurableItemRequest.si > 0)
+                                                        if (insurableItemRequest["si"] != null && Convert.ToInt64(insurableItemRequest["si"]) > 0)
                                                         {
                                                             json1.si = insurableItemRequest.si;
                                                         }
