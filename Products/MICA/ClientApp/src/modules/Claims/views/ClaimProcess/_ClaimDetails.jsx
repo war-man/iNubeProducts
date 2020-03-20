@@ -332,7 +332,7 @@ const ClaimDetails = (props) => {
                         // checked={false}
                         // onChange={(e) => claimDetailsprops.SetRiskClaimsDetailsValue('Claim Process', e)}
                         onChange={(e) => claimDetailsprops.handleCheckbox(e, item.inputType)}
-                        // disabled={(item.disable == false) ? false : true}
+                        disabled={(item.disable == true) ? true : null}
                         formControlProps={{
                             fullWidth: true
                         }} />
@@ -341,24 +341,25 @@ const ClaimDetails = (props) => {
 
             {claimDetailsprops.displaybank &&
                 <GridContainer>
-                    <GridItem>
+                    <div>
                 <CardHeader color="info" icon >
                     {
                         <h3 >
                             <small><TranslationContainer translationKey="BankDetails" /></small>
                         </h3>
                     }
-                    </CardHeader>
-                </GridItem>
-                    {claimDetailsprops.Bankfieldsmodel.map(m =>
+                        </CardHeader>
+                </div>
 
-                        <GridItem xs={8} sm={5} md={3}>
+                {claimDetailsprops.Bankfieldsmodel.map(m =>
+
+                    <GridItem xs={8} sm={5} md={3}>
                             {claimDetailsprops.renderPage(m)}
 
-                        </GridItem>
+                </GridItem>
                     )
-                    }
-                </GridContainer>
+                }
+            </GridContainer>
             }
 
 

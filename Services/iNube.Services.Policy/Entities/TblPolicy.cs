@@ -7,6 +7,7 @@ namespace iNube.Services.Policy.Entities
     {
         public TblPolicy()
         {
+            TblEndorsementDetails = new HashSet<TblEndorsementDetails>();
             TblPolicyDetails = new HashSet<TblPolicyDetails>();
             TblPolicyInsurableDetails = new HashSet<TblPolicyInsurableDetails>();
             TblPolicyPayment = new HashSet<TblPolicyPayment>();
@@ -65,6 +66,7 @@ namespace iNube.Services.Policy.Entities
         public string MasterType { get; set; }
         public string CdaccountNumber { get; set; }
 
+        public virtual ICollection<TblEndorsementDetails> TblEndorsementDetails { get; set; }
         public virtual ICollection<TblPolicyDetails> TblPolicyDetails { get; set; }
         public virtual ICollection<TblPolicyInsurableDetails> TblPolicyInsurableDetails { get; set; }
         public virtual ICollection<TblPolicyPayment> TblPolicyPayment { get; set; }

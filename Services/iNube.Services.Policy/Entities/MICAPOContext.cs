@@ -104,9 +104,16 @@ namespace iNube.Services.Policy.Entities
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PolicyId).HasColumnType("numeric(18, 0)");
+
                 entity.Property(e => e.PremiumAmount).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.TotalPremiumAmount).HasColumnType("numeric(18, 2)");
+
+                entity.HasOne(d => d.Policy)
+                    .WithMany(p => p.TblEndorsementDetails)
+                    .HasForeignKey(d => d.PolicyId)
+                    .HasConstraintName("FK_tblEndorsementDetails_tblPolicy");
             });
 
             modelBuilder.Entity<TblNumberingScheme>(entity =>

@@ -14,6 +14,8 @@ using iNube.Services.Controllers.EGI.IntegrationServices;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -31,7 +33,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
         List<ddDTO> GetVehicleMaster(string lMasterlist);
-        BillingResponse BillingDetails(string PolicyNo, string Month);
+        BillingResponse BillingDetails(string PolicyNo, string Month,int Year);
         Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata);
         TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
 
@@ -212,7 +214,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     tblSwitchLog.SwitchType = "Auto";
 
                     _context.TblSwitchLog.Add(tblSwitchLog);
-
+                    response.ResponseMessage = "Schedule Created Successfully";
+                    response.Status = BusinessStatus.Created;
                 }
                 else
                 {
@@ -235,13 +238,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     tblschedule.ModifiedDate = indianTime;
                     _context.TblSchedule.Update(tblschedule);
+                    response.ResponseMessage = "Schedule Updated Successfully";
+                    response.Status = BusinessStatus.Updated;
                 }
                 _context.SaveChanges();
 
-                response.ScheduleDTO = scheduleDTO;
-                response.Status = BusinessStatus.Ok;
-
-                return response;
+                response.ScheduleDTO = scheduleDTO;                
+                 return response;
             }
             else
             {
@@ -745,7 +748,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (verifydata)
                 {
-                    checkLog = _context.TblSwitchLog.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
+                    checkLog = _context.TblSwitchLog.LastOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
                     ScheduleData = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo);
 
                 }
@@ -781,6 +784,23 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             tblSwitchlog.SwitchType = "Manual";
                             _context.TblSwitchLog.Add(tblSwitchlog);
                             _context.SaveChanges();
+                        }
+                        else if (checkLog.SwitchStatus == true)
+                        {
+                            ///Throw Error
+                            ///Switch ALREADY ON
+                            SwitchOnOffResponse response = new SwitchOnOffResponse();
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            response.ResponseMessage = "The Switch is Already AUTO ON";
+                            response.Status = BusinessStatus.Ok;
+                            errorInfo.ErrorMessage = "The Vehicle Number:  " + VehicleRegistrationNo + "  is already Auto ON Due to Schedule";
+                            errorInfo.ErrorCode = "ExtSWT010";
+                            errorInfo.PropertyName = "AUTOSwitchON";
+                            response.Errors.Add(errorInfo);
+
+                            return response;
+
                         }
                     }
                     else
@@ -1115,6 +1135,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         bookingLog.ToTax = TOTALPMPDTTTAX;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnDetails = "Revised Total Premium for Policy - " + PolicyNo;
+                        bookingLog.TxnStatus = true;
 
                         _context.TblPremiumBookingLog.Add(bookingLog);
                         _context.SaveChanges();
@@ -1175,14 +1196,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         {
                             //bookingLog = new TblPremiumBookingLog();
                             //bookingLog.PolicyNo = PolicyNo;
-                                                       
+
                             bookingLog.TxnAmount = FinalPremium;
                             bookingLog.BasePremium = NewBasePremium;
                             bookingLog.FromTax = NewFromTax;
                             bookingLog.ToTax = NewToTax;
                             bookingLog.TxnDateTime = IndianTime;
                             bookingLog.TxnDetails = "Revised Premium - CD Transaction Successfully Updated in MICA";
-
+                            bookingLog.TxnStatus = true;
                             _context.TblPremiumBookingLog.Update(bookingLog);
 
 
@@ -1222,7 +1243,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             bookingLog.ToTax = NewToTax;
                             bookingLog.TxnDateTime = IndianTime;
                             bookingLog.TxnDetails = "Revised Premium - Transaction Failed while Updating CD Balance MICA";
-
+                            bookingLog.TxnStatus = false;
                             _context.TblPremiumBookingLog.Update(bookingLog);
                             _context.SaveChanges();
 
@@ -1253,7 +1274,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         bookingLog.ToTax = 0;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnDetails = "Transaction Failed while Calculating Premium";
-
+                        bookingLog.TxnStatus = false;
                         _context.TblPremiumBookingLog.Add(bookingLog);
                         _context.SaveChanges();
 
@@ -1330,7 +1351,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (verifydata)
                 {
-                    checkLog = _context.TblSwitchLog.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
+                    checkLog = _context.TblSwitchLog.LastOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleNumber == VehicleRegistrationNo && x.CreatedDate.Value.Date == IndianTime.Date);
                     ScheduleData = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo);
 
                 }
@@ -1822,7 +1843,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         bookingLog.ToTax = 0;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnDetails = "Auto Schedule Transaction Failed while Calculating Premium";
-
+                        bookingLog.TxnStatus = false;
                         _context.TblPremiumBookingLog.Add(bookingLog);
 
 
@@ -2221,13 +2242,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return obj;
         }
 
-        public BillingResponse BillingDetails(string PolicyNo, string Month)
+        public BillingResponse BillingDetails(string PolicyNo, string Month,int Year)
         {
             var getMonthNumber = 0;
             BillingResponse response = new BillingResponse();
             ErrorInfo errorInfo = new ErrorInfo();
 
-            if (!String.IsNullOrEmpty(PolicyNo) && !String.IsNullOrEmpty(Month))
+            if (!String.IsNullOrEmpty(PolicyNo) && !String.IsNullOrEmpty(Month) && Year > 0)
             {
                 try
                 {
@@ -2244,20 +2265,74 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return response;
                 }
 
-                var checkPolicyNo = _context.TblMonthlyBalance.Any(x => x.PolicyNumber == PolicyNo);
+               //var checkPolicyNo = _context.TblMonthlyBalance.Any(x => x.PolicyNumber == PolicyNo);
 
-                if (checkPolicyNo)
+                var checkswitchLog = _context.TblSwitchLog.Any(x=>x.PolicyNo == PolicyNo && x.CreatedDate.Value.Month == getMonthNumber && x.CreatedDate.Value.Year == Year);
+
+                var checkPremiumLog = _context.TblPremiumBookingLog.Any(x => x.PolicyNo == PolicyNo && x.TxnDateTime.Value.Month == getMonthNumber && x.TxnDateTime.Value.Year == Year);
+
+
+                if (checkswitchLog && checkPremiumLog)
                 {
-                    var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
+                    BillingDTO billingDTO = new BillingDTO();
 
-                    if (billData != null)
+                   // var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
+                    
+                    //Integration Call for Balance 
+                    //var callPartnerMica = await _integrationService.DailyBalancePartner(, apiContext);
+
+
+                    var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
+
+                    var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Month(CreatedDate) =" + getMonthNumber + "and Year(CreatedDate) =" + Year +"group by Month(CreatedDate) , PolicyNo";
+
+                    var PremiumQuery = "select sum(BasePremium) 'Billing',Sum(FromTax + ToTax) 'GST',sum(TxnAmount) 'Total' from [QM].[TblPremiumBookingLog] where PolicyNo='" + PolicyNo+"' and Month(TxnDateTime) =" + getMonthNumber + " and Year(TxnDateTime) = " + Year;
+
+                    try
                     {
-                        var mapData = _mapper.Map<BillingDTO>(billData);
-                        response.BillingDTO = mapData;
-                        response.Status = BusinessStatus.Ok;
-                        return response;
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+
+                            //TBLSWITCHLOG
+                            SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
+                            DataSet Switchds = new DataSet();
+                            SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
+                            switchadapter.Fill(Switchds, "Query1");
+                           
+                            var Result = Switchds.Tables[0];
+                            var Days = Result.Rows[0].ItemArray[0];
+
+                            //Total Usage Shown
+                            billingDTO.TotalUsage = Convert.ToInt32(Days);
+
+                            
+                            //TBLPREMIUMBOOKING
+                            SqlCommand Premiumcommand = new SqlCommand(PremiumQuery, connection);
+                            DataSet Premiumds = new DataSet();
+                            SqlDataAdapter Premiumadapter = new SqlDataAdapter(Premiumcommand);
+                            Premiumadapter.Fill(Premiumds, "Query2");
+                            
+                            var PremiumResult = Premiumds.Tables[0];
+
+                            connection.Close();
+
+                            var Billing = PremiumResult.Rows[0].ItemArray[0];                            
+                            var GST = PremiumResult.Rows[0].ItemArray[1];
+                            var Total = PremiumResult.Rows[0].ItemArray[2];
+
+
+                            billingDTO.Billing = Convert.ToDecimal(Billing);
+                            billingDTO.Gst = Convert.ToDecimal(GST);
+                            billingDTO.Total = Convert.ToDecimal(Total);
+                            billingDTO.BalanceCarryForward = 0;
+                            response.BillingDTO = billingDTO;
+                            response.Status = BusinessStatus.Ok;
+                            return response;
+
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
                         response.ResponseMessage = "NO Records found for this Month";
                         response.Status = BusinessStatus.PreConditionFailed;
@@ -2274,7 +2349,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
                     response.ResponseMessage = "NO Records found";
                     response.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "No Records for this Policy Number: " + PolicyNo;
+                    errorInfo.ErrorMessage = "No Records for this Policy Number : " + PolicyNo + " for the specified Month and Year";
                     errorInfo.ErrorCode = "GEN001";
                     errorInfo.PropertyName = "NoRecords";
                     response.Errors.Add(errorInfo);
@@ -2286,7 +2361,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 response.ResponseMessage = "Null/Empty Inputs";
                 response.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Either Policy Number or Month is Null";
+                errorInfo.ErrorMessage = "Either Policy Number or Month or Year is Null";
                 errorInfo.ErrorCode = "GEN002";
                 errorInfo.PropertyName = "MandatoryfieldsMissing";
                 response.Errors.Add(errorInfo);
@@ -2330,7 +2405,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //Ashish Sir
                 //var modelSerialize = JsonConvert.DeserializeObject<dynamic>(SourceObject);
                 // var DriverRiskItem = PolicyItem["Data"]["InsurableItem"][0]["RiskItems"];
-                
+
                 var EndorsmentItem = SourceObject[1];
                 var VehicleRiskItem = EndorsmentItem["Data"]["InsurableItem"][0]["RiskItems"];
 
@@ -2366,11 +2441,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 SumInsured = PolicyData["si"];
                 PolicyNumber = EndorsmentItem["Data"]["PolicyNumber"];
                 BillingFrequency = PolicyData["billingFrequency"].ToString();
-              
+
                 EndorsementPremiumDTO endorsementDto = new EndorsementPremiumDTO();
 
                 endorsementDto.PolicyNo = PolicyNumber;
-                endorsementDto.SI = SumInsured.ToString();
+                endorsementDto.SI = Convert.ToInt32(SumInsured);
                 endorsementDto.PcCount = NoOfPC;
                 endorsementDto.TwCount = NoOfTW;
                 endorsementDto.TypeOfEndorsement = "Addition";
@@ -2379,7 +2454,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
 
                 DeserilizedPremiumData = CallNewEndo;
-               
+
                 if (DeserilizedPremiumData.Count > 0)
                 {
                     var CallEndoMap = EndoADFT(DeserilizedPremiumData, "Addition");
@@ -2423,16 +2498,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 EndorsementPremiumDTO endorsementDto = new EndorsementPremiumDTO();
 
                 endorsementDto.PolicyNo = PolicyNumber;
-                endorsementDto.SI = SumInsured.ToString();
+                endorsementDto.SI = Convert.ToInt32(SumInsured);
                 endorsementDto.PcCount = NoOfPC;
                 endorsementDto.TwCount = NoOfTW;
                 endorsementDto.TypeOfEndorsement = "Deletion";
                 endorsementDto.EndorsementEffectiveDate = IndianTime;
 
                 var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
-                
+
                 DeserilizedPremiumData = CallNewEndo;
-                
+
                 if (DeserilizedPremiumData.Count > 0)
                 {
                     var CallEndoMap = EndoADFT(DeserilizedPremiumData, "Deletion");
@@ -2467,7 +2542,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             premiumDTO.dictionary_rate.DEXPRT_Exp = SourceObject["driverExp"];
             premiumDTO.dictionary_rate.PDAGERT_PAge = SourceObject["driverAge"];
-            premiumDTO.dictionary_rate.ADDRVRT_DRV = SourceObject["additionalDriver"]; 
+            premiumDTO.dictionary_rate.ADDRVRT_DRV = SourceObject["additionalDriver"];
             premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = SourceObject["noOfPC"];
             premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = SourceObject["noOfPC"];
             premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = SourceObject["noOfTW"];
@@ -2737,111 +2812,183 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
             CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
 
-            decimal TotalTax = 0;
-            //AD TAX
-            //From State 
-            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
-            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
-
-            TotalTax = taxTypeDTO.TaxAmount;
-
-            //ARRAY
-            taxAmountDTO.Tax.Add(taxTypeDTO);
-
-            taxTypeDTO = new CDTaxTypeDTO();
-
-            //TO State
-            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
-            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
-
-            TotalTax += taxTypeDTO.TaxAmount;
-
-
-            taxAmountDTO.TaxAmount = TotalTax;
-            taxAmountDTO.Tax.Add(taxTypeDTO);
-
-
-            //AD
-            ADPremiumDTO.Type = "AD";
-            ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
-            ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
-            ADPremiumDTO.TaxAmount = taxAmountDTO;
-
-
-            //FT Objects
-            taxTypeDTO = new CDTaxTypeDTO();
-            TotalTax = 0;
-            CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
-            taxAmountDTO = new CDTaxAmountDTO();
-            //FT TAX
-            //From State 
-            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
-            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
-
-            TotalTax = taxTypeDTO.TaxAmount;
-
-            //ARRAY
-            taxAmountDTO.Tax.Add(taxTypeDTO);
-
-            taxTypeDTO = new CDTaxTypeDTO();
-
-            //TO State
-            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
-            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
-
-            TotalTax += taxTypeDTO.TaxAmount;
-
-
-            taxAmountDTO.TaxAmount = TotalTax;
-            taxAmountDTO.Tax.Add(taxTypeDTO);
-
-
-            //FT
-            FTPremiumDTO.Type = "FT";
-            FTPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
-            FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
-            FTPremiumDTO.TaxAmount = taxAmountDTO;
-
-
-            //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
-            //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
-            var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
-
-            ////AD & FT Credit Object
-
-            CdModel.PremiumDTO.Add(ADPremiumDTO);
-            CdModel.PremiumDTO.Add(FTPremiumDTO);
-            CdModel.Type = "EndorementAdd";
-            CdModel.TxnType = "Credit";
-            CdModel.TxnAmount = ADPremiumDTO.TotalAmount + FTPremiumDTO.TotalAmount;
-            CdModel.TaxAmount = FinalTaxTotal;
-            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
-            FinalDto.Add(CdModel);
-
-            //FT-DebitObject
-            CdModel = new MicaCDDTO();
-            CdModel.PremiumDTO.Add(FTPremiumDTO);
-            CdModel.Type = "EndorementAdd";
-            CdModel.TxnType = "Debit";
-            CdModel.TxnAmount = FTPremiumDTO.TotalAmount;
-            CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount;
-            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
-            FinalDto.Add(CdModel);
-
-            if (TxnType == "Deletion")
+            if (TxnType == "Addition")
             {
+                decimal TotalTax = 0;
+                //AD TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //AD
+                ADPremiumDTO.Type = "AD";
+                ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+                ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                ADPremiumDTO.TaxAmount = taxAmountDTO;
+
+
+                //FT Objects
+                taxTypeDTO = new CDTaxTypeDTO();
+                TotalTax = 0;
+                CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
+                taxAmountDTO = new CDTaxAmountDTO();
+                //FT TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //FT
+                FTPremiumDTO.Type = "FT";
+                FTPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTPREM").EValue);
+                FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
+                FTPremiumDTO.TaxAmount = taxAmountDTO;
+
+
+                //ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
+                //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
+
+                ////AD & FT Credit Object
+
+                CdModel.PremiumDTO.Add(ADPremiumDTO);
+                CdModel.PremiumDTO.Add(FTPremiumDTO);
+                CdModel.Type = "EndorsementAdd";
+                CdModel.TxnType = "Credit";
+                CdModel.TxnAmount = ADPremiumDTO.TxnAmount + FTPremiumDTO.TxnAmount;
+                CdModel.TaxAmount = FinalTaxTotal;
+                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                FinalDto.Add(CdModel);
+
                 //FT-DebitObject
                 CdModel = new MicaCDDTO();
                 CdModel.PremiumDTO.Add(FTPremiumDTO);
-                CdModel.Type = "EndorementAdd";
+                CdModel.Type = "EndorsementAdd";
                 CdModel.TxnType = "Debit";
-                CdModel.TxnAmount = FTPremiumDTO.TotalAmount;
+                CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount;
+                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                FinalDto.Add(CdModel);
+            }
+
+            if (TxnType == "Deletion")
+            {
+                decimal TotalTax = 0;
+                //AD TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue)) * (-1);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue)) * (-1);
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //AD
+                ADPremiumDTO.Type = "AD";
+                ADPremiumDTO.TxnAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue)) * (-1);
+                ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                ADPremiumDTO.TaxAmount = taxAmountDTO;
+
+
+                //FT Objects
+                taxTypeDTO = new CDTaxTypeDTO();
+                TotalTax = 0;
+                CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
+                taxAmountDTO = new CDTaxAmountDTO();
+                //FT TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue)) * (-1);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue)) * (-1);
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //FT
+                FTPremiumDTO.Type = "FT";
+                FTPremiumDTO.TxnAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTPREM").EValue)) * (-1);
+                FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
+                FTPremiumDTO.TaxAmount = taxAmountDTO;
+
+                var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
+
+                //FT and AD - REFUND CREDIT Object
+                CdModel.PremiumDTO.Add(FTPremiumDTO);
+                CdModel.PremiumDTO.Add(ADPremiumDTO);
+                CdModel.Type = "EndorsementDel";
+                CdModel.TxnType = "Credit";
+                CdModel.TxnAmount = FTPremiumDTO.TxnAmount + ADPremiumDTO.TxnAmount;
+                CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount + ADPremiumDTO.TaxAmount.TaxAmount;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
                 FinalDto.Add(CdModel);
 
                 return FinalDto;
             }
+
+
 
             return FinalDto;
 
@@ -3082,7 +3229,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             PremiumReturnDto DifferentialPremium = new PremiumReturnDto();
 
-            if (String.IsNullOrEmpty(endorsementPremium.PolicyNo) && String.IsNullOrEmpty(endorsementPremium.SI))
+            if (String.IsNullOrEmpty(endorsementPremium.PolicyNo) && endorsementPremium.SI > 0)
             {
                 ErrorInfo errorInfo = new ErrorInfo();
 
@@ -3212,7 +3359,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
 
                 //RuleObject
-                premiumDTO.dictionary_rule.SI = endorsementPremium.SI;
+                premiumDTO.dictionary_rule.SI = endorsementPremium.SI.ToString();
                 premiumDTO.dictionary_rule.NOOFPC = (detailsDTO.NoOfPC + endorsementPremium.PcCount).ToString();
                 premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW + endorsementPremium.TwCount).ToString();
 
@@ -3469,7 +3616,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 //RuleObject
-                premiumDTO.dictionary_rule.SI = endorsementPremium.SI;
+                premiumDTO.dictionary_rule.SI = endorsementPremium.SI.ToString();
                 premiumDTO.dictionary_rule.NOOFPC = (detailsDTO.NoOfPC - endorsementPremium.PcCount).ToString();
                 premiumDTO.dictionary_rule.NOOFTW = (detailsDTO.NoOfTW - endorsementPremium.TwCount).ToString();
 

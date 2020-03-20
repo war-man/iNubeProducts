@@ -726,9 +726,7 @@ namespace iNube.Services.Claims.Entities
                     .HasColumnName("DMSdocId")
                     .HasMaxLength(250);
 
-                entity.Property(e => e.DocumentName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.DocumentName).HasMaxLength(100);
 
                 entity.Property(e => e.DocumentType)
                     .HasMaxLength(100)

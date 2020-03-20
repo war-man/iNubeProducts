@@ -457,7 +457,7 @@ class ClaimIntimate extends React.Component {
                             // this.setState({ redirect: true });
                         } else {
                             swal({
-                                text: "Claim is not intimated!S ",
+                                text: "Claim is not intimated! Try again",
                                 icon: "error"
                             })
                         }

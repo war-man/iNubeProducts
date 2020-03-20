@@ -1650,8 +1650,18 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             claimsprocess.ClaimStatusId = claimsDTO.ClaimStatusId;
             claimsprocess.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
             claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
-            //claimsprocess.TblClaimdoc.Add(tblClaimdoc);
-            
+           
+
+            TblBankAccounts _bankAccounts = new TblBankAccounts();
+            _bankAccounts.AccountHolderName = claimsDTO.DataModelDTO["Account Holder Name"];
+            _bankAccounts.AccountNumber = claimsDTO.DataModelDTO["Account No."];
+            _bankAccounts.ClaimId = ClaimApproval.ClaimId;
+            _bankAccounts.BankBranchAddress = claimsDTO.DataModelDTO["Bank Branch Address"];
+            _bankAccounts.BankName = claimsDTO.DataModelDTO["Bank Name"];
+            _bankAccounts.Ifsccode = claimsDTO.DataModelDTO["IFSC Code"];
+            _bankAccounts.AccountType = claimsDTO.DataModelDTO["Account Type"];
+            _context.TblBankAccounts.Add(_bankAccounts);
+
             if (claimsprocess.ClaimStatusId == 9)
             {
                 emailTest.To = claimsDTO.EmailId;

@@ -7,7 +7,6 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     public class ScheduleDTO
     {
-        public decimal ScheduleId { get; set; }
         public string PolicyNo { get; set; }
         public string VehicleRegistrationNo { get; set; }
         public string VehicleType { get; set; }
@@ -18,10 +17,6 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public bool Fri { get; set; }
         public bool Sat { get; set; }
         public bool Sun { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ModifiedDate { get; set; }
-        public decimal? ModifyCount { get; set; }
-        public bool IsActive { get; set; }
 
     }
 
@@ -279,7 +274,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
     public class EndorsementPremiumDTO
     {
         public string PolicyNo { get; set; }
-        public string SI { get; set; }
+        public int SI { get; set; }
         public int PcCount { get; set; }
         public int TwCount { get; set; }
         public string TypeOfEndorsement { get; set; }
@@ -313,12 +308,11 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     public class BillingDTO
     {
-        public decimal AutoId { get; set; }
-        public string PolicyNumber { get; set; }
-        public decimal? Balance { get; set; }
-        public string Month { get; set; }
-        public string Type { get; set; }
-        public DateTime? BalanceDate { get; set; }
+        public int TotalUsage { get; set; }
+        public decimal? Billing { get; set; }
+        public decimal? Gst { get; set; }
+        public decimal? Total { get; set; }
+        public decimal BalanceCarryForward { get; set; }
     }
 
     public class BillingResponse : ResponseStatus
@@ -472,6 +466,6 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal FinalAmount { get; set; }
         public decimal FtPerDay { get; set; }
         public decimal AdPerDay { get; set; }
-    }
+    }   
 }
 
