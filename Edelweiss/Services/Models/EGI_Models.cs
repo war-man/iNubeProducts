@@ -309,10 +309,9 @@ namespace iNube.Services.MicaExtension_EGI.Models
     public class BillingDTO
     {
         public int TotalUsage { get; set; }
-        public decimal Billing { get; set; }
-        public decimal Gst { get; set; }
-        public decimal Total { get; set; }
-        public decimal Type { get; set; }
+        public decimal? Billing { get; set; }
+        public decimal? Gst { get; set; }
+        public decimal? Total { get; set; }
         public decimal BalanceCarryForward { get; set; }
     }
 
@@ -468,6 +467,5 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal FtPerDay { get; set; }
         public decimal AdPerDay { get; set; }
     }   
-
 }
 

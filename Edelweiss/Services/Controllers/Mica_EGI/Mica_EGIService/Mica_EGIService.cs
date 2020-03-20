@@ -14,6 +14,8 @@ using iNube.Services.Controllers.EGI.IntegrationServices;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -2246,7 +2248,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             BillingResponse response = new BillingResponse();
             ErrorInfo errorInfo = new ErrorInfo();
 
-            if (!String.IsNullOrEmpty(PolicyNo) && !String.IsNullOrEmpty(Month))
+            if (!String.IsNullOrEmpty(PolicyNo) && !String.IsNullOrEmpty(Month) && Year > 0)
             {
                 try
                 {
@@ -2263,27 +2265,74 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return response;
                 }
 
-                var checkPolicyNo = _context.TblMonthlyBalance.Any(x => x.PolicyNumber == PolicyNo);
+               //var checkPolicyNo = _context.TblMonthlyBalance.Any(x => x.PolicyNumber == PolicyNo);
 
-                var checkswitchLog = _context.TblSwitchLog.Any(x=>x.PolicyNo == PolicyNo && x.CreatedDate.Value.Date.Year == Year);
+                var checkswitchLog = _context.TblSwitchLog.Any(x=>x.PolicyNo == PolicyNo && x.CreatedDate.Value.Month == getMonthNumber && x.CreatedDate.Value.Year == Year);
 
-                if (checkPolicyNo && checkswitchLog)
+                var checkPremiumLog = _context.TblPremiumBookingLog.Any(x => x.PolicyNo == PolicyNo && x.TxnDateTime.Value.Month == getMonthNumber && x.TxnDateTime.Value.Year == Year);
+
+
+                if (checkswitchLog && checkPremiumLog)
                 {
-                    var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
+                    BillingDTO billingDTO = new BillingDTO();
 
-                    //var switchLog = _context.TblSwitchLog.Where(x => x.PolicyNo == PolicyNo && x.CreatedDate.Value.Date.Month == getMonthNumber && x.SwitchStatus == true)
-                    //                                     .GroupBy(x => new { x.CreatedDate.Value.Date.Month, x.PolicyNo }).Distinct();
-                                                         
+                   // var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
+                    
+                    //Integration Call for Balance 
+                    //var callPartnerMica = await _integrationService.DailyBalancePartner(, apiContext);
 
 
-                    if (billData != null)
+                    var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
+
+                    var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Month(CreatedDate) =" + getMonthNumber + "and Year(CreatedDate) =" + Year +"group by Month(CreatedDate) , PolicyNo";
+
+                    var PremiumQuery = "select sum(BasePremium) 'Billing',Sum(FromTax + ToTax) 'GST',sum(TxnAmount) 'Total' from [QM].[TblPremiumBookingLog] where PolicyNo='" + PolicyNo+"' and Month(TxnDateTime) =" + getMonthNumber + " and Year(TxnDateTime) = " + Year;
+
+                    try
                     {
-                     //   var mapData = _mapper.Map<BillingDTO>(billData);
-                       // response.BillingDTO = mapData;
-                        response.Status = BusinessStatus.Ok;
-                        return response;
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+
+                            //TBLSWITCHLOG
+                            SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
+                            DataSet Switchds = new DataSet();
+                            SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
+                            switchadapter.Fill(Switchds, "Query1");
+                           
+                            var Result = Switchds.Tables[0];
+                            var Days = Result.Rows[0].ItemArray[0];
+
+                            //Total Usage Shown
+                            billingDTO.TotalUsage = Convert.ToInt32(Days);
+
+                            
+                            //TBLPREMIUMBOOKING
+                            SqlCommand Premiumcommand = new SqlCommand(PremiumQuery, connection);
+                            DataSet Premiumds = new DataSet();
+                            SqlDataAdapter Premiumadapter = new SqlDataAdapter(Premiumcommand);
+                            Premiumadapter.Fill(Premiumds, "Query2");
+                            
+                            var PremiumResult = Premiumds.Tables[0];
+
+                            connection.Close();
+
+                            var Billing = PremiumResult.Rows[0].ItemArray[0];                            
+                            var GST = PremiumResult.Rows[0].ItemArray[1];
+                            var Total = PremiumResult.Rows[0].ItemArray[2];
+
+
+                            billingDTO.Billing = Convert.ToDecimal(Billing);
+                            billingDTO.Gst = Convert.ToDecimal(GST);
+                            billingDTO.Total = Convert.ToDecimal(Total);
+                            billingDTO.BalanceCarryForward = 0;
+                            response.BillingDTO = billingDTO;
+                            response.Status = BusinessStatus.Ok;
+                            return response;
+
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
                         response.ResponseMessage = "NO Records found for this Month";
                         response.Status = BusinessStatus.PreConditionFailed;
@@ -2300,7 +2349,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
                     response.ResponseMessage = "NO Records found";
                     response.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "No Records for this Policy Number: " + PolicyNo;
+                    errorInfo.ErrorMessage = "No Records for this Policy Number : " + PolicyNo + " for the specified Month and Year";
                     errorInfo.ErrorCode = "GEN001";
                     errorInfo.PropertyName = "NoRecords";
                     response.Errors.Add(errorInfo);
@@ -2312,7 +2361,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 response.ResponseMessage = "Null/Empty Inputs";
                 response.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Either Policy Number or Month is Null";
+                errorInfo.ErrorMessage = "Either Policy Number or Month or Year is Null";
                 errorInfo.ErrorCode = "GEN002";
                 errorInfo.PropertyName = "MandatoryfieldsMissing";
                 response.Errors.Add(errorInfo);
