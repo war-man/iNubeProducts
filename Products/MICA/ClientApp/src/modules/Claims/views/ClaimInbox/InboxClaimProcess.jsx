@@ -222,13 +222,14 @@ class InboxClaimProcess extends React.Component {
                 policyNo: "",
                 alldoc: [],
                 ClaimInsurable: [],
-                payeeType: "",
+                payeeTypeId: "",
                 DataModelDTO: {},
             },
 
             docs: {
-                dmsdocId: "",
-                documentName: ""
+                documentID: "",
+                fileName: "",
+                documentType: "",
             },
 
             claimamt: [{
@@ -265,7 +266,7 @@ class InboxClaimProcess extends React.Component {
                 { data: "" }
 
             ],
-
+            ProductClaimData: [],
             ClaimSearchDTO: {
                 insuredName: "",
                 insuredRefNo: "",
@@ -311,12 +312,12 @@ class InboxClaimProcess extends React.Component {
                 "approvedClaimAmount": ""
             },
 
-            PayeeType: [{ label: "Workshop", checked: false, typeName: "Workshop" },
-            { label: "Customer", checked: false, typeName: "Customer" },
-            { label: "Financier", checked: false, typeName: "Financier" },
-            { label: "Nominee", checked: false, typeName: "Nominee" },
-            { label: "Surveyor", checked: false, typeName: "Surveyor" },
-
+            Payee: [
+                { mID: 1, mValue: "Workshop", mType: "Payee", mIsRequired: false, disable: false },
+                { mID: 2, mValue: "Customer", mType: "Payee", mIsRequired: false, disable: false },
+                { mID: 3, mValue: "Financier", mType: "Payee", mIsRequired: false, disable: false },
+                { mID: 4, mValue: "Nominee", mType: "Payee", mIsRequired: false, disable: false },
+                { mID: 5, mValue: "Surveyor", mType: "Payee", mIsRequired: false, disable: false }
             ],
 
             claimTableData: [],
@@ -443,11 +444,15 @@ class InboxClaimProcess extends React.Component {
         fields.claimId = ClaimArr[0].claimId;
         // fields.claimStatusId = ClaimArr[0].claimStatusId;
 
+        this.state.prodId = ClaimArr[0].productIdPk;
+        console.log("prodId", this.state.prodId);
+
         this.setState({ fields });
         this.setState({ policyId: ClaimArr[0].policyId });
         console.log("Claimsendlist: ", this.state.Claimsendlist);
 
-        this.policyDetailsfun(ClaimArr[0].policyId);
+        this.policyDetailsfun(ClaimArr[0].policyNo);
+        this.claimAmountTable();
         this.claimDetailsfun(ClaimArr[0].claimId);
         this.documentView(oid, false);
 
@@ -484,8 +489,8 @@ class InboxClaimProcess extends React.Component {
             this.setState({ approved: true });
         }
 
-
-        this.claimAmountTable();
+        this.onGet();
+        //this.claimAmountTable();
     }
 
     componentDidMount() {
@@ -531,6 +536,19 @@ class InboxClaimProcess extends React.Component {
             .then(data => {
                 this.setState({ AccountTypedata: data });
                 console.log("AccountTypedata", data);
+            });
+
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Claim%20Status`, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({ ClaimStatusData: data });
+                console.log("ClaimStatusData", data);
             });
 
         setTimeout(
@@ -743,10 +761,13 @@ class InboxClaimProcess extends React.Component {
                     insurableItem: prop.insurableItem,
                     name: prop.name,
                     identificationNo: prop.identificationNo,
-                    vehicleNo: prop.vehicleNo,
-                    makeModel: prop.makeModel,
-                    typeOfLoss: prop.typeOfLoss,
-                    benefitAmount: prop.benefitAmount,
+                    //vehicleNo: prop.vehicleNo,
+                    //makeModel: prop.makeModel,
+                    typeOfLoss: prop.coverName,
+                    coverValue: prop.coverDynamic.map((c) => {
+                        return (<h6> <b>{c.Header}</b> : {c.Details} </ h6>)
+                    }),
+                    //benefitAmount: prop.benefitAmount,
                     claimAmounts: prop.claimAmounts,
                     approvedClaimAmounts:
                         <GridItem xs={12} sm={12} md={12}>
@@ -789,6 +810,7 @@ class InboxClaimProcess extends React.Component {
         console.log("this.state.claimIds", this.state.claimid);
 
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimDetails?ClaimId=` + id, {
+
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -803,36 +825,43 @@ class InboxClaimProcess extends React.Component {
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
-                //this.state.claimDetailsData.vehicleLocation = data[0][2][1];
-                //this.state.claimDetailsData.driverName = data[0][4][1];
-                //this.state.claimDetailsData.selfSurvey = data[0][5][1];
                 this.state.claimDetailsData.totalClaimedAmount = data[0][3][1];
-                this.state.claimDetailsData.accountHolderName = data[0][4][1];
-                this.state.claimDetailsData.accountNumber = data[0][5][1];
-                this.state.claimDetailsData.accountType = data[0][6][1];
-                this.state.claimDetailsData.bankName = data[0][7][1];
-                this.state.claimDetailsData.ifscCode = data[0][8][1];
-                this.state.claimDetailsData.bankAddress = data[0][9][1];
+
+                if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
+
+                    this.state.claimDetailsData.vehicleLocation = data[0][4][1];
+                    this.state.claimDetailsData.driverName = data[0][5][1];
+                    this.state.claimDetailsData.selfSurvey = data[0][6][1];
+
+                    this.setState({ vehicleclaim: true });
+                }
+                //this.state.claimDetailsData.totalClaimedAmount = data[0][6][1];
+                //this.state.claimDetailsData.accountHolderName = data[0][7][1];
+                //this.state.claimDetailsData.accountNumber = data[0][8][1];
+                //this.state.claimDetailsData.bankName = data[0][9][1];
+                //this.state.claimDetailsData.ifscCode = data[0][10][1];
+                //this.state.claimDetailsData.bankAddress = data[0][11][1];
                 console.log("###", this.state.claimDetailsData);
 
                 this.setState({ claimTableData: data[1] });
-                //let griddata = this.state.claimTableData.filter(item => item.claimAmounts != null);
-                //this.setState({ claimTableData: griddata });
-                console.log("tabledata", this.state.claimTableData);
+
+                console.log("this.state.claimTableData", this.state.claimTableData);
 
                 this.claimAmountTable(this.state.claimTableData);
-                //console.log("DATA", this.state.claimDetailsData, this.state.claimTableData);
+
+                console.log("DATA", this.state.claimDetailsData, this.state.claimTableData);
+
             });
 
-        this.setState({ disabled: true });
+        // this.setState({ disabled: true });
 
 
     }
 
-    policyDetailsfun = (id) => {
+    policyDetailsfun = (policyNo) => {
 
-        console.log("this.state.policyId", id);
-        fetch(`${ClaimConfig.policyconfigUrl}/api/Policy/SearchPolicyDetails?PolicyId=` + id, {
+        console.log("this.state.policyId", policyNo);
+        fetch(`${ClaimConfig.policyconfigUrl}/api/Policy/SearchPolicyDetailsByNumber?PolicyNumber=` + policyNo, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -850,8 +879,8 @@ class InboxClaimProcess extends React.Component {
                 this.state.policyDetailsData.email = data[3][1];
                 //this.state.policyDetailsData.eventdate = new Date(data[3][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
                 //this.state.policyDetailsData.coverEvent = data[4][1];
-                this.state.policyDetailsData.sDate = new Date(data[4][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                this.state.policyDetailsData.eDate = new Date(data[5][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                this.state.policyDetailsData.sDate = new Date(data[6][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                this.state.policyDetailsData.eDate = new Date(data[7][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
 
                 console.log("abcdddddd", this.state.policyDetailsData);
@@ -1095,9 +1124,9 @@ class InboxClaimProcess extends React.Component {
         let dmsids = data.dMSDTOs;
         for (let i = 0; i < dmsids.length; i++) {
             let docclone = Object.assign({}, this.state.docs);
-            docclone.dmsdocId = data.dMSDTOs[i].docId;
-            docclone.documentName = data.dMSDTOs[i].fileName;
-
+            docclone.documentID = data.dMSDTOs[i].docId;
+            docclone.fileName = data.dMSDTOs[i].fileName;
+            docclone.documentType = data.dMSDTOs[i].contentType;
             this.state.fields.alldoc.push(docclone);
             this.setState({});
 
@@ -1106,6 +1135,116 @@ class InboxClaimProcess extends React.Component {
         // console.log("docid", this.state.alldoc.dmsdocId, this.state.alldoc.documentName);
 
     }
+
+    onGet = () => {
+
+        fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId + `&FieldType=Claim%20Process`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("data", data);
+
+                this.setState({ ProductClaimData: data });
+
+                // this.state.ProductClaimData.mIsRequired = false;
+                // this.setState({});
+
+                console.log("ProductClaimData", this.state.ProductClaimData);
+
+
+            });
+    }
+
+    handleCheckbox = (event, name) => {
+
+        let ProductClaimData = this.state.ProductClaimData;
+        //let name = event.target.name;
+        let check = event.target.checked;
+        console.log("values: ", this.state.ProductClaimData, 'chk data ', event, event.target.checked, name);
+
+        if (event.target.checked == "undefined") {
+        } else {
+            const index = this.state.ProductClaimData.findIndex(item => item.inputType === name);
+            if (index != -1) {
+
+
+                let data = [...this.state.ProductClaimData];
+                data[index].mIsRequired = event.target.checked;
+
+                let searchname = "";
+                if (name == "Workshop") {
+                    searchname = "Customer";
+                    this.state.displaybank = true;
+                    this.setState({});
+
+                } else {
+                    searchname = "Workshop";
+                    this.state.displaybank = true;
+                    this.setState({});
+                }
+
+                //if (event.target.checked == true) {
+                //    this.state.fields.payeeTypeId = data[index].mID;
+                //    this.setState({});
+
+
+                //    console.log("this.state.fields.payeeType", this.state.fields.payeeTypeId, "-------", data[index].mID);
+                //}
+
+
+                const key = this.state.ProductClaimData.findIndex(item => item.inputType === searchname);
+                if (key != -1) {
+                    data[key].disable = true;
+
+                    if (event.target.checked == false) {
+                        data[key].disable = false;
+                        //this.state.displaybank = false;
+                        //this.setState({});
+                    }
+                }
+                this.setState({ data });
+
+            }
+
+
+
+
+
+            //if (event.target.checked === true) {
+            //    this.state.displaybank = true;
+            //    this.setState({});
+            //}
+            //else {
+            //   this.state.displaybank = false;
+            //    this.setState({});
+            //}
+
+            //debugger;
+            //var eventname = document.getElementsByName(event.target.name); 
+            //console.log("event.target.name", eventname);
+            //for (var i = 0; i < eventname.length; i++) {
+            //    if (!eventname[i].mIsRequired==true) {
+            //        eventname[i].disable = true;
+            //    } else {
+            //        eventname[i].disable = false;
+            //    }
+            //} 
+
+            console.log("values: ", this.state.ProductClaimData);
+        }
+        //ProductClaimData[name] = check;
+        //this.setState({ ProductClaimData });
+
+        //console.log("name", event.target.name);
+    }
+
+
     renderRedirect = () => {
         const Claimdata = this.state.ClaimResetData;
         this.state.fields = Claimdata;
@@ -1247,15 +1386,11 @@ class InboxClaimProcess extends React.Component {
                                     claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} dmsdocId={this.state.fields.dmsdocId} docidfunc={this.docidfunc} documentName={this.state.fields.documentName}
                                     ClaimIntimationDetails={this.state.ClaimIntimationDetails} handledatechange={this.handledatechange} bytearr={this.state.bytearr}
                                     ClaimsDecisionData={this.state.ClaimsDecisionData} handleChange={this.handleChange} onFormSubmit={this.onFormSubmit}
-                                    approved={this.state.approved} onInputParamChange={this.onInputParamChange} fields={this.state.fields}
+                                    approved={this.state.approved} handleCheckbox={this.handleCheckbox} fields={this.state.fields}
                                     errormessage={this.state.errormessage} ValidationUI={this.state.ValidationUI} classes={this.classes} renderPage={this.renderPage}
                                     errorstatus={this.state.errorstatus} DecisionType={this.state.DecisionType} PayeeType={this.state.PayeeType} displaybank={this.state.displaybank} handleddlChange={this.handleddlChange}
-                                    typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} onModelChange={this.onModelChange} onDateChange={this.onDateChange} />
-                                {/* <ClaimsDecision ClaimsDecisionData={this.state.ClaimsDecisionData}
-                                    handleChange={this.handleChange} onFormSubmit={this.onFormSubmit} approved={this.state.approved} onInputParamChange={this.onInputParamChange} fields={this.state.fields}
-                                    errormessage={this.state.errormessage} ValidationUI={this.state.ValidationUI} classes={this.classes} errorstatus={this.state.errorstatus} DecisionType={this.state.DecisionType} />
-                                    */}
-
+                                    typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
+                                    SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData} />
                             </CardBody>
                         </Card>
                     </Animated>

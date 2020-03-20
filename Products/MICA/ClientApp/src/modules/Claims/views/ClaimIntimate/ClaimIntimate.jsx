@@ -118,9 +118,9 @@ const dateStyle = {
     zoom: "1.15"
 }
 const paddingCard =
-{
-    padding: "10px",
-};
+    {
+        padding: "10px",
+    };
 
 
 class ClaimIntimate extends React.Component {
@@ -290,7 +290,7 @@ class ClaimIntimate extends React.Component {
                 documentType: "",
             },
 
-            
+
             //ClaimResetData: {
             //    lossDateTime: "",
             //    locationOfLoss: "",
@@ -347,7 +347,7 @@ class ClaimIntimate extends React.Component {
             },
 
             selfsurvey: [{ mID: "Yes", mValue: "Yes", mType: 1 },
-            { mID: "No" , mValue: "No", mType: 2 }],
+            { mID: "No", mValue: "No", mType: 2 }],
 
             showInsGrid: false,
         };
@@ -410,7 +410,7 @@ class ClaimIntimate extends React.Component {
                 for (var i = 0; i < this.state.ClaimsAmountData.length; i++) {
                     console.log("amt:", this.state.ClaimsAmountData[i].claimAmounts);
                     //if (this.state.ClaimsAmountData[i].claimAmounts != null) {
-                        this.state.DataAmount.push(this.state.ClaimsAmountData[i]);
+                    this.state.DataAmount.push(this.state.ClaimsAmountData[i]);
                     //}
                     //else {
 
@@ -425,13 +425,13 @@ class ClaimIntimate extends React.Component {
                 this.setState({ detailsdto });
 
                 console.log("trail", detailsdto);
-                
+
                 console.log("bankdetails", this.state.bankDetails);
                 this.state.DetailsDTO.bankAccounts.push(this.state.bankDetails);
                 this.setState({});
 
                 console.log("bankAccounts", this.state.DetailsDTO.bankAccounts);
-
+                debugger;
                 fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimIntimate`, {
                     method: 'post',
                     headers: {
@@ -443,7 +443,7 @@ class ClaimIntimate extends React.Component {
                 }).then(response => response.json())
                     .then(data => {
                         console.log("responseData", data);
-                       
+
                         if (data.status == 2) {
                             this.state.claimId = data.claimId;
                             this.setState({ docpage: true, claimnumber: data.claimNumber });
@@ -480,7 +480,6 @@ class ClaimIntimate extends React.Component {
     };
 
     IsValidProductDetails = () => {
-
         //  console.log("lossdatedetails", this.state.ClaimsAmountData[0].claimAmounts)
         if (this.state.DetailsDTO.lossDateTime !== "" && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== "" && this.state.bankDetails.accountHolderName !== ""
             && this.state.bankDetails.accountNumber !== "" && this.state.bankDetails.bankName !== "" && this.state.bankDetails.ifscCode !== "" && this.state.bankDetails.accountType !== "" && this.state.DetailsDTO.causeOfLoss !== "") {
@@ -494,7 +493,6 @@ class ClaimIntimate extends React.Component {
     }
 
     UIValidation = () => {
-
         if (this.state.locationOfLossState == false && this.state.lossDescriptionState == false && this.state.accountHolderNameState == false
             && this.state.accountNumberState == false && this.state.bankNameState == false && this.state.ifscCodeState == false) {
             //&& this.state.bankBranchAddState == false
@@ -544,7 +542,6 @@ class ClaimIntimate extends React.Component {
         console.log("datediffrance", today, today.getTime());
         console.log("this.state.startDateFlag.getTime()", this.state.startDateFlag.getTime());
         console.log("this.state.endDateFlag.getTime()", this.state.endDateFlag.getTime());
-        debugger;
         if (name == "lossDateTime") {
 
             if (today.getTime() < this.state.startDateFlag.getTime() || today.getTime() > this.state.endDateFlag.getTime()) {
@@ -704,7 +701,7 @@ class ClaimIntimate extends React.Component {
                 console.log("stateMasterList", this.state.stateMasterList);
             });
 
-       
+
 
         setTimeout(
             function () {
@@ -712,11 +709,11 @@ class ClaimIntimate extends React.Component {
             }.bind(this), 2000
         );
 
-     
+
 
         //console.log("Model", Model);
         //console.log("this.state.DataModel", this.state.DataModel);
-        
+
     }
 
     onModelChange = (evt) => {
@@ -768,7 +765,7 @@ class ClaimIntimate extends React.Component {
                     }.bind(this), 2000
                 );
             }
-          //  that.claimAmountTable(data);
+            //  that.claimAmountTable(data);
             console.log("tabledata:", that.state.tabledata)
 
         });
@@ -853,8 +850,8 @@ class ClaimIntimate extends React.Component {
                     coverValue: prop.coverDynamic.map((c) => {
                         return (<h6> <b>{c.Header}</b> : {c.Details} </ h6>)
                     }),
-                   // coverValue: prop.coverValue,
-                   // benefitAmount: prop.benefitAmount,
+                    // coverValue: prop.coverValue,
+                    // benefitAmount: prop.benefitAmount,
                     claimAmounts:
                         <GridItem xs={12} sm={12} md={12}>
                             <CustomInput
@@ -996,7 +993,7 @@ class ClaimIntimate extends React.Component {
 
 
         this.setState({});
-      //  this.claimAmountTable();
+        //  this.claimAmountTable();
         this.onGet();
     }
 
@@ -1191,7 +1188,7 @@ class ClaimIntimate extends React.Component {
         }
     }
 
-    onGet =() => {
+    onGet = () => {
         //fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId, {
         fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId + `&FieldType=Claim%20Intimation`, {
             method: 'GET',
@@ -1204,12 +1201,12 @@ class ClaimIntimate extends React.Component {
             .then(response => response.json())
             .then(data => {
                 console.log("data", data);
-                
-                this.setState({ ProductClaimData: data});
-               
-               console.log("ProductClaimData", this.state.ProductClaimData);
 
-               
+                this.setState({ ProductClaimData: data });
+
+                console.log("ProductClaimData", this.state.ProductClaimData);
+
+
             });
     }
 
@@ -1445,7 +1442,7 @@ class ClaimIntimate extends React.Component {
 
                                 <BankDetails BankData={this.state.BankData} AccountTypedata={this.state.AccountTypedata} DetailsDTO={this.state.DetailsDTO} handleChange={this.handleChange} fields={this.state.fields} details={this.state.details} onInputParamChange={this.onInputParamChange}
                                     accountHolderNameState={this.state.accountHolderNameState} accountNumberState={this.state.accountNumberState} bankNameState={this.state.bankNameState} bankBranchAddState={this.state.bankBranchAddState} ifscCodeState={this.state.ifscCodeState}
-                                    validateUI={this.state.validateUI} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} classes={this.classes} bankDetails={this.state.bankDetails} handleChangebank={this.handleChangebank}/>
+                                    validateUI={this.state.validateUI} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} classes={this.classes} bankDetails={this.state.bankDetails} handleChangebank={this.handleChangebank} />
 
 
                                 <Document DocumentData={this.state.DocumentData} docidfunc={this.docidfunc} doc={this.state.doc} dmsdocId={this.state.dmsdocId} documentName={this.state.documentName} claimId={this.state.claimId} handleChange={this.handleChange} DetailsDTO={this.state.DetailsDTO} getUploadParams={this.state.getUploadParams} onChangeStatus={this.state.handleChangeStatus} onSubmit={this.state.handleSubmit} fields={this.state.fields} onInputParamChange={this.onInputParamChange} />

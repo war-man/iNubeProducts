@@ -46,6 +46,10 @@ class Dashboard extends React.Component {
             miniActive: false,
             switchRoutes: [],
             menuPermission: [],
+            dashboards: [],
+            homedashboards: [],
+            emptyarray: [],
+            dashboardsmenuPermission: [],
             logintoken: "",
             opendialog: false,
             userroledata: [],
@@ -87,19 +91,9 @@ class Dashboard extends React.Component {
             console.log("login: ", userid, roleid);
             console.log("token: ", token);
         }
-        fetch(`${Loginconfig.LoginUrl}/api/Permission/GetPermissions?permissionType=Menu&userId=` + userid + `&roleId=` + roleid + ``, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-        })
-            .then(response => response.json())
-            .then((data) => {
-                this.setState({ menuPermission: data });
-                console.log('Menu Permission', this.state.menuPermission);
-            });
+
+        this.handlepermissions(userid, roleid, token);
+
         window.addEventListener("resize", this.resizeFunction);
 
         fetch(`${Loginconfig.LoginUrl}/api/Role/GetAllUserRoles/` + userid + ` `, {
@@ -118,16 +112,8 @@ class Dashboard extends React.Component {
             });
     }
 
-    handleselectedRole = (event, key) => {
-        console.log("user: ", key);
-        this.state.selectrole = this.state.userroledata[key].id;
-
-        let userid = localStorage.getItem('userId');
-        localStorage.setItem('roleId', this.state.selectrole);
-        this.setState({ selectedrole: localStorage.getItem('roleId') });
-        let token = localStorage.getItem('userToken');
-
-        fetch(`${Loginconfig.LoginUrl}/api/Permission/GetPermissions?permissionType=Menu&userId=` + userid + `&roleId=` + this.state.selectrole + ``, {
+    handlepermissions = (userid, roleid, token) => {
+        fetch(`${Loginconfig.LoginUrl}/api/Permission/GetPermissions?permissionType=Menu&userId=` + userid + `&roleId=` + roleid + ``, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -138,38 +124,52 @@ class Dashboard extends React.Component {
             .then(response => response.json())
             .then((data) => {
                 this.setState({ menuPermission: data });
+                this.handledashboard(userid, roleid, token);
                 console.log('Menu Permission', this.state.menuPermission);
             });
-        this.handlecloseDialog();
     }
 
-    //GetMasterData = (event) => {
-    //    let name = event.target.name;
-    //    let value = event.target.value;
-    //    this.setState({ name: value });
-    //    this.setState({ selectedrole: event.target.value });
-    //    console.log("selected role: ", this.state.selectedrole);
+    handledashboard = (userid, roleid, token) => {
+        fetch(`${Loginconfig.LoginUrl}/api/Permission/GetPermissions?permissionType=Dashboard&userId=` + userid + `&roleId=` + roleid + ``, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+        })
+            .then(response => response.json())
+            .then((data) => {
+                this.setState({ dashboardsmenuPermission: data });
+                let dashboards = this.state.dashboards;
+                console.log("dashboard: ", this.state.dashboards);
+                if (this.state.dashboardsmenuPermission.length > 0) {
+                    dashboards = this.state.dashboardsmenuPermission[0].children;
+                    this.setState({ dashboards, homedashboards: this.state.dashboardsmenuPermission });
+                    //let filtereddash = this.state.homedashboards[0].children;
+                    //console.log("filterdash ", filtereddash);
+                    //filtereddash.length = 0;
+                    //this.setState({ filtereddash });
+                }
+                this.state.menuPermission = [...this.state.homedashboards, ...this.state.menuPermission];
+                this.setState({});
+                console.log('Dashboard Permission', this.state.homedashboards);
+                console.log('Dashboard Permission', this.state.menuPermission);
+            });
+    }
 
-    //    let userid = localStorage.getItem('userId');
-    //    localStorage.setItem('roleId', event.target.value);
-    //    this.setState({ selectedrole: localStorage.getItem('roleId') });
-    //    let token = localStorage.getItem('userToken');
+    handleselectedRole = (event, key) => {
+        console.log("user: ", key);
+        this.state.selectrole = this.state.userroledata[key].id;
 
-    //    fetch(`${Loginconfig.LoginUrl}/api/Permission/GetPermissions?permissionType=Menu&userId=` + userid + `&roleId=` + event.target.value + ``, {
-    //        method: 'GET',
-    //        headers: {
-    //            'Accept': 'application/json',
-    //            'Content-Type': 'application/json',
-    //            'Authorization': 'Bearer ' + token
-    //        },
-    //    })
-    //        .then(response => response.json())
-    //        .then((data) => {
-    //            this.setState({ menuPermission: data });
-    //            console.log('Menu Permission', this.state.menuPermission);
-    //        });
-    //}
+        let userid = localStorage.getItem('userId');
+        localStorage.setItem('roleId', this.state.selectrole);
+        this.setState({ selectedrole: localStorage.getItem('roleId') });
+        let token = localStorage.getItem('userToken');
 
+        this.handlepermissions(userid, this.state.selectrole, token);
+        this.handlecloseDialog();
+    }
 
     handleopenDialog = () => {
         this.setState({ opendialog: true });
@@ -267,13 +267,14 @@ class Dashboard extends React.Component {
                     {/* On the /maps/full-screen-maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
                     {this.getRoute() ? (
                         <div className={classes.content}>
-                            <Hidden smDown implementation="css">
+                            {/* */} <Hidden smDown implementation="css">
                                 <div className={this.sidebarMinimize.bind(this)}>
                                     {this.state.miniActive ? (
                                         <Button
                                             id="Toggle"
                                             justIcon
                                             round
+                                            className="toggle"
                                             color="white"
                                             onClick={this.sidebarMinimize.bind(this)}
                                         >
@@ -284,6 +285,7 @@ class Dashboard extends React.Component {
                                                 id="Toggle"
                                                 justIcon
                                                 round
+                                                className="toggle"
                                                 color="white"
                                                 onClick={this.sidebarMinimize.bind(this)}
                                             >
