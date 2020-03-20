@@ -4170,6 +4170,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var PolicyObj = JsonConvert.DeserializeObject<ExpandoObject>(IssuepolicyDTO.ToString());
 
                 var PolicyStartDate = Convert.ToDateTime(IssuepolicyDTO["StartDate"]);
+
+                if (PolicyStartDate > DateTime.Now) {
+                    System.TimeSpan Stateduration = new System.TimeSpan(0, 1, 00, 00);
+                    DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
+                    PolicyStartDate = startdateTime.Add(Stateduration);
+                }
                 System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
                 DateTime dateTime = Convert.ToDateTime(PolicyStartDate).Date;
 
