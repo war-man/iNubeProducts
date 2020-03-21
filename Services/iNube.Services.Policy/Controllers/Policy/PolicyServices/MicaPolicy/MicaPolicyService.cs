@@ -610,6 +610,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
         private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail)
         {
+            mappedPolicy.PolicyIssueDate = DateTime.Now;
+          
             TblPolicy policy = _mapper.Map<TblPolicy>(mappedPolicy);
 
 
@@ -621,11 +623,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             try
             {
-                EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
-                tblEndorsementDetails.EnddorsementRequest = policyDetail.ToString();
-                TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
+                //EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
+                //tblEndorsementDetails.EnddorsementRequest = policyDetail.ToString();
+                //TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
 
-                _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+                //_context.TblEndorsementDetails.Add(tblEndorsement_mapper);
                 _context.SaveChanges();
             }
             catch (Exception e)
