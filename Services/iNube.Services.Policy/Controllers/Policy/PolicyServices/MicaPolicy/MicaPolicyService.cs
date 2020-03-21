@@ -623,11 +623,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             try
             {
-                //EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
-                //tblEndorsementDetails.EnddorsementRequest = policyDetail.ToString();
-                //TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
+                EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
+                tblEndorsementDetails.EnddorsementRequest = policyDetail.ToString();
+                TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
 
-                //_context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+                _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
                 _context.SaveChanges();
             }
             catch (Exception e)
@@ -4174,7 +4174,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var PolicyStartDate = Convert.ToDateTime(IssuepolicyDTO["StartDate"]);
 
                 if (PolicyStartDate > DateTime.Now) {
-                    System.TimeSpan Stateduration = new System.TimeSpan(0, 1, 00, 00);
+                    System.TimeSpan Stateduration = new System.TimeSpan(0, 23,59, 59);
                     DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
                     PolicyStartDate = startdateTime.Add(Stateduration);
                 }

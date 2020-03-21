@@ -1224,6 +1224,9 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
 
             cDDTO.AccountNo = micaCD.AccountNo;
+            cDDTO.Description = micaCD.Description;
+            cDDTO.Frequency = micaCD.Frequency;
+
             foreach (var Data in micaCD.micaCDDTO)
             {
                 cdTransactionsmasterDTO = new CdTransactionsMasterDTO();
