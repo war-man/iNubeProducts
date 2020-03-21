@@ -3140,52 +3140,52 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             failcount++;
                         }
 
-                        if (Enddate == Startdate.AddDays(364))
-                        {
-                            RuleEngineResponse res1obj = new RuleEngineResponse();
-                            res1obj.ValidatorName = "Policy End Date";
-                            res1obj.Outcome = "Success";
-                            res1obj.Message = "Validation done for Policy End Date";
-                            res1obj.Code = "EXPO004";
+                        //if (Enddate == Startdate.AddDays(364))
+                        //{
+                        //    RuleEngineResponse res1obj = new RuleEngineResponse();
+                        //    res1obj.ValidatorName = "Policy End Date";
+                        //    res1obj.Outcome = "Success";
+                        //    res1obj.Message = "Validation done for Policy End Date";
+                        //    res1obj.Code = "EXPO004";
 
-                            engineResponse.Add(res1obj);
-                            successcount++;
-                        }
-                        else
-                        {
-                            RuleEngineResponse res1obj = new RuleEngineResponse();
-                            res1obj.ValidatorName = "Policy End Date";
-                            res1obj.Outcome = "Fail";
-                            res1obj.Message = "End date is not equal to 364 days from Start date";
-                            res1obj.Code = "EXPO005";
+                        //    engineResponse.Add(res1obj);
+                        //    successcount++;
+                        //}
+                        //else
+                        //{
+                        //    RuleEngineResponse res1obj = new RuleEngineResponse();
+                        //    res1obj.ValidatorName = "Policy End Date";
+                        //    res1obj.Outcome = "Fail";
+                        //    res1obj.Message = "End date is not equal to 364 days from Start date";
+                        //    res1obj.Code = "EXPO005";
 
-                            engineResponse.Add(res1obj);
-                            failcount++;
-                        }
-                        var Endtime = Enddate.ToString("HH:mm");
-                        string tm = "23:59";
-                        if (Endtime == tm)
-                        {
-                            RuleEngineResponse res3obj = new RuleEngineResponse();
-                            res3obj.ValidatorName = "Policy End Time";
-                            res3obj.Outcome = "Success";
-                            res3obj.Message = "Validation done for Policy End Date";
-                            res3obj.Code = "EXPO006";
+                        //    engineResponse.Add(res1obj);
+                        //    failcount++;
+                        //}
+                        //var Endtime = Enddate.ToString("HH:mm");
+                        //string tm = "23:59";
+                        //if (Endtime == tm)
+                        //{
+                        //    RuleEngineResponse res3obj = new RuleEngineResponse();
+                        //    res3obj.ValidatorName = "Policy End Time";
+                        //    res3obj.Outcome = "Success";
+                        //    res3obj.Message = "Validation done for Policy End Date";
+                        //    res3obj.Code = "EXPO006";
 
-                            engineResponse.Add(res3obj);
-                            successcount++;
-                        }
-                        else
-                        {
-                            RuleEngineResponse res3obj = new RuleEngineResponse();
-                            res3obj.ValidatorName = "Policy End Time";
-                            res3obj.Outcome = "Fail";
-                            res3obj.Message = "Policy End time is not valid";
-                            res3obj.Code = "EXPO007";
+                        //    engineResponse.Add(res3obj);
+                        //    successcount++;
+                        //}
+                        //else
+                        //{
+                        //    RuleEngineResponse res3obj = new RuleEngineResponse();
+                        //    res3obj.ValidatorName = "Policy End Time";
+                        //    res3obj.Outcome = "Fail";
+                        //    res3obj.Message = "Policy End time is not valid";
+                        //    res3obj.Code = "EXPO007";
 
-                            engineResponse.Add(res3obj);
-                            failcount++;
-                        }
+                        //    engineResponse.Add(res3obj);
+                        //    failcount++;
+                        //}
 
                         if (failcount > 0)
                         {
