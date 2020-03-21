@@ -2248,9 +2248,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 }
                 policyDTO.PolicyIssueDate = DateTime.Now;
-                policyDTO.PolicyVersion = 1;
+              
             }
-
+            policyDTO.PolicyVersion = 1;
             policyDTO.PolicyInsurableDetails.AddRange(GetMultiCover(policyDetail, productDTO, policyDTO, singleCover, Errors));
             if (productDTO.ProductInsurableItems.FirstOrDefault().ProductCovers.Count > 0)
             {
@@ -2773,10 +2773,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         var lstPolicyInsurableDetailsDto = await InternalCallPolicyInsurableDetails(insurableItemRequest, PolicyNo, apiContext);
 
-
-
-
-
+                        var BSI = 0;
+                        var NewSI = 0;
+                        var OldSI = 0;
 
                         var EndorsmentType = (string)insurableItemRequest["EndorsementType"];
 
@@ -2794,16 +2793,26 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                                 dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
-
-                                //Step2:Validate of Request Object
+                                //OldSI = Convert.ToInt64(json1["si"]);
+                                //if (insurableItemRequest["si"] != null)
+                                //{
+                                //    NewSI = Convert.ToInt64(insurableItemRequest["si"]);
+                                //}
+                                //else
+                                //{
+                                //    NewSI = OldSI;
+                                //}
+                                //BSI = Convert.ToInt64(json1["Balance SumInsued"]) + NewSI - OldSI;
+                                //json1["Balance SumInsued"] = BSI;
+                                ////Step2:Validate of Request Object
                                 List<CDMapper> cDMappers = new List<CDMapper>();
                                 CDMapper cD = new CDMapper();
                                 cD.Type = "Policy";
-                                cD.Data = json;
+                                cD.Data=json;
                                 cDMappers.Add(cD);
                                 cD = new CDMapper();
                                 cD.Type = "Endorsement";
-                                cD.Data = insurableItemRequest;
+                                cD.Data=insurableItemRequest;
                                 cDMappers.Add(cD);
 
 
@@ -2991,11 +3000,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             List<CDMapper> cDMappers = new List<CDMapper>();
                             CDMapper cD = new CDMapper();
                             cD.Type = "Policy";
-                            cD.Data = json;
+                            cD.Data=json;
                             cDMappers.Add(cD);
                             cD = new CDMapper();
                             cD.Type = "Endorsement";
-                            cD.Data = insurableItemRequest;
+                            cD.Data=insurableItemRequest;
                             cDMappers.Add(cD);
 
 
@@ -3232,6 +3241,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
 
 
+                    var BSI = 0;
+                    var NewSI = 0;
+                    var OldSI = 0;
 
                     var policyNo = (string)insurableItemRequest["PolicyNumber"];
                     var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
@@ -3240,17 +3252,26 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     var insurableItem = tblPolicyDetailsdata.PolicyRequest;
                     dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                     dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-
-
+                    //OldSI = Convert.ToInt64(json["si"]);
+                    //if (insurableItemRequest["si"] != null)
+                    //{
+                    //    NewSI = Convert.ToInt64(insurableItemRequest["si"]);
+                    //}
+                    //else
+                    //{
+                    //    NewSI = OldSI;
+                    //}
+                    //BSI = Convert.ToInt64(json1["Balance SumInsued"]) + NewSI - OldSI;
+                    //json1["Balance SumInsued"] = BSI;
                     //Step2:Validate of Request Object
                     List<CDMapper> cDMappers = new List<CDMapper>();
                     CDMapper cD = new CDMapper();
                     cD.Type = "Policy";
-                    cD.Data = json;
+                    cD.Data=json;
                     cDMappers.Add(cD);
                     cD = new CDMapper();
                     cD.Type = "Endorsement";
-                    cD.Data = insurableItemRequest;
+                    cD.Data=insurableItemRequest;
                     cDMappers.Add(cD);
 
 
@@ -4174,7 +4195,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var PolicyStartDate = Convert.ToDateTime(IssuepolicyDTO["StartDate"]);
 
                 if (PolicyStartDate > DateTime.Now) {
-                    System.TimeSpan Stateduration = new System.TimeSpan(0, 23,59, 59);
+                    System.TimeSpan Stateduration = new System.TimeSpan(0,0,00, 00);
                     DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
                     PolicyStartDate = startdateTime.Add(Stateduration);
                 }
@@ -4350,7 +4371,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                                    //policyUpdate.PolicyStartDate = Convert.ToDateTime(IssuepolicyDTO["StartDate"]);
+                                    policyUpdate.PolicyStartDate = PolicyStartDate;
                                     //System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
                                     //DateTime dateTime = Convert.ToDateTime(policyUpdate.PolicyStartDate).Date;
 
