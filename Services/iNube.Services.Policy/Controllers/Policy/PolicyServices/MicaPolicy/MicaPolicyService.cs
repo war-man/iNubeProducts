@@ -2689,36 +2689,39 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             var InsurableItem = productDTO.ProductInsurableItems.FirstOrDefault();
                             if (InsurableItem != null)
                             {
-                                var CoverItem = InsurableItem.ProductCovers.FirstOrDefault();
-                                if (CoverItem != null)
+                                var CoverItemList = InsurableItem.ProductCovers.Where(s => s.CoverTypeId > 0).ToList();
+                                foreach (var CoverItem in CoverItemList)
                                 {
-                                    CoverName = CoverItem.Cover;
-                                    if (InsurableItemName == InsurableItem.InsurableItem)
+                                    if (CoverItem != null)
                                     {
-
-                                        var BenefitItem = CoverItem.ProductBenefits.FirstOrDefault();
-                                        if (BenefitItem != null)
+                                        CoverName = CoverItem.Cover;
+                                        if (InsurableItemName == InsurableItem.InsurableItem)
                                         {
-                                            if (BenefitItem.MaxBenefitAmount != null && BenefitItem.MaxBenefitAmount > 0)
-                                            {
-                                                BenefitAmount = (int)BenefitItem.MaxBenefitAmount;
-                                            }
-                                            else
-                                            {
-                                                BenefitAmount = (int)BenefitItem.BenefitCriteriaValue;
-                                            }
-                                        }
 
-                                        policyInsurableDetailsDto = new TblPolicyInsurableDetails();
-                                        policyInsurableDetailsDto.PolicyId = policy.PolicyId;
-                                        policyInsurableDetailsDto.CoverName = CoverName;
-                                        policyInsurableDetailsDto.InsurableItem = InsurableItem.InsurableItem;
-                                        policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
-                                        policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
-                                        policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
-                                        policyInsurableDetailsDto.CoverValue = insurableInsurablefields.toString;
-                                        policyInsurableDetailsDto.IsActive = true;
-                                        policyInsurableDetailsList.Add(policyInsurableDetailsDto);
+                                            var BenefitItem = CoverItem.ProductBenefits.FirstOrDefault();
+                                            if (BenefitItem != null)
+                                            {
+                                                if (BenefitItem.MaxBenefitAmount != null && BenefitItem.MaxBenefitAmount > 0)
+                                                {
+                                                    BenefitAmount = (int)BenefitItem.MaxBenefitAmount;
+                                                }
+                                                else
+                                                {
+                                                    BenefitAmount = (int)BenefitItem.BenefitCriteriaValue;
+                                                }
+                                            }
+
+                                            policyInsurableDetailsDto = new TblPolicyInsurableDetails();
+                                            policyInsurableDetailsDto.PolicyId = policy.PolicyId;
+                                            policyInsurableDetailsDto.CoverName = CoverName;
+                                            policyInsurableDetailsDto.InsurableItem = InsurableItem.InsurableItem;
+                                            policyInsurableDetailsDto.IdentificationNo = insurableInsurablefields["Identification Number"];
+                                            policyInsurableDetailsDto.Name = insurableInsurablefields["Name"];
+                                            policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
+                                            policyInsurableDetailsDto.CoverValue = JsonConvert.SerializeObject(insurableInsurablefields);
+                                            policyInsurableDetailsDto.IsActive = true;
+                                            policyInsurableDetailsList.Add(policyInsurableDetailsDto);
+                                        }
                                     }
                                 }
                             }
@@ -3762,32 +3765,32 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                var res = await _integrationService.RuleMapper(ProposalDetail, "Proposal", apiContext);
-                var seriaizeListofres = JsonConvert.SerializeObject(res);
-                List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
-                if (Listofres.Count() > 0)
-                {
+                //var res = await _integrationService.RuleMapper(ProposalDetail, "Proposal", apiContext);
+                //if (res!=null)
+                //{
+                //    var seriaizeListofres = JsonConvert.SerializeObject(res);
+                //    List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
 
 
-                    var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
-                    if (Listofres != null)
-                    {
-                        foreach (var item in Listofres)
-                        {
+                //    var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+                //    if (Listofres != null)
+                //    {
+                //        foreach (var item in Listofres)
+                //        {
 
-                            if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
-                            {
+                //            if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
+                //            {
 
-                                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message, PropertyName = item.ValidatorName };
-                                Errors.Add(errorInfo);
+                //                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message, PropertyName = item.ValidatorName };
+                //                Errors.Add(errorInfo);
 
-                            }
+                //            }
 
-                        }
-                        if (Errors.Count > 0)
-                        {
-                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors };
-                        }
+                //        }
+                //        if (Errors.Count > 0)
+                //        {
+                //            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors };
+                //        }
 
                         //Step2:Premium  calculation 
 
@@ -4057,13 +4060,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
                         }
 
-                    }
-                }
-                else
-                {
-                    return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Input Validation failed" };
+                   // }
+                //}
+                //else
+                //{
+                //    return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Input Validation failed" };
 
-                }
+                //}
 
 
             }
