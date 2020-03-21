@@ -43,6 +43,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext);
         Task<ClaimCounts> GetClaimCount(ApiContext apiContext);
         Task<IEnumerable<commonddDTO>> GetMasterForVehicleLocation(string lMasterlist, ApiContext apiContext);
+        Task<BankAccountsDTO> SearchClaimBankDetails(int claimid, ApiContext apiContext);
     }
 
 }

@@ -152,7 +152,7 @@ class ClaimInbox extends React.Component {
 
     handleSettled = () => {
         let status = this.state.ClaimDTO;
-        status.claimStatusId = 38;
+        status.claimStatusId = 22;
         this.setState({
             status,
             intimate: false,
@@ -175,7 +175,7 @@ class ClaimInbox extends React.Component {
             <div>
                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                     <GridContainer justify="center" lg={12}>
-                        <GridItem xs={2}>
+                        <GridItem/* xs={2}*/>
                             <Card id="card-bg1" onClick={(e) => this.handleintimate(e)}>
                                 <CardHeader>
                                     <h5 id="white" className={classes.cardTitle}>Intimated Claims</h5>
@@ -193,7 +193,7 @@ class ClaimInbox extends React.Component {
                                 </CardHeader>
                             </Card>
                         </GridItem>
-                        <GridItem xs={2}>
+                        {/*  <GridItem xs={2}>
                             <Card id="card-bg2" onClick={(e) => this.handleApproved(e)}>
                                 <CardHeader>
                                     <h5 id="white" className={classes.cardTitle}>Approved Claims</h5>
@@ -229,16 +229,16 @@ class ClaimInbox extends React.Component {
                                     </h4>
                                 </CardHeader>
                             </Card>
-                        </GridItem>
-                        <GridItem xs={2}>
-                            <Card id="card-bg4" onClick={(e) => this.handleRejected(e)}>
+                        </GridItem>*/}
+                        <GridItem /*xs={2}*/>
+                            <Card id="card-bg5" onClick={(e) => this.handleSettled(e)}>
                                 <CardHeader>
-                                    <h5 id="white" className={classes.cardTitle}>Rejected Claims</h5>
+                                    <h5 id="white" className={classes.cardTitle}>Setteled Claims</h5>
                                     <h4 className="h4center">
                                         <CountUp
                                             className="account-balance"
                                             start={0}
-                                            end={this.state.ClaimCount.rejected}
+                                            end={this.state.ClaimCount.setteled}
                                             duration={3.50}
                                             useEasing={true}
                                             useGrouping={true}
@@ -248,15 +248,15 @@ class ClaimInbox extends React.Component {
                                 </CardHeader>
                             </Card>
                         </GridItem>
-                        <GridItem xs={2}>
-                            <Card id="card-bg5" onClick={(e) => this.handleSettled(e)}>
+                        <GridItem /*xs={2}*/>
+                            <Card id="card-bg4" onClick={(e) => this.handleRejected(e)}>
                                 <CardHeader>
-                                    <h5 id="white" className={classes.cardTitle}>Setteled Claims</h5>
+                                    <h5 id="white" className={classes.cardTitle}>Rejected Claims</h5>
                                     <h4 className="h4center">
                                         <CountUp
                                             className="account-balance"
                                             start={0}
-                                            end={this.state.ClaimCount.setteled}
+                                            end={this.state.ClaimCount.rejected}
                                             duration={3.50}
                                             useEasing={true}
                                             useGrouping={true}

@@ -115,9 +115,9 @@ const searchBtn = {
 }
 
 const paddingCard =
-{
-    padding: "10px",
-};
+    {
+        padding: "10px",
+    };
 
 class ClaimProcess extends React.Component {
     constructor(props) {
@@ -274,7 +274,7 @@ class ClaimProcess extends React.Component {
             }
 
             ],
-
+            BankDetails: {},
             ClaimInsurable: {
 
                 insurableItem: "",
@@ -475,7 +475,24 @@ class ClaimProcess extends React.Component {
 
 
     }
-    
+
+    handleBankdetails = (id) => {
+
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimBankDetails?claimid=` + id + ``, {
+            method: 'Get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log('Response data', data);
+            this.setState({ BankDetails: data });
+        });
+    }
+
     editFunction(id, oid) {
 
         console.log("pid", oid, id);
@@ -549,13 +566,13 @@ class ClaimProcess extends React.Component {
         }
 
         this.onGet();
-
+        this.handleBankdetails(oid);
     }
 
     componentDidMount() {
 
-
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Claims%20Decision`, {
+        let claimdecision = "Claims Decision";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + claimdecision + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -589,8 +606,8 @@ class ClaimProcess extends React.Component {
                 this.setState({});
                 console.log("DecisionType", this.state.DecisionType, decisiondata);
             });
-
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Account%20Type`, {
+        let accounttype = "Account Type";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + accounttype + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -604,8 +621,8 @@ class ClaimProcess extends React.Component {
                 console.log("AccountTypedata", data);
             });
 
-
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Claim%20Status`, {
+        let Claimstatus = "Claim Decision";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + Claimstatus + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -695,8 +712,6 @@ class ClaimProcess extends React.Component {
 
     }
 
-
-
     onDateChange = (formate, type, name, event) => {
         const { validdate } = this.state;
         this.setState({ validdate: false });
@@ -769,11 +784,11 @@ class ClaimProcess extends React.Component {
         }).then(function (data) {
             console.log('Response data', data);
 
-            
-            console.log(that.state.Claimlist, 'Claim List');
+            //console.log(that.state.Claimlist, 'Claim List');
             that.setState({ showtable: false, loader: false });
-            if (data.length > 0) {
-                that.dataTable(data);
+            if (data.claimSearch.length > 0) {
+                that.dataTable(data.claimSearch);
+                that.setState({ email: data.claimSearch[0].insuredEmail });
             } else {
                 setTimeout(
                     function () {
@@ -781,9 +796,9 @@ class ClaimProcess extends React.Component {
                     }.bind(this), 2000
                 );
             }
-            that.setState({ email: data[0].insuredEmail });
-            that.setState({ Claimlist: data });
-            that.setState({ officelist: data });
+
+            that.setState({ Claimlist: data.claimSearch });
+            that.setState({ officelist: data.claimSearch });
 
             // that.claimAmountTable(data);
 
@@ -910,8 +925,8 @@ class ClaimProcess extends React.Component {
 
         console.log("this.state.claimIds", this.state.claimid);
 
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimDetails?ClaimId=` + id, {
-       
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimDetails?ClaimId=` + this.state.claimid, {
+
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -1244,8 +1259,8 @@ class ClaimProcess extends React.Component {
     }
 
     onGet = () => {
-        
-        fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId + `&FieldType=Claim%20Process`, {
+        let claimprocess = "Claim Process";
+        fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId + `&FieldType=` + claimprocess + ``, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -1260,7 +1275,7 @@ class ClaimProcess extends React.Component {
                 this.setState({ ProductClaimData: data });
 
                 // this.state.ProductClaimData.mIsRequired = false;
-               // this.setState({});
+                // this.setState({});
 
                 console.log("ProductClaimData", this.state.ProductClaimData);
 
@@ -1268,8 +1283,8 @@ class ClaimProcess extends React.Component {
             });
     }
 
-    handleCheckbox = (event,name) => {
-       
+    handleCheckbox = (event, name) => {
+
         let ProductClaimData = this.state.ProductClaimData;
         //let name = event.target.name;
         let check = event.target.checked;
@@ -1303,7 +1318,7 @@ class ClaimProcess extends React.Component {
 
                 //    console.log("this.state.fields.payeeType", this.state.fields.payeeTypeId, "-------", data[index].mID);
                 //}
-                
+
 
                 const key = this.state.ProductClaimData.findIndex(item => item.inputType === searchname);
                 if (key != -1) {
@@ -1319,8 +1334,8 @@ class ClaimProcess extends React.Component {
 
             }
 
-           
-            
+
+
 
 
             //if (event.target.checked === true) {
@@ -1350,7 +1365,6 @@ class ClaimProcess extends React.Component {
 
         //console.log("name", event.target.name);
     }
-
 
     render() {
         const { classes } = this.props;
@@ -1631,7 +1645,7 @@ class ClaimProcess extends React.Component {
                                     errormessage={this.state.errormessage} ValidationUI={this.state.ValidationUI} classes={this.classes} renderPage={this.renderPage}
                                     errorstatus={this.state.errorstatus} DecisionType={this.state.DecisionType} PayeeType={this.state.PayeeType} displaybank={this.state.displaybank} handleddlChange={this.handleddlChange}
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
-                                    SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}/>
+                                    SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData} />
 
                             </CardBody>
                         </Card>

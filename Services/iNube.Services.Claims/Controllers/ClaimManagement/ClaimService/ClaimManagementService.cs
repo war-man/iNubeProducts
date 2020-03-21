@@ -45,6 +45,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext);
         Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext);
         Task<ClaimCounts> GetClaimCount(ApiContext apiContext);
+        Task<BankAccountsDTO> SearchClaimBankDetails(int claimid, ApiContext apiContext);
         Task<IEnumerable<commonddDTO>> GetMasterForVehicleLocation(string lMasterlist, ApiContext apiContext);
     }
     public class ClaimManagementService : IClaimManagementService
@@ -213,7 +214,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         }
         public async Task<IEnumerable<commonddDTO>> GetMasterForVehicleLocation(string lMasterlist, ApiContext apiContext)
         {
-            return await _productService(apiContext.ProductType).GetMasterForVehicleLocation(lMasterlist,apiContext);
+            return await _productService(apiContext.ProductType).GetMasterForVehicleLocation(lMasterlist, apiContext);
+        }
+        public async Task<BankAccountsDTO> SearchClaimBankDetails(int claimid, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).SearchClaimBankDetails(claimid, apiContext);
         }
 
     }

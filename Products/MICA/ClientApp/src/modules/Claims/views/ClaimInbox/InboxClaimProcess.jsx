@@ -231,6 +231,7 @@ class InboxClaimProcess extends React.Component {
                 fileName: "",
                 documentType: "",
             },
+            BankDetails: {},
 
             claimamt: [{
                 approvedClaimAmounts: 0
@@ -423,7 +424,7 @@ class InboxClaimProcess extends React.Component {
 
     handleddlChange = (currentNode, selectedNodes) => {
         console.log("currentNode", currentNode, selectedNodes);
-        if (currentNode.checked === true) {
+        if (currentNode.mIsRequired === true) {
             this.setState({ displaybank: true });
 
         } else {
@@ -499,6 +500,7 @@ class InboxClaimProcess extends React.Component {
         }
 
         this.onGet();
+        this.handleBankdetails(oid);
         //this.claimAmountTable();
     }
 
@@ -688,6 +690,7 @@ class InboxClaimProcess extends React.Component {
                 that.setState({ showtable: false, loader: false });
                 if (data.length > 0) {
                     that.dataTable(data);
+                    that.setState({ email: data[0].insuredEmail });
                 } else {
                     setTimeout(
                         function () {
@@ -702,6 +705,23 @@ class InboxClaimProcess extends React.Component {
                 that.claimAmountTable(data);
             });
     };
+
+    handleBankdetails = (id) => {
+
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimBankDetails?claimid=` + id + ``, {
+            method: 'Get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log('Response data', data);
+            this.setState({ BankDetails: data });
+        });
+    }
 
     setstatus = (type, event) => {
         this.setState({ [event.target.name]: event.target.value });

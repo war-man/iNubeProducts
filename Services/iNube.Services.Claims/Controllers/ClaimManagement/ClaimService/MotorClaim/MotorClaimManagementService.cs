@@ -186,5 +186,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         {
             throw new NotImplementedException();
         }
+        public Task<BankAccountsDTO> SearchClaimBankDetails(int claimid, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

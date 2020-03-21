@@ -45,7 +45,7 @@ const ClaimsDecision = (props) => {
 
             {
                 props.approved &&
-               
+
                 <div>
                     <CardHeader color="info" icon >
                         {
@@ -58,22 +58,22 @@ const ClaimsDecision = (props) => {
                         <GridItem xs={12} sm={4} md={3}>
 
                             <MasterDropdown
-                           // success={props.claimStatusIdState === "success"}
-                            error={props.claimStatusIdState}
-                            labelText="ClaimStatus"
-                            id="ddlstatus"
-                            lstObject={props.ClaimStatusData}
-                            filterName='Claim Status'
-                            required={true}
-                            value={props.fields.claimStatusId}
-                            name='claimStatusId'
-                            onChange={(evt) => props.onInputParamChange("claimStatusId", evt)}
-                            formControlProps={{ fullWidth: true }}
-                        />
-                        {props.errormessage && (props.fields.claimStatusId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
-                    </GridItem>
+                                // success={props.claimStatusIdState === "success"}
+                                error={props.claimStatusIdState}
+                                labelText="ClaimStatus"
+                                id="ddlstatus"
+                                lstObject={props.ClaimsDecisionData}
+                                filterName='Claims Decision'
+                                required={true}
+                                value={props.fields.claimStatusId}
+                                name='claimStatusId'
+                                onChange={(evt) => props.onInputParamChange("claimStatusId", evt)}
+                                formControlProps={{ fullWidth: true }}
+                            />
+                            {props.errormessage && (props.fields.claimStatusId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        </GridItem>
 
-                    {/* <GridItem xs={12} sm={12} md={4}>
+                        {/* <GridItem xs={12} sm={12} md={4}>
                         <CustomInput
                             success={props.approvedClaimAmountState === "success"}
                             error={props.approvedClaimAmountState === "error"}
@@ -90,32 +90,32 @@ const ClaimsDecision = (props) => {
                     */}
 
                         <GridItem xs={12} sm={12} md={6}>
-                        <CustomInput
-                           // success={props.claimManagerRemarksState === "success"}
-                            error={props.claimManagerRemarksState}
-                            labelText="ManagerRemarks"
-                            required={true}
-                            multiline={true}
-                            value={props.fields.claimManagerRemarks}
-                            name="claimManagerRemarks"
-                            onChange={(evt) => props.onInputParamChange("claimManagerRemarks", evt)}
-                            inputProps={{
-                                //type: "number"
-                            }}
-                            formControlProps={{ fullWidth: true }} />
-                        {props.errormessage && (props.fields.claimManagerRemarks == "") ? <p className="error">*Required field cannot be left blank</p> : null}
-                    </GridItem>
+                            <CustomInput
+                                // success={props.claimManagerRemarksState === "success"}
+                                error={props.claimManagerRemarksState}
+                                labelText="ManagerRemarks"
+                                required={true}
+                                multiline={true}
+                                value={props.fields.claimManagerRemarks}
+                                name="claimManagerRemarks"
+                                onChange={(evt) => props.onInputParamChange("claimManagerRemarks", evt)}
+                                inputProps={{
+                                    //type: "number"
+                                }}
+                                formControlProps={{ fullWidth: true }} />
+                            {props.errormessage && (props.fields.claimManagerRemarks == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        </GridItem>
 
                         <GridContainer lg={12} justify="center">
-                        <GridItem xs={5} sm={3} md={3} lg={1}>
+                            <GridItem xs={5} sm={3} md={3} lg={1}>
                                 <Button color="info" round onClick={() => props.onFormSubmit()}>
                                     <TranslationContainer translationKey="Submit" />
-                                </Button>	
+                                </Button>
                             </GridItem>
                         </GridContainer>
 
                     </GridContainer>
-                    </div>
+                </div>
             }
 
         </div>

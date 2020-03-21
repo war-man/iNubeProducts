@@ -67,7 +67,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
 
-        public async Task<List<FinanceProcessDTO>> GetFinanceBankDataAsync(SearchFinanceRequest financeRequest,ApiContext apiContext)
+        public async Task<List<FinanceProcessDTO>> GetFinanceBankDataAsync(SearchFinanceRequest financeRequest, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -122,7 +122,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
 
-        public async Task<List<object>> GetClaimsByProductPartner(PolicySearchbyPidDTO claimDash,ApiContext apiContext)
+        public async Task<List<object>> GetClaimsByProductPartner(PolicySearchbyPidDTO claimDash, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -183,6 +183,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         }
 
         public Task<IEnumerable<commonddDTO>> GetMasterForVehicleLocation(string lMasterlist, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<BankAccountsDTO> SearchClaimBankDetails(int claimid, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

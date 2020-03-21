@@ -405,6 +405,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
             return Ok(commonTypesDTOs);
         }
 
-
+        [HttpGet]
+        public async Task<IActionResult> SearchClaimBankDetails(int claimid)
+        {
+            var response = await _claimService.SearchClaimBankDetails(claimid, Context);
+            return Ok(response);
+        }
     }
 }
