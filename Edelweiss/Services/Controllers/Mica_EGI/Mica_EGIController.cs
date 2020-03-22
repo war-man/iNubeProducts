@@ -157,7 +157,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return ServiceResponse(response);
         }
 
+        [HttpPost]
+        public IActionResult GetVehicleActivity(VehicleActivityDTO vehicleActivity)
+        {
+            var response = _quotationService.GetVehicleActivity(vehicleActivity);
+            return ServiceResponse(response);
 
+        }
 
     }
 }

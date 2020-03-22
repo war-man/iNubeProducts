@@ -45,6 +45,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         //Policy Cancellation Method
         Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber, dynamic PolicyObject);
+
+        //Claims needs Activity of Vehicle
+        ResponseVehicleActivity GetVehicleActivity(VehicleActivityDTO vehicleActivity);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -3907,6 +3910,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
                 var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
+
+                var ad30days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30DAYS").EValue);
                 var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
                 var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
 
@@ -3926,7 +3931,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
                     returnobj.ADPremium = Convert.ToDecimal(Ad60days);
                     returnobj.GST = Convert.ToDecimal(monthlyGST);
-                    returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
+                    returnobj.MonthlyPremium = ad30days + Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
                 }
                 else if (BillingFrequency == "Yearly")
                 {
@@ -4087,6 +4092,54 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return cancelReturnDto;
 
 
+
+        }
+
+
+        public ResponseVehicleActivity GetVehicleActivity(VehicleActivityDTO vehicleActivity)
+        {
+
+            ResponseVehicleActivity response = new ResponseVehicleActivity();
+
+            var checkPolicyNo = _context.TblSwitchLog.Any(x => x.PolicyNo == vehicleActivity.PolicyNumber);
+
+            if (checkPolicyNo)
+            {
+                foreach (var VehicleNumber in vehicleActivity.VehicleNumbers)
+                {
+                    var logData = _context.TblSwitchLog.Where(x => x.PolicyNo == vehicleActivity.PolicyNumber && x.VehicleNumber == VehicleNumber)
+                                                .Select(x => new ActivityDTO
+                                                {
+                                                    DateTime = x.CreatedDate,
+                                                    VehicleNo = x.VehicleNumber,
+                                                    SwitchState = x.SwitchStatus.ToString(),
+                                                    SwitchType = x.SwitchType
+                                                }).ToList();
+
+                    if (logData.Count > 0)
+                    {
+                        response.VehicleData.Add(VehicleNumber, logData);
+
+                    }
+
+                }
+                response.PolicyNumber = vehicleActivity.PolicyNumber;
+                response.Status = BusinessStatus.Ok;
+                response.ResponseMessage = "Success";
+                return response;
+                
+            }
+            else
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+                response.ResponseMessage = "NO Records found";
+                response.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "No Records for this Policy Number: " + vehicleActivity.PolicyNumber;
+                errorInfo.ErrorCode = "GEN001";
+                errorInfo.PropertyName = "NoRecords";
+                response.Errors.Add(errorInfo);
+                return response;
+            }
 
         }
 

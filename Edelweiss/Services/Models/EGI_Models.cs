@@ -489,5 +489,24 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string ToTaxType { get; set; }
        
     }
+
+    public partial class VehicleActivityDTO
+    {
+        public string PolicyNumber { get; set; }
+        public List<string> VehicleNumbers { get; set; }
+    }
+
+    public partial class ResponseVehicleActivity : ResponseStatus
+    {
+        public ResponseVehicleActivity()
+        {
+            VehicleData = new Dictionary<string, List<ActivityDTO>>();
+        }
+
+        public string PolicyNumber { get; set; }
+        public Dictionary<string,List<ActivityDTO>> VehicleData { get; set; }
+    }
+
+
 }
 
