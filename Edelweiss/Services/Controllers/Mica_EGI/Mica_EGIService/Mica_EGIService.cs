@@ -2557,8 +2557,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 MICACDModel.PremiumDTO.Add(FTModel);
                 MICACDModel.Type = "PolicyCancellation";
                 MICACDModel.TxnType = "Credit";
-                MICACDModel.TxnAmount = CallCancleCalculator.FireTheft;
-                MICACDModel.TaxAmount = CallCancleCalculator.FTFromTax + CallCancleCalculator.FTToTax;
+                MICACDModel.TxnAmount = CallCancleCalculator.FireTheft * (-1);
+                MICACDModel.TaxAmount = CallCancleCalculator.FTFromTax * (-1) + CallCancleCalculator.FTToTax * (-1);
                 MICACDModel.TotalAmount = MICACDModel.TxnAmount + MICACDModel.TaxAmount;
 
                 FinalDto.Add(MICACDModel);
