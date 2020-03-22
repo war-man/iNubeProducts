@@ -651,10 +651,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     expression = rateitem.ExpressionValue;
                     resultExpression = Replace(expression, json_Dictionary);
                     double result = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
-                    calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = (Math.Round((Convert.ToDecimal(result)), 2)).ToString("0.00") });
+                    calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = result.ToString() });
                     json_Dictionary.Add(rateitem.ExpressionResult, result.ToString());
-                   // calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = result.ToString() });
-                    //foreach(var tr in calcultion)
+                    // calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = (Math.Round((Convert.ToDecimal(result)), 2)).ToString("0.00")
                     //{
                     //    json_Dictionary.Add(tr.Entity, tr.EValue);
                     //}
