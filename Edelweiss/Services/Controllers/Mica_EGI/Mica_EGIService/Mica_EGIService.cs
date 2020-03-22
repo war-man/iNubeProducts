@@ -367,20 +367,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                                 PremiumReturnDto returnobj = new PremiumReturnDto();
-                                returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
-                                returnobj.FireTheft = Convert.ToDecimal(Ft365days);
+                                returnobj.PerDayPremium = Math.Round(Convert.ToDecimal(Ftperday), 2);
+                                returnobj.FireTheft = Math.Round(Convert.ToDecimal(Ft365days), 2);
                                 if (premiumdata.BillingFrequency == "Monthly")
                                 {
-                                    returnobj.ADPremium = Convert.ToDecimal(Ad60days);
-                                    returnobj.GST = Convert.ToDecimal(monthlyGST);
-                                    returnobj.MonthlyPremium = ad30days + Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
+                                    returnobj.ADPremium = Math.Round(Convert.ToDecimal(Ad60days), 2);
+                                    returnobj.GST = Math.Round(Convert.ToDecimal(monthlyGST), 2);
+                                    returnobj.MonthlyPremium = Math.Round((ad30days + Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax)), 2);
                                 }
                                 else if (premiumdata.BillingFrequency == "Yearly")
                                 {
-                                    returnobj.ADPremium = Convert.ToDecimal(Ad365days);
-                                    returnobj.GST = Convert.ToDecimal(yearlyGST);
+                                    returnobj.ADPremium = Math.Round(Convert.ToDecimal(Ad365days), 2);
+                                    returnobj.GST = Math.Round(Convert.ToDecimal(yearlyGST), 2);
                                 }
-                                returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
+                                returnobj.Total = Math.Round((returnobj.FireTheft + returnobj.ADPremium + returnobj.GST), 2);
 
                                 returnobj.FinalAmount = Math.Round(returnobj.Total);
                                 returnobj.Status = BusinessStatus.Ok;
@@ -495,16 +495,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             var driver3totalpm = val.FirstOrDefault(x => x.Entity == "DRIVER3_TOTALPMPD").EValue;
 
 
-                            returnobj.FTPM = Convert.ToDecimal(fire);
+                            returnobj.FTPM = Math.Round(Convert.ToDecimal(fire), 2);
 
-                            returnobj.driverList.driver1.D1ADPM = Convert.ToDecimal(driver1Ad);
-                            returnobj.driverList.driver1.D1TotalPM = Convert.ToDecimal(driver1totalpm);
+                            returnobj.driverList.driver1.D1ADPM = Math.Round(Convert.ToDecimal(driver1Ad), 2);
+                            returnobj.driverList.driver1.D1TotalPM = Math.Round(Convert.ToDecimal(driver1totalpm), 2);
 
-                            returnobj.driverList.driver2.D2ADPM = Convert.ToDecimal(driver2Ad);
-                            returnobj.driverList.driver2.D2TotalPM = Convert.ToDecimal(driver2totalpm);
+                            returnobj.driverList.driver2.D2ADPM = Math.Round(Convert.ToDecimal(driver2Ad), 2);
+                            returnobj.driverList.driver2.D2TotalPM = Math.Round(Convert.ToDecimal(driver2totalpm), 2);
 
-                            returnobj.driverList.driver3.D3ADPM = Convert.ToDecimal(driver3Ad);
-                            returnobj.driverList.driver3.D3TotalPM = Convert.ToDecimal(driver3totalpm);
+                            returnobj.driverList.driver3.D3ADPM = Math.Round(Convert.ToDecimal(driver3Ad), 2);
+                            returnobj.driverList.driver3.D3TotalPM = Math.Round(Convert.ToDecimal(driver3totalpm), 2);
 
                             returnobj.Status = BusinessStatus.Ok;
 
@@ -3580,16 +3580,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         if (CallEndorsmentCalculator.Count > 0)
                         {
-                            DifferentialPremium.PerDayPremium = NewPremiumData.PerDayPremium - OldPremiumData.PerDayPremium;
-                            DifferentialPremium.FireTheft = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue);
-                            DifferentialPremium.ADPremium = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+                            DifferentialPremium.PerDayPremium = Math.Round((NewPremiumData.PerDayPremium - OldPremiumData.PerDayPremium), 2);
+                            DifferentialPremium.FireTheft = Math.Round(Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue), 2);
+                            DifferentialPremium.ADPremium = Math.Round(Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADPREM").EValue), 2);
 
                             var GSTTotal = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
 
-                            DifferentialPremium.GST = GSTTotal;
+                            DifferentialPremium.GST = Math.Round(GSTTotal, 2);
 
-                            DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium - OldPremiumData.MonthlyPremium;
-                            DifferentialPremium.Total = DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + GSTTotal;
+                            DifferentialPremium.MonthlyPremium = Math.Round((NewPremiumData.MonthlyPremium - OldPremiumData.MonthlyPremium), 2);
+                            DifferentialPremium.Total = Math.Round((DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + GSTTotal), 2);
                             DifferentialPremium.FinalAmount = Math.Round(DifferentialPremium.Total);
                         }
                         else
@@ -3829,16 +3829,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         if (CallEndorsmentCalculator.Count > 0)
                         {
-                            DifferentialPremium.PerDayPremium = NewPremiumData.PerDayPremium;
-                            DifferentialPremium.FireTheft = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue);
-                            DifferentialPremium.ADPremium = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+                            DifferentialPremium.PerDayPremium = Math.Round(NewPremiumData.PerDayPremium, 2);
+                            DifferentialPremium.FireTheft = Math.Round(Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue), 2);
+                            DifferentialPremium.ADPremium = Math.Round(Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADPREM").EValue), 2);
 
                             var GSTTotal = Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) + Convert.ToDecimal(CallEndorsmentCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue);
 
-                            DifferentialPremium.GST = GSTTotal;
+                            DifferentialPremium.GST = Math.Round(GSTTotal, 2);
 
-                            DifferentialPremium.MonthlyPremium = NewPremiumData.MonthlyPremium;
-                            DifferentialPremium.Total = DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + GSTTotal;
+                            DifferentialPremium.MonthlyPremium = Math.Round(NewPremiumData.MonthlyPremium, 2);
+                            DifferentialPremium.Total = Math.Round((DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + GSTTotal), 2);
                             DifferentialPremium.FinalAmount = Math.Round(DifferentialPremium.Total);
 
                         }
