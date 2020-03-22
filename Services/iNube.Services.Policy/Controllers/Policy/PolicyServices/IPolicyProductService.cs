@@ -64,5 +64,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext);
         Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
         Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext);
+
+        Task<List<object>> PolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext);
     }
 }

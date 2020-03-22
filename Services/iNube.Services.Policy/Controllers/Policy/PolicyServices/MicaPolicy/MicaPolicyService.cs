@@ -5280,6 +5280,37 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
         }
+
+        //To get policy data by policy number
+        public async Task<List<object>> PolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var DATA = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNumber);
+
+            Dictionary<object, object> finaldata = new Dictionary<object, object>();
+            List<object> FullfinalData = new List<object>();
+
+            finaldata.Add("Insured Ref No", DATA.CustomerId);
+            finaldata.Add("Insured Name", DATA.CoverNoteNo);
+            finaldata.Add("Insured Mobile No", DATA.MobileNumber);
+            finaldata.Add("Insured Email", DATA.Email);
+            finaldata.Add("Event Date", DATA.CreatedDate);
+            finaldata.Add("Cover Event", DATA.CoverEvent);
+            finaldata.Add("Policy Start Date", DATA.PolicyStartDate);
+            finaldata.Add("Policy End Date", DATA.PolicyEndDate);
+            finaldata.Add("Total Sum Insured", DATA.SumInsured);
+            finaldata.Add("Balance SumInsured", DATA.BalanceSumInsued);
+            foreach (var item in finaldata)
+            {
+                List<object> data = new List<object>();
+                data.Add(item.Key);
+                data.Add(item.Value);
+                FullfinalData.Add(data);
+            }
+            return FullfinalData;
+        }
+
     }
 
 

@@ -590,6 +590,13 @@ namespace iNube.Services.Policy.Controllers.Policy
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SearchPolicyDetailsByNumber(string PolicyNumber)
+        {
+            var searchPolicyDetails = await _policyService.PolicyDetailsByNumber(PolicyNumber, Context);
+            return Ok(searchPolicyDetails);
+        }
+
 
     }
 }
