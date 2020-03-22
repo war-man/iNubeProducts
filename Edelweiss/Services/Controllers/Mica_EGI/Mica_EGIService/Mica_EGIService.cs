@@ -43,6 +43,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         //Rule Engine 
         Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject);
 
+        //Policy Cancellation Method
+        Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber, dynamic PolicyObject);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -1716,7 +1718,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
             TblDailyActiveVehicles dailyActiveVehicles = new TblDailyActiveVehicles();
             TblScheduleReport scheduleReport = new TblScheduleReport();
-
+            
             scheduleReport.ScheduleStartDate = IndianTime;
             scheduleReport.SuccessCount = 0;
             scheduleReport.FailCount = 0;
@@ -1727,14 +1729,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             var ReportID = scheduleReport.ReportId;
-
+         
             var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
-
+         
             foreach (var policy in PolicyNumberList)
             {
 
                 schedulerLog = new TblSchedulerLog();
-
 
                 var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
 
@@ -2541,6 +2542,27 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 return FinalDto;
 
             }
+            else if (TxnType == "PolicyCancellation")
+            {
+                MicaCDDTO MICACDModel = new MicaCDDTO();
+
+                PolicyCancelReturnDto CallCancleCalculator = await PolicyCancellationCalculator(null,SourceObject);
+
+
+               var FTModel =  PolicyCancelFT(CallCancleCalculator);
+
+                MICACDModel.PremiumDTO.Add(FTModel);
+                MICACDModel.Type = "PolicyCancellation";
+                MICACDModel.TxnType = "Credit";
+                MICACDModel.TxnAmount = CallCancleCalculator.FireTheft;
+                MICACDModel.TaxAmount = CallCancleCalculator.FTFromTax + CallCancleCalculator.FTToTax;
+                MICACDModel.TotalAmount = MICACDModel.TxnAmount + MICACDModel.TaxAmount;
+
+                FinalDto.Add(MICACDModel);
+                return FinalDto;
+
+
+            }
             else
             {
                 ///<summary>
@@ -2827,6 +2849,45 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             FTYearlyObj.TaxAmount = taxAmountDTO;
             return FTYearlyObj;
         }
+
+        private CDPremiumDTO PolicyCancelFT(PolicyCancelReturnDto policyCancel)
+        {
+            CDPremiumDTO FTYearlyObj = new CDPremiumDTO();
+            CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
+            CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
+                      
+
+            decimal TotalTax = 0;
+            //AD TAX
+            //From State 
+            taxTypeDTO.Type = policyCancel.FromTaxType;
+            taxTypeDTO.TaxAmount = policyCancel.FTFromTax * (-1);
+
+            TotalTax = taxTypeDTO.TaxAmount;
+
+            //ARRAY
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            taxTypeDTO = new CDTaxTypeDTO();
+
+            //TO State
+            taxTypeDTO.Type = policyCancel.ToTaxType;
+            taxTypeDTO.TaxAmount = policyCancel.FTToTax * (-1);
+
+            TotalTax += taxTypeDTO.TaxAmount;
+
+
+            taxAmountDTO.TaxAmount = TotalTax;
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            //FT 365Days
+            FTYearlyObj.Type = "FT";
+            FTYearlyObj.TxnAmount = policyCancel.FireTheft * (-1);
+            FTYearlyObj.TotalAmount = FTYearlyObj.TxnAmount + TotalTax;
+            FTYearlyObj.TaxAmount = taxAmountDTO;
+            return FTYearlyObj;
+        }
+
 
         private List<MicaCDDTO> EndoADFT(List<CalculationResult> EndoRatingObject, string TxnType)
         {
@@ -3913,6 +3974,120 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             return RatingResponnse;
+        }
+
+
+        public async Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber,dynamic PolicyObject)
+        {
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            var CurrentDate = IndianTime.Date;
+
+            PolicyCancelReturnDto cancelReturnDto = new PolicyCancelReturnDto();
+
+
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+
+            dynamic PolicyData = null;
+
+            if (PolicyObject == null)
+            {
+                //Get the Policy Details by PolicyNumber
+                //In response from Policy
+                 PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
+            }
+            else
+            {
+                PolicyData = PolicyObject;
+            }
+            SchedulerPremiumDTO premiumDTO = new SchedulerPremiumDTO();
+
+            var StateCode = "";
+            DateTime PolicyStartDate;
+            DateTime PolicyEndDate;
+            double RemainingDays = 0;
+            var BillingFrequency = "";
+
+            if (PolicyData != null)
+            {
+                try
+                {
+                    premiumDTO.dictionary_rule.SI = PolicyData["si"].ToString();
+                    premiumDTO.dictionary_rule.NOOFPC = PolicyData["noOfPC"].ToString();
+                    premiumDTO.dictionary_rule.NOOFTW = PolicyData["noOfTW"].ToString();
+
+                    premiumDTO.dictionary_rate.PDAGERT_PAge = PolicyData["driverAge"].ToString();
+                    premiumDTO.dictionary_rate.DEXPRT_Exp = PolicyData["driverExp"].ToString();
+                    premiumDTO.dictionary_rate.ADDRVRT_DRV = PolicyData["additionalDriver"].ToString();
+                    premiumDTO.dictionary_rate.AVFACTORPC_PC_NOOFPC = PolicyData["noOfPC"].ToString();
+                    premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = PolicyData["noOfPC"].ToString();
+                    premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = PolicyData["noOfTW"].ToString();
+
+                    StateCode = PolicyData["stateCode"];
+
+                    TaxTypeDTO taxType = new TaxTypeDTO();
+                    taxType = TaxTypeForStateCode(StateCode);
+
+                    premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                    premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+
+                    BillingFrequency = PolicyData["billingFrequency"];
+                    PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
+                    PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
+
+                    //Adding 1 because it should give in between days.
+                    RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays + 1;
+
+                }
+                catch (Exception Ex)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    cancelReturnDto.ResponseMessage = "Policy Data Not Parsed";
+                    cancelReturnDto.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Policy Data Not Parsed";
+                    errorInfo.ErrorCode = "ExtEP";
+                    errorInfo.PropertyName = "CheckPolicyObject";
+                    cancelReturnDto.Errors.Add(errorInfo);
+                    return cancelReturnDto;
+                }
+            }
+
+
+
+            EndorsementCalDTO endorsementCalDTO = new EndorsementCalDTO();
+          
+            var CallRatingCalculator = await NewInternalCalculatePremium(premiumDTO, BillingFrequency);
+
+
+            endorsementCalDTO.dictionary_rate.FSTTAX_TAXTYPE = premiumDTO.dictionary_rate.FSTTAX_TAXTYPE;
+            endorsementCalDTO.dictionary_rate.TSTTAX_TAXTYPE = premiumDTO.dictionary_rate.TSTTAX_TAXTYPE;
+
+
+            endorsementCalDTO.dictionary_rule.FT = CallRatingCalculator.FtPerDay.ToString();
+            endorsementCalDTO.dictionary_rule.FTDAYS = RemainingDays.ToString(); //Get from Policy Object
+            endorsementCalDTO.dictionary_rule.AD = "0";
+            endorsementCalDTO.dictionary_rule.ADDAYS= "0";
+
+
+            var CallEndoCalculator = await EndorsementCalculator(endorsementCalDTO);
+
+            cancelReturnDto.FromTaxType = premiumDTO.dictionary_rate.FSTTAX_TAXTYPE;
+            cancelReturnDto.ToTaxType = premiumDTO.dictionary_rate.TSTTAX_TAXTYPE;
+            cancelReturnDto.FireTheft = Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue) * (-1);
+            cancelReturnDto.FTFromTax = Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) * (-1);
+            cancelReturnDto.FTToTax = Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue) * (-1);
+            cancelReturnDto.Status = BusinessStatus.Ok;
+
+            return cancelReturnDto;
+
+
+
         }
 
     }

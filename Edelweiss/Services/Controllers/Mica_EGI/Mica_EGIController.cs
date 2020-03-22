@@ -95,7 +95,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         public async Task<IActionResult> PremiumBooking(DateTime? dateTime)
         {
             var response = await _quotationService.PremiumBookingScheduler(dateTime);
-
             return Ok(response);
         }
 
@@ -150,6 +149,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var response = await _quotationService.EndorsementPremium(endorsementPremium, null, "EndorsementPremium");
             return ServiceResponse(response);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PolicyCancellationCalculator(string PolicyNo)
+        {
+            var response = await _quotationService.PolicyCancellationCalculator(PolicyNo,null);
+            return ServiceResponse(response);
+        }
+
+
 
     }
 }
