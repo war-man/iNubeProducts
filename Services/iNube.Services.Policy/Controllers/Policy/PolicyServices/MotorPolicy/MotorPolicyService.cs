@@ -277,5 +277,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<object>> PolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
