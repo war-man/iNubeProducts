@@ -109,6 +109,8 @@ namespace iNube.Services.Policy.Models
         public decimal? PremiumAmount { get; set; }
         public string CdaccountNumber { get; set; }
         public string MasterType { get; set; }
+        public DateTime? PolicyCancelDate { get; set; }
+        public int? BalanceSumInsued { get; set; }
 
         public List<PolicyInsurableDetailsDTO> PolicyInsurableDetails { get; set; }
     }

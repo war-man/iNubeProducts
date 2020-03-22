@@ -1273,6 +1273,19 @@ namespace iNube.Services.Partners.Models
        
 
     }
+
+    public class CDBalanceDTO : ResponseStatus
+    {
+        public string AccountNo { get; set; }
+        public string TxnEventType { get; set; }
+        public DateTime? TxnDateTime { get; set; }
+        public decimal? TxnAmountBalance { get; set; }
+        public decimal? TaxAmountBalance { get; set; }
+        public decimal? TotalAvailableBalance { get; set; }
+   
+
+
+    }
 }
 
 

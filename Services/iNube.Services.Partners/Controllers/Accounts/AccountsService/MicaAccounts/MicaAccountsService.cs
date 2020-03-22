@@ -1723,5 +1723,19 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             return new DailyDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this Account Number {accountnumber}" };
         
         }
+        public async Task<CDBalanceDTO> GetAccountBalance(string accountnumber,string TxnEventType, ApiContext apiContext)
+        {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            TblCdaccountDetails Data = _context.TblCdaccountDetails.LastOrDefault(s => s.AccountNo == accountnumber);
+            var accountdetails = _context.TblCdaccountDetails.LastOrDefault(s => s.AccountNo == accountnumber &&  s.TxnEventType == TxnEventType);
+            if (accountdetails != null)
+            {
+
+                return new CDBalanceDTO { Status = BusinessStatus.Ok, ResponseMessage = $"Account Balance Details for this Account Number {accountnumber}", TotalAvailableBalance = accountdetails.TotalAvailableBalance,TaxAmountBalance= accountdetails.TaxAmountBalance,TxnAmountBalance= accountdetails.TxnAmountBalance, AccountNo = accountnumber, TxnEventType = accountdetails.TxnEventType ,TxnDateTime=accountdetails.TxnDateTime};
+
+            }
+            return new CDBalanceDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this Account Number {accountnumber}" };
+
+        }
     }
 }

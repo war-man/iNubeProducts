@@ -552,5 +552,9 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         {
             throw new NotImplementedException();
         }
+        public Task<CDBalanceDTO> GetAccountBalance(string accountnumber, string TxnEventType, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

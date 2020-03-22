@@ -527,6 +527,8 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return BadRequest(response);
                 case BusinessStatus.PreConditionFailed:
                     return Ok(response);
+                case BusinessStatus.NothingModified:
+                    return Ok(response);
 
                 default:
                     return NotFound(response);

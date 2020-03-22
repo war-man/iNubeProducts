@@ -252,6 +252,14 @@ namespace iNube.Services.Partners.Controllers.Accounts
             return Ok(response);
 
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAccountBalance(string accountnumber, string TxnEventType)
+        {
+            //MicaCDDTO
+            var response = (await _accountService.GetAccountBalance(accountnumber,TxnEventType, Context));
+            return Ok(response);
+
+        }
 
     }
 }

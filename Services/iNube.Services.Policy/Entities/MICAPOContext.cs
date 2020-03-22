@@ -177,6 +177,8 @@ namespace iNube.Services.Policy.Entities
                     .HasColumnName("AgentID")
                     .HasColumnType("numeric(18, 0)");
 
+                entity.Property(e => e.BalanceSumInsued).HasColumnName("Balance SumInsued");
+
                 entity.Property(e => e.BranchIdPk).HasColumnName("Branch_ID_PK");
 
                 entity.Property(e => e.BundleId)
@@ -254,6 +256,8 @@ namespace iNube.Services.Policy.Entities
                 entity.Property(e => e.MobileNumber)
                     .HasMaxLength(15)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PolicyCancelDate).HasColumnType("datetime");
 
                 entity.Property(e => e.PolicyEndDate).HasColumnType("datetime");
 
