@@ -150,7 +150,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return ServiceResponse(response);
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> PolicyCancellationCalculator(string PolicyNo)
         {
             var response = await _quotationService.PolicyCancellationCalculator(PolicyNo,null);
