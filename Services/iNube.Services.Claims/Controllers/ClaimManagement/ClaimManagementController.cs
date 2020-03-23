@@ -318,9 +318,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
 
         
         [HttpGet]
-        public async Task<IActionResult> DocumentView(decimal ClaimId, bool isDoc)
+        public async Task<IActionResult> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy)
         {
-            var document = await _claimService.DocumentView(ClaimId, isDoc, Context);
+            var document = await _claimService.DocumentView(ClaimId, isDoc,isPolicy, Context);
             return Ok(document);
         }
 

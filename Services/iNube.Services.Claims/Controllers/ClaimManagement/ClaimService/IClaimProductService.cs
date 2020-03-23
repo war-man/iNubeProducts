@@ -37,7 +37,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<BankDocumentDTO> GetDocumentId(string filename, ApiContext apiContext);
         //Task<BillingEventResponseDTO> BillingEventResponseAsync(BillingEventRequest cDTO, ApiContext apiContext);
         Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest cDTO, ApiContext apiContext);
-        Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, ApiContext apiContext);
+        Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext);
         Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext);

@@ -2721,14 +2721,21 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         }
 
         //view the uploaded document
-        public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, ApiContext apiContext)
+        public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc,bool isPolicy, ApiContext apiContext)
 
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<ClaimdocDTO> claimdocs = new List<ClaimdocDTO>();
             var tblClaimDoc = _context.TblClaimdoc.Where(s => s.ClaimId == ClaimId).ToList();
             if (tblClaimDoc != null)
             {
-                var claimDocDTO = _mapper.Map<IEnumerable<ClaimdocDTO>>(tblClaimDoc);
+                if(isPolicy)
+                {
+                    var tblClaim = _context.TblClaims.FirstOrDefault(s => s.ClaimId == ClaimId);
+                    var polDocs = await _integrationService.GetPolicyDocuments(tblClaim.PolicyNo, apiContext);
+                    claimdocs.AddRange(polDocs);
+                }
+                var claimDocDTO = _mapper.Map<List<ClaimdocDTO>>(tblClaimDoc);
                 if (!isDoc)
                 {
                     foreach (var item in claimDocDTO)
@@ -2736,9 +2743,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         item.Document = null;
                     }
                 }
-                return claimDocDTO;
+                claimdocs.AddRange(claimDocDTO);
             }
-            return null;
+            return claimdocs;
         }
 
         public async Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)

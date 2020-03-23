@@ -38,6 +38,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext);
         Task<decimal> UpdatePolicySumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
         Task<List<dynamic>> CheckRuleSets(string EventId, AllocDTO allocDTO, ApiContext apiContext);
+        Task<IEnumerable<ClaimdocDTO>> GetPolicyDocuments(string policyNo, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -184,6 +185,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
             return await GetApiInvoke<PolicyDTO>(uri, apiContext);
         }
 
+        public async Task<IEnumerable<ClaimdocDTO>> GetPolicyDocuments(string policyNo, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/GetPolicyDocumentsByNumber?PolicyNumber=" + policyNo;
+            return await GetListApiInvoke<ClaimdocDTO>(uri, apiContext);
+        }
         public async Task<IEnumerable<ProductRcbdetailsDTO>> GetProductClaimsDetailsAsync(string productId, ApiContext apiContext)
         {
             var uri = ProductUrl + "/api/Product/GetProductClaimsDetails?ProductId=" + productId;

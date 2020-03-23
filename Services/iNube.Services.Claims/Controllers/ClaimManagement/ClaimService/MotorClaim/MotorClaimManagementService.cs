@@ -152,7 +152,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, ApiContext apiContext)
+        public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

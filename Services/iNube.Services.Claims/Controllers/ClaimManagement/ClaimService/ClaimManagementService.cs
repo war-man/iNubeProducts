@@ -40,7 +40,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<List<ClaimResponseDTO>> ClaimsReport(ClaimsRequest claimsRequest, ApiContext apiContext);
         Task<BankDocumentDTO> GetDocumentId(string filename, ApiContext apiContext);
         Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest cDTO, ApiContext apiContext);
-        Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, ApiContext apiContext);
+        Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext);
         Task<IEnumerable<SearchDTO>> SearchClaimByUserid(SearchClaimDTO searchclaim, ApiContext apiContext);
@@ -189,9 +189,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             return await _productService(apiContext.ProductType).BillingEventResponse(cDTO, apiContext);
         }
 
-        public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, ApiContext apiContext)
+        public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy, ApiContext apiContext)
         {
-            return await _productService(apiContext.ProductType).DocumentView(ClaimId, isDoc, apiContext);
+            return await _productService(apiContext.ProductType).DocumentView(ClaimId, isDoc,isPolicy, apiContext);
         }
 
         public async Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)

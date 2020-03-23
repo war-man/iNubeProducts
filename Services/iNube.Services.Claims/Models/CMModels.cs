@@ -459,6 +459,7 @@ namespace iNube.Services.Claims.Models
         public int ClaimDocId { get; set; }
         public string DocumentType { get; set; }
         public string DocumentName { get; set; }
+        public string DocumentView { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public byte[] Document { get; set; }
