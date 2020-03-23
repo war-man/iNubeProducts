@@ -2059,7 +2059,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 catch
                 {
                     response.ResponseMessage = "NO Such Month";
-                    response.Status = BusinessStatus.PreConditionFailed;
+                    response.Status = BusinessStatus.NotFound;
                     errorInfo.ErrorMessage = "No Such Month Name: " + Month;
                     errorInfo.ErrorCode = "GEN001";
                     errorInfo.PropertyName = "NoRecords";
@@ -2101,7 +2101,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 else
                 {
                     response.ResponseMessage = "NO Records found";
-                    response.Status = BusinessStatus.PreConditionFailed;
+                    response.Status = BusinessStatus.NotFound;
                     errorInfo.ErrorMessage = "No Records for this Policy Number: " + PolicyNo;
                     errorInfo.ErrorCode = "GEN001";
                     errorInfo.PropertyName = "NoRecords";
@@ -2113,7 +2113,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             else
             {
                 response.ResponseMessage = "Null/Empty Inputs";
-                response.Status = BusinessStatus.PreConditionFailed;
+                response.Status = BusinessStatus.NotFound;
                 errorInfo.ErrorMessage = "Either Policy Number or Month is Null";
                 errorInfo.ErrorCode = "GEN002";
                 errorInfo.PropertyName = "MandatoryfieldsMissing";
@@ -2274,7 +2274,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 catch
                 {
                     response.ResponseMessage = "NO Such Month";
-                    response.Status = BusinessStatus.PreConditionFailed;
+                    response.Status = BusinessStatus.NotFound;
                     errorInfo.ErrorMessage = "No Such Month Name: " + Month;
                     errorInfo.ErrorCode = "GEN001";
                     errorInfo.PropertyName = "NoRecords";
@@ -2363,7 +2363,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     catch (Exception ex)
                     {
                         response.ResponseMessage = "NO Records found for this Month";
-                        response.Status = BusinessStatus.PreConditionFailed;
+                        response.Status = BusinessStatus.NotFound;
                         errorInfo.ErrorMessage = "For " + Month + " Month No Records for this Policy Number: " + PolicyNo;
                         errorInfo.ErrorCode = "GEN001";
                         errorInfo.PropertyName = "NoRecords";
@@ -2376,7 +2376,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 else
                 {
                     response.ResponseMessage = "NO Records found";
-                    response.Status = BusinessStatus.PreConditionFailed;
+                    response.Status = BusinessStatus.NotFound;
                     errorInfo.ErrorMessage = "No Records for this Policy Number : " + PolicyNo + " for the specified Month and Year";
                     errorInfo.ErrorCode = "GEN001";
                     errorInfo.PropertyName = "NoRecords";
@@ -2388,7 +2388,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             else
             {
                 response.ResponseMessage = "Null/Empty Inputs";
-                response.Status = BusinessStatus.PreConditionFailed;
+                response.Status = BusinessStatus.NotFound;
                 errorInfo.ErrorMessage = "Either Policy Number or Month or Year is Null";
                 errorInfo.ErrorCode = "GEN002";
                 errorInfo.PropertyName = "MandatoryfieldsMissing";
