@@ -19,7 +19,7 @@ phases:
       - docker tag $REPOSITORY_URI:policylatest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
-      - echo Build completed on `date`
+      - echo Build completed on `date` 
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:policylatest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
