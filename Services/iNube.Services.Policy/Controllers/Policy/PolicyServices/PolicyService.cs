@@ -76,9 +76,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext);
         Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
         Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext);
-
-        Task<List<object>> PolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext);
-
+        Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext);
     }
     public class PolicyService : IPolicyService
     {
@@ -742,9 +740,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return await _policyProductService(apiContext.ProductType).GetDailyAccountDetails(policyNumber, month, year, TxnEventType, apiContext);
         }
 
-        public async Task<List<object>> PolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext)
+        public async Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext)
         {
-            return await _policyProductService(apiContext.ProductType).PolicyDetailsByNumber(PolicyNumber, apiContext);
+            return await _policyProductService(apiContext.ProductType).GetPolicyDocumentsByNumber(policyNumber, apiContext);
         }
     }
 }

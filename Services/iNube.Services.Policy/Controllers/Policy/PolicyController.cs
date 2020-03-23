@@ -527,8 +527,6 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return BadRequest(response);
                 case BusinessStatus.PreConditionFailed:
                     return Ok(response);
-                case BusinessStatus.NothingModified:
-                    return Ok(response);
 
                 default:
                     return NotFound(response);
@@ -589,14 +587,12 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = await _policyService.GetDailyAccountDetails(policyNumber, month, year, TxnEventType, Context);
             return Ok(response);
         }
-
         [HttpGet]
-        public async Task<IActionResult> SearchPolicyDetailsByNumber(string PolicyNumber)
+        public async Task<IActionResult> GetPolicyDocumentsByNumber(string PolicyNumber)
         {
-            var searchPolicyDetails = await _policyService.PolicyDetailsByNumber(PolicyNumber, Context);
-            return Ok(searchPolicyDetails);
+            var SumInsured = await _policyService.GetPolicyDocumentsByNumber(PolicyNumber, Context);
+            return Ok(SumInsured);
         }
-
 
     }
 }

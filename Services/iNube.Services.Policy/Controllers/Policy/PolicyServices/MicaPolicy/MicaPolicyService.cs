@@ -5311,6 +5311,62 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return FullfinalData;
         }
 
+        public async Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<UploadDocument> lstDocuments = new List<UploadDocument>();
+            UploadDocument doc = null;
+            var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyNumber).FirstOrDefault();
+            if (tblPolicy != null)
+            {
+                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == tblPolicy.PolicyId);
+                var policyRequest = tblPolicyDetailsdata.PolicyRequest;
+                dynamic insList = JsonConvert.DeserializeObject<dynamic>(policyRequest);
+                foreach (var insurableItem in insList.InsurableItem)
+                {
+                    foreach (var fields in insurableItem.RiskItems)
+                    {
+
+                        foreach (var insItem in fields)
+                        {
+                            // insItem.ToString()
+                            if (insItem.Name == "Documents")
+                            {
+                               
+                                foreach (var docItems in fields[insItem.Name])
+                                {
+                                    doc = new UploadDocument();
+                                    foreach (var docItem in docItems)
+                                    {
+                                        if (docItem.Name == "FileName")
+                                        {
+                                            doc.DocumentName = docItem.Value;
+                                        }
+                                        if (docItem.Name == "DocumentID" || docItem.Name == "DocumentId")
+                                        {
+                                            doc.DmsdocId = docItem.Value;
+                                        }
+                                        if (docItem.Name == "DocumentType")
+                                        {
+                                            doc.DocumentType = docItem.Value;
+                                        }
+                                        if (docItem.Name == "VehicleView" || docItem.Name == "View")
+                                        {
+                                            doc.DocumentView = docItem.Value;
+                                        }
+                                    }
+                                    lstDocuments.Add(doc);
+                                }
+                               
+                            }
+
+                        }
+                    }
+                }
+            }
+            return lstDocuments;
+        }
+
     }
 
 

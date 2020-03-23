@@ -109,8 +109,6 @@ namespace iNube.Services.Policy.Models
         public decimal? PremiumAmount { get; set; }
         public string CdaccountNumber { get; set; }
         public string MasterType { get; set; }
-        public DateTime? PolicyCancelDate { get; set; }
-        public int? BalanceSumInsued { get; set; }
 
         public List<PolicyInsurableDetailsDTO> PolicyInsurableDetails { get; set; }
     }
@@ -1497,6 +1495,14 @@ namespace iNube.Services.Policy.Models
         public string TxnEventType { get; set; }
         public CdTransactionsMasterDTO cdTransactionsMasterDTO { get; set; }
 
+    }
+
+    public class UploadDocument
+    {
+        public string DmsdocId { get; set; }
+        public string DocumentView { get; set; }
+        public string DocumentType { get; set; }
+        public string DocumentName { get; set; }       
     }
 }
 
