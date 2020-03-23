@@ -1030,24 +1030,24 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     ////Insert New Active Vehicle in Daily Active Table if Previous No Active Vehicle was their in It
                     ///
-                    if (ActivePCCount > 0 || ActiveTWCount > 0)
+                    if (activeVehicleStat == null)
                     {
-                        TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
-                        tblDailyActive.ActivePc = ActivePCCount;
-                        tblDailyActive.ActiveTw = ActiveTWCount;
-                        tblDailyActive.PolicyNumber = PolicyNo;
-                        tblDailyActive.TotalPremium = 0;
-                        tblDailyActive.FromTax = 0;
-                        tblDailyActive.ToTax = 0;
-                        tblDailyActive.BasePremium = 0;
-                        tblDailyActive.TxnDate = IndianTime;
+                        if (ActivePCCount > 0 || ActiveTWCount > 0)
+                        {
+                            TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+                            tblDailyActive.ActivePc = ActivePCCount;
+                            tblDailyActive.ActiveTw = ActiveTWCount;
+                            tblDailyActive.PolicyNumber = PolicyNo;
+                            tblDailyActive.TotalPremium = 0;
+                            tblDailyActive.FromTax = 0;
+                            tblDailyActive.ToTax = 0;
+                            tblDailyActive.BasePremium = 0;
+                            tblDailyActive.TxnDate = IndianTime;
 
-                        _context.TblDailyActiveVehicles.Add(tblDailyActive);
-                        _context.SaveChanges();
+                            _context.TblDailyActiveVehicles.Add(tblDailyActive);
+                            _context.SaveChanges();
+                        }
                     }
-
-
-
 
 
                     //Call the Policy Service to Get Policy Details.
@@ -1111,33 +1111,108 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
                     CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
                     CDPremiumDTO CdPremiumDTO = new CDPremiumDTO();
-
-
-
-                    if (CalPremiumResponse != null)
+                    decimal ADPERDAY = 0;
+                    decimal ADFROMTAXPERDAY = 0;
+                    decimal ADTOTAXPERDAY = 0;
+                  
+                    try
                     {
-                        DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
-                    }
 
+                        if (CalPremiumResponse != null)
+                        {
+                            DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
+                        }
+                    }catch(Exception ex)
+                    {
+                        TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
+
+                        bookingLog.PolicyNo = PolicyNo;
+                        bookingLog.TxnAmount = 0;
+                        bookingLog.BasePremium = 0;
+                        bookingLog.FromTax = 0;
+                        bookingLog.ToTax = 0;
+                        bookingLog.TxnDateTime = IndianTime;
+                        bookingLog.TxnDetails = "Transaction Failed while Calculating Premium";
+                        bookingLog.TxnStatus = false;
+                        _context.TblPremiumBookingLog.Add(bookingLog);
+                        _context.SaveChanges();
+
+                        SwitchOnOffResponse response = new SwitchOnOffResponse();
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        response.ResponseMessage = "Calculate Premium Method Failed";
+                        response.Id = bookingLog.LogId.ToString();//Log Id is Sent to Verify 
+                        response.Status = BusinessStatus.Error;
+                        errorInfo.ErrorMessage = "The Vehicle Number" + VehicleRegistrationNo + "Premium not Calculated Yet Check Log";
+                        errorInfo.ErrorCode = "ExtSWT008";
+                        errorInfo.PropertyName = "PremiumFail";
+                        response.Errors.Add(errorInfo);
+
+                        return response;
+                    }
 
                     if (DeserilizedPremiumData.Count() > 0)
                     {
 
-                        var TOTALPMPD = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "TOTALPMPD").EValue);
+                        //ADPMPD IS THE PER DAY AD RATE CONFIG IN RATING CONFIG MODULE
+                        ADPERDAY = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "ADPMPD").EValue);
 
-                        var TOTALPMPDFTTAX = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "TOTALPMPDFTTAX").EValue);
+                        EndorsementCalDTO endorsementCal = new EndorsementCalDTO();
 
-                        var TOTALPMPDTTTAX = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "TOTALPMPDTTTAX").EValue);
+                        //Rule
+                        endorsementCal.dictionary_rule.FT = "0";
+                        endorsementCal.dictionary_rule.FTDAYS = "0";
+                        endorsementCal.dictionary_rule.AD = ADPERDAY.ToString();
+                        endorsementCal.dictionary_rule.ADDAYS = "1";
+                        //Rate
+                        endorsementCal.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                        endorsementCal.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
 
-                        var NewPremium = TOTALPMPD + TOTALPMPDFTTAX + TOTALPMPDTTTAX;
+                        //TO GET AD PERDAY - FROM TAX AND TO TAX Because its not coming from rating Module
+                        var callEndoCalculator = await EndorsementCalculator(endorsementCal);
+
+                        if (callEndoCalculator.Count > 0)
+                        {
+                            ADFROMTAXPERDAY = Convert.ToDecimal(callEndoCalculator.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+                            ADTOTAXPERDAY = Convert.ToDecimal(callEndoCalculator.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+                        }
+                        else
+                        {
+                            TblPremiumBookingLog tblPremium = new TblPremiumBookingLog();
+                            tblPremium.PolicyNo = PolicyNo;
+                            tblPremium.TxnAmount = 0;
+                            tblPremium.BasePremium = 0;
+                            tblPremium.FromTax = 0;
+                            tblPremium.ToTax = 0;
+                            tblPremium.TxnDateTime = IndianTime;
+                            tblPremium.TxnDetails = "Transaction Failed while Calculating Premium";
+                            tblPremium.TxnStatus = false;
+                            _context.TblPremiumBookingLog.Add(tblPremium);
+                            _context.SaveChanges();
+
+                            SwitchOnOffResponse response = new SwitchOnOffResponse();
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            response.ResponseMessage = "Calculate Premium Method Failed";
+                            response.Id = tblPremium.LogId.ToString();//Log Id is Sent to Verify 
+                            response.Status = BusinessStatus.Error;
+                            errorInfo.ErrorMessage = "The Vehicle Number" + VehicleRegistrationNo + "Premium not Calculated Yet Check Log";
+                            errorInfo.ErrorCode = "ExtSWT008";
+                            errorInfo.PropertyName = "PremiumFail";
+                            response.Errors.Add(errorInfo);
+
+                            return response;
+                        }                     
+                       
+                        var NewPremium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                         TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
 
                         bookingLog.PolicyNo = PolicyNo;
                         bookingLog.TxnAmount = NewPremium;
-                        bookingLog.BasePremium = TOTALPMPD;
-                        bookingLog.FromTax = TOTALPMPDFTTAX;
-                        bookingLog.ToTax = TOTALPMPDTTTAX;
+                        bookingLog.BasePremium = ADPERDAY;
+                        bookingLog.FromTax = ADFROMTAXPERDAY;
+                        bookingLog.ToTax = ADTOTAXPERDAY;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnDetails = "Revised Total Premium for Policy - " + PolicyNo;
                         bookingLog.TxnStatus = true;
@@ -1150,33 +1225,33 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         //Internal Private Method to get Old Premium Amount.
                         var OldPremium = CheckPremiumUpdate(PolicyNo);
 
-                        var NewBasePremium = TOTALPMPD - OldPremium.BasePremium;
-                        var NewFromTax = TOTALPMPDFTTAX - OldPremium.FromTax;
-                        var NewToTax = TOTALPMPDTTTAX - OldPremium.ToTax;
-                        var NewTotalPremium = NewPremium - OldPremium.TotalPremium;
+                        var NewBasePremium = Convert.ToDecimal(ADPERDAY - OldPremium.BasePremium);
+                        var NewFromTax = Convert.ToDecimal(ADFROMTAXPERDAY - OldPremium.FromTax);
+                        var NewToTax = Convert.ToDecimal(ADTOTAXPERDAY - OldPremium.ToTax);
+                        var NewTotalPremium = Convert.ToDecimal(NewPremium - OldPremium.TotalPremium);
 
                         var FinalPremium = NewTotalPremium;
 
-                        taxAmountDTO.TaxAmount = TOTALPMPDFTTAX + TOTALPMPDTTTAX;
+                        taxAmountDTO.TaxAmount = NewFromTax + NewToTax;
                         taxTypeDTO.Type = taxType.FSTTAX_TAXTYPE;
-                        taxTypeDTO.TaxAmount = TOTALPMPDFTTAX;
+                        taxTypeDTO.TaxAmount = ADFROMTAXPERDAY;
                         taxAmountDTO.Tax.Add(taxTypeDTO);
 
                         taxTypeDTO = new CDTaxTypeDTO();
                         taxTypeDTO.Type = taxType.TSTTAX_TAXTYPE;
-                        taxTypeDTO.TaxAmount = TOTALPMPDTTTAX;
+                        taxTypeDTO.TaxAmount = NewToTax;
                         taxAmountDTO.Tax.Add(taxTypeDTO);
 
                         CdPremiumDTO.TaxAmount = taxAmountDTO;
                         CdPremiumDTO.Type = "AD";
-                        CdPremiumDTO.TxnAmount = TOTALPMPD;
-                        CdPremiumDTO.TotalAmount = TOTALPMPD + taxAmountDTO.TaxAmount;
+                        CdPremiumDTO.TxnAmount = NewBasePremium;
+                        CdPremiumDTO.TotalAmount = NewBasePremium + taxAmountDTO.TaxAmount;
 
                         micaCDDTO.PremiumDTO.Add(CdPremiumDTO);
                         micaCDDTO.TxnType = "Debit";
                         micaCDDTO.Type = "SwitchOnOff";
-                        micaCDDTO.TxnAmount = TOTALPMPD;
-                        micaCDDTO.TaxAmount = TOTALPMPD + taxAmountDTO.TaxAmount;
+                        micaCDDTO.TxnAmount = NewBasePremium;
+                        micaCDDTO.TaxAmount = taxAmountDTO.TaxAmount;
                         micaCDDTO.TotalAmount = micaCDDTO.TxnAmount + micaCDDTO.TaxAmount;
 
                         ExtCdModel.micaCDDTO.Add(micaCDDTO);
@@ -1217,9 +1292,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                                                                 x.PolicyNumber == PolicyNo);
 
                             tblDailyActive.TotalPremium = NewPremium;
-                            tblDailyActive.BasePremium = TOTALPMPD;
-                            tblDailyActive.FromTax = TOTALPMPDFTTAX;
-                            tblDailyActive.ToTax = TOTALPMPDFTTAX;
+                            tblDailyActive.BasePremium = ADPERDAY;
+                            tblDailyActive.FromTax = ADFROMTAXPERDAY;
+                            tblDailyActive.ToTax = ADTOTAXPERDAY;
 
                             if (activeVehicleStat != null)
                             {
@@ -1242,10 +1317,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             //bookingLog = new TblPremiumBookingLog();
                             //bookingLog.PolicyNo = PolicyNo;
 
-                            bookingLog.TxnAmount = FinalPremium;
-                            bookingLog.BasePremium = NewBasePremium;
-                            bookingLog.FromTax = NewFromTax;
-                            bookingLog.ToTax = NewToTax;
+                            bookingLog.TxnAmount = NewPremium;
+                            bookingLog.BasePremium = ADPERDAY;
+                            bookingLog.FromTax = ADFROMTAXPERDAY;
+                            bookingLog.ToTax = ADTOTAXPERDAY;
                             bookingLog.TxnDateTime = IndianTime;
                             bookingLog.TxnDetails = "Revised Premium - Transaction Failed while Updating CD Balance MICA";
                             bookingLog.TxnStatus = false;
@@ -1826,6 +1901,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
                 CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
                 CDPremiumDTO CdPremiumDTO = new CDPremiumDTO();
+                decimal ADPERDAY = 0;
+                decimal ADFROMTAXPERDAY = 0;
+                decimal ADTOTAXPERDAY = 0;
 
                 if (CalPremiumResponse != null)
                 {
@@ -1870,15 +1948,63 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 if (DeserilizedPremiumData.Count() > 0)
-                {
+                {                  
+                    //ADPMPD IS THE PER DAY AD RATE CONFIG IN RATING CONFIG MODULE
+                    ADPERDAY = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "ADPMPD").EValue);
 
-                    var TOTALPMPD = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "TOTALPMPD").EValue);
 
-                    var TOTALPMPDFTTAX = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "TOTALPMPDFTTAX").EValue);
+                    EndorsementCalDTO endorsementCal = new EndorsementCalDTO();
+                    
+                    //Rule
+                    endorsementCal.dictionary_rule.FT = "0";
+                    endorsementCal.dictionary_rule.FTDAYS = "0";
+                    endorsementCal.dictionary_rule.AD = ADPERDAY.ToString();
+                    endorsementCal.dictionary_rule.ADDAYS = "1";
+                    //Rate
+                    endorsementCal.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+                    endorsementCal.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
 
-                    var TOTALPMPDTTTAX = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "TOTALPMPDTTTAX").EValue);
+                    //TO GET AD PERDAY - FROM TAX AND TO TAX Because its not coming from rating Module
+                    var callEndoCalculator = await EndorsementCalculator(endorsementCal);
 
-                    var Premium = TOTALPMPD + TOTALPMPDFTTAX + TOTALPMPDTTTAX;
+                    if (callEndoCalculator.Count > 0)
+                    {
+                        ADFROMTAXPERDAY = Convert.ToDecimal(callEndoCalculator.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+                        ADTOTAXPERDAY = Convert.ToDecimal(callEndoCalculator.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+                    }
+                    else
+                    {
+                        DeserilizedPremiumData = null;
+
+                        bookingLog = new TblPremiumBookingLog();
+
+                        bookingLog.PolicyNo = policy;
+                        bookingLog.TxnAmount = 0;
+                        bookingLog.BasePremium = 0;
+                        bookingLog.FromTax = 0;
+                        bookingLog.ToTax = 0;
+                        bookingLog.TxnDateTime = IndianTime;
+                        bookingLog.TxnDetails = "Auto Schedule Transaction Failed while Endorsement - Calculating Premium";
+                        bookingLog.TxnStatus = false;
+                        _context.TblPremiumBookingLog.Add(bookingLog);
+
+
+                        schedulerLog.SchedulerStatus = "Deserialized Failed - Endorsement Premium Failed";
+                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        _context.TblSchedulerLog.Update(schedulerLog);
+
+                        var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
+
+                        report.FailCount += 1;
+
+                        _context.TblScheduleReport.Update(report);
+
+                        _context.SaveChanges();
+
+                        continue;
+                    }
+                                       
+                    var Premium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Success";
                     schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
@@ -1886,26 +2012,26 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     _context.SaveChanges();
 
-                    taxAmountDTO.TaxAmount = TOTALPMPDFTTAX + TOTALPMPDTTTAX;
+                    taxAmountDTO.TaxAmount = ADFROMTAXPERDAY + ADTOTAXPERDAY;
                     taxTypeDTO.Type = taxType.FSTTAX_TAXTYPE;
-                    taxTypeDTO.TaxAmount = TOTALPMPDFTTAX;
+                    taxTypeDTO.TaxAmount = ADFROMTAXPERDAY;
                     taxAmountDTO.Tax.Add(taxTypeDTO);
 
                     taxTypeDTO = new CDTaxTypeDTO();
                     taxTypeDTO.Type = taxType.TSTTAX_TAXTYPE;
-                    taxTypeDTO.TaxAmount = TOTALPMPDTTTAX;
+                    taxTypeDTO.TaxAmount = ADTOTAXPERDAY;
                     taxAmountDTO.Tax.Add(taxTypeDTO);
 
                     CdPremiumDTO.TaxAmount = taxAmountDTO;
                     CdPremiumDTO.Type = "AD";
-                    CdPremiumDTO.TxnAmount = TOTALPMPD;
-                    CdPremiumDTO.TotalAmount = TOTALPMPD + taxAmountDTO.TaxAmount;
+                    CdPremiumDTO.TxnAmount = ADPERDAY;
+                    CdPremiumDTO.TotalAmount = ADPERDAY + taxAmountDTO.TaxAmount;
 
                     micaCDDTO.PremiumDTO.Add(CdPremiumDTO);
                     micaCDDTO.TxnType = "Debit";
                     micaCDDTO.Type = "PremiumBooking";
-                    micaCDDTO.TxnAmount = TOTALPMPD;
-                    micaCDDTO.TaxAmount = TOTALPMPD + taxAmountDTO.TaxAmount;
+                    micaCDDTO.TxnAmount = ADPERDAY;
+                    micaCDDTO.TaxAmount = taxAmountDTO.TaxAmount;
                     micaCDDTO.TotalAmount = micaCDDTO.TxnAmount + micaCDDTO.TaxAmount;
 
                     ExtCdModel.micaCDDTO.Add(micaCDDTO);
@@ -1922,9 +2048,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         bookingLog.PolicyNo = policy;
                         bookingLog.TxnAmount = Premium;
-                        bookingLog.BasePremium = TOTALPMPD;
-                        bookingLog.FromTax = TOTALPMPDFTTAX;
-                        bookingLog.ToTax = TOTALPMPDTTTAX;
+                        bookingLog.BasePremium = ADPERDAY;
+                        bookingLog.FromTax = ADFROMTAXPERDAY;
+                        bookingLog.ToTax = ADTOTAXPERDAY;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnStatus = true;
                         bookingLog.TxnDetails = "Auto Schedule Premium for Policy - " + policy;
@@ -1933,9 +2059,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         getDailyStat.TotalPremium = Premium;
-                        getDailyStat.BasePremium = TOTALPMPD;
-                        getDailyStat.FromTax = TOTALPMPDFTTAX;
-                        getDailyStat.ToTax = TOTALPMPDTTTAX;
+                        getDailyStat.BasePremium = ADPERDAY;
+                        getDailyStat.FromTax = ADFROMTAXPERDAY;
+                        getDailyStat.ToTax = ADTOTAXPERDAY;
 
                         //var tblDailyActive = _context.TblDailyActiveVehicles.FirstOrDefault(x => x.TxnDate == IndianTime &&
                         //                                                                    x.PolicyNumber == policy);
@@ -1962,9 +2088,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         bookingLog.PolicyNo = policy;
                         bookingLog.TxnAmount = Premium;
-                        bookingLog.BasePremium = TOTALPMPD;
-                        bookingLog.FromTax = TOTALPMPDFTTAX;
-                        bookingLog.ToTax = TOTALPMPDTTTAX;
+                        bookingLog.BasePremium = ADPERDAY;
+                        bookingLog.FromTax = ADFROMTAXPERDAY;
+                        bookingLog.ToTax = ADTOTAXPERDAY;
                         bookingLog.TxnDateTime = IndianTime;
                         bookingLog.TxnStatus = false;
                         bookingLog.TxnDetails = "Auto Schedule - Transaction Failed while Updating CD Balance MICA";
@@ -2013,6 +2139,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     _context.TblScheduleReport.Update(report);
 
                     _context.SaveChanges();
+
+                    continue;
 
                 }
 
