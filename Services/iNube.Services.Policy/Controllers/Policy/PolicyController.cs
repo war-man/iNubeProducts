@@ -594,5 +594,12 @@ namespace iNube.Services.Policy.Controllers.Policy
             return Ok(SumInsured);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SearchPolicyDetailsByNumber(string PolicyNumber)
+        {
+            var searchPolicyDetails = await _policyService.SearchPolicyDetailsByNumber(PolicyNumber, Context);
+            return Ok(searchPolicyDetails);
+        }
+
     }
 }

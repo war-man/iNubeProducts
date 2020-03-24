@@ -65,5 +65,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
         Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext);
         Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext);
+
+        Task<List<object>> SearchPolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext);
     }
 }

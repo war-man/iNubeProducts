@@ -67,7 +67,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<InsurableField> GetProposalByMobileNo(string MobNo, ApiContext apiContext);
         Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
 
-
+        Task<List<object>> SearchPolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext);
 
 
         Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext);
@@ -743,6 +743,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).GetPolicyDocumentsByNumber(policyNumber, apiContext);
+        }
+
+        public async Task<List<object>> SearchPolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).SearchPolicyDetailsByNumber(PolicyNumber, apiContext);
         }
     }
 }
