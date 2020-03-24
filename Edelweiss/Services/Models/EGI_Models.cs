@@ -479,12 +479,11 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     public partial class PolicyCancelReturnDto : ResponseStatus
     {
-        public decimal FireTheft { get; set; }
-        public decimal ADPremium { get; set; }
+        public decimal FireTheft { get; set; }       
         public decimal FTFromTax { get; set; }
         public decimal FTToTax { get; set; }
-        public decimal ADFromTax { get; set; }
-        public decimal ADToTax { get; set; }
+        public decimal Total { get; set; }
+        public decimal FinalTotal { get; set; }
         public string FromTaxType { get; set; }
         public string ToTaxType { get; set; }
        

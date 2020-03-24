@@ -3125,39 +3125,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             if (TxnType == "Deletion")
             {
                 decimal TotalTax = 0;
-                //AD TAX
-                //From State 
-                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
-                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue)) * (-1);
-
-                TotalTax = taxTypeDTO.TaxAmount;
-
-                //ARRAY
-                taxAmountDTO.Tax.Add(taxTypeDTO);
-
-                taxTypeDTO = new CDTaxTypeDTO();
-
-                //TO State
-                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
-                taxTypeDTO.TaxAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue)) * (-1);
-
-                TotalTax += taxTypeDTO.TaxAmount;
-
-
-                taxAmountDTO.TaxAmount = TotalTax;
-                taxAmountDTO.Tax.Add(taxTypeDTO);
-
-
-                //AD
-                ADPremiumDTO.Type = "AD";
-                ADPremiumDTO.TxnAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue)) * (-1);
-                ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
-                ADPremiumDTO.TaxAmount = taxAmountDTO;
-
-
+           
                 //FT Objects
                 taxTypeDTO = new CDTaxTypeDTO();
-                TotalTax = 0;
                 CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
                 taxAmountDTO = new CDTaxAmountDTO();
                 //FT TAX
@@ -3193,7 +3163,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //FT and AD - REFUND CREDIT Object
                 CdModel.PremiumDTO.Add(FTPremiumDTO);
-                CdModel.PremiumDTO.Add(ADPremiumDTO);
                 CdModel.Type = "EndorsementDel";
                 CdModel.TxnType = "Credit";
                 CdModel.TxnAmount = FTPremiumDTO.TxnAmount + ADPremiumDTO.TxnAmount;
@@ -3932,7 +3901,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (NewPremiumData.Total > 0 && OldPremiumData.Total > 0)
                 {
                     var DifferentialFireTheft = NewPremiumData.FtPerDay - OldPremiumData.FtPerDay;
-                    var DifferentialADPremium = NewPremiumData.AdPerDay - OldPremiumData.AdPerDay;
+                    
+                    //Because the Difference is not relevant in this vehicle deletion case - ravi sir 
+                    //var DifferentialADPremium = NewPremiumData.AdPerDay - OldPremiumData.AdPerDay;
+
+                    var DifferentialADPremium = 0;
 
                     EndoRuleDTO endoRule = new EndoRuleDTO
                     {
@@ -4174,7 +4147,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
 
                     //Adding 1 because it should give in between days.
-                    RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays + 1;
+                    RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
 
                 }
                 catch (Exception Ex)
@@ -4212,9 +4185,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             cancelReturnDto.FromTaxType = premiumDTO.dictionary_rate.FSTTAX_TAXTYPE;
             cancelReturnDto.ToTaxType = premiumDTO.dictionary_rate.TSTTAX_TAXTYPE;
-            cancelReturnDto.FireTheft = Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue) * (-1);
-            cancelReturnDto.FTFromTax = Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) * (-1);
-            cancelReturnDto.FTToTax = Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue) * (-1);
+            cancelReturnDto.FireTheft = Math.Round(Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue) * (-1), 2);
+            cancelReturnDto.FTFromTax = Math.Round(Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) * (-1), 2);
+            cancelReturnDto.FTToTax = Math.Round(Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue) * (-1),2);
+            cancelReturnDto.Total = cancelReturnDto.FireTheft + cancelReturnDto.FTFromTax + cancelReturnDto.FTToTax;
+            cancelReturnDto.FinalTotal = Math.Round(cancelReturnDto.Total);
+
             cancelReturnDto.Status = BusinessStatus.Ok;
 
             return cancelReturnDto;
