@@ -10,7 +10,8 @@ if (config.env == "dev") {
 else {
     /*  Server url */
     //accountConfigUrl = 'http://localhost:52166';
-    accountConfigUrl = 'https://inubeservicesaccounting.azurewebsites.net';
+    //accountConfigUrl = 'https://inubeservicesaccounting.azurewebsites.net';
+    accountConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
 }
 export const AccountConfig = {
     accountConfigUrl

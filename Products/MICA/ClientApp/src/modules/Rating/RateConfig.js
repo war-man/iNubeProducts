@@ -10,7 +10,8 @@ if (config.env == "dev") {
 else {
     /*  Server url */
     //rateConfigUrl = 'http://localhost:58593';
-    rateConfigUrl = 'https://inubeservicesrating.azurewebsites.net';
+    //rateConfigUrl = 'https://inubeservicesrating.azurewebsites.net';
+    rateConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9012';
 }
 export const RateConfig = {
     rateConfigUrl

@@ -6,8 +6,8 @@ if (config.env == "dev") {
 }
 else {
 
-    ruleEngineUrl = 'https://inubecomponentsruleengine.azurewebsites.net';
-
+    //ruleEngineUrl = 'https://inubecomponentsruleengine.azurewebsites.net';
+    ruleEngineUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9052';
 }
 export const ruleconfig = {
     ruleEngineUrl
