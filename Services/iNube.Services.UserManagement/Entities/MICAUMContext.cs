@@ -22,6 +22,8 @@ namespace iNube.Services.UserManagement.Entities
         public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUserTokens> AspNetUserTokens { get; set; }
         public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
+        public virtual DbSet<TblDynamicConfig> TblDynamicConfig { get; set; }
+        public virtual DbSet<TblDynamicPermissions> TblDynamicPermissions { get; set; }
         public virtual DbSet<TblEmployees> TblEmployees { get; set; }
         public virtual DbSet<TblMasCity> TblMasCity { get; set; }
         public virtual DbSet<TblMasCountry> TblMasCountry { get; set; }
@@ -40,7 +42,7 @@ namespace iNube.Services.UserManagement.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
@@ -168,6 +170,59 @@ namespace iNube.Services.UserManagement.Entities
                 entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
 
                 entity.Property(e => e.UserName).HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<TblDynamicConfig>(entity =>
+            {
+                entity.HasKey(e => e.ConfigId)
+                    .HasName("PK__tblDynam__C3BC335CAF8A8915");
+
+                entity.ToTable("tblDynamicConfig", "UM");
+
+                entity.Property(e => e.ConfigId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ItemDescription).HasMaxLength(50);
+
+                entity.Property(e => e.ItemType).HasMaxLength(50);
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TblDynamicPermissions>(entity =>
+            {
+                entity.HasKey(e => e.DynamicPermissionId)
+                    .HasName("PK__tblDynam__9E6E40FAB95D68DF");
+
+                entity.ToTable("tblDynamicPermissions", "UM");
+
+                entity.Property(e => e.DynamicPermissionId)
+                    .HasColumnName("DynamicPermissionID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DynamicId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.DynamicName).HasMaxLength(50);
+
+                entity.Property(e => e.DynamicType).HasMaxLength(50);
+
+                entity.Property(e => e.Roleid).HasMaxLength(450);
+
+                entity.Property(e => e.Userid).HasMaxLength(450);
+
+                entity.Property(e => e.UserorRole)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<TblEmployees>(entity =>
