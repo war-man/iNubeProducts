@@ -36,6 +36,11 @@ namespace iNube.Services.Policy.Models
         public decimal? AmountBalanced { get; set; }
         public string PaymentGatewayReferenceId { get; set; }
         public DateTime? DateOfPayment { get; set; }
+        public decimal? PolicyId { get; set; }
+        public bool? IsPremiumRegister { get; set; }
+        public string UpdatedResponse { get; set; }
+
+        public virtual PolicyDTO Policy { get; set; }
     }
 
     public class PolicyPremiumDetailsDTO
@@ -55,6 +60,7 @@ namespace iNube.Services.Policy.Models
     {
         public PolicyDTO()
         {
+            EndorsementDetails = new HashSet<EndorsementDetailsDTO>();
             PolicyInsurableDetails = new List<PolicyInsurableDetailsDTO>();
         }
         public decimal PolicyId { get; set; }
@@ -115,6 +121,7 @@ namespace iNube.Services.Policy.Models
 
 
         public List<PolicyInsurableDetailsDTO> PolicyInsurableDetails { get; set; }
+        public virtual ICollection<EndorsementDetailsDTO> EndorsementDetails { get; set; }
     }
 
   

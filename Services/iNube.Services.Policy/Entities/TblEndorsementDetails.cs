@@ -17,6 +17,8 @@ namespace iNube.Services.Policy.Entities
         public string PaymentGatewayReferenceId { get; set; }
         public DateTime? DateOfPayment { get; set; }
         public decimal? PolicyId { get; set; }
+        public bool? IsPremiumRegister { get; set; }
+        public string UpdatedResponse { get; set; }
 
         public virtual TblPolicy Policy { get; set; }
     }
