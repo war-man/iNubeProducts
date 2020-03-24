@@ -152,6 +152,8 @@ class ReportExecution extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
+                this.setState({ parameterList: [] });   //item is my state variable
+                //this.setState({ parameterList: parameterList }) 
                 this.setState({ parameterList: data });
                 console.log(this.state.parameterList, data, 'CheckConditions');
                 this.setState({ otFlag: true });
@@ -160,6 +162,7 @@ class ReportExecution extends React.Component {
 
     queryExecution = event => {
         let val = this.state.CheckCondition;
+        this.setState({ paramList: [] });
         let pArray = this.state.paramList;
         this.setState({
             paramList: Object.keys(this.state.CheckCondition).map((prop, key) => {
@@ -218,7 +221,7 @@ class ReportExecution extends React.Component {
         this.setState({
             TableDataList: Object.keys(this.state.result[0]).map((prop, key) => {
                 return {
-                    Header: prop.charAt(0).toUpperCase() + prop.slice(1).toLowerCase(),
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
                     accessor: prop,
                 };
                 this.setState({});

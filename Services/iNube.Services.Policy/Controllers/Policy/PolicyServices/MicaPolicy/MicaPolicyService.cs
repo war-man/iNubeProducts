@@ -625,6 +625,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
                 tblEndorsementDetails.EnddorsementRequest = policyDetail.ToString();
+                tblEndorsementDetails.IsPremiumRegister = false;
+                tblEndorsementDetails.PolicyId = policy.PolicyId;
+
                 TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
 
                 _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
@@ -3012,6 +3015,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
                                             endorsementDetailsDTO.Action = EndorsmentType;
                                             endorsementDetailsDTO.EndorsementNo = EndorsementNo;
+                                            endorsementDetailsDTO.IsPremiumRegister = true;
+                                            endorsementDetailsDTO.UpdatedResponse = json1.ToString();
                                             endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
                                             endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
 
@@ -3505,6 +3510,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         endorsementDetailsDTO.EndorsementNo = EndorsementNo;
                         endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
                         endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
+                        endorsementDetailsDTO.IsPremiumRegister = true;
+                        endorsementDetailsDTO.UpdatedResponse = json1.ToString();
                         TblEndorsementDetails tblEndorsement_mapper1 = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
                         _context.TblEndorsementDetails.Add(tblEndorsement_mapper1);
 
@@ -3637,11 +3644,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var policyId = tbl_particiant.PolicyId;
             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
             List<ErrorInfo> Errors = new List<ErrorInfo>();
-            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
+            var type = "Update Proposal";
+            var tblPolicy = ModifyUpdateInsurabableItem(modifydata,type, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
             return _mapper.Map<PolicyDTO>(tblPolicy);
         }
 
-        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails, List<ErrorInfo> Errors, ApiContext apiContext)
+        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata,string type, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails, List<ErrorInfo> Errors, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -3733,7 +3741,36 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _context.TblPolicy.Update(tblPolicy);
             tblPolicyDetails.PolicyRequest = json1.ToString();
             _context.TblPolicyDetails.Update(tblPolicyDetails);
-            _context.SaveChanges();
+
+            //Saving data into tblEndorsementDetails table
+            try
+            {
+                EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
+                endorsementDetailsDTO.Action = type;
+                if (type == "Update Proposal")
+                {
+                    endorsementDetailsDTO.IsPremiumRegister = false;
+                }
+                if(type == "Issue Policy")
+                {
+                    endorsementDetailsDTO.IsPremiumRegister = true;
+                }
+                endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                endorsementDetailsDTO.EnddorsementRequest = modifydata.ToString();
+                endorsementDetailsDTO.UpdatedResponse = json1.ToString();
+                
+
+                TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
+
+                _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+
+
+
+                _context.SaveChanges();
+            }catch(Exception e)
+            {
+
+            }
 
             return tblPolicy;
         }
@@ -4388,8 +4425,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             var policyId = tblPolicy.PolicyId;
                             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
                             tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
-
-                            var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
+                            var type = "Issue Policy";
+                            var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
                             if (tblPolicy1 == null && Errors.Count > 0)
                             {
                                 return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
@@ -4596,8 +4633,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                 var policyId = tbl_particiant.PolicyId;
+                var type = "Update Proposal";
                 var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
+                var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
                 if (tblPolicy1 == null && Errors.Count > 0)
                 {
                     return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };

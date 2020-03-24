@@ -162,5 +162,20 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaRe
                 return new DataTable();
             }
         }
+
+        public async Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext)
+        {
+            _context = (MICARPContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            IEnumerable<ddDTO> obj;
+            obj = from pr in _context.TblReportConfig.OrderByDescending(p => p.CreatedDate)
+                  select new ddDTO
+                  {
+                      mID = pr.ReportConfigId,
+                      mValue = pr.ReportConfigName,
+                     // mType = lMasterlist,
+
+                  };
+            return obj;
+        }
     }
 }

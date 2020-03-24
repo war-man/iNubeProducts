@@ -20,6 +20,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext);
         Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
         Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext);
+        Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext);
     }
 
     public class ReportService : IReportService
@@ -62,6 +63,10 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         public async Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).QueryExecution(queryDTO,apiContext);
+        }
+        public async Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).GetReportNameForPermissions(apiContext);
         }
     }
 }

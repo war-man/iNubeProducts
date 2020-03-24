@@ -89,5 +89,12 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
             var query = await _reportService.QueryExecution(queryDTO, Context);
             return Ok(query);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetReportNameForPermissions()
+        {
+            var objectval = await _reportService.GetReportNameForPermissions(Context);
+            return Ok(objectval);
+        }
     }
 }
