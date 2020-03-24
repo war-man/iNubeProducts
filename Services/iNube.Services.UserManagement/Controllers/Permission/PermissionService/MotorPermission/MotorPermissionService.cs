@@ -23,6 +23,11 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             throw new NotImplementedException();
         }
 
+        public IEnumerable<MasPermissionDTO> GetUserRoleReports(string userId, string roleId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<MasPermissionDTO> GetRolePermissions(UserRoleMapDTO userPermissionDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
@@ -39,6 +44,21 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         }
 
         public NewRolePermissionResponse AssignRolePermission(NewRolesPermissionDTO permissionIds, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<MasPermissionDTO> GetDashboards(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<MasPermissionDTO> GetReports(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<MasPermissionDTO> GetReportOnRole(ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

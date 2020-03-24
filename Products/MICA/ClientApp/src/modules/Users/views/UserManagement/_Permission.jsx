@@ -44,10 +44,13 @@ const Permission = (props) => {
     let menuname = props.menuname;
     let listData = props.listData;
     let dashboard = props.dashboard;
+    let reports = props.reports;
     let testCheck = props.testCheck;
     let changeCollapse = props.changeCollapse;
     let testCheck1 = props.testCheck1;
     let changeCollapse1 = props.changeCollapse1;
+    let testCheck2 = props.testCheck2;
+    let changeCollapse2 = props.changeCollapse2;
     let permissions = (a, b, location, c) => {
         return (
             <div>
@@ -118,51 +121,48 @@ const Permission = (props) => {
             </div>
         );
     }
+    let reportsmenu = (a2, b2, location2, c2) => {
+        return (
+            <div>
+                <React.Fragment>
+                    {a2.map((item, index) =>
+                        <React.Fragment>
+                            <ListItem className="tree-Assign-Privileges">
+                                <ListItemIcon className="checkboxPading" >
+                                    <CustomCheckbox
+                                        value={item.status}
+                                        onChange={(e) => { testCheck2(index, location2, c2, e) }}
+                                        checked={item.status}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </ListItemIcon>
+                                <ListItemText className="checkboxText" primary={item.label} onClick={() => { changeCollapse2(index, location2, c2) }} />
+                            </ListItem>
+                            {
+                                (item.children.length == 0) ? "" :
+                                    <Collapse in={!item.collapse} unmountOnExit>
+                                        <ListItem>
+                                            <List className="list-padding">
+                                                {reportsmenu(item.children, b2 + 1, location2.concat([index]), c2)}
+                                            </List>
+                                        </ListItem>
+                                    </Collapse>
+                            }
+                        </React.Fragment>
+                    )}
+                </React.Fragment>
+            </div>
+        );
+    }
     return (
         <GridContainer>
             <GridItem xs={12} sm={12} md={12}>
                 <GridContainer>
 
                     <CardBody className="permission-card">
-                        <List>
-                            {listData.map((item, index) =>
-                                <div className="permissiongrid" id="'+ randomID +'">
-                                    {/*    <GridItem xs={12} sm={12}>
-                                        {menuname ? null
-                                            : <Dropdown
-                                                required={true}
-                                                labelText="SelectDashBoard"
-                                                lstObject={props.dasboard}
-                                                value={props.dashboardvalue}
-                                                name='dashboardvalue'
-                                                onChange={(e) => props.handleDropdown(e)}
-                                                formControlProps={{ fullWidth: true }}
-                                            />}
-                                    </GridItem>*/}
-                                    <GridItem xs={12} sm={12}>
-                                        <ListItem className="mica-admin" >
-                                            <ListItemIcon className="checkboxPading" >
-                                            </ListItemIcon>
-                                            {menuname ?
-                                                <ListItemText className="checboxText" primary={item.roleName} />
-                                                : <label><TranslationContainer translationKey="ListofMenuPermissions" /></label>}
-                                        </ListItem>
-                                        <GridItem>
-                                            <ListItem className="partner-admin">
-                                                <List>
-                                                    {permissions(item.mdata, 0, [], index)}
-                                                </List>
-                                            </ListItem>
-                                        </GridItem>
-                                    </GridItem>
-                                </div>
-                            )}
-
-                        </List>
-                    </CardBody>
-                </GridContainer>
-                <GridContainer>
-                    <CardBody className="permission-card">
+                        <h4 style={{ fontWeight: '400' }}> Dashoard Privileges </h4>
                         <List>
                             {dashboard.map((item, index) =>
                                 <div className="permissiongrid" id="'+ randomID +'">
@@ -170,6 +170,9 @@ const Permission = (props) => {
                                         <ListItem className="mica-admin" >
                                             <ListItemIcon className="checkboxPading" >
                                             </ListItemIcon>
+                                            {/* {menuname ?	
+                                                <ListItemText className="checboxText" primary={item.roleName} />	
+                                                : <label><TranslationContainer translationKey="ListofDashboards" /></label>}*/}
                                             <ListItemText className="checboxText" primary={item.roleName} />
                                         </ListItem>
                                         <GridItem>
@@ -182,10 +185,87 @@ const Permission = (props) => {
                                     </GridItem>
                                 </div>
                             )}
-
                         </List>
                     </CardBody>
                 </GridContainer>{/**/}
+                <GridContainer>
+                    <CardBody className="permission-card">
+                        <h4 style={{ fontWeight: '400' }}> Menu Privileges </h4>
+                        <List>
+                            {listData.map((item, index) =>
+                                <div className="permissiongrid" id="'+ randomID +'">
+                                    {/*    <GridItem xs={12} sm={12}>	
+                                        {menuname ? null	
+                                            : <Dropdown	
+                                                required={true}	
+                                                labelText="SelectDashBoard"	
+                                                lstObject={props.dasboard}	
+                                                value={props.dashboardvalue}	
+                                                name='dashboardvalue'	
+                                                onChange={(e) => props.handleDropdown(e)}	
+                                                formControlProps={{ fullWidth: true }}	
+                                            />}	
+                                    </GridItem>*/}
+                                    <GridItem xs={12} sm={12}>
+                                        <ListItem className="mica-admin" >
+                                            <ListItemIcon className="checkboxPading" >
+                                            </ListItemIcon>
+                                            {/*  {menuname ?	
+                                                <ListItemText className="checboxText" primary={item.roleName} />	
+                                                : <label><TranslationContainer translationKey="ListofMenuPermissions" /></label>}*/}
+                                        </ListItem>
+                                        <GridItem>
+                                            <ListItem className="partner-admin">
+                                                <List>
+                                                    {permissions(item.mdata, 0, [], index)}
+                                                </List>
+                                            </ListItem>
+                                        </GridItem>
+                                    </GridItem>
+                                </div>
+                            )}
+                        </List>
+                    </CardBody>
+                </GridContainer>
+                <GridContainer>
+                    <CardBody className="permission-card">
+                        <h4 style={{ fontWeight: '400' }}> Reports Privileges </h4>
+                        <List>
+                            {reports.map((item, index) =>
+                                <div className="permissiongrid" id="'+ randomID +'">
+                                    {/*    <GridItem xs={12} sm={12}>	
+                                        {menuname ? null	
+                                            : <Dropdown	
+                                                required={true}	
+                                                labelText="SelectDashBoard"	
+                                                lstObject={props.dasboard}	
+                                                value={props.dashboardvalue}	
+                                                name='dashboardvalue'	
+                                                onChange={(e) => props.handleDropdown(e)}	
+                                                formControlProps={{ fullWidth: true }}	
+                                            />}	
+                                    </GridItem>*/}
+                                    <GridItem xs={12} sm={12}>
+                                        <ListItem className="mica-admin" >
+                                            <ListItemIcon className="checkboxPading" >
+                                            </ListItemIcon>
+                                            {/*   {menuname ?	
+                                                <ListItemText className="checboxText" primary={item.roleName} />	
+                                                : <label><TranslationContainer translationKey="ListofReports" /></label>}*/}
+                                        </ListItem>
+                                        <GridItem>
+                                            <ListItem className="partner-admin">
+                                                <List>
+                                                    {reportsmenu(item.mdata, 0, [], index)}
+                                                </List>
+                                            </ListItem>
+                                        </GridItem>
+                                    </GridItem>
+                                </div>
+                            )}
+                        </List>
+                    </CardBody>
+                </GridContainer>
                 <GridContainer lg={12} justify="center">
                     <GridItem xs={7} sm={3} md={3} lg={1} >
                         <Button id="permissionbnt" /*disabled={props.btnload1}*/ onClick={props.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>

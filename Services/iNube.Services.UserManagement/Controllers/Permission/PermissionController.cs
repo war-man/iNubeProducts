@@ -80,6 +80,21 @@ namespace iNube.Services.UserManagement.Controllers.Permission
             }
         }
 
+        //GET: api/Permission/GetUserRoleReports
+        [HttpGet]
+        public IActionResult GetUserRoleReports(string userId, string roleId)
+        {
+            if (userId == null || roleId == null)
+            {
+                return NoContent();
+            }
+            else
+            {
+                var _permissions = _permissionService.GetUserRoleReports(userId, roleId, Context);
+                return Ok(_permissions);
+            }
+        }
+
         [HttpGet]
         public IActionResult GetProductPermissions(string permissionType, string userId, string roleId, string productType)
         {
@@ -126,6 +141,14 @@ namespace iNube.Services.UserManagement.Controllers.Permission
         public IActionResult GetUserRoleDashboard(UserRoleMapDTO userPermissionDTO)
         {
             var _permissions = _permissionService.GetUserRoleDashboard(userPermissionDTO, Context);
+            var masterdata = _permissions.GroupBy(c => new { c.RoleName }).Select(mdata => new { mdata.Key.RoleName, mdata });
+            return Ok(masterdata);
+        }
+
+        [HttpPost]
+        public IActionResult GetUserRoleGetReports(UserRoleMapDTO userPermissionDTO)
+        {
+            var _permissions = _permissionService.GetUserRoleGetReports(userPermissionDTO, Context);
             var masterdata = _permissions.GroupBy(c => new { c.RoleName }).Select(mdata => new { mdata.Key.RoleName, mdata });
             return Ok(masterdata);
         }
@@ -182,6 +205,22 @@ namespace iNube.Services.UserManagement.Controllers.Permission
             return Ok(responseddata);
         }
 
+        [HttpGet]
+        public IActionResult GetReports()
+        {
+            var response = _permissionService.GetReports(Context);
+            var responseddata = response.GroupBy(c => new { c.RoleName }).Select(mdata => new { mdata.Key.RoleName, mdata });
+            return Ok(responseddata);
+        }
+
+        [HttpPost]
+        public IActionResult RoleReports(RoleDashDTO roleDashDTO)
+        {
+            var _permissions = _permissionService.RoleReports(roleDashDTO, Context);
+            var masterdata = _permissions.GroupBy(c => new { c.RoleName }).Select(mdata => new { mdata.Key.RoleName, mdata });
+            return Ok(masterdata);
+        }
+
         [HttpPost]
         public IActionResult AssignRolePermissions(NewRolesPermissionDTO newRolePermissionDTO)
         {
@@ -201,5 +240,11 @@ namespace iNube.Services.UserManagement.Controllers.Permission
 
         }
 
+        [HttpGet]
+        public IActionResult GetReportOnRole()
+        {
+            var reports = _permissionService.GetReportOnRole(Context);
+            return Ok(reports);
+        }
     }
 }

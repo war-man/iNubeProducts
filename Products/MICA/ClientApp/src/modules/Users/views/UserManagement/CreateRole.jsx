@@ -99,6 +99,7 @@ class CreateRole extends React.Component {
             },
             dashboardvalue: "",
             listData: [],
+            reports: [],
             rolemenupermissions: {
                 "roleId": ""
             },
@@ -225,6 +226,19 @@ class CreateRole extends React.Component {
                 this.setState({ dashboard: data });
                 console.log("permission data", this.state.dashboard);
             });
+
+        fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetReports`, {
+            method: 'Get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({ reports: data });
+                console.log("permission data", this.state.reports);
+            });
     }
 
     handleOpen = () => {
@@ -274,6 +288,24 @@ class CreateRole extends React.Component {
             .then(data => {
                 this.setState({ dashboard: data });
                 console.log("dashboards: ", this.state.dashboard);
+            });
+
+        this.state.reports = [];
+        fetch(`${UserConfig.UserConfigUrl}/api/Permission/RoleReports`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(perm)
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                this.setState({ reports: data });
+                console.log("reports: ", this.state.reports);
+                this.handleOpen();
             });
     };
 
@@ -348,6 +380,20 @@ class CreateRole extends React.Component {
         event.preventDefault();
     }
 
+    testCheck2 = (index, location, c, event) => {
+        if (location.length > 0) {
+            let responses = [...this.state.reports[c].mdata];
+            responses[location[0]]['children'][index]['status'] = !responses[location[0]]['children'][index]['status'];
+            this.setState({ responses });
+        } else {
+            let responses = [...this.state.reports[c].mdata];
+            responses[index].status = !responses[index].status;
+            this.setState({ responses });
+            this.setChildren(responses[index]['children'], responses[index].status);
+        }
+        event.preventDefault();
+    }
+
     changeCollapse = (index, location, c) => {
         let listData = this.state.listData[c].mdata;
         for (let i = 0; i < location.length; i++) {
@@ -364,6 +410,15 @@ class CreateRole extends React.Component {
         }
         dashboard[index]['collapse'] = !dashboard[index]['collapse'];
         this.setState(dashboard);
+    }
+
+    changeCollapse2 = (index, location, c) => {
+        let reports = this.state.reports[c].mdata;
+        for (let i = 0; i < location.length; i++) {
+            reports = reports[location[i]]['children'];
+        }
+        reports[index]['collapse'] = !reports[index]['collapse'];
+        this.setState(reports);
     }
 
     setChildren = (parent, value) => {
@@ -416,7 +471,8 @@ class CreateRole extends React.Component {
         const that = this;
         let x = {};
         let listData = that.state.listData;
-        let dashboard = that.state.dashboard
+        let dashboard = that.state.dashboard;
+        let reports = that.state.reports;
         console.log("new Roleid", that.state.newroleid);
         if (this.state.newroleid != "") {
             x.roleId = that.state.newroleid;
@@ -435,7 +491,7 @@ class CreateRole extends React.Component {
                 y.newpermissionIds = this.handleSubmitForChildren(listData[i].mdata[j].children, y.newpermissionIds);
             }
 
-            if (y.newpermissionIds.length > 0) {
+            if (y.newpermissionIds.length > 0 || y.newpermissionIds.length == 0) {
                 y.newpermissionIds = [...new Set(y.newpermissionIds)];
                 console.log("y.newpermissionIds: ", y.newpermissionIds);
                 x.permissionIds = x.permissionIds.concat(y.newpermissionIds);
@@ -452,11 +508,29 @@ class CreateRole extends React.Component {
                 }
                 y.newpermissionIds = this.handleSubmitForChildren(dashboard[i].mdata[j].children, y.newpermissionIds);
             }
-            if (y.newpermissionIds.length > 0) {
+            if (y.newpermissionIds.length > 0 || y.newpermissionIds.length || 0) {
                 y.newpermissionIds = [...new Set(y.newpermissionIds)];
                 console.log("dashboards changes: ", y.newpermissionIds);
                 x.permissionIds = x.permissionIds.concat(y.newpermissionIds);
                 console.log("dashboards changes: ", x.permissionIds);
+            }
+        }
+        debugger;
+        for (let i = 0; i < reports.length; i++) {
+            let y = {};
+            y.newpermissionIds = [];
+            for (let j = 0; j < reports[i].mdata.length; j++) {
+                if (reports[i].mdata[j].status == true) {
+                    y.newpermissionIds = y.newpermissionIds.concat([reports[i].mdata[j].permissionId]);
+                }
+                y.newpermissionIds = this.handleSubmitForChildren(reports[i].mdata[j].children, y.newpermissionIds);
+            }
+
+            if (y.newpermissionIds.length > 0 || y.newpermissionIds.length == 0) {
+                y.newpermissionIds = [...new Set(y.newpermissionIds)];
+                console.log("y.newpermissionIds: ", y.newpermissionIds);
+                x.permissionIds = x.permissionIds.concat(y.newpermissionIds);
+                console.log("x.permissionIds: ", x.permissionIds);
             }
         }
 
@@ -660,7 +734,7 @@ class CreateRole extends React.Component {
                                         </div>
                                     </GridContainer>
                                     <div id="disp" >
-                                        <Permission handleSubmit={this.handleSubmit} /*btnload1={this.state.btnload1}*/ dashboard={this.state.dashboard} handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                        <Permission handleSubmit={this.handleSubmit} reports={this.state.reports} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ dashboard={this.state.dashboard} handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
                                     </div>
                                 </div>
 
@@ -790,7 +864,7 @@ class CreateRole extends React.Component {
                         </CardHeader>
                         <CardBody>
                             <GridContainer justify="center" >
-                                <Permission handleSubmit={this.handleSubmit} dashboard={this.state.dashboard}/*btnload1={this.state.btnload1}*/ handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} />
+                                <Permission handleSubmit={this.handleSubmit} dashboard={this.state.dashboard} reports={this.state.reports} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} />
                             </GridContainer>
                         </CardBody>
                     </Card>

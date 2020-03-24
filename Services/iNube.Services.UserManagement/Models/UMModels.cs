@@ -410,7 +410,7 @@ namespace iNube.Services.UserManagement.Models
         public string RoleId { get; set; }
         public int mID { get; set; }
         public string mValue { get; set; }
-        
+        public string mType { get; set; }
 
         public virtual IEnumerable<MasPermissionDTO> Children { get; set; }
     }
@@ -447,7 +447,7 @@ namespace iNube.Services.UserManagement.Models
         public string RoleId { get; set; }
         public int mID { get; set; }
         public string mValue { get; set; }
-        
+
 
         public virtual IEnumerable<MasPermissionDTO> Children { get; set; }
     }

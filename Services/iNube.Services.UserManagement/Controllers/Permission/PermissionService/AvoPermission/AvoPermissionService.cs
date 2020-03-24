@@ -132,6 +132,50 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             return _masPermissionDTOs;
         }
 
+        public IEnumerable<MasPermissionDTO> GetUserRoleReports( string userId, string roleId, ApiContext apiContext)
+        {
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            IEnumerable<TblMasPermission> _permissions = from maspermission in _context.TblMasPermission
+                                                         join permission in
+                                                            (from rolepermission in _context.TblUserPermissions
+                                                             where rolepermission.RoleId == roleId
+                                                             && rolepermission.UserorRole == "Role"
+                                                             select rolepermission.PermissionId)
+                                                                .Except(
+                                                                        from userpermission in _context.TblUserPermissions
+
+                                                                        where userpermission.UserId == userId
+                                                                        && userpermission.UserorRole == "User"
+                                                                        select userpermission.PermissionId
+                                                                        ) on maspermission.PermissionId equals permission.Value
+                                                         where maspermission.ItemType == "Reports"
+                                                         orderby maspermission.SortOrderBy ascending
+                                                         select maspermission;
+
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = _permissions
+                            .Where(c => (c.ParentId == 0))
+                            .Select(c => new MasPermissionDTO()
+                            {
+                                PermissionId = c.PermissionId,
+                                ItemType = c.ItemType,
+                                ParentId = c.ParentId,
+                                MenuId = c.MenuId,
+                                ItemDescription = c.ItemDescription,
+                                Label = c.ItemDescription,
+                                Url = c.Url,
+                                PathTo = c.PathTo,
+                                Collapse = c.Collapse,
+                                State = c.State,
+                                Mini = c.Mini,
+                                Icon = c.Icon,
+                                Redirect = c.Redirect,
+                                Component = c.Component,
+                                Children = GetChildren(_permissions, c.PermissionId)
+                            });
+            // 
+            return _masPermissionDTOs;
+        }
+
         /// <summary>
         /// Assigns the permission.
         /// </summary>
@@ -397,6 +441,21 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                         Children = GetChildren(permissions, c.PermissionId)
                     });
             return masPermissionDTOs;
+        }
+
+        public IEnumerable<MasPermissionDTO> GetDashboards(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<MasPermissionDTO> GetReports(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<MasPermissionDTO> GetReportOnRole(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
