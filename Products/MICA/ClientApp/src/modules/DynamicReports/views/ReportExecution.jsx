@@ -218,7 +218,7 @@ class ReportExecution extends React.Component {
         this.setState({
             TableDataList: Object.keys(this.state.result[0]).map((prop, key) => {
                 return {
-                    Header: prop.charAt(0).toUpperCase() + prop.slice(1).toLowerCase(),
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
                     accessor: prop,
                 };
                 this.setState({});
