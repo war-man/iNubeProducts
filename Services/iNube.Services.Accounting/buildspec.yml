@@ -13,7 +13,7 @@ phases:
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
     commands:
-      - echo Build started on `date`
+      - echo Build started on `date` 
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:accountinglatest Services/iNube.Services.Accounting
       - docker tag $REPOSITORY_URI:accountinglatest $REPOSITORY_URI:$IMAGE_TAG
