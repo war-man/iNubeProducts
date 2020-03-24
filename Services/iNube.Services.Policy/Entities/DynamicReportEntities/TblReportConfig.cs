@@ -17,8 +17,6 @@ namespace iNube.Services.Policy.Entities.DynamicReportEntities
         public DateTime? CreatedDate { get; set; }
         public bool? IsActive { get; set; }
 
-
-
         public virtual ICollection<TblReportConfigParam> TblReportConfigParam { get; set; }
     }
 }

@@ -461,7 +461,7 @@ class User extends React.Component {
         cust.partnerid = localStorage.getItem('partnerId');
         this.setState({ cust });
         console.log("response data", cust);
-        if (cust.customerid == 112 && cust.partnerid == 0 || cust.partnerid != 0) {
+        if (cust.customerid == 121 && cust.partnerid == 0 || cust.partnerid != 0) {
             this.setState({ hideexternal: true });
         }
 

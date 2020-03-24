@@ -530,7 +530,7 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var ruleNames = _context.AspNetRoles.Where(r => RolePermissionDTO.RoleId.Contains(r.Id)).ToList();
-            var menupermission = _context.TblMasPermission.Where(r => r.Icon != "dashboard")
+            var menupermission = _context.TblMasPermission.Where(r => r.ItemType == "Menu")
                 .Select(c => new MasPermissionDTO
                 {
                     PermissionId = c.PermissionId,
@@ -599,7 +599,7 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
         public IEnumerable<MasPermissionDTO> GetAllPermissions(ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var menupermission = _context.TblMasPermission.Where(r => r.Icon != "dashboard")
+            var menupermission = _context.TblMasPermission.Where(r => r.ItemType == "Menu")
                 .Select(c => new MasPermissionDTO
                 {
                     PermissionId = c.PermissionId,

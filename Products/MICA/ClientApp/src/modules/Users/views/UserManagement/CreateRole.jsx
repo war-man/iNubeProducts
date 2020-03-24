@@ -561,9 +561,7 @@ class CreateRole extends React.Component {
                 });
                 that.setState({ permissionpage: false });
                 console.log("data", data);
-                if (this.state.menuname == true) {
-                    this.handleClose();
-                }
+                this.handleClose();
             }
             else if (data.status == 8) {
                 swal({

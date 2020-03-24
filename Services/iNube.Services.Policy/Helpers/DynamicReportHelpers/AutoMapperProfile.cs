@@ -17,6 +17,8 @@ namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
             CreateMap<ReportConfigDTO, TblReportConfig>()
                 .ForMember(dest => dest.TblReportConfigParam, opt => opt.MapFrom(src => src.TblReportConfigParam)).ReverseMap();
 
+            CreateMap<DynamicConfigDTO, TblDynamicConfig>().ReverseMap();
+            CreateMap<DynamicPermissionsDTO, TblDynamicPermissions>().ReverseMap();
         }
     }
 }

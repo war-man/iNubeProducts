@@ -81,4 +81,32 @@ namespace iNube.Services.DynamicReports.model
     {
         public string Dbconnection { get; set; }
     }
+
+    public partial class DynamicConfigDTO
+    {
+        public decimal ConfigId { get; set; }
+        public string ItemType { get; set; }
+        public string Name { get; set; }
+        public string ItemDescription { get; set; }
+        public string Url { get; set; }
+        public bool? IsActive { get; set; }
+        public int? SortOrderBy { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+    }
+
+    public partial class DynamicPermissionsDTO
+    {
+        public decimal DynamicPermissionId { get; set; }
+        public decimal? DynamicId { get; set; }
+        public string DynamicName { get; set; }
+        public string DynamicType { get; set; }
+        public string Userid { get; set; }
+        public string Roleid { get; set; }
+        public string UserorRole { get; set; }
+        public bool? IsActive { get; set; }
+        public int? SortOrderBy { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+    }
 }
