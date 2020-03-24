@@ -10,10 +10,18 @@ if (config.env == "dev") {
     policyconfigUrl = 'https://localhost:44351';
 }
 else {
-    claimConfigUrl = 'https://inubeservicesclaims.azurewebsites.net';
-    productConfigUrl = 'https://inubeservicesproductconfiguration.azurewebsites.net';
-    partnerconfigUrl = 'https://inubeservicespartners.azurewebsites.net';
-    policyconfigUrl = 'https://inubeservicespolicy.azurewebsites.net';
+    ////claimConfigUrl = 'https://inubeservicesclaims.azurewebsites.net';
+    //productConfigUrl = 'https://inubeservicesproductconfiguration.azurewebsites.net';
+    //partnerconfigUrl = 'https://inubeservicespartners.azurewebsites.net';
+    //policyconfigUrl = 'https://inubeservicespolicy.azurewebsites.net';
+    claimConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9002';
+    productConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9007';
+    partnerconfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9005';
+    policyconfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9006';
+    //claimConfigUrl = 'http://egiswitchapi.edelweisscustomeruat.com:9002';
+    //productConfigUrl = 'http://egiswitchapi.edelweisscustomeruat.com:9007';
+    //partnerconfigUrl = 'http://egiswitchapi.edelweisscustomeruat.com:9005';
+    //policyconfigUrl = 'http://egiswitchapi.edelweisscustomeruat.com:9006';
 }
 export const ClaimConfig = {
     claimConfigUrl,
