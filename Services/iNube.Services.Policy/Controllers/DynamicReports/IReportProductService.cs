@@ -16,5 +16,6 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext);
         Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
         Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext);
+        Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext);
     }
 }

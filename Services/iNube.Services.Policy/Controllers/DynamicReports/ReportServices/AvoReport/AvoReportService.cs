@@ -31,6 +31,11 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.AvoRep
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
