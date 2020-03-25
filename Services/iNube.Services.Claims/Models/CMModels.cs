@@ -22,8 +22,6 @@ namespace iNube.Services.Claims.Models
             ClaimDetails = new HashSet<ClaimDetailsDTO>();
             ClaimTransaction = new HashSet<ClaimTransactionDTO>();
         }
-
-
         public decimal ClaimId { get; set; }
         public bool? IsValid { get; set; }
         public DateTime? CreatedDateTime { get; set; }
