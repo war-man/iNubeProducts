@@ -27,6 +27,8 @@ class AddVehicle extends React.Component {
         super(props)
 
         this.state = {
+            random:0,
+            amount:0,
             showDropZone:false,
             showbtn:true,
             bytestring: "",
@@ -58,16 +60,16 @@ class AddVehicle extends React.Component {
 
             },
             RiskObj: {
-                "Model": "",
+                "Make": "",
                 "VehicleNumber": "",
-                "Identification Number": "1",
+                "Identification Number": "",
                 "YearofRegistration": "",
                 "Vehicle Type": "",
                 "Documents": []
             },
             duplicateRiskObj: {
 
-                "Model": "",
+                "Make": "",
 
                 "VehicleNumber": "",
 
@@ -137,32 +139,28 @@ class AddVehicle extends React.Component {
                 "fileExtension": "",
                 "fileData": "",
                 "contentType": "",
-                "tagname": "",
-                "tagValue": ""
+                "tagdto": []
             },
             leftfilestr: {
                 "fileName": "",
                 "fileExtension": "",
                 "fileData": "",
                 "contentType": "",
-                "tagname": "",
-                "tagValue": ""
+                "tagdto": []
             },
             backfilestr: {
                 "fileName": "",
                 "fileExtension": "",
                 "fileData": "",
                 "contentType": "",
-                "tagname": "",
-                "tagValue": ""
+                "tagdto": []
             },
             rightfilestr: {
                 "fileName": "",
                 "fileExtension": "",
                 "fileData": "",
                 "contentType": "",
-                "tagname": "",
-                "tagValue": ""
+                "tagdto": []
             },
             duplicatefilestr: {
                 "fileName": "",
@@ -172,23 +170,74 @@ class AddVehicle extends React.Component {
                 "tagname": "",
                 "tagValue": ""
             },
+            tagdtos: {
+                "tagname": "",
+                "tagValue": ""
+            },
+            duplicatetagtos: {
+                "tagname": "",
+                "tagValue": ""
+            },
         }
     }
     AddVehicle = (files) => {
         debugger;
-        if (this.state.policyIssueRequest.InsurableItem[1].InsurableName == "Vehicle") {
-
-            this.state.policyIssueRequest.InsurableItem[1].RiskItems.push(this.state.RiskObj);
-
-
+        for (var i = 0; i < this.state.policyIssueRequest.InsurableItem.length;i++) {
+            if (this.state.policyIssueRequest.InsurableItem[i].InsurableName == "Vehicle") {
+                this.state.RiskObj['Identification Number'] = "V" + i.toString();
+                this.state.policyIssueRequest.InsurableItem[i].RiskItems.push(this.state.RiskObj);
+            }
         }
         //this.setState({ RiskObj: this.state.duplicateRiskObj });
         console.log(" this.state.policyRqst", this.state.policyRqst);
     }
+    Updateproposal = () => {
+        this.state.policyIssueRequest.InsurableItem[1].RiskItems["Vehicle Number"] = this.state.RiskObj.VehicleNumber;
+        this.state.policyIssueRequest.InsurableItem[1].RiskItems["Year of Registration"] = this.state.YearofRegistration;
+        this.state.RiskObj['Identification Number'] = "V1"; 
+        this.state.policyIssueRequest.InsurableItem[1].RiskItems.push(this.state.RiskObj);
+        console.log("updateproposal", this.state.policyIssueRequest);
+        fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/UpdateProposal`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('edelweisstoken')
+            },
+            body: JSON.stringify(this.state.policyIssueRequest)
+        }).then(response => response.json())
+            .then(data => {
+                console.log("proposalrespata", data)
+                console.log("respdata", data.response);
+                if (data.status == 3) {
+                    swal({
+                        text: data.responseMessage,
+                        icon: "success"
+                    });
+                }
+                else {
+                    swal({
+                        text: data.responseMessage,
+                        icon: "error"
+                    });
+                }
+             
+            });
+    }
     Issuepolicy = () => {
         debugger;
         //let policyno = this.state.scheduleDTO.policyNo;
+        this.state.policyIssueRequest.StartDate = this.state.startdate; 
         this.state.scheduleDTO.vehicleRegistrationNo = this.state.RiskObj.VehicleNumber;
+        this.state.policyIssueRequest.PaymentInfo[0].RefrenceNumber = this.state.random.toFixed();
+       
+        //if (this.state.policyIssueRequest.InsurableItem[0].InsurableName == "Driver") {
+        //    this.state.policyIssueRequest.InsurableItem[0].RiskItems['Identification Number'] = "D1";
+        //    } else if (this.state.policyIssueRequest.InsurableItem[1].InsurableName == "Vehicle") {
+        //    this.state.policyIssueRequest.InsurableItem[1].RiskItems['Identification Number'] = "V1";
+        //    }
+       
+       
         console.log("this.state.RiskObj.VehicleNumber", this.state.RiskObj.VehicleNumber, this.state.RiskObj)
         this.AddVehicle();
         debugger;
@@ -253,17 +302,33 @@ class AddVehicle extends React.Component {
     componentDidMount() {
         const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
         localStorage.setItem('edelweisstoken', edelweisstoken);
-
+        //console.log("ocation.state.policyIssueDTO", this.props.location.state.policyIssueDTO);
         //const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg';
         //localStorage.setItem('edelweisstoken', edelweisstoken);
-
+        const min = 1;
+        const max = 100;
+        const rand = min + Math.random() * (max - min);
+        //const rand = Math.random();
+        this.setState({ random: this.state.random + rand });
         if (this.props.location.state != undefined) {
+            this.state.startdate = this.props.location.state.startdate;
+            console.log("this.state.startdate", this.state.startdate, this.props.location.state.startdate);
             this.state.scheduleDTO.vehicleType = this.props.location.state.drvvehicleType;
             this.state.RiskObj['Vehicle Type'] = this.props.location.state.drvvehicleType;
-            this.state.RiskObj.Model = this.props.location.state.adddrvMakeModel;
+            this.state.RiskObj.Make = this.props.location.state.adddrvMakeModel;
+            this.state.amount = this.props.location.state.amount;
+            console.log("bbbbbb", this.state.amount, this.props.location.state.amount);
             console.log("this.state.scheduleDTO.vehicleType", this.state.RiskObj.Model, this.state.scheduleDTO.vehicleType);
 
-            this.setState({ quotationdataDto: this.props.location.state.quotationDetailsDto, policyIssueRequest: this.props.location.state.policyIssueDTO, vehiclepremiumDto: this.props.location.state.premDTO });
+            this.state.quotationdataDto = this.props.location.state.quotationDetailsDto;
+            //this.state.policyIssueRequest = this.props.location.state.policyRqst;
+            this.state.policyIssueRequest = this.props.location.state.policyIssueDTO;
+            //if (this.state.policyIssueRequest.InsurableItem[0].InsurableName == "Driver") {
+            //    this.state.policyIssueRequest.InsurableItem[0].RiskItems['Identification Number'] = this.props.location.state.policyIssueDTO.InsurableItem[0].RiskItems['Identification Number'];
+            //    this.state.policyIssueRequest.InsurableItem[0].RiskItems.push(this.state.RiskObj);
+            //}
+            this.state.vehiclepremiumDto = this.props.location.state.premDTO;
+            this.setState({});
             //this.state.policyIssueRequest = this.props.location.state.policyRqst;
             //this.state.insurableObj[0].RiskItems[0].Name = this.state.quotationdataDto.primaryDriverName;
             console.log("policyIssueRequestis.stat", this.state.policyIssueRequest);
@@ -313,15 +378,20 @@ class AddVehicle extends React.Component {
 
     }
 
-    Uploadfile = (files, bytes, name) => {
+    Uploadfile = (files, bytes, name,imgdata) => {
         console.log("fyles", files, bytes, name);;
         if (name == "front") {
             this.state.frontfilestr.fileName = files.frontfileimage.name;
             this.state.frontfilestr.fileExtension = files.frontfileimage.name.split(".")[1];
-            this.state.frontfilestr.fileData = bytes.frontimage.toString();
+            this.state.frontfilestr.fileData = imgdata.toString().replace('data:image/png;base64,', '');
+                //bytes.frontimage.toString();
             this.state.frontfilestr.contentType = files.frontfileimage.type;
-            this.state.frontfilestr.tagname = 'ImageType';
-            this.state.frontfilestr.tagValue = name;
+            //this.state.frontfilestr.tagname = 'ImageType';
+            //this.state.frontfilestr.tagValue = name;
+            this.state.tagdtos.tagname = 'ImageType';
+            this.state.tagdtos.tagValue = name;
+            this.state.frontfilestr.tagdto.push(this.state.tagdtos);
+            this.setState({ tagdtos: this.state.duplicatetagtos });
             this.state.fileUploaddto.fileUploadDTOs.push(this.state.frontfilestr);
          }
             
@@ -329,28 +399,43 @@ class AddVehicle extends React.Component {
         if (name == "left") {
             this.state.leftfilestr.fileName = files.leftfileimage.name;
             this.state.leftfilestr.fileExtension = files.leftfileimage.name.split(".")[1];
-            this.state.leftfilestr.fileData = bytes.leftimage.toString();
+            this.state.leftfilestr.fileData = imgdata.toString().replace('data:image/png;base64,', '');
+                //bytes.leftimage.toString();
             this.state.leftfilestr.contentType = files.leftfileimage.type;
-            this.state.leftfilestr.tagname = 'ImageType';
-            this.state.leftfilestr.tagValue = name;
+            //this.state.leftfilestr.tagname = 'ImageType';
+            //this.state.leftfilestr.tagValue = name;
+            this.state.tagdtos.tagname = 'ImageType';
+            this.state.tagdtos.tagValue = name;
+            this.state.leftfilestr.tagdto.push(this.state.tagdtos);
+            this.setState({ tagdtos: this.state.duplicatetagtos });
             this.state.fileUploaddto.fileUploadDTOs.push(this.state.leftfilestr);
         }
         if (name == "back") {
             this.state.backfilestr.fileName = files.backfileimage.name;
             this.state.backfilestr.fileExtension = files.backfileimage.name.split(".")[1];
-            this.state.backfilestr.fileData = bytes.backimage.toString().replace('data:image/png;base64,', '');
+            this.state.backfilestr.fileData = imgdata.toString().replace('data:image/png;base64,', '');
+                //bytes.backimage.toString().replace('data:image/png;base64,', '');
             this.state.backfilestr.contentType = files.backfileimage.type;
-            this.state.backfilestr.tagname = 'ImageType';
-            this.state.backfilestr.tagValue = name;
+            //this.state.backfilestr.tagname = 'ImageType';
+            //this.state.backfilestr.tagValue = name;
+            this.state.tagdtos.tagname = 'ImageType';
+            this.state.tagdtos.tagValue = name;
+            this.state.backfilestr.tagdto.push(this.state.tagdtos);
+            this.setState({ tagdtos: this.state.duplicatetagtos });
             this.state.fileUploaddto.fileUploadDTOs.push(this.state.backfilestr);
         }
         if (name == "right") {
             this.state.rightfilestr.fileName = files.rightfileimage.name;
             this.state.rightfilestr.fileExtension = files.rightfileimage.name.split(".")[1];
-            this.state.rightfilestr.fileData = bytes.rightimage.toString().replace('data:image/png;base64,','');
+            this.state.rightfilestr.fileData = imgdata.toString().replace('data:image/png;base64,', '');
+                //bytes.rightimage.toString().replace('data:image/png;base64,', '');
             this.state.rightfilestr.contentType = files.rightfileimage.type;
-            this.state.rightfilestr.tagname = 'ImageType';
-            this.state.rightfilestr.tagValue = name;
+            //this.state.rightfilestr.tagname = 'ImageType';
+            //this.state.rightfilestr.tagValue = name;
+            this.state.tagdtos.tagname = 'ImageType';
+            this.state.tagdtos.tagValue = name;
+            this.state.rightfilestr.tagdto.push(this.state.tagdtos);
+            this.setState({ tagdtos: this.state.duplicatetagtos });
             this.state.fileUploaddto.fileUploadDTOs.push(this.state.rightfilestr);
         }
     }
@@ -402,7 +487,7 @@ class AddVehicle extends React.Component {
         if (this.state.redirect === true) {
             return <Redirect to={{
                 pathname: '/pages/LogonVehicle',
-                state: { policyIssueRequest: this.state.policyIssueRequest, RiskObj: this.state.RiskObj, scheduleDTO: this.state.scheduleDTO, vehiclepremiumDto: this.state.vehiclepremiumDto, policyNo: this.state.policyNo }
+                state: { policyIssueRequest: this.state.policyIssueRequest, RiskObj: this.state.RiskObj, scheduleDTO: this.state.scheduleDTO, vehiclepremiumDto: this.state.vehiclepremiumDto, policyNo: this.state.policyNo, amount: this.state.amount }
             }} />
         }
     }
@@ -477,7 +562,7 @@ class AddVehicle extends React.Component {
         }
 
         this.setState({ images, imagefiles });
-        this.Uploadfile(imagefiles, images, name);
+        this.Uploadfile(imagefiles, images, name, this.state.imagePreviewUrl);
         reader.readAsDataURL(event.target.files[0]);
 
         console.log("filwimage", images.frontimage);
@@ -528,7 +613,7 @@ class AddVehicle extends React.Component {
                                         <CustomInput
                                             labelText="Make & Model"
                                             name="Model"
-                                            value={this.state.RiskObj.Model}
+                                            value={this.state.RiskObj.Make}
                                             onChange={(e) => this.onInputChange(e)}
                                             formControlProps={{
                                                 fullWidth: true
@@ -690,6 +775,7 @@ class AddVehicle extends React.Component {
                                     <Button color="primary" round onClick={this.showonclick}> Upload </Button>
                                 </GridContainer> : null}
                                 <GridContainer justify="center">
+                                    <Button color="primary" round onClick={this.Updateproposal}> Update Proposal </Button>
                                     {this.renderRedirect()}
                                     <Button color="primary" round onClick={this.Issuepolicy}> Issue Policy </Button>
                                 </GridContainer>

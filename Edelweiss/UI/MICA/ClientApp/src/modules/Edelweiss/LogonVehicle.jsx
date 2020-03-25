@@ -37,6 +37,7 @@ import AddCircle from '@material-ui/icons/AddCircle';
 import Delete from '@material-ui/icons/Delete';
 import Scheduler from './Scheduler.jsx';
 import Dashboard from './Dashboard.jsx';
+import BillingDetails from './BillingDetails.jsx';
 import EdelweissConfig from "./EdelweissConfig.js";
 import Visibility from "@material-ui/icons/Visibility";
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -102,6 +103,10 @@ class LogonVehicle extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            random:0,
+            policynum:"",
+            openbilling:false,
+            showbtn: true,
             bytestring: "",
             fbase64: [],
             vehicleMakeModel: "",
@@ -111,7 +116,7 @@ class LogonVehicle extends React.Component {
             vehiclestype: "",
             vehiclecount: "",
             policynumber: "",
-            suminsured: "",
+            suminsured: 0,
             proposalno: "",
             schedule: {
                 vehicleRegistrationNo: "",
@@ -258,12 +263,20 @@ class LogonVehicle extends React.Component {
             RiskObj: {
                 "Model": "",
                 "VehicleNumber": "",
-                "Identification Number": "123",
+                "Identification Number": "",
                 "YearofRegistration": "",
                 "Vehicle Type": "",
                 "Documents": [],
             },
             endorsementPremiumDTO: {
+                "policyNo": "",
+                "si": "",
+                "pcCount": 0,
+                "twCount": 0,
+                "typeOfEndorsement": "Addition",
+                "endorsementEffectiveDate": ""
+            },
+            resetendorsementPremiumDTO: {
                 "policyNo": "",
                 "si": "",
                 "pcCount": 0,
@@ -279,10 +292,18 @@ class LogonVehicle extends React.Component {
                 "typeOfEndorsement": "Deletion",
                 "endorsementEffectiveDate": ""
             },
+            resetendorsementpremium: {
+                "policyNo": "",
+                "si": "",
+                "pcCount": 0,
+                "twCount": 0,
+                "typeOfEndorsement": "Deletion",
+                "endorsementEffectiveDate": ""
+            },
             deleteEndorsement: {
-                "SI": "",
+                "si": 0,
                 "PolicyNumber": "",
-                "EndorsementType": "Deletion of vehicle",
+                "EndorsementType": "",
                 "InsurableItem": [
                     {
                         "InsurableName": "Vehicle",
@@ -291,6 +312,17 @@ class LogonVehicle extends React.Component {
                             }
                         ]
                     }
+                ],
+                "PaymentInfo": [
+
+                    {
+
+                        "RefrenceNumber": "",
+
+                        "Amount": 0,
+
+                    }
+
                 ]
             },
             policyIssueRqstDto: {},
@@ -304,10 +336,31 @@ class LogonVehicle extends React.Component {
                 "additionalDriver": "1",
                 "billingFrequency": ""
             },
+            resetpremiumDTO: {
+                "stateCode": "",
+                "si": 0,
+                "noOfPC": 0,
+                "noOfTW": 0,
+                "driverAge": "",
+                "driverExp": "",
+                "additionalDriver": "1",
+                "billingFrequency": ""
+            },
+
+            duplicatepremiumDTO: {
+                "stateCode": "",
+                "si": 0,
+                "noOfPC": 0,
+                "noOfTW": 0,
+                "driverAge": "",
+                "driverExp": "",
+                "additionalDriver": "1",
+                "billingFrequency": ""
+            },
             emptyarray: [],
             typevehicle: "",
             endorsementVehDTO: {
-                "SI": "",
+                "si": 0,
                 "PolicyNumber": "",
                 "EndorsementType": "Addition of vehicle",
                 "InsurableItem": [
@@ -315,6 +368,17 @@ class LogonVehicle extends React.Component {
                         "InsurableName": "Vehicle",
                         "RiskItems": []
                     }
+                ],
+                "PaymentInfo": [
+
+                    {
+
+                        "RefrenceNumber": "",
+
+                        "Amount": 0,
+
+                    }
+
                 ]
             },
             imagePreviewUrl: '',
@@ -414,12 +478,12 @@ class LogonVehicle extends React.Component {
     handleSubmit = () => {
         console.log("schedular: ", this.state.schedule);
 
-        fetch(`${EdelweissConfig.Edelweiss}/api/Mica_EGI/CreateUpdateSchedule`, {
+        fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/CreateUpdateSchedule`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
             body: JSON.stringify(this.state.schedule)
         }).then(response => response.json())
@@ -444,17 +508,24 @@ class LogonVehicle extends React.Component {
     }
 
     componentDidMount() {
-
+        const min = 1;
+        const max = 100;
+        const rand = min + Math.random() * (max - min);
+        //const rand = Math.random();
+        this.setState({ random: this.state.random + rand });
         //const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJhOTVkMDNjZC1kZjE4LTQ3NTYtYTU3Ny0zNDEyYjY4MTdkZDAiLCJFbWFpbCI6InNhbmRoeWFAZ21haWwuY29tIiwiT3JnSWQiOiIyNzciLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6InNhbmRoeWEiLCJVc2VyTmFtZSI6InNhbmRoeWFAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE2NzU0OTkyOTksImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.2oUTJQBxiqqqgl2319ZCREz1IyYHjVRhlDehI__O8Xg';
         //localStorage.setItem('edelweisstoken', edelweisstoken);
 
         //const edelweisstoken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
         //localStorage.setItem('edelweisstoken', edelweisstoken);
-
+      
         this.setState({ selectedSI: this.state.suminsuredamount[0].mValue })
         if (this.props.location.state != undefined) {
             if (this.props.location.state.policyNo != undefined || this.props.location.state.policyNo != "") {
                 this.handlePolicyDetails(this.props.location.state.policyNo);
+                this.state.policynum = this.props.location.state.policyNo;
+                this.state.endorsementVehDTO.PaymentInfo[0].Amount = this.props.location.state.amount;
+                console.log("this.props.location.state.amount", this.state.endorsementVehDTO.PaymentInfo[0].Amount,this.props.location.state.amount)
             } else {
                 this.handlePolicyDetails(this.props.location.state.scheduleDTO.policyNo);
             }
@@ -473,7 +544,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
         })
             .then(response => response.json())
@@ -497,34 +568,34 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
         }).then(response => response.json())
             .then(data => {
                 console.log('response: ', data);
-                this.setState({ proposalDetails: data });
+                this.setState({ proposalDetails: data, bsi: data.proposalPolicyDetail['Balance SumInsured'], claims: data.proposalPolicyDetail['No. of Claim'] });
                 console.log('response: ', this.state.proposalDetails);
-                console.log('response: ', data.PolicyNo);
-                if (data.InsurableItem.length !== 0) {
+                console.log('response1: ', data.proposalPolicyDetail.PolicyNo, data.proposalPolicyDetail['Balance SumInsured'], data.proposalPolicyDetail['No. of Claim']);
+                if (data.proposalPolicyDetail.InsurableItem.length !== 0) {
                     this.setState({ Novehicles: true });
                 }
                 this.setState({
-                    vehiclearray: data.InsurableItem,
-                    proposalno: data.ProposalNo,
-                    policynumber: data.PolicyNumber,
-                    suminsured: data.si
+                    vehiclearray: data.proposalPolicyDetail.InsurableItem,
+                    proposalno: data.proposalPolicyDetail.ProposalNo,
+                    policynumber: data.proposalPolicyDetail.PolicyNumber,
+                    suminsured: data.proposalPolicyDetail.si
                 });
                 let premium = this.state.premiumDTO;
-                premium.stateCode = data.stateCode;
-                premium.si = data.si;
-                this.state.bsi = data.si;
-                premium.noOfPC = data.noOfPC;
-                premium.noOfTW = data.noOfTW;
-                premium.driverAge = data.driverAge;
-                premium.driverExp = data.driverExp;
-                premium.additionalDriver = data.additionalDriver;
-                premium.billingFrequency = data.billingFrequency;
-                this.setState({ premium, selectedamount: data.si, duplicatepremiumDTO: this.state.premiumDTO });
+                premium.stateCode = data.proposalPolicyDetail.stateCode;
+                premium.si = data.proposalPolicyDetail.si;
+                //this.state.bsi = data.si;
+                premium.noOfPC = data.proposalPolicyDetail.noOfPC;
+                premium.noOfTW = data.proposalPolicyDetail.noOfTW;
+                premium.driverAge = data.proposalPolicyDetail.driverAge;
+                premium.driverExp = data.proposalPolicyDetail.driverExp;
+                premium.additionalDriver = data.proposalPolicyDetail.additionalDriver;
+                premium.billingFrequency = data.proposalPolicyDetail.billingFrequency;
+                this.setState({ premium, selectedamount: data.proposalPolicyDetail.si, duplicatepremiumDTO: this.state.premiumDTO });
                 console.log("page ", premium)
                 console.log("page ", this.state.vehiclearray);
                 for (let i = 0; i < this.state.vehiclearray.length; i++) {
@@ -553,7 +624,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
             body: JSON.stringify(this.state.createschedule)
         }).then(response => response.json())
@@ -583,7 +654,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
         }).then(response => response.json())
             .then(data => {
@@ -617,12 +688,12 @@ class LogonVehicle extends React.Component {
         newvehicle.VehicleType = "";
         newvehicle.YearofRegistration = "";
         newvehicle.Model = "";
-        this.setState({ openaddvehicle: false, newvehicle });
+        this.setState({ openaddvehicle: false, newvehicle, endorsementPremiumDTO: this.state.resetendorsementPremiumDTO });
     }
 
     handleDeleteclose = () => {
-        this.setState({ deletevehicle: false });
-        this.setState({ duplicatepremiumDTO: this.state.premiumDTO, index: "" });
+        this.setState({ deletevehicle: false, duplicatepremiumDTO: this.state.premiumDTO, index: "", endorsementpremium: this.state.resetendorsementpremium });
+        console.log("endorsementPremiumDTO: ", this.state.endorsementpremium)
     }
 
     handlecloseDialog = () => {
@@ -646,10 +717,11 @@ class LogonVehicle extends React.Component {
 
             console.log("this.state.endorsementVehDTO.", this.state.endorsementVehDTO);
         }
-        addvehicle.SI = this.state.suminsured.toString();
+        addvehicle.si = this.state.suminsured;
         addvehicle.PolicyNumber = this.state.policynumber;
         addvehicle.InsurableItem[0].RiskItems[0]["Vehicle Type"] = this.state.typevehicle;
-        addvehicle.InsurableItem[0].RiskItems[0]["Identification Number"] = (this.state.vehiclecount + 1).toString();
+        addvehicle.InsurableItem[0].RiskItems[0]["Identification Number"] = ("V" + (this.state.vehiclecount + 1)).toString();
+        addvehicle.PaymentInfo[0].RefrenceNumber = this.state.random.toFixed();
         this.setState({ addvehicle });
 
         let newschedule = this.state.createschedule;
@@ -663,7 +735,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
             body: JSON.stringify(addvehicle)
         }).then(response => response.json())
@@ -697,6 +769,12 @@ class LogonVehicle extends React.Component {
     handleviewClose = () => {
         this.setState({ openvehicle: false });
     }
+    handleopenbilling = () => {
+        this.setState({ openbilling: true });
+    }
+    handleviewbillingclose = () => {
+        this.setState({ openbilling: false });
+    }
 
     handleDeleteVehicle = () => {
         var today = new Date();
@@ -725,14 +803,15 @@ class LogonVehicle extends React.Component {
 
         let deletevehicles = this.state.deleteEndorsement;
         deletevehicles.InsurableItem[0].RiskItems = [];
-        deletevehicles.SI = premium.si.toString();
+        deletevehicles.si = premium.si;
         deletevehicles.PolicyNumber = this.state.policynumber;
         deletevehicles.EndorsementType = "Deletion of vehicle";
+        deletevehicles.PaymentInfo[0].RefrenceNumber = this.state.random.toFixed();
         deletevehicles.InsurableItem[0].RiskItems.push(vehicle[this.state.index]);
 
         vehicle = vehicle.filter(item => item !== vehicle[this.state.index]);
 
-        this.setState({ deletevehicles, deletevehicle: false, vehicle });
+        this.setState({ deletevehicles, vehicle });
 
         console.log("delete vehilce: ", deletevehicles);
         console.log("delete vehilce: ", vehicle);
@@ -740,6 +819,7 @@ class LogonVehicle extends React.Component {
         this.DeleteEndorsement(deletevehicles);
 
         this.setState({ vehicles: this.state.emptyarray });
+        this.handleDeleteclose();
         //this.handlePolicyDetails(this.state.policynumber);
     }
 
@@ -749,13 +829,14 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
             body: JSON.stringify(endorsementdto)
         }).then(response => response.json())
             .then(data => {
                 console.log("premdata", data);
                 if (data.status == 5) {
+                    this.setState({ endorsementpremium: this.state.resetendorsementpremium });
                     swal({
                         text: data.responseMessage,
                         icon: "success",
@@ -795,7 +876,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
             body: JSON.stringify(this.state.endorsementPremiumDTO)
         }).then(response => response.json())
@@ -832,6 +913,7 @@ class LogonVehicle extends React.Component {
             this.setState({ showvehicles: true, endorsement })
         }
         endorsement.policyNo = this.state.policynumber;
+        console.log("PoNo: ", this.state.policynumber);
         console.log("suminsured: ", this.state.selectedSI);
         endorsement.si = this.state.suminsured;
         endorsement.endorsementEffectiveDate = date;
@@ -840,22 +922,23 @@ class LogonVehicle extends React.Component {
     }
 
     showOnClick = (evt) => {
-        this.setState({ showDropZone: true })
+        this.setState({ showDropZone: true, showbtn: false })
     }
 
     handleDeleteopen = (vehicleno, vehiclestype, key) => {
-        debugger;
         var today = new Date();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + (today.getHours()) + ':' + (today.getMinutes()) + ':' + (today.getSeconds());
         this.state.vehiclestype = vehiclestype;
         let premium = this.state.duplicatepremiumDTO;
         let premiumdata = this.state.endorsementpremium;
         if (this.state.vehiclestype === "TW") {
+
             premium.noOfTW = 1;
             premiumdata.twCount = 1;
         }
         if (this.state.vehiclestype === "PC") {
             premium.noOfPC = 1;
+            premium.noOfTW = 0;
             premiumdata.pcCount = 1;
         }
         this.state.index = key;
@@ -886,7 +969,7 @@ class LogonVehicle extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
             body: JSON.stringify(premiumDTO)
         }).then(response => response.json())
@@ -897,7 +980,7 @@ class LogonVehicle extends React.Component {
                         text: data.responseMessage,
                         icon: "error"
                     })
-                    this.setState({ deletevehicle: false });
+                    this.handleDeleteclose();
                 } else {
                     this.setState({
                         perDayPremium: data.perDayPremium,
@@ -999,6 +1082,8 @@ class LogonVehicle extends React.Component {
         premiumendorse.si = this.state.selectedSI;
         premiumendorse.endorsementEffectiveDate = date;
         premiumendorse.policyNo = this.state.policynumber;
+        this.state.suminsured = this.state.suminsuredamount[key].mValue;
+        this.state.bsi = this.state.suminsuredamount[key].mValue;;
         if (this.state.typevehicle == "PC") {
             premiumendorse.pcCount = 1;
         }
@@ -1006,7 +1091,7 @@ class LogonVehicle extends React.Component {
             premiumendorse.twCount = 1;
         }
 
-        this.setState({ selectedSI: this.state.suminsuredamount[key].mValue, selectedamount: this.state.suminsuredamount[key].label, premiumendorse, opendialog: false });
+        this.setState({ selectedSI: this.state.suminsuredamount[key].mValue, selectedamount: this.state.suminsuredamount[key].label, premiumendorse, opendialog: false});
         console.log("state.endorsementPremium", this.state.endorsementPremiumDTO);
         this.handleCalculateendorsementpremium();
     }
@@ -1274,6 +1359,8 @@ class LogonVehicle extends React.Component {
                                         }.bind(this))
                                         }
                                     </GridContainer> : null}
+                                    
+
                                     <Modal
                                         aria-labelledby="simple-modal-title"
                                         aria-describedby="simple-modal-description"
@@ -1293,12 +1380,38 @@ class LogonVehicle extends React.Component {
                                                         </Button>
                                                     </div>
                                                     <div id='disp'>
-                                                        <Dashboard vehicleno={this.state.vehicleno} handleviewClose={this.handleviewClose} vehiclestype={this.state.vehiclestype} openvehicle={this.state.openvehicle} suminsured={this.state.suminsured} policynumber={this.state.policynumber} />
+                                                        <Dashboard vehicleno={this.state.vehicleno} vehiclestype={this.state.vehiclestype} handleviewClose={this.handleviewClose} vehiclestype={this.state.vehiclestype} openvehicle={this.state.openvehicle} suminsured={this.state.suminsured} policynumber={this.state.policynumber} bsi={this.state.bsi} />
                                                     </div>
                                                 </Card>
                                             </GridItem>
                                         </GridContainer>
                                     </Modal>
+
+                                    <Modal
+                                        aria-labelledby="simple-modal-title"
+                                        aria-describedby="simple-modal-description"
+                                        open={this.state.openbilling}
+                                        onClose={this.handleviewbillingclose}>
+                                        <GridContainer justify="center">
+                                            <GridItem xs={10}>
+                                                <Card >
+                                                    <div>
+                                                        <Button
+                                                            color="primary"
+                                                            round
+                                                            style={{ left: '66rem', top: '00rem' }}
+                                                            onClick={this.handleviewbillingclose}>
+                                                            &times;
+                                                        </Button>
+                                                    </div>
+
+                                                    <BillingDetails policynum={this.state.policynum}/>
+
+                                                </Card>
+                                            </GridItem>
+                                        </GridContainer>
+                                    </Modal>
+
                                     <Modal
                                         aria-labelledby="simple-modal-title"
                                         aria-describedby="simple-modal-description"
@@ -1417,6 +1530,7 @@ class LogonVehicle extends React.Component {
 
                                     <GridContainer justify="center">
                                         <Button round color="primary" onClick={() => this.handleaddVehicle()} ><AddCircle />Add Vehicle</Button>
+                                        {/*<Button round color="primary" onClick={() => this.handleopenbilling()}>View Billing Details</Button>*/}
                                     </GridContainer>
                                 </GridContainer>
                                 :
@@ -1430,14 +1544,14 @@ class LogonVehicle extends React.Component {
                                     open={this.state.openaddvehicle}
                                     onClose={this.handleCloseaddvehicle}>
                                     <GridContainer justify="center">
-                                        <GridItem xs={6}>
-                                            <Card>
+                                        <GridItem xs={10}>
+                                            <Card id="pop-card">
                                                 <div>
 
                                                     <Button
                                                         color="success"
                                                         round
-                                                        style={{ left: '37rem' }}
+                                                        style={{ left: '37rem', 'margin-left': '27rem', }}
                                                         onClick={this.handleCloseaddvehicle}>
                                                         &times;
                                                         </Button>
@@ -1469,6 +1583,18 @@ class LogonVehicle extends React.Component {
                                                         </GridItem>
                                                         <GridItem >
                                                             <CustomInput
+                                                                labelText="Vehicle Type"
+                                                                name="typevehicle"
+                                                                value={this.state.typevehicle}
+                                                                //onChange={(e) => this.onInputChange(e)}
+                                                                formControlProps={{
+                                                                    fullWidth: true
+                                                                }}
+                                                            />
+                                                        </GridItem>
+
+                                                        <GridItem >
+                                                            <CustomInput
                                                                 labelText="Year of Registration"
                                                                 name="YearofRegistration"
                                                                 value={this.state.RiskObj.YearofRegistration}
@@ -1496,11 +1622,87 @@ class LogonVehicle extends React.Component {
                                                             </GridItem> : null}
 
                                                     </GridContainer>*/}
+                                                    {this.state.showDropZone ? <GridContainer >
+                                                        <GridItem xs={3}>
+                                                            <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Front</h6>
+                                                            <div className="container">
+                                                                <div className="avatar-upload">
+                                                                    {/*<div className="avatar-edit">
+                                                    <input type='file' onChange={(e) => this.fileSelectedHandlerfront(e, 'front')} accept=".png, .jpg, .jpeg" />
+                                                    <label for="imageUpload"></label>
+                                                </div>*/}
+                                                                    <form action="/action_page.php">
+                                                                        <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'front')} />
+                                                                    </form>
+                                                                    <div className="avatar-preview">
+                                                                        <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.frontimage + ")" }} />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </GridItem>
+                                                        <GridItem xs={3}>
+                                                            <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Left</h6>
+                                                            <div className="container">
+                                                                <div className="avatar-upload">
+                                                                    {/*<div className="avatar-edit">
+                                                    <input type='file' onChange={(e) => this.fileSelectedHandlerfront(e, 'left')} accept=".png, .jpg, .jpeg" />
+                                                    <label for="imageUpload"></label>
+                                                </div>*/}
+                                                                    <form action="/action_page.php">
+                                                                        <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'left')} />
+                                                                    </form>
+                                                                    <div className="avatar-preview">
+                                                                        <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.leftimage + ")" }} />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </GridItem>
+                                                        <GridItem xs={3}>
+                                                            <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Back</h6>
+                                                            <div className="container">
+                                                                <div className="avatar-upload">
+                                                                    {/*<div className="avatar-edit">
+                                                    <input type='file' onChange={(e) => this.fileSelectedHandlerback(e, 'back')} accept=".png, .jpg, .jpeg" />
+                                                    <label for="imageUpload"></label>
+                                                </div>*/}
+                                                                    <form action="/action_page.php">
+                                                                        <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'back')} />
+                                                                    </form>
+                                                                    <div className="avatar-preview">
+                                                                        <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.backimage + ")" }} />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </GridItem>
+                                                        <GridItem xs={3}>
+                                                            <h6 style={{ top: '1.2rem', position: 'relative', left: '1.3rem' }}>Right</h6>
+                                                            <div className="container">
+                                                                <div className="avatar-upload">
+                                                                    {/*<div className="avatar-edit">
+                                                    <input type='file' onChange={(e) => this.fileSelectedHandlerright(e, 'right')} accept=".png, .jpg, .jpeg" />
+                                                    <label for="imageUpload"></label>
+                                                </div>*/}
+                                                                    <form action="/action_page.php">
+                                                                        <input type="file" name="myfile" onChange={(e) => this.fileSelectedHandlerfront(e, 'right')} />
+                                                                    </form>
+                                                                    <div className="avatar-preview">
+                                                                        <div id="imagePreview" style={{ backgroundImage: "url(" + this.state.rightimage + ")" }} />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </GridItem>
 
-                                                    <GridContainer justify="center">
+                                                    </GridContainer> : null}
+
+                                                    {this.state.showDropZone ? <GridContainer justify="center">
                                                         {this.renderRedirect()}
                                                         <Button color="primary" round onClick={this.FileUploadSubmit}> Upload </Button>
-                                                    </GridContainer>
+                                                    </GridContainer> : null}
+
+                                                    {this.state.showbtn ? <GridContainer justify="center">
+                                                        {this.renderRedirect()}
+                                                        <Button color="primary" round onClick={this.showOnClick}> Upload </Button>
+                                                    </GridContainer> : null}
                                                     <GridContainer justify="center">
                                                         {this.renderRedirect()}
                                                         <Button color="primary" round onClick={this.EndorsementPremium}> Calculate Premium </Button>
