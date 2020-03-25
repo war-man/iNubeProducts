@@ -48,7 +48,7 @@ namespace inube.Services.Notification.Controllers
 		
 		
         [HttpPost]
-        public async Task<IActionResult> SendNotificationAsync([FromBody]NotificationRequest request)
+        public async Task<IActionResult> SendNotificationAsync([FromBody]Models.NotificationRequest request)
         {
             TemplateController templateController = new TemplateController(_iDMSService, _host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
@@ -85,7 +85,7 @@ namespace inube.Services.Notification.Controllers
    
 
         [HttpPost]
-        public async Task<IActionResult> SendQuestionsNotificationAsync([FromBody]NotificationRequest request)
+        public async Task<IActionResult> SendQuestionsNotificationAsync([FromBody]Models.NotificationRequest request)
         {
             TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
@@ -118,7 +118,7 @@ namespace inube.Services.Notification.Controllers
 
         //Quotation
         [HttpPost]
-        public async Task<IActionResult> SendQuotationNotificationAsync([FromBody]NotificationRequest request)
+        public async Task<IActionResult> SendQuotationNotificationAsync([FromBody]Models.NotificationRequest request)
         {
             TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
@@ -152,7 +152,7 @@ namespace inube.Services.Notification.Controllers
 
         //ProductApi
         [HttpPost]
-        public async Task<IActionResult> SendProductApiKitNotificationAsync([FromBody]NotificationRequest request)
+        public async Task<IActionResult> SendProductApiKitNotificationAsync([FromBody]Models.NotificationRequest request)
         {
             TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
@@ -188,7 +188,7 @@ namespace inube.Services.Notification.Controllers
 
         //MultiCover
         [HttpPost]
-        public async Task<IActionResult> SendMultiCoverNotificationAsync([FromBody]NotificationRequest request)
+        public async Task<IActionResult> SendMultiCoverNotificationAsync([FromBody]Models.NotificationRequest request)
         {
             TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
@@ -241,7 +241,7 @@ namespace inube.Services.Notification.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> SendTemplateNotificationAsync([FromBody]NotificationRequest request)
+        public async Task<IActionResult> SendTemplateNotificationAsync([FromBody]Models.NotificationRequest request)
         {
             TemplateController templateController = new TemplateController(_iDMSService,_host, _emailService, _configuration, _viewEngine);
             templateController.ControllerContext = new ControllerContext(ControllerContext);
@@ -259,7 +259,7 @@ namespace inube.Services.Notification.Controllers
             return ServiceResponse(response);
         }
 
-        private void SendSMS(SMSRequest SMSDTO)
+        private void SendSMS(Models.SMSRequest SMSDTO)
         {
 
             SMSDTO.APIKey = "6nnnnyhH4ECKDFC5n59Keg";
@@ -277,7 +277,7 @@ namespace inube.Services.Notification.Controllers
             var client = new WebClient();
             var content = client.DownloadString(SMSAPI);
         }
-        private async Task<dynamic> GetNotificationModelAsync(NotificationRequest request, TemplateController templateController)
+        private async Task<dynamic> GetNotificationModelAsync(Models.NotificationRequest request, TemplateController templateController)
         {
             if (request.TemplateKey == "AptiQuestions")
             {
@@ -372,7 +372,7 @@ namespace inube.Services.Notification.Controllers
                 return null;
         }
 
-        private dynamic GetTemplateModel(NotificationRequest request,dynamic model)
+        private dynamic GetTemplateModel(Models.NotificationRequest request,dynamic model)
         {
             TemplateModel templateModel = new TemplateModel();
             if (request.TemplateKey == "AptiQuestions")

@@ -5,6 +5,7 @@ using inube.Services.Notification.Controllers.DMS.DMSService;
 using inube.Services.Notification.Controllers.RDLC.RdlcService;
 using inube.Services.Notification.Models;
 using iNube.Services.Notification.Helpers;
+using iNube.Utility.Framework.Extensions;
 using iNube.Utility.Framework.Filters.Attribute;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Notification;
@@ -35,78 +36,38 @@ namespace inube.Services.Notification
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
-            //var connectionstring = Configuration.GetConnectionString("PCConnection");
-            //services.AddDbContext<MICACMContext>(x => x.UseSqlServer(connectionstring));
-
-            // configure DI for application services
-            services.AddScoped<ILoggerManager, LoggerManager>();
-            services.AddTransient<IEmailService, EmailService>();
-            // services.AddScoped<IIntegrationService, IntegrationService>();
-            services.AddScoped<IReportsService, ReportsService>();
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                };
-            });
-
-            services.AddMvc(options =>
-            {
-                options.Filters.Add(new ValidateModelAttribute(new LoggerManager()));
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-            .AddFluentValidation(options =>
-            {
-                options.RegisterValidatorsFromAssemblyContaining<Startup>();
-            });
-
             services.Configure<DMSDatabaseSettings>(
-               Configuration.GetSection(nameof(DMSDatabaseSettings)));
-
+                Configuration.GetSection(nameof(DMSDatabaseSettings)));
             services.AddSingleton<IDMSDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<DMSDatabaseSettings>>().Value);
-            //services.AddSingleton<DMSService1>();
-            services.AddTransient<IDMSService, DMSService1>();
-            services.AddAutoMapper();
-            services.AddHealthChecks();
-            //services.AddHealthChecks().AddSqlServer(connectionstring);
+              sp.GetRequiredService<IOptions<DMSDatabaseSettings>>().Value);
 
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
-            // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Title = "Notification Module",
-                    Version = "v1"
-                });
-                c.AddFluentValidationRules();
-            });
+            //Module service
+            ConfigureModuleService(services);
+
+            //Common Service
+            services.InitializedCommonServices(Configuration);
+
+            services.AddMvc()
+           .AddFluentValidation(options =>
+           {
+               options.RegisterValidatorsFromAssemblyContaining<Startup>();
+           });
+
+
+            services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            // global cors policy
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials());
-
+            app.InitializedCommonConfiguration(env, Configuration);
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -116,44 +77,15 @@ namespace inube.Services.Notification
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            // HealthCheck middleware
-            app.UseHealthChecks("/hc", new HealthCheckOptions()
-            {
-                Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            });
-            //Application Looger
-            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            //loggerFactory.AddDebug();
-            //loggerFactory.AddContext(LogLevel.Information, Configuration.GetConnectionString("PCConnection"));
-            //loggerFactory.AddLog4Net();
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-            Mapper.Initialize(cfg =>
-            {
-                //  cfg.ConstructServicesUsing(ObjectFactory.GetInstance);
-
-            });
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Notification Module V1");
-            });
-            //app.ConfigureExceptionHandler(new LoggerManager());
             app.UseAuthentication();
             app.UseHttpsRedirection();
-           
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
-            RotativaConfiguration.Setup(env);
+            app.UseMvc();
         }
-    }
+
+        private void ConfigureModuleService(IServiceCollection services)
+        {
+            services.AddScoped<IReportsService, ReportsService>();
+            services.AddTransient<IDMSService, DMSService1>();
+        }
+        }
 }
