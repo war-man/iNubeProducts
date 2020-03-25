@@ -1,4 +1,5 @@
 import config from '../../config';
+let ProductType = config.product;
 
 //UserConfigUrl = 'https://inubeservicesusermanagement.azurewebsites.net';
 //LoginUrl = 'https://inubeservicesusermanagement.azurewebsites.net';
