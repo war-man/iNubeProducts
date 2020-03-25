@@ -1587,7 +1587,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            BillingEventRequest EventRequet = new BillingEventRequest();
+            Models.BillingEventRequest EventRequet = new Models.BillingEventRequest();
             EventRequet.FromDate = (DateTime)invoiceRequest.InvoiceStartDate;
             EventRequet.ToDate = (DateTime)invoiceRequest.InvoiceEndDate;
             EventRequet.CustomerId = invoiceRequest.CustomerId;
@@ -1618,7 +1618,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //int EventMappingId = 2;
-            BillingEventRequest EventRequet = new BillingEventRequest();
+            Models.BillingEventRequest EventRequet = new Models.BillingEventRequest();
 
             EventRequet.FromDate = (DateTime)invoiceRequest.InvoiceStartDate;
             EventRequet.ToDate = (DateTime)invoiceRequest.InvoiceEndDate;
@@ -1677,7 +1677,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             int count = 0;
             // InvoiceModel invoiceModel = new InvoiceModel();
-            NotificationRequest notificationRequest = new NotificationRequest();
+            Models.NotificationRequest notificationRequest = new Models.NotificationRequest();
 
 
             var _contract = _context.TblContract.Where(a => a.ContractId == invoiceDto.ContractId).First();
@@ -1848,7 +1848,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
             try
             {
-                NotificationRequest request = new NotificationRequest();
+                Models.NotificationRequest request = new Models.NotificationRequest();
                 request.TemplateKey = "Invoice";
                 request.AttachPDF = true;
                 request.NotificationPayload = JsonConvert.SerializeObject(invoiceModel);

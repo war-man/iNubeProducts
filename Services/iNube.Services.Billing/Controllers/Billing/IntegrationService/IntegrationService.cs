@@ -15,14 +15,14 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
     public interface IIntegrationService
     {
 
-        Task<IEnumerable<BilingEventDataDTO>> GetProductBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext);
-        Task<IEnumerable<BilingEventDataDTO>> GetClaimBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext);
-        Task<IEnumerable<BilingEventDataDTO>> GetPolicyBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext);
-        Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext);
+        Task<IEnumerable<BilingEventDataDTO>> GetProductBilingDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext);
+        Task<IEnumerable<BilingEventDataDTO>> GetClaimBilingDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext);
+        Task<IEnumerable<BilingEventDataDTO>> GetPolicyBilingDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext);
+        Task<ResponseStatus> SendNotificationAsync(Models.NotificationRequest notificationRequest, ApiContext apiContext);
         Task<OrganizationResponse> SaveCustomerAsync(OrganizationDTO EventRequest, ApiContext apiContext);
-        Task<BillingEventResponseDTO> GetProductItemizedDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext);
-        Task<BillingEventResponseDTO> GetPolicyItemizedDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext);
-        Task<BillingEventResponseDTO> GetClaimItemizedDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext);
+        Task<BillingEventResponseDTO> GetProductItemizedDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext);
+        Task<BillingEventResponseDTO> GetPolicyItemizedDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext);
+        Task<BillingEventResponseDTO> GetClaimItemizedDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<UserNameById> GetUserNameById(string Id, ApiContext apiContext);
     }
@@ -62,52 +62,52 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
             return data;
         }
 
-        public async Task<IEnumerable<BilingEventDataDTO>> GetProductBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
+        public async Task<IEnumerable<BilingEventDataDTO>> GetProductBilingDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext)
         {
             var uri = ProductUrl + "/api/Product/BillingEventData";
 
-            return await PostListApiInvoke<BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
+            return await PostListApiInvoke<Models.BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
         }
 
-        public async Task<BillingEventResponseDTO> GetProductItemizedDetailsAsync(BillingEventRequest EventRequest,ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> GetProductItemizedDetailsAsync(Models.BillingEventRequest EventRequest,ApiContext apiContext)
         {
             var uri = ProductUrl + "/api/Product/BillingEventResponse";
 
-            return await PostApiInvoke<BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
+            return await PostApiInvoke<Models.BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
         }
 
-        public async Task<IEnumerable<BilingEventDataDTO>> GetPolicyBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
+        public async Task<IEnumerable<BilingEventDataDTO>> GetPolicyBilingDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext)
         {
             var uri = PolicyUrl + "/api/Policy/BillingEventData";
 
-            return await PostListApiInvoke<BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
+            return await PostListApiInvoke<Models.BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
         }
 
-        public async Task<BillingEventResponseDTO> GetPolicyItemizedDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> GetPolicyItemizedDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext)
         {
             var uri = PolicyUrl + "/api/Policy/BillingEventResponse";
 
-            return await PostApiInvoke<BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
+            return await PostApiInvoke<Models.BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
         }
 
-        public async Task<IEnumerable<BilingEventDataDTO>> GetClaimBilingDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
+        public async Task<IEnumerable<BilingEventDataDTO>> GetClaimBilingDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext)
         {
             var uri = ClaimUrl + "/api/ClaimManagement/BillingEventData";
 
-            return await PostListApiInvoke<BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
+            return await PostListApiInvoke<Models.BillingEventRequest, BilingEventDataDTO>(uri, apiContext, EventRequest);
         }
 
-        public async Task<BillingEventResponseDTO> GetClaimItemizedDetailsAsync(BillingEventRequest EventRequest, ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> GetClaimItemizedDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext)
         {
             var uri = ClaimUrl + "/api/ClaimManagement/BillingEventResponse";
 
-            return await PostApiInvoke<BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
+            return await PostApiInvoke<Models.BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
         }
 
-        public async Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext)
+        public async Task<ResponseStatus> SendNotificationAsync(Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
-            return await PostApiInvoke<NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
+            return await PostApiInvoke<Models.NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
         }
 
 
