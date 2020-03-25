@@ -1137,13 +1137,13 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             try
             {
 
-                NotificationRequest request = new NotificationRequest();
+                Partners.Models.NotificationRequest request = new Partners.Models.NotificationRequest();
                 request.TemplateKey = "ProductApi";
                 request.AttachPDF = true;
                 request.NotificationPayload = JsonConvert.SerializeObject(productKitModel);
                 request.SendEmail = true;
                 request.SendSms = true;
-                request.smsRequest = new SMSRequest()
+                request.smsRequest = new Partners.Models.SMSRequest()
                 {
                     RecipientNumber = MobileNumber,
                     SMSMessage = $"Product {productKitModel.PName} is assigned successfully. For Policy Creation : http://bit.ly/2Y9eAZV and Claims Intimation: http://bit.ly/33EQvLz use respective link.",

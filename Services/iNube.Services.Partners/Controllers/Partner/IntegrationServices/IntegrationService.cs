@@ -20,7 +20,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         //Transaction Mapping
         Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext);
         Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext);
-        Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext);
+        Task<ResponseStatus> SendNotificationAsync(Partners.Models.NotificationRequest notificationRequest, ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal productId, ApiContext apiContext);
         Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext);
@@ -88,10 +88,10 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return productList;
         }
 
-        public async Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext)
+        public async Task<ResponseStatus> SendNotificationAsync(Partners.Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
-            return await PostApiInvoke<NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
+            return await PostApiInvoke<Partners.Models.NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
         }
         public async Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal productId, ApiContext apiContext)
         {

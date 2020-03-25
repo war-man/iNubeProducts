@@ -58,11 +58,27 @@ namespace iNube.Services.Partners
             services.AddAutoMapper(typeof(Startup));
         }
 
-        public void Configure(IApplicationBuilder app,IHostingEnvironment env)
-        {
-            app.InitializedCommonConfiguration(env, Configuration);
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
+        {
+
+            app.InitializedCommonConfiguration(env, Configuration);
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
             app.UseAuthentication();
+            app.UseHttpsRedirection();
+
+            app.UseMvc();
+
         }
 
         public void ConfigureModuleService(IServiceCollection services)
