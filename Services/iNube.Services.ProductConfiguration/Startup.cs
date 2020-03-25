@@ -28,7 +28,7 @@ namespace iNube.Services.ProductConfiguration
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            Configuration = configuration;   
         }
 
         public IConfiguration Configuration { get; }
