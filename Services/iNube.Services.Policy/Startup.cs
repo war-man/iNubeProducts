@@ -78,7 +78,16 @@ namespace iNube.Services.Policy
             app.InitializedCommonConfiguration(env, Configuration);
             // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
-            app.UseAuthentication();
+            if (env.IsDevelopment())
+            {
+               app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+           app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
         }
