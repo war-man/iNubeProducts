@@ -27,8 +27,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<ProductDTO> GetProductById(int ProductId, ApiContext apiContext);
         Task<IEnumerable<ddDTOs>> GetMaster(string sMasterList, ApiContext apiContext);
         Task<IEnumerable<decimal>> GetPolicyByDetails(PolicySearchbyPidDTO claimDashBoard, ApiContext apiContext);
-        Task<BillingEventResponseDTO> PolicyData(BillingEventRequest pDTO, ApiContext apiContext);
-        Task<IEnumerable<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequet, ApiContext apiContext);
+        Task<BillingEventResponseDTO> PolicyData(Models.BillingEventRequest pDTO, ApiContext apiContext);
+        Task<IEnumerable<PolicyDataForClaims>> GetPolicyForClaimsInvoice(Models.BillingEventRequest EventRequet, ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<String> GetEnvironmentConnectionforDoc(string product, decimal EnvId);
         Task<ProductDTO> GetProductNameAsync(decimal productId, ApiContext apiContext);
@@ -341,16 +341,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
 
         }
 
-        public async Task<BillingEventResponseDTO> PolicyData(BillingEventRequest pDTO, ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> PolicyData(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             var uri = PolicyUrl + "/api/Policy/BillingEventResponse";
             return await GetApiInvoke<BillingEventResponseDTO>(uri, apiContext);
         }
 
-        public async Task<IEnumerable<PolicyDataForClaims>> GetPolicyForClaimsInvoice(BillingEventRequest EventRequet, ApiContext apiContext)
+        public async Task<IEnumerable<PolicyDataForClaims>> GetPolicyForClaimsInvoice(Models.BillingEventRequest EventRequet, ApiContext apiContext)
         {
             var uri = PolicyUrl + "/api/Policy/GetPolicyForClaimsInvoice";
-            return await PostListApiInvoke<BillingEventRequest, PolicyDataForClaims>(uri, apiContext, EventRequet);
+            return await PostListApiInvoke<Models.BillingEventRequest, PolicyDataForClaims>(uri, apiContext, EventRequet);
         }
     }
 }

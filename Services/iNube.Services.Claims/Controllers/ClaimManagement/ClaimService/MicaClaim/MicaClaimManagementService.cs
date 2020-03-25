@@ -1792,7 +1792,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             return imagebytes;
         }
 
-        public async Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest cDTO, ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest cDTO, ApiContext apiContext)
         {
             try
             {
@@ -1817,7 +1817,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                                              CreatedDate = tblClaims.CreatedDate
 
                                          });
-                    List<BillingEventDataDTO> BillingResult = new List<BillingEventDataDTO>();
+                    List<Models.BillingEventDataDTO> BillingResult = new List<Models.BillingEventDataDTO>();
                     BillingData.claimEventDTOs.AddRange(Billingresult);
                 }
                 BillingData.billingEventDataDTOs = (await BillingEventData(cDTO, apiContext)).ToList();
@@ -1830,12 +1830,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
         }
 
-        public async Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest cDTO, ApiContext apiContext)
+        public async Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest cDTO, ApiContext apiContext)
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, cDTO.EvtId.ToString(), _configuration));
 
-            List<BillingEventDataDTO> Claimlist = new List<BillingEventDataDTO>();
-            BillingEventDataDTO ClaimEvent = new BillingEventDataDTO();
+            List<Models.BillingEventDataDTO> Claimlist = new List<Models.BillingEventDataDTO>();
+            Models.BillingEventDataDTO ClaimEvent = new Models.BillingEventDataDTO();
 
             if (cDTO.FromDate != null && cDTO.ToDate != null)
             {

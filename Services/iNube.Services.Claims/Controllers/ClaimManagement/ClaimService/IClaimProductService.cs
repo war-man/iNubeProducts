@@ -18,7 +18,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         //Task<ClaimDTO> SendRequestAsync(ApiContext apiContext);
         Task<ClaimDTOGWP> GetClaimGWP(ClaimDTOGWP claimgwp, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetMaster(string sMasterlist, ApiContext apiContext);
-        Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext);
+        Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext);
         Task<ClaimProcessDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext);
         Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext);
         Task<ClaimSearchResponseDTO> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext);
@@ -36,7 +36,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<List<ClaimResponseDTO>> ClaimsReport(ClaimsRequest claimsRequest, ApiContext apiContext);
         Task<BankDocumentDTO> GetDocumentId(string filename, ApiContext apiContext);
         //Task<BillingEventResponseDTO> BillingEventResponseAsync(BillingEventRequest cDTO, ApiContext apiContext);
-        Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest cDTO, ApiContext apiContext);
+        Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest cDTO, ApiContext apiContext);
         Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext);

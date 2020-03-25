@@ -17,7 +17,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.IntegrationServices
 
         Task<IEnumerable<LeadDTO>> GetProspectInfo(int ContactId);
         Task<LeadDTO> SaveProspect(LeadDTO leadDTO);
-        Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext);
+        Task<ResponseStatus> SendNotificationAsync(Lead.Models.NotificationRequest notificationRequest, ApiContext apiContext);
         Task<AVOProductDTO> GetAVOProduct(int productid);
         Task<LifeQuoteDTO> GetQuotePremium(LifeQuoteDTO objQuote);
     }
@@ -62,12 +62,12 @@ namespace iNube.Services.Quotation.Controllers.Quotation.IntegrationServices
 
 
         
-        public async Task<ResponseStatus> SendNotificationAsync(NotificationRequest notificationRequest, ApiContext apiContext)
+        public async Task<ResponseStatus> SendNotificationAsync(Lead.Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             //local-http://localhost:53000
             notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
             var uri = notificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
-            return await PostApiInvoke<NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
+            return await PostApiInvoke<Lead.Models.NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
         }
 
 

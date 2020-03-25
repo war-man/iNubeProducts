@@ -117,7 +117,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
         public async Task<QuotationModel> QuotationPdfGeneration(QuotePoolDTO quotePoolDTO, ApiContext apiContext)
         {
             int count = 0;
-            NotificationRequest notificationRequest = new NotificationRequest();
+            Lead.Models.NotificationRequest notificationRequest = new Lead.Models.NotificationRequest();
             QuotationModel QuoteData = new QuotationModel();
             QuoteData.ProposerName = quotePoolDTO.ProposerName;
             QuoteData.QuotationNo = quotePoolDTO.QuoteNo;
@@ -141,7 +141,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
             try
             {
 
-                NotificationRequest request = new NotificationRequest();
+                Lead.Models.NotificationRequest request = new Lead.Models.NotificationRequest();
                 request.TemplateKey = "QuotationPdf";
                 request.AttachPDF = true;
                 request.NotificationPayload = JsonConvert.SerializeObject(QuoteData);

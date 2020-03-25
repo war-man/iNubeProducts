@@ -12,6 +12,7 @@ using iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices;
 using iNube.Services.Claims.Controllers.ClaimManagement.ClaimService;
 using System;
 using iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaProduct;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.Claims
 {
@@ -55,10 +56,21 @@ namespace iNube.Services.Claims
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager());
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
             app.UseAuthentication();
+            app.UseHttpsRedirection();
+            app.UseMvc();
         }
-
         private void ConfigureModuleService(IServiceCollection services)
         {
             services.AddMvc().AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);

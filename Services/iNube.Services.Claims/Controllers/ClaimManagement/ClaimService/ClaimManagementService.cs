@@ -26,7 +26,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<List<FinanceProcessDTO>> GetPaymentFinanceDataAsync(SearchFinanceRequest financeRequest, ApiContext apiContext);
         Task<ClaimProcessDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext);
         Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext);
-        Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext);
+        Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext);
         Task<ClaimSearchResponseDTO> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext);
         Task<List<object>> ClaimDetails(decimal ClaimId, ApiContext apiContext);
         Task<List<object>> PaymentDetails(decimal ClaimId, ApiContext apiContext);
@@ -39,7 +39,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         Task<List<object>> GetClaimsByProductPartner(PolicySearchbyPidDTO claimDash, ApiContext apiContext);
         Task<List<ClaimResponseDTO>> ClaimsReport(ClaimsRequest claimsRequest, ApiContext apiContext);
         Task<BankDocumentDTO> GetDocumentId(string filename, ApiContext apiContext);
-        Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest cDTO, ApiContext apiContext);
+        Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest cDTO, ApiContext apiContext);
         Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<decimal> GetBalanceSumInsured(string policyNo, ApiContext apiContext);
@@ -139,7 +139,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             return await _productService(apiContext.ProductType).GetMaster(sMasterlist, apiContext);
         }
 
-        public async Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext)
+        public async Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).BillingEventData(pDTO, apiContext);
         }
@@ -179,12 +179,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             return await _productService(apiContext.ProductType).PaymentDetailsAsync(ClaimId, apiContext);
         }
 
-        //public Task<BillingEventResponseDTO> BillingEventResponseAsync(BillingEventRequest cDTO, ApiContext apiContext)
+        //public Task<BillingEventResponseDTO> BillingEventResponseAsync(Models.BillingEventRequest cDTO, ApiContext apiContext)
         //{
         //    return _productService(apiContext.ProductType).BillingEventResponseAsync(cDTO, apiContext);
         //}
 
-        public async Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest cDTO, ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest cDTO, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).BillingEventResponse(cDTO, apiContext);
         }

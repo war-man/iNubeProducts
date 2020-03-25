@@ -57,11 +57,6 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<ClaimDTO> SendRequestAsync(ApiContext apiContext)
         {
             throw new NotImplementedException();
@@ -146,12 +141,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
         {
             throw new NotImplementedException();
         }
-
-        public async Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest cDTO, ApiContext apiContext)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy, ApiContext apiContext)
         {
             throw new NotImplementedException();
@@ -187,6 +177,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
         public Task<BankAccountsDTO> SearchClaimBankDetails(int claimid, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest cDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
