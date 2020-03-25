@@ -87,7 +87,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             var productList = await PostApiInvoke<UserDTO, UserResponse>(uri, apiContext, userDTO);
             return productList;
         }
-
+         
         public async Task<ResponseStatus> SendNotificationAsync(Partners.Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendTemplateNotificationAsync";

@@ -1135,8 +1135,8 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         private async Task SendNotificationAsync(ProductApiModel productKitModel,string MobileNumber, ApiContext apiContext)
         {
             try
-            {
-
+            { 
+                 
                 Partners.Models.NotificationRequest request = new Partners.Models.NotificationRequest();
                 request.TemplateKey = "ProductApi";
                 request.AttachPDF = true;

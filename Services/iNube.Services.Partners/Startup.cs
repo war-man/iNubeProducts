@@ -66,7 +66,7 @@ namespace iNube.Services.Partners
             // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
             if (env.IsDevelopment())
-            {
+            { 
                 app.UseDeveloperExceptionPage();
             }
             else

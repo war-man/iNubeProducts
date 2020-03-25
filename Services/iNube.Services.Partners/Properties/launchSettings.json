@@ -16,7 +16,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
+    }, 
     "iNube.Services.Partners": {
       "commandName": "Project",
       "launchBrowser": true,
