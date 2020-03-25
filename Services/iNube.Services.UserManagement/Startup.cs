@@ -22,6 +22,7 @@ using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Models;
 using iNube.Services.UserManagement.Validations;
 using iNube.Utility.Framework.Extensions;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -88,8 +89,20 @@ namespace iNube.Services.UserManagement
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager());
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
             app.UseAuthentication();
+            app.UseHttpsRedirection();
+            app.UseMvc();
         }
 
         private void ConfigureModuleService(IServiceCollection services)
