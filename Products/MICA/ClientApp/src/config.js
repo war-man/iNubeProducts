@@ -16,6 +16,7 @@ let rateConfigUrl = 'http://localhost:58593';
 let RDLCConfigUrl = 'https://localhost:49776';
 let ReinsuranceConfigUrl = 'http://localhost:5000';
 let Baseurl = 'https://egiswitchapi.edelweisscustomeruat.com';
+let ReportConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
 
 if (env === "Local") {
     partnerconfigUrl = 'https://localhost:44315';
@@ -59,7 +60,7 @@ if (env === "Production") {
     claimConfigUrl = 'https://localhost:44344';
     dynamicPagesConfigUrl = 'http://localhost:52166';
     rateConfigUrl = 'http://localhost:58593';
-
+    
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
     ReinsuranceConfigUrl = 'https://inubeservicesreinsurance.azurewebsites.net';
 }
