@@ -3,6 +3,7 @@ using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Integra
 using iNube.Services.Rating.Entities;
 using iNube.Services.Rating.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -73,10 +74,10 @@ namespace iNube.Services.Accounting.Helpers
             return dbConnectionString;
         }
 
-        public static async Task<DbContext> GetContextAsync(string product, string connectionKey)
+        public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
             DbContext context = null;
-            DbHelper dbHelper = new DbHelper(new IntegrationService());
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
 

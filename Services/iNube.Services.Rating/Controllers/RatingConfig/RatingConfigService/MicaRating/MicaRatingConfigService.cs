@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Data;
 using Newtonsoft.Json.Linq;
 using System.Dynamic;
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.MicaRating
 {
@@ -27,11 +28,13 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
         private readonly Func<string, IRatingConfigService> _ratingService;
+        private IConfiguration _configuration;
 
-        public MicaRatingConfigService(Func<string, IRatingConfigService> ratingService, IMapper mapper, MICARTContext context,
+        public MicaRatingConfigService(Func<string, IRatingConfigService> ratingService, IMapper mapper, MICARTContext context, IConfiguration configuration,
             IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
+            _configuration = configuration;
             _appSettings = appSettings.Value;
             _context = context;
             _ratingService = ratingService;
@@ -41,7 +44,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         //Creation of RatingParameters
         public async Task<RatingParameterResponce> CreateRatingParameter(RatingParametersDTO ratingParaDto, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var dto = _mapper.Map<TblRatingParameters>(ratingParaDto);
@@ -59,7 +62,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         //Creation of ParamSetDetails
         public async Task<ParamSetResponce> CreateParamSet(ParameterSetDTO paramSetDto, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var dto = _mapper.Map<TblParameterSet>(paramSetDto);
@@ -77,7 +80,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<RatingRulesResponse> CreateRatingRules(RatingDTO ratingDto, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             
             if (ratingDto.RateObj != "")
@@ -213,7 +216,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<CalConfigResponse> CreateCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var dto = _mapper.Map<TblCalculationConfig>(calConfigDto);
@@ -230,7 +233,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         }
         public async Task<EllConfigResponse> CreateIllustrationRules(IllustrationConfigDTO ellConfigDto, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var dto = _mapper.Map<TblIllustrationConfig>(ellConfigDto);
@@ -249,7 +252,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<RatingDTO>> GetRules(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var param_list = _context.TblRating.ToList();
@@ -270,7 +273,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         }
         public async Task<IEnumerable<RatingParametersDTO>> GetParameterName(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var param_list = _context.TblRatingParameters.ToList();
@@ -294,7 +297,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<RuleConditionsDetailsDTO>> GetRateConditions(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var ruleConditionList = from tblRules in _context.TblRating
                                     join tblConditions in _context.TblRatingRuleConditions on tblRules.RatingId equals tblConditions.RatingRuleId
                                     join tblRatingRules in _context.TblRatingRules on tblRules.RatingId equals tblRatingRules.RatingId
@@ -320,7 +323,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         public async Task<ResponseStatus> CheckRuleSets(String RuleId, dynamic dictionary_rule, ApiContext apiContext)
         {
             ResponseStatus response = new ResponseStatus();
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             string[] words = RuleId.Split(',');
             var main_rule = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
                              join tblratingcondition in _context.TblRatingRules on tblrate.RatingId equals tblratingcondition.RatingId
@@ -363,7 +366,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                        }).ToList().FirstOrDefault();
 
                     var RatingRuleId = (int)single_Rule.rule_id;
-                    string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+                    string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                    //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
                         string queryForCol = "select Rate from [RT].[tblRating] where RatingID =" + RatingRuleId;
@@ -487,7 +491,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                         try
                         {
                             var RatingRuleId = (int)rule.rule_id;
-                            string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+                            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                            //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
                             using (SqlConnection connection = new SqlConnection(connectionString))
                             {
                                 string queryForCol = "DECLARE @columns NVARCHAR(MAX) = '' ,@sql NVARCHAR(MAX) = '';SELECT @columns+=QUOTENAME(RatingParameters) + ',' from (Select t1.RatingID,t1.RateObj,t1.RateName,t4.Rate, t3.ParameterName+(case when t2.ConditionValueFrom is Not Null Then 'From' when t2.ConditionValueTo is Not Null then 'To' End) as  RatingParameters , IsNull(t2.ConditionValueFrom,t2.ConditionValueTo) as Value From [RT].[tblRating] t1  inner join [RT].[tblRatingRules] t4 on t1.RatingID = t4.RatingID inner join [RT].[tblRatingRuleConditions] t2 on t2.RatingRuleID = t4.RatingRuleID join [RT].[tblRatingParameters] t3 on  t3.ParametersID = t2.RatingParameters) as B where B.RatingID = " + RatingRuleId + " group by B.RatingParameters SET @columns = LEFT(@columns, LEN(@columns) - 1); set @sql = 'select Rate from ( select B.RatingID,B.RateObj,B.RateName,B.Rate,B.RatingParameters,B.Value from (Select t1.RatingID,t1.RateObj,t1.RateName,t4.Rate, t3.ParameterName+(case when t2.ConditionValueFrom is Not Null Then ''From'' when t2.ConditionValueTo is Not Null then ''To'' End) as  RatingParameters , IsNull(t2.ConditionValueFrom,t2.ConditionValueTo) as Value From [RT].[tblRating] t1 inner join [RT].[tblRatingRules] t4 on t1.RatingID = t4.RatingID inner join [RT].[tblRatingRuleConditions] t2 on t2.RatingRuleID = t4.RatingRuleID join [RT].[tblRatingParameters] t3 on  t3.ParametersID = t2.RatingParameters) as B ) t PIVOT (max(Value) for RatingParameters in ('+ @columns +')) as pvt where RatingID =''" + RatingRuleId + "'' and " + condition + "' EXECUTE sp_executesql @sql;";
@@ -521,7 +526,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             ResponseStatus errorResponse = new ResponseStatus();
             ResponseStatus response = new ResponseStatus();
             ResponseStatus rateresponse = new ResponseStatus();
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId)).OrderBy(it =>it.Steps);
             //For ODSI RUles
             var CalculationConigParam = _context.TblCalculationConfigParam.Where(item => item.Type == "Rate" && item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId));
@@ -692,7 +697,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         //Illustration Execution 
         public async Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //Fetching Value from dynamic IllustrationParam that is available for that ID
             var illustrationDetails = from tblIllConfig in _context.TblIllustrationConfigParam.Where(i => i.Type == "Param" && i.IllustrationConfigId == Convert.ToDecimal(IllustrationConfigId))
                                       select new
@@ -808,7 +813,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         //RateRule
         public async Task<IEnumerable<GetParamSetDetailDTO>> GetRateRule(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var Rate_list = (from tblParameter in _context.TblParameterSet
                              join tblParamSet in _context.TblParameterSetDetails on tblParameter.ParameterSetId equals tblParamSet.ParameterSetId
                              join tblRatingParam in _context.TblRatingParameters on tblParamSet.ParametersId equals tblRatingParam.ParametersId
@@ -888,7 +893,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         }
         public async Task<IEnumerable<CalculationConfigDTO>> GetCalculationConfig(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblCalConfig = _context.TblCalculationConfig.OrderBy(item => item.CreatedDate).Include(add => add.TblCalculationConfigExpression).Include(add => add.TblCalculationConfigParam);
             var coaDTO = _mapper.Map<IList<CalculationConfigDTO>>(tblCalConfig);
@@ -896,7 +901,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         }
         public async Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblCalConfig = _context.TblIllustrationConfig.OrderBy(item => item.CreatedDate);
             var coaDTO = _mapper.Map<IList<IllustrationConfigDTO>>(tblCalConfig);
@@ -906,7 +911,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<CalculationConfigParamDTO>> GetCalculationParam(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblCalConfig = _context.TblCalculationConfigParam.OrderBy(item => item.CreatedDate);
             var calDTO = _mapper.Map<IList<CalculationConfigParamDTO>>(tblCalConfig);
@@ -915,7 +920,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<object> CalculationDisplaySearch(CalculationDisplayDTO calculationDisplay, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var data = from tblheader in _context.TblCalculationHeader
                        join tblresult in _context.TblCalculationResult on tblheader.CalculationHeaderId equals tblresult.CalculationHeaderId
@@ -925,7 +930,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         }
         public async Task<HandleEvent> GetHandleEvents(String EventId, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             HandleEvent objEvent = new HandleEvent();
             var ruleConditionList = from tblRules in _context.TblRating
                                     join tblRatingRules in _context.TblRatingRules on tblRules.RatingId equals tblRatingRules.RatingId
@@ -989,7 +994,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         //HandleEvent for Illustration Config
         public async Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var illustrationList = from tblIllConfigParam in _context.TblIllustrationConfigParam.Where(i => i.IllustrationConfigId == Convert.ToDecimal(EventIllutrationId) && i.Type == "Param")
                                    select new HandleEventIllustration
                                    {
@@ -1004,7 +1009,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<ddDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> objEvent;
             //objEvent = from tblRules in _context.TblRating
             //                        join tblRatingRules in _context.TblRatingRules on tblRules.RatingId equals tblRatingRules.RatingId
@@ -1078,7 +1083,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<CalculationHeaderResponse> CreateCalculationHeader(CalculationHeaderDTO calculationHeader, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             try
             {
@@ -1096,7 +1101,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<CalculationResultResponse> CreateCalculationResult(CalculationResultDTO calculationResult, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             try
             {
@@ -1115,7 +1120,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<ParameterSetDataDTO>> GetParameterSet(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             try
             {
@@ -1137,7 +1142,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<RatingParametersDTO>> SearchRateParameters(ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var searchData = from t1 in _context.TblRatingParameters.OrderBy(a => a.CreatedDate)
                              select new RatingParametersDTO
                              {
@@ -1150,7 +1155,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<ddDTO>> GetRateConfigName(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> obj;
             obj = from pr in _context.TblCalculationConfig.OrderByDescending(p => p.CreatedDate)
                   select new ddDTO
@@ -1165,7 +1170,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<CalConfigExpression>> GetCalConfigExpressions(decimal CalculationConfigId,ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                 var calData = from t1 in _context.TblCalculationConfigExpression.OrderBy(i=>i.Steps)
@@ -1197,7 +1202,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<IEnumerable<CalConfigParam>> GetCalConfigParam(decimal CalculationConfigId, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var paramData = from t1 in _context.TblCalculationConfigParam.Where(x=>x.CalculationConfigId==CalculationConfigId)
                             select new CalConfigParam
@@ -1212,7 +1217,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
         public async Task<CalConfigResponse> EditCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext)
         {
-            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
                //checking Configurationi parameter weather exists or not 

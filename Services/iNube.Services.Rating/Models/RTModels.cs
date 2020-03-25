@@ -392,6 +392,13 @@ namespace iNube.Services.Rating.Models
         public string Year { get; set; }
         public string Duration { get; set; }
     }
-
+    public partial class AppSetting : IConnectingString
+    {
+        public string ConnectingString { get; set; }
+    }
+    public interface IConnectingString
+    {
+        string ConnectingString { get; set; }
+    }
 
 }

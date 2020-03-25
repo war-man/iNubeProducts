@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.IntegrationServices
 {
@@ -20,8 +21,16 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
         //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        readonly string UsermanangementUrl = "http://elwei-publi-1sxquhk82c0h4-688030859.ap-south-1.elb.amazonaws.com:9009";
+        //readonly string UsermanangementUrl = "http://elwei-publi-1sxquhk82c0h4-688030859.ap-south-1.elb.amazonaws.com:9009";
+        
+        private IConfiguration _configuration;
+        readonly string  UsermanangementUrl;
 
+        public IntegrationService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            UsermanangementUrl = _configuration["Integration_Url:User:UserUrl"];
+        }
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
             var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
