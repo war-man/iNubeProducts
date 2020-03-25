@@ -234,7 +234,7 @@ class Logon extends React.Component {
         }).then(response => response.json())
             .then(data => {
                 console.log('response: ', data);
-                this.setState({ policyNo: data.PolicyNumber, redirect: true });
+                this.setState({ policyNo: data.proposalPolicyDetail.PolicyNumber, redirect: true });
             });
     }
 

@@ -75,6 +75,7 @@ class Dashboard extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            noclaim: 0,
             schedule: {
                 vehicleRegistrationNo: "",
                 policyNo: "",
@@ -161,7 +162,7 @@ class Dashboard extends React.Component {
                                 headers: {
                                     'Accept': 'application/json',
                                     'Content-Type': 'application/json',
-                                    'Authorization': localStorage.getItem('edelweisstoken')
+                                    'Authorization': 'Bearer ' + localStorage.getItem('Token')
                                 },
                                 body: JSON.stringify(object)
                             }).then(response => response.json())
@@ -214,29 +215,34 @@ class Dashboard extends React.Component {
     }
 
     handleSubmit = () => {
-        console.log("schedular: ", this.state.schedule);
+        let schedule = this.state.schedule;
+        schedule.policyNo = this.props.policynumber;
+        schedule.vehicleRegistrationNo = this.props.vehicleno;
+        schedule.vehicleType = this.props.vehiclestype;
+        this.setState({ schedule })
+        console.log("schedular: ", schedule);
         fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/CreateUpdateSchedule`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
-            body: JSON.stringify(this.state.schedule)
+            body: JSON.stringify(schedule)
         }).then(response => response.json())
             .then((data) => {
                 console.log("response ", data);
 
-                if (data.status == 1) {
+                if (data.status == 3) {
                     swal({
-                        text: "Schedule updated  successfully!",
+                        text: data.responseMessage,
                         icon: "success"
                     })
                     this.props.handleviewClose();
                 }
                 else {
                     swal({
-                        text: data.responseMessage,
+                        text: "Cannot Update Schedule",
                         icon: "error"
                     })
                 }
@@ -264,18 +270,20 @@ class Dashboard extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
         }).then(response => response.json())
             .then(data => {
                 console.log('response: ', data);
+                this.setState({ schedule: data.getSchedule });
                 if (data.status == 4) {
                     this.setState({ hidepage: true });
                 }
                 else {
                     this.setState({ hidepage: false });
                 }
-                this.setState({ schedule: data.getSchedule });
+                
+                console.log("schedule time", this.state.schedule)
             });
 
     }
@@ -291,7 +299,7 @@ class Dashboard extends React.Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('edelweisstoken')
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
             body: JSON.stringify(this.state.createschedule)
         }).then(response => response.json())
@@ -335,10 +343,10 @@ class Dashboard extends React.Component {
                             <Divider style={{ width: '38rem', height: '0.2rem', }} />
                         </GridContainer>
                         <GridContainer justify="center">
-                            <h4>1 claim on this vehicle</h4>
+                            <h4>{this.state.noclaim} claim on this vehicle</h4>
                         </GridContainer>
                         <GridContainer justify="center">
-                            <h4>SI balance: {this.props.suminsured}</h4>
+                            <h4>SI balance: {this.props.bsi}</h4>
                         </GridContainer>
                         <GridContainer justify="center">
                             <Divider style={{ width: '38rem', height: '0.2rem', }} />

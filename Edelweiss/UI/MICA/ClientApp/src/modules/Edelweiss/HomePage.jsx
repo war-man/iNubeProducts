@@ -80,6 +80,8 @@ class HomePage extends React.Component {
         super(props)
 
         this.state = {
+            numofpc: "",
+            numoftw:"",
             errormessage:false,
             ageState:"",
             makeModel:"",
@@ -175,10 +177,6 @@ class HomePage extends React.Component {
         console.log("porpsdat", props)
         const edelweisstoken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
         localStorage.setItem('edelweisstoken', edelweisstoken);
-
-
-        //fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleMaster?isFilter=true `, {
-     //fetch(`http://edelw-publi-10uqrh34garg4-1391995876.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetVehicleMaster?isFilter=true`, {
         fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetVehicleMaster?lMasterlist=asdfgh&isFilter=true`, {
 
             method: 'get',
@@ -195,8 +193,7 @@ class HomePage extends React.Component {
             });
         console.log("data", this.state.masterList);
 
-       // fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/GetCityMaster?lMasterlist=rtyu&isFilter=true`, {
-        fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetCityMaster?lMasterlist=rtyu&isFilter=true`, {
+        fetch(`${EdelweissConfig.micaEdelweissConfig}/api/Mica_EGI/GetCityMaster?lMasterlist=rtyu&isFilter=true`, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -218,7 +215,7 @@ class HomePage extends React.Component {
 
         if (name=="city") {
             let searchKey = event.target.value + event.key;
-            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/SmartCityMaster?searchString=` + searchKey, {
+            fetch(`${EdelweissConfig.micaEdelweissConfig}/api/Mica_EGI/SmartCityMaster?searchString=` + searchKey, {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',
@@ -246,8 +243,7 @@ class HomePage extends React.Component {
                let makemodel = this.state.masterList.filter(x => x.mID == values.mID)[0].mValue;
                this.setState({ vehicleType: vehicletype, makeModel: makemodel })
                console.log("this.state.vehicleType", this.state.vehicleType, this.state.makeModel);
-
-            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetSIFromMakeModel?VehicleId=` + values.mID, {
+            fetch(`${EdelweissConfig.micaEdelweissConfig}/api/Mica_EGI/GetSIFromMakeModel?VehicleId=` + values.mID, {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',
@@ -279,7 +275,16 @@ class HomePage extends React.Component {
         console.log("tags: ", quotation)
         if (values != null) {
             debugger;
-            fetch(`http://mica-publi-11qa3l637dqw3-293834673.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/GetStateCode?CityName=` + values.cityName, {
+            if (values.mType == "PC") {
+                this.state.numofpc = 1;
+                this.state.numoftw = 0;
+            }
+            else if (values.mType == "TW") {
+                this.state.numoftw = 1;
+                this.state.numofpc = 0;
+            }
+            console.log("nopcnotw", this.state.numoftw, this.state.numofpc);
+            fetch(`${EdelweissConfig.micaEdelweissConfig}/api/Mica_EGI/GetStateCode?CityName=` + values.cityName, {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',
@@ -307,53 +312,65 @@ class HomePage extends React.Component {
         if (this.state.redirect === true) {
             return <Redirect to={{
                 pathname: '/pages/DriverPage',
-                state: { quotationDTO: this.state.quotationDTO, stateCode: this.state.stateCode, vehicleType: this.state.vehicleType, makeModel: this.state.makeModel }
+                state: { quotationDTO: this.state.quotationDTO, stateCode: this.state.stateCode, vehicleType: this.state.vehicleType, makeModel: this.state.makeModel, numofpc: this.state.numofpc, numoftw: this.state.numoftw }
             }} />
-        }
+        } 
     }
 
     quickbuyRedirect = () => {
+
+        debugger;
         console.log("quotationDTO", this.state.quotationDTO);
         this.renderRedirect();
-        if (this.state.quotationDTO.age < 18) {
-           swal({
-                text: "Driver age cannot be less than 18 years",
-                icon: "error",
-                buttons: [false, "OK"],
-           }).then((willDelete) => {
-               if (willDelete) {
-                   this.handlecheck();
-               }
-           });
+      
+        
+        //if (this.state.quotationDTO.age < 18) {
+        //   swal({
+        //        text: "Driver age cannot be less than 18 years",
+        //        icon: "error",
+        //        buttons: [false, "OK"],
+        //   }).then((willDelete) => {
+        //       if (willDelete) {
+        //           this.handlecheck();
+        //       }
+        //   });
+        //    this.setState({ redirect: false })
+        //} else if (this.state.quotationDTO.age>75) {
+        //    swal({
+        //        text: "Driver age cannot be greater than 75 years",
+        //        icon: "error",
+        //        buttons: [false, "OK"],
+        //    }).then((willDelete) => {
+        //        if (willDelete) {
+        //            this.handlecheck();
+        //        }
+        //    });
+        //    this.setState({ redirect: false })
+        //}
+        //else if (this.state.quotationDTO.experience<1) {
+        //    swal({
+        //        text: "Driver experience cannot be less than 1 year",
+        //        icon: "error",
+        //    })
+        //}
+        //else if (this.state.quotationDTO.experience > (this.state.quotationDTO.age - 1)) {
+        //    swal({
+        //        text: "Driver experience cannot be more than " + (this.state.quotationDTO.age-1),
+        //        icon: "error",
+        //        buttons: [false, "OK"],
+        //    })
+        //}
+        if (this.state.quotationDTO.vehicleMakeModelId == null || this.state.quotationDTO.city == null || this.state.quotationDTO.vehicleAge == "") {
             this.setState({ redirect: false })
-        } else if (this.state.quotationDTO.age>75) {
             swal({
-                text: "Driver age cannot be greater than 75 years",
+                text: "Please enter all the details",
                 icon: "error",
-                buttons: [false, "OK"],
-            }).then((willDelete) => {
-                if (willDelete) {
-                    this.handlecheck();
-                }
-            });
-            this.setState({ redirect: false })
-        }
-        else if (this.state.quotationDTO.experience<1) {
-            swal({
-                text: "Driver experience cannot be less than 1 year",
-                icon: "error",
-            })
-        }
-        else if (this.state.quotationDTO.experience > (this.state.quotationDTO.age - 1)) {
-            swal({
-                text: "Driver experience cannot be more than " + (this.state.quotationDTO.age-1),
-                icon: "error",
-                buttons: [false, "OK"],
             })
         }
         else {
             this.setState({ redirect: true })
         }
+        console.log("thisquotationDTO", this.state.quotationDTO);
     }
 
     //onInputChange = (event) => {

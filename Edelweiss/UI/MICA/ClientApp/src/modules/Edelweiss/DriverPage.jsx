@@ -137,6 +137,9 @@ class DriverPage extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            random:0,
+            amount:0,
+            monthlypremium:"",
             validdate: true,
             datediff: 1,
             //button css 
@@ -148,7 +151,7 @@ class DriverPage extends React.Component {
             //step Flags 
             step1: true,
             step2: false,
-            step3: false,
+            //step3: false,
             step5: false,
             step6: false,
             //
@@ -164,26 +167,28 @@ class DriverPage extends React.Component {
             policyRequest:
                 {
                     "InsurableItem": [{
-                        "InsurableName": "Driver", "RiskItems": [{
+                        "InsurableName": "Driver", "RiskCount": 0, "RiskItems": [{
                             "Name": "",
-                            "Identification Number": "223",
-                            "Aadhaar No.": "33",
-                            "Licence No.": "333",
-                            "Driving Experience": ""
+                            "Identification Number": "D1",
+                            "Aadhaar No.": "",
+                            "Licence No.": "",
+                            "Driving Experience": "",
+                             "Documents": [],
                         }], "Covers": []
-                }, { "InsurableName": "Vehicle", "RiskItems": [{ "Make": "pks", "Model": "sds", "Vehicle Number": "2323", "Year of Registration": "3", "Vehicle Type": "" }], "Covers": [{ "CoverName": "Fire & Theft", "CoverFields": [{ "Cover Name": "Fire & Theft", "CEF Value": "3" }] }, { "CoverName": "Accidental Damage", "CoverFields": [{ "Cover Name": "Accidental Damage", "CEF Value": "3" }] }] }], "Identification Number": "233", "Name": "", "Product Code": "DBI001", "No. Of Risks": "3", "Policy Start Date": "", "Mobile Number": "", "Policy End Date": "2020-2-19", "Email ID": "prasant.k@inubesolutions.com",
+                },
+                        { "InsurableName": "Vehicle", "RiskCount": 0, "RiskItems": [{ "Make": "","Model":"", "Vehicle Number": "", "Year of Registration": "", "Vehicle Type": "", "Identification Number": "V1", "Documents": [],}], "Covers": [] }], "Identification Number": "", "Name": "", "Product Code": "DBI001", "No. Of Risks": "", "Policy Start Date": "", "Mobile Number": "", "Policy End Date": "", "Email ID": "",
 
                     "stateCode": "",
-                    "si": "",
-                    "PaymentReferenceNumber": "1002",
-                    "noOfPC": "1",
-                    "noOfTW": "0",
+                    "si": 0,
+                    "PaymentReferenceNumber": "",
+                    "noOfPC": "",
+                    "noOfTW": "",
                     "driverAge": "",
                     "driverExp": "",
                     "additionalDriver": "",
                     "billingFrequency": ""
                     ,
-                    "PaymentInfo": [{ "RefrenceNumber": "1", "Amount": "" }],
+                    "PaymentInfo": [{ "RefrenceNumber": "", "Amount": "" }],
 
                 },
             proposalNo: "",
@@ -254,20 +259,20 @@ class DriverPage extends React.Component {
                 "TSTTAX_TAXTYPE": ""
             },
             premiumDto: {
-                "cityId": "2",
+                "cityId": "",
                 "premiumObj": {
                     "dictionary_rule": {
-                        "SI": "800000",
-                        "NOOFTW": "0",
-                        "NOOFPC": "1"
+                        "SI": "",
+                        "NOOFTW": "",
+                        "NOOFPC": ""
                     },
                     "dictionary_rate": {
                         "DEXPRT_Exp": "",
                         "PDAGERT_PAge": "",
                         "ADDRVRT_DRV": "1",
-                        "AVFACTORPC_PC_NOOFPC": "1",
-                        "AVFACTORTW_TW_NOOFPC": "1",
-                        "AVFACTORTW_TW_NOOFTW": "0",
+                        "AVFACTORPC_PC_NOOFPC": "",
+                        "AVFACTORTW_TW_NOOFPC": "",
+                        "AVFACTORTW_TW_NOOFTW": "",
                         "FSTTAX_TAXTYPE": "",
                         "TSTTAX_TAXTYPE": ""
                     }
@@ -277,13 +282,14 @@ class DriverPage extends React.Component {
             premiumDTO: {
                 "stateCode": "",
                 "si": "",
-                "noOfPC": "1",
-                "noOfTW": "0",
+                "noOfPC": "",
+                "noOfTW": "",
                 "driverAge": "",
                 "driverExp": "",
-                "additionalDriver": "1",
+                "additionalDriver": "",
                 "billingFrequency": ""
             },
+            noofdrivers:"",
             //
             total: "",
 
@@ -304,7 +310,7 @@ class DriverPage extends React.Component {
             gsttax: "",
             totalsum: "",
             suminsureamount: [
-                { mID: 1, mValue: "600000", label: "6,00,000" },
+                { mID: 1, mValue: "300000", label: "3,00,000" },
                 { mID: 2, mValue: "700000", label: "7,00,000" },
             ],
             suminsured: [
@@ -335,7 +341,7 @@ class DriverPage extends React.Component {
             steps: [
                 { label: "Drivers", value: "Drivers" },
                 { label: "Details", value: "Details" },
-                { label: 'Start Date', value: "date" },
+                //{ label: 'Start Date', value: "date" },
                 { label: 'Billing Frequency', value: "billing" },
                 { label: 'Payment', value: "payment" },
                 { label: 'Final Step', value: "final" },
@@ -498,7 +504,7 @@ class DriverPage extends React.Component {
 
         console.log("qqqqqqqq", this.state.quotationDto)
         this.CalCulatePremium(this.state.drivercount);
-        this.setState({ step4: false, step5: true, activeStep: this.state.activeStep + 1 });
+        this.setState({ step3: false, step4: true, activeStep: this.state.activeStep + 1 });
     }
     //
 
@@ -525,7 +531,7 @@ class DriverPage extends React.Component {
         const fields = this.state.quotationDto;
         fields[name] = date;
         this.setState({ fields });
-        this.state.policyRequest["Policy Start Date"] = this.state.quotationDto.startDate;
+        //this.state.policyRequest["Policy Start Date"] = this.state.quotationDto.startDate;
 
     };
 
@@ -751,7 +757,7 @@ class DriverPage extends React.Component {
 
     CalCulatePremium = (N) => {
         //this.state.premiumDto.premiumObj.dictionary_rate.ADDRVRT_DRV = N; additionalDriver
-        this.state.premiumDTO.additionalDriver = N;
+        this.state.premiumDTO.additionalDriver = N-1;
         fetch(`${EdelweissConfig.EdelweissConfigUrl}/api/Mica_EGI/CalCulatePremium `, {
             method: 'post',
             headers: {
@@ -763,13 +769,22 @@ class DriverPage extends React.Component {
             body: JSON.stringify(this.state.premiumDTO)
         }).then(response => response.json())
             .then(data => {
+                if (data.status == 8) {
+                    swal({
+                        text: data.errors[0].errorMessage,
+                        icon: "error",
+                    })
+                }
                 console.log("premdata", data);
                 let premperday = data.perDayPremium;
                 let ft365 = data.fireTheft;
                 let adprem = data.adPremium;
                 let gstt = data.gst;
+                let monthprem = data.monthlyPremium;
                 this.state.policyRequest.PaymentInfo[0].Amount = data.total;
-                this.setState({ premiumperday: premperday, ft365days: ft365, adpremium: adprem, gsttax: gstt });
+                this.state.amount = data.total;
+                console.log("ammmt", this.state.amount);
+                this.setState({ premiumperday: premperday, ft365days: ft365, adpremium: adprem, gsttax: gstt, monthlypremium: monthprem});
 
 
 
@@ -882,14 +897,30 @@ class DriverPage extends React.Component {
     }
     //
 
-    datechange = (date) => {
-        const _date = date.split('/');
-        const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
+    //datechange = (date) => {
+    //    const _date = date.split('/');
+    //    const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
 
-        return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
-    }
+    //    return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
+    //}
     //payment step 5
     handlepayment = () => {
+        var tempDate = new Date();
+        var date = tempDate.getFullYear() + '-' + (tempDate.getMonth() + 1) + '-' + tempDate.getDate() + " " + tempDate.getHours() + ':' + tempDate.getMinutes() + ':' + tempDate.getSeconds();
+        console.log("currDate", date);
+
+
+        var enddate = new Date();
+        var endddate = (enddate.getFullYear() + 1) + '-' + (enddate.getMonth() + 1) + '-' + (enddate.getDate() - 1) +" "+ tempDate.getHours() + ':' + tempDate.getMinutes() + ':' + tempDate.getSeconds();
+        //var endddate = (enddate.getFullYear() + 1) + '-' + (enddate.getMonth() + 1) + '-' + (enddate.getDate() - 1) + 'T' + tempDate.getHours() + ':' + tempDate.getMinutes() + ':' + tempDate.getSeconds();
+        console.log("endDate", endddate);
+
+
+        //console.log("endDate", in_a_week);
+        this.state.policyRequest["Policy Start Date"] = date;
+        this.state.policyRequest["Policy End Date"] = endddate;
+        this.state.policyRequest.PaymentInfo[0].RefrenceNumber = this.state.random.toFixed();
+        console.log("ppreq", this.state.policyRequest);
         let calculateDto = this.state.policyRequest;
         calculateDto.stateCode = this.state.premiumDTO.stateCode;
         calculateDto.si = this.state.premiumDTO.si;
@@ -904,12 +935,17 @@ class DriverPage extends React.Component {
         for (var i = 0; i < calculateDto.InsurableItem[1].RiskItems.length; i++) {
             calculateDto.InsurableItem[1].RiskItems[i]["Vehicle Type"] = this.state.vehType;
         }
+
+        calculateDto.InsurableItem[0].RiskCount = this.state.drivercount;
+        calculateDto.InsurableItem[1].RiskCount = 1;
+        console.log("calculateDto.InsurableItem[0].RiskCount", calculateDto.InsurableItem[0].RiskCount, calculateDto.InsurableItem[1].RiskCount);
+       
         this.setState({ calculateDto });
         console.log("calculateDto", calculateDto);
         let startDate = this.state.policyRequest["Policy Start Date"];
-        if (this.state.policyRequest["Policy Start Date"] != "") {
-            this.state.policyRequest["Policy Start Date"] = this.datechange(this.state.policyRequest["Policy Start Date"]);
-        }
+        //if (this.state.policyRequest["Policy Start Date"] != "") {
+        //    this.state.policyRequest["Policy Start Date"] = this.datechange(this.state.policyRequest["Policy Start Date"]);
+        //}
 
         fetch(`${EdelweissConfig.PolicyConfigUrl}/api/Policy/CreateProposal`, {
             method: 'POST',
@@ -933,21 +969,22 @@ class DriverPage extends React.Component {
                         text: data.responseMessage,
                         icon: "success"
                     });
-                } else if (data.status == 8) {
+                } 
+                  else {
                     swal({
                         text: data.responseMessage,
                         icon: "error"
                     });
-                }
-                else {
-                    swal({
-                        text: data.errors[0].errorMessage,
-                        icon: "error"
-                    });
-                }
+                }   
+                //else if (data.status == 7 && data.errors!=[]) {
+                //    swal({
+                //        text: data.errors[0].errorMessage,
+                //        icon: "error"
+                //    });
+                //}
+              
             });
         this.state.policyRequest["Policy Start Date"] = startDate;
-
     }
     //
 
@@ -955,14 +992,14 @@ class DriverPage extends React.Component {
     renderRedirect = () => {
         if (this.state.redirect === true) {
             return <Redirect to={{
-                pathname: '/pages/AddDriver',
-                state: { proposalNo: this.state.proposalNo, quotationDto: this.state.quotationDto, policyRequest: this.state.policyRequest, premiumDTO: this.state.premiumDTO, vehType: this.state.vehType, drMakeModel: this.state.drMakeModel }
+                pathname: '/pages/StartDate',
+                state: { proposalNo: this.state.proposalNo, quotationDto: this.state.quotationDto, policyRequest: this.state.policyRequest, premiumDTO: this.state.premiumDTO, vehType: this.state.vehType, drMakeModel: this.state.drMakeModel, amount: this.state.amount }
             }} />
         }
     }
     proposalRedirect = () => {
 
-        this.setState({ activeStep: this.state.activeStep + 1, step5: false, step6: true });
+        this.setState({ activeStep: this.state.activeStep + 1, step4: false, step5: true });
 
     }
     //handleSubmit = () => {
@@ -973,12 +1010,17 @@ class DriverPage extends React.Component {
     //}
 
     componentDidMount() {
+        const min = 1;
+        const max = 100;
+        const rand = min + Math.random() * (max - min);
+        //const rand = Math.random();
+        this.setState({ random: this.state.random + rand });
         const edelweisstoken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJjNTFhYmQ0Mi0zZDEyLTRkODctOTI5OS1iOTY0MGUzMmU3ZjIiLCJFbWFpbCI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkdvcGkiLCJVc2VyTmFtZSI6ImphZ3VhcnJpZGVyMThAZ21haWwuY29tIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjI5OCIsImV4cCI6MTYxNDUwNzU0OSwiaXNzIjoiSW51YmUiLCJhdWQiOiJJbnViZU1JQ0EifQ.MxIIyauo1RUqJfaAZNKIuVDKMjpsM8ax1NYGE1Wq3Sk';
         localStorage.setItem('edelweisstoken', edelweisstoken);
         if (this.props.location.state != undefined) {
-
             this.state.vehType = this.props.location.state.vehicleType;
-            this.state.drMakeModel = this.props.location.state.makeModel
+            this.state.drMakeModel = this.props.location.state.makeModel;
+            //this.state.policyRequest.InsurableItem[1].RiskItems[0].MakeModel = this.props.location.state.makeModel;
             this.state.premiumperday = this.state.quotationDto.premium;
             this.setState({ quotationDto: this.props.location.state.quotationDTO });
             //this.state.premiumDto.premiumObj.dictionary_rate.PDAGERT_PAge = this.props.location.state.quotationDTO.age;
@@ -990,6 +1032,8 @@ class DriverPage extends React.Component {
             premium.billingFrequency = this.props.location.state.quotationDTO.frequency;
             premium.si = this.props.location.state.quotationDTO.sumInsured;
             premium.stateCode = this.props.location.state.stateCode;
+            premium.noOfPC = this.props.location.state.numofpc;
+            premium.noOfTW = this.props.location.state.numoftw;
 
             //let premrday = this.state.premiumperday;
             //premrday = this.props.location.state.quotationDTO.premium;
@@ -1075,7 +1119,7 @@ class DriverPage extends React.Component {
                                             <GridContainer justify="center">
                                                 <ButtonGroup size="large" color="primary" aria-label="contained primary button group">
                                                     <GridItem xs={6}>
-                                                        <Button variant="outlined" round size="large" color={btn1_class} onClick={this.handleSI1}>6,00,000</Button>
+                                                        <Button variant="outlined" round size="large" color={btn1_class} onClick={this.handleSI1}>3,00,000</Button>
                                                     </GridItem>
                                                     <GridItem xs={6}>
                                                         <Button variant="outlined" round size="large" color={btn2_class} onClick={this.handleSI2}>7,00,000</Button>
@@ -1197,34 +1241,8 @@ class DriverPage extends React.Component {
                                         </GridContainer>
                                     </div> /*step 2 ends*/
                                     : null}
+
                                 {this.state.step3 ?
-                                    <div>   {/*step 3 starts */}
-                                        <GridContainer justify="center">
-                                            <h3>Starting Date</h3>
-                                        </GridContainer>
-                                        <GridContainer justify="center">
-                                            <GridItem xs={6}>
-                                                <CustomDatetime
-                                                    labelText="EffectiveFromDate"
-                                                    id='startDate'
-                                                    name='startDate'
-                                                    validdate={this.state.validdate}
-                                                    onChange={(event) => this.onDateChange('datetime', 'startDate', event)}
-                                                    value={this.state.quotationDto.startDate}
-                                                    required={true}
-                                                    formControlProps={{ fullWidth: true }}
-                                                />
-                                            </GridItem>
-                                        </GridContainer>
-
-
-                                        <GridContainer justify="center">
-                                            <Button round color="primary" onClick={this.quickbuyDateProceed}> Proceed</Button>
-
-                                        </GridContainer>
-                                    </div> //step 3 ends
-                                    : null}
-                                {this.state.step4 ?
                                     <div>   {/*Step 4 starts*/}
                                         <GridContainer justify="center">
                                             <h3>Billing Frequency</h3>
@@ -1315,7 +1333,7 @@ class DriverPage extends React.Component {
                                         </GridContainer>
                                     </div>  //step 4 ends
                                     : null}
-                                {this.state.step5 ?
+                                {this.state.step4 ?
                                     <div>       {/* step 5 start*/}
                                         <GridContainer justify="center">
                                             <h1>Payment</h1>
@@ -1341,7 +1359,7 @@ class DriverPage extends React.Component {
                                                                 <td style={{ fontSize: "1rem", textAlign: "right" }}>₹<b>{this.state.policyRequest.PaymentInfo[0].Amount}</b>/-</td>
                                                             </tr>
                                                             <tr>
-                                                                <td style={{ fontWeight: "400" }}><h6>I authorize EGIC to bill me upto a maximum ₹<b>600</b>/- Per month</h6></td>
+                                                                <td style={{ fontWeight: "400" }}><h6>I authorize EGIC to bill me upto a maximum ₹<b>{this.state.monthlypremium}</b>/- Per month</h6></td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -1355,7 +1373,7 @@ class DriverPage extends React.Component {
                                     </div> // step 5 ends
                                     :
                                     null}
-                                {this.state.step6 ?
+                                {this.state.step5 ?
                                     <div>{/*step 6 starts*/}
                                         <GridContainer justify="center">
                                             <GridItem>

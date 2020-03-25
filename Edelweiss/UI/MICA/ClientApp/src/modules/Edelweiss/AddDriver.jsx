@@ -28,6 +28,8 @@ class AddDriver extends React.Component {
         super(props)
 
         this.state = {
+            amount:0,
+            startdate:"",
             drvcount:"1",
             showleftDropZone: false,
             showbtn:true,
@@ -58,18 +60,18 @@ class AddDriver extends React.Component {
             RiskObj: {
                 "Age": "",
                 "Name": "",
-                "Identification Number": "223",
-                "Aadhaar No.": "33",
-                "Licence No.": "333",
+                "Identification Number": "",
+                "Aadhaar No.": "",
+                "Licence No.": "",
                 "Driving Experience": "",
                 "Documents": [],
             },
             duplicateRiskObj: {
                 "Age": "",
                 "Name": "",
-                "Identification Number": "223",
-                "Aadhaar No.": "33",
-                "Licence No.": "333",
+                "Identification Number": "",
+                "Aadhaar No.": "",
+                "Licence No.": "",
                 "Driving Experience": "",
                 "Documents": []
             },
@@ -95,6 +97,7 @@ class AddDriver extends React.Component {
             {
 
                 "ProposalNumber": "",
+                "StartDate":"",
                 "InsurableItem": [],
 
 
@@ -131,11 +134,39 @@ class AddDriver extends React.Component {
                     }
                 ]
             },
+            tags: {
+                "tagname": "",
+                "tagValue": ""
+            },
+            duplicatetags: {
+                "tagname": "",
+                "tagValue": ""
+            },
+            fileUpload: {
+                "fileUploadDTOs": [
+                    {
+                        "fileName": "",
+                        "fileExtension": "",
+                        "fileData": "",
+                        "contentType": "",
+                        "tagdto": [
+                           
+                        ]
+                    }
+                ]
+            },
             frontfilestr: {
                 "fileName": "",
                 "fileExtension": "",
                 "fileData": "",
                 "contentType": "",
+                "tagdto": []
+            },
+            tagdtos: {
+                "tagname": "",
+                "tagValue": ""
+            },
+            duplicatetagtos: {
                 "tagname": "",
                 "tagValue": ""
             },
@@ -144,8 +175,7 @@ class AddDriver extends React.Component {
                 "fileExtension": "",
                 "fileData": "",
                 "contentType": "",
-                "tagname": "",
-                "tagValue": ""
+                "tagdto": []
             },
             fileUploaddto: {
                 "fileUploadDTOs": [
@@ -157,19 +187,26 @@ class AddDriver extends React.Component {
     }
    
     componentDidMount() {
+        //console.log("this.location.policyRequest....", this.props.location.state.policyRequest, this.props.location.state.quotationDto)
         if (this.props.location.state != undefined) {
             this.state.drvvehicleType = this.props.location.state.vehType;
             this.state.adddrvMakeModel = this.props.location.state.drMakeModel
-
-            this.setState({ quotationDetailsDto: this.props.location.state.quotationDto, proposalno: this.props.location.state.proposalNo, policyRqst: this.props.location.state.policyRequest, premDTO: this.props.location.state.premiumDTO });
+            this.state.quotationDetailsDto = this.props.location.state.quotationDto;
+            this.state.startdate = this.props.location.state.startdate;
+            //this.state.proposalno = this.props.location.state.proposalNo;
+            this.state.policyIssueDTO = this.props.location.state.policyRequest;
+            this.state.premDTO = this.props.location.state.premiumDTO;
             this.state.RiskObj.Age = this.props.location.state.quotationDto.age;
             this.state.RiskObj.Name = this.props.location.state.quotationDto.primaryDriverName;
             this.state.policyIssueDTO.ProposalNumber = this.props.location.state.proposalNo;
+            this.state.amount = this.props.location.state.paymentAmt;
+            console.log("aaaaaa", this.state.amount, this.props.location.state.paymentAmt);
             this.setState({});
             console.log("prno", this.props.location.state.proposalNo);
-            console.log("policyRqst", this.state.policyRqst);
+            console.log("policyRqstisueDTO", this.state.policyIssueDTO, this.props.location.state.startdate);
+            console.log("this.state.RiskObj.Age", this.state.RiskObj.Age);
 
-            if (this.props.location.state.premiumDTO.additionalDriver > 1 && this.props.location.state.premiumDTO.additionalDriver <= 3) {
+            if (this.props.location.state.premiumDTO.additionalDriver > 0 && this.props.location.state.premiumDTO.additionalDriver <= 2) {
                 this.setState({ showadddrvbtn: true });
             }
         }
@@ -377,26 +414,33 @@ class AddDriver extends React.Component {
         if (this.state.redirect === true) {
             return <Redirect to={{
                 pathname: '/pages/AddVehicle',
-                state: { quotationDetailsDto: this.state.quotationDetailsDto, proposalno: this.state.proposalno, policyIssueDTO: this.state.policyIssueDTO, premDTO: this.state.premDTO, drvvehicleType: this.state.drvvehicleType, adddrvMakeModel: this.state.adddrvMakeModel, policyRqst: this.state.policyRqst }
+                state: { quotationDetailsDto: this.state.quotationDetailsDto, proposalno: this.state.proposalno, policyIssueDTO: this.state.policyIssueDTO, premDTO: this.state.premDTO, drvvehicleType: this.state.drvvehicleType, adddrvMakeModel: this.state.adddrvMakeModel, policyRqst: this.state.policyRqst, startdate: this.state.startdate, amount: this.state.amount }
             }} />
         }
     }
     submitDriverDetails = (e) => {
         this.AddDrv();
+      
         this.state.policyIssueDTO.InsurableItem = this.state.insurableObj;
+        for (var i = 0; i < this.state.policyIssueDTO.InsurableItem[0].RiskItems.length; i++) {
+            if (this.state.policyIssueDTO.InsurableItem[0].InsurableName == "Driver") {
+                this.state.policyIssueDTO.InsurableItem[0].RiskItems[i]["Identification Number"] = "D" + (i+1).toString();
+            }
+        }
         console.log("policyIssueDTOpolicyIssueDTO", this.state.policyIssueDTO);
         this.renderRedirect();
         this.setState({ redirect: true })
     }
-    AddDrv = () => {
+    AddDrv = (N) => {
         debugger;
-        console.log("additionalDriver", this.props.location.state.premiumDTO.additionalDriver);
-        if (this.props.location.state != undefined && this.props.location.state.premiumDTO.additionalDriver > 1 && this.props.location.state.premiumDTO.additionalDriver <= 3) {
+        //console.log("additionalDriver", this.props.location.state.premiumDTO.additionalDriver);
+        if (this.props.location.state != undefined && this.props.location.state.premiumDTO.additionalDriver > 0 && this.props.location.state.premiumDTO.additionalDriver <= 2) {
 
             for (var i = 0; i < this.state.insurableObj.length; i++) {
-                if (this.state.insurableObj[i].InsurableName == "Driver") {
+                if (this.state.insurableObj[i].InsurableName  == "Driver") {
+                    //this.state.RiskObj["Identification Number"] = "D" + i.toString();
                     this.state.insurableObj[i].RiskItems.push(this.state.RiskObj);
-                }
+                } 
             }
             this.setState({ showadddrvbtn: true });
 
@@ -404,15 +448,17 @@ class AddDriver extends React.Component {
             this.setState({ showadddrvbtn: false });
             for (var i = 0; i < this.state.insurableObj.length; i++) {
                 if (this.state.insurableObj[i].InsurableName == "Driver") {
+                    //this.state.RiskObj["Identification Number"] = "D" + (i+1).toString();
                     this.state.insurableObj[i].RiskItems.push(this.state.RiskObj);
                 }
+                
             }
         }
 
-        //this.setState({ showadddrvflag: false, RiskObj: this.state.duplicateRiskObj });
+        this.setState({ showadddrvflag: false, RiskObj: this.state.duplicateRiskObj});
       
-                this.state.RiskObj.Name = '';
-                this.state.RiskObj.Age = '';
+                //this.state.RiskObj.Name = '';
+                //this.state.RiskObj.Age = '';
                 this.state.backimage = '';
                 this.state.frontimage = '';
                 const file = document.querySelector('.file');
@@ -468,9 +514,10 @@ class AddDriver extends React.Component {
             this.setState({
                 imagePreviewUrl: reader.result
             });
+            console.log("b5", this.state.bytestring);
         }
         console.log("imagePreviewUrl", this.state.imagePreviewUrl);
-        console.log("b5", this.state.bytestring);
+        
         //let data = base.toString();
 
         console.log("baseee", base);
@@ -492,37 +539,52 @@ class AddDriver extends React.Component {
             imagefiles.backfileimage = event.target.files[0];
         }
       
-
+            
         this.setState({ images, imagefiles });
-        this.Uploadfile(imagefiles, images, name);
+        this.Uploadfile(imagefiles, images, name, this.state.imagePreviewUrl);
         reader.readAsDataURL(event.target.files[0]);
 
         console.log("filwimage", images.frontimage);
 
 
     }
-    Uploadfile = (files, bytes, name) => {
-        console.log("fyles", files, bytes, name);;
+    Uploadfile = (files, bytes, name,imgdata) => {
+        console.log("fyles", files, bytes, name, imgdata);
         if (name == "front") {
             this.state.frontfilestr.fileName = files.frontfileimage.name;
             this.state.frontfilestr.fileExtension = files.frontfileimage.name.split(".")[1];
-            this.state.frontfilestr.fileData = bytes.frontimage.toString();
+            this.state.frontfilestr.fileData = imgdata.toString().replace('data:image/png;base64,', '');
+                //bytes.frontimage[0];
+            //.toString().replace('data:image/png;base64,', '');;
             this.state.frontfilestr.contentType = files.frontfileimage.type;
-            this.state.frontfilestr.tagname = 'ImageType';
-            this.state.frontfilestr.tagValue = name;
+            //this.state.frontfilestr.tagdto[0].tagname = 'ImageType';
+            //this.state.frontfilestr.tagdto[0].tagValue = name;
+            this.state.tagdtos.tagname = 'ImageType';
+            this.state.tagdtos.tagValue = name;
+            this.state.frontfilestr.tagdto.push(this.state.tagdtos);
+            this.setState({ tagdtos: this.state.duplicatetagtos });
             this.state.fileUploaddto.fileUploadDTOs.push(this.state.frontfilestr);
-
+            console.log("fileUploaddtodocx", this.state.fileUploaddto);
         }
 
 
         if (name == "back") {
             this.state.backfilestr.fileName = files.backfileimage.name;
             this.state.backfilestr.fileExtension = files.backfileimage.name.split(".")[1];
-            this.state.backfilestr.fileData = bytes.backimage.toString().replace('data:image/png;base64,', '');
+            this.state.backfilestr.fileData = imgdata.toString().replace('data:image/png;base64,', '');
+                //bytes.backimage[0];
+                //.toString().replace('data:image/png;base64,', '');
+            console.log("bytes.backimage[0]", bytes.backimage[0]);
             this.state.backfilestr.contentType = files.backfileimage.type;
-            this.state.backfilestr.tagname = 'ImageType';
-            this.state.backfilestr.tagValue = name;
+            //this.state.backfilestr.tagdto[0].tagname = 'ImageType';
+            //this.state.backfilestr.tagdto[0].tagValue = name;
+            this.state.tagdtos.tagname = 'ImageType';
+            this.state.tagdtos.tagValue = name;
+            this.state.backfilestr.tagdto.push(this.state.tagdtos);
+            this.setState({ tagdtos: this.state.duplicatetagtos});
             this.state.fileUploaddto.fileUploadDTOs.push(this.state.backfilestr);
+            console.log("fileUploaddtodocx11", this.state.fileUploaddto);
+
         }
    
     }
