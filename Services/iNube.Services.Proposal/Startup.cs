@@ -3,7 +3,7 @@ using AutoMapper;
 using iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigService;
 using iNube.Services.Proposal.PLEntities;
 using iNube.Utility.Framework.Extensions;
-
+using iNube.Utility.Framework.LogPrivider.LogService;
 using Microsoft.AspNetCore.Builder;
 
 using Microsoft.AspNetCore.Hosting;
@@ -115,17 +115,23 @@ namespace iNube.Services.Proposal
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-
         {
-
             app.InitializedCommonConfiguration(env, Configuration);
-
-            // app.ConfigureExceptionHandler(new LoggerManager());
-
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
             app.UseAuthentication();
-
+            //app.UseHttpRedirection();
+            app.UseMvc();
         }
 
 
