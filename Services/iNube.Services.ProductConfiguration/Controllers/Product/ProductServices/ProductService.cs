@@ -39,7 +39,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<EntityDTOs>> GetEntityMaster(ApiContext apiContext);
         Task<IEnumerable<ProductDTO>> SearchAssignProduct(ProductSearchDTO productSearchDTO, ApiContext apiContext);
         Task<MasterEntityDTO> AddEntityData(MasterEntityDTO entityDTO, ApiContext apiContext);
-        Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext);
+        Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext);
         Task<List<ddDTOs>> ProductMasterAvo(string masterType, int parentID, ApiContext apiContext);
         Task<List<MasterListItemDTO>> ListProducts(ApiContext Context);
         Task<IEnumerable<ProductDTO>> GetProductByLob(int id, ApiContext apiContext);
@@ -51,7 +51,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<ddDTOs>> GetAllProductMaster(string masterType, int parentID, ApiContext apiContext);
         Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal ProductId, string type, ApiContext apiContext);
         Task<ProductDTO> GetProductByCode(string ProductCode, ApiContext apiContext);
-        Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext);
+        Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest pDTO, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<DocumentResponse> Docupload(string productcode,string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<DocumentResponse> PromoDocupload(string productcode, string productId,HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
@@ -266,7 +266,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return await _productConfigService(apiContext.ProductType).Create(productDTO, apiContext);
         }
 
-        public async Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest productDTO, ApiContext apiContext)
+        public async Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest productDTO, ApiContext apiContext)
         {
             return await _productConfigService(apiContext.ProductType).BillingEventData(productDTO, apiContext);
         }
@@ -282,7 +282,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return await _productConfigService(apiContext.ProductType).GetInsurableRiskDetails(ProductId, type, apiContext);
         }
 
-        public async Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             return await _productConfigService(apiContext.ProductType).BillingEventResponse(pDTO, apiContext);
         }

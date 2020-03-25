@@ -136,7 +136,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
 
         //For invoice generation-- displaying line item details in email pdf
-        public async Task<BillingEventResponseDTO> BillingEventResponse(BillingEventRequest pDTO, ApiContext apiContext)
+        public async Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, pDTO.EvtId.ToString(), _configuration));
             BillingEventResponseDTO BillingData = new BillingEventResponseDTO();
@@ -149,7 +149,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                          ProductName = tblProducts.ProductName,
                                          CreatedDate = tblProducts.CreatedDate
                                      });
-                List<BillingEventDataDTO> BillingResult = new List<BillingEventDataDTO>();
+                List<Models.BillingEventDataDTO> BillingResult = new List<Models.BillingEventDataDTO>();
                 BillingData.productEventDTOs.AddRange(Billingresult);
             }
 
@@ -159,7 +159,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         }
 
         //For invoice generation-- getting product count
-        public async Task<IEnumerable<BillingEventDataDTO>> BillingEventData(BillingEventRequest pDTO, ApiContext apiContext)
+        public async Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, pDTO.EvtId.ToString(), _configuration));
             //var BilingData = (from P in _context.TblProducts.OrderBy(p => p.CreatedDate)
@@ -169,8 +169,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //                      ProductCode = P.ProductCode,
             //                      ProductCount = P.ProductCode.Count()
             //                  });
-            List<BillingEventDataDTO> BilingData = new List<BillingEventDataDTO>();
-            BillingEventDataDTO Bilingresult = new BillingEventDataDTO();
+            List<Models.BillingEventDataDTO> BilingData = new List<Models.BillingEventDataDTO>();
+            Models.BillingEventDataDTO Bilingresult = new Models.BillingEventDataDTO();
 
             if (pDTO.FromDate != null && pDTO.ToDate != null)
             {
@@ -1406,7 +1406,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             foreach (var item in LeadInfo)
             {
-                SMSRequest SMSDTO = new SMSRequest();
+                Models.SMSRequest SMSDTO = new Models.SMSRequest();
 
                 SMSDTO.APIKey = "6nnnnyhH4ECKDFC5n59Keg";
                 SMSDTO.SenderId = "SMSTST";

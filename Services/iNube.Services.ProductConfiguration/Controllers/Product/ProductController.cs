@@ -421,14 +421,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpPost]
-        public async Task<IActionResult> BillingEventResponse(BillingEventRequest EventRequet)
+        public async Task<IActionResult> BillingEventResponse(Models.BillingEventRequest EventRequet)
         {
             var _searchResult =await _productService.BillingEventResponse(EventRequet, Context);
             return Ok(_searchResult);
         }
 
         [HttpPost]
-        public async Task<IActionResult> BillingEventData(BillingEventRequest EventRequet)
+        public async Task<IActionResult> BillingEventData(Models.BillingEventRequest EventRequet)
         {
             var _searchResult =await _productService.BillingEventData(EventRequet, Context);
             return Ok(_searchResult);
