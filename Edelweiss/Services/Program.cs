@@ -20,7 +20,7 @@ namespace MicaExtension_EGI
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-            var config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder() 
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false)
                 .Build();
