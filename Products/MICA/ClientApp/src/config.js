@@ -99,7 +99,7 @@ export const config = {
     rateConfigUrl: rateConfigUrl,
     RDLCConfigUrl: RDLCConfigUrl,
     ReinsuranceConfigUrl: ReinsuranceConfigUrl,
-    ReportConfigUrl: ReportConfigUrl
+    ReportConfigUrl: ReportConfigUrl,
 
     apiUrl: 'https://inubeservicesusermanagement.azurewebsites.net/api',
     localUrl: 'http://localhost:63034/api',
