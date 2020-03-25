@@ -1,7 +1,7 @@
 //let env = "Production";
-let env = "Dev";
+//let env = "Dev";
 //let env = "Local";
-//let env = "UAT";
+let env = "UAT";
 
 let partnerconfigUrl = 'https://localhost:44315';
 let productConfigUrl = 'https://localhost:44347';
@@ -65,15 +65,15 @@ if (env === "Production") {
 }
 if (env === "UAT") {
     Baseurl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    partnerconfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9005';
-    productConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9007';
-    UserConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9009';
-    ruleEngineUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9052';
-    accountConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9011';
-    BillingConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9001';
-    policyconfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9006';
-    claimConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9002';
-    rateConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9012';
+    partnerconfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+    productConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+    UserConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+    ruleEngineUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+    accountConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+    BillingConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+    policyconfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+    claimConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+    rateConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
 
     dynamicPagesConfigUrl = 'https://inubeservicesaccounting.azurewebsites.net';
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
