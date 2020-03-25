@@ -74,7 +74,7 @@ if (env === "UAT") {
     policyconfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
     claimConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
     rateConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-
+    ReportConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
     dynamicPagesConfigUrl = 'https://inubeservicesaccounting.azurewebsites.net';
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
     ReinsuranceConfigUrl = 'https://inubeservicesreinsurance.azurewebsites.net';
@@ -99,6 +99,7 @@ export const config = {
     rateConfigUrl: rateConfigUrl,
     RDLCConfigUrl: RDLCConfigUrl,
     ReinsuranceConfigUrl: ReinsuranceConfigUrl,
+    ReportConfigUrl: ReportConfigUrl
 
     apiUrl: 'https://inubeservicesusermanagement.azurewebsites.net/api',
     localUrl: 'http://localhost:63034/api',
