@@ -27,6 +27,7 @@ namespace iNube.Services.Billing
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false)
+                //.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .Build();
             return WebHost.CreateDefaultBuilder(args)
                 .UseUrls($"http://*:{config.GetValue<int>("Host:Port")}")
