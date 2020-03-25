@@ -620,6 +620,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             policyRequest.PolicyRequest = policyDetail.ToString();
             policy.TblPolicyDetails.Add(policyRequest);
             _context.TblPolicy.Add(policy);
+            var action = "Create Proposal";
 
             try
             {
@@ -627,6 +628,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 tblEndorsementDetails.EnddorsementRequest = policyDetail.ToString();
                 tblEndorsementDetails.IsPremiumRegister = false;
                 tblEndorsementDetails.PolicyId = policy.PolicyId;
+                tblEndorsementDetails.Action = action;
 
                 TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
 
@@ -3019,6 +3021,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             endorsementDetailsDTO.UpdatedResponse = json1.ToString();
                                             endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
                                             endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
+                                            endorsementDetailsDTO.PolicyId = policy.PolicyId;
 
                                             TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
 
@@ -3512,6 +3515,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
                         endorsementDetailsDTO.IsPremiumRegister = true;
                         endorsementDetailsDTO.UpdatedResponse = json1.ToString();
+                        //policyId
+                        endorsementDetailsDTO.PolicyId = policyId;
                         TblEndorsementDetails tblEndorsement_mapper1 = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
                         _context.TblEndorsementDetails.Add(tblEndorsement_mapper1);
 
@@ -3758,7 +3763,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
                 endorsementDetailsDTO.EnddorsementRequest = modifydata.ToString();
                 endorsementDetailsDTO.UpdatedResponse = json1.ToString();
-                
+                //policyId
+                endorsementDetailsDTO.PolicyId = policyId;
+
 
                 TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
 
