@@ -18,6 +18,7 @@ using iNube.Services.ReInsurance.Models;
 using iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService;
 using iNube.Services.ReInsurance.Entities;
 using iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.ReInsurance
 {
@@ -62,12 +63,23 @@ namespace iNube.Services.ReInsurance
             services.AddAutoMapper(typeof(Startup));
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager());
+            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
             app.UseAuthentication();
+            app.UseHttpsRedirection();
+            app.UseMvc();
         }
 
         private void ConfigureModuleService(IServiceCollection services)
