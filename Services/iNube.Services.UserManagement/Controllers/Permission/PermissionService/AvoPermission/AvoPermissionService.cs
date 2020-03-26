@@ -132,7 +132,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             return _masPermissionDTOs;
         }
 
-        public IEnumerable<MasPermissionDTO> GetUserRoleReports( string userId, string roleId, ApiContext apiContext)
+        public IEnumerable<MasPermissionDTO> GetUserRoleReports(string userId, string roleId, ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             IEnumerable<TblMasPermission> _permissions = from maspermission in _context.TblMasPermission
@@ -453,7 +453,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             throw new NotImplementedException();
         }
 
-        public IEnumerable<MasPermissionDTO> GetReportOnRole(ApiContext apiContext)
+        public IEnumerable<DynamicResponse> GetReportOnRole(UserRoleReportDTO reportDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

@@ -27,7 +27,7 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
         IEnumerable<MasPermissionDTO> GetAllPermissions(ApiContext apiContext);
         IEnumerable<MasPermissionDTO> GetDashboards(ApiContext apiContext);
         IEnumerable<MasPermissionDTO> GetReports(ApiContext apiContext);
-        IEnumerable<MasPermissionDTO> GetReportOnRole(ApiContext apiContext);
+        IEnumerable<DynamicResponse> GetReportOnRole(UserRoleReportDTO reportDTO, ApiContext apiContext);
     }
 
     public class PermissionService : IPermissionService
@@ -656,9 +656,9 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
             return _permissionService(apiContext.ProductType).GetReports(apiContext);
         }
 
-        public IEnumerable<MasPermissionDTO> GetReportOnRole(ApiContext apiContext)
+        public IEnumerable<DynamicResponse> GetReportOnRole(UserRoleReportDTO reportDTO, ApiContext apiContext)
         {
-            return _permissionService(apiContext.ProductType).GetReportOnRole(apiContext);
+            return _permissionService(apiContext.ProductType).GetReportOnRole(reportDTO, apiContext);
         }
     }
 }

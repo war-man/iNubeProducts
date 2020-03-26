@@ -411,8 +411,31 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             return new NewRolePermissionResponse { Status = BusinessStatus.Created, Id = newRolePermissions?.UserPermissionsId.ToString(), ResponseMessage = $"Assigned Permissions successfully!!" };
         }
 
-        public IEnumerable<MasPermissionDTO> GetReportOnRole(ApiContext apiContext)
+        public IEnumerable<DynamicResponse> GetReportOnRole(UserRoleReportDTO reportDTO, ApiContext apiContext)
         {
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            //var ruleNames = _context.AspNetRoles.Where(r => reportDTO.RoleId.Contains(r.Id)).ToList();
+
+            //var data = _context.TblDynamicPermissions.Where(a => /*a.Userid == reportDTO.UserId &&*/ a.UserorRole == "Role" && reportDTO.RoleId.Contains(a.Roleid))
+            //    .Select(b => b).ToList();
+
+            //List<DynamicResponse> dynamic = new List<DynamicResponse>();
+            //List<RPermissionDTO> rPermissions = new List<RPermissionDTO>();
+            //List<RPermissionDTO> list = new List<RPermissionDTO>();
+
+            //var result = data.Select(c => new RPermissionDTO
+            //{
+            //    mID = Convert.ToInt32(c.DynamicId),
+            //    mValue = c.DynamicName,
+            //    Label = c.DynamicName,
+            //    Collapse = "false",
+            //    Status = false,
+            //    Children = list,
+            //    mType = c.DynamicType,
+            //}).ToList();
+
+            //var userreports= .Where(d=>d.u)
+            //var reportperm = _context.TblDynamicPermissions.Where(a => a.DynamicType == "Report" && a.Userid == null).ToList();
             throw new NotImplementedException();
         }
 

@@ -58,7 +58,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             throw new NotImplementedException();
         }
 
-        public IEnumerable<MasPermissionDTO> GetReportOnRole(ApiContext apiContext)
+        public IEnumerable<DynamicResponse> GetReportOnRole(UserRoleReportDTO reportDTO,ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

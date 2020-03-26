@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
 {
@@ -249,5 +250,19 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             }
         }
 
+        public Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

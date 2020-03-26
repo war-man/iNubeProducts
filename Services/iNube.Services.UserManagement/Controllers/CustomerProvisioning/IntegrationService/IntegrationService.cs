@@ -15,9 +15,10 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
     public interface IIntegrationService
     {
         Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext);
+        Task<IEnumerable<ddDTO>> GetReportNameForPermissionsDetails(string Url, ApiContext apiContext);
     }
 
- 
+
 
     public class IntegrationService : IIntegrationService
     {
@@ -41,9 +42,9 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
 
         }
 
-  //      //readonly string BillingConfigUrl = "https://localhost:44362";
-  //      readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
-		////readonly string BillingConfigUrl = "http://mica-inube-billing-service.mica-internal.:9001";
+        //      //readonly string BillingConfigUrl = "https://localhost:44362";
+        //      readonly string BillingConfigUrl = "https://inubeservicesbilling.azurewebsites.net";
+        ////readonly string BillingConfigUrl = "http://mica-inube-billing-service.mica-internal.:9001";
 
 
         public async Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext)
@@ -52,6 +53,31 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
             return await GetApiInvoke<CustomersDTO>(uri, apiContext);
         }
 
+        public async Task<IEnumerable<ddDTO>> GetReportNameForPermissionsDetails(string Url, ApiContext apiContext)
+        {
+            var uri = Url;
+            //var uri = "https://localhost:44351/api/Report/GetReportNameForPermissions";
+            return await GetListApiInvoke<ddDTO>(uri, apiContext);
+        }
+
+        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+            using (var response = await client.GetAsync(url))
+            using (var content = response.Content)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
+                    if (serviceResponse != null)
+                    {
+                        return serviceResponse;
+                    }
+                }
+            }
+            return new List<TResponse>();
+        }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {

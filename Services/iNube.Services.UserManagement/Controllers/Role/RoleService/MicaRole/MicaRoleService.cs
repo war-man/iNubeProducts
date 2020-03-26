@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using iNube.Services.UserManagement.Controllers.CustomerProvisioning.IntegrationService;
 using iNube.Services.UserManagement.Entities;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Models;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
 {
@@ -14,9 +16,13 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
     {
         private MICAUMContext _context;
         private IMapper _mapper;
+        private IIntegrationService _integrationService;
+        //private RoleIntegrationService _integrationService;
         public IConfiguration _config;
-        public MicaRoleService(MICAUMContext context, IMapper mapper, IConfiguration configuration)
+        //public MicaRoleService(MICAUMContext context, RoleIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
+        public MicaRoleService(MICAUMContext context, IIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
         {
+            _integrationService = integrationService;
             _context = context;
             _mapper = mapper;
             _config = configuration;
@@ -286,6 +292,88 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
                 var _roleDTOs = _mapper.Map<RolesDTO>(_roles);
                 return new RoleResponse { Status = BusinessStatus.Created, roles = _roleDTOs, Id = _roleDTOs.Id, ResponseMessage = $"Role modified successfully!" };
             }
+        }
+
+        public async Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var data = _context.TblDynamicConfig.OrderByDescending(a => a.CreatedDate).ToList();
+            List<DynamicResponse> result = new List<DynamicResponse>();
+            foreach (var item in data)
+            {
+                var response = await _integrationService.GetReportNameForPermissionsDetails(item.Url, apiContext);
+                DynamicResponse respon = new DynamicResponse();
+                respon.name = item.ItemType;
+                List<RPermissionDTO> rperm = new List<RPermissionDTO>();
+                List<RPermissionDTO> list = new List<RPermissionDTO>();
+                var resddto = response.Select(a => new RPermissionDTO
+                {
+                    mID = a.mID,
+                    mValue = a.mValue,
+                    Label = a.mValue,
+                    Collapse = "false",
+                    Status = false,
+                    Children = list,
+                    mType = item.ItemType,
+                }).ToList();
+                rperm.AddRange(resddto);
+                respon.mdata.AddRange(rperm);
+                result.Add(respon);
+            }
+            return result;
+        }
+
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var response = _context.TblDynamicPermissions.Where(b =>/* b.Userid == Userid &&*/ b.Roleid == Roleid && b.DynamicType == itemType && b.UserorRole == "Role")
+                .Select(a => new DynamicPermissionsDTO
+                {
+                    DynamicPermissionId = a.DynamicPermissionId,
+                    DynamicId = a.DynamicId,
+                    DynamicName = a.DynamicName,
+                    DynamicType = a.DynamicType,
+                    Userid = a.Userid,
+                    Roleid = a.Roleid,
+                    UserorRole = a.UserorRole,
+                    IsActive = a.IsActive,
+                    SortOrderBy = a.SortOrderBy,
+                    CreatedBy = a.CreatedBy,
+                    CreatedDate = a.CreatedDate,
+                    mID = Convert.ToInt32(a.DynamicId),
+                    mValue = a.DynamicName,
+                    mType = a.DynamicType,
+                }).ToList();
+            return response;
+        }
+
+        public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)
+        {
+            var data = _context.TblDynamicPermissions.Where(a => a.Roleid == configDTO.RoleId && a.UserorRole == "Role").ToList();
+            TblDynamicPermissions dynamicPermissions = null;
+            foreach (var item in data)
+            {
+                _context.TblDynamicPermissions.Remove(item);
+            }
+
+            DynamicPermissionsDTO permissionsDTO = new DynamicPermissionsDTO();
+            foreach (var item in configDTO.PermissionIds)
+            {
+                dynamicPermissions = new TblDynamicPermissions();
+                dynamicPermissions.DynamicId = item.mID;
+                dynamicPermissions.DynamicName = item.mValue;
+                dynamicPermissions.DynamicType = item.mType;
+                dynamicPermissions.Roleid = configDTO.RoleId;
+                dynamicPermissions.IsActive = true;
+                dynamicPermissions.UserorRole = "Role";
+                dynamicPermissions.CreatedBy = apiContext.UserId;
+                dynamicPermissions.CreatedDate = DateTime.Now;
+
+                _context.TblDynamicPermissions.Add(dynamicPermissions);
+            }
+
+            _context.SaveChanges();
+            return new DynamicResponseResponse { Status = BusinessStatus.Created, Id = dynamicPermissions.Roleid, ResponseMessage = $"Assigned Report Permissions successfully!!" };
         }
 
     }

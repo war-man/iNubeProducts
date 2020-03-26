@@ -715,6 +715,21 @@ namespace iNube.Services.UserManagement.Models
         public DateTime? CreatedDate { get; set; }
     }
 
+    public partial class DynamicPermissions
+    {
+        public DynamicPermissions()
+        {
+            PermissionIds = new List<RPermissionDTO>();
+        }
+        public string RoleId { get; set; }
+        public List<RPermissionDTO> PermissionIds { get; set; }
+    }
+
+    public class DynamicResponseResponse : ResponseStatus
+    {
+        public DynamicPermissionsDTO dynamicPermissions { get; set; }
+    }
+
     public partial class DynamicPermissionsDTO
     {
         public decimal DynamicPermissionId { get; set; }
@@ -733,13 +748,32 @@ namespace iNube.Services.UserManagement.Models
         public string mType { get; set; }
     }
 
+    public partial class RPermissionDTO
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+        public bool? Status { get; set; }
+        public string Collapse { get; set; }
+        public String Label { get; set; }
+
+        public virtual IEnumerable<RPermissionDTO> Children { get; set; }
+    }
+
     public partial class DynamicResponse
     {
         public DynamicResponse()
         {
-            lstDTO = new List<ddDTO>();
+            mdata = new List<RPermissionDTO>();
         }
         public string name { get; set; }
-        public List<ddDTO> lstDTO { get; set; }
+        public List<RPermissionDTO> mdata { get; set; }
+    }
+
+    public partial class UserRoleReportDTO
+    {
+        public string UserId { get; set; }
+        public string[] RoleId { get; set; }
+        public decimal EnvId { get; set; }
     }
 }

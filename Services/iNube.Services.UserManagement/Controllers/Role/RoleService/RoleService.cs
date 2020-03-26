@@ -14,11 +14,14 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
     public interface IRoleService
     {
         IEnumerable<RolesDTO> GetRoles(ApiContext apiContext);
-        IEnumerable<RolesDTO> GetRolePermissionsById(string roleid,ApiContext apiContext);
+        IEnumerable<RolesDTO> GetRolePermissionsById(string roleid, ApiContext apiContext);
         UserRoleResponse AssignRole(UserRoleMapDTO userRoles, ApiContext apiContext);
         IEnumerable<RolesDTO> GetUserRole(string userId, ApiContext apiContext);
         IEnumerable<RolesDTO> GetAllUserRoles(string userId, ApiContext apiContext);
         RoleResponse CreateRole(RolesDTO role, ApiContext apiContext);
+        Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext);
+        IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid, */string Roleid, string itemType, ApiContext apiContext);
+        DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext);
     }
     public class RoleService : IRoleService
     {
@@ -38,7 +41,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
             return _roleService(apiContext.ProductType).GetRoles(apiContext);
         }
 
-        public IEnumerable<RolesDTO> GetRolePermissionsById(string roleid,ApiContext apiContext)
+        public IEnumerable<RolesDTO> GetRolePermissionsById(string roleid, ApiContext apiContext)
         {
             return _roleService(apiContext.ProductType).GetRolePermissionsById(roleid, apiContext);
         }
@@ -135,5 +138,19 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
             return _roleService(apiContext.ProductType).CreateRole(role, apiContext);
         }
 
+        public async Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext)
+        {
+            return await _roleService(apiContext.ProductType).GetDynamicConfig(apiContext);
+        }
+
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType, ApiContext apiContext)
+        {
+            return _roleService(apiContext.ProductType).GetDynamicPermissions(/*Userid,*/ Roleid, itemType, apiContext);
+        }
+
+        public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)
+        {
+            return _roleService(apiContext.ProductType).SaveDynamicPermission(configDTO, apiContext);
+        }
     }
 }

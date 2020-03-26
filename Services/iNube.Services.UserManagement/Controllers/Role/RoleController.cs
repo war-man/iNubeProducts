@@ -45,7 +45,7 @@ namespace iNube.Services.UserManagement.Controllers.Role
         [HttpGet]
         public IActionResult GetRolePermissionsById(string roleid)
         {
-            var _roles = _roleService.GetRolePermissionsById(roleid,Context);
+            var _roles = _roleService.GetRolePermissionsById(roleid, Context);
             return Ok(_roles);
         }
 
@@ -112,6 +112,27 @@ namespace iNube.Services.UserManagement.Controllers.Role
             var _roles = _roleService.GetAllUserRoles(userId, Context);
             var masterdata = _roles.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
             return Ok(masterdata);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDynamicConfig()
+        {
+            var response = await _roleService.GetDynamicConfig(Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public IActionResult GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType)
+        {
+            var response = _roleService.GetDynamicPermissions(/*Userid,*/ Roleid, itemType, Context);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public IActionResult SaveDynamicPermission(DynamicPermissions configDTO)
+        {
+            var response = _roleService.SaveDynamicPermission(configDTO, Context);
+            return Ok(response);
         }
     }
 }

@@ -241,10 +241,11 @@ namespace iNube.Services.UserManagement.Controllers.Permission
         }
 
         [HttpGet]
-        public IActionResult GetReportOnRole()
+        public IActionResult GetReportOnRole(UserRoleReportDTO reportDTO)
         {
-            var reports = _permissionService.GetReportOnRole(Context);
+            var reports = _permissionService.GetReportOnRole(reportDTO,Context);
             return Ok(reports);
         }
+
     }
 }

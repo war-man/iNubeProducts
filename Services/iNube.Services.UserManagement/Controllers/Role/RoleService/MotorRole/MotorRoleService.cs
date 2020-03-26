@@ -19,7 +19,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MotorRole
             throw new NotImplementedException();
         }
 
-        public IEnumerable<RolesDTO> GetRolePermissionsById(string roleid,ApiContext apiContext)
+        public IEnumerable<RolesDTO> GetRolePermissionsById(string roleid, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -35,6 +35,21 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MotorRole
         }
 
         public RoleResponse CreateRole(RolesDTO role, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid, */string Roleid, string itemType, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
