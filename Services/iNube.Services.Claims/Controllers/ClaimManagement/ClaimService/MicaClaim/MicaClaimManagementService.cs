@@ -1682,7 +1682,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             foreach (var item in Insurable)
             {
                 // item.ApprovedClaimAmounts = claimsDTO.ApprovedClaimAmounts ;
-                item.ApprovedClaimAmounts = claimsDTO.ClaimInsurable.FirstOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId).ApprovedClaimAmounts;
+                item.ApprovedClaimAmounts = claimsDTO.ClaimInsurable.SingleOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId).ApprovedClaimAmounts;
                 _context.TblClaimInsurable.Update(item);
             }
 
@@ -1727,7 +1727,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             _context.SaveChanges();
 
+            var amount = (decimal)claimsprocess.ApprovedClaimAmount;
+
             var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
+            
+            //Balance Sum Insured
+            var balanceSumInsured = await _integrationService.UpdatePolicySumInsuredAsync(claimsprocess.PolicyNo, amount, apiContext);
 
             //Accouting Transaction 
             var account = AccountMapApproval(apiContext, claimsDTO);

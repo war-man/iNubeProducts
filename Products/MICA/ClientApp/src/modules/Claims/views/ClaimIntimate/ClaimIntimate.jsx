@@ -127,6 +127,10 @@ class ClaimIntimate extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+
+            policyflag: false,
+            productflag: false,
+
             prodId: "",
             startDateFlag: "",
             endDateFlag: "",
@@ -583,14 +587,19 @@ class ClaimIntimate extends React.Component {
         claim[name] = value;
         this.setState({ claim });
 
-        if (name === "insurableItems") {
-            console.log('grid setup', this.state.DetailsDTO.insurableItems)
-            if (value != "") {
-                this.setState({ showInsGrid: true });
-            }
-            this.claimAmountTable();
+       // if (this.state.policyflag === true) {
+            if (name === "insurableItems") {
+                console.log('grid setup', this.state.DetailsDTO.insurableItems)
+                if (value != "") {
+                    this.setState({ showInsGrid: true });
+                }
+                this.claimAmountTable();
 
-        }
+            }
+        //}
+        //else {
+        //    swal("", "Policy Insurable data is missing", "error");
+        //}
         console.log("this.state.DetailsDTO", this.state.DetailsDTO)
         this.change(event, name, type);
     }
@@ -898,11 +907,20 @@ class ClaimIntimate extends React.Component {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
-        }).then(function (response) {
-            return response.json();
-        }).then(function (cdata) {
-            that.setState({ ClaimsAmountData: cdata.policyInsurableDetails, InsurableItemData: cdata.insurableItems });
-            console.log("PolicyInsurableDetails: ", that.state.ClaimsAmountData);
+        }).then(response => response.json())
+            .then(cdata => {
+                console.log("cdata", cdata);
+              
+               if (cdata.status === 0) {
+                   this.setState({ policyflag: true });
+                    that.setState({ ClaimsAmountData: cdata.policyInsurableDetails, InsurableItemData: cdata.insurableItems });
+                    console.log("PolicyInsurableDetails: ", that.state.ClaimsAmountData);
+
+                    
+                } else {
+                   this.setState({ policyflag: false });
+                   swal("", "Policy Insurable data is missing", "error");
+                }
 
         });
         console.log("PolicytArr", PolicyArr);
@@ -993,7 +1011,7 @@ class ClaimIntimate extends React.Component {
 
 
         this.setState({});
-        //  this.claimAmountTable();
+
         this.onGet();
     }
 
@@ -1190,7 +1208,6 @@ class ClaimIntimate extends React.Component {
 
     onGet = () => {
         let value = "Claim Intimation";
-        //fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId, {
         fetch(`${ClaimConfig.productConfigUrl}/api/Product/GetProductClaimsDetails?ProductId=` + this.state.prodId + `&FieldType=` + value + ``, {
             method: 'GET',
             headers: {
@@ -1201,7 +1218,7 @@ class ClaimIntimate extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                console.log("data", data);
+                console.log("getproductclaimsdetailsdata:", data);
 
                 this.setState({ ProductClaimData: data });
 
@@ -1437,7 +1454,7 @@ class ClaimIntimate extends React.Component {
                                     masterList={this.state.masterList} master={this.state.master} addressDTO={this.state.addressDTO} ProductClaimData={this.state.ProductClaimData} stateMasterList={this.state.stateMasterList}
                                     onModelChange={this.onModelChange} AdditionalDetails={this.state.AdditionalDetails} onDateChange={this.onDateChange} />
 
-                                <ClaimAmount TableData={this.state.TableData} ClaimAmountSum={this.ClaimAmountSum} ClaimsAmountData={this.state.ClaimsAmountData} claimAmountState={this.state.claimAmountState} validateUI={this.state.validateUI} InsurableItemData={this.state.InsurableItemData}
+                                <ClaimAmount TableData={this.state.TableData} ClaimAmountSum={this.ClaimAmountSum} ClaimsAmountData={this.state.ClaimsAmountData} claimAmountState={this.state.claimAmountState} validateUI={this.state.validateUI} InsurableItemData={this.state.InsurableItemData} policyflag={this.state.policyflag}
                                     claims={this.state.claims} handleChange={this.handleChange} DetailsDTO={this.state.DetailsDTO} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} classes={classes}
                                     fields={this.state.fields} showInsGrid={this.state.showInsGrid} details={this.state.details} handleClaimAmount={this.handleClaimAmount} errormessage={this.state.errormessage} erroramt={this.state.erroramt} />
 
