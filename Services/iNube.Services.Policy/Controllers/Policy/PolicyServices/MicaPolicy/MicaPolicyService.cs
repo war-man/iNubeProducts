@@ -629,7 +629,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 tblEndorsementDetails.IsPremiumRegister = true;
                 tblEndorsementDetails.PolicyId = policy.PolicyId;
                 tblEndorsementDetails.Action = action;
-
+                tblEndorsementDetails.EndorsementEffectivedate = DateTime.Now;
+                tblEndorsementDetails.UpdatedResponse = policyDetail.ToString();
                 TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
 
                 _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
@@ -2079,13 +2080,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         foreach (var insItem in insurableInsurablefields)
                                         {
                                             // insItem.ToString()
-                                            if (insItem.Name == "Identification Number" || insItem.Name == "Name")
+                                            if (insItem.Name == "Identification Number" || insItem.Name == "Name"|| insItem.Name == "Documents")
                                             {
 
                                             }
                                             else
                                             {
-                                                AddProperty(polFields, insItem.Name, insurableInsurablefields[insItem.Name]);
+                                                AddProperty(polFields, insItem.Name, insurableInsurablefields[insItem.Name].ToString());
                                             }
 
                                         }
@@ -2126,13 +2127,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 dynamic polFields = new ExpandoObject();
                                 foreach (var insItem in insurableInsurablefields)
                                 {
-                                    if (insItem.Name == "Identification Number" || insItem.Name == "Name")
+                                    if (insItem.Name == "Identification Number" || insItem.Name == "Name"|| insItem.Name == "Documents")
                                     {
 
                                     }
                                     else
                                     {
-                                        AddProperty(polFields, insItem.Name, insurableInsurablefields[insItem.Name]);
+                                        AddProperty(polFields, insItem.Name, insurableInsurablefields[insItem.Name].ToString());
                                     }
 
                                 }
@@ -2942,11 +2943,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                                            var expObj = JsonConvert.DeserializeObject<ExpandoObject>(insurableItemRequest.ToString());
-                                            AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
-                                            var tempobj = JsonConvert.SerializeObject(expObj);
-                                            insurableItemRequest = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
-
 
 
 
@@ -3012,8 +3008,18 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                             }
 
+                                           
+
+
+                                            var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
+                                            expObj.PremiumDetails = CalculatePremiumResponse;
+                                           // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                                            var tempobj = JsonConvert.SerializeObject(expObj);
+                                            json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+
                                             tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                                             _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+
 
                                             //Endorsement Details data saving for the addition of vehicle
 
@@ -3244,6 +3250,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             }
 
                                         }
+
+                                        var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
+                                        expObj.PremiumDetails = CalculatePremiumResponse;
+                                        // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                                        var tempobj = JsonConvert.SerializeObject(expObj);
+                                        json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+
                                         tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                                         _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
 
@@ -3518,6 +3531,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
 
                         }
+
+                        //var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
+                        //expObj.PremiumDetails = CalculatePremiumResponse;
+                        //AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                        //var tempobj = JsonConvert.SerializeObject(expObj);
+
+                        json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+
                         tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                         var x1 = _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
 
@@ -3783,6 +3804,29 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
 
                 _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+
+                //foreach (var item in modifydata.InsurableItem)
+                //{
+
+                //    foreach (var Data in item.RiskItems)
+                //    {
+                //        var id = (string)Data["Identification Number"];
+                //        var insurabledetails = _context.TblPolicyInsurableDetails.Where(s => s.IdentificationNo == id && s.PolicyId == policyId).ToList();
+                //        if (insurabledetails.Count() > 0)
+                //        {
+                //            foreach (var temp in insurabledetails)
+                //            {
+
+                //                if (id == temp.IdentificationNo)
+                //                {
+
+                //                    temp.CoverValue = Data.ToString();
+                //                }
+                //            }
+                //        }
+                //        _context.TblPolicyInsurableDetails.UpdateRange(insurabledetails);
+                //    }
+                //}
 
 
 
