@@ -1376,25 +1376,25 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public void WriteToExcel(string path)
         {
-           // path = @"C:/Users/prasant.k/source/Workspaces/MICA/Services/iNube.Services.Policy/Models/Excel.xlsx";
-           // //Let use below test data for writing it to excel
-           // // path = Server.MapPath(C: \Users\rashmidevi.p\source\repos\MICA Services\iNube.Services.Policy\Models\excel.xml);
-           // List<PolicysearchDTO> policydata = new List<PolicysearchDTO>()
-           // {
+            // path = @"C:/Users/prasant.k/source/Workspaces/MICA/Services/iNube.Services.Policy/Models/Excel.xlsx";
+            // //Let use below test data for writing it to excel
+            // // path = Server.MapPath(C: \Users\rashmidevi.p\source\repos\MICA Services\iNube.Services.Policy\Models\excel.xml);
+            // List<PolicysearchDTO> policydata = new List<PolicysearchDTO>()
+            // {
 
-           //     new PolicysearchDTO() {PartnerId ="123" , Email = "ajay@gmail.com" , EventId="123",  Insuredreference = "ajay" , MobileNumber = "2345678" , Policynumber = "123" , ProductId = "123"     }
+            //     new PolicysearchDTO() {PartnerId ="123" , Email = "ajay@gmail.com" , EventId="123",  Insuredreference = "ajay" , MobileNumber = "2345678" , Policynumber = "123" , ProductId = "123"     }
 
-           //};
+            //};
 
 
-           // DataTable table = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(policydata), (typeof(DataTable)));
-           // FileInfo filePath = new FileInfo(path);
-           // using (var excelPack = new ExcelPackage(filePath))
-           // {
-           //     var ws = excelPack.Workbook.Worksheets.Add("WriteTest");
-           //     ws.Cells.LoadFromDataTable(table, true, OfficeOpenXml.Table.TableStyles.Light8);
-           //     excelPack.Save();
-           // }
+            // DataTable table = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(policydata), (typeof(DataTable)));
+            // FileInfo filePath = new FileInfo(path);
+            // using (var excelPack = new ExcelPackage(filePath))
+            // {
+            //     var ws = excelPack.Workbook.Worksheets.Add("WriteTest");
+            //     ws.Cells.LoadFromDataTable(table, true, OfficeOpenXml.Table.TableStyles.Light8);
+            //     excelPack.Save();
+            // }
         }
 
         //To get policy data for claims for genetaring Invoice 2nd Page Pdf
@@ -2080,7 +2080,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         foreach (var insItem in insurableInsurablefields)
                                         {
                                             // insItem.ToString()
-                                            if (insItem.Name == "Identification Number" || insItem.Name == "Name"|| insItem.Name == "Documents")
+                                            if (insItem.Name == "Identification Number" || insItem.Name == "Name" || insItem.Name == "Documents")
                                             {
 
                                             }
@@ -2127,7 +2127,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 dynamic polFields = new ExpandoObject();
                                 foreach (var insItem in insurableInsurablefields)
                                 {
-                                    if (insItem.Name == "Identification Number" || insItem.Name == "Name"|| insItem.Name == "Documents")
+                                    if (insItem.Name == "Identification Number" || insItem.Name == "Name" || insItem.Name == "Documents")
                                     {
 
                                     }
@@ -2820,7 +2820,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
         }
 
-       
+
 
 
         public async Task<EndorsmentDTO> AddInsurableItem(dynamic insurableItemRequest, ApiContext apiContext)
@@ -3008,12 +3008,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                             }
 
-                                           
+
 
 
                                             var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
                                             expObj.PremiumDetails = CalculatePremiumResponse;
-                                           // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                                            // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
                                             var tempobj = JsonConvert.SerializeObject(expObj);
                                             json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
@@ -3318,12 +3318,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                     }
-                  
+
 
 
 
                     // _context.SaveChanges();
-                   return new EndorsmentDTO() { Status = BusinessStatus.NothingModified, Id = EndorsementNo, ResponseMessage = "Nothing is Modified" };
+                    return new EndorsmentDTO() { Status = BusinessStatus.NothingModified, Id = EndorsementNo, ResponseMessage = "Nothing is Modified" };
 
                 }
                 else
@@ -3468,11 +3468,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                        var expObj = JsonConvert.DeserializeObject<ExpandoObject>(insurableItemRequest.ToString());
-                        AddProperty(expObj, "PremiumDetails", CDmap);
-                        var tempobj = JsonConvert.SerializeObject(expObj);
-                        insurableItemRequest = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
+                        var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
 
 
                         foreach (var item in insurableItemRequest.InsurableItem)
@@ -3532,12 +3529,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         }
 
-                        //var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
-                        //expObj.PremiumDetails = CalculatePremiumResponse;
-                        //AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
-                        //var tempobj = JsonConvert.SerializeObject(expObj);
 
+                        var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
+                        expObj.PremiumDetails = CalculatePremiumResponse;
+                        // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                        var tempobj = JsonConvert.SerializeObject(expObj);
                         json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+
 
                         tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                         var x1 = _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
@@ -3684,11 +3682,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var type = "Update Proposal";
-            var tblPolicy = ModifyUpdateInsurabableItem(modifydata,type, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
+            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
             return _mapper.Map<PolicyDTO>(tblPolicy);
         }
 
-        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata,string type, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails, List<ErrorInfo> Errors, ApiContext apiContext)
+        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata, string type, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails, List<ErrorInfo> Errors, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -3790,7 +3788,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                     endorsementDetailsDTO.IsPremiumRegister = false;
                 }
-                if(type == "Issue Policy")
+                if (type == "Issue Policy")
                 {
                     endorsementDetailsDTO.IsPremiumRegister = true;
                 }
@@ -3805,33 +3803,53 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
 
-                //foreach (var item in modifydata.InsurableItem)
-                //{
+                foreach (var item in modifydata.InsurableItem)
+                {
 
-                //    foreach (var Data in item.RiskItems)
-                //    {
-                //        var id = (string)Data["Identification Number"];
-                //        var insurabledetails = _context.TblPolicyInsurableDetails.Where(s => s.IdentificationNo == id && s.PolicyId == policyId).ToList();
-                //        if (insurabledetails.Count() > 0)
-                //        {
-                //            foreach (var temp in insurabledetails)
-                //            {
+                    foreach (var Data in item.RiskItems)
+                    {
+                        var id = (string)Data["Identification Number"];
+                        var insurabledetails = _context.TblPolicyInsurableDetails.Where(s => s.IdentificationNo == id && s.PolicyId == policyId).ToList();
+                        if (insurabledetails.Count() > 0)
+                        {
 
-                //                if (id == temp.IdentificationNo)
-                //                {
-
-                //                    temp.CoverValue = Data.ToString();
-                //                }
-                //            }
-                //        }
-                //        _context.TblPolicyInsurableDetails.UpdateRange(insurabledetails);
-                //    }
-                //}
+                            //dynamic polFields = new ExpandoObject();
+                         
+                            foreach (var temp in insurabledetails)
+                            {
+                                dynamic polFields = JsonConvert.DeserializeObject<ExpandoObject>(temp.CoverValue);
 
 
+                                if (id == temp.IdentificationNo)
+                                {
+                                    foreach (var insItem in Data)
+                                    {
+                                        if (insItem.Name == "Documents")
+                                        {
 
-                _context.SaveChanges();
-            }
+                                        }
+                                        else
+                                        {
+                                            
+                                            AddProperty(polFields, insItem.Name, Data[insItem.Name].ToString());
+                                        }
+
+
+                                       
+
+                                    }
+                                    temp.CoverValue = JsonConvert.SerializeObject(polFields);
+                                }
+                            }
+                            _context.TblPolicyInsurableDetails.UpdateRange(insurabledetails);
+                        }
+                    }
+                }
+
+
+
+                    _context.SaveChanges();
+                }
             catch (Exception e)
             {
 
@@ -4485,86 +4503,28 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         {
                             var policyId = tblPolicy.PolicyId;
                             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+
+                            //Step:4 Calling CD mapping API
+
+                            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+                            List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
                             tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
                             var type = "Issue Policy";
+
+
+
                             var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
                             if (tblPolicy1 == null && Errors.Count > 0)
                             {
                                 return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
                             }
-                            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                            //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                            //// var paymentDetails = json["PaymentInfoDeatils"];
 
 
-                            //tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
-                            //foreach (var item in IssuepolicyDTO.InsurableItem)//Client
-                            //{
-                            //    foreach (var insurableName in json.InsurableItem)//table 
-                            //    {
-                            //        if (item.InsurableName == insurableName.InsurableName)
-                            //        {
-                            //            foreach (var insurableName1 in json1.InsurableItem)
-                            //            {
-                            //                //json-table-insurableName
-                            //                //IssuepolicyDTO-request-item
-                            //                var riskcount = Convert.ToInt32(insurableName["RiskCount"]);
-                            //                var additonalDriverCount = item.RiskItems.Count;
-
-                            //                foreach (var fields in item.RiskItems)
-                            //                {
-                            //                    foreach (var jsoninsurableFields in insurableName.RiskItems)
-                            //                    {
-
-                            //                        try
-                            //                        {
-                            //                            if (additonalDriverCount < riskcount)
-                            //                            {
 
 
-                            //                                var InputidentificationNumber = (string)fields["Identification Number"];
-                            //                                var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                            //                                if (InputidentificationNumber == TblIdentificationNo)
-                            //                                {
 
-                            //                                }
-                            //                                //else
-                            //                                //{
-                            //                                //    insurableName.RiskItems.Add(fields);
-                            //                                //}
-                            //                            }
-                            //                            else
-                            //                            {
-                            //                                return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = "vehicle cannot be more from additional driver" };
-
-                            //                            }
-                            //                        }
-                            //                        catch (Exception e)
-                            //                        {
-                            //                            insurableName1.RiskItems = insurableName.RiskItems;
-                            //                        }
-                            //                    }
-                            //                }
-                            //            }
-
-
-                            //        }
-
-                            //    }
-
-                            //}
-
-                            //tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                            //_context.TblPolicy.Update(tblPolicy);
-                            //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                            //_context.SaveChanges();
-
-
-                            //Step:4 Calling CD mapping API
-
-
-                            List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
                             if (CDmap.Count > 0)
                             {
                                 MicaCD micaCD = new MicaCD();
@@ -5467,7 +5427,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             // insItem.ToString()
                             if (insItem.Name == "Documents")
                             {
-                               
+
                                 foreach (var docItems in fields[insItem.Name])
                                 {
                                     doc = new UploadDocument();
@@ -5492,7 +5452,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     }
                                     lstDocuments.Add(doc);
                                 }
-                               
+
                             }
 
                         }
