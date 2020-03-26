@@ -4446,6 +4446,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
                     PolicyStartDate = startdateTime.Add(Stateduration);
                 }
+                else {
+                    System.TimeSpan Stateduration = DateTime.Now.TimeOfDay;
+                    DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
+                    PolicyStartDate = startdateTime.Add(Stateduration);
+                }
                 System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
                 DateTime dateTime = Convert.ToDateTime(PolicyStartDate).Date;
 
