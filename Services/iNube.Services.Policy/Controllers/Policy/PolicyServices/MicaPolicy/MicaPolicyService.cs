@@ -2701,7 +2701,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         private async Task<EndorsmentDTO> InternalCallPolicyInsurableDetails(dynamic policyDetail, string PolicyNo, ApiContext apiContext)
         {
-
+            System.Type Datatype;
             var policy = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNo);
             var InsurableItemName = "";
             var CoverName = "";
@@ -2768,7 +2768,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             }
                                             else
                                             {
-                                                AddProperty(polFields, insItem.Name, insurableInsurablefields[insItem.Name]);
+                                                AddProperty(polFields, insItem.Name, insurableInsurablefields[insItem.Name].ToString());
+
                                             }
 
                                         }
@@ -2941,6 +2942,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
+                                            var expObj = JsonConvert.DeserializeObject<ExpandoObject>(insurableItemRequest.ToString());
+                                            AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                                            var tempobj = JsonConvert.SerializeObject(expObj);
+                                            insurableItemRequest = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
 
 
@@ -3026,7 +3031,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
 
                                             _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
-
+                                            _context.TblPolicy.Update(policy);
                                             _context.SaveChanges();
 
 
@@ -3252,7 +3257,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
                                         TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
                                         _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
-
+                                        _context.TblPolicy.Update(policy);
                                         _context.SaveChanges();
 
 
@@ -3352,6 +3357,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var policy = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == PolicyNo);
             if (policy != null)
             {
+                policy.PolicyVersion++;
                 EndorsementNo = policy.PolicyNo + "" + "_" + (policy.PolicyVersion).ToString();
                 if (insurableItemRequest.InsurableItem != null && insurableItemRequest.InsurableItem.Count > 0)
                 {
@@ -3449,6 +3455,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
+                        var expObj = JsonConvert.DeserializeObject<ExpandoObject>(insurableItemRequest.ToString());
+                        AddProperty(expObj, "PremiumDetails", CDmap);
+                        var tempobj = JsonConvert.SerializeObject(expObj);
+                        insurableItemRequest = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+
+
+
                         foreach (var item in insurableItemRequest.InsurableItem)
                         {
 
@@ -3519,7 +3532,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         endorsementDetailsDTO.PolicyId = policyId;
                         TblEndorsementDetails tblEndorsement_mapper1 = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
                         _context.TblEndorsementDetails.Add(tblEndorsement_mapper1);
-
+                        _context.TblPolicy.Update(policy);
 
 
                         var x2 = await _context.SaveChangesAsync();
@@ -3774,7 +3787,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                 _context.SaveChanges();
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
 
             }
@@ -4152,14 +4166,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     {
 
 
-
-                                        policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
-
-                                        policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
-
+                                        policyUpdate.PolicyStageId = ModuleConstants.PolicyStageProposal;
+                                        policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusInActive;
                                         policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
-
-
+                                        policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStageProposalCreated;
 
                                         policyUpdate.IsActive = true;
 
@@ -4530,8 +4540,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     TblPolicy policyUpdate = _context.TblPolicy.Find(tblPolicy.PolicyId);
 
 
-                                    policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
-
+                                    //policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
+                                    policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStageQuoteCreated;
+                                    policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
+                                    policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
 
 
                                     policyUpdate.IsActive = true;
@@ -4860,7 +4872,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     //STEP:1-GET POLICY DETAILS
                     var policyNo = (string)endoresementDto["PolicyNumber"];
                     var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
-
+                    tbl_particiant.PolicyVersion++;
 
                     EndorsementNo = tbl_particiant.PolicyNo + "" + "_" + (tbl_particiant.PolicyVersion).ToString();
                     if (tbl_particiant != null)
@@ -4928,7 +4940,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     MicaCD micaCD = new MicaCD();
                                     micaCD.AccountNo = tbl_particiant.CdaccountNumber;
                                     micaCD.micaCDDTO = CDmap;
-                                    micaCD.Description = "Endorsement-Cancelation-" + EndorsementNo;
+                                    micaCD.Description = "Endorsement-Cancellation-" + EndorsementNo;
 
                                     //Step5:CD Transaction for the policy
                                     var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
@@ -4947,6 +4959,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                     tbl_particiant.IsActive = false;
                                     tbl_particiant.PolicyStatus = ModuleConstants.PolicyCancelStatus;
+                                    tbl_particiant.PolicyStatusId = ModuleConstants.PolicyStatusCancelled;
+                                    tbl_particiant.PolicyStageId = ModuleConstants.PolicyStagePolicy;
+                                    tbl_particiant.PolicyStageStatusId = ModuleConstants.EndorsementStageCancelled;
                                     tbl_particiant.PolicyCancelDate = DateTime.Now;
                                     _context.TblPolicy.Update(tbl_particiant);
 
@@ -5087,161 +5102,161 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             // JsonConvert.DeserializeObject<dynamic>(scontract.ToString());
         }
-        public async Task<PremiumReturnDto> PremiumCalCulation(PremiumRequestDTO premiumdata, ApiContext apiContext)
-        {
-            // _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            PremiumReturnDto response = new PremiumReturnDto();
-            if (premiumdata.NoOfPC != 0)
-            {
-                if (premiumdata.DriverAge >= 18 && premiumdata.DriverAge <= 75)
-                {
-                    if (premiumdata.DriverExp <= (premiumdata.DriverAge - 18))
-                    {
-                        if (premiumdata.BillingFrequency == "" || premiumdata.BillingFrequency == "Monthly" || premiumdata.BillingFrequency == "Yearly")
-                        {
-                            DynamicData prem = new DynamicData();
-                            prem.dictionary_rule.SI = premiumdata.SI.ToString();
-                            prem.dictionary_rule.NOOFPC = premiumdata.NoOfPC.ToString();
-                            prem.dictionary_rule.NOOFTW = premiumdata.NoOfTW.ToString();
+        //public async Task<PremiumReturnDto> PremiumCalCulation(PremiumRequestDTO premiumdata, ApiContext apiContext)
+        //{
+        //    // _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+        //    PremiumReturnDto response = new PremiumReturnDto();
+        //    if (premiumdata.NoOfPC != 0)
+        //    {
+        //        if (premiumdata.DriverAge >= 18 && premiumdata.DriverAge <= 75)
+        //        {
+        //            if (premiumdata.DriverExp <= (premiumdata.DriverAge - 18))
+        //            {
+        //                if (premiumdata.BillingFrequency == "" || premiumdata.BillingFrequency == "Monthly" || premiumdata.BillingFrequency == "Yearly")
+        //                {
+        //                    DynamicData prem = new DynamicData();
+        //                    prem.dictionary_rule.SI = premiumdata.SI.ToString();
+        //                    prem.dictionary_rule.NOOFPC = premiumdata.NoOfPC.ToString();
+        //                    prem.dictionary_rule.NOOFTW = premiumdata.NoOfTW.ToString();
 
 
-                            prem.dictionary_rate.AVFACTORPC_PC_NOOFPC = premiumdata.NoOfPC.ToString();
-                            prem.dictionary_rate.AVFACTORTW_TW_NOOFPC = premiumdata.NoOfPC.ToString();
-                            prem.dictionary_rate.AVFACTORTW_TW_NOOFTW = premiumdata.NoOfTW.ToString();
-                            prem.dictionary_rate.PDAGERT_PAge = premiumdata.DriverAge.ToString();
-                            prem.dictionary_rate.DEXPRT_Exp = premiumdata.DriverExp.ToString();
-                            prem.dictionary_rate.ADDRVRT_DRV = premiumdata.AdditionalDriver.ToString();
+        //                    prem.dictionary_rate.AVFACTORPC_PC_NOOFPC = premiumdata.NoOfPC.ToString();
+        //                    prem.dictionary_rate.AVFACTORTW_TW_NOOFPC = premiumdata.NoOfPC.ToString();
+        //                    prem.dictionary_rate.AVFACTORTW_TW_NOOFTW = premiumdata.NoOfTW.ToString();
+        //                    prem.dictionary_rate.PDAGERT_PAge = premiumdata.DriverAge.ToString();
+        //                    prem.dictionary_rate.DEXPRT_Exp = premiumdata.DriverExp.ToString();
+        //                    prem.dictionary_rate.ADDRVRT_DRV = premiumdata.AdditionalDriver.ToString();
 
 
 
 
-                            TaxTypeDTO taxType = new TaxTypeDTO();
-                            taxType = await _integrationService.TaxTypeForStateCode(premiumdata.StateCode, apiContext);
+        //                    TaxTypeDTO taxType = new TaxTypeDTO();
+        //                    taxType = await _integrationService.TaxTypeForStateCode(premiumdata.StateCode, apiContext);
 
-                            prem.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
-                            prem.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
+        //                    prem.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
+        //                    prem.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
 
-                            var Data = await CalCulatePremium(prem, apiContext);
+        //                    var Data = await CalCulatePremium(prem, apiContext);
 
-                            List<CalculationResult> val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
-                            if (val != null)
-                            {
-                                var Ftperday = 0.00;
-                                var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
-                                var theft = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
-                                Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(theft);
+        //                    List<CalculationResult> val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
+        //                    if (val != null)
+        //                    {
+        //                        var Ftperday = 0.00;
+        //                        var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
+        //                        var theft = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
+        //                        Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(theft);
 
-                                var Ft30days = Ftperday * 30;
-                                var Ft60days = Ftperday * 60;
+        //                        var Ft30days = Ftperday * 30;
+        //                        var Ft60days = Ftperday * 60;
 
-                                var Ft365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FT365").EValue);
-                                var Ad60days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60DAYS").EValue);
-                                var Ad365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365DAYS").EValue);
-                                var ad60fttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60FTAXAMT").EValue);
-                                var ad60ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60TTAXAMT").EValue);
+        //                        var Ft365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FT365").EValue);
+        //                        var Ad60days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60DAYS").EValue);
+        //                        var Ad365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365DAYS").EValue);
+        //                        var ad60fttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60FTAXAMT").EValue);
+        //                        var ad60ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60TTAXAMT").EValue);
 
-                                var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
-                                var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
-                                var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
-                                var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
+        //                        var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
+        //                        var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
+        //                        var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
+        //                        var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
 
-                                var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
-                                var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
+        //                        var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
+        //                        var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
 
-                                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftfttax;
-                                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftfttax;
+        //                        var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftfttax;
+        //                        var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftfttax;
 
 
-                                PremiumReturnDto returnobj = new PremiumReturnDto();
+        //                        PremiumReturnDto returnobj = new PremiumReturnDto();
 
-                                returnobj.FTTax = Convert.ToDecimal(ftfttax + ftfttax);
-                                returnobj.ADTax = Convert.ToDecimal(ad60fttax);
-                                returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
-                                returnobj.FireTheft = Convert.ToDecimal(Ft365days);
-                                returnobj.TotalFTAmount = returnobj.FTTax + returnobj.FireTheft;
-                                if (premiumdata.BillingFrequency == "Monthly")
-                                {
-                                    returnobj.ADPremium = Convert.ToDecimal(Ad60days);
-                                    returnobj.GST = Convert.ToDecimal(monthlyGST);
-                                    returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
-                                }
-                                else if (premiumdata.BillingFrequency == "Yearly")
-                                {
-                                    returnobj.ADPremium = Convert.ToDecimal(Ad365days);
-                                    returnobj.GST = Convert.ToDecimal(yearlyGST);
-                                }
-                                returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
-                                returnobj.TotalADAmount = returnobj.ADTax + returnobj.ADPremium;
+        //                        returnobj.FTTax = Convert.ToDecimal(ftfttax + ftfttax);
+        //                        returnobj.ADTax = Convert.ToDecimal(ad60fttax);
+        //                        returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
+        //                        returnobj.FireTheft = Convert.ToDecimal(Ft365days);
+        //                        returnobj.TotalFTAmount = returnobj.FTTax + returnobj.FireTheft;
+        //                        if (premiumdata.BillingFrequency == "Monthly")
+        //                        {
+        //                            returnobj.ADPremium = Convert.ToDecimal(Ad60days);
+        //                            returnobj.GST = Convert.ToDecimal(monthlyGST);
+        //                            returnobj.MonthlyPremium = Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
+        //                        }
+        //                        else if (premiumdata.BillingFrequency == "Yearly")
+        //                        {
+        //                            returnobj.ADPremium = Convert.ToDecimal(Ad365days);
+        //                            returnobj.GST = Convert.ToDecimal(yearlyGST);
+        //                        }
+        //                        returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
+        //                        returnobj.TotalADAmount = returnobj.ADTax + returnobj.ADPremium;
 
-                                returnobj.FinalAmount = Math.Round(returnobj.Total);
-                                returnobj.Status = BusinessStatus.Ok;
-                                return returnobj;
-                            }
-                            else
-                            {
-                                ErrorInfo errorInfo = new ErrorInfo();
+        //                        returnobj.FinalAmount = Math.Round(returnobj.Total);
+        //                        returnobj.Status = BusinessStatus.Ok;
+        //                        return returnobj;
+        //                    }
+        //                    else
+        //                    {
+        //                        ErrorInfo errorInfo = new ErrorInfo();
 
-                                response.ResponseMessage = "Null/Empty Inputs";
-                                response.Status = BusinessStatus.PreConditionFailed;
-                                errorInfo.ErrorMessage = "Calculate Premium Failed";
-                                errorInfo.ErrorCode = "ExtCP005";
-                                errorInfo.PropertyName = "MandatoryfieldsMissing";
-                                response.Errors.Add(errorInfo);
-                                return response;
-                            }
-                        }
-                        else
-                        {
-                            ErrorInfo errorInfo = new ErrorInfo();
+        //                        response.ResponseMessage = "Null/Empty Inputs";
+        //                        response.Status = BusinessStatus.PreConditionFailed;
+        //                        errorInfo.ErrorMessage = "Calculate Premium Failed";
+        //                        errorInfo.ErrorCode = "ExtCP005";
+        //                        errorInfo.PropertyName = "MandatoryfieldsMissing";
+        //                        response.Errors.Add(errorInfo);
+        //                        return response;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    ErrorInfo errorInfo = new ErrorInfo();
 
-                            response.ResponseMessage = "Null/Empty Inputs";
-                            response.Status = BusinessStatus.PreConditionFailed;
-                            errorInfo.ErrorMessage = "Billing Frequency Should be either Monthly or Yearly";
-                            errorInfo.ErrorCode = "ExtCP004";
-                            errorInfo.PropertyName = "MandatoryfieldsMissing";
-                            response.Errors.Add(errorInfo);
-                            return response;
-                        }
-                    }
-                    else
-                    {
-                        ErrorInfo errorInfo = new ErrorInfo();
+        //                    response.ResponseMessage = "Null/Empty Inputs";
+        //                    response.Status = BusinessStatus.PreConditionFailed;
+        //                    errorInfo.ErrorMessage = "Billing Frequency Should be either Monthly or Yearly";
+        //                    errorInfo.ErrorCode = "ExtCP004";
+        //                    errorInfo.PropertyName = "MandatoryfieldsMissing";
+        //                    response.Errors.Add(errorInfo);
+        //                    return response;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                ErrorInfo errorInfo = new ErrorInfo();
 
-                        response.ResponseMessage = "Null/Empty Inputs";
-                        response.Status = BusinessStatus.PreConditionFailed;
-                        errorInfo.ErrorMessage = "Driver Experience should be less than or equal to his age – 18";
-                        errorInfo.ErrorCode = "ExtCP003";
-                        errorInfo.PropertyName = "MandatoryfieldsMissing";
-                        response.Errors.Add(errorInfo);
-                        return response;
-                    }
-                }
-                else
-                {
-                    ErrorInfo errorInfo = new ErrorInfo();
+        //                response.ResponseMessage = "Null/Empty Inputs";
+        //                response.Status = BusinessStatus.PreConditionFailed;
+        //                errorInfo.ErrorMessage = "Driver Experience should be less than or equal to his age – 18";
+        //                errorInfo.ErrorCode = "ExtCP003";
+        //                errorInfo.PropertyName = "MandatoryfieldsMissing";
+        //                response.Errors.Add(errorInfo);
+        //                return response;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            ErrorInfo errorInfo = new ErrorInfo();
 
-                    response.ResponseMessage = "Null/Empty Inputs";
-                    response.Status = BusinessStatus.PreConditionFailed;
-                    errorInfo.ErrorMessage = "Driver age should be between 18 and 75.";
-                    errorInfo.ErrorCode = "ExtCP002";
-                    errorInfo.PropertyName = "MandatoryfieldsMissing";
-                    response.Errors.Add(errorInfo);
-                    return response;
-                }
-            }
-            else
-            {
-                ErrorInfo errorInfo = new ErrorInfo();
+        //            response.ResponseMessage = "Null/Empty Inputs";
+        //            response.Status = BusinessStatus.PreConditionFailed;
+        //            errorInfo.ErrorMessage = "Driver age should be between 18 and 75.";
+        //            errorInfo.ErrorCode = "ExtCP002";
+        //            errorInfo.PropertyName = "MandatoryfieldsMissing";
+        //            response.Errors.Add(errorInfo);
+        //            return response;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        ErrorInfo errorInfo = new ErrorInfo();
 
-                response.ResponseMessage = "Null/Empty Inputs";
-                response.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Minimum One PC should be their.";
-                errorInfo.ErrorCode = "ExtCP001";
-                errorInfo.PropertyName = "MandatoryfieldsMissing";
-                response.Errors.Add(errorInfo);
-                return response;
-            }
-        }
+        //        response.ResponseMessage = "Null/Empty Inputs";
+        //        response.Status = BusinessStatus.PreConditionFailed;
+        //        errorInfo.ErrorMessage = "Minimum One PC should be their.";
+        //        errorInfo.ErrorCode = "ExtCP001";
+        //        errorInfo.PropertyName = "MandatoryfieldsMissing";
+        //        response.Errors.Add(errorInfo);
+        //        return response;
+        //    }
+        //}
 
 
 

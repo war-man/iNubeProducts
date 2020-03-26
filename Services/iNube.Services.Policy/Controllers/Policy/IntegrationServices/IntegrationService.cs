@@ -45,7 +45,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<object> CalCulateRatingPremium(DynamicData dynamicData, ApiContext apiContext);
         Task<dynamic> GetMappingParams(string mappingname, ApiContext apiContext);
         Task<MasterCDDTO> CreateMasterCDAccount(MicaCD cdTransactionsMaster, ApiContext apiContext);
-        Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext);
+     //   Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext);
         Task<List<MicaCDDTO>> CDMapper(dynamic PolicyRequest, string type, ApiContext apiContext);
         Task<List<MicaCDDTO>> CDMapperList(dynamic PolicyRequest, string type, ApiContext apiContext);
         Task<dynamic> RuleMapper(dynamic InputRequest, string type, ApiContext apiContext);
@@ -290,11 +290,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         }
         //Get State Code
-        public async Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext)
-        {
-            var uri = "http://elwei-publi-1sxquhk82c0h4-688030859.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/TaxTypeForStateCode?stateabbreviation=" + stateabbreviation;
-            return await GetApiInvoke<TaxTypeDTO>(uri, apiContext);
-        }
+        //public async Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext)
+        //{
+        //    var uri = "http://elwei-publi-1sxquhk82c0h4-688030859.ap-south-1.elb.amazonaws.com:9025/api/Mica_EGI/TaxTypeForStateCode?stateabbreviation=" + stateabbreviation;
+        //    return await GetApiInvoke<TaxTypeDTO>(uri, apiContext);
+        //}
 
         //Get CD Map 
 

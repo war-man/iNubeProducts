@@ -10,6 +10,7 @@ namespace iNube.Services.Policy.Helpers
         public const int PolicyStatusActive = 1;
         public const int PolicyStatusInActive = 2;
         public const int PolicyStatusOnHold = 3;
+        public const int PolicyStatusCancelled = 4;
 
         public const int PolicyStageQuote = 5;
         public const int PolicyStageProposal = 6;
@@ -24,6 +25,7 @@ namespace iNube.Services.Policy.Helpers
         public const int PolicyStageCancelled = 11;//policyStatus creeated
         public const int PolicyStagePolicyIssued = 12;
         public const int PolicyStagePolicyLive = 13;
+        public const int EndorsementStageCancelled = 21;
        
     }
 }
