@@ -14,6 +14,7 @@ namespace iNube.Services.Policy.Helpers
         public const int PolicyStageQuote = 5;
         public const int PolicyStageProposal = 6;
         public const int PolicyStagePolicy = 7;
+        public const string PolicyCancelStatus = "PolicyCancel";
         public const string PolicyStatus = "PolicyIssued";
         public const string ProposalStatus = "ProposalCreated";
         
