@@ -323,10 +323,10 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             return result;
         }
 
-        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType, ApiContext apiContext)
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var response = _context.TblDynamicPermissions.Where(b =>/* b.Userid == Userid &&*/ b.Roleid == Roleid && b.DynamicType == itemType && b.UserorRole == "Role")
+            var response = _context.TblDynamicPermissions.Where(b => b.Userid == Userid && b.Roleid == Roleid && b.DynamicType == itemType && b.UserorRole == "Role")
                 .Select(a => new DynamicPermissionsDTO
                 {
                     DynamicPermissionId = a.DynamicPermissionId,

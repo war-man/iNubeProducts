@@ -255,7 +255,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType, ApiContext apiContext)
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

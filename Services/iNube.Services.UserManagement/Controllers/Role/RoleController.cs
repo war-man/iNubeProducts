@@ -122,9 +122,9 @@ namespace iNube.Services.UserManagement.Controllers.Role
         }
 
         [HttpGet]
-        public IActionResult GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType)
+        public IActionResult GetDynamicPermissions(string Userid, string Roleid, string itemType)
         {
-            var response = _roleService.GetDynamicPermissions(/*Userid,*/ Roleid, itemType, Context);
+            var response = _roleService.GetDynamicPermissions(Userid, Roleid, itemType, Context);
             return Ok(response);
         }
 

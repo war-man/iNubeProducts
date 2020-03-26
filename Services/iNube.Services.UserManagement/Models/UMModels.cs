@@ -756,6 +756,10 @@ namespace iNube.Services.UserManagement.Models
         public bool? Status { get; set; }
         public string Collapse { get; set; }
         public String Label { get; set; }
+        public string Userid { get; set; }
+        public string Roleid { get; set; }
+        public string UserorRole { get; set; }
+        public string RoleName { get; set; }
 
         public virtual IEnumerable<RPermissionDTO> Children { get; set; }
     }
@@ -773,7 +777,7 @@ namespace iNube.Services.UserManagement.Models
     public partial class UserRoleReportDTO
     {
         public string UserId { get; set; }
-        public string[] RoleId { get; set; }
+        public string RoleId { get; set; }
         public decimal EnvId { get; set; }
     }
 }

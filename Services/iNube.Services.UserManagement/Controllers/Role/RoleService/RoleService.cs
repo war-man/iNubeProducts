@@ -20,7 +20,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
         IEnumerable<RolesDTO> GetAllUserRoles(string userId, ApiContext apiContext);
         RoleResponse CreateRole(RolesDTO role, ApiContext apiContext);
         Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext);
-        IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid, */string Roleid, string itemType, ApiContext apiContext);
+        IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext);
         DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext);
     }
     public class RoleService : IRoleService
@@ -143,9 +143,9 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
             return await _roleService(apiContext.ProductType).GetDynamicConfig(apiContext);
         }
 
-        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType, ApiContext apiContext)
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext)
         {
-            return _roleService(apiContext.ProductType).GetDynamicPermissions(/*Userid,*/ Roleid, itemType, apiContext);
+            return _roleService(apiContext.ProductType).GetDynamicPermissions(Userid, Roleid, itemType, apiContext);
         }
 
         public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)

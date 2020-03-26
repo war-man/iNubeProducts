@@ -14,7 +14,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
         IEnumerable<RolesDTO> GetAllUserRoles(string userId, ApiContext apiContext);
         RoleResponse CreateRole(RolesDTO role, ApiContext apiContext);
         Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext);
-        IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(/*string Userid,*/ string Roleid, string itemType, ApiContext apiContext);
+        IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext);
         DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext);
 
     }
