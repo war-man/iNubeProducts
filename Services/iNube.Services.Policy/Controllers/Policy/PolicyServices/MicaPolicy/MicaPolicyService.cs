@@ -4520,7 +4520,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                            var tblPolicy1 = ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
+                            var tblPolicy1 = await ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
                             if (tblPolicy1 == null && Errors.Count > 0)
                             {
                                 return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
