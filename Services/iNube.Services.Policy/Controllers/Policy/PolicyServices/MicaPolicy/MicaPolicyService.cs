@@ -626,7 +626,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
                 tblEndorsementDetails.EnddorsementRequest = policyDetail.ToString();
-                tblEndorsementDetails.IsPremiumRegister = false;
+                tblEndorsementDetails.IsPremiumRegister = true;
                 tblEndorsementDetails.PolicyId = policy.PolicyId;
                 tblEndorsementDetails.Action = action;
 
@@ -1375,25 +1375,25 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public void WriteToExcel(string path)
         {
-            path = @"C:/Users/prasant.k/source/Workspaces/MICA/Services/iNube.Services.Policy/Models/Excel.xlsx";
-            //Let use below test data for writing it to excel
-            // path = Server.MapPath(C: \Users\rashmidevi.p\source\repos\MICA Services\iNube.Services.Policy\Models\excel.xml);
-            List<PolicysearchDTO> policydata = new List<PolicysearchDTO>()
-            {
+           // path = @"C:/Users/prasant.k/source/Workspaces/MICA/Services/iNube.Services.Policy/Models/Excel.xlsx";
+           // //Let use below test data for writing it to excel
+           // // path = Server.MapPath(C: \Users\rashmidevi.p\source\repos\MICA Services\iNube.Services.Policy\Models\excel.xml);
+           // List<PolicysearchDTO> policydata = new List<PolicysearchDTO>()
+           // {
 
-                new PolicysearchDTO() {PartnerId ="123" , Email = "ajay@gmail.com" , EventId="123",  Insuredreference = "ajay" , MobileNumber = "2345678" , Policynumber = "123" , ProductId = "123"     }
+           //     new PolicysearchDTO() {PartnerId ="123" , Email = "ajay@gmail.com" , EventId="123",  Insuredreference = "ajay" , MobileNumber = "2345678" , Policynumber = "123" , ProductId = "123"     }
 
-           };
+           //};
 
 
-            DataTable table = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(policydata), (typeof(DataTable)));
-            FileInfo filePath = new FileInfo(path);
-            using (var excelPack = new ExcelPackage(filePath))
-            {
-                var ws = excelPack.Workbook.Worksheets.Add("WriteTest");
-                ws.Cells.LoadFromDataTable(table, true, OfficeOpenXml.Table.TableStyles.Light8);
-                excelPack.Save();
-            }
+           // DataTable table = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(policydata), (typeof(DataTable)));
+           // FileInfo filePath = new FileInfo(path);
+           // using (var excelPack = new ExcelPackage(filePath))
+           // {
+           //     var ws = excelPack.Workbook.Worksheets.Add("WriteTest");
+           //     ws.Cells.LoadFromDataTable(table, true, OfficeOpenXml.Table.TableStyles.Light8);
+           //     excelPack.Save();
+           // }
         }
 
         //To get policy data for claims for genetaring Invoice 2nd Page Pdf
@@ -4545,6 +4545,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
+                                    policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
 
                                     policyUpdate.PolicyStartDate = PolicyStartDate;
                                     //System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
@@ -4945,6 +4946,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     }
 
                                     tbl_particiant.IsActive = false;
+                                    tbl_particiant.PolicyStatus = ModuleConstants.PolicyCancelStatus;
                                     tbl_particiant.PolicyCancelDate = DateTime.Now;
                                     _context.TblPolicy.Update(tbl_particiant);
 
