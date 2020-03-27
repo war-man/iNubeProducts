@@ -104,8 +104,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                                   && x.CreatedDate.Value.Date == IndianTime.Date);
 
 
+                    if (checkstatus != null)
+                    {
+                        response.GetSchedule.SwitchStatus = checkstatus.SwitchStatus;
+                    }
+                    else
+                    {
+                        response.GetSchedule.SwitchStatus = false;
+                    }
 
-                    response.GetSchedule.SwitchStatus = checkstatus.SwitchStatus;
 
                     if (CurrentTimeHour < Convert.ToDecimal(_configuration["Scheduler_Validation:TimeInHours"]))
                     {
