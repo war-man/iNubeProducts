@@ -163,6 +163,12 @@ export const TRANSLATIONS = {
         ReportUpdate:'Report Update',
 
         ClaimInbox: 'Claim Inbox',
+        //Allocation
+        Allocation: "Allocation",
+        AllocationConfig: 'Allocation Config',
+        AllocationRules: 'Allocation Rules',
+        AllocationExecution: 'Allocation Execution',
+        EllustrationConfig: 'Ellustration Config',
         /**********************************************************************/
 
         //UserManagement

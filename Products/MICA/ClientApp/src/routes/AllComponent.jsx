@@ -167,6 +167,11 @@ const ReportConfiguration = AsyncComponent(() => { return import("modules/Dynami
 const ReportExecution = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportExecution.jsx"); });
 const ReportUpdate = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportUpdate.jsx"); });
 
+/*Allocation Module*/
+const AllocationExecution = AsyncComponent(() => { return import("modules/Allocation/views/AllocationExecution.jsx"); });
+const AllocationConfig = AsyncComponent(() => { return import("modules/Allocation/views/AllocationConfig.jsx"); });
+const AllocationRules = AsyncComponent(() => { return import("modules/Allocation/views/AllocationRules.jsx"); });
+
 export const ComponentsList = {
     Uwdashboard: Uwdashboard,
     PricingPage: PricingPage,
@@ -278,6 +283,10 @@ export const ComponentsList = {
     ReportExecution: ReportExecution,
     ReportUpdate: ReportUpdate,
     ClaimInbox: ClaimInbox,
+    //Allocation
+    AllocationConfig: AllocationConfig,
+    AllocationRules: AllocationRules,
+    AllocationExecution: AllocationExecution,
 }
 
 export default ComponentsList
