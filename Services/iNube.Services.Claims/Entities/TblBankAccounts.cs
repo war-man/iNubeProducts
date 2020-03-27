@@ -18,9 +18,12 @@ namespace iNube.Services.Claims.Entities
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int? PayeeTypeId { get; set; }
+        public string PayeeType { get; set; }
+        public decimal? AmountPaid { get; set; }
+        public DateTime? DataOfPayment { get; set; }
 
         public virtual TblmasCmcommonTypes AccountTypeNavigation { get; set; }
         public virtual TblClaims Claim { get; set; }
-        public virtual TblmasCmcommonTypes PayeeType { get; set; }
+        public virtual TblmasCmcommonTypes PayeeTypeNavigation { get; set; }
     }
 }

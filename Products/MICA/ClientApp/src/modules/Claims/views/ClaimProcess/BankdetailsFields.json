@@ -1,9 +1,9 @@
 [
-
   {
     "Name": "Account Holder Name",
     "DataType": "string",
     "Validation": "",
+    "Value": "",
     "ValidationType": "",
     "UIControl": "TextField"
   },
@@ -11,6 +11,7 @@
     "Name": "Account No.",
     "DataType": "string",
     "Validation": "",
+    "Value": "",
     "ValidationType": "",
     "UIControl": "TextField"
   },
@@ -18,6 +19,7 @@
     "Name": "Account Type",
     "DataType": "bool",
     "Validation": "",
+    "Value": "",
     "ValidationType": "",
     "UIControl": "Dropdown"
   },
@@ -25,6 +27,7 @@
     "Name": "Bank Name",
     "DataType": "string",
     "Validation": "",
+    "Value": "",
     "ValidationType": "",
     "UIControl": "TextField"
   },
@@ -32,6 +35,7 @@
     "Name": "IFSC Code",
     "DataType": "string",
     "Validation": "",
+    "Value": "",
     "ValidationType": "",
     "UIControl": "TextField"
   },
@@ -39,6 +43,7 @@
     "Name": "Bank Branch Address",
     "DataType": "string",
     "Validation": "",
+    "Value": "",
     "ValidationType": "",
     "UIControl": "TextField"
   },
@@ -46,6 +51,7 @@
     "Name": "Amount Paid",
     "DataType": "string",
     "Validation": "",
+    "Value": "",
     "ValidationType": "",
     "UIControl": "TextField"
   },
@@ -53,6 +59,7 @@
     "Name": "Date Of Payment",
     "DataType": "datetime",
     "Validation": "",
+    "Value": "",
     "ValidationType": "",
     "UIControl": "Datetime"
   }

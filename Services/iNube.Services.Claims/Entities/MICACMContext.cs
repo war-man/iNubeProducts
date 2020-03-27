@@ -44,7 +44,7 @@ namespace iNube.Services.Claims.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblBank>(entity =>
             {
@@ -96,6 +96,8 @@ namespace iNube.Services.Claims.Entities
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.AmountPaid).HasColumnType("numeric(18, 0)");
+
                 entity.Property(e => e.BankBranchAddress)
                     .HasMaxLength(100)
                     .IsUnicode(false);
@@ -108,6 +110,8 @@ namespace iNube.Services.Claims.Entities
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.DataOfPayment).HasColumnType("datetime");
+
                 entity.Property(e => e.Ifsccode)
                     .HasColumnName("IFSCCode")
                     .HasMaxLength(11)
@@ -116,6 +120,8 @@ namespace iNube.Services.Claims.Entities
                 entity.Property(e => e.ModifiedBy).HasMaxLength(450);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PayeeType).HasMaxLength(50);
 
                 entity.HasOne(d => d.AccountTypeNavigation)
                     .WithMany(p => p.TblBankAccountsAccountTypeNavigation)
@@ -128,8 +134,8 @@ namespace iNube.Services.Claims.Entities
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tblBankAccounts_tblClaims");
 
-                entity.HasOne(d => d.PayeeType)
-                    .WithMany(p => p.TblBankAccountsPayeeType)
+                entity.HasOne(d => d.PayeeTypeNavigation)
+                    .WithMany(p => p.TblBankAccountsPayeeTypeNavigation)
                     .HasForeignKey(d => d.PayeeTypeId)
                     .HasConstraintName("FK__tblBankAc__Payee__15FA39EE");
             });

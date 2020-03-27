@@ -69,7 +69,7 @@ class ClaimInbox extends React.Component {
 
     handleintimate = () => {
         let status = this.state.ClaimDTO;
-        status.claimStatusId = 16;
+        status.claimStatusId = 33;
         this.setState({
             status,
             intimate: true,
@@ -101,7 +101,7 @@ class ClaimInbox extends React.Component {
 
     handleApproved = () => {
         let status = this.state.ClaimDTO;
-        status.claimStatusId = 9;
+        status.claimStatusId = 38;
         this.setState({
             status,
             intimate: false,
@@ -135,7 +135,7 @@ class ClaimInbox extends React.Component {
 
     handleRejected = () => {
         let status = this.state.ClaimDTO;
-        status.claimStatusId = 11;
+        status.claimStatusId = 0;
         this.setState({
             status,
             intimate: false,
@@ -152,7 +152,7 @@ class ClaimInbox extends React.Component {
 
     handleSettled = () => {
         let status = this.state.ClaimDTO;
-        status.claimStatusId = 22;
+        status.claimStatusId = 38;
         this.setState({
             status,
             intimate: false,
@@ -251,7 +251,7 @@ class ClaimInbox extends React.Component {
                         <GridItem /*xs={2}*/>
                             <Card id="card-bg4" onClick={(e) => this.handleRejected(e)}>
                                 <CardHeader>
-                                    <h5 id="white" className={classes.cardTitle}>Rejected Claims</h5>
+                                    <h5 id="white" className={classes.cardTitle}>Other Claims</h5>
                                     <h4 className="h4center">
                                         <CountUp
                                             className="account-balance"
