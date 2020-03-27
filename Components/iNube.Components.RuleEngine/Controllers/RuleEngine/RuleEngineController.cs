@@ -34,7 +34,6 @@ namespace iNube.Components.RuleEngine.Controllers
         private IRuleEngineService _userServiceRule;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
-
         // For Join
         private RuleEngineContext _context_rule;
 
@@ -50,12 +49,11 @@ namespace iNube.Components.RuleEngine.Controllers
             _appSettings = appSettings.Value;
             _context_rule = context_rule;
         }
-
         // For InListOperation
         private bool CheckRecordExistInMaster(string tableName , string colName, string value )
         {
-            
-            SqlConnection cnn = new SqlConnection("Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123");
+            //SqlConnection cnn = new SqlConnection("Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123");
+            SqlConnection cnn = new SqlConnection("Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Initial Catalog=EdelweissTest;User Id=admin;Password=micaadmin");
             SqlCommand cmd;
             try
             {
