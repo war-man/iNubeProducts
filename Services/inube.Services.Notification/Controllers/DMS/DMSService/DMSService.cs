@@ -39,6 +39,11 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
             var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
             DMSDTO dMSDTO = new DMSDTO();
             var item = await collection.FindSync(Builders<DMSDTO>.Filter.Eq("docId", id)).FirstOrDefaultAsync();
+            if(item ==null)
+            {
+                documentResp.ResponseMessage = "No Recoreds found";
+                return documentResp;
+            }
             // documentResp.data=item.data;
             var itemstring1 = item.fileName;
             String[] strlist1 = itemstring1.Split('.', StringSplitOptions.None);

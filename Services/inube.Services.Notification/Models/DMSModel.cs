@@ -46,6 +46,8 @@ namespace inube.Services.Notification.Models
 
         public byte[] data { get; set; }
         public string fileExtension { get; set; }
+        public string ResponseMessage { get; set; }
+
 
 
     }
