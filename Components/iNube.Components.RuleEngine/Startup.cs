@@ -41,7 +41,7 @@ namespace iNube.Components.RuleEngine
         {
             var connectionstring = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<RuleEngineContext>(x => x.UseSqlServer(connectionstring));
-            services.AddDbContext<MICAALContext>(x => x.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;"));
+            services.AddDbContext<MICAALContext>(x => x.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;Trusted_Connection=False;");
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
