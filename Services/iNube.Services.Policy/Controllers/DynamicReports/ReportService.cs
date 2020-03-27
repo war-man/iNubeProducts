@@ -21,6 +21,9 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
         Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext);
+        Task<IEnumerable<ReportConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext);
+        void DeleteParameter(int ReportConfigParamId, ApiContext apiContext);
+        Task<ReportConfigDTO> UpdateReport(ReportConfigDTO reportConfigDTO, ApiContext apiContext);
     }
 
     public class ReportService : IReportService
@@ -67,6 +70,18 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         public async Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).GetReportNameForPermissions(apiContext);
+        }
+        public async Task<IEnumerable<ReportConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).GetParameterDetails(ReportConfigId,apiContext);
+        }
+        public async void DeleteParameter(int ReportConfigParamId, ApiContext apiContext)
+        {
+             _productService(apiContext.ProductType).DeleteParameter(ReportConfigParamId, apiContext);
+        }
+        public async Task<ReportConfigDTO> UpdateReport(ReportConfigDTO reportConfigDTO, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).UpdateReport(reportConfigDTO, apiContext);
         }
     }
 }

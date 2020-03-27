@@ -31,6 +31,7 @@ namespace iNube.Services.DynamicReports.model
         public string Query { get; set; }
         public DateTime? CreatedDate { get; set; }
         public bool? IsActive { get; set; }
+        public DateTime? ModifiedDate { get; set; }
 
         public virtual ICollection<ReportConfigParamDTO> TblReportConfigParam { get; set; }
     }

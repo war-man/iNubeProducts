@@ -30,7 +30,7 @@ namespace iNube.Services.Policy.Entities.DynamicReportEntities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<TblReportConfig>(entity =>
             {
@@ -44,6 +44,8 @@ namespace iNube.Services.Policy.Entities.DynamicReportEntities
                 entity.Property(e => e.Dbschema)
                     .HasColumnName("DBSchema")
                     .HasMaxLength(50);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ReportConfigName).HasMaxLength(50);
             });

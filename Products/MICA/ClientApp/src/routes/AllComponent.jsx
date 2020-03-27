@@ -165,6 +165,7 @@ const ModifyMapping = AsyncComponent(() => { return import("modules/Reinsurance/
 //Dynamic Reports
 const ReportConfiguration = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportConfiguration.jsx"); });
 const ReportExecution = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportExecution.jsx"); });
+const ReportUpdate = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportUpdate.jsx"); });
 
 export const ComponentsList = {
     Uwdashboard: Uwdashboard,
@@ -275,6 +276,7 @@ export const ComponentsList = {
     UserDashboard: UserDashboard,
     ReportConfig: ReportConfiguration,
     ReportExecution: ReportExecution,
+    ReportUpdate: ReportUpdate,
     ClaimInbox: ClaimInbox,
 }
 
