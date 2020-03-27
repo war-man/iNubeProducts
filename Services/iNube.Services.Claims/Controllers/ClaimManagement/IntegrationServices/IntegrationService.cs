@@ -87,7 +87,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
 
         public async Task<List<dynamic>> CheckRuleSets(String EventId, AllocDTO allocDTO, ApiContext apiContext)
         {
-            var uri = AllocRuleEngineUrl + "/CheckRuleSets/CheckRuleSets/" + EventId;
+            var uri = RuleEngineUrl + "/api/AllocationConfig/CheckRuleSets/CheckRuleSets/" + EventId;
             return await PostApiInvoke<AllocDTO, List<dynamic>>(uri, allocDTO, apiContext);
         }
 
