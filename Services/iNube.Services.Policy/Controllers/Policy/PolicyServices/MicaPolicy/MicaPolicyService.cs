@@ -2924,7 +2924,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 var CDmap = await _integrationService.CDMapperList(cDMappers, "EndorsementAdd", apiContext);
                                 if (CDmap.Count > 0)
                                 {
-
                                     var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
 
                                     //Step3:Check Premium vs Payment Amount
@@ -2932,8 +2931,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     if (paymentinfo != null)
                                     {
                                         var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
-
-                                        if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 || (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                                        var paymentdiff = (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount);
+                                        if (paymentdiff <= 1 && paymentdiff >= -1)
                                         {
 
                                             MicaCD micaCD = new MicaCD();
@@ -3012,9 +3011,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                                             var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
-                                            expObj.PremiumDetails = CalculatePremiumResponse;
-                                            // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
-                                            var tempobj = JsonConvert.SerializeObject(expObj);
+                                          //  AddProperty(expObj, "PremiumDetails", CDmap);
+                                            expObj.PaymentInfo = paymentinfo;
+                                            expObj.PremiumDetails = CDmap;
+                                             var tempobj = JsonConvert.SerializeObject(expObj);
                                             json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
                                             tblPolicyDetailsdata.PolicyRequest = json1.ToString();
@@ -3252,7 +3252,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         }
 
                                         var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
-                                        expObj.PremiumDetails = CalculatePremiumResponse;
+                                        expObj.PremiumDetails = CDmap;
                                         // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
                                         var tempobj = JsonConvert.SerializeObject(expObj);
                                         json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
@@ -3469,7 +3469,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                        var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                       // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
 
 
                         foreach (var item in insurableItemRequest.InsurableItem)
@@ -3531,7 +3531,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                         var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
-                        expObj.PremiumDetails = CalculatePremiumResponse;
+                        expObj.PremiumDetails = CDmap;
                         // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
                         var tempobj = JsonConvert.SerializeObject(expObj);
                         json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
@@ -3824,7 +3824,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 {
                                     foreach (var insItem in Data)
                                     {
-                                        if (insItem.Name == "Documents")
+                                        if (insItem.Name == "Documents" || insItem.Name == "Identification Number" || insItem.Name == "Name")
                                         {
 
                                         }
@@ -4066,7 +4066,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
 
-                        if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 || (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                        if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
                         {
                             var expObj = JsonConvert.DeserializeObject<ExpandoObject>(ProposalDetail.ToString());
 
@@ -4175,7 +4175,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 //Step7:Add payment section Inside Proposal Json
                                 logMsg = logMsg + ",4";
 
-                                AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                                AddProperty(expObj, "PremiumDetails", CDmap);
                                 var tempobj = JsonConvert.SerializeObject(expObj);
                                 ProposalDetail = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
@@ -4521,10 +4521,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
 
                                 List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
-                                var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
-                                if (CalculatePremiumResponse!=null) {
+                               // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                                if (CDmap.Count>0) {
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
-                                    expObj.PremiumDetails = CalculatePremiumResponse;
+                                    expObj.PremiumDetails = CDmap;
                                     var tempobj = JsonConvert.SerializeObject(expObj);
                                     json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
                                     tblPolicyDetailsdata.PolicyRequest = json.ToString();
@@ -4611,7 +4611,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
                             else
                             {
-                                return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy is already issued for this Policy Number{tblPolicy.PolicyNo}" };
+                                return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy is already issued for this Proposal Number{tblPolicy.ProposalNo}" };
 
                             }
                         }
@@ -4986,6 +4986,22 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         // _tblPolicy.PolicyRemarks = policycancel.Remarks;
 
                                     }
+                                    //Endrosment
+                                    string  EndorsmentType = "Cancel Policy";
+                                    EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
+                                    endorsementDetailsDTO.Action = EndorsmentType;
+                                    endorsementDetailsDTO.EndorsementNo = EndorsementNo;
+                                    endorsementDetailsDTO.IsPremiumRegister = true;
+                                    endorsementDetailsDTO.UpdatedResponse = json.ToString();
+                                    endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                                    endorsementDetailsDTO.EnddorsementRequest = endoresementDto.ToString();
+                                    endorsementDetailsDTO.PolicyId = policyId;
+
+                                    TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
+
+                                    _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+                                  
+                                 
 
                                     tbl_particiant.IsActive = false;
                                     tbl_particiant.PolicyStatus = ModuleConstants.PolicyCancelStatus;
