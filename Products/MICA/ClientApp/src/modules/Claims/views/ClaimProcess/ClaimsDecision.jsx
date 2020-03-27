@@ -36,8 +36,7 @@ import TranslationContainer from "components/Translation/TranslationContainer.js
 
 
 const ClaimsDecision = (props) => {
-    console.log("props.ClaimStatusData", props.ClaimStatusData);
-
+  
     return (
 
         <div>

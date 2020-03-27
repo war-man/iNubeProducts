@@ -24,6 +24,7 @@ import CustomDatetime from "components/CustomComponent/CustomDatetimeFormate.jsx
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import CustomDropDownTree from "components/CustomDropdownTree/CustomDropDownTree.jsx";
 import CustomCheckbox from "components/Checkbox/CustomCheckbox";
+import Button from "components/CustomButtons/Button.jsx";
 
 
 
@@ -69,15 +70,7 @@ const CustomTableCell = withStyles(theme => ({
 }))(TableCell);
 
 const ClaimDetails = (props) => {
-    console.log("claimDetailsData123", props);
-    // const { classes } = this.props;
     const claimDetailsprops = props.componentData;
-
-    //console.log('claimDetailsprops.typeList', claimDetailsprops.typeList);
-
-    console.log("claimDetailsprops.ClaimStatusData", claimDetailsprops.ClaimStatusData);
-
-    // const claimAmountData = props;
 
     return (
         <div>
@@ -189,6 +182,10 @@ const ClaimDetails = (props) => {
                         />
                     </GridItem>
                 }
+
+
+
+
             </GridContainer>
 
             <GridContainer justify="center" >
