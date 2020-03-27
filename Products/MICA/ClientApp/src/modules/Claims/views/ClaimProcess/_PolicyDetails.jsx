@@ -40,14 +40,8 @@ const style = {
 };
 
 const PolicyDetails = (props) => {
-    console.log("policyDetailsData3", props);
-    // const { classes } = this.props;
 
     const policyDetailsprops = props.componentData;
-
-    //const insurableData = props.componentData;
-    //console.log('Insurable data ', insurableData);
-    //console.log('Insurable data props ', props);
 
     return (
         <div>
@@ -189,8 +183,8 @@ const PolicyDetails = (props) => {
                 <GridItem xs={12} sm={4} md={3}>
                     <CustomInput
                         labelText="Total Sum Insured"
-                        //value={policyDetailsprops.policyDetailsData.customerId}
-                        // name='customerId'
+                        value={policyDetailsprops.policyDetailsData.totalSumInsured}
+                        name='totalSumInsured'
                         disabled={policyDetailsprops.disabled}
                         formControlProps={{
                             fullWidth: true
@@ -201,8 +195,8 @@ const PolicyDetails = (props) => {
                 <GridItem xs={12} sm={4} md={3}>
                     <CustomInput
                         labelText="Balance Sum Insured"
-                        //value={policyDetailsprops.policyDetailsData.customerId}
-                        // name='customerId'
+                        value={policyDetailsprops.policyDetailsData.balanceSumInsured}
+                        name='balanceSumInsured'
                         disabled={policyDetailsprops.disabled}
                         formControlProps={{
                             fullWidth: true

@@ -35,13 +35,8 @@ const style = {
 };
 
 const DocDetails = (props) => {
-    console.log("docDetailsData1", props);
     // const { classes } = this.props;
     const docDetailsprops = props.componentData;
-    console.log("docDetailsprops: ", docDetailsprops);
-    console.log("docDetailsprops id: ", docDetailsprops.claimId);
-    //console.log('Insurable data ', insurableData);
-    //console.log('Insurable data props ', props);
     var ClaimId = docDetailsprops.claimId;
 
     return (

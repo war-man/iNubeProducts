@@ -128,6 +128,7 @@ class ClaimProcess extends React.Component {
             displaybank: false,
             isimage: false,
             openpop: false,
+            popopen: false,
             bytearr: [],
             docbyte: [],
             base64: [],
@@ -161,7 +162,7 @@ class ClaimProcess extends React.Component {
             claimsdecisionshow: false,
             documentName: "",
             masterList: [],
-            DocumentData: [],
+            
             ClaimDataDTO: [],
             ClaimAmountdetailsdata: [],
             ClaimStatusData: [],
@@ -331,6 +332,8 @@ class ClaimProcess extends React.Component {
                 "coverEvent": "",
                 "sDate": "",
                 "eDate": "",
+                "totalSumInsured": "",
+                "balanceSumInsured": ""
             },
 
             ClaimResetData: {
@@ -358,7 +361,8 @@ class ClaimProcess extends React.Component {
             PayeeTypedata: [],
             StatusType: [],
             DecisionType: [],
-            AccountTypedata: []
+            AccountTypedata: [],
+            ActivityData: []
         };
         this.dataTable = this.dataTable.bind(this);
         this.SetValue = this.SetValue.bind(this);
@@ -368,6 +372,11 @@ class ClaimProcess extends React.Component {
 
     handleClose = () => {
         this.setState({ openpop: false });
+        
+    };
+
+    handleActivityClose = () => {
+        this.setState({ popopen: false });
     };
     SetValue = (type, event) => {
 
@@ -377,9 +386,6 @@ class ClaimProcess extends React.Component {
         ClaimDTO[name] = value;
         this.setState({ ClaimDTO });
         this.change(event, name, type);
-
-        console.log("claimNumber ", this.state.ClaimDTO);
-
     };
 
     onFormSubmit = (evt) => {
@@ -391,21 +397,17 @@ class ClaimProcess extends React.Component {
 
             this.setState({ claimsdecisionshow: true });
 
-            console.log("submit", this.state.fields);
             let field = this.state.fields;
             field.emailId = this.state.email;
             this.setState({ field });
-            console.log("fields: ", field);
-            console.log("submit JSON", JSON.stringify(this.state.fields));
 
             let detailsdto = this.state.fields;
 
-            console.log("ClaimData", this.state.claimTableData);
 
             for (var i = 0; i < this.state.claimTableData.length; i++) {
-                if (this.state.claimTableData[i].approvedClaimAmounts != null) {
+               // if (this.state.claimTableData[i].approvedClaimAmounts != null) {
                     this.state.DataAmount.push(this.state.claimTableData[i]);
-                }
+               // }
             }
             detailsdto['ClaimInsurable'] = this.state.DataAmount;
 
@@ -423,7 +425,6 @@ class ClaimProcess extends React.Component {
 
             }).then(response => response.json())
                 .then(data => {
-                    console.log("response: ", data)
                     //if (data.status == 200) {
                     this.state.claimId = data.claimId;
                     this.setState({ claimnumber: data.claimNumber });
@@ -450,12 +451,10 @@ class ClaimProcess extends React.Component {
     }
 
     onInputParamChange = (type, evt) => {
-        console.log('Event', evt);
         let fields = this.state.fields;
         let name = evt.target.name;
         let value = evt.target.value;
         fields[name] = value;
-        console.log("fields", fields);
         this.setState({ fields });
 
         this.change(evt, name, type);
@@ -464,7 +463,6 @@ class ClaimProcess extends React.Component {
     };
 
     handleddlChange = (currentNode, selectedNodes) => {
-        console.log("currentNode", currentNode, selectedNodes);
 
         if (currentNode.mIsRequired === true) {
             this.setState({ displaybank: true });
@@ -477,7 +475,7 @@ class ClaimProcess extends React.Component {
     }
 
     handleBankdetails = (id) => {
-
+        let that = this;
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimBankDetails?claimid=` + id + ``, {
             method: 'Get',
             headers: {
@@ -489,14 +487,13 @@ class ClaimProcess extends React.Component {
             return response.json();
         }).then(function (data) {
             console.log('Response data', data);
-            this.setState({ BankDetails: data });
+            that.setState({ BankDetails: data });
+            console.log('BankDetails data', that.state.BankDetails);
         });
     }
 
     editFunction(id, oid) {
 
-        console.log("pid", oid, id);
-        console.log("officelist data", this.state.Claimlist);
         var CArr = this.state.Claimlist;
         var ClaimArr = [];
         $.each(CArr, function (k, v) {
@@ -504,16 +501,13 @@ class ClaimProcess extends React.Component {
                 ClaimArr.push(CArr[id]);
             }
         })
-        console.log("ClaimArr", ClaimArr);
         this.setState({ Claimsendlist: ClaimArr });
         this.state.claimid = ClaimArr[0].claimId;
 
         this.state.prodId = ClaimArr[0].productIdPk;
-        console.log("prodId", this.state.prodId);
 
         const Claimdata = ClaimArr[0].claimId;
         this.setState({ claimid: oid });
-        console.log("Claimid: ", this.state.claimid);
         this.setState({ claimId: Claimdata });
         const fields = this.state.fields;
         fields.claimNumber = ClaimArr[0].claimNumber;
@@ -524,20 +518,19 @@ class ClaimProcess extends React.Component {
 
         this.setState({ fields });
         this.setState({ policyId: ClaimArr[0].policyId });
-        console.log("Claimsendlist: ", this.state.Claimsendlist);
 
         this.policyDetailsfun(ClaimArr[0].policyNo);
 
         this.claimDetailsfun(ClaimArr[0].claimId);
         this.claimAmountTable();
-        this.documentView(oid, false);
+        this.documentView(oid, false , true);
 
         // this.paymentDetailsfun(ClaimArr[0].claimId);
         this.state.PolicyNumber = ClaimArr[0].policyNo;
+        //this.state.vehicleActivity.policyNumber = ClaimArr[0].policyNo;
         this.state.ClaimNumber = ClaimArr[0].claimNumber;
         this.setState({ open: true });
 
-        console.log("approved", this.state.approved, this.state.decision);
         if (ClaimArr[0].claimStatus == "Approved" || ClaimArr[0].claimStatus == "Rejected") {
             this.setState({ approved: false });
         }
@@ -548,7 +541,7 @@ class ClaimProcess extends React.Component {
             this.setState({ approved: true });
 
         }
-        // this.docTable();
+       
         if (ClaimArr[0].claimStatus == "Approved") {
             this.setState({ approved: false });
             swal("", "Claim is already approved!", "success");
@@ -584,8 +577,6 @@ class ClaimProcess extends React.Component {
             .then(data => {
                 this.setState({ ClaimsDecisionData: data });
 
-                console.log("ClaimsDecisionData", data);
-
                 const statusdata = this.state.ClaimsDecisionData[0].mdata;
                 const status1 = statusdata.filter(i => i.mID === 16);
                 const status2 = statusdata.filter(i => i.mID === 17);
@@ -595,8 +586,6 @@ class ClaimProcess extends React.Component {
                 // state.concat(this.state.ClaimsDecisionData[0].mdata[3]);
 
                 this.setState({});
-                console.log("StatusType: ", status2, this.state.StatusType);
-
 
                 const decisiondata = this.state.ClaimsDecisionData[0].mdata;
                 const decision1 = decisiondata.filter(x => x.mID === 9);
@@ -604,7 +593,6 @@ class ClaimProcess extends React.Component {
                 const decision3 = decisiondata.filter(x => x.mID === 17);
                 this.state.DecisionType.push(decision1[0], decision2[0], decision3[0]);
                 this.setState({});
-                console.log("DecisionType", this.state.DecisionType, decisiondata);
             });
         let accounttype = "Account Type";
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + accounttype + ``, {
@@ -618,7 +606,6 @@ class ClaimProcess extends React.Component {
             .then(data => {
                 this.setState({ AccountTypedata: data });
 
-                console.log("AccountTypedata", data);
             });
 
         let Claimstatus = "Claim Decision";
@@ -633,7 +620,6 @@ class ClaimProcess extends React.Component {
             .then(data => {
                 this.setState({ ClaimStatusData: data });
 
-                console.log("ClaimStatusData", data);
             });
 
 
@@ -651,8 +637,6 @@ class ClaimProcess extends React.Component {
         let DataModelDTO = this.state.fields.DataModelDTO;
         DataModelDTO[evt.target.name] = evt.target.value;
         this.setState({ DataModelDTO });
-        console.log("DataModelDTO", this.state.fields.DataModelDTO);
-        console.log("name", evt.target.name);
     };
 
     renderPage = (Bankfieldsmodel) => {
@@ -758,9 +742,6 @@ class ClaimProcess extends React.Component {
 
     tableshow = () => {
 
-        console.log("ClaimDTO", this.state.ClaimDTO);
-
-        console.log("1234567", this.state.fields.claimId);
         const Cdate = this.state.ClaimDTO.eventDate;
 
         if (this.state.ClaimDTO.eventDate != "") {
@@ -782,9 +763,6 @@ class ClaimProcess extends React.Component {
         }).then(function (response) {
             return response.json();
         }).then(function (data) {
-            console.log('Response data', data);
-
-            //console.log(that.state.Claimlist, 'Claim List');
             that.setState({ showtable: false, loader: false });
             if (data.claimSearch.length > 0) {
                 that.dataTable(data.claimSearch);
@@ -815,14 +793,10 @@ class ClaimProcess extends React.Component {
     }
 
     dataTable = (officelist) => {
-        console.log("officelist in react", officelist);
         this.setState({ loader: true, showtable: true });
         this.setState({
             data: officelist.map((prop, key) => {
-                console.log("coming");
                 const { classes } = this.props;
-                console.log("prop data", prop);
-                console.log("send data", key);
                 return {
                     // id: key + 1,
                     insuredName: prop.insuredName,
@@ -847,29 +821,22 @@ class ClaimProcess extends React.Component {
 
     docTable = () => {
 
-        console.log("@@@@", this.state.docDetailsData)
         this.setState({
-            docdata: this.state.docDetailsData.map((prop, key) => {
-                console.log("coming", this.state.docdata);
+            docdata: this.state.DocumentData.map((prop, key) => {
                 const { classes } = this.props;
 
                 return {
                     id: key + 1,
                     documentName: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>,
-                    // documentName: <a href={`http://localhost:53000/api/DMS/DownloadFile?id=`+ prop.dmsdocId}> {prop.documentName} </a>,
-                    // documentType: prop.documentType
-
+                    
                 };
 
             })
         });
-        console.log("docdata", this.state.docdata);
 
     }
 
     claimAmountTable = () => {
-
-        console.log("TableData#007", this.state.claimTableData);
 
         this.setState({
             TableData: this.state.claimTableData.map((prop, key) => {
@@ -900,8 +867,8 @@ class ClaimProcess extends React.Component {
                                 onChange={(e) => this.handleClaimAmount("approvedClaimAmounts", e, key)}
                                 formControlProps={{ fullWidth: true }
                                 } />
-                            {this.state.errormessage && (this.state.claimTableData[key].approvedClaimAmounts) ? <p className="error" >*Enter Claim Amount </p> : null}
-                            {(this.state.claimTableData[key].approvedClaimAmounts > this.state.claimTableData[key].claimAmounts) ? <p className="error">*Approved Amount should not be greater than Claim Amount</p> : null}
+                            {/* {this.state.errormessage && (this.state.claimTableData[key].approvedClaimAmounts) ? <p className="error" >*Enter Claim Amount </p> : null}
+                            {(this.state.claimTableData[key].approvedClaimAmounts > this.state.claimTableData[key].claimAmounts) ? <p className="error">*Approved Amount should not be greater than Claim Amount</p> : null}*/}
                         </GridItem>
                 };
             })
@@ -917,13 +884,11 @@ class ClaimProcess extends React.Component {
     Editopen = () => {
         this.setState({ disabled: false });
         this.setState({ open: true });
-        console.log("officesendlist: ", this.state.officesendlist);
 
     }
 
     claimDetailsfun = (id) => {
 
-        console.log("this.state.claimIds", this.state.claimid);
 
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimDetails?ClaimId=` + this.state.claimid, {
 
@@ -937,7 +902,6 @@ class ClaimProcess extends React.Component {
             .then(response => response.json())
             .then(data => {
                 // this.setState({ claimDetailsData: data[0] });
-                console.log("details of claims", data);
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
@@ -951,32 +915,25 @@ class ClaimProcess extends React.Component {
 
                     this.setState({ vehicleclaim: true });
                 }
-                //this.state.claimDetailsData.totalClaimedAmount = data[0][6][1];
-                //this.state.claimDetailsData.accountHolderName = data[0][7][1];
-                //this.state.claimDetailsData.accountNumber = data[0][8][1];
-                //this.state.claimDetailsData.bankName = data[0][9][1];
-                //this.state.claimDetailsData.ifscCode = data[0][10][1];
-                //this.state.claimDetailsData.bankAddress = data[0][11][1];
-                console.log("###", this.state.claimDetailsData);
+               
 
                 this.setState({ claimTableData: data[1] });
 
-                console.log("this.state.claimTableData", this.state.claimTableData);
+                //console.log("claimTableData", this.state.claimTableData, "fsdfdsg", this.state.claimTableData[0].coverDynamic[2].Details);
+
+                //this.state.vehicleActivity.vehicleNumbers = this.state.claimTableData[0].coverDynamic[2].Details;
+                //this.setState({})
+
+                //console.log("acticityvehicle", this.state.vehicleActivity.vehicleNumbers);
 
                 this.claimAmountTable(this.state.claimTableData);
 
-                console.log("DATA", this.state.claimDetailsData, this.state.claimTableData);
-
             });
-
-        // this.setState({ disabled: true });
 
 
     }
 
     policyDetailsfun = (policyNo) => {
-
-        console.log("this.state.policyId", policyNo);
         fetch(`${ClaimConfig.policyconfigUrl}/api/Policy/SearchPolicyDetailsByNumber?PolicyNumber=` + policyNo, {
             method: 'get',
             headers: {
@@ -988,7 +945,7 @@ class ClaimProcess extends React.Component {
             .then(response => response.json())
             .then(data => {
                 // this.setState({ policyDetailsData: data });
-                console.log("insured", data);
+               
                 this.state.policyDetailsData.customerId = data[0][1];
                 this.state.policyDetailsData.coverNoteNo = data[1][1];
                 this.state.policyDetailsData.mobileNumber = data[2][1];
@@ -997,20 +954,18 @@ class ClaimProcess extends React.Component {
                 //this.state.policyDetailsData.coverEvent = data[4][1];
                 this.state.policyDetailsData.sDate = new Date(data[6][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 this.state.policyDetailsData.eDate = new Date(data[7][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                this.state.policyDetailsData.totalSumInsured = data[8][1];
+                this.state.policyDetailsData.balanceSumInsured = data[9][1];
 
-
-                console.log("abcdddddd", this.state.policyDetailsData);
-
-
+               
             });
         this.setState({ disabled: true });
     }
 
-    documentView = (oid, isDoc) => {
+    documentView = (oid, isDoc, isPolicy) => {
 
-        console.log("1234567", oid);
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid + `&isDoc=` + isDoc, {
-            method: 'get',
+       fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid + `&isDoc=` + isDoc + `&isPolicy=` + isPolicy, {
+           method: 'get',
 
             headers: {
 
@@ -1023,34 +978,27 @@ class ClaimProcess extends React.Component {
         }).then(response => response.json())
 
             .then(data => {
-                console.log("Data:123234", data);
                 this.setState({ docDetailsData: data });
 
-                console.log("document data", data)
-                //console.log("docDetailsData", this.state.docDetailsData);
+                
+                    const doc = this.state.Datapic[0];
 
-                const doc = this.state.Datapic[0];
+                    doc.document = data[0].document;
 
-                doc.document = data[0].document;
-
-                this.setState({ doc });
-
-                console.log("document", this.state.Datapic[0].document);
-                //let file = this.state.Datapic[0].document;
-                //window.open(file);
-                // window.open("https://localhost:44344/api/ClaimManagement/Download?ClaimId=" + this.state.Datapic[0].document);
-
-                // window.open("data:application/jpg;base64, " + this.state.Datapic[0].document);
-
-                this.docTable(this.state.docDetailsData);
+                    this.setState({ doc });
+               
+                for (let i = 0; i < this.state.docDetailsData.length; i++) {
+                    if (this.state.docDetailsData[i].dmsdocId != null) {
+                        this.state.DocumentData.push(this.state.docDetailsData[i]);
+                        this.docTable(this.state.DocumentData);
+                    }
+                }
             });
     }
 
     documentLinkView = (dmsdocId) => {
-        //this.setState({ openpop: true });
-        console.log("1234567", dmsdocId);
-        //fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid + `&isDoc=` + isDoc, {
-
+        let that = this;
+       
         fetch("https://inubeservicesnotification.azurewebsites.net/api/DMS/DownloadView?id=" + dmsdocId, {
 
             method: 'get',
@@ -1064,37 +1012,18 @@ class ClaimProcess extends React.Component {
         }).then(response => response.json())
 
             .then(data => {
-                console.log("Data:fgdgh", data);
-                this.setState({ bytearr: data.data });
-
-                console.log("doc123data", this.state.bytearr);
-                console.log("docDetailsData", this.state.docDetailsData);
-
+               
+                that.setState({ bytearr: data.data });
+            
                 if (data.contentType == "pdf") {
-                    this.setState({ isimage: true });
+                    that.setState({ isimage: true });
                 }
                 else {
-                    this.setState({ isimage: false });
+                    that.setState({ isimage: false });
                 }
 
-                //const doc = this.state.Datapic[0];
-
-                // doc.document = data[0].document;
-
-                // this.setState({ doc });
-
-                // console.log("document", this.state.Datapic[0].documentType);
-                //let file = this.state.Datapic[0].document;
-                //window.open(file);
-                //window.open('http://localhost:61048/Bills/"+documentStr+"', '_blank');
-
-                // window.open("data:application/pdf;base64, " + this.state.bytearr);
-                // let pdfWindow = window.open("")
-                // pdfWindow.bytearr.write("<iframe width='100%' height='100%' src='data:application/jpg;base64, " + this.state.bytearr + "'></iframe>") 
-                // this.docTable(this.state.bytearr);
                 this.setState({ openpop: true });
             });
-        // this.setState({ openpop: true });
     }
 
 
@@ -1115,7 +1044,7 @@ class ClaimProcess extends React.Component {
     SetDecision(setValue) {
 
         this.setState({ decision: setValue });
-        console.log("data", setValue);
+       
     }
 
     searchagain = () => {
@@ -1207,22 +1136,6 @@ class ClaimProcess extends React.Component {
                 }
                 break;
 
-            case "policyNo":
-                if (validationPage.verifyPolicynumber(event.target.value)) {
-                    this.setState({ [stateName + "State"]: false });
-                } else {
-                    this.setState({ [stateName + "State"]: true });
-                }
-                break;
-
-            case "claimNumber":
-                if (validationPage.verifyClaimNumber(event.target.value)) {
-                    this.setState({ [stateName + "State"]: false });
-                } else {
-                    this.setState({ [stateName + "State"]: true });
-                }
-                break;
-
             case "claimManagerRemarks":
                 if (validationPage.verifyName(event.target.value)) {
                     this.setState({ [stateName + "State"]: false });
@@ -1247,8 +1160,6 @@ class ClaimProcess extends React.Component {
             this.setState({});
 
         }
-        console.log("alldoc", this.state.fields);
-        // console.log("docid", this.state.alldoc.dmsdocId, this.state.alldoc.documentName);
 
     }
     renderRedirect = () => {
@@ -1257,6 +1168,8 @@ class ClaimProcess extends React.Component {
         this.setState({ Claimdata });
 
     }
+
+   
 
     onGet = () => {
         let claimprocess = "Claim Process";
@@ -1270,14 +1183,8 @@ class ClaimProcess extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                console.log("data", data);
 
                 this.setState({ ProductClaimData: data });
-
-                // this.state.ProductClaimData.mIsRequired = false;
-                // this.setState({});
-
-                console.log("ProductClaimData", this.state.ProductClaimData);
 
 
             });
@@ -1288,7 +1195,6 @@ class ClaimProcess extends React.Component {
         let ProductClaimData = this.state.ProductClaimData;
         //let name = event.target.name;
         let check = event.target.checked;
-        console.log("values: ", this.state.ProductClaimData, 'chk data ', event, event.target.checked, name);
 
         if (event.target.checked == "undefined") {
         } else {
@@ -1316,7 +1222,6 @@ class ClaimProcess extends React.Component {
                 //    this.setState({});
 
 
-                //    console.log("this.state.fields.payeeType", this.state.fields.payeeTypeId, "-------", data[index].mID);
                 //}
 
 
@@ -1334,10 +1239,6 @@ class ClaimProcess extends React.Component {
 
             }
 
-
-
-
-
             //if (event.target.checked === true) {
             //    this.state.displaybank = true;
             //    this.setState({});
@@ -1349,7 +1250,6 @@ class ClaimProcess extends React.Component {
 
             //debugger;
             //var eventname = document.getElementsByName(event.target.name); 
-            //console.log("event.target.name", eventname);
             //for (var i = 0; i < eventname.length; i++) {
             //    if (!eventname[i].mIsRequired==true) {
             //        eventname[i].disable = true;
@@ -1358,12 +1258,10 @@ class ClaimProcess extends React.Component {
             //    }
             //} 
 
-            console.log("values: ", this.state.ProductClaimData);
         }
         //ProductClaimData[name] = check;
         //this.setState({ ProductClaimData });
 
-        //console.log("name", event.target.name);
     }
 
     render() {
@@ -1645,7 +1543,8 @@ class ClaimProcess extends React.Component {
                                     errormessage={this.state.errormessage} ValidationUI={this.state.ValidationUI} classes={this.classes} renderPage={this.renderPage}
                                     errorstatus={this.state.errorstatus} DecisionType={this.state.DecisionType} PayeeType={this.state.PayeeType} displaybank={this.state.displaybank} handleddlChange={this.handleddlChange}
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
-                                    SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData} />
+                                    SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
+                                    />
 
                             </CardBody>
                         </Card>
@@ -1677,7 +1576,7 @@ class ClaimProcess extends React.Component {
                                 />
 
 
-                                : <img style={{ width: "80rem" }}
+                                : <img style={{ width: "40rem" }}
                                     src={
                                         this.state.docbyte = "data:image;base64," + this.state.bytearr
                                     }

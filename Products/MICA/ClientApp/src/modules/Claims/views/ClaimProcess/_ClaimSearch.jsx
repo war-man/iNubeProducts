@@ -24,7 +24,7 @@ import TranslationContainer from "components/Translation/TranslationContainer.js
 
 
 const ClaimSearch = (props) => {
-    console.log("props1", props);
+  
     return (
         <div>
             {
