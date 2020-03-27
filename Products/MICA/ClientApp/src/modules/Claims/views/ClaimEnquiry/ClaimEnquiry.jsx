@@ -115,6 +115,7 @@ class ClaimEnquiry extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            vehicleclaim: false,
             isimage: false,
             openpop: false,
             bytearr: [],
@@ -147,7 +148,7 @@ class ClaimEnquiry extends React.Component {
             ClaimsDecisionData: [],
             claimsdecisionshow: false,
             Claimdetailsdata: [],
-            DocumentData: [],
+          
             ClaimDataDTO: [],
             claimId: 0,
             documentName: "",
@@ -254,6 +255,9 @@ class ClaimEnquiry extends React.Component {
                 "lossDate": "",
                 "locationOfEvent": "",
                 "lossDescription": "",
+                "vehicleLocation": "",
+                "driverName": "",
+                "selfSurvey": "",
                 "claimManagerRemarks": "",
                 "totalClaimedAmount": "",
                 "claimStatus": "",
@@ -266,14 +270,16 @@ class ClaimEnquiry extends React.Component {
             },
             policyDetailsData: {
                 "customerId": "",
+                "coverNoteNo": "",
                 "mobileNumber": "",
                 "email": "",
                 "eventdate": "",
                 "coverEvent": "",
                 "sDate": "",
                 "eDate": "",
+                "totalSumInsured": "",
+                "balanceSumInsured": ""
             },
-
             claimTableData: [],
             paymentDetailsData: [],
             docDetailsData: [],
@@ -395,19 +401,12 @@ class ClaimEnquiry extends React.Component {
         this.setState({ fields });
         this.setState({ policyId: ClaimArr[0].policyId });
         console.log("Claimsendlist: ", this.state.Claimsendlist);
-        this.policyDetailsfun(ClaimArr[0].policyId);
+        this.policyDetailsfun(ClaimArr[0].policyNo);
         this.claimDetailsfun(ClaimArr[0].claimId);
-
-       // this.downloadDocument(oid, false);
-
-        this.documentView(oid, false);
-        
-        //this.paymentDetailsfun(ClaimArr[0].claimId);
+        this.documentView(oid, false, true);
         this.state.PolicyNumber = ClaimArr[0].policyNo;
         this.state.ClaimNumber = ClaimArr[0].claimNumber;
         this.setState({ open: true });
-
-
         this.claimAmountTable();
     }
 
@@ -430,24 +429,6 @@ class ClaimEnquiry extends React.Component {
 
                 console.log("ClaimsDecisionData", data);
             });
-
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Document%20Name`, {
-            method: 'get',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.setState({ DocumentData: data });
-
-                console.log("DocumentData", data);
-            });
-
-        //this.setState({ ClaimsAmountData: AmtData });
 
 
         setTimeout(
@@ -520,30 +501,26 @@ class ClaimEnquiry extends React.Component {
             body: JSON.stringify(this.state.ClaimDTO)
         }).then(function (response) {
             return response.json();
-        }).then(function (data) {
-            console.log('Response data', data);
+            }).then(function (data) {
+                that.setState({ showtable: false, loader: false });
+                if (data.claimSearch.length > 0) {
+                    that.dataTable(data.claimSearch);
+                    that.setState({ email: data.claimSearch[0].insuredEmail });
+                } else {
+                    setTimeout(
+                        function () {
+                            that.setState({ loader: true, showtable: false, nodata: true });
+                        }.bind(this), 2000
+                    );
+                }
+
+                that.setState({ Claimlist: data.claimSearch });
+                that.setState({ officelist: data.claimSearch });
+
+                 that.claimAmountTable(data);
 
 
-
-            console.log(that.state.Claimlist, 'Claim List');
-            that.setState({ showtable: false, loader: false });
-            if (data.length > 0) {
-                that.dataTable(data);
-            } else {
-                setTimeout(
-                    function () {
-                        that.setState({ loader: true, showtable: false, nodata: true });
-                    }.bind(this), 2000
-                );
-            }
-            that.setState({ email: data[0].insuredEmail });
-            that.setState({ Claimlist: data });
-            that.setState({ officelist: data });
-
-            that.claimAmountTable(data);
-
-
-        });
+            });
 
 
         this.state.ClaimDTO.eventDate = Cdate;
@@ -567,17 +544,11 @@ class ClaimEnquiry extends React.Component {
                 return {
                     
                     insuredName: prop.insuredName,
-                    insuredReference: prop.insuredReference,
                     policyNo: prop.policyNo,
                     claimNumber: prop.claimNumber,
-                    claimStatus: prop.claimStatus,
-                    coverEvent: prop.coverEvent,
-                    coverName: prop.coverName,
-                    eventDate: new Date(prop.eventDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
-
+                    typeOfLoss: prop.typeOfLoss,
                     lossDateTime: new Date(prop.lossDateTime).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
-
-
+                    claimStatus: prop.claimStatus,
                     radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.claimId)} />
 
                 };
@@ -600,7 +571,9 @@ class ClaimEnquiry extends React.Component {
                     name: prop.name,
                     identificationNo: prop.identificationNo,
                     typeOfLoss: prop.typeOfLoss,
-                    benefitAmount: prop.benefitAmount,
+                    coverValue: prop.coverDynamic.map((c) => {
+                        return (<h6> <b>{c.Header}</b> : {c.Details} </ h6>)
+                    }),
                     claimAmounts: prop.claimAmounts,
                     approvedClaimAmounts: prop.approvedClaimAmounts
 
@@ -610,11 +583,11 @@ class ClaimEnquiry extends React.Component {
 
     }
 
-    docTable = (docDetailsData) => {
+    docTable = (DocumentData) => {
 
-        console.log("@@@@", this.state.docDetailsData)
+        console.log("@@@@", this.state.DocumentData)
         this.setState({
-            docdata: this.state.docDetailsData.map((prop, key) => {
+            docdata: this.state.DocumentData.map((prop, key) => {
                 console.log("coming", this.state.docdata);
                 const { classes } = this.props;
                 
@@ -650,27 +623,28 @@ class ClaimEnquiry extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                //this.setState({ claimDetailsData: data[0] });
+                console.log("claimDetailsfndata", data);
 
-                this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });;
+                this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
                 this.state.claimDetailsData.totalClaimedAmount = data[0][3][1];
                 this.state.claimDetailsData.totalApprovedAmount = data[0][4][1];
-                this.state.claimDetailsData.accountHolderName = data[0][5][1];
-                this.state.claimDetailsData.accountNumber = data[0][6][1];
-                this.state.claimDetailsData.bankName = data[0][7][1];
-                this.state.claimDetailsData.ifscCode = data[0][8][1];
-                this.state.claimDetailsData.bankAddress = data[0][9][1];
-                this.state.claimDetailsData.claimStatus = data[0][10][1];
-                this.state.claimDetailsData.claimManagerRemarks = data[0][11][1];
+                this.state.claimDetailsData.claimStatus = data[0][5][1];
+                this.state.claimDetailsData.claimManagerRemarks = data[0][6][1];
+                if (data[0][7][1].length != 0 && data[0][8][1].length != 0 && data[0][9][1].length != 0) {
 
-                console.log("asdfgh", this.state.claimDetailsData);
+                    this.state.claimDetailsData.vehicleLocation = data[0][7][1];
+                    this.state.claimDetailsData.driverName = data[0][8][1];
+                    this.state.claimDetailsData.selfSurvey = data[0][9][1];
+
+                    this.setState({ vehicleclaim: true });
+                }
+
 
                 this.setState({ claimTableData: data[1] });
-                //let griddata = this.state.claimTableData.filter(x => x.approvedClaimAmounts != null);
-                //this.setState({ claimTableData: griddata });
-
+               
+                console.log("this.state.claimTableData", this.state.claimTableData)
                 this.claimAmountTable(this.state.claimTableData);
 
                 console.log("DATA", this.state.claimTableData);
@@ -681,9 +655,8 @@ class ClaimEnquiry extends React.Component {
 
     }
 
-    policyDetailsfun = (id) => {
-        console.log("this.state.policyId", this.state.policyId);
-        fetch(`${ClaimConfig.policyconfigUrl}/api/Policy/SearchPolicyDetails?PolicyId=` + id, {
+    policyDetailsfun = (policyNo) => {
+        fetch(`${ClaimConfig.policyconfigUrl}/api/Policy/SearchPolicyDetailsByNumber?PolicyNumber=` + policyNo, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -693,50 +666,24 @@ class ClaimEnquiry extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                //this.setState({ policyDetailsData: data });
 
                 this.state.policyDetailsData.customerId = data[0][1];
-                this.state.policyDetailsData.mobileNumber = data[1][1];
-                this.state.policyDetailsData.email = data[2][1];
-                this.state.policyDetailsData.eventdate = new Date(data[3][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
-                this.state.policyDetailsData.coverEvent = data[4][1];
-                this.state.policyDetailsData.sDate = new Date(data[5][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                this.state.policyDetailsData.eDate = new Date(data[6][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                this.state.policyDetailsData.coverNoteNo = data[1][1];
+                this.state.policyDetailsData.mobileNumber = data[2][1];
+                this.state.policyDetailsData.email = data[3][1];
+                this.state.policyDetailsData.sDate = new Date(data[6][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                this.state.policyDetailsData.eDate = new Date(data[7][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                this.state.policyDetailsData.totalSumInsured = data[8][1];
+                this.state.policyDetailsData.balanceSumInsured = data[9][1];
 
-                console.log("policyDetailsData", this.state.policyDetailsData);
+
             });
-
     }
 
 
-    //paymentDetailsfun = (id) => {
-    //    console.log("this.state.claimId", this.state.claimId);
+    documentView = (oid, isDoc, isPolicy) => {
 
-    //    fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchPaymentDetails?ClaimId=` + id, {
-    //        method: 'get',
-    //        headers: {
-    //            'Accept': 'application/json',
-    //            'Content-Type': 'application/json',
-    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-    //        },
-    //    }).then(response => response.json())
-    //        .then(data => {
-    //            this.setState({ paymentDetailsData: data });
-
-    //            //if (typeof data.length != "undefined" && data.length != null && data.length > 0) {
-    //            //    this.state.paymentDetailsData[1][1] = new Date(data[1][1]).toLocaleDateString('en-IN', { day: 'numeric', month: 'numeric', year: 'numeric', });
-
-    //            //    this.state.paymentDetailsData[3][1] = new Date(data[3][1]).toLocaleDateString('en-IN', { day: 'numeric', month: 'numeric', year: 'numeric', });
-
-    //            //}
-    //        });
-    //}
-
-    documentView = (oid,isDoc) => {
-     
-        console.log("1234567", oid);
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid +`&isDoc=`+ isDoc , {
-
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid + `&isDoc=` + isDoc + `&isPolicy=` + isPolicy, {
             method: 'get',
 
             headers: {
@@ -750,11 +697,8 @@ class ClaimEnquiry extends React.Component {
         }).then(response => response.json())
 
             .then(data => {
-                console.log("Data:fgdgh", data);
                 this.setState({ docDetailsData: data });
 
-                console.log("document data", data)
-                //console.log("docDetailsData", this.state.docDetailsData);
 
                 const doc = this.state.Datapic[0];
 
@@ -762,18 +706,13 @@ class ClaimEnquiry extends React.Component {
 
                 this.setState({ doc });
 
-                console.log("document", this.state.Datapic[0].document);
-                //let file = this.state.Datapic[0].document;
-                //window.open(file);
-                //window.open('http://localhost:61048/Bills/"+documentStr+"', '_blank');
-
-               // window.open("data:application/jpg;base64, " + this.state.Datapic[0].document);
-
-                this.docTable(this.state.docDetailsData);
-
+                for (let i = 0; i < this.state.docDetailsData.length; i++) {
+                    if (this.state.docDetailsData[i].dmsdocId != null) {
+                        this.state.DocumentData.push(this.state.docDetailsData[i]);
+                        this.docTable(this.state.DocumentData);
+                    }
+                }
             });
-
-
     }
 
     documentLinkView = (dmsdocId) => {
@@ -895,21 +834,7 @@ class ClaimEnquiry extends React.Component {
                 }
                 break;
 
-            case "policyNo":
-                if (validationPage.verifyPolicynumber(event.target.value)) {
-                    this.setState({ [stateName + "State"]: false });
-                } else {
-                    this.setState({ [stateName + "State"]: true });
-                }
-                break;
-
-            case "claimNumber":
-                if (validationPage.verifyClaimNumber(event.target.value)) {
-                    this.setState({ [stateName + "State"]: false });
-                } else {
-                    this.setState({ [stateName + "State"]: true });
-                }
-                break;
+            
 
             case "claimManagerRemarks":
                 if (validationPage.verifyName(event.target.value)) {
@@ -1182,7 +1107,7 @@ class ClaimEnquiry extends React.Component {
                             </GridContainer>
                            
                                         <ClaimSearch TableData={this.state.TableData} handleDisappear={this.handleDisappear} refreshData={this.refreshData} ClaimAmountSum={this.ClaimAmountSum} ClaimDTO={this.state.ClaimDTO} fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount} disabled={this.state.disabled} claimId={this.state.claimId} SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} policyDetailsData={this.state.policyDetailsData} decision={this.state.decision} claimDetailsData={this.state.claimDetailsData}
-                                docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} />
+                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} />
 
                         </CardBody>
                             </Card>

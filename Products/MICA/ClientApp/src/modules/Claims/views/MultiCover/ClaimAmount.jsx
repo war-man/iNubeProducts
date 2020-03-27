@@ -170,7 +170,7 @@ const ClaimAmount = (props) => {
                         headerClassName: 'react-table-center'
                     },
                             {
-                            Header: "CoverValue",
+                            Header: "Risk Details",
                         accessor: "coverValue",
                         minWidth: 20,
                                 setCellProps: (value) => ({style: {textAlign: "center" } }),
