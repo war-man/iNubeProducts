@@ -137,6 +137,54 @@ const ClaimDetails = (props) => {
                     />
                 </GridItem>
 
+                {
+                    claimDetailsprops.vehicleclaim &&
+
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
+                            disabled={claimDetailsprops.disabled}
+                            labelText="Vehicle Location"
+                            value={claimDetailsprops.claimDetailsData.vehicleLocation}
+                            name='vehicleLocation'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+
+                }
+
+                {
+                    claimDetailsprops.vehicleclaim &&
+
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
+                            disabled={claimDetailsprops.disabled}
+                            labelText="Driver Name"
+                            value={claimDetailsprops.claimDetailsData.driverName}
+                            name='driverName'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
+
+                {
+                    claimDetailsprops.vehicleclaim &&
+
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
+                            disabled={claimDetailsprops.disabled}
+                            labelText="Self-Survey Required"
+                            value={claimDetailsprops.claimDetailsData.selfSurvey}
+                            name='selfSurvey'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
 
 
             </GridContainer>
@@ -186,13 +234,14 @@ const ClaimDetails = (props) => {
                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                 headerClassName: 'react-table-center'
                             },
-
                             {
-                                Header: "BenefitAmount",
-                                accessor: "benefitAmount",
+                                Header: "Risk Details",
+                                accessor: "coverValue",
+                                setCellProps: (value) => ({ style: { textAlign: "right" } }),
                                 minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "center" } }),
                                 headerClassName: 'react-table-center',
+                                //sortable: false,
+                                //filterable: false
 
                             },
                             {
@@ -265,7 +314,7 @@ const ClaimDetails = (props) => {
             </GridContainer>
 
 
-            <GridContainer>
+            {/*  <GridContainer>
                 <CardHeader color="info" icon >
                     {
                         <h3 >
@@ -377,7 +426,7 @@ const ClaimDetails = (props) => {
                     </GridItem>
                 </GridContainer>
 
-            </GridContainer>
+            </GridContainer>*/}
 
             <br />
             <GridContainer>
@@ -397,15 +446,9 @@ const ClaimDetails = (props) => {
 
                     <CustomInput
 
-                        // success={this.state.firstNameState == "success"}
-                        // error={this.state.firstNameState == "error"}
                         labelText="ClaimStatus"
-                        // required={true}
-                        // id="fName"
                         value={claimDetailsprops.claimDetailsData.claimStatus}
                         name='claimStatus'
-                        // onChange={(e) => claimDetailsprops.SetClaimValues("string", e)}
-                        //modelbind={model('UserDetailsDTO.FirstName')}
                         disabled={claimDetailsprops.disabled}
                         formControlProps={{
                             fullWidth: true
@@ -417,16 +460,9 @@ const ClaimDetails = (props) => {
 
 
                     <CustomInput
-
-                        // success={this.state.firstNameState == "success"}
-                        // error={this.state.firstNameState == "error"}
                         labelText="ManagerRemarks"
-                        // required={true}
-                        // id="fName"
                         value={claimDetailsprops.claimDetailsData.claimManagerRemarks}
                         name='claimManagerRemarks'
-                        // onChange={(e) => claimDetailsprops.SetClaimValues("string", e)}
-                        //modelbind={model('UserDetailsDTO.FirstName')}
                         disabled={claimDetailsprops.disabled}
                         formControlProps={{
                             fullWidth: true

@@ -27,7 +27,7 @@ namespace iNube.Components.RuleEngine.Entities.AllocationEntities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;Trusted_Connection=False;");
             }
         }
 
@@ -77,16 +77,16 @@ namespace iNube.Components.RuleEngine.Entities.AllocationEntities
                     .HasColumnType("numeric(18, 0)")
                     .ValueGeneratedOnAdd();
 
-                entity.Property(e => e.AllocParamSetId)
-                    .HasColumnName("AllocParamSetID")
+                entity.Property(e => e.AllocParametersId)
+                    .HasColumnName("AllocParametersID")
                     .HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.Output).IsUnicode(false);
 
-                entity.HasOne(d => d.AllocParamSet)
+                entity.HasOne(d => d.AllocParameters)
                     .WithMany(p => p.TblAllocParameterSetDetails)
-                    .HasForeignKey(d => d.AllocParamSetId)
-                    .HasConstraintName("FK_tblAllocParameterSettblAllocParameterSetDetails");
+                    .HasForeignKey(d => d.AllocParametersId)
+                    .HasConstraintName("FK__tblAllocP__Alloc__2724C5F0");
             });
 
             modelBuilder.Entity<TblAllocation>(entity =>
@@ -145,7 +145,7 @@ namespace iNube.Components.RuleEngine.Entities.AllocationEntities
                 entity.HasOne(d => d.AllocationRule)
                     .WithMany(p => p.TblAllocationRuleConditions)
                     .HasForeignKey(d => d.AllocationRuleId)
-                    .HasConstraintName("FK_tblRatingRulestblRatingRuleConditions");
+                    .HasConstraintName("FK_tblAllocationRulestblAllocationRuleConditions");
             });
 
             modelBuilder.Entity<TblAllocationRules>(entity =>

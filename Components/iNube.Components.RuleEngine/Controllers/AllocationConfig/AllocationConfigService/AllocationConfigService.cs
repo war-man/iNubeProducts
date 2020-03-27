@@ -15,16 +15,16 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
 {
     public interface IAllocationConfigService
     {
-       // List<dynamic> MastertypeData();
+        // List<dynamic> MastertypeData();
         List<ddDTOs> MastertypeData();
         Task<IEnumerable<ddDTOs>> GetAllocationRules(ApiContext apiContext);
         dynamic CheckRuleSets(String EventId, dynamic expression, ApiContext apiContext);
         Task<IEnumerable<ParameterSetDataDTO>> GetParameterSet(ApiContext apiContext);
-        Task<IEnumerable<GetParamSetDetailDTO>> GetRateRule(decimal paramid, ApiContext apiContext);
-        Task<ParameterSetDTO> CreateParamSet(ParameterSetDTO paramSetDto, ApiContext apiContext);
-        Task<AllocationDTO> CreateAllocationRules(AllocationDTO allocDto, ApiContext apiContext);
-
-
+        // Task<IEnumerable<GetParamSetDetailDTO>> GetRateRule(decimal paramid, ApiContext apiContext);
+        Task<List<HandleModel>> GetRateRule(decimal paramid, ApiContext apiContext);
+        Task<AllocParamSetResponce> CreateParamSet(ParameterSetDTO paramSetDto, ApiContext apiContext);
+        //Task<AllocationDTO> CreateAllocationRules(AllocationDTO allocDto, ApiContext apiContext);
+        Task<AllocationResponse> CreateAllocationRules(AllocationDTO allocDto, ApiContext apiContext);
 
     }
 
@@ -79,7 +79,7 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
                                                    .Select(x => new ddDTOs
                                                    {
                                                        mID = x.AllocationId,
-                                                       mType =x.AllocationObj,
+                                                       mType = x.AllocationObj,
                                                        mValue = x.AllocationName
 
                                                    });
@@ -92,13 +92,15 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
             try
             {
                 IEnumerable<ParameterSetDataDTO> data;
-                 data =  _context.TblAllocationParameters
-                           .Select( x => new ParameterSetDataDTO
-                           {
-                               mID = x.AllocParametersId,
-                               mType = x.AllocParamName,
-                               mValue = x.Type
-                           });
+                data = _context.TblAllocationParameters
+                          .Select(x => new ParameterSetDataDTO
+                          {
+                              mID = x.AllocParametersId,
+                              //mType = x.AllocParamName,
+                              //mValue = x.Type
+                              mType = x.Type,
+                              mValue = x.AllocParamName
+                          });
                 return data;
             }
             catch (Exception ex)
@@ -106,11 +108,11 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
                 throw ex;
             }
         }
-      
-        public async Task<ParameterSetDTO> CreateParamSet(ParameterSetDTO paramSetDto, ApiContext apiContext)
+
+        public async Task<AllocParamSetResponce> CreateParamSet(ParameterSetDTO paramSetDto, ApiContext apiContext)
         {
             // _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-          
+
 
             try
             {
@@ -118,8 +120,8 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
                 _context.TblAllocationParameters.Add(dto);
                 _context.SaveChanges();
                 var acntDTO = _mapper.Map<ParameterSetDTO>(dto);
-                return acntDTO;
-                // return new ParamSetResponce { Status = BusinessStatus.Created, ResponseMessage = $"Configuration of Parameter Succesfully Done! \n Allocation Config Name: {acntDTO.ParameterSetName}" };
+                // return acntDTO;
+                return new AllocParamSetResponce { Status = BusinessStatus.Created, ResponseMessage = $"Configuration of Parameter Succesfully Done! \n Allocation Config Name: {acntDTO.AllocParamName}" };
             }
             catch (Exception ex)
             {
@@ -127,35 +129,89 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
             }
             return null;
         }
-        public async Task<IEnumerable<GetParamSetDetailDTO>> GetRateRule(decimal paramid,ApiContext apiContext)
+        //        public async Task<IEnumerable<GetParamSetDetailDTO>> GetRateRule(decimal paramid,ApiContext apiContext)
+        //        {
+        //           try { 
+        //            var Rate_list = (from tblAllocParam in _context.TblAllocationParameters where tblAllocParam.AllocParametersId == paramid
+        //                             join tblAllocParSet in _context.TblAllocParameterSet on tblAllocParam.AllocParametersId equals tblAllocParSet.AllocParametersId
+        //                             join tblAllocParSetDet in _context.TblAllocParameterSetDetails on tblAllocParam.AllocParametersId equals tblAllocParSetDet.AllocParametersId
+        //                             select new GetParamSetDetailDTO
+        //                                     {
+
+
+        //                                 AllocParamSetID = tblAllocParSet.AllocParametersId,
+        //                                 AllocParametersID = tblAllocParam.AllocParametersId,
+
+        //                                 Type = tblAllocParam.Type,
+        //                                 Input = tblAllocParSet.Input,
+        //                                 Output = tblAllocParSetDet.Output,
+
+        //                             }).ToList();
+
+
+
+        //            var data = "";
+        //            return Rate_list;
+        //        }
+        //            catch (Exception ex)
+        //            {
+        //                throw ex;
+        //            }
+        //}
+        public async Task<List<HandleModel>> GetRateRule(decimal paramid, ApiContext apiContext)
         {
-           try { 
-            var Rate_list = (from tblAllocParam in _context.TblAllocationParameters where tblAllocParam.AllocParametersId == paramid
-                             join tblAllocParSet in _context.TblAllocParameterSet on tblAllocParam.AllocParametersId equals tblAllocParSet.AllocParametersId
-                             join tblAllocParSetDet in _context.TblAllocParameterSetDetails on tblAllocParSet.AllocParamSetId equals tblAllocParSetDet.AllocParamSetId
-                             select new GetParamSetDetailDTO
-                                     {
+            try
+            {
+                // Dictionary<decimal?, String> dict = new Dictionary<decimal?, string>();
+                //  Dictionary<string, string> dict = new Dictionary<string, string>();
+                var InputParam = (from tblInput in _context.TblAllocParameterSet
+                                  where tblInput.AllocParametersId == paramid
+
+                                  select new
+                                  {
+                                      Inputval = tblInput.Input,
+                                      InputId = tblInput.AllocParametersId
+
+                                  }).ToList();
+                var OutputParam = (from tblOutput in _context.TblAllocParameterSetDetails
+                                   where tblOutput.AllocParametersId == paramid
+                                   select new
+                                   {
+                                       Outputval = tblOutput.Output,
+                                       OutputId = tblOutput.AllocParametersId
+                                   }).ToList();
+
+                List<HandleModel> check = new List<HandleModel>();
+                foreach (var item in InputParam)
+                {
+                    HandleModel obj = new HandleModel();
+                    obj.AllocParametersID = item.InputId;
+                    obj.Parameter = item.Inputval;
+
+                    check.Add(obj);
+                    // check.Add(item.InputId, item.Inputval);
 
 
-                                 AllocParamSetID = tblAllocParSet.AllocParamSetId,
-                                 AllocParametersID = tblAllocParam.AllocParametersId,
-                                 Type = tblAllocParam.Type,
-                                 Input = tblAllocParSet.Input,
-                                 Output = tblAllocParSetDet.Output,
-                          
-                             }).ToList();
+                }
+                foreach (var item in OutputParam)
+                {
+                    HandleModel obj = new HandleModel();
+                    obj.AllocParametersID = item.OutputId;
+                    obj.Parameter = item.Outputval;
+                    check.Add(obj);
+                }
 
 
-
-            var data = "";
-            return Rate_list;
-        }
+                //var data = "";
+                return check;
+            }
             catch (Exception ex)
             {
                 throw ex;
             }
-}
-       
+        }
+
+
         public dynamic CheckRuleSets(String EventId, dynamic expression, ApiContext apiContext)
         {
             HandleExecEvent objEvent = new HandleExecEvent();
@@ -172,9 +228,9 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
                                          Input = tblAllocRules.Input,
                                          Ouput = tblAllocRules.Output,
                                          IsMulti = tblAllocRules.IsMulti
-                                        
+
                                      }).ToList();
-           // var val = JsonConvert.DeserializeObject<dynamic>(ruleConditionList.ToString());
+            // var val = JsonConvert.DeserializeObject<dynamic>(ruleConditionList.ToString());
             List<object> check = new List<object>();
             try
             {
@@ -188,14 +244,15 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
                         //  List<object> Obj1AsObjects = .Cast<object>().ToList();
                         var Obj1AsObjects = JsonConvert.DeserializeObject<dynamic>(item.Ouput);
                         check.Add(Obj1AsObjects);
-                        
+
                     }
                 }
-                
+
 
                 return check[0];
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return null;
 
             }
@@ -204,29 +261,29 @@ namespace iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationCon
         }
 
         //Alloc Rule Post
-        public async Task<AllocationDTO> CreateAllocationRules(AllocationDTO allocDto, ApiContext apiContext)
+        public async Task<AllocationResponse> CreateAllocationRules(AllocationDTO allocDto, ApiContext apiContext)
         {
-             var name = _context.TblAllocParameterSet.Where(x => x.AllocParamSetId == Convert.ToInt32(allocDto.AllocationObj)).Select(x => x.Input).Single();
+            var name = _context.TblAllocParameterSet.Where(x => x.AllocParametersId == Convert.ToInt32(allocDto.AllocationObj)).Select(x => x.Input).Single();
 
 
             try
             {
-                    var dto = _mapper.Map<TblAllocation>(allocDto);
+                var dto = _mapper.Map<TblAllocation>(allocDto);
                 dto.AllocationObj = name;
 
 
-                    _context.TblAllocation.Add(dto);
-                    _context.SaveChanges();
-                    var acntDTO = _mapper.Map<AllocationDTO>(dto);
-                //  return new RatingRulesResponse { Status = BusinessStatus.Created, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
-                return acntDTO;
+                _context.TblAllocation.Add(dto);
+                _context.SaveChanges();
+                var acntDTO = _mapper.Map<AllocationDTO>(dto);
+                return new AllocationResponse { Status = BusinessStatus.Created, ResponseMessage = $"Allocation Conditions Succesfully Done! \n Alloc Config Name: {acntDTO.AllocationId}" };
+                // return acntDTO;
             }
-                catch (Exception ex)
-                {
+            catch (Exception ex)
+            {
 
-                }
+            }
 
-            
+
 
             return null;
         }

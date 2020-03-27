@@ -17,5 +17,8 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
         Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext);
+        Task<IEnumerable<ReportConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext);
+        void DeleteParameter(int ReportConfigParamId, ApiContext apiContext);
+        Task<ReportConfigDTO> UpdateReport(ReportConfigDTO reportConfigDTO, ApiContext apiContext);
     }
 }

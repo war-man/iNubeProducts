@@ -96,5 +96,28 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
             var objectval = await _reportService.GetReportNameForPermissions(Context);
             return Ok(objectval);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetParameterDetails(int ReportConfigId)
+        {
+            var eventDetails = await _reportService.GetParameterDetails(ReportConfigId, Context);
+            return Ok(eventDetails);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteParameter(int ReportConfigParamId)
+        {
+            _reportService.DeleteParameter(ReportConfigParamId, Context);
+            return Ok();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateReport(int ReportConfigId, ReportConfigDTO reportConfigDTO)
+        {
+            reportConfigDTO.ReportConfigId = ReportConfigId;
+            await _reportService.UpdateReport(reportConfigDTO, Context);
+            return Ok();
+
+        }
     }
 }

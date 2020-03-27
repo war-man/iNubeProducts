@@ -5,11 +5,6 @@ namespace iNube.Components.RuleEngine.Entities.AllocationEntities
 {
     public partial class TblAllocParameterSet
     {
-        public TblAllocParameterSet()
-        {
-            TblAllocParameterSetDetails = new HashSet<TblAllocParameterSetDetails>();
-        }
-
         public decimal AllocParamSetId { get; set; }
         public string Input { get; set; }
         public decimal? AllocParametersId { get; set; }
@@ -17,6 +12,5 @@ namespace iNube.Components.RuleEngine.Entities.AllocationEntities
         public string DataType { get; set; }
 
         public virtual TblAllocationParameters AllocParameters { get; set; }
-        public virtual ICollection<TblAllocParameterSetDetails> TblAllocParameterSetDetails { get; set; }
     }
 }
