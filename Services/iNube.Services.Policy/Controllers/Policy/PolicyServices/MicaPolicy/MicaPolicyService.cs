@@ -3814,7 +3814,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         {
 
                             //dynamic polFields = new ExpandoObject();
-                         
+
                             foreach (var temp in insurabledetails)
                             {
                                 dynamic polFields = JsonConvert.DeserializeObject<ExpandoObject>(temp.CoverValue);
@@ -3830,12 +3830,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         }
                                         else
                                         {
-                                            
+
                                             AddProperty(polFields, insItem.Name, Data[insItem.Name].ToString());
                                         }
 
 
-                                       
+
 
                                     }
                                     temp.CoverValue = JsonConvert.SerializeObject(polFields);
@@ -3848,8 +3848,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                    _context.SaveChanges();
-                }
+                _context.SaveChanges();
+            }
             catch (Exception e)
             {
 
@@ -3961,6 +3961,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         dynamicPolicyrequest["Balance SumInsured"] = dynamicPolicyrequest["Balance SumInsured"] - amount;
                         policy.PolicyRequest = dynamicPolicyrequest.ToString();
+                        policydetails.BalanceSumInsued = policydetails.BalanceSumInsued - Convert.ToInt32(amount);
                     }
                     else
                     {
@@ -3971,6 +3972,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
+                _context.TblPolicy.Update(policydetails);
                 _context.TblPolicyDetails.Update(policy);
                 _context.SaveChanges();
                 return new PolicyResponse { Status = BusinessStatus.Updated, ResponseMessage = $"balance SumInsured Updated for this policy number {PolicyNumber}" };
@@ -4446,7 +4448,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
                     PolicyStartDate = startdateTime.Add(Stateduration);
                 }
-                else {
+                else
+                {
                     System.TimeSpan Stateduration = DateTime.Now.TimeOfDay;
                     DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
                     PolicyStartDate = startdateTime.Add(Stateduration);
@@ -4506,91 +4509,109 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         //step:3 update the insurable fileds
                         if (tblPolicy != null)
                         {
-                            var policyId = tblPolicy.PolicyId;
-                            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-
-                            //Step:4 Calling CD mapping API
-
-                            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-
-                            List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
-                            tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
-                            var type = "Issue Policy";
-
-
-
-                            var tblPolicy1 = await ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
-                            if (tblPolicy1 == null && Errors.Count > 0)
+                            if (tblPolicy.PolicyStageId == ModuleConstants.PolicyStageProposal)
                             {
-                                return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
-                            }
+
+                                var policyId = tblPolicy.PolicyId;
+                                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+
+                                //Step:4 Calling CD mapping API
+
+                                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                                dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+                                List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
+                                var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                                if (CalculatePremiumResponse!=null) {
+                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                    expObj.PremiumDetails = CalculatePremiumResponse;
+                                    var tempobj = JsonConvert.SerializeObject(expObj);
+                                    json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+                                    tblPolicyDetailsdata.PolicyRequest = json.ToString();
+                                }
+
+                                tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
+                                var type = "Issue Policy";
 
 
 
-
-
-                            if (CDmap.Count > 0)
-                            {
-                                MicaCD micaCD = new MicaCD();
-                                micaCD.AccountNo = tblPolicy.CdaccountNumber;
-                                micaCD.micaCDDTO = CDmap;
-                                micaCD.Description = "Policy Issue-" + tblPolicy.PolicyNo;
-                                BusinessStatus businessStatus = 0;
-
-
-                                //Step5:CD Transaction for the policy
-                                var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
-
-                                businessStatus = transaction.Status;
-                                if (businessStatus == BusinessStatus.Created)
+                                var tblPolicy1 = await ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
+                                if (tblPolicy1 == null && Errors.Count > 0)
                                 {
-                                    //Status for Txn
-                                    TblPolicy policyUpdate = _context.TblPolicy.Find(tblPolicy.PolicyId);
-
-
-                                    //policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
-                                    policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStageQuoteCreated;
-                                    policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
-                                    policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
-
-
-                                    policyUpdate.IsActive = true;
-                                    //string[] Separate = (policyUpdate.PolicyStartDate.ToString()).Split(' ');
-                                    //string desiredDate = Separate[1];
-
-                                    //string[] SeparateTime = (desiredDate.ToString()).Split(':');
-                                    //var hour = Convert.ToInt32(SeparateTime[0]);
-                                    //var minute= Convert.ToInt32(SeparateTime[1]);
-                                    //var second = Convert.ToInt32(SeparateTime[2];
+                                    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                                }
 
 
 
-                                    policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
-
-                                    policyUpdate.PolicyStartDate = PolicyStartDate;
-                                    //System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
-                                    //DateTime dateTime = Convert.ToDateTime(policyUpdate.PolicyStartDate).Date;
-
-                                    //policyUpdate.PolicyEndDate = dateTime.Add(duration);
-                                    policyUpdate.PolicyEndDate = PolicyEndDate;
 
 
-                                    _context.SaveChanges();
+                                if (CDmap.Count > 0)
+                                {
+                                    MicaCD micaCD = new MicaCD();
+                                    micaCD.AccountNo = tblPolicy.CdaccountNumber;
+                                    micaCD.micaCDDTO = CDmap;
+                                    micaCD.Description = "Policy Issue-" + tblPolicy.PolicyNo;
+                                    BusinessStatus businessStatus = 0;
 
+
+                                    //Step5:CD Transaction for the policy
+                                    var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+
+                                    businessStatus = transaction.Status;
+                                    if (businessStatus == BusinessStatus.Created)
+                                    {
+                                        //Status for Txn
+                                        TblPolicy policyUpdate = _context.TblPolicy.Find(tblPolicy.PolicyId);
+
+
+                                        //policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
+                                        policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStageQuoteCreated;
+                                        policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
+                                        policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
+
+
+                                        policyUpdate.IsActive = true;
+                                        //string[] Separate = (policyUpdate.PolicyStartDate.ToString()).Split(' ');
+                                        //string desiredDate = Separate[1];
+
+                                        //string[] SeparateTime = (desiredDate.ToString()).Split(':');
+                                        //var hour = Convert.ToInt32(SeparateTime[0]);
+                                        //var minute= Convert.ToInt32(SeparateTime[1]);
+                                        //var second = Convert.ToInt32(SeparateTime[2];
+
+
+
+                                        policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
+
+                                        policyUpdate.PolicyStartDate = PolicyStartDate;
+                                        //System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
+                                        //DateTime dateTime = Convert.ToDateTime(policyUpdate.PolicyStartDate).Date;
+
+                                        //policyUpdate.PolicyEndDate = dateTime.Add(duration);
+                                        policyUpdate.PolicyEndDate = PolicyEndDate;
+
+
+                                        _context.SaveChanges();
+
+                                    }
+                                    else
+                                    {
+
+                                        return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
+
+                                    }
+                                    return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number {tblPolicy.PolicyNo} Issued for this Proposal Number {tblPolicy.ProposalNo} Successfully" };
                                 }
                                 else
                                 {
+                                    return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
 
-                                    return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
 
                                 }
-                                return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number {tblPolicy.PolicyNo} Issued for this Proposal Number {tblPolicy.ProposalNo} Successfully" };
                             }
                             else
                             {
-                                return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
-
+                                return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy is already issued for this Policy Number{tblPolicy.PolicyNo}" };
 
                             }
                         }
