@@ -4521,32 +4521,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                                 dynamic jsonObj = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                                 List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
-                               // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
-                                if (CDmap.Count>0) {
-                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
-                                    var premium = JsonConvert.DeserializeObject <List<MicaCDDTO>>(jsonObj.PremiumDetails.ToString());
-                                    expObj.PremiumDetails = CDmap;
-                                   
-                                    expObj.PremiumDetails.AddRange(premium);
-                                    var tempobj = JsonConvert.SerializeObject(expObj);
-                                    json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
-                                    tblPolicyDetailsdata.PolicyRequest = json.ToString();
-                                }
 
                                 tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
                                 var type = "Issue Policy";
-
-
-
-                                var tblPolicy1 = await ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
-                                if (tblPolicy1 == null && Errors.Count > 0)
-                                {
-                                    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
-                                }
-
-
-
-
 
                                 if (CDmap.Count > 0)
                                 {
@@ -4560,6 +4537,32 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     //Step5:CD Transaction for the policy
                                     var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
 
+                                    // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                                    if (CDmap.Count>0) {
+                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                    var premium = JsonConvert.DeserializeObject <List<MicaCDDTO>>(jsonObj.PremiumDetails.ToString());
+                                    //expObj.PremiumDetails = CDmap;
+                                   
+                                    expObj.PremiumDetails.AddRange(CDmap);
+                                    var tempobj = JsonConvert.SerializeObject(expObj);
+                                    json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+                                    tblPolicyDetailsdata.PolicyRequest = json.ToString();
+                                }
+
+                            
+
+
+                                var tblPolicy1 = await ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
+                                if (tblPolicy1 == null && Errors.Count > 0)
+                                {
+                                    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                                }
+
+
+
+
+
+                              
                                     businessStatus = transaction.Status;
                                     if (businessStatus == BusinessStatus.Created)
                                     {
