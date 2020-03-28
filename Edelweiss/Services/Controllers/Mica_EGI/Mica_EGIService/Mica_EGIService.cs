@@ -49,7 +49,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         //Claims needs Activity of Vehicle
         ResponseVehicleActivity GetVehicleActivity(VehicleActivityDTO vehicleActivity);
         //refurnd Details
-        Task<PolicyCancelResponse> GetPolicyCancelDetails(PolicyCancelRequest policyRequest, ApiContext apiContext);
+        Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -4259,7 +4259,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
 
-        public async Task<PolicyCancelResponse> GetPolicyCancelDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
+        public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
         {
             var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apiContext);
             // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();

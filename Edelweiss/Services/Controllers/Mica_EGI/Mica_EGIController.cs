@@ -165,9 +165,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
         }
         [HttpPost]
-        public async Task<IActionResult> GetPolicyCancelDetails(PolicyCancelRequest policyRequest)
+        public async Task<IActionResult> GetRefundDetails(PolicyCancelRequest policyRequest)
         {
-            var searchPolicyDetails = await _quotationService.GetPolicyCancelDetails(policyRequest, Context);
+            var searchPolicyDetails = await _quotationService.GetRefundDetails(policyRequest, Context);
             return Ok(searchPolicyDetails);
         }
 
