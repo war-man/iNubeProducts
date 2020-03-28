@@ -505,6 +505,35 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string PolicyNumber { get; set; }
         public Dictionary<string,List<ActivityDTO>> VehicleData { get; set; }
     }
+    public class PolicyCancelRequest
+    {
+        public string PolicyNumber { get; set; }
+        public DateTime? EffectiveDate { get; set; }
+        public DateTime? CancelRequestDate { get; set; }
+    }
+    public class PolicyCancelResponse
+    {
+        public double NoofDayRemaining { get; set; }
+        public double NoofUnusedDays { get; set; }
+        public decimal? FTPremium { get; set; }
+        public decimal? ADPremium { get; set; }
+        public decimal? TotalPremium { get; set; }
+
+    }
+
+  
+    public class CDBalanceDTO : ResponseStatus
+    {
+        public string AccountNo { get; set; }
+        public string TxnEventType { get; set; }
+        public DateTime? TxnDateTime { get; set; }
+        public decimal? TxnAmountBalance { get; set; }
+        public decimal? TaxAmountBalance { get; set; }
+        public decimal? TotalAvailableBalance { get; set; }
+
+
+
+    }
 
 
 }

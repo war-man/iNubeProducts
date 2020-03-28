@@ -48,6 +48,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         //Claims needs Activity of Vehicle
         ResponseVehicleActivity GetVehicleActivity(VehicleActivityDTO vehicleActivity);
+        //refurnd Details
+        Task<PolicyCancelResponse> GetPolicyCancelDetails(PolicyCancelRequest policyRequest, ApiContext apiContext);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -4254,6 +4256,62 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
+
+
+
+        public async Task<PolicyCancelResponse> GetPolicyCancelDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
+        {
+            var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apiContext);
+            // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();
+            var CdaccountNumber=(string)PolicyData["CDAccountNumber"];
+            var PolicyEndDate = (DateTime)PolicyData["Policy End Date"];
+            PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
+
+            PolicyCancelReturnDto canceldetails =await PolicyCancellationCalculator(policyRequest.PolicyNumber,null);
+            policyCancelResponse.FTPremium = (-1) * canceldetails.FinalTotal;
+
+
+            if (CdaccountNumber != null)
+            {
+
+                CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
+                policyCancelResponse.ADPremium = accountdetails.TaxAmountBalance;
+
+            }
+            policyCancelResponse.NoofDayRemaining = (PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
+            policyCancelResponse.TotalPremium = policyCancelResponse.FTPremium + policyCancelResponse.ADPremium;
+
+            var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
+
+            var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from[QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + policyRequest.PolicyNumber + "'group by Month(CreatedDate) , PolicyNo";
+
+            
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    //TBLSWITCHLOG
+                    SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
+                    DataSet Switchds = new DataSet();
+                    SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
+                    switchadapter.Fill(Switchds, "Query1");
+
+                    var Result = Switchds.Tables[0];
+                    var Days = (Result.Rows.Count>0)?Result.Rows[0].ItemArray[0]:0;
+
+                    //Total Usage Shown
+                    var usedays= Convert.ToInt32(Days);
+                    policyCancelResponse.NoofUnusedDays = 365 - policyCancelResponse.NoofDayRemaining - usedays;
+
+                }
+            }
+            catch (Exception ex) {
+
+            }
+            return policyCancelResponse;
+        }
     }
 }
 
