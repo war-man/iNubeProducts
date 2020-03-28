@@ -1738,7 +1738,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
 
             //Balance Sum Insured
-            var balanceSumInsured = await _integrationService.UpdatePolicySumInsuredAsync(claimsprocess.PolicyNo, amount, apiContext);
+            var balanceSumInsured = await _integrationService.UpdatePolicyBalanceSumInsuredAsync(claimsprocess.PolicyNo, amount, apiContext);
 
             //Accouting Transaction 
             var account = AccountMapApproval(apiContext, claimsDTO);
