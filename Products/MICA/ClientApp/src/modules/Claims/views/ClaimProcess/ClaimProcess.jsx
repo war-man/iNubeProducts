@@ -485,9 +485,9 @@ class ClaimProcess extends React.Component {
                 .then(data => {
                     //if (data.status == 200) {
                     this.state.claimId = data.claimId;
-                    this.setState({ claimnumber: data.claimNumber });
+                    //this.setState({ claimnumber: data.claimNumber });
                     swal({
-                        text: "Claim Status updated successfully! \n Your Claim Number: " + this.state.claimnumber,
+                        text: "Claim Status updated successfully! \n Your Claim Number: " + data.claimNumber,
                         icon: "success"
                     });
 

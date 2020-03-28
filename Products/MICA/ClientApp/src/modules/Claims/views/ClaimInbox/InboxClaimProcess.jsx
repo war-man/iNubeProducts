@@ -435,9 +435,9 @@ class InboxClaimProcess extends React.Component {
                     console.log("response: ", data)
                     //      if (data.status == 200) {
                     this.state.claimId = data.claimId;
-                    this.setState({ claimnumber: data.claimNumber });
+                  //  this.setState({ claimnumber: data.claimNumber });
                     swal({
-                        text: "Claim Processed successfully! \n Your Claim Number: " + this.state.claimnumber,
+                        text: "Claim Processed successfully! \n Your Claim Number: " + data.claimNumber ,
                         icon: "success",
                         buttons: [false, "OK"],
                     }).then((willDelete) => {
