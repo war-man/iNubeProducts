@@ -4541,9 +4541,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     if (CDmap.Count>0) {
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
                                     var premium = JsonConvert.DeserializeObject <List<MicaCDDTO>>(jsonObj.PremiumDetails.ToString());
-                                    //expObj.PremiumDetails = CDmap;
-                                   
-                                    expObj.PremiumDetails.AddRange(CDmap);
+                                        //expObj.PremiumDetails = CDmap;
+                                        AddProperty(expObj, "Policy Start Date", PolicyStartDate);
+                                        AddProperty(expObj, "Policy End Date", PolicyEndDate);
+
+                                        expObj.PremiumDetails.AddRange(CDmap);
                                     var tempobj = JsonConvert.SerializeObject(expObj);
                                     json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
                                     tblPolicyDetailsdata.PolicyRequest = json.ToString();
@@ -5509,6 +5511,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             return lstDocuments;
         }
+
+
 
     }
 
