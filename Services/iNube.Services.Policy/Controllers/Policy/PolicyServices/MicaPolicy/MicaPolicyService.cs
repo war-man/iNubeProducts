@@ -4519,12 +4519,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                 var insurableItem = tblPolicyDetailsdata.PolicyRequest;
                                 dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-
+                                dynamic jsonObj = JsonConvert.DeserializeObject<dynamic>(insurableItem);
                                 List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
                                // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
                                 if (CDmap.Count>0) {
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                    var premium = JsonConvert.DeserializeObject <List<MicaCDDTO>>(jsonObj.PremiumDetails.ToString());
                                     expObj.PremiumDetails = CDmap;
+                                   
+                                    expObj.PremiumDetails.AddRange(premium);
                                     var tempobj = JsonConvert.SerializeObject(expObj);
                                     json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
                                     tblPolicyDetailsdata.PolicyRequest = json.ToString();
@@ -5027,7 +5030,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         }
                         else if (tbl_particiant.IsActive == false)
                         {
-                            return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = "Policy is already inActive" };
+                            return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Policy is already cancelled for this Policy Number {policyNo}" };
 
                         }
                     }
