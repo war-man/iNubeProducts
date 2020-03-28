@@ -587,15 +587,15 @@ class ClaimIntimate extends React.Component {
         claim[name] = value;
         this.setState({ claim });
 
-       // if (this.state.policyflag === true) {
-            if (name === "insurableItems") {
-                console.log('grid setup', this.state.DetailsDTO.insurableItems)
-                if (value != "") {
-                    this.setState({ showInsGrid: true });
-                }
-                this.claimAmountTable();
-
+        // if (this.state.policyflag === true) {
+        if (name === "insurableItems") {
+            console.log('grid setup', this.state.DetailsDTO.insurableItems)
+            if (value != "") {
+                this.setState({ showInsGrid: true });
             }
+            this.claimAmountTable();
+
+        }
         //}
         //else {
         //    swal("", "Policy Insurable data is missing", "error");
@@ -857,7 +857,7 @@ class ClaimIntimate extends React.Component {
                     identificationNo: prop.identificationNo,
                     typeOfLoss: prop.coverName,
                     coverValue: prop.coverDynamic.map((c) => {
-                        return (<h6> <b>{c.Header}</b> : {c.Details} </ h6>)
+                        return (<p className="gridparagraph">  <b>{c.Header}</b> : {c.Details}</p>)
                     }),
                     // coverValue: prop.coverValue,
                     // benefitAmount: prop.benefitAmount,
@@ -910,19 +910,19 @@ class ClaimIntimate extends React.Component {
         }).then(response => response.json())
             .then(cdata => {
                 console.log("cdata", cdata);
-              
-               if (cdata.status === 0) {
-                   this.setState({ policyflag: true });
+
+                if (cdata.status === 0) {
+                    this.setState({ policyflag: true });
                     that.setState({ ClaimsAmountData: cdata.policyInsurableDetails, InsurableItemData: cdata.insurableItems });
                     console.log("PolicyInsurableDetails: ", that.state.ClaimsAmountData);
 
-                    
+
                 } else {
-                   this.setState({ policyflag: false });
-                   swal("", "Policy Insurable data is missing", "error");
+                    this.setState({ policyflag: false });
+                    swal("", "Policy Insurable data is missing", "error");
                 }
 
-        });
+            });
         console.log("PolicytArr", PolicyArr);
         this.state.prodId = PolicyArr[0].productIdPk;
         console.log("prodId", this.state.prodId);
@@ -979,7 +979,7 @@ class ClaimIntimate extends React.Component {
         this.state.DetailsDTO.policyNo = this.state.PolicyNumber;
 
 
-        //this.setState({ BenefitAmount : userArr[0].sumInsured });
+        //this.setState({BenefitAmount : userArr[0].sumInsured });
         console.log("BenefitAmount", this.state.BenefitAmount, this.state.PolicyNumber);
         let claim = this.state.DetailsDTO;
         claim.policyNumber = PolicyArr[0].policyNo;

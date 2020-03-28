@@ -36,16 +36,12 @@ import TranslationContainer from "components/Translation/TranslationContainer.js
 
 
 const ClaimsDecision = (props) => {
-  
+
     return (
 
         <div>
-
-
-            {
-                props.approved &&
-
-                <div>
+            {props.approved &&
+                <GridContainer>
                     <CardHeader color="info" icon >
                         {
                             <h3 >
@@ -61,8 +57,8 @@ const ClaimsDecision = (props) => {
                                 error={props.claimStatusIdState}
                                 labelText="ClaimStatus"
                                 id="ddlstatus"
-                                lstObject={props.ClaimsDecisionData}
-                                filterName='Claims Decision'
+                                lstObject={props.ClaimStatusData}
+                                filterName='Claim Status'
                                 required={true}
                                 value={props.fields.claimStatusId}
                                 name='claimStatusId'
@@ -114,7 +110,7 @@ const ClaimsDecision = (props) => {
                         </GridContainer>
 
                     </GridContainer>
-                </div>
+                </GridContainer>
             }
 
         </div>
