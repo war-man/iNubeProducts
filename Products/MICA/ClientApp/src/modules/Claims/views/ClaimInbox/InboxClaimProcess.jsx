@@ -1008,7 +1008,7 @@ class InboxClaimProcess extends React.Component {
                     //makeModel: prop.makeModel,
                     typeOfLoss: prop.coverName,
                     coverValue: prop.coverDynamic.map((c) => {
-                        return (<p className="gridparagraph"> <b>{c.Header}</b> : {c.Details} </p>)
+                        return (<p className="gridparagraph"> {c.Header} : {c.Details} </p>)
                     }),
                     //benefitAmount: prop.benefitAmount,
                     claimAmounts: prop.claimAmounts,

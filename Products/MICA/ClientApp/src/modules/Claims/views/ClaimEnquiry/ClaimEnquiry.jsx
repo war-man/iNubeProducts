@@ -572,7 +572,7 @@ class ClaimEnquiry extends React.Component {
                     identificationNo: prop.identificationNo,
                     typeOfLoss: prop.typeOfLoss,
                     coverValue: prop.coverDynamic.map((c) => {
-                        return (<h6> <b>{c.Header}</b> : {c.Details} </ h6>)
+                        return (<p className="gridparagraph"> {c.Header} : {c.Details} </p>)
                     }),
                     claimAmounts: prop.claimAmounts,
                     approvedClaimAmounts: prop.approvedClaimAmounts

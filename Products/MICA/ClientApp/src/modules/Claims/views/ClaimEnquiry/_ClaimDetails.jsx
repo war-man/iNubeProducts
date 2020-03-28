@@ -205,21 +205,21 @@ const ClaimDetails = (props) => {
                                 sortable: false,
                                 //  filterable: false 
                             },
-                            {
-                                // Header: "Cover Event Factor - From Value",
-                                Header: "InsurableItem",
-                                accessor: "insurableItem",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                headerClassName: 'react-table-center'
-                            },
-                            {
-                                Header: "Name",
-                                accessor: "name",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                headerClassName: 'react-table-center'
-                            },
+                            //{
+                            //    // Header: "Cover Event Factor - From Value",
+                            //    Header: "InsurableItem",
+                            //    accessor: "insurableItem",
+                            //    minWidth: 40,
+                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                            //    headerClassName: 'react-table-center'
+                            //},
+                            //{
+                            //    Header: "Name",
+                            //    accessor: "name",
+                            //    minWidth: 40,
+                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                            //    headerClassName: 'react-table-center'
+                            //},
                             {
                                 Header: "IdentificationNo",
                                 accessor: "identificationNo",
@@ -237,8 +237,8 @@ const ClaimDetails = (props) => {
                             {
                                 Header: "Risk Details",
                                 accessor: "coverValue",
-                                setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                minWidth: 40,
+                                setCellProps: (value) => ({ style: { textAlign: "center" } }),
+                                minWidth: 200,
                                 headerClassName: 'react-table-center',
                                 //sortable: false,
                                 //filterable: false

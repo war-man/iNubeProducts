@@ -1001,7 +1001,7 @@ class ClaimProcess extends React.Component {
                     typeOfLoss: prop.coverName,
                     //coverValue: prop.coverValue,
                     coverValue: prop.coverDynamic.map((c) => {
-                        return (<p className="gridparagraph">  <b>{c.Header}</b> : {c.Details} </ p>)
+                        return (<p className="gridparagraph"> {c.Header} : {c.Details} </ p>)
                     }),
                     claimAmounts: prop.claimAmounts,
                     approvedClaimAmounts:

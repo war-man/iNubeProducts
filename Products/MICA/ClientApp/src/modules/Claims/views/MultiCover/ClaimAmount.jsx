@@ -132,73 +132,73 @@ const ClaimAmount = (props) => {
                             filterable
                             columns={[
                                 {
-                            Header: "SerialNo",
-                        accessor: "id",
-                        headerClassName: 'react-table-center',
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        minWidth: 20,
-                        sortable: false,
-                        //  filterable: false
-                    },
-                            {
-                            // Header: "Cover Event Factor - From Value",
-                            Header: "InsurableItem",
-                        accessor: "insurableItem",
-                        minWidth: 40,
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        headerClassName: 'react-table-center'
-                    },
-                            {
-                            Header: "Name",
-                        accessor: "name",
-                        minWidth: 40,
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        headerClassName: 'react-table-center'
-                    },
-                            {
-                            Header: "IdentificationNo",
-                        accessor: "identificationNo",
-                        minWidth: 40,
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        headerClassName: 'react-table-center'
-                    },
-                            {
-                            Header: "TypeOfLoss",
-                        accessor: "typeOfLoss",
-                        minWidth: 40,
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        headerClassName: 'react-table-center'
-                    },
-                            {
-                            Header: "Risk Details",
-                        accessor: "coverValue",
-                        minWidth: 20,
-                                setCellProps: (value) => ({style: {textAlign: "center" } }),
-                        headerClassName: 'react-table-center'
+                                    Header: "SerialNo",
+                                    accessor: "id",
+                                    headerClassName: 'react-table-center',
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    minWidth: 20,
+                                    sortable: false,
+                                    //  filterable: false
+                                },
+                                //{
+                                //    // Header: "Cover Event Factor - From Value",
+                                //    Header: "InsurableItem",
+                                //    accessor: "insurableItem",
+                                //    minWidth: 40,
+                                //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                //    headerClassName: 'react-table-center'
+                                //},
+                                //{
+                                //    Header: "Name",
+                                //    accessor: "name",
+                                //    minWidth: 40,
+                                //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                //    headerClassName: 'react-table-center'
+                                //},
+                                {
+                                    Header: "IdentificationNo",
+                                    accessor: "identificationNo",
+                                    minWidth: 40,
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    headerClassName: 'react-table-center'
+                                },
+                                {
+                                    Header: "TypeOfLoss",
+                                    accessor: "typeOfLoss",
+                                    minWidth: 40,
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    headerClassName: 'react-table-center'
+                                },
+                                {
+                                    Header: "Risk Details",
+                                    accessor: "coverValue",
+                                    minWidth: 20,
+                                    setCellProps: (value) => ({ style: { textAlign: "center" } }),
+                                    headerClassName: 'react-table-center'
 
-                    },
-                    //        {
-                    //        Header: "BenefitAmount",
-                    //    accessor: "benefitAmount",
-                    //    minWidth: 40,
-                    //            setCellProps: (value) => ({style: {textAlign: "center" } }),
-                    //    headerClassName: 'react-table-center',
+                                },
+                                //        {
+                                //        Header: "BenefitAmount",
+                                //    accessor: "benefitAmount",
+                                //    minWidth: 40,
+                                //            setCellProps: (value) => ({style: {textAlign: "center" } }),
+                                //    headerClassName: 'react-table-center',
 
-                    //},
-                            {
-                            Header: "ClaimAmount",
-                        accessor: "claimAmounts",
-                                setCellProps: (value) => ({style: {textAlign: "right" } }),
-                        minWidth: 40,
-                        headerClassName: 'react-table-center',
-                        //sortable: false,
-                        //filterable: false
+                                //},
+                                {
+                                    Header: "ClaimAmount",
+                                    accessor: "claimAmounts",
+                                    setCellProps: (value) => ({ style: { textAlign: "right" } }),
+                                    minWidth: 40,
+                                    headerClassName: 'react-table-center',
+                                    //sortable: false,
+                                    //filterable: false
 
-                    },  
- 
+                                },
 
 
-                    ]}
+
+                            ]}
                             defaultPageSize={4}
                             pageSize={([props.TableData.length + 1] < 4) ? [props.TableData.length + 1] : 4}
                             showPaginationTop={false}

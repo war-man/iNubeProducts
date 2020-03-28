@@ -857,7 +857,7 @@ class ClaimIntimate extends React.Component {
                     identificationNo: prop.identificationNo,
                     typeOfLoss: prop.coverName,
                     coverValue: prop.coverDynamic.map((c) => {
-                        return (<p className="gridparagraph">  <b>{c.Header}</b> : {c.Details}</p>)
+                        return (<p className="gridparagraph"> {c.Header} : {c.Details} </p>)
                     }),
                     // coverValue: prop.coverValue,
                     // benefitAmount: prop.benefitAmount,

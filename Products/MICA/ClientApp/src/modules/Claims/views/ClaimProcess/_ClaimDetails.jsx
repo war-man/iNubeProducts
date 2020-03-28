@@ -241,7 +241,7 @@ const ClaimDetails = (props) => {
                             {
                                 Header: "Risk Details",
                                 accessor: "coverValue",
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                setCellProps: (value) => ({ style: { textAlign: "center" } }),
                                 minWidth: 200,
                                 headerClassName: 'react-table-center'
                                 //sortable: false,
