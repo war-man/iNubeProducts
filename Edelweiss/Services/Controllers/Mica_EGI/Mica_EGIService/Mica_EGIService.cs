@@ -4265,6 +4265,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();
             var CdaccountNumber=(string)PolicyData["CDAccountNumber"];
             var PolicyEndDate = (DateTime)PolicyData["Policy End Date"];
+            var BillingFrequency = (string)PolicyData["billingFrequency"];
             PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
 
             PolicyCancelReturnDto canceldetails =await PolicyCancellationCalculator(policyRequest.PolicyNumber,null);
@@ -4304,7 +4305,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     //Total Usage Shown
                     var usedays= Convert.ToInt32(Days);
-                    policyCancelResponse.NoofUnusedDays = 365 - policyCancelResponse.NoofDayRemaining - usedays;
+                    // No. of days for AD
+                    if ( BillingFrequency == "Monthly")
+                        policyCancelResponse.NoofUnusedDays = 60 - usedays;
+                    else
+                        policyCancelResponse.NoofUnusedDays = 365 - usedays;
 
                 }
             }
