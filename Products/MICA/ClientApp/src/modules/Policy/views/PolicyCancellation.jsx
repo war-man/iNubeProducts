@@ -404,7 +404,7 @@ class PolicyCancellation extends React.Component {
                                         error={this.state.mobileNumberState}
                                         labelText="InsuredMobileNo"
                                         name="mobileNumber"
-                                        inputType="number"
+                                        inputType="number" type="numeric"
                                         // required={true}
                                         value={this.state.PolicysearchDTO.mobileNumber}
                                         onChange={(e) => this.SetValue("mobileNumber", e)}
@@ -439,7 +439,7 @@ class PolicyCancellation extends React.Component {
                                             {
                                                 Header: "Select",
                                                 accessor: "radio",
-                                                minWidth: 30,
+                                                minWidth: 50,
                                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                                 headerClassName: 'react-table-center',
                                                 sortable: false,
@@ -468,7 +468,7 @@ class PolicyCancellation extends React.Component {
                                             {
                                                 Header: "Mobile No",
                                                 accessor: "mobileNo",
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                setCellProps: (value) => ({ style: { textAlign: "right" } }),
                                                 headerClassName: 'react-table-center',
                                                 minWidth: 70,
                                                 resizable: false,
@@ -554,7 +554,7 @@ class PolicyCancellation extends React.Component {
                                 </GridContainer>
                                 <GridContainer>
 
-
+                                    {/*
                                     <GridItem xs={12} sm={4} md={3}>
 
 
@@ -571,7 +571,7 @@ class PolicyCancellation extends React.Component {
                                             }}
                                         />
                                     </GridItem>
-
+                                    */}
 
                                     <GridItem xs={12} sm={4} md={3}>
                                         <CustomInput
@@ -591,6 +591,7 @@ class PolicyCancellation extends React.Component {
                                         <CustomInput
                                             disabled={this.state.disabled}
                                             labelText="InsuredMobileNo"
+                                            inputType="number" type="numeric"
                                             value={this.state.policyDetailsData.mobileNumber}
                                             name='mobileNumber'
 
@@ -658,8 +659,9 @@ class PolicyCancellation extends React.Component {
                                     <GridItem xs={12} sm={4} md={3}>
                                         <CustomInput
                                             labelText="Total Sum Insured"
-                                            value={this.state.policyDetailsData.totalSumInsured}
+                                            value={this.state.policyDetailsData.totalSumInsured.toFixed(2)}
                                             name='totalSumInsured'
+                                            inputType="number" type="numeric"
                                             disabled={this.state.disabled}
                                             formControlProps={{
                                                 fullWidth: true
@@ -670,8 +672,9 @@ class PolicyCancellation extends React.Component {
                                     <GridItem xs={12} sm={4} md={3}>
                                         <CustomInput
                                             labelText="Balance Sum Insured"
-                                            value={this.state.policyDetailsData.balanceSumInsured}
+                                            value={this.state.policyDetailsData.balanceSumInsured.toFixed(2)}
                                             name='balanceSumInsured'
+                                            inputType="number" type="numeric"
                                             disabled={this.state.disabled}
                                             formControlProps={{
                                                 fullWidth: true
@@ -745,14 +748,14 @@ class PolicyCancellation extends React.Component {
                                                 headerClassName: 'react-table-center',
                                                 resizable: false,
                                             },
-                                            {
-                                                Header: "UTR/NEFT Ref No.",
-                                                accessor: "policyEndDate",
-                                                minWidth: 80,
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                headerClassName: 'react-table-center',
-                                                resizable: false,
-                                            }
+                                            //{
+                                            //    Header: "UTR/NEFT Ref No.",
+                                            //    accessor: "policyEndDate",
+                                            //    minWidth: 80,
+                                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                            //    headerClassName: 'react-table-center',
+                                            //    resizable: false,
+                                            //}
 
                                         ]}
                                         defaultPageSize={5}
@@ -837,26 +840,8 @@ class PolicyCancellation extends React.Component {
                                             <CustomInput
 
                                                 labelText="Number of Days till Policy End Date"
-
+                                                inputType="number" type="numeric"
                                                 value={this.state.PolicyCancelResponse.noofDayRemaining}
-                                                name='customerId'
-
-                                                disabled={this.state.disabled}
-                                                formControlProps={{
-                                                    fullWidth: true
-                                                }}
-                                            />
-                                        </GridItem>
-
-
-                                        <GridItem xs={12} sm={4} md={3}>
-
-
-                                            <CustomInput
-
-                                                labelText="Number of Unused Days"
-
-                                                value={this.state.PolicyCancelResponse.noofUnusedDays}
                                                 name='customerId'
 
                                                 disabled={this.state.disabled}
@@ -873,7 +858,23 @@ class PolicyCancellation extends React.Component {
 
                                                 labelText="Fire & Theft Including GST"
 
-                                                value={this.state.PolicyCancelResponse.ftPremium}
+                                                value={this.state.PolicyCancelResponse.ftPremium.toFixed(2)}
+                                                name='customerId'
+                                                inputType="number" type="numeric"
+                                                disabled={this.state.disabled}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+                                            />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={4} md={3}>
+
+
+                                            <CustomInput
+
+                                                labelText="Number of Unused Days"
+                                                inputType="number" type="numeric"
+                                                value={this.state.PolicyCancelResponse.noofUnusedDays}
                                                 name='customerId'
 
                                                 disabled={this.state.disabled}
@@ -883,14 +884,16 @@ class PolicyCancellation extends React.Component {
                                             />
                                         </GridItem>
 
+                                        
+
                                         <GridItem xs={12} sm={4} md={3}>
 
 
                                             <CustomInput
 
                                                 labelText="Accidental Damages Including GST"
-
-                                                value={this.state.PolicyCancelResponse.adPremium}
+                                                inputType="number" type="numeric"
+                                                value={this.state.PolicyCancelResponse.adPremium.toFixed(2)}
                                                 name='customerId'
 
                                                 disabled={this.state.disabled}
@@ -906,8 +909,8 @@ class PolicyCancellation extends React.Component {
                                             <CustomInput
 
                                                 labelText="Total Refund Including GST"
-
-                                                value={this.state.PolicyCancelResponse.totalPremium}
+                                                inputType="number" type="numeric"
+                                                value={this.state.PolicyCancelResponse.totalPremium.toFixed(2)}
                                                 name='customerId'
 
                                                 disabled={this.state.disabled}

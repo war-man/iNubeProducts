@@ -4995,13 +4995,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                     }
                                     //Endrosment
+                                    var datetimeNow=DateTime.Now;
+                                  
                                     string  EndorsmentType = "Cancel Policy";
                                     EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
                                     endorsementDetailsDTO.Action = EndorsmentType;
                                     endorsementDetailsDTO.EndorsementNo = EndorsementNo;
                                     endorsementDetailsDTO.IsPremiumRegister = true;
                                     endorsementDetailsDTO.UpdatedResponse = json.ToString();
-                                    endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                                    endorsementDetailsDTO.EndorsementEffectivedate = datetimeNow;
                                     endorsementDetailsDTO.EnddorsementRequest = endoresementDto.ToString();
                                     endorsementDetailsDTO.PolicyId = policyId;
 
@@ -5016,22 +5018,22 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     tbl_particiant.PolicyStatusId = ModuleConstants.PolicyStatusCancelled;
                                     tbl_particiant.PolicyStageId = ModuleConstants.PolicyStagePolicy;
                                     tbl_particiant.PolicyStageStatusId = ModuleConstants.EndorsementStageCancelled;
-                                    tbl_particiant.PolicyCancelDate = DateTime.Now;
+                                    tbl_particiant.PolicyCancelDate = datetimeNow;
                                     _context.TblPolicy.Update(tbl_particiant);
 
 
 
                                     //Refund Txn
                                     PolicyCancelRequest policyCancelRequest = new PolicyCancelRequest();
-                                    policyCancelRequest.EffectiveDate = DateTime.Now;
-                                    policyCancelRequest.CancelRequestDate = DateTime.Now;
+                                    policyCancelRequest.EffectiveDate = datetimeNow;
+                                    policyCancelRequest.CancelRequestDate = datetimeNow;
                                     policyCancelRequest.PolicyNumber = tbl_particiant.PolicyNo;
                                     PolicyCancelResponse RefundDetails = await _integrationService.GetRefundDetails(policyCancelRequest,apiContext);
 
 
                                     PolicyRefund policyRefund = new PolicyRefund();
-                                    policyRefund.EndorsementEffectivedate = DateTime.Now;
-                                    policyRefund.TxnDate = DateTime.Now;
+                                    policyRefund.EndorsementEffectivedate = datetimeNow;
+                                    policyRefund.TxnDate = datetimeNow;
                                     policyRefund.TotalRefundAmount = RefundDetails.TotalPremium;
                                     policyRefund.EndorsementNumber = EndorsementNo;
                                     policyRefund.UpdatedResponse = json.ToString();
@@ -5046,7 +5048,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                     _context.SaveChanges();
 
-                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {policyCancelRequest.EffectiveDate} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credit to Customer's Account."};
+                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {datetimeNow.ToString("dd/MM/yyyy HH:mm:ss tt")} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
 
                                 }
                                 else
