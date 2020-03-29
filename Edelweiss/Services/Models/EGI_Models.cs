@@ -499,11 +499,20 @@ namespace iNube.Services.MicaExtension_EGI.Models
     {
         public ResponseVehicleActivity()
         {
-            VehicleData = new Dictionary<string, List<ActivityDTO>>();
+            VehicleData = new List<VehicleActivity>();
         }
 
         public string PolicyNumber { get; set; }
-        public Dictionary<string,List<ActivityDTO>> VehicleData { get; set; }
+         public List<VehicleActivity> VehicleData { get; set; }
+    }
+    public class VehicleActivity
+    {
+        public VehicleActivity()
+        {
+            activityDTOs = new List<ActivityDTO>();
+        }
+        public string VehicleNumber { get; set; }
+        public List<ActivityDTO> activityDTOs { get; set; }
     }
     public class PolicyCancelRequest
     {

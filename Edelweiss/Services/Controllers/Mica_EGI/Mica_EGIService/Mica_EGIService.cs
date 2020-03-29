@@ -4215,7 +4215,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             ResponseVehicleActivity response = new ResponseVehicleActivity();
 
             var checkPolicyNo = _context.TblSwitchLog.Any(x => x.PolicyNo == vehicleActivity.PolicyNumber);
-
+            VehicleActivity vehicle = null;
             if (checkPolicyNo)
             {
                 foreach (var VehicleNumber in vehicleActivity.VehicleNumbers)
@@ -4228,10 +4228,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                     SwitchState = x.SwitchStatus.ToString(),
                                                     SwitchType = x.SwitchType
                                                 }).ToList();
-
+                    
                     if (logData.Count > 0)
                     {
-                        response.VehicleData.Add(VehicleNumber, logData);
+                        vehicle = new VehicleActivity() ;
+                        vehicle.VehicleNumber = VehicleNumber;
+                        vehicle.activityDTOs.AddRange(logData);
+                        response.VehicleData.Add(vehicle);
 
                     }
 
