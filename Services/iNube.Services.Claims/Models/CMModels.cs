@@ -161,6 +161,8 @@ namespace iNube.Services.Claims.Models
         public DateTime? CreatedDate { get; set; }
         public string InsuredName { get; set; }
         public int? ProductIdPk { get; set; }
+        public string LocationOfEvent { get; set; }
+        public int? ClaimAmount { get; set; }
     }
 
     public partial class ClaimResponseDTO

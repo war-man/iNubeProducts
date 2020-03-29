@@ -2266,7 +2266,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                                 join c in _context.TblmasCmcommonTypes on a.ClaimStatusId equals c.CommonTypeId
                                 select c).FirstOrDefault();
 
-                    var insurabledata = _context.TblClaimInsurable.SingleOrDefault(x => x.ClaimId == item.ClaimId);
+                    var insurabledata = _context.TblClaimInsurable.FirstOrDefault(x => x.ClaimId == item.ClaimId);
 
                     var covervalue = JsonConvert.DeserializeObject<dynamic>(insurabledata.CoverValue);
 
@@ -2281,10 +2281,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.InsuredEmail = pk[0].Email;
                     item.InsuredMobileNo = pk[0].MobileNumber;
                     item.ProductIdPk = pk[0].ProductIdPk;
+                  
 
 
                 }
-                catch (Exception ex) { }
+                catch (Exception ex) {
+
+                }
             }
 
             var _claimsearchDTOs = new ClaimSearchResponseDTO();

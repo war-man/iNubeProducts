@@ -55,7 +55,9 @@ class PolicyCancellation extends React.Component {
         super(props);
         var date = new Date();
 
-        var CurrentDateTime = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes() }:${date.getSeconds()}`
+        var CurrentDateTime = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        //var CurrentDateTime = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes() }:${date.getSeconds()}`
+       // var CurrentDateTime1 = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
         var CurrentDateTime1 = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
         this.state = {
@@ -113,7 +115,9 @@ class PolicyCancellation extends React.Component {
 
 
     componentDidMount() {
-        setTimeout(
+      
+         
+            setTimeout(
             function () {
                 this.setState({ pageloader: true });
             }.bind(this), 2000
@@ -243,7 +247,8 @@ class PolicyCancellation extends React.Component {
                   
                     claimStatus: prop.claimStatus,
                     lossDateTime: new Date(prop.lossDateTime).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
-                  
+                    locationOfEvent: prop.locationOfEvent,
+                    claimAmount: (prop.claimAmount!=null)?prop.claimAmount.toFixed(2):null,
                     };
             })
         });
@@ -715,8 +720,8 @@ class PolicyCancellation extends React.Component {
 
                                             },
                                             {
-                                                Header: "Loss location",
-                                                accessor: "IN",
+                                                Header: "Loss Location",
+                                                accessor: "locationOfEvent",
                                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                                 headerClassName: 'react-table-center',
                                                 minWidth: 70,
@@ -734,9 +739,9 @@ class PolicyCancellation extends React.Component {
 
                                             {
                                                 Header: "Claim Amount",
-                                                accessor: "policyStartDate",
+                                                accessor: "claimAmount",
                                                 minWidth: 80,
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                setCellProps: (value) => ({ style: { textAlign: "right" } }),
                                                 headerClassName: 'react-table-center',
                                                 resizable: false,
                                             },
