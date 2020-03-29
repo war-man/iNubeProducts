@@ -241,7 +241,7 @@ class ReportExecution extends React.Component {
                             </CardIcon>
                             {
                                 <h4 >
-                                    <small> <TranslationContainer translationKey="ReportExecution" /> </small>
+                                    <small> <TranslationContainer translationKey="Reports" /> </small>
                                 </h4>
                             }
                         </CardHeader>
@@ -276,7 +276,7 @@ class ReportExecution extends React.Component {
 
                                                             {
                                                                 <h3 >
-                                                                    <small>Parameters</small>
+                                                                <small>Criteria</small>
                                                                 </h3>
                                                             }
                                                         </CardHeader>
@@ -300,7 +300,7 @@ class ReportExecution extends React.Component {
                                                             <GridContainer>
 
                                                                 <GridItem>
-                                                                    <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={(e) => this.queryExecution(e)}> <TranslationContainer translationKey="Execute" />  </Button>
+                                                                    <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={(e) => this.queryExecution(e)}> <TranslationContainer translationKey="Generate" />  </Button>
                                                                 </GridItem>
 
                                                             </GridContainer>

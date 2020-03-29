@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using iNube.Services.Policy.Controllers.Policy.PolicyServices;
@@ -600,7 +601,12 @@ namespace iNube.Services.Policy.Controllers.Policy
             var searchPolicyDetails = await _policyService.SearchPolicyDetailsByNumber(PolicyNumber, Context);
             return Ok(searchPolicyDetails);
         }
-       
 
+        [HttpPost]
+        public async Task<IActionResult> RefundUpload(CancellationToken cancellationToken)
+        {
+            var response = await _policyService.RefundUpload(Request, cancellationToken, Context);
+            return Ok(response);
+        }
     }
 }

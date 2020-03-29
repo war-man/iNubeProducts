@@ -4215,7 +4215,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             ResponseVehicleActivity response = new ResponseVehicleActivity();
 
             var checkPolicyNo = _context.TblSwitchLog.Any(x => x.PolicyNo == vehicleActivity.PolicyNumber);
-
+            VehicleActivity vehicle = null;
             if (checkPolicyNo)
             {
                 foreach (var VehicleNumber in vehicleActivity.VehicleNumbers)
@@ -4228,10 +4228,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                     SwitchState = x.SwitchStatus.ToString(),
                                                     SwitchType = x.SwitchType
                                                 }).ToList();
-
+                    
                     if (logData.Count > 0)
                     {
-                        response.VehicleData.Add(VehicleNumber, logData);
+                        vehicle = new VehicleActivity() ;
+                        vehicle.VehicleNumber = VehicleNumber;
+                        vehicle.activityDTOs.AddRange(logData);
+                        response.VehicleData.Add(vehicle);
 
                     }
 
@@ -4265,6 +4268,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();
             var CdaccountNumber=(string)PolicyData["CDAccountNumber"];
             var PolicyEndDate = (DateTime)PolicyData["Policy End Date"];
+            var BillingFrequency = (string)PolicyData["billingFrequency"];
             PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
 
             PolicyCancelReturnDto canceldetails =await PolicyCancellationCalculator(policyRequest.PolicyNumber,null);
@@ -4304,7 +4308,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     //Total Usage Shown
                     var usedays= Convert.ToInt32(Days);
-                    policyCancelResponse.NoofUnusedDays = 365 - policyCancelResponse.NoofDayRemaining - usedays;
+                    // No. of days for AD
+                    if ( BillingFrequency == "Monthly")
+                        policyCancelResponse.NoofUnusedDays = 60 - usedays;
+                    else
+                        policyCancelResponse.NoofUnusedDays = 365 - usedays;
 
                 }
             }
