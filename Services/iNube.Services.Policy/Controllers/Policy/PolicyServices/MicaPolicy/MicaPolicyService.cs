@@ -4980,13 +4980,20 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     micaCD.micaCDDTO = CDmap;
                                     micaCD.Description = "Endorsement-Cancellation-" + EndorsementNo;
 
+                                    //Replace Premium details
+                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                    expObj.PremiumDetails = CDmap;
+                                    var tempobj = JsonConvert.SerializeObject(expObj);
+                                    json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+
                                     //Step5:CD Transaction for the policy
                                     var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
                                     BusinessStatus businessStatus = 0;
                                     businessStatus = transaction.Status;
 
 
-
+                                    tblPolicyDetailsdata.PolicyRequest= json.ToString();
+                                    _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
 
                                     if (businessStatus == BusinessStatus.Created)
                                     {
@@ -5063,7 +5070,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         }
                         else if (tbl_particiant.IsActive == false)
                         {
-                            return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Policy is already cancelled for this Policy Number {policyNo}" };
+                            return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is already Cancelled" };
 
                         }
                     }
