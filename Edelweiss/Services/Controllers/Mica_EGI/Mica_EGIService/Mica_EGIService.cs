@@ -4268,14 +4268,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
 
             PolicyCancelReturnDto canceldetails =await PolicyCancellationCalculator(policyRequest.PolicyNumber,null);
-            policyCancelResponse.FTPremium = (-1) * canceldetails.FinalTotal;
+            
+            policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
 
 
             if (CdaccountNumber != null)
             {
 
                 CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
-                policyCancelResponse.ADPremium = accountdetails.TaxAmountBalance;
+                policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance;
 
             }
             policyCancelResponse.NoofDayRemaining = (PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
