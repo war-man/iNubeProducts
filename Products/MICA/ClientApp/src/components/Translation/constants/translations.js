@@ -158,8 +158,9 @@ export const TRANSLATIONS = {
         DynamicProduct: 'Dynamic Product',
         DynamicProd: 'Dynamic Product',
         //Dynamic Reports
+        DynamicReports:'Reports',
         ReportConfig: 'Report Config',
-        ReportExecution:'Report Execution',
+        ReportExecution:'Report Generation',
         ReportUpdate:'Report Update',
 
         ClaimInbox: 'Claim Inbox',
