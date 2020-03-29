@@ -326,7 +326,53 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var response = _context.TblDynamicPermissions.Where(b => b.Userid == Userid && b.Roleid == Roleid && b.DynamicType == itemType && b.UserorRole == "User")
+            //var _permissions =
+            //(from rolepermission in _context.TblDynamicPermissions
+            // where rolepermission.Roleid == Roleid && rolepermission.UserorRole == "Role"
+            // select rolepermission)
+
+            //.Except(
+            //from userpermission in _context.TblDynamicPermissions
+            //where (userpermission.Userid == Userid && userpermission.Roleid == Roleid
+            //&& userpermission.UserorRole == "User")
+            //select userpermission
+            //);
+
+            ///////////////////////////////NEW////////////////////////////////////////////////
+            //var rolePermissions =(from rolepermission in _context.TblDynamicPermissions
+            // where rolepermission.Roleid == Roleid && rolepermission.UserorRole == "Role" && rolepermission.DynamicType=="Report"
+            // select rolepermission);
+
+            var rolePermissions=  _context.TblDynamicPermissions.Where(b=>b.Roleid==Roleid && b.UserorRole== "Role" && b.DynamicType == "Report")
+                  .Select(a => new DynamicPermissionsDTO
+                  {
+                      DynamicPermissionId = a.DynamicPermissionId,
+                      DynamicId = a.DynamicId,
+                      DynamicName = a.DynamicName,
+                      DynamicType = a.DynamicType,
+                      Userid = a.Userid,
+                      Roleid = a.Roleid,
+                      UserorRole = a.UserorRole,
+                      IsActive = a.IsActive,
+                      SortOrderBy = a.SortOrderBy,
+                      CreatedBy = a.CreatedBy,
+                      CreatedDate = a.CreatedDate,
+                      mID = Convert.ToInt32(a.DynamicId),
+                      mValue = a.DynamicName,
+                      mType = a.DynamicType,
+                  }).ToList();
+            return rolePermissions;
+
+            //var userPermissions=(from userpermission in _context.TblDynamicPerSmissions
+            //where (userpermission.Userid == Userid && userpermission.Roleid == Roleid
+            //&& userpermission.UserorRole == "User")
+            //select userpermission);
+
+            //var permissionIds = rolePermissions.Select(x => x.DynamicId).Except(userPermissions.Select(x => x.DynamicId));
+
+            //var permission = rolePermissions.Select(x => x).Where(x => x.DynamicId = permissionIds.DynamicId);
+
+            {/* var response = _context.TblDynamicPermissions.Where(b => b.Userid == Userid && b.Roleid == Roleid && b.DynamicType == itemType && b.UserorRole == "User")
                 .Select(a => new DynamicPermissionsDTO
                 {
                     DynamicPermissionId = a.DynamicPermissionId,
@@ -344,7 +390,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
                     mValue = a.DynamicName,
                     mType = a.DynamicType,
                 }).ToList();
-            return response;
+            return response;*/}
         }
 
         public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)
