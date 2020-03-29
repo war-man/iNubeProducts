@@ -1570,6 +1570,10 @@ namespace iNube.Services.Policy.Models
         public DateTime? EffectiveDate { get; set; }
         public DateTime? CancelRequestDate { get; set; }
     }
+    public class FileUploadResponse : ResponseStatus
+    {
+        
+    }
 }
 
 

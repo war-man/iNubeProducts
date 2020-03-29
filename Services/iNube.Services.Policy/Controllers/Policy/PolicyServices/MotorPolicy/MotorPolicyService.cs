@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Http;
+using System.Threading;
 
 namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 {
@@ -294,6 +296,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
 
         public Task<PolicyCancelResponse> GetPolicyCancelDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

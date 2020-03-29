@@ -1,6 +1,8 @@
 ﻿using iNube.Services.Policy.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
@@ -67,5 +69,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext);
 
         Task<List<object>> SearchPolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext);
-     }
+        Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+    }
 }

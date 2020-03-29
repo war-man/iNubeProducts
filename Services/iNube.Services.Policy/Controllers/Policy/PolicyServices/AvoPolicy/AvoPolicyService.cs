@@ -17,6 +17,8 @@ using Microsoft.EntityFrameworkCore;
 using iNube.Utility.Framework.Notification;
 using iNube.Utility.Framework.Model;
 using iNube.Services.UserManagement.Helpers;
+using Microsoft.AspNetCore.Http;
+using System.Threading;
 
 namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 {
@@ -314,6 +316,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
 
         public Task<PolicyCancelResponse> GetPolicyCancelDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
