@@ -852,7 +852,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate)
+            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true)
                           select P;
             if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
             {
@@ -5046,7 +5046,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                     _context.SaveChanges();
 
-                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number ${tbl_particiant.PolicyNo} is cancelled with effect from ${policyCancelRequest.EffectiveDate} Refund Amount Rs.${RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credit to Customer's Card Account with in xx days"};
+                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {policyCancelRequest.EffectiveDate} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credit to Customer's Account."};
 
                                 }
                                 else

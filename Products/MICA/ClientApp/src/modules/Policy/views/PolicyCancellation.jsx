@@ -55,7 +55,8 @@ class PolicyCancellation extends React.Component {
         super(props);
         var date = new Date();
 
-        var CurrentDateTime = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+        var CurrentDateTime = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes() }:${date.getSeconds()}`
+        var CurrentDateTime1 = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
         this.state = {
             ShowRefundDetails: false,
@@ -65,6 +66,8 @@ class PolicyCancellation extends React.Component {
             loader: true,
             pageloader: false,
             showtable: false,
+            effectiveDate: CurrentDateTime,
+            cancelRequestDate: CurrentDateTime,
             PolicysearchDTO: {
                 policynumber: "",
 
@@ -89,8 +92,8 @@ class PolicyCancellation extends React.Component {
             policyCancelDTO: {
 
                 "policyNumber": "",
-                "effectiveDate": CurrentDateTime,
-                "cancelRequestDate": CurrentDateTime
+                "effectiveDate": CurrentDateTime1,
+                "cancelRequestDate": CurrentDateTime1
 
             },
             policyCancelRequest: { "PolicyNumber":"","EndorsementType":"Policy Cancellation"},
@@ -278,16 +281,16 @@ class PolicyCancellation extends React.Component {
     }
     datechange = (date) => {
         const _date = date.split('/');
+        console.log("_date", _date);
         const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
 
         return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
     }
     showRefundFun = () => {
-        let effdate = this.state.policyCancelDTO.effectiveDate;
-        let canceldate = this.state.policyCancelDTO.cancelRequestDate;
-        this.state.policyCancelDTO.effectiveDate = this.datechange(this.state.policyCancelDTO.effectiveDate);
+      //  this.state.policyCancelDTO.effectiveDate = Date.now.ToString('yyyy-MM-dd');
+      
 
-        this.state.policyCancelDTO.cancelRequestDate = this.datechange(this.state.policyCancelDTO.cancelRequestDate);
+        //this.state.policyCancelDTO.cancelRequestDate = Date.now.ToString('yyyy-MM-dd');
         fetch(`${policyConfig.ExtensionUrl}/api/Mica_EGI/GetRefundDetails`, {
             method: 'post',
             headers: {
@@ -301,32 +304,65 @@ class PolicyCancellation extends React.Component {
                 this.setState({ PolicyCancelResponse: data, ShowRefundDetails: true });
             });
 
-       this.state.policyCancelDTO.effectiveDate = effdate;
-       this.state.policyCancelDTO.cancelRequestDate = canceldate;
-    }
+     }
 
 
     CancelPolicyFun = () => {
-    
-        fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/PolicyEndoresemenet`, {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-            body: JSON.stringify(this.state.policyCancelRequest)
-        }).then(response => response.json())
-            .then(data => {
-                if (data.status == 3) {
-                    swal({ text: data.responseMessage, icon: "success" });
-                } else {
-              
-                    swal({ text: data.responseMessage, icon: "error" });
+       
+            let that = this;
+            if (this.state.policyCancelRequest.PolicyNumber !== "") {
+                swal("Are you sure you want to cancel  policy?", {
+                    buttons: {
+                        cancel: {
+                            text: "No",
+                            value: true,
+                            visible: true,
+                            className: "",
 
-                }        
-            });
-           }
+                            closeModal: true,
+                        },
+                        confirm: {
+                            text: "Yes",
+                            value: "confirm",
+                            visible: true,
+                            className: "",
+                            closeModal: true
+                        }
+                    }
+
+                }).then((value) => {
+                    console.log("policyDTO", this.state.policyCancelRequest)
+                    switch (value) {
+
+                        case "confirm":
+
+                            fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/PolicyEndoresemenet`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                                },
+                                body: JSON.stringify(this.state.policyCancelRequest)
+                            }).then(response => response.json())
+                                .then(data => {
+                                    if (data.status == 3) {
+                                        swal({ text: data.responseMessage, icon: "success" });
+                                    } else {
+
+                                        swal({ text: data.responseMessage, icon: "error" });
+
+                                    }
+                                });
+                            break;
+                    }
+                }
+                );
+            }
+        }
+
+       
+       
 
  
 
@@ -396,7 +432,7 @@ class PolicyCancellation extends React.Component {
                             <GridItem xs={12}>
                                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                     <ReactTable
-                                        title={<h5><TranslationContainer translationKey="Policy Details" /></h5>}
+                                        title={<h4 className={this.props.cardIconTitle}><small><TranslationContainer translationKey="Policy Details" /></small></h4>}
                                         data={this.state.Policydetailsdata}
                                         filterable
                                         columns={[
@@ -653,7 +689,7 @@ class PolicyCancellation extends React.Component {
                             <GridItem xs={12}>
                                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                     <ReactTable
-                                        title={<h5><TranslationContainer translationKey="ClaimDetails" /></h5>}
+                                        title={<h4 className={this.props.cardIconTitle}><small><TranslationContainer translationKey="ClaimDetails" /></small></h4>}
                                         data={this.state.Claimdetailsdata}
                                         filterable
                                         columns={[
@@ -739,7 +775,7 @@ class PolicyCancellation extends React.Component {
                                     <CardHeader color="rose" icon>
 
                                         <h4 className={this.props.cardIconTitle}>
-                                            <small><TranslationContainer translationKey="PolicyCancellation" /></small>
+                                            <small><TranslationContainer translationKey="RefundDetails" /></small>
                                         </h4>
                                     </CardHeader>
                                     <GridContainer>
@@ -747,7 +783,7 @@ class PolicyCancellation extends React.Component {
 
                                         <GridItem xs={12} sm={4} md={3}>
 
-                                            <CustomDatetime disabled={true} required={true} labelText="Cancel Request Date" id='dtActiveFrom' name='cancelRequestDate' value={this.state.policyCancelDTO.cancelRequestDate} formControlProps={{ fullWidth: true }} />
+                                            <CustomDatetime disabled={true} required={true} labelText="Cancellation Request Date" id='dtActiveFrom' name='cancelRequestDate' value={this.state.cancelRequestDate} formControlProps={{ fullWidth: true }} />
                                             {/*
                                             <CustomInput
 
@@ -765,7 +801,7 @@ class PolicyCancellation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={4} md={3}>
 
-                                            <CustomDatetime disabled={true} required={true} labelText="Cancellation Effective Date" id='dtActiveFrom' name='effectiveDate' value={this.state.policyCancelDTO.effectiveDate} formControlProps={{ fullWidth: true }} />
+                                            <CustomDatetime disabled={true} required={true} labelText="Cancellation Effective Date" id='dtActiveFrom' name='effectiveDate' value={this.state.effectiveDate} formControlProps={{ fullWidth: true }} />
 
                                             {/*  <CustomInput
 
@@ -835,7 +871,7 @@ class PolicyCancellation extends React.Component {
 
                                             <CustomInput
 
-                                                labelText="Refund Premium Fire & Theft"
+                                                labelText="Fire & Theft Including GST"
 
                                                 value={this.state.PolicyCancelResponse.ftPremium}
                                                 name='customerId'
@@ -852,7 +888,7 @@ class PolicyCancellation extends React.Component {
 
                                             <CustomInput
 
-                                                labelText="Refund Premium Accidental Damages"
+                                                labelText="Accidental Damages Including GST"
 
                                                 value={this.state.PolicyCancelResponse.adPremium}
                                                 name='customerId'

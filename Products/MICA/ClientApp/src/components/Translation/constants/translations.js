@@ -749,7 +749,8 @@ export const TRANSLATIONS = {
         SearchPolicy: 'Search Policy',
         PolicyDetails: 'Policy Details',
         ClaimDetails:'Claim Details',
-        PolicyCancellation:'Policy Cancellation'
+        PolicyCancellation: 'Policy Cancellation',
+        RefundDetails:'Refund Details'
     },
     hi_IN: TRANSLATIONS_HN,
     kn_IN: TRANSLATIONS_KN,
