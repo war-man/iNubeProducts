@@ -52,6 +52,8 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext);
         Task<ProductDTO> GetProductDetailByIdAsync(string productId, ApiContext apiContext);
         Task<DailyDTO> GetDailyTransaction(string accountnumber,int month, int year,string TxnEventType, ApiContext apiContext);
+        Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string type, ApiContext apiContext);
+        Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyCancelRequest, ApiContext apiContext);
         //GetMappingParams(string mappingname, ApiContext apiContext)
     }
     public class IntegrationService : IIntegrationService
@@ -289,6 +291,14 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await PostApiInvoke<MicaCD, MasterCDDTO>(uri, apiContext, cdTransactionsMaster);
 
         }
+        public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyCancelRequest, ApiContext apiContext)
+        {
+
+            var uri = ExtensionUrl + "/api/Mica_EGI/GetRefundDetails";
+
+            return await PostApiInvoke<PolicyCancelRequest, PolicyCancelResponse>(uri, apiContext, policyCancelRequest);
+
+        }
         //Get State Code
         //public async Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext apiContext)
         //{
@@ -314,6 +324,15 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await GetApiInvoke<MasterCDDTO>(uri, apiContext);
 
         }
+        public async Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string type,ApiContext apiContext)
+        {
+
+            var uri = PartnerUrl + "/api/Accounts/GetAccountBalance?accountnumber=" + accountnumber+ "&TxnEventType="+ type;
+
+            return await GetApiInvoke<CDBalanceDTO>(uri, apiContext);
+
+        }
+      
         public async Task<DailyDTO> GetDailyTransaction(string accountnumber, int month, int year, string TxnEventType, ApiContext apiContext)
         {
 

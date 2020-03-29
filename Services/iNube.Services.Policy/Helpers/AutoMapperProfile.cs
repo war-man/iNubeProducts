@@ -88,7 +88,8 @@ namespace iNube.Services.Policy.Helpers
             CreateMap<PolicyRelationshipDto, TblPolicyRelationship>();
             CreateMap<TblPolicyRelationship, PolicyRelationshipDto>();
 
-            
+            CreateMap<TblPolicyRefund, PolicyRefund>().ReverseMap();
+
         }
 
     }

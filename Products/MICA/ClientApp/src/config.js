@@ -17,6 +17,7 @@ let RDLCConfigUrl = 'https://localhost:49776';
 let ReinsuranceConfigUrl = 'http://localhost:5000';
 let Baseurl = 'https://egiswitchapi.edelweisscustomeruat.com';
 let ReportConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
+let ExtensionUrl= "https://egiswitchapi.edelweisscustomeruat.com";
 
 if (env === "Local") {
     partnerconfigUrl = 'https://localhost:44315';
@@ -31,6 +32,7 @@ if (env === "Local") {
     rateConfigUrl = 'http://localhost:58593';
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
     ReinsuranceConfigUrl = 'http://localhost:5000';
+    ExtensionUrl = "http://localhost:63630";
 }
 if (env === "Dev") {
     Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
@@ -47,6 +49,7 @@ if (env === "Dev") {
     dynamicPagesConfigUrl = 'https://inubeservicesaccounting.azurewebsites.net';
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
     ReinsuranceConfigUrl = 'https://inubeservicesreinsurance.azurewebsites.net';
+    ExtensionUrl = 'http://localhost:63630';
 }
 if (env === "Production") {
     partnerconfigUrl = 'https://localhost:44315';
@@ -60,7 +63,8 @@ if (env === "Production") {
     claimConfigUrl = 'https://localhost:44344';
     dynamicPagesConfigUrl = 'http://localhost:52166';
     rateConfigUrl = 'http://localhost:58593';
-    
+    ExtensionUrl = 'http://localhost:63630';
+
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
     ReinsuranceConfigUrl = 'https://inubeservicesreinsurance.azurewebsites.net';
 }
@@ -79,6 +83,7 @@ if (env === "UAT") {
     dynamicPagesConfigUrl = 'https://inubeservicesaccounting.azurewebsites.net';
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
     ReinsuranceConfigUrl = 'https://inubeservicesreinsurance.azurewebsites.net';
+    ExtensionUrl = "https://egiswitchapi.edelweisscustomeruat.com";
 }
 
 
@@ -101,6 +106,7 @@ export const config = {
     RDLCConfigUrl: RDLCConfigUrl,
     ReinsuranceConfigUrl: ReinsuranceConfigUrl,
     ReportConfigUrl: ReportConfigUrl,
+    ExtensionUrl: ExtensionUrl,
 
     apiUrl: 'https://inubeservicesusermanagement.azurewebsites.net/api',
     localUrl: 'http://localhost:63034/api',

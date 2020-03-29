@@ -67,5 +67,5 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext);
 
         Task<List<object>> SearchPolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext);
-    }
+     }
 }

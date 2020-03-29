@@ -5019,8 +5019,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     tbl_particiant.PolicyCancelDate = DateTime.Now;
                                     _context.TblPolicy.Update(tbl_particiant);
 
+
+
+                                    //Refund Txn
+                                    PolicyCancelRequest policyCancelRequest = new PolicyCancelRequest();
+                                    policyCancelRequest.EffectiveDate = DateTime.Now;
+                                    policyCancelRequest.CancelRequestDate = DateTime.Now;
+                                    policyCancelRequest.PolicyNumber = tbl_particiant.PolicyNo;
+                                    PolicyCancelResponse RefundDetails = await _integrationService.GetRefundDetails(policyCancelRequest,apiContext);
+
+
+                                    PolicyRefund policyRefund = new PolicyRefund();
+                                    policyRefund.EndorsementEffectivedate = DateTime.Now;
+                                    policyRefund.TxnDate = DateTime.Now;
+                                    policyRefund.TotalRefundAmount = RefundDetails.TotalPremium;
+                                    policyRefund.EndorsementNumber = EndorsementNo;
+                                    policyRefund.UpdatedResponse = json.ToString();
+                                    policyRefund.PolicyId = policyId;
+
+                                    TblPolicyRefund tblpolicyRefund_mapper = _mapper.Map<TblPolicyRefund>(policyRefund);
+
+                                    _context.TblPolicyRefund.Add(tblpolicyRefund_mapper);
+
+
+
+
                                     _context.SaveChanges();
-                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy cancelled Successfully for this PolicyNumber " + policyNo + " With Endoresement Number " + EndorsementNo };
+
+                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number ${tbl_particiant.PolicyNo} is cancelled with effect from ${policyCancelRequest.EffectiveDate} Refund Amount Rs.${RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credit to Customer's Card Account with in xx days"};
 
                                 }
                                 else
@@ -5511,14 +5537,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             return lstDocuments;
         }
+      
+
+        }
 
 
 
     }
-
-
-
-}
 
 
 

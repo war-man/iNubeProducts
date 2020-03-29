@@ -11,6 +11,7 @@ namespace iNube.Services.Policy.Entities
             TblPolicyDetails = new HashSet<TblPolicyDetails>();
             TblPolicyInsurableDetails = new HashSet<TblPolicyInsurableDetails>();
             TblPolicyPayment = new HashSet<TblPolicyPayment>();
+            TblPolicyRefund = new HashSet<TblPolicyRefund>();
         }
 
         public decimal PolicyId { get; set; }
@@ -72,5 +73,6 @@ namespace iNube.Services.Policy.Entities
         public virtual ICollection<TblPolicyDetails> TblPolicyDetails { get; set; }
         public virtual ICollection<TblPolicyInsurableDetails> TblPolicyInsurableDetails { get; set; }
         public virtual ICollection<TblPolicyPayment> TblPolicyPayment { get; set; }
+        public virtual ICollection<TblPolicyRefund> TblPolicyRefund { get; set; }
     }
 }

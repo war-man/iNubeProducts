@@ -600,6 +600,7 @@ namespace iNube.Services.Policy.Controllers.Policy
             var searchPolicyDetails = await _policyService.SearchPolicyDetailsByNumber(PolicyNumber, Context);
             return Ok(searchPolicyDetails);
         }
+       
 
     }
 }

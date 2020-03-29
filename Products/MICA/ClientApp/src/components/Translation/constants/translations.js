@@ -743,6 +743,13 @@ export const TRANSLATIONS = {
         //Buttons
         AddParameter: 'Add Parameter',
         Save: 'Save',
+
+        //Policy 
+        /****************************************************************/
+        SearchPolicy: 'Search Policy',
+        PolicyDetails: 'Policy Details',
+        ClaimDetails:'Claim Details',
+        PolicyCancellation:'Policy Cancellation'
     },
     hi_IN: TRANSLATIONS_HN,
     kn_IN: TRANSLATIONS_KN,
