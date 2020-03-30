@@ -2398,6 +2398,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
             apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
 
+            var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
+
+
             var getMonthNumber = 0;
             BillingResponse response = new BillingResponse();
             ErrorInfo errorInfo = new ErrorInfo();
@@ -2419,39 +2422,32 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return response;
                 }
 
-               //var checkPolicyNo = _context.TblMonthlyBalance.Any(x => x.PolicyNumber == PolicyNo);
+                BillingDTO billingDTO = new BillingDTO();
+                CDDailyDTO CdDailyDTO = new CDDailyDTO();
 
-                var checkswitchLog = _context.TblSwitchLog.Any(x=>x.PolicyNo == PolicyNo && x.CreatedDate.Value.Month == getMonthNumber && x.CreatedDate.Value.Year == Year);
+                //var checkPolicyNo = _context.TblMonthlyBalance.Any(x => x.PolicyNumber == PolicyNo);
+
+                var checkswitchLog = _context.TblSwitchLog.Any(x => x.PolicyNo == PolicyNo && x.CreatedDate.Value.Month == getMonthNumber && x.CreatedDate.Value.Year == Year);
 
                 var checkPremiumLog = _context.TblPremiumBookingLog.Any(x => x.PolicyNo == PolicyNo && x.TxnDateTime.Value.Month == getMonthNumber && x.TxnDateTime.Value.Year == Year);
 
 
-                if (checkswitchLog && checkPremiumLog)
+                //Integration Call for Balance 
+                CdDailyDTO = await _integrationService.GetDailyAccountDetails(PolicyNo, getMonthNumber, Year, apiContext);
+
+
+                if (CdDailyDTO.Status == BusinessStatus.Ok)
                 {
-                    BillingDTO billingDTO = new BillingDTO();
-                    CDDailyDTO CdDailyDTO = new CDDailyDTO();
+                    billingDTO.BalanceCarryForward = CdDailyDTO.AvailableAmount;
+                }else
+                {
+                    billingDTO.BalanceCarryForward = 0;
+                }
 
-                    // var billData = _context.TblMonthlyBalance.SingleOrDefault(x => x.PolicyNumber == PolicyNo && x.BalanceDate.Value.Month == getMonthNumber);
 
-                    if (getMonthNumber > CurrentMonth)
-                    {
-                        //Integration Call for Balance 
-                        CdDailyDTO = await _integrationService.GetDailyAccountDetails(PolicyNo, getMonthNumber, Year, apiContext);
-                    }
-                    if(CdDailyDTO.Status !=0)
-                    {
-                        billingDTO.BalanceCarryForward = CdDailyDTO.AvailableAmount;
-                    }
-                    else if (CurrentMonth == getMonthNumber)
-                    {
-                        billingDTO.BalanceCarryForward = 0;
-                    }
-
-                    var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
-
-                    var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Month(CreatedDate) =" + getMonthNumber + "and Year(CreatedDate) =" + Year +"group by Month(CreatedDate) , PolicyNo";
-
-                    var PremiumQuery = "select sum(BasePremium) 'Billing',Sum(FromTax + ToTax) 'GST',sum(TxnAmount) 'Total' from [QM].[TblPremiumBookingLog] where PolicyNo='" + PolicyNo+"' and Month(TxnDateTime) =" + getMonthNumber + " and Year(TxnDateTime) = " + Year;
+                if (checkswitchLog)
+                {
+                    var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Month(CreatedDate) =" + getMonthNumber + "and Year(CreatedDate) =" + Year + "group by Month(CreatedDate) , PolicyNo";
 
                     try
                     {
@@ -2464,25 +2460,48 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             DataSet Switchds = new DataSet();
                             SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
                             switchadapter.Fill(Switchds, "Query1");
-                           
+
                             var Result = Switchds.Tables[0];
                             var Days = Result.Rows[0].ItemArray[0];
 
                             //Total Usage Shown
                             billingDTO.TotalUsage = Convert.ToInt32(Days);
 
-                            
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        billingDTO.TotalUsage = 0;
+                    }
+
+                }
+                else
+                {
+                    billingDTO.TotalUsage = 0;
+                }
+
+                if (checkPremiumLog)
+                {
+                    var PremiumQuery = "select sum(BasePremium) 'Billing',Sum(FromTax + ToTax) 'GST',sum(TxnAmount) 'Total' from [QM].[TblPremiumBookingLog] where PolicyNo='" + PolicyNo + "' and Month(TxnDateTime) =" + getMonthNumber + " and Year(TxnDateTime) = " + Year;
+
+
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+
                             //TBLPREMIUMBOOKING
                             SqlCommand Premiumcommand = new SqlCommand(PremiumQuery, connection);
                             DataSet Premiumds = new DataSet();
                             SqlDataAdapter Premiumadapter = new SqlDataAdapter(Premiumcommand);
                             Premiumadapter.Fill(Premiumds, "Query2");
-                            
+
                             var PremiumResult = Premiumds.Tables[0];
 
                             connection.Close();
 
-                            var Billing = PremiumResult.Rows[0].ItemArray[0];                            
+                            var Billing = PremiumResult.Rows[0].ItemArray[0];
                             var GST = PremiumResult.Rows[0].ItemArray[1];
                             var Total = PremiumResult.Rows[0].ItemArray[2];
 
@@ -2490,38 +2509,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             billingDTO.Billing = Convert.ToDecimal(Billing);
                             billingDTO.Gst = Convert.ToDecimal(GST);
                             billingDTO.Total = Convert.ToDecimal(Total);
-                            
-                            response.BillingDTO = billingDTO;
-                            response.Status = BusinessStatus.Ok;
-                            return response;
+
 
                         }
                     }
                     catch (Exception ex)
                     {
-                        response.ResponseMessage = "NO Records found for this Month";
-                        response.Status = BusinessStatus.NotFound;
-                        errorInfo.ErrorMessage = "For " + Month + " Month No Records for this Policy Number: " + PolicyNo;
-                        errorInfo.ErrorCode = "GEN001";
-                        errorInfo.PropertyName = "NoRecords";
-                        response.Errors.Add(errorInfo);
-                        response.Status = BusinessStatus.Error;
-                        return response;
+                        billingDTO.Billing = 0;
+                        billingDTO.Gst = 0;
+                        billingDTO.Total = 0;
                     }
-
                 }
                 else
                 {
-                    response.ResponseMessage = "NO Records found";
-                    response.Status = BusinessStatus.NotFound;
-                    errorInfo.ErrorMessage = "No Records for this Policy Number : " + PolicyNo + " for the specified Month and Year";
-                    errorInfo.ErrorCode = "GEN001";
-                    errorInfo.PropertyName = "NoRecords";
-                    response.Errors.Add(errorInfo);
-                    return response;
+                    billingDTO.Billing = 0;
+                    billingDTO.Gst =0;
+                    billingDTO.Total = 0;
                 }
 
-            }
+
+                response.BillingDTO = billingDTO;
+                response.Status = BusinessStatus.Ok;
+                return response;
+
+            }             
             else
             {
                 response.ResponseMessage = "Null/Empty Inputs";
@@ -2572,6 +2583,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 // var DriverRiskItem = PolicyItem["Data"]["InsurableItem"][0]["RiskItems"];
 
                 var EndorsmentItem = SourceObject[1];
+                var EndorsmentDataItem = EndorsmentItem["Data"];
                 var VehicleRiskItem = EndorsmentItem["Data"]["InsurableItem"][0]["RiskItems"];
 
                 //dynamic EndoData = PolicyItem.FirstOrDefault(x=>x.Type == "Endorsement").Data;
@@ -2603,7 +2615,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var PolicyObject = SourceObject[0];
                 var PolicyData = PolicyObject["Data"];
+
                 SumInsured = PolicyData["si"];
+
+
+                var EndoresementSI = EndorsmentDataItem["si"];
+
+                if (EndoresementSI != null)
+                {
+                    SumInsured = EndoresementSI;
+                }                
+
                 PolicyNumber = EndorsmentItem["Data"]["PolicyNumber"];
                 BillingFrequency = PolicyData["billingFrequency"].ToString();
 
@@ -2633,6 +2655,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 //Ashish Sir
                 var EndorsmentItem = SourceObject[1];
+                var EndorsmentDataItem = EndorsmentItem["Data"];
                 var VehicleRiskItem = EndorsmentItem["Data"]["InsurableItem"][0]["RiskItems"];
 
                 if (VehicleRiskItem != null)
@@ -2653,6 +2676,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var PolicyObject = SourceObject[0];
                 var PolicyData = PolicyObject["Data"];
                 SumInsured = PolicyData["si"];
+
+                var EndoresementSI = EndorsmentDataItem["si"];
+
+                if (EndoresementSI != null)
+                {
+                    SumInsured = EndoresementSI;
+                }
+
                 PolicyNumber = EndorsmentItem["Data"]["PolicyNumber"];
                 BillingFrequency = PolicyData["billingFrequency"].ToString();
                 //var CheckSI = SourceObject["si"].ToString();
@@ -4258,9 +4289,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
         }
-
-
-
+               
 
         public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
         {
