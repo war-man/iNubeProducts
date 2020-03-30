@@ -919,7 +919,7 @@ class InboxClaimProcess extends React.Component {
                         }.bind(this), 2000
                     );
                 }
-                that.setState({ email: data[0].insuredEmail });
+                //that.setState({ email: data[0].insuredEmail });
                 that.setState({ Claimlist: data });
                 that.setState({ officelist: data });
 

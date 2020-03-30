@@ -104,7 +104,7 @@ function Header12({ ...props }) {
         <AppBar className={classes.appBar + appBarClasses}>
             <Toolbar className={classes.container}>
                 <div className="logoClasses">
-                    <a href="https://micav0002.azurewebsites.net/dashboard/home" className="logoNormal">
+                    <a /*href="https://micav0002.azurewebsites.net/dashboard/home"*/ className="logoNormal">
                         <img src={logotext} alt="logo" className="imgNormal" width="150" height="240" />
                     </a>
                 </div>

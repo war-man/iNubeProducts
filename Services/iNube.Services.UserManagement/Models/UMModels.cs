@@ -774,7 +774,41 @@ namespace iNube.Services.UserManagement.Models
         public List<RPermissionDTO> mdata { get; set; }
     }
 
+    public partial class DynamicReportResponse
+    {
+        public DynamicReportResponse()
+        {
+            DynamicResponse = new List<DynamicResponse>();
+        }
+
+        public List<DynamicResponse> DynamicResponse { get; set; }
+    }
+
+
     public partial class UserRoleReportDTO
+    {
+        public string UserId { get; set; }
+        public string[] RoleId { get; set; }
+        public decimal EnvId { get; set; }
+    }
+
+    public partial class UserRoleReportsDTO
+    {
+        public UserRoleReportsDTO()
+        {
+            RolePermissionIds = new List<RolesReportDTO>();
+        }
+        public string UserId { get; set; }
+        public List<RolesReportDTO> RolePermissionIds { get; set; }
+    }
+
+    public partial class RolesReportDTO
+    {
+        public string RoleId { get; set; }
+        public int[] PermissionIds { get; set; }
+    }
+
+    public partial class RoleReportDTO
     {
         public string UserId { get; set; }
         public string RoleId { get; set; }

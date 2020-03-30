@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using iNube.Services.UserManagement.Helpers;
+using System.Threading.Tasks;
 
 namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
 {
@@ -27,7 +28,9 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
         IEnumerable<MasPermissionDTO> GetAllPermissions(ApiContext apiContext);
         IEnumerable<MasPermissionDTO> GetDashboards(ApiContext apiContext);
         IEnumerable<MasPermissionDTO> GetReports(ApiContext apiContext);
-        IEnumerable<DynamicResponse> GetReportOnRole(UserRoleReportDTO reportDTO, ApiContext apiContext);
+        DynamicReportResponse GetReportOnRoles(UserRoleReportDTO reportDTO, ApiContext apiContext);
+        Task<DynamicReportResponse> GetReportByRole(RoleReportDTO reportDTO, ApiContext apiContext);
+        DynamicReportResponse SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext);
     }
 
     public class PermissionService : IPermissionService
@@ -656,9 +659,19 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
             return _permissionService(apiContext.ProductType).GetReports(apiContext);
         }
 
-        public IEnumerable<DynamicResponse> GetReportOnRole(UserRoleReportDTO reportDTO, ApiContext apiContext)
+        public DynamicReportResponse GetReportOnRoles(UserRoleReportDTO reportDTO, ApiContext apiContext)
         {
-            return _permissionService(apiContext.ProductType).GetReportOnRole(reportDTO, apiContext);
+            return _permissionService(apiContext.ProductType).GetReportOnRoles(reportDTO, apiContext);
+        }
+
+        public DynamicReportResponse SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
+        {
+            return _permissionService(apiContext.ProductType).SaveAssignReports(reportDTO, apiContext);
+        }
+
+        public async Task<DynamicReportResponse> GetReportByRole(RoleReportDTO reportDTO, ApiContext apiContext)
+        {
+            return await _permissionService(apiContext.ProductType).GetReportByRole(reportDTO, apiContext);
         }
     }
 }

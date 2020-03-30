@@ -152,6 +152,7 @@ class AssignRole extends React.Component {
                 "roleId": []
             },
             reports: [],
+            dynamicReport: [],
             loader: true,
             pageloader: false,
             //intervalId: 0,
@@ -268,8 +269,24 @@ class AssignRole extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     this.setState({ reports: data });
-                    console.log("reports: ", this.state.reports);
+                    //console.log("reports: ", this.state.reports);
                 });
+            fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetReportOnRoles`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(permissions)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({ dynamicReport: data.dynamicResponse });
+                    console.log("reports: ", this.state.dynamicReport);
+                });
+
+
         } else {
             this.setState({ perFlag: false });
         }
@@ -406,17 +423,19 @@ class AssignRole extends React.Component {
     }
 
     testCheck2 = (index, location, c, event) => {
+        let responses = [...this.state.dynamicReport[c].mdata];
         if (location.length > 0) {
-            let responses = [...this.state.reports[c].mdata];
+            responses = [...this.state.dynamicReport[c].mdata];
             responses[location[0]]['children'][index]['status'] = !responses[location[0]]['children'][index]['status'];
             this.setState({ responses });
         } else {
-            let responses = [...this.state.reports[c].mdata];
+            responses = [...this.state.dynamicReport[c].mdata];
             responses[index].status = !responses[index].status;
             this.setState({ responses });
             this.setChildren(responses[index]['children'], responses[index].status);
         }
         event.preventDefault();
+        console.log("selected data: ", responses);
     }
 
     changeCollapse1 = (index, location, c) => {
@@ -644,6 +663,20 @@ class AssignRole extends React.Component {
                     this.setState({ reports: data });
                     console.log("reports: ", this.state.reports);
                 });
+            fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetReportOnRoles`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(permissions)
+            }).then(response => response.json())
+                .then(data => {
+                    this.setState({ dynamicReport: data.dynamicResponse });
+                    console.log("reports: ", this.state.dynamicReport);
+                });
+
         } else {
             this.setState({ perFlag: false });
         }
@@ -1134,7 +1167,7 @@ class AssignRole extends React.Component {
                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                             <CardBody>
                                                 <GridContainer justify="center" display={this.state.isButtonVisibility} >
-                                                    <Permission handleSubmit={this.handleSubmit} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2} reports={this.state.reports} dashboard={this.state.dashboard} /*btnload1={this.state.btnload1}*/ menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                                    <Permission handleSubmit={this.handleSubmit} dynamicReport={this.state.dynamicReport} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2} reports={this.state.reports} dashboard={this.state.dashboard} /*btnload1={this.state.btnload1}*/ menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
                                                 </GridContainer>
                                             </CardBody>
                                         </Animated>
