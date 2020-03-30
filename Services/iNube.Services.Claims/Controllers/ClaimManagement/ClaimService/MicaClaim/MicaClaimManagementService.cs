@@ -2344,26 +2344,15 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var policyDetails = await _integrationService.PolicySearch(sdto, apiContext);
 
             // var _policy = await _integrationService.GetPolicyDetails(apiContext);
-
             if (searchclaim.ClaimStatusId > 0)
             {
                 _claims = _claims.Where(p => p.ClaimStatusId == searchclaim.ClaimStatusId);
             }
-            if (searchclaim.ClaimStatusId == 33)
-            {
-                _claims = _claims.Where(p => p.ClaimStatusId == searchclaim.ClaimStatusId);
-            }
 
-            if (searchclaim.ClaimStatusId == 38)
-            {
-                _claims = _claims.Where(p => p.ClaimStatusId == searchclaim.ClaimStatusId);
-            }
             if (searchclaim.ClaimStatusId == 0)
             {
-                _claims = _claims.Where(p => p.ClaimStatusId == 34);
-                _claims = _claims.Where(p => p.ClaimStatusId == 35);
-                _claims = _claims.Where(p => p.ClaimStatusId == 36);
-                _claims = _claims.Where(p => p.ClaimStatusId == 37);
+                int[] lstNotOthers = { 33, 38 };
+                _claims = _claims.Where(p => !lstNotOthers.Contains(p.ClaimStatusId));
             }
 
             var _ClaimSearchData = _mapper.Map<List<SearchDTO>>(_claims);
