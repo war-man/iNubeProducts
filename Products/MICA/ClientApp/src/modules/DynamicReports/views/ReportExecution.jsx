@@ -28,6 +28,7 @@ import bindModel from 'components/ModelBinding/bindModel.js';
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 import ReportConfig from "modules/DynamicReports/ReportConfig.js";
+import UserConfig from 'modules/Users/UserConfig.js';
 
 class ReportExecution extends React.Component {
     constructor(props) {
@@ -51,12 +52,13 @@ class ReportExecution extends React.Component {
             fields: [],
             TableDataList: [],
             tableFlag: false,
+            reportName: [],
         };
     }
 
     componentDidMount() {
 
-        fetch(`${ReportConfig.ReportConfigUrl}/api/Report/GetReportConfigName`, {
+        {/* fetch(`${ReportConfig.ReportConfigUrl}/api/Report/GetReportConfigName`, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -71,6 +73,37 @@ class ReportExecution extends React.Component {
             });
         console.log("data", this.state.masterList);
 
+        setTimeout(
+            function () {
+                this.setState({ pageloader: true });
+            }
+                .bind(this),
+            2000
+        );*/}
+
+        /////////////////
+        let userid = "";
+        let roleid = "";
+        userid = localStorage.getItem('userId');
+        roleid = localStorage.getItem('roleId');
+        console.log("login: ", userid, roleid);
+        debugger;
+        fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicPermissions?Userid=` + userid + `&Roleid=`+roleid+ `&itemType=` +"Report", {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("masterList: ", data);
+                this.setState({ masterList: data });
+                this.state.reportName = this.state.masterList.filter(x => x.mType == "Report");
+                    console.log("list1", this.state.reportName);
+            });
+        
         setTimeout(
             function () {
                 this.setState({ pageloader: true });
@@ -256,9 +289,9 @@ class ReportExecution extends React.Component {
                                                 labelText="ReportName"
                                                 id="ReportConfigDto.ReportName"
                                                 value={this.state.ReportConfigDto.ReportName}
-                                                lstObject={this.state.masterList}
+                                                lstObject={this.state.reportName}
                                                 required={true}
-                                                //filterName='InvoiceStatus'
+                                                //filterName='Report'
                                                 name='ReportName'
                                                 onChange={this.handleParameterCheck}
                                                 formControlProps={{
