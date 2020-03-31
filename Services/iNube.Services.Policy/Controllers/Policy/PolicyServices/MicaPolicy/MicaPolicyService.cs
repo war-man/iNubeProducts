@@ -5055,6 +5055,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     }
                                 }
 
+                                var endObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                AddProperty(endObj, "PolicyNumber", tbl_particiant.PolicyNo);
+                                AddProperty(endObj, "CDAccountNumber", tbl_particiant.CdaccountNumber);
+
+                                var exptempobj = JsonConvert.SerializeObject(endObj);
+                                json = JsonConvert.DeserializeObject<dynamic>(exptempobj.ToString());
+
+
+
                                 //step:3 Call CD mapper
                                 var CDmap = await _integrationService.CDMapperList(json, "PolicyCancellation", apiContext);
                                 if (CDmap.Count > 0)

@@ -2748,9 +2748,75 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 PolicyCancelReturnDto CallCancleCalculator = await PolicyCancellationCalculator(null,SourceObject);
 
+                PolicyNumber = (string)SourceObject["PolicyNumber"];
 
-               var FTModel =  PolicyCancelFT(CallCancleCalculator);
+                //var CDData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
 
+                var CdaccountNumber = (string)SourceObject["CDAccountNumber"];
+
+
+                if (CdaccountNumber != null)
+                {
+                    CDBalanceDTO FtAccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
+                    CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
+                    var ADPremium = Convert.ToDecimal(accountdetails.TxnAmountBalance + FtAccountdetails.TxnAmountBalance);
+                    var GST = Convert.ToDecimal(accountdetails.TaxAmountBalance + FtAccountdetails.TaxAmountBalance);
+                    var Total = ADPremium + GST;
+
+                    //CD AD Object Form 
+                    CDPremiumDTO ADPremiumDTO = new CDPremiumDTO();
+                    CDTaxAmountDTO ADtaxAmountDTO = new CDTaxAmountDTO();
+                    CDTaxTypeDTO ADtaxTypeDTO = new CDTaxTypeDTO();
+                    decimal TotalTax = 0;
+
+
+                    //AD TAX
+                    //From State 
+                    ADtaxTypeDTO.Type = CallCancleCalculator.FromTaxType;
+                    ADtaxTypeDTO.TaxAmount = GST;
+
+                    TotalTax = ADtaxTypeDTO.TaxAmount;
+
+                    //ARRAY
+                    ADtaxAmountDTO.Tax.Add(ADtaxTypeDTO);
+
+                    ADtaxTypeDTO = new CDTaxTypeDTO();
+
+                    //TO State
+                    ADtaxTypeDTO.Type = CallCancleCalculator.ToTaxType;
+                    ADtaxTypeDTO.TaxAmount = 0;
+
+                    TotalTax += ADtaxTypeDTO.TaxAmount;
+
+
+                    ADtaxAmountDTO.TaxAmount = TotalTax;
+                    ADtaxAmountDTO.Tax.Add(ADtaxTypeDTO);
+
+
+                    //AD
+                    ADPremiumDTO.Type = "AD";
+                    ADPremiumDTO.TxnAmount = ADPremium;
+                    ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                    ADPremiumDTO.TaxAmount = ADtaxAmountDTO;
+
+
+
+
+                    MICACDModel.PremiumDTO.Add(ADPremiumDTO);
+                    MICACDModel.Type = "PolicyCancellation";
+                    MICACDModel.TxnType = "Balance";
+                    MICACDModel.TxnAmount = ADPremiumDTO.TxnAmount;
+                    MICACDModel.TaxAmount = ADtaxAmountDTO.TaxAmount;
+                    MICACDModel.TotalAmount = MICACDModel.TxnAmount + MICACDModel.TaxAmount;
+                    FinalDto.Add(MICACDModel);
+
+
+                }
+
+
+                var FTModel =  PolicyCancelFT(CallCancleCalculator);
+
+                MICACDModel = new MicaCDDTO();
                 MICACDModel.PremiumDTO.Add(FTModel);
                 MICACDModel.Type = "PolicyCancellation";
                 MICACDModel.TxnType = "Credit";
@@ -3271,7 +3337,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
                 FTPremiumDTO.TaxAmount = taxAmountDTO;
 
-                var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
+                var FinalTaxTotal = FTPremiumDTO.TaxAmount.TaxAmount;
 
 
                 //AD - Dummy Entry for Balance
@@ -3281,8 +3347,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.PremiumDTO.Add(FTPremiumDTO);
                 CdModel.Type = "EndorsementDel";
                 CdModel.TxnType = "Credit";
-                CdModel.TxnAmount = FTPremiumDTO.TxnAmount + ADPremiumDTO.TxnAmount;
-                CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount + ADPremiumDTO.TaxAmount.TaxAmount;
+                CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
+                CdModel.TaxAmount = FinalTaxTotal;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
                 FinalDto.Add(CdModel);
 
