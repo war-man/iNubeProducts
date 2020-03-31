@@ -1281,7 +1281,7 @@ class ClaimIntimate extends React.Component {
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
-                                <GridItem xs={4} sm={4} md={3}>
+                                {/*<GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         // success={this.state.insuredreferenceState === "success"}
                                         error={this.state.insuredreferenceState}
@@ -1292,7 +1292,7 @@ class ClaimIntimate extends React.Component {
                                         onChange={(e) => this.SetValue("insuredreference", e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
-                                </GridItem>
+                                </GridItem>*/}
                                 <GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         // success={this.state.mobileNumberState === "success"}
@@ -1306,7 +1306,7 @@ class ClaimIntimate extends React.Component {
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
-                                <GridItem xs={4} sm={4} md={3}>
+                                {/* <GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         //success={this.state.emailState === "success"}
                                         error={this.state.emailState}
@@ -1317,7 +1317,7 @@ class ClaimIntimate extends React.Component {
                                         onChange={(e) => this.SetValue("email", e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
-                                </GridItem>
+                                </GridItem>*/}
                                 {/* <GridItem xs={4} sm={4} md={4}>
                                     <CustomDatetime
                                         success={this.state.eventDateState === "success"}
