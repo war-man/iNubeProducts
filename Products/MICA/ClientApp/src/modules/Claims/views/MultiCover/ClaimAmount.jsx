@@ -16,7 +16,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 // @material-ui/icons
 import CardBody from "components/Card/CardBody.jsx";
-import AmountData from "modules/Claims/views/ClaimIntimate/AmountData.json";
+
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 //import ReactTable from "react-table";
 import ReactTable from "components/MuiTable/MuiTable.jsx";
@@ -131,30 +131,26 @@ const ClaimAmount = (props) => {
                             data={props.TableData}
                             filterable
                             columns={[
+
+                                {
+                                    Header: "Select",
+                                    accessor: "select",
+                                    minWidth: 60,
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    headerClassName: 'react-table-center',
+                                    sortable: false,
+                                    resizable: false,
+                                },
                                 {
                                     Header: "SerialNo",
-                                    accessor: "id",
+                                    accessor: "insurableitemId",
                                     headerClassName: 'react-table-center',
                                     setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                     minWidth: 20,
                                     sortable: false,
                                     //  filterable: false
                                 },
-                                //{
-                                //    // Header: "Cover Event Factor - From Value",
-                                //    Header: "InsurableItem",
-                                //    accessor: "insurableItem",
-                                //    minWidth: 40,
-                                //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                //    headerClassName: 'react-table-center'
-                                //},
-                                //{
-                                //    Header: "Name",
-                                //    accessor: "name",
-                                //    minWidth: 40,
-                                //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                //    headerClassName: 'react-table-center'
-                                //},
+                                
                                 {
                                     Header: "IdentificationNo",
                                     accessor: "identificationNo",

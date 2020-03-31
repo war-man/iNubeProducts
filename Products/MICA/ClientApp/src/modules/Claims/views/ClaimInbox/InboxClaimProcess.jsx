@@ -1027,8 +1027,9 @@ class InboxClaimProcess extends React.Component {
                                 onChange={(e) => this.handleClaimAmount("approvedClaimAmounts", e, key)}
                                 formControlProps={{ fullWidth: true }
                                 } />
-                            {this.state.errormessage && (this.state.claimTableData[key].approvedClaimAmounts) ? <p className="error" >*Enter Claim Amount </p> : null}
+                            {/*     {this.state.errormessage && (this.state.claimTableData[key].approvedClaimAmounts) ? <p className="error" >*Enter Claim Amount </p> : null}
                             {(this.state.claimTableData[key].approvedClaimAmounts > this.state.claimTableData[key].claimAmounts) ? <p className="error">*Approved Amount should not be greater than Claim Amount</p> : null}
+                        */}
                         </GridItem>
                 };
             })
