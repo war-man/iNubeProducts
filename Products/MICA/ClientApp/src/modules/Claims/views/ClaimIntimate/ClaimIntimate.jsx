@@ -26,7 +26,7 @@ import Document from "./Document.jsx";
 import BankDetails from "./BankDetails.jsx";
 import validationPage from "modules/Claims/views/ValidationPage.jsx";
 import ClaimAmount from "../MultiCover/ClaimAmount.jsx";
-import AmountData from "modules/Claims/views/ClaimIntimate/AmountData.json";
+
 //import Model from "modules/Claims/views/ClaimIntimate/Model.json";
 import { keys } from "@material-ui/core/styles/createBreakpoints";
 import { Animated } from "react-animated-css";
@@ -36,7 +36,7 @@ import data_Not_found from "assets/img/data-not-found-new.png";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import { Redirect } from 'react-router-dom';
 import Dropdown from "components/Dropdown/Dropdown.jsx";
-
+import CustomCheckbox from "components/Checkbox/CustomCheckbox";
 
 const CustomTableCell = withStyles(theme => ({
     head: {
@@ -130,7 +130,7 @@ class ClaimIntimate extends React.Component {
 
             policyflag: false,
             productflag: false,
-
+            claimamtdisable: true,
             prodId: "",
             startDateFlag: "",
             endDateFlag: "",
@@ -141,6 +141,7 @@ class ClaimIntimate extends React.Component {
             ValidationUI: true,
             validateUI: false,
             errormessage: false,
+            
             errorstatus: false,
             errordate: false,
             erroramt: true,
@@ -164,8 +165,7 @@ class ClaimIntimate extends React.Component {
                 "benefitAmount": "",
                 "claimAmounts": "",
                 "coverName": "",
-
-
+              
             }],
             DataAmount: [],
             DocumentData: [],
@@ -278,7 +278,7 @@ class ClaimIntimate extends React.Component {
                 bankAccounts: [],
                 AdditionalDetails: {},
             },
-
+            selected: [],
             bankDetails: {
                 accountHolderName: "",
                 accountNumber: "",
@@ -413,19 +413,14 @@ class ClaimIntimate extends React.Component {
 
                 for (var i = 0; i < this.state.ClaimsAmountData.length; i++) {
                     console.log("amt:", this.state.ClaimsAmountData[i].claimAmounts);
-                    //if (this.state.ClaimsAmountData[i].claimAmounts != null) {
-                    this.state.DataAmount.push(this.state.ClaimsAmountData[i]);
-                    //}
-                    //else {
-
-                    //}
+                    this.state.DataAmount.push(this.state.ClaimsAmountData[i].claimAmounts);
                 }
-
 
                 console.log("123:", this.state.DataAmount);
                 console.log("123456:", this.state.ClaimsAmountData);
-                detailsdto['ClaimInsurable'] = this.state.DataAmount;
 
+                detailsdto['ClaimInsurable'] = this.state.selected;
+               
                 this.setState({ detailsdto });
 
                 console.log("trail", detailsdto);
@@ -435,7 +430,7 @@ class ClaimIntimate extends React.Component {
                 this.setState({});
 
                 console.log("bankAccounts", this.state.DetailsDTO.bankAccounts);
-                debugger;
+        
                 fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimIntimate`, {
                     method: 'post',
                     headers: {
@@ -474,11 +469,12 @@ class ClaimIntimate extends React.Component {
             }
             else {
                 this.setState({ errormessage: true });
-                //this.setState({ erroramt: true });
+                
                 swal("", "Some fields are missing", "error");
             }
         } else {
-            swal("", "Input fields are not valid, Please enter valid input", "error");
+           swal("", "Input fields are not valid, Please enter valid input", "error");
+           
         }
 
     };
@@ -497,6 +493,9 @@ class ClaimIntimate extends React.Component {
     }
 
     UIValidation = () => {
+       
+        console.log("lossDateTimeState", this.state.lossDateTimeState, "locationOfLossState", this.state.locationOfLossState, "lossDescriptionState", this.state.lossDescriptionState);
+
         if (this.state.locationOfLossState == false && this.state.lossDescriptionState == false && this.state.accountHolderNameState == false
             && this.state.accountNumberState == false && this.state.bankNameState == false && this.state.ifscCodeState == false) {
             //&& this.state.bankBranchAddState == false
@@ -507,6 +506,8 @@ class ClaimIntimate extends React.Component {
         }
         else {
             this.state.validateUI = false;
+            
+            this.setState({});
         }
     }
 
@@ -851,7 +852,7 @@ class ClaimIntimate extends React.Component {
             TableData: this.state.ClaimsAmountData.map((prop, key) => {
 
                 return {
-                    id: key + 1,
+                    insurableitemId: key + 1,
                     insurableItem: prop.insurableItem,
                     name: prop.name,
                     identificationNo: prop.identificationNo,
@@ -866,7 +867,7 @@ class ClaimIntimate extends React.Component {
                             <CustomInput
                                 // success={this.state.claimAmountsState === "success"}
                                 error={this.state.claimAmountsState}
-                                // required={true}
+                               // disabled={this.state.claimamtdisable}
                                 labelText=""
                                 id="padding-input"
                                 value={this.state.ClaimsAmountData.claimAmounts}
@@ -881,12 +882,34 @@ class ClaimIntimate extends React.Component {
                             }*/}
 
 
-                        </GridItem>
+                        </GridItem>,
+                    select: <CustomCheckbox key={key}
+                        name="select"
+                        value={this.state.selected}
+                        onChange={(e) => this.SetclauseValue(key, e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
                 };
             })
         });
 
         console.log("TableData", this.state.TableData);
+    }
+
+    SetclauseValue = (index, event) => {
+      
+        let state = this.state;
+        if (event.target.checked == true) {
+            state.selected.push(this.state.ClaimsAmountData[index]);
+           // this.setState({ claimamtdisable: false });
+        } else if (event.target.checked == false) {
+            console.log("selected array: ", this.state.ClaimsAmountData[index].insurableitemId);
+            state.selected = state.selected.filter(item => item.insurableitemId !== this.state.ClaimsAmountData[index].insurableitemId);
+        }
+        this.setState({ state });
+        console.log("selected: ", this.state.selected);
     }
 
     editFunction(id, pid) {
@@ -1258,7 +1281,7 @@ class ClaimIntimate extends React.Component {
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
-                                <GridItem xs={4} sm={4} md={3}>
+                                {/*<GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         // success={this.state.insuredreferenceState === "success"}
                                         error={this.state.insuredreferenceState}
@@ -1269,7 +1292,7 @@ class ClaimIntimate extends React.Component {
                                         onChange={(e) => this.SetValue("insuredreference", e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
-                                </GridItem>
+                                </GridItem>*/}
                                 <GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         // success={this.state.mobileNumberState === "success"}
@@ -1283,7 +1306,7 @@ class ClaimIntimate extends React.Component {
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
-                                <GridItem xs={4} sm={4} md={3}>
+                                {/* <GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         //success={this.state.emailState === "success"}
                                         error={this.state.emailState}
@@ -1294,7 +1317,7 @@ class ClaimIntimate extends React.Component {
                                         onChange={(e) => this.SetValue("email", e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
-                                </GridItem>
+                                </GridItem>*/}
                                 {/* <GridItem xs={4} sm={4} md={4}>
                                     <CustomDatetime
                                         success={this.state.eventDateState === "success"}
@@ -1460,7 +1483,7 @@ class ClaimIntimate extends React.Component {
 
                                 <BankDetails BankData={this.state.BankData} AccountTypedata={this.state.AccountTypedata} DetailsDTO={this.state.DetailsDTO} handleChange={this.handleChange} fields={this.state.fields} details={this.state.details} onInputParamChange={this.onInputParamChange}
                                     accountHolderNameState={this.state.accountHolderNameState} accountNumberState={this.state.accountNumberState} bankNameState={this.state.bankNameState} bankBranchAddState={this.state.bankBranchAddState} ifscCodeState={this.state.ifscCodeState}
-                                    validateUI={this.state.validateUI} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} classes={this.classes} bankDetails={this.state.bankDetails} handleChangebank={this.handleChangebank} />
+                                    validateUI={this.state.validateUI} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} errorifsccode={this.state.errorifsccode} erroraccno={this.state.erroraccno} errorlossdate={this.state.errorlossdate} classes={this.classes} bankDetails={this.state.bankDetails} handleChangebank={this.handleChangebank} />
 
 
                                 <Document DocumentData={this.state.DocumentData} docidfunc={this.docidfunc} doc={this.state.doc} dmsdocId={this.state.dmsdocId} documentName={this.state.documentName} claimId={this.state.claimId} handleChange={this.handleChange} DetailsDTO={this.state.DetailsDTO} getUploadParams={this.state.getUploadParams} onChangeStatus={this.state.handleChangeStatus} onSubmit={this.state.handleSubmit} fields={this.state.fields} onInputParamChange={this.onInputParamChange} />

@@ -751,7 +751,9 @@ export const TRANSLATIONS = {
         PolicyDetails: 'Policy Details',
         ClaimDetails:'Claim Details',
         PolicyCancellation: 'Policy Cancellation',
-        RefundDetails:'Refund Details'
+        RefundDetails: 'Refund Details',
+        //ClaimEnquiry
+        IntimationDate:'Intimation Date'
     },
     hi_IN: TRANSLATIONS_HN,
     kn_IN: TRANSLATIONS_KN,

@@ -53,6 +53,8 @@ class ReportExecution extends React.Component {
             TableDataList: [],
             tableFlag: false,
             reportName: [],
+            selectedReport: "",
+            reportparameters: [],
             requestData: {
                 ReportConfigId: "",
                 paramList: [],
@@ -104,7 +106,7 @@ class ReportExecution extends React.Component {
                 console.log("masterList: ", data);
                 this.setState({ masterList: data });
                 this.state.reportName = this.state.masterList.filter(x => x.mType == "Report");
-                console.log("list1", this.state.reportName);
+                console.log("list1: ", this.state.reportName);
             });
 
         setTimeout(
@@ -172,20 +174,26 @@ class ReportExecution extends React.Component {
     handleParameterCheck = event => {
         let param = this.state.paramList;
         let parameter = this.state.parameterList;
+        let rparam = this.state.reportparameters;
         let array = [];
         param = array;
+        rparam = array;
         parameter = array;
         var emptyarray = {};
         this.state.CheckCondition = {};
         //this.state.CheckCondition = Object.assign(this.state.CheckCondition, emptyarray);
-        this.setState({ param, parameter });
+        this.setState({ param, parameter, rparam });
+        let index = this.state.reportName.findIndex(a => a.dynamicId == event.target.value);
+        let report = this.state.reportName[index].dynamicName;
+        this.setState({ selectedReport: report });
+
         const ReportConfigDto = this.state.ReportConfigDto;
         ReportConfigDto[event.target.name] = event.target.value;
         this.setState({ ReportConfigDto });
         this.setState({ [event.target.name]: event.target.value });
         console.log(ReportConfigDto[event.target.name], event.target.value, "reportdto");
 
-        this.setState({ flagParam: true });
+        this.setState({ flagParam: true, tableFlag: false });
         fetch(`${ReportConfig.ReportConfigUrl}/api/Report/GetParameters?ReportConfigId=` + event.target.value, {
             method: 'GET',
             headers: {
@@ -205,16 +213,13 @@ class ReportExecution extends React.Component {
     }
 
     queryExecution = event => {
-        debugger;
         let check = this.state.CheckCondition;
         this.setState({ paramList: [] });
         let param = this.state.paramList;
-        let parameter = this.state.parameterList;
         let array = [];
         let object = {};
         param = array;
-        parameter = array;
-        this.setState({ param, parameter });
+        this.setState({ param });
         let pArray = [];
 
         var dummyvalue = Object.keys(check).map((prop, key) => {
@@ -228,8 +233,10 @@ class ReportExecution extends React.Component {
         let request = this.state.requestData;
         request.ReportConfigId = this.state.ReportConfigDto.ReportName;
         request.paramList = [...param];
+        this.state.reportparameters = [...param];
         this.setState({ request });
 
+        console.log("rparameter: ", this.state.reportparameters);
         fetch(`${ReportConfig.ReportConfigUrl}/api/Report/QueryExecution`, {
             method: 'post',
             headers: {
@@ -242,8 +249,8 @@ class ReportExecution extends React.Component {
             .then(data => {
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
-                var emptyarray = {};
-                this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
+                //var emptyarray = {};
+                //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {
                     this.setState({ tableFlag: false });
                     this.tabledata();
@@ -261,12 +268,12 @@ class ReportExecution extends React.Component {
     }
 
     reset = () => {
-        let check = this.state.CheckCondition;
-        var emptyarray = {};
-        check = Object.assign(check, emptyarray);
+        //let check = this.state.CheckCondition;
+        //var emptyarray = {};
+        //check = Object.assign(check, emptyarray);
         let resetField = this.state.ReportConfigDto;
         resetField['ReportName'] = "";
-        this.setState({ resetField, check });
+        this.setState({ resetField/* check */ });
     }
 
     tabledata = () => {
@@ -375,13 +382,33 @@ class ReportExecution extends React.Component {
                         </Card>
                         : <PageContentLoader />
                 }
-
+                {this.state.tableFlag ?
+                    <Card>
+                        <GridItem>
+                            <GridContainer>
+                                <GridItem>
+                                    <label><h5><b>Report name:</b> {this.state.selectedReport}</h5></label>
+                                </GridItem>
+                            </GridContainer>
+                        </GridItem>
+                        <GridItem>
+                            <GridContainer>
+                                <GridItem>
+                                    {this.state.reportparameters.map((item, key) =>
+                                        <label><h5><b>{item.parameterName}:</b> {item.parameterValue}</h5></label>
+                                    )}
+                                </GridItem>
+                            </GridContainer>
+                        </GridItem>
+                    </Card>
+                    : null}
                 {
                     this.state.tableFlag &&
                     <GridContainer xl={12}>
                         <GridItem lg={12}>
                             <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                 <ReactTable
+                                    title={this.state.selectedReport}
                                     data={this.state.result}
                                     filterable
 

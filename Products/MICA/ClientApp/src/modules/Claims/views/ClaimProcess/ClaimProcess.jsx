@@ -1138,11 +1138,12 @@ class ClaimProcess extends React.Component {
                     doc.document = data[0].document;
 
                     this.setState({ doc });
-                }
+                
                 for (let i = 0; i < this.state.docDetailsData.length; i++) {
                     if (this.state.docDetailsData[i].dmsdocId != null) {
                         this.state.DocumentData.push(this.state.docDetailsData[i]);
                         this.docTable(this.state.DocumentData);
+                    }
                     }
                 }
             });
