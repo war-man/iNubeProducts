@@ -875,7 +875,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true)
+            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true && s.PolicyNo!= null)
                           select P;
             if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
             {
