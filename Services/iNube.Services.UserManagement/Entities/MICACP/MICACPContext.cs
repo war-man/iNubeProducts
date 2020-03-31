@@ -25,7 +25,7 @@ namespace iNube.Services.UserManagement.Entities.MICACP
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER; Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=iNubeCommon;User ID=admin;Password=micaadmin;");
             }
         }
 
@@ -72,6 +72,8 @@ namespace iNube.Services.UserManagement.Entities.MICACP
 
                 entity.Property(e => e.CustomerId).HasColumnType("numeric(18, 0)");
 
+                entity.Property(e => e.EnvId).HasColumnType("numeric(18, 0)");
+
                 entity.Property(e => e.IsActive).HasColumnName("isActive");
 
                 entity.Property(e => e.Key).HasMaxLength(250);
@@ -81,6 +83,11 @@ namespace iNube.Services.UserManagement.Entities.MICACP
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Type).HasMaxLength(250);
+
+                entity.HasOne(d => d.Env)
+                    .WithMany(p => p.TblCustomerSettings)
+                    .HasForeignKey(d => d.EnvId)
+                    .HasConstraintName("FK_tblCustomerSettings_tblCustomerEnvironment");
             });
 
             modelBuilder.Entity<TblCustomerUsers>(entity =>
@@ -121,7 +128,7 @@ namespace iNube.Services.UserManagement.Entities.MICACP
             modelBuilder.Entity<TblmasCpcommonTypes>(entity =>
             {
                 entity.HasKey(e => e.CommonTypeId)
-                    .HasName("PK__tblmasCP__4050837233C0275C");
+                    .HasName("PK__tblmasCP__405083722D74C8DD");
 
                 entity.ToTable("tblmasCPCommonTypes", "CP");
 

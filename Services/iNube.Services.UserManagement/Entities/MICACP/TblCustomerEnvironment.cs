@@ -5,6 +5,11 @@ namespace iNube.Services.UserManagement.Entities.MICACP
 {
     public partial class TblCustomerEnvironment
     {
+        public TblCustomerEnvironment()
+        {
+            TblCustomerSettings = new HashSet<TblCustomerSettings>();
+        }
+
         public decimal Id { get; set; }
         public decimal? CustomerId { get; set; }
         public string EnvName { get; set; }
@@ -15,5 +20,7 @@ namespace iNube.Services.UserManagement.Entities.MICACP
         public DateTime? ModifiedDate { get; set; }
         public string Product { get; set; }
         public int? SortOrderBy { get; set; }
+
+        public virtual ICollection<TblCustomerSettings> TblCustomerSettings { get; set; }
     }
 }
