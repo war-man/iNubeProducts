@@ -1652,9 +1652,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
 
 
-            TblBankAccounts _bankAccounts = new TblBankAccounts();
+
+
             foreach (var item in claimsDTO.DataModelDTO)
             {
+                TblBankAccounts _bankAccounts = new TblBankAccounts();
                 _bankAccounts.AccountHolderName = item["Account Holder Name"];
                 _bankAccounts.AccountNumber = item["Account No."];
                 _bankAccounts.ClaimId = ClaimApproval.ClaimId;
@@ -2281,11 +2283,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.InsuredEmail = pk[0].Email;
                     item.InsuredMobileNo = pk[0].MobileNumber;
                     item.ProductIdPk = pk[0].ProductIdPk;
-                  
+
 
 
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
 
                 }
             }
