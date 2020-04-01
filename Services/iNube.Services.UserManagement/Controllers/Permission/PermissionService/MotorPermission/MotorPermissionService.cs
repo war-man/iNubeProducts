@@ -69,7 +69,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             throw new NotImplementedException();
         }
 
-        public DynamicReportResponse SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
+        public async Task<UserReportPermissionResponse> SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
