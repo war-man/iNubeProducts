@@ -4219,6 +4219,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 AddProperty(expObj, "ProposalNumber", mappedPolicy.ProposalNo);
                                 AddProperty(expObj, "Balance SumInsured", ProposalDetail["si"]);
                                 AddProperty(expObj, "No. of Claim", 0);
+                                AddProperty(expObj, "PolicyStatus", "InActive");
 
                                 var Proposaltempobj = JsonConvert.SerializeObject(expObj);
                                 ProposalDetail = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
@@ -4623,6 +4624,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         //expObj.PremiumDetails = CDmap;
                                         AddProperty(expObj, "Policy Start Date", PolicyStartDate);
                                         AddProperty(expObj, "Policy End Date", PolicyEndDate);
+                                        AddProperty(expObj, "PolicyStatus", "Active");
 
                                         expObj.PremiumDetails.AddRange(CDmap);
                                     var tempobj = JsonConvert.SerializeObject(expObj);
@@ -5077,6 +5079,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     //Replace Premium details
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
                                     expObj.PremiumDetails = CDmap;
+                                    AddProperty(expObj, "PolicyStatus", "Cancel");
                                     var tempobj = JsonConvert.SerializeObject(expObj);
                                     json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
