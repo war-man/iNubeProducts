@@ -116,6 +116,9 @@ class ClaimEnquiry extends React.Component {
         super(props);
         this.state = {
             vehicleclaim: false,
+            vehicleclaimstate: false,
+            vehicleclaimdriver: false,
+            vehicleclaimsurvey: false,
             isimage: false,
             openpop: false,
             bytearr: [],
@@ -256,6 +259,7 @@ class ClaimEnquiry extends React.Component {
                 "locationOfEvent": "",
                 "lossDescription": "",
                 "vehicleLocation": "",
+                "vehicleLocationState": "",
                 "driverName": "",
                 "selfSurvey": "",
                 "claimManagerRemarks": "",
@@ -562,15 +566,15 @@ class ClaimEnquiry extends React.Component {
 
     claimAmountTable = () => {
 
-
+        console.log("this.state.claimTableData", this.state.claimTableData);
         this.setState({
             TableData: this.state.claimTableData.map((prop, key) => {
 
                 return {
-                    id: key + 1,
+                    insurableitemId: key + 1,
                     insurableItem: prop.insurableItem,
-                    name: prop.name,
-                    identificationNo: prop.identificationNo,
+                    //name: prop.name,
+                    //identificationNo: prop.identificationNo,
                     typeOfLoss: prop.typeOfLoss,
                     coverValue: prop.coverDynamic.map((c) => {
                         return (<p className="gridparagraph"> {c.Header} : {c.Details} </p>)
@@ -626,6 +630,10 @@ class ClaimEnquiry extends React.Component {
             .then(data => {
                 console.log("claimDetailsfndata", data);
 
+                this.setState({ claimTableData: data[1] });
+                
+                this.claimAmountTable(this.state.claimTableData);
+
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
@@ -633,22 +641,27 @@ class ClaimEnquiry extends React.Component {
                 this.state.claimDetailsData.totalApprovedAmount = data[0][4][1];
                 this.state.claimDetailsData.claimStatus = data[0][5][1];
                 this.state.claimDetailsData.claimManagerRemarks = data[0][6][1];
-                if (data[0][7][1].length != 0 && data[0][8][1].length != 0 && data[0][9][1].length != 0) {
 
+                debugger;
+
+                if (data[0][8][1].length != 0) {
+                    this.state.claimDetailsData.vehicleLocationState = data[0][8][1];
+                    this.setState({ vehicleclaimstate: true });
+                }
+                if (data[0][7][1].length != 0) {
                     this.state.claimDetailsData.vehicleLocation = data[0][7][1];
-                    this.state.claimDetailsData.driverName = data[0][8][1];
-                    this.state.claimDetailsData.selfSurvey = data[0][9][1];
-
                     this.setState({ vehicleclaim: true });
                 }
-
-
-                this.setState({ claimTableData: data[1] });
-               
-                console.log("this.state.claimTableData", this.state.claimTableData)
-                this.claimAmountTable(this.state.claimTableData);
-
-                console.log("DATA", this.state.claimTableData);
+                if (data[0][10][1].length != 0) {
+                    this.state.claimDetailsData.selfSurvey = data[0][10][1];
+                    this.setState({ vehicleclaimsurvey: true });
+                }
+                if (data[0][9][1].length != 0) {
+                    this.state.claimDetailsData.driverName = data[0][9][1];
+                    this.setState({ vehicleclaimdriver: true });
+                }
+                
+                console.log("insurablegrid vaalue", this.state.claimTableData);
             });
 
 
@@ -1117,7 +1130,7 @@ class ClaimEnquiry extends React.Component {
                             </GridContainer>
                            
                                         <ClaimSearch TableData={this.state.TableData} handleDisappear={this.handleDisappear} refreshData={this.refreshData} ClaimAmountSum={this.ClaimAmountSum} ClaimDTO={this.state.ClaimDTO} fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount} disabled={this.state.disabled} claimId={this.state.claimId} SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} policyDetailsData={this.state.policyDetailsData} decision={this.state.decision} claimDetailsData={this.state.claimDetailsData}
-                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} />
+                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}/>
 
                         </CardBody>
                             </Card>
