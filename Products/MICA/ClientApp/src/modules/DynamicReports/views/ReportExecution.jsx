@@ -32,6 +32,11 @@ import Dropdown from "components/Dropdown/Dropdown.jsx";
 import ReportConfig from "modules/DynamicReports/ReportConfig.js";
 import UserConfig from 'modules/Users/UserConfig.js';
 
+const paddingCard =
+{
+    padding: "10px",
+}
+
 class ReportExecution extends React.Component {
     constructor(props) {
         super(props);
@@ -254,6 +259,8 @@ class ReportExecution extends React.Component {
         this.setState({ request });
 
         console.log("rparameter: ", this.state.reportparameters);
+        this.setState({ loader: false });
+
         fetch(`${ReportConfig.ReportConfigUrl}/api/Report/QueryExecution`, {
             method: 'post',
             headers: {
@@ -269,7 +276,7 @@ class ReportExecution extends React.Component {
                 //var emptyarray = {};
                 //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {
-                    this.setState({ tableFlag: false, flagParam: false });
+                    this.setState({ tableFlag: false, flagParam: false, loader: false});
                     this.tabledata();
                     this.reset();
                     this.setState({ otFlag: false });
@@ -277,7 +284,7 @@ class ReportExecution extends React.Component {
                 else {
                     setTimeout(
                         function () {
-                            this.setState({ loader: true, searchTableSec: false, nodata: true });
+                            this.setState({ loader: true, tableFlag: false, nodata: true });
                         }.bind(this), 2000
                     );
                 }
@@ -311,7 +318,7 @@ class ReportExecution extends React.Component {
     }
 
     tabledata = () => {
-        this.setState({ tableFlag: true });
+        this.setState({ tableFlag: true, loader: true});
         console.log("prop data", this.state.result);
         this.setState({
             TableDataList: Object.keys(this.state.result[0]).map((prop, key) => {
@@ -323,6 +330,11 @@ class ReportExecution extends React.Component {
             })
         });
         console.log("table data", this.state.TableDataList);
+    }
+
+    searchagain = () => {
+        this.setState({ nodata: false });
+        window.scrollTo(0, 0);
     }
 
     render() {
@@ -435,7 +447,7 @@ class ReportExecution extends React.Component {
                         </Card>
                         : <PageContentLoader />
                 }
-                {this.state.tableFlag ?
+                {this.state.tableFlag ? 
                     <Card>
                         <GridItem>
                             <GridContainer>
@@ -456,8 +468,10 @@ class ReportExecution extends React.Component {
                     </Card>
                     : null}
                 {
-                    this.state.tableFlag &&
-                    <GridContainer xl={12}>
+                    this.state.loader ?
+                    
+                        <GridContainer xl={12}>
+                        {this.state.tableFlag ?
                         <GridItem lg={12}>
                             <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                 <ReactTable
@@ -470,10 +484,32 @@ class ReportExecution extends React.Component {
                                     className="-striped -highlight discription-tab"
                                 />
                             </Animated>
-                        </GridItem>
-                    </GridContainer>
-                }
-            </div >
+                                </GridItem>
+                                : <GridItem lg={12}>
+                                    {this.state.nodata ?
+                                        <Card>
+                                            <GridContainer lg={12} justify="center">
+                                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                    <img src={data_Not_found} className="tab-data-not-found" />
+                                                </Animated>
+                                            </GridContainer>
+                                            <GridContainer lg={12} justify="center">
+                                                <GridItem xs={5} sm={3} md={3} lg={1} >
+                                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                        <Button className="secondary-color" round onClick={() => this.searchagain()}> Try again </Button>
+                                                    </Animated>
+                                                </GridItem>
+                                            </GridContainer>
+                                        </Card>
+                                        : null}
+                                </GridItem>}
+
+                        </GridContainer>
+                        : <Card style={paddingCard}>
+                            <TableContentLoader />
+                        </Card>}
+            
+            </div>
 
         );
     }
