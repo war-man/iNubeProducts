@@ -614,63 +614,49 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             return dynamicrpt;
         }
 
-        public DynamicReportResponse SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
+        public async Task<UserReportPermissionResponse> SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
         {
-            //TblDynamicPermissions dynamicPermissions = null;
-            //foreach (var item in reportDTO.RolePermissionIds)
-            //{
-            //    var newPermission = item.PermissionIds.ToList();
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
 
-            //    var existingPerm = _context.TblDynamicPermissions.Where(t => t.Userid == reportDTO.UserId && t.UserorRole == "User" && t.Roleid == item.RoleId).ToList();
+            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Report");
+            var rresponse = await _integrationService.GetReportNameForPermissionsDetails(data.Url, apiContext);
 
-            //    //Delete which are not in current permissions--
-            //    var delPermission = existingPerm.Where(m => !item.PermissionIds.Contains((int)m.DynamicId)).ToList();
-            //    foreach (var perm in delPermission)
-            //    {
-            //        _context.Remove(perm);
-            //        existingPerm.Remove(perm);
-            //    }
-            //    var includedPermission = existingPerm.Where(m => item.PermissionIds.Contains((int)m.DynamicId)).ToList();
-            //    foreach (var incPerm in includedPermission)
-            //    {
-            //        newPermission.Remove((int)incPerm.DynamicId);
-            //    }
-            //    //Add new record
-            //    foreach (var permissionId in newPermission)
-            //    {
+            TblDynamicPermissions reportPermissions = null;
+            foreach (var item in reportDTO.RolePermissionIds)
+            {
+                var newPermission = item.PermissionIds.ToList();
+                var existingPerm = _context.TblDynamicPermissions.Where(t => t.Userid == reportDTO.UserId && t.UserorRole == "User" && t.Roleid == item.RoleId).ToList();
+                //Delete which are not in current permissions--
+                var delPermission = existingPerm.Where(m => !item.PermissionIds.Contains((int)m.DynamicId)).ToList();
+                foreach (var perm in delPermission)
+                {
+                    _context.Remove(perm);
+                    existingPerm.Remove(perm);
+                }
+                var includedPermission = existingPerm.Where(m => item.PermissionIds.Contains((int)m.DynamicId)).ToList();
+                foreach (var incPerm in includedPermission)
+                {
+                    newPermission.Remove((int)incPerm.DynamicId);
+                }
+                //Add new record
+                foreach (var permissionId in newPermission)
+                {
+                    reportPermissions = new TblDynamicPermissions();
+                    reportPermissions.Userid = reportDTO.UserId;
+                    reportPermissions.DynamicId = permissionId;
+                    reportPermissions.IsActive = true;
+                    reportPermissions.DynamicType = data.ItemType;
+                    reportPermissions.DynamicName = rresponse.FirstOrDefault(a => a.mID == permissionId).mValue;
+                    reportPermissions.Roleid = item.RoleId;
+                    reportPermissions.UserorRole = "User";
+                    reportPermissions.CreatedBy = apiContext.UserId;
+                    reportPermissions.CreatedDate = DateTime.Now;
 
-            //        dynamicPermissions = new TblDynamicPermissions();
-
-            //        dynamicPermissions.DynamicId=permissionId.
-            //        dynamicPermissions.DynamicId = reports.mID;
-            //        dynamicPermissions.DynamicName = reports.mValue;
-            //        dynamicPermissions.DynamicType = reports.mType;
-            //        dynamicPermissions.Roleid = item;
-            //        dynamicPermissions.IsActive = true;
-            //        dynamicPermissions.UserorRole = "User";
-            //        dynamicPermissions.CreatedBy = apiContext.UserId;
-            //        dynamicPermissions.CreatedDate = DateTime.Now;
-
-            //        dynamicPermissions.UserId = reportDTO.UserId;
-            //        dynamicPermissions. = permissionId;
-            //        dynamicPermissions.RoleId = item.RoleId;
-            //        dynamicPermissions.UserorRole = "User";
-            //        // userPermissions.CreatedBy = CreatedBy;
-            //        dynamicPermissions.CreatedDate = DateTime.Now;
-            //        dynamicPermissions.Status = true;
-            //        _context.TblUserPermissions.Add(dynamicPermissions);
-            //    }
-
-            //}
-
-            //_context.SaveChanges();
-            //  return new UserPermissionResponse { Status = BusinessStatus.Created, Id = userPermissions?.UserPermissionsId.ToString(), ResponseMessage = $"Assigned Permissions successfully!!" };
-
-
-
-
-
-            throw new NotImplementedException();
+                    _context.TblDynamicPermissions.Add(reportPermissions);
+                }
+            }
+            _context.SaveChanges();
+            return new UserReportPermissionResponse { Status = BusinessStatus.Created, ResponseMessage = $"Report permissions assigned successfully!!" };
         }
         #endregion
     }

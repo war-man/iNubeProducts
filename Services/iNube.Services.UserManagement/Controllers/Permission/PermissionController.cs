@@ -256,9 +256,9 @@ namespace iNube.Services.UserManagement.Controllers.Permission
         }
 
         [HttpPost]
-        public IActionResult SaveAssignReports(UserRoleReportsDTO reportDTO)
+        public async Task<IActionResult> SaveAssignReports(UserRoleReportsDTO reportDTO)
         {
-            var response = _permissionService.SaveAssignReports(reportDTO, Context);
+            var response = await _permissionService.SaveAssignReports(reportDTO, Context);
             return Ok(response);
         }
     }

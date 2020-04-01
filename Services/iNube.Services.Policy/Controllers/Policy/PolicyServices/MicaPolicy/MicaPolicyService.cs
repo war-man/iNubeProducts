@@ -875,7 +875,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true)
+            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true && s.PolicyNo!= null)
                           select P;
             if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
             {
@@ -4219,6 +4219,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 AddProperty(expObj, "ProposalNumber", mappedPolicy.ProposalNo);
                                 AddProperty(expObj, "Balance SumInsured", ProposalDetail["si"]);
                                 AddProperty(expObj, "No. of Claim", 0);
+                                AddProperty(expObj, "PolicyStatus", "InActive");
 
                                 var Proposaltempobj = JsonConvert.SerializeObject(expObj);
                                 ProposalDetail = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
@@ -4623,6 +4624,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         //expObj.PremiumDetails = CDmap;
                                         AddProperty(expObj, "Policy Start Date", PolicyStartDate);
                                         AddProperty(expObj, "Policy End Date", PolicyEndDate);
+                                        AddProperty(expObj, "PolicyStatus", "Active");
 
                                         expObj.PremiumDetails.AddRange(CDmap);
                                     var tempobj = JsonConvert.SerializeObject(expObj);
@@ -5055,6 +5057,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     }
                                 }
 
+                                var endObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                AddProperty(endObj, "PolicyNumber", tbl_particiant.PolicyNo);
+                                AddProperty(endObj, "CDAccountNumber", tbl_particiant.CdaccountNumber);
+
+                                var exptempobj = JsonConvert.SerializeObject(endObj);
+                                json = JsonConvert.DeserializeObject<dynamic>(exptempobj.ToString());
+
+
+
                                 //step:3 Call CD mapper
                                 var CDmap = await _integrationService.CDMapperList(json, "PolicyCancellation", apiContext);
                                 if (CDmap.Count > 0)
@@ -5068,6 +5079,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     //Replace Premium details
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
                                     expObj.PremiumDetails = CDmap;
+                                    AddProperty(expObj, "PolicyStatus", "Cancel");
                                     var tempobj = JsonConvert.SerializeObject(expObj);
                                     json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 

@@ -30,7 +30,7 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
         IEnumerable<MasPermissionDTO> GetReports(ApiContext apiContext);
         DynamicReportResponse GetReportOnRoles(UserRoleReportDTO reportDTO, ApiContext apiContext);
         Task<DynamicReportResponse> GetReportByRole(RoleReportDTO reportDTO, ApiContext apiContext);
-        DynamicReportResponse SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext);
+        Task<UserReportPermissionResponse> SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext);
     }
 
     public class PermissionService : IPermissionService
@@ -664,9 +664,9 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
             return _permissionService(apiContext.ProductType).GetReportOnRoles(reportDTO, apiContext);
         }
 
-        public DynamicReportResponse SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
+        public async Task<UserReportPermissionResponse> SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
         {
-            return _permissionService(apiContext.ProductType).SaveAssignReports(reportDTO, apiContext);
+            return await _permissionService(apiContext.ProductType).SaveAssignReports(reportDTO, apiContext);
         }
 
         public async Task<DynamicReportResponse> GetReportByRole(RoleReportDTO reportDTO, ApiContext apiContext)

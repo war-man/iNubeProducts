@@ -20,7 +20,7 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
         UserPermissionResponse SaveAssignPermission(UserRolesPermissionDTO permissionIds, ApiContext apiContext);
         NewRolePermissionResponse AssignRolePermission(NewRolesPermissionDTO permissionIds, ApiContext apiContext);
         DynamicReportResponse GetReportOnRoles(UserRoleReportDTO reportDTO, ApiContext apiContext);
-        DynamicReportResponse SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext);
+        Task<UserReportPermissionResponse> SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext);
         Task<DynamicReportResponse> GetReportByRole(RoleReportDTO reportDTO, ApiContext apiContext);
         IEnumerable<MasPermissionDTO> GetDashboards(ApiContext apiContext);
         IEnumerable<MasPermissionDTO> GetReports(ApiContext apiContext);

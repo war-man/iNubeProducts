@@ -814,4 +814,10 @@ namespace iNube.Services.UserManagement.Models
         public string RoleId { get; set; }
         public decimal EnvId { get; set; }
     }
+
+    public class UserReportPermissionResponse : ResponseStatus
+    {
+        public DynamicPermissionsDTO reportperm { get; set; }
+    }
+
 }
