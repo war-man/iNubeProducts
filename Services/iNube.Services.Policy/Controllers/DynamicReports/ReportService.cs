@@ -17,7 +17,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext);
         Task<ReportConfigResonse> SaveConfigParameters(ReportConfigDTO reportConfigDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetReportConfigName(string lMasterlist, ApiContext apiContext);
-        Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext);
+        Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext);
         Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
         Task<DataTable> QueryExecution(QueryDTO queryDTO, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetReportNameForPermissions(ApiContext apiContext);
@@ -55,7 +55,7 @@ namespace iNube.Services.Policy.Controllers.DynamicReports
         {
             return await _productService(apiContext.ProductType).GetReportConfigName(lMasterlist, apiContext);
         }
-        public async Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext)
+        public async Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).GetParameters(ReportConfigId, apiContext);
         }

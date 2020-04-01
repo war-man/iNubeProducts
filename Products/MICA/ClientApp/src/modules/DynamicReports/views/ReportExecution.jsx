@@ -10,12 +10,14 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import Icon from "@material-ui/core/Icon";
 import ReactTable from "components/MuiTable/MuiTable.jsx";
-import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
+//import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import $ from 'jquery';
 import money from "assets/img/money.png";
 import swal from 'sweetalert';
+import CustomDatetime from "components/CustomComponent/CustomDatetimeFormate.jsx";
+
 import Visibility from "@material-ui/icons/Visibility";
 import GetApp from "@material-ui/icons/GetApp";
 import Edit from "@material-ui/icons/Edit";
@@ -55,10 +57,13 @@ class ReportExecution extends React.Component {
             reportName: [],
             selectedReport: "",
             reportparameters: [],
+            fromDate: "",
+            toDate: "",
             requestData: {
                 ReportConfigId: "",
                 paramList: [],
-            }
+            },
+            displayparameter: {},
         };
     }
 
@@ -128,10 +133,14 @@ class ReportExecution extends React.Component {
     };
 
     onInputParamListChange = (evt) => {
-        const fields = this.state.CheckCondition;
+        var fields = this.state.CheckCondition;
         fields[evt.target.name] = evt.target.value;
         this.setState({ fields });
         console.log("fields", fields);
+
+        let param = this.state.displayparameter;
+        param[evt.target.name] = evt.target.value;
+        this.setState({ param });
         //let paramindex = this.state.paramList.findIndex(s => s.parameterName == evt.target.name);
         ///*Create obj*/
         //if (paramindex == -1) {
@@ -148,28 +157,28 @@ class ReportExecution extends React.Component {
         console.log(this.state.paramList, "Array List");
     };
 
-    onDateChange = (formate, name, event) => {
-        var today = event.toDate();
-        if (today.getDate() < 10) {
-            var dt = '0' + today.getDate();
-        }
-        else {
-            var dt = today.getDate();
-        }
-        if (today.getMonth() < 10) {
-            var mm = '0' + (today.getMonth() + 1)
-        }
-        else {
-            var mm = (today.getMonth() + 1);
-        }
-        var date = dt + '/' + mm + '/' + today.getFullYear();
-        var date2 = new Date();
-        var date1 = new Date(today);
-        let state = this.state.fields;
-        state[name] = date;
-        this.setState({ state });
+    //onDateChange = (formate, name, event) => {
+    //    var today = event.toDate();
+    //    if (today.getDate() < 10) {
+    //        var dt = '0' + today.getDate();
+    //    }
+    //    else {
+    //        var dt = today.getDate();
+    //    }
+    //    if (today.getMonth() < 10) {
+    //        var mm = '0' + (today.getMonth() + 1)
+    //    }
+    //    else {
+    //        var mm = (today.getMonth() + 1);
+    //    }
+    //    var date = dt + '/' + mm + '/' + today.getFullYear();
+    //    var date2 = new Date();
+    //    var date1 = new Date(today);
+    //    let state = this.state.fields;
+    //    state[name] = date;
+    //    this.setState({ state });
 
-    };
+    //};
 
     handleParameterCheck = event => {
         let param = this.state.paramList;
@@ -181,6 +190,7 @@ class ReportExecution extends React.Component {
         parameter = array;
         var emptyarray = {};
         this.state.CheckCondition = {};
+        this.state.displayparameter = {};
         //this.state.CheckCondition = Object.assign(this.state.CheckCondition, emptyarray);
         this.setState({ param, parameter, rparam });
         let index = this.state.reportName.findIndex(a => a.dynamicId == event.target.value);
@@ -207,7 +217,7 @@ class ReportExecution extends React.Component {
                 //this.setState({ parameterList: [] });   //item is my state variable
                 //this.setState({ parameterList: parameterList }) 
                 this.setState({ parameterList: data });
-                //console.log(this.state.parameterList, data, 'CheckConditions');
+                console.log("rparameter: ", data);
                 this.setState({ otFlag: true });
             });
     }
@@ -221,19 +231,26 @@ class ReportExecution extends React.Component {
         param = array;
         this.setState({ param });
         let pArray = [];
-
+        let dArray = [];
         var dummyvalue = Object.keys(check).map((prop, key) => {
             pArray.push({
                 "parameterName": prop,
                 "parameterValue": check[prop],
             });
         });
-
+        var dummyparam = Object.keys(this.state.displayparameter).map((prop, key) => {
+            dArray.push({
+                "parameterName": prop,
+                "parameterValue": this.state.displayparameter[prop],
+            });
+        });
+        this.state.reportparameters = [...dArray];
+        console.log("rparameter: ", this.state.CheckCondition);
         param = pArray;
         let request = this.state.requestData;
         request.ReportConfigId = this.state.ReportConfigDto.ReportName;
         request.paramList = [...param];
-        this.state.reportparameters = [...param];
+
         this.setState({ request });
 
         console.log("rparameter: ", this.state.reportparameters);
@@ -252,7 +269,7 @@ class ReportExecution extends React.Component {
                 //var emptyarray = {};
                 //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {
-                    this.setState({ tableFlag: false });
+                    this.setState({ tableFlag: false, flagParam: false });
                     this.tabledata();
                     this.reset();
                     this.setState({ otFlag: false });
@@ -266,6 +283,23 @@ class ReportExecution extends React.Component {
                 }
             });
     }
+
+    onDateChange = (name, event) => {
+        var today = event.toDate();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+
+        var fields = this.state.CheckCondition;
+        fields[name] = date;
+        this.setState({ fields });
+
+        var temp = event.toDate();
+        var tempDate = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+
+        var dparam = this.state.displayparameter;
+        dparam[name] = tempDate;
+        this.setState({ dparam });
+        console.log("fields", fields);
+    };
 
     reset = () => {
         //let check = this.state.CheckCondition;
@@ -345,17 +379,36 @@ class ReportExecution extends React.Component {
                                                             <CardBody>
                                                                 {this.state.otFlag &&
                                                                     <GridContainer>
-                                                                        {this.state.parameterList.map((item, index) =>
-                                                                            <GridItem xs={12} sm={12} md={3} key={index}>
-                                                                                <CustomInput labelText={item}
-                                                                                    // value={item.paramName}
-                                                                                    name={item}
-                                                                                    onChange={this.onInputParamListChange}
-                                                                                    inputProps={{
-                                                                                        //type: "number"
-                                                                                    }}
-                                                                                    formControlProps={{ fullWidth: true }} />
-                                                                            </GridItem>
+                                                                        {this.state.parameterList.map((item, index) => {
+                                                                            if (item.dataType != "Date") {
+                                                                                return (
+                                                                                    <GridItem xs={12} sm={12} md={3} key={index}>
+                                                                                        <CustomInput labelText={item.parameterName}
+                                                                                            // value={item.paramName}
+                                                                                            name={item.parameterName}
+                                                                                            onChange={(e) => this.onInputParamListChange(e)}
+                                                                                            inputProps={{
+                                                                                                //type: "number"
+                                                                                            }}
+                                                                                            formControlProps={{ fullWidth: true }} />
+                                                                                    </GridItem>
+                                                                                );
+                                                                            }
+                                                                            else {
+                                                                                return (
+                                                                                    <GridItem xs={12} sm={12} md={3} key={index}>
+                                                                                        <CustomDatetime style="ddl"
+                                                                                            labelText={item.parameterName}
+                                                                                            id='dob'
+                                                                                            //Futuredatevalidate={true}
+                                                                                            name={item.parameterName}
+                                                                                            onChange={(evt) => this.onDateChange(item.parameterName, evt)}
+                                                                                            value={this.state.CheckCondition[item.parameterName]}
+                                                                                            formControlProps={{ fullWidth: true }} />
+                                                                                    </GridItem>
+                                                                                )
+                                                                            }
+                                                                        }
                                                                         )}
                                                                     </GridContainer>
                                                                 }
@@ -387,17 +440,17 @@ class ReportExecution extends React.Component {
                         <GridItem>
                             <GridContainer>
                                 <GridItem>
-                                    <label><h5><b>Report name:</b> {this.state.selectedReport}</h5></label>
+                                    <h4><small> {this.state.selectedReport}</small></h4>
                                 </GridItem>
                             </GridContainer>
                         </GridItem>
                         <GridItem>
                             <GridContainer>
-                                <GridItem>
-                                    {this.state.reportparameters.map((item, key) =>
-                                        <label><h5><b>{item.parameterName}:</b> {item.parameterValue}</h5></label>
-                                    )}
-                                </GridItem>
+                                {this.state.reportparameters.map((item, key) =>
+                                    <GridItem xs={12} sm={4}>
+                                        <h5><b><TranslationContainer translationKey={item.parameterName} />:</b> {item.parameterValue}</h5>
+                                    </GridItem>
+                                )}
                             </GridContainer>
                         </GridItem>
                     </Card>
@@ -408,16 +461,11 @@ class ReportExecution extends React.Component {
                         <GridItem lg={12}>
                             <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                 <ReactTable
-                                    title={this.state.selectedReport}
                                     data={this.state.result}
                                     filterable
-
                                     columns={this.state.TableDataList}
-
-
                                     defaultPageSize={5}
                                     showPaginationTop={false}
-
                                     showPaginationBottom
                                     className="-striped -highlight discription-tab"
                                 />
