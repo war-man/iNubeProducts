@@ -21,6 +21,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -5550,127 +5551,163 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
         public async Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
-            var files = httpRequest.Form.Files;
+            var files =httpRequest.Form.Files;
             //var docId = GetActiveResult(file.Name); HttpRequest
             DataTable dt = new DataTable();
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            foreach (var file in files)
+
+            var fileExtension = "csv";
+            if (fileExtension == "csv")
             {
-                var filename = file.Name;
-                var fileExt = Path.GetExtension(file.FileName);
-                //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
-                if (file == null || file.Length <= 0)
+                string filepath = @"C:\Users\brajesh.kumar\Desktop\test11.csv";
+                DataTable res = await ConvertCSVtoDataTable(filepath, apiContext);
+
+                //Saving data into database
+
+                var envResponse = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+                //string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
+                try
                 {
-                    return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
-                }
-                if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
-                {
-                    bool sms = true;
-                    bool email = true;
-                    //dt.Columns.Add("BankFileId", typeof(int));
-                    // dt.Columns.Add("Id", typeof(string));
-                    dt.Columns.Add("EndorsementNumber", typeof(string));
-                    dt.Columns.Add("EndorsementEffectivedate", typeof(DateTime));
-                    dt.Columns.Add("TxnDate", typeof(DateTime));
-                    dt.Columns.Add("TotalRefundAmount", typeof(decimal));
-                    dt.Columns.Add("PaymentGatewayReferenceId", typeof(string));
-                    dt.Columns.Add("AmountPaid", typeof(decimal));
-                    dt.Columns.Add("DateOfPayment", typeof(DateTime));
-                    dt.Columns.Add("PolicyId", typeof(decimal));
-                    dt.Columns.Add("PaymentStatus", typeof(string));
-                    dt.Columns.Add("UpdatedResponse", typeof(string));
-                    using (var stream = new MemoryStream())
+                    using (var bulkCopy = new SqlBulkCopy(envResponse.Dbconnection, SqlBulkCopyOptions.KeepIdentity))
                     {
-                        await file.CopyToAsync(stream, cancellationToken);
-                        try
+                        // my DataTable column names match my SQL Column names, so I simply made this loop. However if your column names don't match, just pass in which datatable name matches the SQL column name in Column Mappings
+                        foreach (DataColumn col in res.Columns)
                         {
-                            using (var package = new ExcelPackage(stream))
+                            bulkCopy.ColumnMappings.Add(col.ColumnName, col.ColumnName);
+                        }
+                        bulkCopy.BulkCopyTimeout = 600;
+                        bulkCopy.DestinationTableName = "[PO].[tblPolicyRefund]";
+                        bulkCopy.WriteToServer(res);
+                    }
+                }
+                catch(Exception e)
+                {
+
+                }
+
+
+            }
+            else
+            {
+                foreach (var file in files)
+                {
+                    var filename = file.Name;
+                    var fileExt = Path.GetExtension(file.FileName);
+                    //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
+                    if (file == null || file.Length <= 0)
+                    {
+                        return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
+                    }
+                    if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
+                    {
+                        bool sms = true;
+                        bool email = true;
+                        //dt.Columns.Add("BankFileId", typeof(int));
+                        // dt.Columns.Add("Id", typeof(string));
+                        dt.Columns.Add("EndorsementNumber", typeof(string));
+                        dt.Columns.Add("EndorsementEffectivedate", typeof(DateTime));
+                        dt.Columns.Add("TxnDate", typeof(DateTime));
+                        dt.Columns.Add("TotalRefundAmount", typeof(decimal));
+                        dt.Columns.Add("PaymentGatewayReferenceId", typeof(string));
+                        dt.Columns.Add("AmountPaid", typeof(decimal));
+                        dt.Columns.Add("DateOfPayment", typeof(DateTime));
+                        dt.Columns.Add("PolicyId", typeof(decimal));
+                        dt.Columns.Add("PaymentStatus", typeof(string));
+                        dt.Columns.Add("UpdatedResponse", typeof(string));
+                        using (var stream = new MemoryStream())
+                        {
+                            await file.CopyToAsync(stream, cancellationToken);
+                            try
                             {
-                                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                                // EPPlusHelper.GetColumnByName()
-                                int endrsId = worksheet.GetColumnByName("endorsement Number");
-                                int refundId = worksheet.GetColumnByName("total Refund Amount");
-                                int endrEffDtId = worksheet.GetColumnByName("endorsement Effective Date");
-                                int pmtRefId = worksheet.GetColumnByName("payment Gateway Reference Id");
-                                int amtId = worksheet.GetColumnByName("amount Paid");
-                                int dtPmtId = worksheet.GetColumnByName("date Of Payment");
-                                int pmtStatId = worksheet.GetColumnByName("payment Status");
-                                if (worksheet != null)
+                                using (var package = new ExcelPackage(stream))
                                 {
-                                    var rowCount = worksheet.Dimension.Rows;
-                                    for (int row = 2; row <= rowCount; row++)
+                                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                                    // EPPlusHelper.GetColumnByName()
+                                    int endrsId = worksheet.GetColumnByName("endorsement Number");
+                                    int refundId = worksheet.GetColumnByName("total Refund Amount");
+                                    int endrEffDtId = worksheet.GetColumnByName("endorsement Effective Date");
+                                    int pmtRefId = worksheet.GetColumnByName("payment Gateway Reference Id");
+                                    int amtId = worksheet.GetColumnByName("amount Paid");
+                                    int dtPmtId = worksheet.GetColumnByName("date Of Payment");
+                                    int pmtStatId = worksheet.GetColumnByName("payment Status");
+                                    if (worksheet != null)
                                     {
-                                        var endrsNum = "";
-                                        if (worksheet.Cells[row, endrsId].Value != null)
+                                        var rowCount = worksheet.Dimension.Rows;
+                                        for (int row = 2; row <= rowCount; row++)
                                         {
-                                            endrsNum = worksheet.Cells[row, endrsId].Value.ToString().Trim();
-                                        }
-                                        if (endrsNum == "")
-                                        {
-                                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber can not be empty for row {row}" };
-                                            Errors.Add(errorInfo);
-                                        }
-                                        else
-                                        {
-                                            var EndorsementDetails = _context.TblEndorsementDetails.FirstOrDefault(et => et.EndorsementNo == endrsNum);
-                                            if (EndorsementDetails == null)
+                                            var endrsNum = "";
+                                            if (worksheet.Cells[row, endrsId].Value != null)
                                             {
-                                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber {endrsNum} does not exist for row {row} " };
+                                                endrsNum = worksheet.Cells[row, endrsId].Value.ToString().Trim();
+                                            }
+                                            if (endrsNum == "")
+                                            {
+                                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber can not be empty for row {row}" };
                                                 Errors.Add(errorInfo);
                                             }
                                             else
                                             {
-                                                DataRow dr = dt.NewRow();
-                                                dr["EndorsementNumber"] = endrsNum;
-                                                if (worksheet.Cells[row, endrEffDtId].Value != null)
+                                                var EndorsementDetails = _context.TblEndorsementDetails.FirstOrDefault(et => et.EndorsementNo == endrsNum);
+                                                if (EndorsementDetails == null)
                                                 {
-                                                    dr["EndorsementEffectivedate"] = Convert.ToDateTime(worksheet.Cells[row, endrEffDtId].Value.ToString().Trim());
+                                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber {endrsNum} does not exist for row {row} " };
+                                                    Errors.Add(errorInfo);
                                                 }
+                                                else
+                                                {
+                                                    DataRow dr = dt.NewRow();
+                                                    dr["EndorsementNumber"] = endrsNum;
+                                                    if (worksheet.Cells[row, endrEffDtId].Value != null)
+                                                    {
+                                                        dr["EndorsementEffectivedate"] = Convert.ToDateTime(worksheet.Cells[row, endrEffDtId].Value.ToString().Trim());
+                                                    }
 
-                                                dr["TxnDate"] = DateTime.Now;
+                                                    dr["TxnDate"] = DateTime.Now;
 
-                                                if (worksheet.Cells[row, refundId].Value != null)
-                                                {
-                                                    dr["TotalRefundAmount"] = Convert.ToDecimal(worksheet.Cells[row, refundId].Value);
-                                                }
-                                                if (worksheet.Cells[row, pmtRefId].Value != null)
-                                                {
-                                                    dr["PaymentGatewayReferenceId"] = worksheet.Cells[row, pmtRefId].Value.ToString().Trim();
-                                                }
-                                                if (worksheet.Cells[row, amtId].Value != null)
-                                                {
-                                                    dr["AmountPaid"] = Convert.ToDecimal(worksheet.Cells[row, amtId].Value);
-                                                }
-                                                if (worksheet.Cells[row, dtPmtId].Value != null)
-                                                {
-                                                    dr["DateOfPayment"] = Convert.ToDateTime(worksheet.Cells[row, dtPmtId].Value.ToString().Trim());
-                                                }
-                                                if (worksheet.Cells[row, pmtStatId].Value != null)
-                                                {
-                                                    dr["PaymentStatus"] = worksheet.Cells[row, pmtStatId].Value.ToString().Trim();
-                                                }
-                                                dr["PolicyId"] = EndorsementDetails.PolicyId;
-                                                dr["UpdatedResponse"] = EndorsementDetails.UpdatedResponse;
+                                                    if (worksheet.Cells[row, refundId].Value != null)
+                                                    {
+                                                        dr["TotalRefundAmount"] = Convert.ToDecimal(worksheet.Cells[row, refundId].Value);
+                                                    }
+                                                    if (worksheet.Cells[row, pmtRefId].Value != null)
+                                                    {
+                                                        dr["PaymentGatewayReferenceId"] = worksheet.Cells[row, pmtRefId].Value.ToString().Trim();
+                                                    }
+                                                    if (worksheet.Cells[row, amtId].Value != null)
+                                                    {
+                                                        dr["AmountPaid"] = Convert.ToDecimal(worksheet.Cells[row, amtId].Value);
+                                                    }
+                                                    if (worksheet.Cells[row, dtPmtId].Value != null)
+                                                    {
+                                                        dr["DateOfPayment"] = Convert.ToDateTime(worksheet.Cells[row, dtPmtId].Value.ToString().Trim());
+                                                    }
+                                                    if (worksheet.Cells[row, pmtStatId].Value != null)
+                                                    {
+                                                        dr["PaymentStatus"] = worksheet.Cells[row, pmtStatId].Value.ToString().Trim();
+                                                    }
+                                                    dr["PolicyId"] = EndorsementDetails.PolicyId;
+                                                    dr["UpdatedResponse"] = EndorsementDetails.UpdatedResponse;
 
-                                                dt.Rows.Add(dr);
+                                                    dt.Rows.Add(dr);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            var error = ex.ToString();
-                            return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                            catch (Exception ex)
+                            {
+                                var error = ex.ToString();
+                                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                            }
                         }
                     }
+                    else
+                    {
+                        return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx/csv file" };
+                    }
                 }
-                else
-                {
-                    return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx/csv file" };
-                }
+
             }
             try
             {
@@ -5706,6 +5743,142 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
         }
 
+        public async Task<DataTable> ConvertCSVtoDataTable(string strFilePath,ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            StreamReader sr = new StreamReader(strFilePath);
+            string[] headers = sr.ReadLine().Split(',');
+            DataTable dt = new DataTable();
+            foreach (string header in headers)
+            {
+                dt.Columns.Add(header);
+            }
+
+            //Required Columns only
+            DataTable dt1 = new DataTable();
+
+            dt1.Columns.Add("EndorsementNumber", typeof(string));
+            dt1.Columns.Add("EndorsementEffectivedate", typeof(DateTime));
+            dt1.Columns.Add("TxnDate", typeof(DateTime));
+            dt1.Columns.Add("TotalRefundAmount", typeof(decimal));
+            dt1.Columns.Add("PaymentGatewayReferenceId", typeof(string));
+            dt1.Columns.Add("AmountPaid", typeof(decimal));
+            dt1.Columns.Add("DateOfPayment", typeof(DateTime));
+            dt1.Columns.Add("PolicyId", typeof(decimal));
+            dt1.Columns.Add("PaymentStatus", typeof(string));
+            dt1.Columns.Add("UpdatedResponse", typeof(string));
+
+           // var cellValue = datatable.Rows[i]["column_name"];
+
+            
+            try
+            {
+                while (!sr.EndOfStream)
+                {
+                    string[] rows = Regex.Split(sr.ReadLine(), ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    DataRow dr = dt.NewRow();
+                  
+
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        dr[i] = rows[i];
+
+                        //dr1[i] = dt.Rows[i+1]["endorsement Number"];
+                    }
+                    dt.Rows.Add(dr);
+                }
+               // var c = dt.Rows[0][2];
+                var count = dt.Rows.Count;
+                
+               
+                var endrsNum = "";
+                var updatedResponse = "";
+                DateTime endorsementeffectivedate = Convert.ToDateTime("1/1/1754 12:00:00");
+                DateTime txndate = Convert.ToDateTime("1/1/1754 12:00:00");
+                var paymentstatus= "";
+                DateTime dateofpayment = Convert.ToDateTime("1/1/1754 12:00:00");
+                decimal totalRefundAmount =0;
+                decimal ammountpaid = 0;
+                var paymentrefId = "";
+
+                for (var i=0;i< count;i++)
+                {
+                   // var s = dt.Rows[i][10].ToString().Trim();
+                    var s0 = dt.Rows[i][8].ToString().Trim();
+                    if (s0 != null || s0 != "")
+                    {
+                        endrsNum = s0.Replace("\"", "");
+                    }
+                    var EndorsementDetails = _context.TblEndorsementDetails.FirstOrDefault(et => et.EndorsementNo == endrsNum);
+                    updatedResponse = EndorsementDetails.UpdatedResponse.ToString();
+                    var s = dt.Rows[i][10].ToString().Trim();
+                    endorsementeffectivedate = Convert.ToDateTime(s.Replace("\"", ""));
+                    txndate = DateTime.Now;
+                    var s1 = dt.Rows[i][18].ToString().Trim();
+                    if (s1 != null || s1 != "")
+                    {
+                         totalRefundAmount = Convert.ToDecimal(s1.Replace("\"", ""));
+                    }
+
+                    var s2 = dt.Rows[i][19].ToString().Trim();
+                    if (s2 != null || s2 != "" || s1 == "\"\"")
+                    {
+                         s1 = "0.0";
+                         paymentrefId = s2.Replace("\"", "");
+                    }
+
+                    var s3 = dt.Rows[i][20].ToString().Trim();
+                    if (s3 != null || s3 != "")
+                    {
+                        if (s3 == "\"\"")
+                        {
+                            s3 = "0.0";
+                        }
+                        else
+                        {
+                            ammountpaid = Convert.ToDecimal(s3.Replace("\"", ""));
+                        }
+                    }
+
+                    var policyid = EndorsementDetails.PolicyId;
+                    var s4 = dt.Rows[i][22].ToString().Trim();
+                    if (s4 != null || s4 != "")
+                    {
+                        paymentstatus = s4.Replace("\"", "");
+                    }
+                    var s5 = dt.Rows[i][21].ToString().Trim();
+                    if (s5 != null || s5 != "" )
+                    {
+                        if (s5 == "\"\"")
+                        {
+                            s5 = Convert.ToDateTime("1/1/1754 12:00:00").ToString();
+                        }
+                        else
+                        {
+                            dateofpayment = Convert.ToDateTime(s5.Replace("\"", ""));
+                        }
+
+                    }
+                   
+
+                    // dt1.Rows.Add(dt.Rows[i][8], dt.Rows[i][10], dt.Rows[i][8], dt.Rows[i][18], dt.Rows[i][8], dt.Rows[i][8], dt.Rows[i][8], dt.Rows[i][8], dt.Rows[i][8])
+                    dt1.Rows.Add(endrsNum, endorsementeffectivedate, txndate, totalRefundAmount, paymentrefId, ammountpaid, dateofpayment, policyid, paymentstatus, updatedResponse);
+                }
+                return dt1;
+
+            }
+            catch(Exception e)
+            {
+
+            }
+            DataRow dr1 = dt.NewRow();
+            var rows1 = dt.Rows;
+
+           // dr1[1] = dt.Rows[1]["endorsement Number"];
+           // dr1[2] = dt.Rows[2]["endorsement Number"];
+
+            return dt1;
+        }
     }
 
 
