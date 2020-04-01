@@ -5657,43 +5657,25 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var fileExtension = "csv";
-            if (fileExtension == "csv")
-            {
-                string filepath = @"C:\Users\brajesh.kumar\Desktop\test11.csv";
-                DataTable res = await ConvertCSVtoDataTable(filepath, apiContext);
-
-                //Saving data into database
-
-                var envResponse = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
-                //string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
-                try
-                {
-                    using (var bulkCopy = new SqlBulkCopy(envResponse.Dbconnection, SqlBulkCopyOptions.KeepIdentity))
-                    {
-                        // my DataTable column names match my SQL Column names, so I simply made this loop. However if your column names don't match, just pass in which datatable name matches the SQL column name in Column Mappings
-                        foreach (DataColumn col in res.Columns)
-                        {
-                            bulkCopy.ColumnMappings.Add(col.ColumnName, col.ColumnName);
-                        }
-                        bulkCopy.BulkCopyTimeout = 600;
-                        bulkCopy.DestinationTableName = "[PO].[tblPolicyRefund]";
-                        bulkCopy.WriteToServer(res);
-                    }
-                }
-                catch(Exception e)
-                {
-
-                }
+       
+            
+               
 
 
-            }
-            else
-            {
+
+           
                 foreach (var file in files)
                 {
                     var filename = file.Name;
+
                     var fileExt = Path.GetExtension(file.FileName);
+
+                    if(fileExt==".CSV" || fileExt==".csv")
+                {
+                    string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
+                    var res = await ConvertCSVtoDataTable(filepath, apiContext);
+                    return res;
+                    }
                     //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
                     if (file == null || file.Length <= 0)
                     {
@@ -5808,7 +5790,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
                 }
 
-            }
+            
             try
             {
                 // add list to db ..
@@ -5843,8 +5825,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
         }
 
-        public async Task<DataTable> ConvertCSVtoDataTable(string strFilePath,ApiContext apiContext)
+        public async Task<FileUploadResponse> ConvertCSVtoDataTable(string strFilePath,ApiContext apiContext)
         {
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             StreamReader sr = new StreamReader(strFilePath);
             string[] headers = sr.ReadLine().Split(',');
@@ -5853,31 +5836,24 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 dt.Columns.Add(header);
             }
+            //finding index of every column
+            var endorsementindex = FindIndex(strFilePath,"endorsement Number");
+            var EndorsementEffectivedateIndex= FindIndex(strFilePath,"endorsement Effective Date");
 
-            //Required Columns only
-            DataTable dt1 = new DataTable();
-
-            dt1.Columns.Add("EndorsementNumber", typeof(string));
-            dt1.Columns.Add("EndorsementEffectivedate", typeof(DateTime));
-            dt1.Columns.Add("TxnDate", typeof(DateTime));
-            dt1.Columns.Add("TotalRefundAmount", typeof(decimal));
-            dt1.Columns.Add("PaymentGatewayReferenceId", typeof(string));
-            dt1.Columns.Add("AmountPaid", typeof(decimal));
-            dt1.Columns.Add("DateOfPayment", typeof(DateTime));
-            dt1.Columns.Add("PolicyId", typeof(decimal));
-            dt1.Columns.Add("PaymentStatus", typeof(string));
-            dt1.Columns.Add("UpdatedResponse", typeof(string));
-
-           // var cellValue = datatable.Rows[i]["column_name"];
-
-            
+            //need to put current date time
+           // var TxnDateIndex = FindIndex("endorsement Effective Date");
+            var TotalRefundAmountIndex = FindIndex(strFilePath,"total Refund Amount");
+            var PaymentGatewayReferenceIdIndex = FindIndex(strFilePath,"payment Gateway Reference Id");
+            var AmountPaidIndex = FindIndex(strFilePath,"amount Paid");
+            var DateOfPaymentIndex = FindIndex(strFilePath,"date Of Payment");
+            var PaymentStatusIndex = FindIndex(strFilePath,"payment Status");
+          
             try
             {
                 while (!sr.EndOfStream)
                 {
                     string[] rows = Regex.Split(sr.ReadLine(), ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
                     DataRow dr = dt.NewRow();
-                  
 
                     for (int i = 0; i < headers.Length; i++)
                     {
@@ -5904,30 +5880,59 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 for (var i=0;i< count;i++)
                 {
                    // var s = dt.Rows[i][10].ToString().Trim();
-                    var s0 = dt.Rows[i][8].ToString().Trim();
+                    var s0 = dt.Rows[i][endorsementindex].ToString().Trim();
                     if (s0 != null || s0 != "")
                     {
+                        if(s0== "")
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber can not be empty for row {i+1}" };
+                            Errors.Add(errorInfo);
+                        }
                         endrsNum = s0.Replace("\"", "");
                     }
-                    var EndorsementDetails = _context.TblEndorsementDetails.FirstOrDefault(et => et.EndorsementNo == endrsNum);
-                    updatedResponse = EndorsementDetails.UpdatedResponse.ToString();
-                    var s = dt.Rows[i][10].ToString().Trim();
-                    endorsementeffectivedate = Convert.ToDateTime(s.Replace("\"", ""));
+
+                    var s = dt.Rows[i][EndorsementEffectivedateIndex].ToString().Trim();
+
+                    if (s != null || s != "")
+                    {
+                        if (s == "\"\"")
+                        {
+                            s= Convert.ToDateTime("1/1/1754 12:00:00").ToString();
+                        }
+                        else
+                        {
+                            endorsementeffectivedate = Convert.ToDateTime(s.Replace("\"", ""));
+                        }
+                      
+                    }
                     txndate = DateTime.Now;
-                    var s1 = dt.Rows[i][18].ToString().Trim();
+
+                    var s1 = dt.Rows[i][TotalRefundAmountIndex].ToString().Trim();
                     if (s1 != null || s1 != "")
                     {
-                         totalRefundAmount = Convert.ToDecimal(s1.Replace("\"", ""));
-                    }
+                        if (s1 == "\"\"")
+                        {
+                            totalRefundAmount = 0;
+                        }
+                        else
+                        {
 
-                    var s2 = dt.Rows[i][19].ToString().Trim();
-                    if (s2 != null || s2 != "" || s1 == "\"\"")
+                            totalRefundAmount = Convert.ToDecimal(s1.Replace("\"", ""));
+                        }
+                    }
+                    var s2 = dt.Rows[i][PaymentGatewayReferenceIdIndex].ToString().Trim();
+                    if (s2 != null || s2 != "")
                     {
-                         s1 = "0.0";
-                         paymentrefId = s2.Replace("\"", "");
+                        if (s2 == "\"\"")
+                        {
+                            s1 = "0.0";
+                        }
+                        else
+                        {
+                            paymentrefId = s2.Replace("\"", "");
+                        }
                     }
-
-                    var s3 = dt.Rows[i][20].ToString().Trim();
+                    var s3 = dt.Rows[i][AmountPaidIndex].ToString().Trim();
                     if (s3 != null || s3 != "")
                     {
                         if (s3 == "\"\"")
@@ -5939,15 +5944,21 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             ammountpaid = Convert.ToDecimal(s3.Replace("\"", ""));
                         }
                     }
-
-                    var policyid = EndorsementDetails.PolicyId;
-                    var s4 = dt.Rows[i][22].ToString().Trim();
+                    var s4 = dt.Rows[i][PaymentStatusIndex].ToString().Trim();
                     if (s4 != null || s4 != "")
                     {
-                        paymentstatus = s4.Replace("\"", "");
+                        if (s4 == "\"\"")
+                        {
+                            s4 = "Pending";
+                        }
+                        else
+                        {
+                            paymentstatus = s4.Replace("\"", "");
+                        }
                     }
-                    var s5 = dt.Rows[i][21].ToString().Trim();
-                    if (s5 != null || s5 != "" )
+
+                    var s5 = dt.Rows[i][DateOfPaymentIndex].ToString().Trim();
+                    if (s5 != null || s5 != "")
                     {
                         if (s5 == "\"\"")
                         {
@@ -5959,25 +5970,69 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         }
 
                     }
-                   
 
-                    // dt1.Rows.Add(dt.Rows[i][8], dt.Rows[i][10], dt.Rows[i][8], dt.Rows[i][18], dt.Rows[i][8], dt.Rows[i][8], dt.Rows[i][8], dt.Rows[i][8], dt.Rows[i][8])
-                    dt1.Rows.Add(endrsNum, endorsementeffectivedate, txndate, totalRefundAmount, paymentrefId, ammountpaid, dateofpayment, policyid, paymentstatus, updatedResponse);
+                    var PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == endrsNum);
+                    if (PolicyRefundDetails == null)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber does not exist for row {i+1} in database" };
+                        Errors.Add(errorInfo);
+                    }
+                    else
+                    {
+
+                        //updating the details from csv to table
+                        PolicyRefundDetails.EndorsementEffectivedate = endorsementeffectivedate;
+                        PolicyRefundDetails.TotalRefundAmount = totalRefundAmount;
+                        PolicyRefundDetails.TxnDate = txndate;
+                        PolicyRefundDetails.PaymentGatewayReferenceId = paymentrefId;
+                        PolicyRefundDetails.PaymentStatus = paymentstatus;
+                        PolicyRefundDetails.AmountPaid = ammountpaid;
+                        PolicyRefundDetails.DateOfPayment = dateofpayment;
+
+
+                        _context.TblPolicyRefund.Update(PolicyRefundDetails);
+                        _context.SaveChanges();
+                    }
+
                 }
-                return dt1;
-
+                if (Errors.Count > 0)
+                {
+                    return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded with following Erros",Errors=Errors };
+                }
+                else
+                {
+                    return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded Successfully" };
+                }
             }
             catch(Exception e)
             {
 
             }
-            DataRow dr1 = dt.NewRow();
-            var rows1 = dt.Rows;
+            return new FileUploadResponse { Status = BusinessStatus.Ok, ResponseMessage = $"Document Uploaded" }; ;
+        }
+    
+    public int FindIndex(string filepath,string columnName)
+        {
+           // string filepath = @"C:\Users\brajesh.kumar\Desktop\test11.csv";
+            var lines = File.ReadLines(filepath);
 
-           // dr1[1] = dt.Rows[1]["endorsement Number"];
-           // dr1[2] = dt.Rows[2]["endorsement Number"];
+            var lineIdx = 0;
+            var colIdx = 0;
 
-            return dt1;
+            foreach (var line in lines)
+            {
+                lineIdx++;
+                foreach (var column in line.Split(','))
+                { // split cols here
+                    colIdx++;
+                    if (column.Contains(columnName))
+                    {
+                        return colIdx-1;
+                    }
+                }
+                colIdx = 0; // reset col index
+            }
+            return colIdx;
         }
     }
 
