@@ -63,7 +63,7 @@ const BankDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                        // success={props.accNumberState === "success"}
-                        error={props.accNumberState}
+                        error={props.accountNumberState}
                             labelText="AccountNo"
                             inputType="number"
                             value={props.bankDetails.accountNumber}
@@ -73,6 +73,8 @@ const BankDetails = (props) => {
 
                         formControlProps={{ fullWidth: true }} />
                         {props.errormessage && (props.bankDetails.accountNumber == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                        {props.erroraccno && (props.accountNumberState == true) ? <p className="error"> Account Number should be greater than 9 digits</p> : null}
                     </GridItem>
 
                     <GridItem xs={12} sm={12} md={3}>
@@ -116,6 +118,8 @@ const BankDetails = (props) => {
 
                         formControlProps={{ fullWidth: true }} />
                         {props.errormessage && (props.bankDetails.ifscCode == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                        {props.errorifsccode && (props.ifscCodeState == true) ? <p className="error"> IFSC Code should be in correct formate (eg: CNBK1234567)</p> : null}
                     </GridItem>
 
                     <GridItem xs={12} sm={8} md={9}>

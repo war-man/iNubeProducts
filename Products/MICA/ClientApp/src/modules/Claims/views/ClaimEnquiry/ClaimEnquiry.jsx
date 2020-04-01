@@ -414,8 +414,8 @@ class ClaimEnquiry extends React.Component {
 
     componentDidMount() {
 
-
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=Claims%20Decision`, {
+        let claimdecision = "Claim Decision";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + claimdecision + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -548,6 +548,7 @@ class ClaimEnquiry extends React.Component {
                     claimNumber: prop.claimNumber,
                     typeOfLoss: prop.typeOfLoss,
                     lossDateTime: new Date(prop.lossDateTime).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
+                    createdDate: new Date(prop.createdDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
                     claimStatus: prop.claimStatus,
                     radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.claimId)} />
 
@@ -697,19 +698,21 @@ class ClaimEnquiry extends React.Component {
         }).then(response => response.json())
 
             .then(data => {
-                this.setState({ docDetailsData: data });
+                if (data.length > 0) {
+                    this.setState({ docDetailsData: data });
 
 
-                const doc = this.state.Datapic[0];
+                    const doc = this.state.Datapic[0];
 
-                doc.document = data[0].document;
+                    doc.document = data[0].document;
 
-                this.setState({ doc });
+                    this.setState({ doc });
 
-                for (let i = 0; i < this.state.docDetailsData.length; i++) {
-                    if (this.state.docDetailsData[i].dmsdocId != null) {
-                        this.state.DocumentData.push(this.state.docDetailsData[i]);
-                        this.docTable(this.state.DocumentData);
+                    for (let i = 0; i < this.state.docDetailsData.length; i++) {
+                        if (this.state.docDetailsData[i].dmsdocId != null) {
+                            this.state.DocumentData.push(this.state.docDetailsData[i]);
+                            this.docTable(this.state.DocumentData);
+                        }
                     }
                 }
             });
@@ -880,18 +883,18 @@ class ClaimEnquiry extends React.Component {
                                 }}
                             />
                             </GridItem>
-                            <GridItem xs={12} sm={4} md={3}> <CustomInput
-                                //success={this.state.insuredReferenceState === "success"}
-                                error={this.state.insuredReferenceState}
-                                labelText="InsuredReferenceNo"
-                                name="insuredReference"
-                                value={this.state.ClaimDTO.insuredReference}
-                                onChange={(e) => this.SetValue("insuredReference", e)}
-                                formControlProps={{
-                                    fullWidth: true
+                            {/*<GridItem xs={12} sm={4} md={3}> <CustomInput
+                                //success={this.state.insuredreferencestate === "success"}
+                                error={this.state.insuredreferencestate}
+                                labeltext="insuredreferenceno"
+                                name="insuredreference"
+                                value={this.state.claimdto.insuredreference}
+                                onchange={(e) => this.setvalue("insuredreference", e)}
+                                formcontrolprops={{
+                                    fullwidth: true
                                 }}
                             />
-                            </GridItem>
+                            </griditem>*/}
 
                             <GridItem xs={12} sm={4} md={3}> <CustomInput
                                // success={this.state.insuredMobileNoState === "success"}
@@ -905,7 +908,7 @@ class ClaimEnquiry extends React.Component {
                                 }}
                             />
                             </GridItem>
-                            <GridItem xs={12} sm={4} md={3}> <CustomInput
+                                {/*<GridItem xs={12} sm={4} md={3}> <CustomInput
                                // success={this.state.insuredEmailState === "success"}
                                 error={this.state.insuredEmailState}
                                 labelText="InsuredEmailID"
@@ -916,7 +919,7 @@ class ClaimEnquiry extends React.Component {
                                     fullWidth: true
                                 }}
                             />
-                            </GridItem>
+                            </GridItem>*/}
                             <GridItem xs={12} sm={4} md={3}> <CustomInput
                                // success={this.state.claimNumberState === "success"}
                                 error={this.state.claimNumberState}
@@ -953,7 +956,7 @@ class ClaimEnquiry extends React.Component {
                                     labelText="ClaimStatus"
                                     id="ddlstatus"
                                     lstObject={this.state.ClaimsDecisionData}
-                                    filterName='Claims Decision'
+                                    filterName='Claim Status'
                                     value={this.state.ClaimDTO.claimStatusId}
                                     name='claimStatusId'
                                     onChange={(e) => this.SetValue("claimStatusId", e)}
@@ -1036,15 +1039,22 @@ class ClaimEnquiry extends React.Component {
                                                         minWidth: 40,
                                                         resizable: false,
                                                     },
+                                                    //{
+                                                    //    Header: "CoverEvent",
+                                                    //    accessor: "coverEvent",
+                                                    //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                    //    headerClassName: 'react-table-center',
+                                                    //    minWidth: 40,
+                                                    //    resizable: false,
+                                                    //},
                                                     {
-                                                        Header: "CoverEvent",
-                                                        accessor: "coverEvent",
+                                                        Header: "IntimationDate",
+                                                        accessor: "createdDate",
                                                         setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                                         headerClassName: 'react-table-center',
                                                         minWidth: 40,
                                                         resizable: false,
                                                     },
-
                                                     {
                                                         Header: "LossDate",
                                                         accessor: "lossDateTime",

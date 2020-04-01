@@ -2351,8 +2351,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             if (searchclaim.ClaimStatusId == 0)
             {
-                int[] lstNotOthers = { 33, 38 };
-                _claims = _claims.Where(p => !lstNotOthers.Contains(p.ClaimStatusId));
+                int[] lstOthers = { 34, 35, 36, 37 };
+                _claims = _claims.Where(p => lstOthers.Contains(p.ClaimStatusId));
             }
 
             var _ClaimSearchData = _mapper.Map<List<SearchDTO>>(_claims);

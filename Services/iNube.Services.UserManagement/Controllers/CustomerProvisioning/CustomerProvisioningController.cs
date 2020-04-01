@@ -17,13 +17,13 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning
     [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = "Bearer")]
-    public class CustomerProvisioningController: BaseApiController
+    public class CustomerProvisioningController : BaseApiController
     {
         public ICustomerProvisioningService _customerProvisioningService;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
-        public CustomerProvisioningController(ICustomerProvisioningService customerProvisioningService,IMapper mapper,IOptions<AppSettings> appSettings)
+        public CustomerProvisioningController(ICustomerProvisioningService customerProvisioningService, IMapper mapper, IOptions<AppSettings> appSettings)
         {
             _customerProvisioningService = customerProvisioningService;
             _mapper = mapper;
@@ -47,8 +47,14 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning
         {
             var response = await _customerProvisioningService.createProvision(customerProvisioningDTO, Context);
             return Ok(response);
-
-
         }
+
+        [HttpGet]
+        public IActionResult GetCustomerSettings(int customerid, string type, int envid)
+        {
+            var response = _customerProvisioningService.GetCustomerSettings(customerid, type, envid, Context);
+            return Ok(response);
+        }
+
     }
 }

@@ -38,10 +38,9 @@ namespace iNube.Services.UserManagement.Models
         public CustomerSettingsDTO customerSettingsDTO { get; set; }
     }
 
-
     public partial class CustomerSettingsDTO
     {
-        //public decimal Id { get; set; }
+        public decimal Id { get; set; }
         public decimal? CustomerId { get; set; }
         public string Type { get; set; }
         public string Key { get; set; }
@@ -49,6 +48,7 @@ namespace iNube.Services.UserManagement.Models
         public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public decimal? EnvId { get; set; }
     }
     public partial class ddDTOs
     {
@@ -105,7 +105,7 @@ namespace iNube.Services.UserManagement.Models
         public DateTime? ModifiedDate { get; set; }
         public string Code { get; set; }
 
-       
+
         public virtual ICollection<CustAddressDTO> CustAddress { get; set; }
         public virtual ICollection<CustSpocDetailsDTO> CustSpocDetails { get; set; }
     }

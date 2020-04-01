@@ -13,5 +13,8 @@ namespace iNube.Services.UserManagement.Entities.MICACP
         public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public decimal? EnvId { get; set; }
+
+        public virtual TblCustomerEnvironment Env { get; set; }
     }
 }

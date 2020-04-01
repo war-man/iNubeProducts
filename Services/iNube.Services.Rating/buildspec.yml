@@ -9,7 +9,6 @@ phases:
       - echo Logging in to Amazon ECR...
       - $ECR_LOGIN
       - REPOSITORY_URI=820227512150.dkr.ecr.ap-south-1.amazonaws.com/micacontainerregistry
-      
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
@@ -31,12 +30,6 @@ phases:
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
-      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 471379395009.dkr.ecr.ap-south-1.amazonaws.com/micacontainerregistry
-      - REPOSITORY_URI2=471379395009.dkr.ecr.ap-south-1.amazonaws.com/micacontainerregistry
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
-      - docker push $REPOSITORY_URI2:ratinglatest
-      - docker push $REPOSITORY_URI2:$IMAGE_TAG
     
  
 artifacts:

@@ -54,6 +54,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<DailyDTO> GetDailyTransaction(string accountnumber,int month, int year,string TxnEventType, ApiContext apiContext);
         Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string type, ApiContext apiContext);
         Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyCancelRequest, ApiContext apiContext);
+        Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         //GetMappingParams(string mappingname, ApiContext apiContext)
     }
     public class IntegrationService : IIntegrationService
@@ -355,7 +356,14 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await PostListApiInvoke<dynamic, MicaCDDTO>(uri, apiContext, PolicyRequest);
 
         }
+        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
+        {
 
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {

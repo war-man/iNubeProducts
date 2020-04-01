@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -607,6 +608,15 @@ namespace iNube.Services.Policy.Controllers.Policy
         {
             var response = await _policyService.RefundUpload(Request, cancellationToken, Context);
             return Ok(response);
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetUTCDateTime()
+        {
+            var date1 = DateTime.UtcNow;
+            string date = DateTime.UtcNow.ToString();
+
+            return Ok(date);
         }
     }
 }

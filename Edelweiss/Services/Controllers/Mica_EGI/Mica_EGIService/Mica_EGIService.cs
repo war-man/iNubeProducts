@@ -2704,6 +2704,35 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 DeserilizedPremiumData = CallNewEndo;
 
+                var CDData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
+
+                var CdaccountNumber = (string)CDData["CDAccountNumber"];
+
+
+                if (CdaccountNumber != null)
+                {
+                    CDBalanceDTO FtAccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
+                    CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
+                    var ADPremium = Convert.ToDecimal(accountdetails.TxnAmountBalance + FtAccountdetails.TxnAmountBalance);
+                    var GST = Convert.ToDecimal(accountdetails.TaxAmountBalance + FtAccountdetails.TaxAmountBalance);
+                    var Total = ADPremium + GST;
+
+                    CalculationResult calculation = new CalculationResult();
+
+                    calculation.Entity = "ADPremium";
+                    calculation.EValue = ADPremium.ToString();
+                    DeserilizedPremiumData.Add(calculation);
+
+                    calculation = new CalculationResult();
+
+                    calculation.Entity = "ADGST";
+                    calculation.EValue = GST.ToString();
+                    DeserilizedPremiumData.Add(calculation);
+
+                }
+
+
+
                 if (DeserilizedPremiumData.Count > 0)
                 {
                     var CallEndoMap = EndoADFT(DeserilizedPremiumData, "Deletion");
@@ -2719,9 +2748,75 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 PolicyCancelReturnDto CallCancleCalculator = await PolicyCancellationCalculator(null,SourceObject);
 
+                PolicyNumber = (string)SourceObject["PolicyNumber"];
 
-               var FTModel =  PolicyCancelFT(CallCancleCalculator);
+                //var CDData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
 
+                var CdaccountNumber = (string)SourceObject["CDAccountNumber"];
+
+
+                if (CdaccountNumber != null)
+                {
+                    CDBalanceDTO FtAccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
+                    CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
+                    var ADPremium = Convert.ToDecimal(accountdetails.TxnAmountBalance + FtAccountdetails.TxnAmountBalance);
+                    var GST = Convert.ToDecimal(accountdetails.TaxAmountBalance + FtAccountdetails.TaxAmountBalance);
+                    var Total = ADPremium + GST;
+
+                    //CD AD Object Form 
+                    CDPremiumDTO ADPremiumDTO = new CDPremiumDTO();
+                    CDTaxAmountDTO ADtaxAmountDTO = new CDTaxAmountDTO();
+                    CDTaxTypeDTO ADtaxTypeDTO = new CDTaxTypeDTO();
+                    decimal TotalTax = 0;
+
+
+                    //AD TAX
+                    //From State 
+                    ADtaxTypeDTO.Type = CallCancleCalculator.FromTaxType;
+                    ADtaxTypeDTO.TaxAmount = GST;
+
+                    TotalTax = ADtaxTypeDTO.TaxAmount;
+
+                    //ARRAY
+                    ADtaxAmountDTO.Tax.Add(ADtaxTypeDTO);
+
+                    ADtaxTypeDTO = new CDTaxTypeDTO();
+
+                    //TO State
+                    ADtaxTypeDTO.Type = CallCancleCalculator.ToTaxType;
+                    ADtaxTypeDTO.TaxAmount = 0;
+
+                    TotalTax += ADtaxTypeDTO.TaxAmount;
+
+
+                    ADtaxAmountDTO.TaxAmount = TotalTax;
+                    ADtaxAmountDTO.Tax.Add(ADtaxTypeDTO);
+
+
+                    //AD
+                    ADPremiumDTO.Type = "AD";
+                    ADPremiumDTO.TxnAmount = ADPremium;
+                    ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                    ADPremiumDTO.TaxAmount = ADtaxAmountDTO;
+
+
+
+
+                    MICACDModel.PremiumDTO.Add(ADPremiumDTO);
+                    MICACDModel.Type = "PolicyCancellation";
+                    MICACDModel.TxnType = "Balance";
+                    MICACDModel.TxnAmount = ADPremiumDTO.TxnAmount;
+                    MICACDModel.TaxAmount = ADtaxAmountDTO.TaxAmount;
+                    MICACDModel.TotalAmount = MICACDModel.TxnAmount + MICACDModel.TaxAmount;
+                    FinalDto.Add(MICACDModel);
+
+
+                }
+
+
+                var FTModel =  PolicyCancelFT(CallCancleCalculator);
+
+                MICACDModel = new MicaCDDTO();
                 MICACDModel.PremiumDTO.Add(FTModel);
                 MICACDModel.Type = "PolicyCancellation";
                 MICACDModel.TxnType = "Credit";
@@ -3165,7 +3260,50 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             if (TxnType == "Deletion")
             {
                 decimal TotalTax = 0;
-           
+
+                //AD TAX
+                //From State 
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADGST").EValue);
+
+                TotalTax = taxTypeDTO.TaxAmount;
+
+                //ARRAY
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+                taxTypeDTO = new CDTaxTypeDTO();
+
+                //TO State
+                taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+                taxTypeDTO.TaxAmount = 0;
+
+                TotalTax += taxTypeDTO.TaxAmount;
+
+
+                taxAmountDTO.TaxAmount = TotalTax;
+                taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+                //AD
+                ADPremiumDTO.Type = "AD";
+                ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPremium").EValue);
+                ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                ADPremiumDTO.TaxAmount = taxAmountDTO;
+
+     
+	 
+	 
+	            CdModel.PremiumDTO.Add(ADPremiumDTO);
+                CdModel.Type = "EndorsementDel";
+                CdModel.TxnType = "Balance";
+                CdModel.TxnAmount = ADPremiumDTO.TxnAmount;
+                CdModel.TaxAmount =  taxAmountDTO.TaxAmount;
+                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                FinalDto.Add(CdModel);
+
+
+                TotalTax = 0;
+
                 //FT Objects
                 taxTypeDTO = new CDTaxTypeDTO();
                 CDPremiumDTO FTPremiumDTO = new CDPremiumDTO();
@@ -3199,14 +3337,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
                 FTPremiumDTO.TaxAmount = taxAmountDTO;
 
-                var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
+                var FinalTaxTotal = FTPremiumDTO.TaxAmount.TaxAmount;
+
+
+                //AD - Dummy Entry for Balance
 
                 //FT and AD - REFUND CREDIT Object
+                CdModel = new MicaCDDTO();
                 CdModel.PremiumDTO.Add(FTPremiumDTO);
                 CdModel.Type = "EndorsementDel";
                 CdModel.TxnType = "Credit";
-                CdModel.TxnAmount = FTPremiumDTO.TxnAmount + ADPremiumDTO.TxnAmount;
-                CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount + ADPremiumDTO.TaxAmount.TaxAmount;
+                CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
+                CdModel.TaxAmount = FinalTaxTotal;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
                 FinalDto.Add(CdModel);
 
@@ -3983,6 +4125,22 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             DifferentialPremium.FinalAmount = Math.Round(DifferentialPremium.Total);
 
                         }
+
+                        //var CDData = await _integrationService.InternalGetPolicyDetailsByNumber(endorsementPremium.PolicyNo, apiContext);
+
+                        //var CdaccountNumber = (string)CDData["CDAccountNumber"];
+
+
+                        //if (CdaccountNumber != null)
+                        //{
+                        //    CDBalanceDTO FtAccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
+                        //    CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
+                        //    DifferentialPremium.ADPremium = Convert.ToDecimal(accountdetails.TxnAmountBalance + FtAccountdetails.TxnAmountBalance)*(-1);
+                        //    DifferentialPremium.GST += Convert.ToDecimal(accountdetails.TaxAmountBalance + FtAccountdetails.TaxAmountBalance) * (-1);
+                        //    DifferentialPremium.Total = Math.Round((DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + DifferentialPremium.GST), 2);
+                        //    DifferentialPremium.FinalAmount = Math.Round(DifferentialPremium.Total);
+                        //}
+                                               
                     }
 
                     DifferentialPremium.Status = BusinessStatus.Ok;
@@ -4303,14 +4461,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             PolicyCancelReturnDto canceldetails =await PolicyCancellationCalculator(policyRequest.PolicyNumber,null);
             
             policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
-
-
+                                 
             if (CdaccountNumber != null)
             {
-
+                CDBalanceDTO FTaccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
                 CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
-                policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance;
-
+                policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance + FTaccountdetails.TotalAvailableBalance;
             }
             policyCancelResponse.NoofDayRemaining = (PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
             policyCancelResponse.TotalPremium = policyCancelResponse.FTPremium + policyCancelResponse.ADPremium;
