@@ -694,7 +694,6 @@ namespace iNube.Components.RuleEngine.Controllers
                 //string utcDateTime = "02-04-2020 06:19:07";
                 var utctoZone = ConvertUTCToZone(utcDateTime, userTimeZone);
                 var timeZone = GetDateTimeByZone(userTimeZone);
-
                 Dictionary<string, string> dt = new Dictionary<string, string>();
                 dt.Add("DateToUTC", datetoUTC.ToString());
                 dt.Add("UTCToZone", utctoZone.ToString());
@@ -710,8 +709,12 @@ namespace iNube.Components.RuleEngine.Controllers
         public static DateTime ConvertUTCToZone(string utcDateTime, string userTimeZone)
         {
             DateTime dateTime = DateTime.Parse(utcDateTime);
-            TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById(userTimeZone);
-            DateTime zoneDateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime, TimeZone);
+            //TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById(userTimeZone);
+            TimeZoneInfo TimeZone = TimeZoneInfo.GetSystemTimeZones().Any(x => x.Id == userTimeZone) ?
+            TimeZoneInfo.FindSystemTimeZoneById(userTimeZone) :
+            TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+            
+            DateTime zoneDateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime,TimeZone);
             return zoneDateTime;
         }
         public static DateTime ConvertDateToUTC(string userDate)
