@@ -157,7 +157,24 @@ const ClaimDetails = (props) => {
                 }
 
                 {
-                    claimDetailsprops.vehicleclaim &&
+                    claimDetailsprops.vehicleclaimstate &&
+
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
+                            disabled={claimDetailsprops.disabled}
+                            labelText="Vehicle Location State"
+                            value={claimDetailsprops.claimDetailsData.vehicleLocationState}
+                            name='vehicleLocationState'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+
+                }
+
+                {
+                    claimDetailsprops.vehicleclaimdriver &&
 
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
@@ -173,7 +190,7 @@ const ClaimDetails = (props) => {
                 }
 
                 {
-                    claimDetailsprops.vehicleclaim &&
+                    claimDetailsprops.vehicleclaimsurvey &&
 
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput

@@ -1048,32 +1048,43 @@ class ClaimProcess extends React.Component {
             .then(response => response.json())
             .then(data => {
                 // this.setState({ claimDetailsData: data[0] });
+                this.setState({ claimTableData: data[1] });
+                this.claimAmountTable(this.state.claimTableData);
+
+
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
                 this.state.claimDetailsData.totalClaimedAmount = data[0][3][1];
 
-                if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
+                //if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
 
+                //    this.state.claimDetailsData.vehicleLocation = data[0][4][1];
+                //    this.state.claimDetailsData.driverName = data[0][5][1];
+                //    this.state.claimDetailsData.selfSurvey = data[0][6][1];
+
+                //    this.setState({ vehicleclaim: true });
+                //}
+
+                if (data[0][4][1].length != 0) {
                     this.state.claimDetailsData.vehicleLocation = data[0][4][1];
-                    this.state.claimDetailsData.driverName = data[0][5][1];
-                    this.state.claimDetailsData.selfSurvey = data[0][6][1];
-
                     this.setState({ vehicleclaim: true });
+                }
+                if (data[0][5][1].length != 0) {
+                    this.state.claimDetailsData.vehicleLocationState = data[0][5][1];
+                    this.setState({ vehicleclaimstate: true });
+                }
+                if (data[0][6][1].length != 0) {
+                    this.state.claimDetailsData.driverName = data[0][6][1];
+                    this.setState({ vehicleclaimdriver: true });
+                }
+                if (data[0][7][1].length != 0) {
+                    this.state.claimDetailsData.selfSurvey = data[0][7][1];
+                    this.setState({ vehicleclaimsurvey: true });
                 }
 
 
-                this.setState({ claimTableData: data[1] });
-
-                //console.log("claimTableData", this.state.claimTableData, "fsdfdsg", this.state.claimTableData[0].coverDynamic[2].Details);
-
-                //this.state.vehicleActivity.vehicleNumbers = this.state.claimTableData[0].coverDynamic[2].Details;
-                //this.setState({})
-
-                //console.log("acticityvehicle", this.state.vehicleActivity.vehicleNumbers);
-
-                this.claimAmountTable(this.state.claimTableData);
-
+                
             });
 
 
@@ -1847,7 +1858,7 @@ handleActivityClose = () => {
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
                                     SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
                                     displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
-                                    handleActivitylog={this.handleActivitylog}
+                                    handleActivitylog={this.handleActivitylog} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}
                                 />
 
                             </CardBody>
