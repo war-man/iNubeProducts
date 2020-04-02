@@ -4492,14 +4492,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 foreach (var VehicleNumber in vehicleActivity.VehicleNumbers)
                 {
                     var logData = _context.TblSwitchLog.Where(x => x.PolicyNo == vehicleActivity.PolicyNumber && x.VehicleNumber == VehicleNumber)
-                                                .Select(x => new ActivityDTO
-                                                {
-                                                    DateTime = x.CreatedDate,
-                                                    VehicleNo = x.VehicleNumber,
-                                                    SwitchState = x.SwitchStatus.ToString(),
-                                                    SwitchType = x.SwitchType
-                                                }).ToList();
-                    
+                                                 .Select(x => new VehActivityDTO
+                                                 {
+                                                     DateTime = x.CreatedDate,
+                                                    // VehicleNo = x.VehicleNumber,Status
+                                                    // SwitchState = x.SwitchStatus.ToString(),
+                                                    TriggerSwitch = x.SwitchType,
+                                                     Activity = Convert.ToBoolean(x.SwitchStatus) ? "Switch On" : "Switch Off",
+                                                     Status = Convert.ToBoolean(x.SwitchStatus) ? "Active" : "InActive"
+                                                 }).ToList();
+
                     if (logData.Count > 0)
                     {
                         vehicle = new VehicleActivity() ;

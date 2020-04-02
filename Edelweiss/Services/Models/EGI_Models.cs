@@ -513,10 +513,10 @@ namespace iNube.Services.MicaExtension_EGI.Models
     {
         public VehicleActivity()
         {
-            activityDTOs = new List<ActivityDTO>();
+            activityDTOs = new List<VehActivityDTO>();
         }
         public string VehicleNumber { get; set; }
-        public List<ActivityDTO> activityDTOs { get; set; }
+        public List<VehActivityDTO> activityDTOs { get; set; }
     }
     public class PolicyCancelRequest
     {
@@ -564,6 +564,14 @@ namespace iNube.Services.MicaExtension_EGI.Models
             PolicyStatus = new PolicyStatusDTO();
         }
         public PolicyStatusDTO PolicyStatus { get; set; }
+    }
+    public class VehActivityDTO
+    {
+        public DateTime? DateTime { get; set; }
+        //public string SwitchState { get; set; }
+        public string TriggerSwitch { get; set; }
+        public string Status { get; set; }
+        public string Activity { get; set; }
     }
 }
 
