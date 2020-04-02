@@ -4144,12 +4144,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var DifferentialFireTheft = NewPremiumData.FtPerDay - OldPremiumData.FtPerDay;
 
                     //Before
-                    //Because the Difference is not relevant in this vehicle deletion case - ravi sir 
-                    //var DifferentialADPremium = 0;
+                    //var DifferentialADPremium = NewPremiumData.AdPerDay - OldPremiumData.AdPerDay;
 
                     //After
-                    var DifferentialADPremium = NewPremiumData.AdPerDay - OldPremiumData.AdPerDay;
-
+                    //Because the Difference is not relevant in this vehicle deletion case - ravi sir 
+                    var DifferentialADPremium = 0;
+                    
                     EndoRuleDTO endoRule = new EndoRuleDTO
                     {
                         AD = DifferentialADPremium.ToString(),
