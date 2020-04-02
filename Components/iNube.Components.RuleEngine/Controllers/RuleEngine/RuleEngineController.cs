@@ -680,5 +680,60 @@ namespace iNube.Components.RuleEngine.Controllers
      
             return Ok(rule);
         }
+
+        //Trial For RuleEngine
+        [HttpGet("CheckTimeZone")]
+        public IActionResult CheckTimeZonw(string userTimeZone, string utcDateTime)
+        {
+            string localDate = "";
+            try
+            {
+                var datetoUTC = ConvertDateToUTC(localDate);
+
+                //string userTimeZone = "India Standard Time";
+                //string utcDateTime = "02-04-2020 06:19:07";
+                var utctoZone = ConvertUTCToZone(utcDateTime, userTimeZone);
+                var timeZone = GetDateTimeByZone(userTimeZone);
+
+                Dictionary<string, string> dt = new Dictionary<string, string>();
+                dt.Add("DateToUTC", datetoUTC.ToString());
+                dt.Add("UTCToZone", utctoZone.ToString());
+                dt.Add("TimeZone", timeZone.ToString());
+                return Ok(dt);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public static DateTime ConvertUTCToZone(string utcDateTime, string userTimeZone)
+        {
+            DateTime dateTime = DateTime.Parse(utcDateTime);
+            TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById(userTimeZone);
+            DateTime zoneDateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTime, TimeZone);
+            return zoneDateTime;
+        }
+        public static DateTime ConvertDateToUTC(string userDate)
+        {
+            if (userDate != "")
+            {
+                DateTime datNowLocal = Convert.ToDateTime(userDate);
+                return TimeZoneInfo.ConvertTimeToUtc(datNowLocal);
+            }
+            else
+            {
+                DateTime datNowLocal = DateTime.UtcNow;
+                return datNowLocal;
+            }
+        }
+        public static DateTime GetDateTimeByZone(string userTimeZone)
+        {
+            TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById(userTimeZone);
+            DateTime dateTimeUTC = DateTime.UtcNow;
+            DateTime zonelocalDateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTimeUTC, TimeZone);
+            return zonelocalDateTime;
+        }
     }
 }
