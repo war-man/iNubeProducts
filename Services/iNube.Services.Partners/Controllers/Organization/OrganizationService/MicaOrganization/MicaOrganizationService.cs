@@ -23,12 +23,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         private readonly IConfiguration _configuration;
         private IIntegrationService _integrationService;
+        public DbHelper dbHelper;
         public MicaOrganizationService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
         }
 
         //get for master
@@ -109,6 +111,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration)); ;
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             TblOrganization organization = _mapper.Map<TblOrganization>(orgDTO);
             //_context.Entry(organization).State = organization.OrganizationId == 0 ? EntityState.Added : EntityState.Modified;
             if (organization.OrganizationId == 0)
@@ -118,13 +124,13 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     organization.ParentId = apiContext.OrgId;
                 }
                 organization.CreatedBy = apiContext.UserId;
-                organization.CreatedDate = DateTime.Now;
+                organization.CreatedDate = DateTimeNow;
                 _context.TblOrganization.Add(organization);
             }
             else
             {
                 organization.ModifiedBy = apiContext.UserId;
-                organization.ModifiedDate = DateTime.Now;
+                organization.ModifiedDate = DateTimeNow;
                 //_context.Entry(organization).State = EntityState.Modified;
                 _context.Update(organization);
             }

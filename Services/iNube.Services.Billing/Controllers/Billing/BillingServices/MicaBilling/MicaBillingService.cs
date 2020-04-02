@@ -25,13 +25,14 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         private IMapper _mapper;
         private IIntegrationService _integrationService;
         private readonly IConfiguration _configuration;
-
+        public DbHelper dbHelper;
         public MicaBillingService(MICABIContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
         }
 
 
@@ -313,11 +314,15 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         public async Task<IEnumerable<HistoryDTO>> GetHistry(decimal contractid, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             var BillingHistory = (from s in _context.TblBillingConfig.Where(x => x.ContractId == contractid)
                                   join cs in _context.TblBillingItem on s.BillingConfigId equals cs.BillingConfigId
                                   select new HistoryDTO
                                   {
-                                      ModifiedDate = DateTime.Now.Date,
+                                      ModifiedDate = DateTimeNow.Date,
                                       CurrencyId = s.CurrencyId,
                                       BillingFrequencyId = cs.BillingFrequencyId,
                                       EfficitiveDate = s.BillingStartDate,
@@ -988,6 +993,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         public async Task<ContractDocDTO> UploadFiles(ContractDocDTO contractDoc, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             //_context = (MICACMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             //var claimdetails = _context.TblClaimdoc.SingleOrDefault(x => x.ClaimId == ClaimId);
 
@@ -997,7 +1006,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             contractDocDTO.DocumentName = contractDoc.DocumentName;
             contractDocDTO.ContractId = contractDoc.ContractId;
             contractDocDTO.CreatedDate = contractDoc.CreatedDate;
-            contractDocDTO.UploadDate = DateTime.Now;
+            contractDocDTO.UploadDate = DateTimeNow;
             var ContractDoc = _mapper.Map<TblContractDoc>(contractDocDTO);
 
             _context.TblContractDoc.Add(ContractDoc);
@@ -1091,6 +1100,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         public async Task<IEnumerable<InvoiceSearchHistory>> GetSearchInvoiceHistory(InvoiceContractSearch invoiceContractSearch, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             InvoiceSearchHistory invoiceSearchHistory = new InvoiceSearchHistory();
 
             string[] lstStatus = new string[] { "InvoiceStatus" };
@@ -1133,7 +1146,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                                   PenaltyAmount = (invoiceSearchHistory.PenaltyCalculation == 0) ? 0 : tblinvoice.Balance * tblinvoiceConfig.PenaltyPercentage / 100,
                                   RevisedInvoiceAmount = tblinvoice.InvAmount + tblinvoice.PenaltyAmount,
                                   UserId = tblinvoice.CreatedUserId,
-                                  ModifiedDate = DateTime.Now,
+                                  ModifiedDate = DateTimeNow,
                                   RevisedPenaltyRate = pd.PenaltyRate,
                                   RevisedPenaltyAmount = pd.PenaltyAmount,
                                   RevisedInvoiceAmountGrid = pd.RevisedInvAmount,
@@ -1205,6 +1218,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             //if (invoiceCustSearch.EnvId > 0)
             //{
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             //}
             //else
             //{
@@ -1254,7 +1271,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                                   PenaltyAmount = (invoiceSearchHistory.PenaltyCalculation == 0) ? 0 : tblinvoice.Balance * tblinvoiceConfig.PenaltyPercentage / 100,
                                   RevisedInvoiceAmount = tblinvoice.InvAmount + tblinvoice.PenaltyAmount,
                                   UserId = tblinvoice.CreatedUserId,
-                                  ModifiedDate = DateTime.Now,
+                                  ModifiedDate = DateTimeNow,
                                   RevisedPenaltyRate = pd.PenaltyRate,
                                   RevisedPenaltyAmount = pd.PenaltyAmount,
                                   RevisedInvoiceAmountGrid = pd.RevisedInvAmount,
@@ -1472,7 +1489,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         public async Task<InvoiceDTO> SaveBillingInvoiceAsync(decimal BillingConfigId, InvoiceRequest invoiceRequest, InvoiceConfigDTO invoiceConfigDTO, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             try
             {
                 decimal totalInvoiceAmount = 0;
@@ -1545,7 +1565,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 //Fill Invoice Table
                 invoiceDto.InvoiceConfigId = invoiceConfigDTO.InvoiceConfigId;
                 invoiceDto.ContractId = invoiceConfigDTO.ContractId;
-                invoiceDto.InvoiceDate = DateTime.Now;
+                invoiceDto.InvoiceDate = DateTimeNow;
                 //invoiceDto.RevisedInvAmount = 0;
                 invoiceDto.PaymentRecd = 0;//From Payment table--PaymentAmount
                 invoiceDto.Balance = totalInvoiceAmount;
@@ -1559,7 +1579,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 invoiceDto.CreatedUserId = apiContext.UserId;
                 invoiceDto.Discount = 0;
                 invoiceDto.StatusId = ModuleConstants.InvoicePendingStatus;
-                invoiceDto.CreatedDate = DateTime.Now;
+                invoiceDto.CreatedDate = DateTimeNow;
                 invoiceDto.InvoiceNo = GetInvoiceNumber();
                 invoiceDto.InvAmount = totalInvoiceAmount;
                 invoiceDto.TotalAmount = invoiceDto.InvAmount - invoiceDto.Discount + invoiceDto.TaxAmount + invoiceDto.PenaltyAmount;
@@ -1675,6 +1695,10 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         public async Task<InvoiceModel> InvoicePdfGeneration(InvoiceModel invoiceModel, InvoiceDTO invoiceDto, InvoiceRequest invoiceRequest, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             int count = 0;
             // InvoiceModel invoiceModel = new InvoiceModel();
             Models.NotificationRequest notificationRequest = new Models.NotificationRequest();
@@ -1683,7 +1707,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             var _contract = _context.TblContract.Where(a => a.ContractId == invoiceDto.ContractId).First();
 
             invoiceModel.InvoiceItemsModel.InvoiceNo = invoiceDto.InvoiceNo;
-            invoiceModel.InvoiceItemsModel.InvoiceDate = DateTime.Now.ToShortDateString(); //DateTime.Now.ToString("dd'-'MMM'-'YYYY'");
+            invoiceModel.InvoiceItemsModel.InvoiceDate = DateTimeNow.ToShortDateString(); //DateTime.Now.ToString("dd'-'MMM'-'YYYY'");
             //invoiceModel.InvoiceItemsModel.InvoiceDate = DateTime(string.Format("{ 0:yyyy - MM - dd hh: mm} ", DateTime.Now));
             //invoiceModel.InvoiceItemsModel.InvoiceDate =invoiceDto.InvoiceDate "{ "dd'-'MMM'-'YYYY"}";
             invoiceModel.InvoiceItemsModel.SuppliesrsRef = "";

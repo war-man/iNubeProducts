@@ -40,6 +40,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<List<dynamic>> CheckRuleSets(string EventId, AllocDTO allocDTO, ApiContext apiContext);
         Task<IEnumerable<ClaimdocDTO>> GetPolicyDocuments(string policyNo, ApiContext apiContext);
         Task<decimal> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
+        Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -125,7 +126,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
             var uri = ProductUrl + "/api/Product/GetMasterData?sMasterlist=" + sMasterList;
             return await GetListApiInvoke<ddDTOs>(uri, apiContext);
         }
+        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
+        {
 
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
         public async Task<ProductDTO> GetProductById(int ProductId, ApiContext apiContext)
         {
             var uri = ProductUrl + "/api/Product/GetProductById?productId=" + ProductId;

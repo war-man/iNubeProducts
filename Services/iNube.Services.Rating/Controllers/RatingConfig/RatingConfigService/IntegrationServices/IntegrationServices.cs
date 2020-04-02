@@ -15,6 +15,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
     public interface IIntegrationService
     {
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
+ 
     }
     public class IntegrationService : IIntegrationService
     {
@@ -123,7 +124,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
             }
 
         }
-
+       
         private async Task<IEnumerable<TResponse>> PostListApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
         {
             try

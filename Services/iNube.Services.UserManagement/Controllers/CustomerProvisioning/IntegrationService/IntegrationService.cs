@@ -16,6 +16,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
     {
         Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetReportNameForPermissionsDetails(string Url, ApiContext apiContext);
+     
     }
 
 
@@ -52,7 +53,6 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
             var uri = BillingUrl + "/api/Billing/GetCustProvisioningDetailsAsync?customerId=" + customerId;
             return await GetApiInvoke<CustomersDTO>(uri, apiContext);
         }
-
         public async Task<IEnumerable<ddDTO>> GetReportNameForPermissionsDetails(string Url, ApiContext apiContext)
         {
             var uri = Url;

@@ -32,6 +32,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         private ILoggerManager _logger;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        public DbHelper dbHelper;
         public MicaProductService(MICAPCContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IIntegrationService integrationService, IConfiguration configuration)
         {
 
@@ -41,6 +42,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _emailService = emailService;
             _integrationService = integrationService;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
         }
 
         public async Task<ProductResponse> Create(ProductDTO productDTO, ApiContext apiContext)
@@ -1071,11 +1073,16 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         public async Task<ProductDTO> UpdateProductModel(ProductDTO objProduct, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             ProductRcbdetailsDTO rcbDetail = null;
             InsurableChildRcbdetailsDTO InsChildrcbDetail = null;
             CoverChildRcbdetailsDTO CoverChildrcbDetail = null;
             ProductSwitchOnDetailsDTO switchdetails = null;
-            objProduct.CreatedDate = DateTime.Now;
+            objProduct.CreatedDate = DateTimeNow;
             objProduct.OrganizationId = apiContext.OrgId;
             objProduct.PartnerId = apiContext.PartnerId;
 

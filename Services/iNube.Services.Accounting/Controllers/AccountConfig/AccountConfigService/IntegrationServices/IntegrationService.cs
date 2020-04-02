@@ -14,6 +14,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
     public interface IIntegrationService
     {
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
+        Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -99,7 +100,14 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
             }
             return new List<TResponse>();
         }
+        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
+        {
 
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
         private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri,ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
         {
             try

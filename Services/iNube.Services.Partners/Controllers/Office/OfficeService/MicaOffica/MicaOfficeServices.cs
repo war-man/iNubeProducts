@@ -11,6 +11,8 @@ using iNube.Services.Partners.Controllers.Partner.PartnerService;
 using iNube.Utility.Framework.Model;
 using iNube.Services.UserManagement.Helpers;
 using Microsoft.Extensions.Configuration;
+using iNube.Services.Partners.Helpers;
+using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 
 namespace iNube.Services.Partners.Controllers.Office.OfficeService
 {
@@ -18,31 +20,39 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
     {
         private MICAPRContext _context;
         private IMapper _mapper;
+        private IIntegrationService _integrationService;
         private readonly IConfiguration _configuration;
+        public DbHelper dbHelper;
+        private IIntegrationService integrationService;
 
         public MicaOfficeService(MICAPRContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            _integrationService = integrationService;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
         }
 
         public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             var office = _mapper.Map<TblOrgOffice>(officeDTO);
             //_context.Entry(office).State=(office.OrgOfficeId == 0)?EntityState.Added : EntityState.Modified;
             if (office.OrgOfficeId == 0)
             {
                 office.CreatedBy = apiContext.UserId;
-                office.CreatedDate = DateTime.Now;
+                office.CreatedDate = DateTimeNow;
                 _context.TblOrgOffice.Add(office);
             }
             else
             {
                 office.ModifiedBy = apiContext.UserId;
-                office.ModifiedDate = DateTime.Now;
+                office.ModifiedDate = DateTimeNow;
                 //_context.Entry(office).State = EntityState.Modified;
                 _context.Update(office);
             }

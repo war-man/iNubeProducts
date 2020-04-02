@@ -198,6 +198,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             LoginResponse loginResponse = new LoginResponse();
             var dbConnection = GetEnvironmentConnection(productType, envId).Dbconnection;
             _context = (MICAUMContext)DbManager.GetContextByConnection(productType, dbConnection);
+
             var userDetails = _context.TblUserDetails.FirstOrDefault(u => u.UserName == user.UserName);
             //var roleDetails = from ro in _context.AspNetRoles
             //                  join ur in _context.AspNetUserRoles on ro.Id equals ur.RoleId

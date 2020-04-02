@@ -27,6 +27,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         private IIntegrationService _integrationService;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        public DbHelper dbHelper;
         /// <summary>
         /// Initializes a new instance of the <see cref="PartnerService"/> class.
         /// </summary>
@@ -41,6 +42,8 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             _integrationService = integrationService;
             _emailService = emailService;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
+
         }
         /// <summary>
         /// Creates the partner asynchronous.
@@ -50,6 +53,12 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         public async Task<PartnerResponse> CreatePartnerAsync(PartnersDTO partnerDTO, ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+
             TblPartners partner = _mapper.Map<TblPartners>(partnerDTO);
             partnerDTO.Flag = false;
             // _context.Entry(partner).State = partner.PartnerId == 0 ? EntityState.Added : EntityState.Modified;
@@ -58,12 +67,12 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                 partner.CreatedBy = apiContext.UserId;
                 partner.OrganizationId = apiContext.OrgId;
                 partnerDTO.Flag = true;
-                partner.CreatedDate = DateTime.Now;
+                partner.CreatedDate = DateTimeNow;
                 _context.TblPartners.Add(partner);
             }
             else
             {
-                partner.ModifyDate = DateTime.Now;
+                partner.ModifyDate = DateTimeNow;
                 partner.ModifyBy = apiContext.UserId;
                 var address = _context.TblPartnerAddress.Where(p => p.PartnerId == partner.PartnerId);
                 foreach (var item in address)
@@ -159,6 +168,11 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         public async Task<PolicyAgreementResponse> SaveAssignProduct( AssignProductDTO AssignProductDto, ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
 
             TblPolicyAgreement tb = null;
             List<ErrorInfo> Errors = new List<ErrorInfo>();
@@ -190,7 +204,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                             tb.PolicyEndDate = AssignProductDto.EffectiveTo;
                             tb.PolicyIssueDate = AssignProductDto.AssignDate;
                             tb.ProductIdPk = Convert.ToInt32(AssignProductDto.ProductId);
-                            tb.CreatedDate = DateTime.Now;
+                            tb.CreatedDate = DateTimeNow;
                             tb.IsUploadedToIcm = 1;
                             tb.ProductIdPk = pId;
                             _context.TblPolicyAgreement.Add(tb);
@@ -1081,6 +1095,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         }
         private ClaimDataDTO FillClaimIntimationRequest()
         {
+           
             ClaimDataDTO claimIntimationDTO = new ClaimDataDTO();
             claimIntimationDTO.PolicyNumber = "000-111-222";
             claimIntimationDTO.lossDateTime = DateTime.Now;

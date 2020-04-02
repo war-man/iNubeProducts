@@ -25,6 +25,7 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
         Task<BillingEventResponseDTO> GetClaimItemizedDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<UserNameById> GetUserNameById(string Id, ApiContext apiContext);
+        Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -89,7 +90,14 @@ namespace iNube.Services.Billing.Controllers.Billing.IntegrationServices
 
             return await PostApiInvoke<Models.BillingEventRequest, BillingEventResponseDTO>(uri, apiContext, EventRequest);
         }
+        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
+        {
 
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
         public async Task<IEnumerable<BilingEventDataDTO>> GetClaimBilingDetailsAsync(Models.BillingEventRequest EventRequest, ApiContext apiContext)
         {
             var uri = ClaimUrl + "/api/ClaimManagement/BillingEventData";

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using iNube.Services.Accounting.Controllers.AccountConfig.IntegrationServices;
 using iNube.Services.Accounting.Entities;
 using iNube.Services.Accounting.Helpers;
 using iNube.Services.Accounting.Models;
@@ -26,6 +27,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         private readonly AppSettings _appSettings;
         private readonly Func<string, IAccountingConfigService> _accountsService;
         private IConfiguration _configuration;
+        public DbHelper dbHelper;
         public MicaAccountConfigService(Func<string, IAccountingConfigService> accountsService, IMapper mapper, MICAACContext context,
             IOptions<AppSettings> appSettings, IConfiguration configuration)
         {
@@ -34,6 +36,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
             _context = context;
             _accountsService = accountsService;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
         }
 
         public async Task<AccountResponce> CreateAccounts(CoaaccountsDto coaacountsdto, ApiContext apiContext)

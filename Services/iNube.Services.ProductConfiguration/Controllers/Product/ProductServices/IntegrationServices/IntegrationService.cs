@@ -17,6 +17,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         Task<string> GetEnvironmentConnection(string product, decimal EnvId);
         Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID,ApiContext apiContext);
         Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext);
+        Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -113,7 +114,14 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             }
             return new List<TResponse>();
         }
+        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
+        {
 
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
         private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri,ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
         {
             try
