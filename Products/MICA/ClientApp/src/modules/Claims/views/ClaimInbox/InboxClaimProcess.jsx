@@ -641,14 +641,6 @@ class InboxClaimProcess extends React.Component {
         datamodel["Financier"] = {};
         datamodel["Nominee"] = {};
         datamodel["Surveyor"] = {};
-        //datamodel["Workshop"] = {};
-        //datamodel["Workshop"] = {};
-        //datamodel["Workshop"] = {};
-        //datamodel.push(this.state.Workshop);
-        //datamodel.push(this.state.Customer);
-        //datamodel.push(this.state.Financier);
-        //datamodel.push(this.state.Nominee);
-        //datamodel.push(this.state.Surveyor);
         this.setState({ datamodel });
 
         console.log("datamodel ", datamodel);
@@ -658,32 +650,22 @@ class InboxClaimProcess extends React.Component {
         let BankDataModelDTO = this.state.BankDataModelDTO;
         let data = BankDataModelDTO[name];
         data.type = name;
-        //let data = this.state.Bankfieldsmodel.filter(e => e.Name == evt.target.name);
         data[evt.target.name] = evt.target.value;
 
         if (name == "Customer") {
             let bank = this.state.Bankarray;
             let index = bank.findIndex(e => e.name == name);
-            //let bank = this.state.Bankarray(e => e.name == name)
             let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
             bankvalue[0].Value = evt.target.value;
             this.setState({ bank });
         }
 
         this.setState({ /*bank,*/ data, BankDataModelDTO });
-
-        //this.setState({ DataModelDTO });
-        console.log("BankDataModelDTO: ", this.state.BankDataModelDTO);
-        console.log("BankDataModelDTO: ", this.state.Bankarray);
-        console.log("BankDataModelDTO: ", this.state.Bankfieldsmodel);
-        console.log("name", evt.target.name);
     };
 
     oncustomerselect = () => {
         console.log("Data: ", this.state.BankDetails);
         let bank = this.state.BankDataModelDTO;
-        //BankDataModelDTO[this.state.selectedcheckbox] = {};
-        //let data = BankDataModelDTO[this.state.selectedcheckbox];
         let bankdata = this.state.Bankdata.Customer;
         let cbank = this.state.BankDetails;
         let jsondata = this.state.Bankfieldsmodel;
@@ -695,8 +677,6 @@ class InboxClaimProcess extends React.Component {
         bankdata["IFSC Code"] = cbank.ifsccode;
         bankdata["Bank Branch Address"] = cbank.bankBranchAddress;
         bankdata.type = "Customer";
-        //bankdata["Amount Paid"] = "";
-        //bankdata["Date Of Payment"] = "";
 
         jsondata[0].Value = cbank.accountHolderName;
         jsondata[1].Value = cbank.accountNumber;
@@ -704,8 +684,6 @@ class InboxClaimProcess extends React.Component {
         jsondata[3].Value = cbank.bankName;
         jsondata[4].Value = cbank.ifsccode;
         jsondata[5].Value = cbank.bankBranchAddress;
-        //jsondata[6].Value = "";
-        //jsondata[7].Value = "";
 
         bank.Customer = bankdata;
 
@@ -833,18 +811,6 @@ class InboxClaimProcess extends React.Component {
         var today = event.toDate();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-        //var dd = today.getDate();
-        //var mm = today.getMonth() + 1;
-        //if (mm < 10) {
-        //    mm = '0' + mm;
-
-        //}
-        //if (dd < 10) {
-        //    dd = '0' + dd;
-        //}
-
-        //var date = dd + '/' + mm + '/' + today.getFullYear();
-
         const ClaimDataDTO = this.state.ClaimDTO;
         ClaimDataDTO[name] = date;
         this.setState({ ClaimDataDTO });
@@ -861,9 +827,6 @@ class InboxClaimProcess extends React.Component {
             this.setState({ bank });
         }
 
-        //const BankDataModelDTO = this.state.fields.BankDataModelDTO;
-        //let data = BankDataModelDTO[this.state.selectedcheckbox];
-        //data[name] = date;
         this.setState({ data });
 
         this.change(event, name, formate, date, type);
@@ -1036,11 +999,6 @@ class InboxClaimProcess extends React.Component {
         });
 
     }
-
-    //handleClose = () => {
-    //    this.setState({ open: false });
-
-    //};
 
     Editopen = () => {
         this.setState({ disabled: false });
@@ -1400,16 +1358,10 @@ class InboxClaimProcess extends React.Component {
     handleCheckbox = (event, name, i) => {
 
         let ProductClaimData = this.state.ProductClaimData;
-        //let BankDataModelDTO = this.state.BankDataModelDTO;
         let array = [];
         array.name = name;
         array.data = {};
         console.log("")
-        //name = {};
-        //BankDataModelDTO.push(name);
-        ////let data = BankDataModelDTO[name];
-        //this.setState({});
-        //let name = event.target.name;
         let check = event.target.checked;
         console.log("values: ", this.state.ProductClaimData, 'chk data ', event, event.target.checked, name);
         this.setState({ selectedcheckbox: name });
@@ -1425,117 +1377,53 @@ class InboxClaimProcess extends React.Component {
                 if (name == "Workshop") {
                     searchname = "Customer";
                     if (event.target.checked == true) {
-                        // this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
-                        //this.state.displaybank = true;
-                        //this.state.BankDataModelDTO.push(this.state.Bankfieldsmodel);
-                        this.state.displaywork = true;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                     if (event.target.checked == false) {
-                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Workshop);
-                        //delete this.state.BankDataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 } else {
                     searchname = "Workshop";
-                    //this.state.displaybank = true;
-                    this.state.displaywork = false;
                     this.state.displaycust = false;
-                    this.state.displayfinancier = false;
-                    this.state.displaynominee = false;
-                    this.state.displaysurveyor = false;
                     this.setState({});
                 }
                 if (name == "Customer") {
                     if (event.target.checked === true) {
                         this.oncustomerselect();
-                        //this.state.fields.BankDataModelDTO[name] = Object.assign(this.state.fields.BankDataModelDTO[name], this.state.Bankdata.Customer);
                         this.state.BankDataModelDTO[name] = this.state.Bankdata.Customer;
-                        this.state.displaywork = false;
                         this.state.displaycust = true;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     } if (event.target.checked === false) {
-                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Customer);
-                        //delete this.state.BankDataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 }
                 if (name == "Financier") {
                     if (event.target.checked === true) {
-                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = true;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     } if (event.target.checked === false) {
-                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Financier);
-                        //delete this.state.BankDataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 }
                 if (name == "Nominee") {
                     if (event.target.checked === true) {
-                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
-                        //this.state.BankDataModelDTO[name] = this.state.Bankdata1;
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = true;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     } if (event.target.checked === false) {
-                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Nominee);
-                        //delete this.state.BankDataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 }
                 if (name == "Surveyor") {
                     if (event.target.checked === true) {
-                        //this.state.DataModelDTO[name] = Object.assign(this.state.DataModelDTO[name], this.state.Bankdata1);
-                        //this.state.DataModelDTO[name] = this.state.Bankdata1;
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = true;
                         this.setState({});
                     } if (event.target.checked === false) {
-                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Surveyor);
-                        //delete this.state.BankDataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 }
