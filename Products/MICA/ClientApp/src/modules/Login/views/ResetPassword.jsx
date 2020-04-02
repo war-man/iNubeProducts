@@ -237,7 +237,7 @@ class ResetPassword extends React.Component {
                             <CardBody>
                                 <GridContainer>
                                     <GridItem>
-                                        <p><b>*Note: </b>The Password should contain 8 - 16 characters with at least one alphabets, one numeric digit and a special character.</p>
+                                        <p><b>*Note: </b>The Password should contain more than 8 characters with at least one lowercase alphabet, one uppercase alphabet , one numeric digit and a special character.</p>
                                     </GridItem>
                                 </GridContainer>
                                 <CustomInput

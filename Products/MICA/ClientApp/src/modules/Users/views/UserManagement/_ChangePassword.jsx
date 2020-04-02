@@ -169,7 +169,7 @@ class ChangePassword extends React.Component {
             }
         } else {
             swal({
-                text: "Please enter valid Password format" + "\n" + "The Password should contain 8-16 characters with at least one alphabets, one numeric digit and a special character.",
+                text: "Please enter valid Password format" + "\n" + "The Password should contain more than 8 characters with at least one lowercase alphabet,one upper case alphabet, one numeric digit and a special character.",
                 icon: "error"
             })
         }
