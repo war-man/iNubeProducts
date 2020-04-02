@@ -121,6 +121,8 @@ const ClaimAmount = (props) => {
 
                     {props.errormessage && (props.DetailsDTO.insurableItems == "") ? <p className="error">*Required field cannot be left blank</p> : null}
 
+                    {props.insurableitemflag && (props.DetailsDTO.insurableItems == "") ? <p className="error"> </p> : null}
+
                 </GridItem>
             </GridContainer>
 

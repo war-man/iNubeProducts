@@ -353,7 +353,6 @@ class ReportExecution extends React.Component {
                                     </h4>
                                 }
                             </CardHeader>
-                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                 <CardBody>
 
                                     <div>
@@ -443,7 +442,6 @@ class ReportExecution extends React.Component {
                                         </GridContainer>
                                     </div>
                                 </CardBody>
-                            </Animated>
                         </Card>
                         : <PageContentLoader />
                 }

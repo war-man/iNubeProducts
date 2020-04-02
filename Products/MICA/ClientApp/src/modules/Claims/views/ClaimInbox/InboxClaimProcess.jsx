@@ -119,6 +119,9 @@ class InboxClaimProcess extends React.Component {
         this.state = {
             prodId: "",
             vehicleclaim: false,
+            vehicleclaimstate: false,
+            vehicleclaimdriver: false,
+            vehicleclaimsurvey: false,
             displaybank: false,
             isimage: false,
             openpop: false,
@@ -295,6 +298,7 @@ class InboxClaimProcess extends React.Component {
                 "locationOfEvent": "",
                 "lossDescription": "",
                 "vehicleLocation": "",
+                "vehicleLocationState": "",
                 "driverName": "",
                 "selfSurvey": "",
                 "totalClaimedAmount": "",
@@ -1022,36 +1026,42 @@ class InboxClaimProcess extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                // this.setState({ claimDetailsData: data[0] });
-                console.log("details of claims", data);
+
+                this.setState({ claimTableData: data[1] });
+
+                this.claimAmountTable(this.state.claimTableData);
+
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
                 this.state.claimDetailsData.totalClaimedAmount = data[0][3][1];
 
-                if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
+                //if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
 
+                //    this.state.claimDetailsData.vehicleLocation = data[0][4][1];
+                //    this.state.claimDetailsData.driverName = data[0][5][1];
+                //    this.state.claimDetailsData.selfSurvey = data[0][6][1];
+
+                //    this.setState({ vehicleclaim: true });
+                //}
+
+                if (data[0][4][1].length != 0) {
                     this.state.claimDetailsData.vehicleLocation = data[0][4][1];
-                    this.state.claimDetailsData.driverName = data[0][5][1];
-                    this.state.claimDetailsData.selfSurvey = data[0][6][1];
-
                     this.setState({ vehicleclaim: true });
                 }
-                //this.state.claimDetailsData.totalClaimedAmount = data[0][6][1];
-                //this.state.claimDetailsData.accountHolderName = data[0][7][1];
-                //this.state.claimDetailsData.accountNumber = data[0][8][1];
-                //this.state.claimDetailsData.bankName = data[0][9][1];
-                //this.state.claimDetailsData.ifscCode = data[0][10][1];
-                //this.state.claimDetailsData.bankAddress = data[0][11][1];
-                console.log("###", this.state.claimDetailsData);
-
-                this.setState({ claimTableData: data[1] });
-
-                console.log("this.state.claimTableData", this.state.claimTableData);
-
-                this.claimAmountTable(this.state.claimTableData);
-
-                console.log("DATA", this.state.claimDetailsData, this.state.claimTableData);
+                if (data[0][5][1].length != 0) {
+                    this.state.claimDetailsData.vehicleLocationState = data[0][5][1];
+                    this.setState({ vehicleclaimstate: true });
+                }
+                if (data[0][6][1].length != 0) {
+                    this.state.claimDetailsData.driverName = data[0][6][1];
+                    this.setState({ vehicleclaimdriver: true });
+                }
+                if (data[0][7][1].length != 0) {
+                    this.state.claimDetailsData.selfSurvey = data[0][7][1];
+                    this.setState({ vehicleclaimsurvey: true });
+                }
+               
 
             });
 
@@ -1614,7 +1624,7 @@ class InboxClaimProcess extends React.Component {
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
                                     SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
                                     displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
-                                    Bankarray={this.state.Bankarray}
+                                    Bankarray={this.state.Bankarray} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}
                                 />
                             </CardBody>
                         </Card>
