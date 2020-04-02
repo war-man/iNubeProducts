@@ -48,7 +48,7 @@ const PolicyDetails = (props) => {
             <GridContainer>
 
 
-                <GridItem xs={12} sm={4} md={3}>
+                {/*  <GridItem xs={12} sm={4} md={3}>
 
 
                     <CustomInput
@@ -63,7 +63,7 @@ const PolicyDetails = (props) => {
                             fullWidth: true
                         }}
                     />
-                </GridItem>
+                </GridItem>*/}
 
 
                 <GridItem xs={12} sm={4} md={3}>
@@ -93,7 +93,7 @@ const PolicyDetails = (props) => {
                     />
                 </GridItem>
 
-                <GridItem xs={12} sm={4} md={3}>
+                {/* <GridItem xs={12} sm={4} md={3}>
 
 
                     <CustomInput
@@ -110,7 +110,7 @@ const PolicyDetails = (props) => {
                     />
                 </GridItem>
 
-                {/*  <GridItem xs={12} sm={4} md={3}>
+                  <GridItem xs={12} sm={4} md={3}>
 
 
                     <CustomInput
