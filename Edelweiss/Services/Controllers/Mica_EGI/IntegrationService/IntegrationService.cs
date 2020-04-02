@@ -38,6 +38,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         //NEW Internal Policy Method for Account Number
         Task<dynamic> InternalGetPolicyDetailsByNumber(string PolicyNo, ApiContext apiContext);
+
+        //AD Call In CD Account Details table
+        Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string TxnEventType, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -157,6 +160,12 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             return await GetApiInvoke<CDDailyDTO>(uri, apiContext);
         }
 
+        public async Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string TxnEventType, ApiContext apiContext)
+        {
+        
+            var uri = PartnerUrl + "/api/Accounts/GetAccountBalance?accountnumber=" + accountnumber + "&TxnEventType=" + TxnEventType;
+            return await GetApiInvoke<CDBalanceDTO>(uri, apiContext);
+        }
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();

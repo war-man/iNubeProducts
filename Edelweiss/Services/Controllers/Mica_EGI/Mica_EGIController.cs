@@ -164,6 +164,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return ServiceResponse(response);
 
         }
+        [HttpPost]
+        public async Task<IActionResult> GetRefundDetails(PolicyCancelRequest policyRequest)
+        {
+            var searchPolicyDetails = await _quotationService.GetRefundDetails(policyRequest, Context);
+            return Ok(searchPolicyDetails);
+        }
+
+        [HttpPost]
+        public IActionResult PolicyStatusUpdate(PolicyStatusDTO policyStatus)
+        {
+            var response = _quotationService.PolicyStatusUpdate(policyStatus);
+            return ServiceResponse(response);
+        }
 
     }
 }

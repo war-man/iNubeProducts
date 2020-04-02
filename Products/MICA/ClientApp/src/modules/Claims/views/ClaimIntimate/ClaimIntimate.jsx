@@ -26,7 +26,7 @@ import Document from "./Document.jsx";
 import BankDetails from "./BankDetails.jsx";
 import validationPage from "modules/Claims/views/ValidationPage.jsx";
 import ClaimAmount from "../MultiCover/ClaimAmount.jsx";
-import AmountData from "modules/Claims/views/ClaimIntimate/AmountData.json";
+
 //import Model from "modules/Claims/views/ClaimIntimate/Model.json";
 import { keys } from "@material-ui/core/styles/createBreakpoints";
 import { Animated } from "react-animated-css";
@@ -36,7 +36,7 @@ import data_Not_found from "assets/img/data-not-found-new.png";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import { Redirect } from 'react-router-dom';
 import Dropdown from "components/Dropdown/Dropdown.jsx";
-
+import CustomCheckbox from "components/Checkbox/CustomCheckbox";
 
 const CustomTableCell = withStyles(theme => ({
     head: {
@@ -118,9 +118,9 @@ const dateStyle = {
     zoom: "1.15"
 }
 const paddingCard =
-    {
-        padding: "10px",
-    };
+{
+    padding: "10px",
+};
 
 
 class ClaimIntimate extends React.Component {
@@ -130,7 +130,7 @@ class ClaimIntimate extends React.Component {
 
             policyflag: false,
             productflag: false,
-
+            claimamtdisable: true,
             prodId: "",
             startDateFlag: "",
             endDateFlag: "",
@@ -141,6 +141,19 @@ class ClaimIntimate extends React.Component {
             ValidationUI: true,
             validateUI: false,
             errormessage: false,
+            errorifsccode: false,
+            locationflag: false,
+            descriptionflag: false,
+            lossdateflag: false,
+            lossintimatedflag: false,
+            causeflag: false,
+            accholdernameflag: false,
+            accnumflag: false,
+            acctypeflag: false,
+            banknameflag: false,
+            ifsccodeflag: false,
+            insurableitemflag: false,
+            erroraccno: false,
             errorstatus: false,
             errordate: false,
             erroramt: true,
@@ -164,7 +177,6 @@ class ClaimIntimate extends React.Component {
                 "benefitAmount": "",
                 "claimAmounts": "",
                 "coverName": "",
-
 
             }],
             DataAmount: [],
@@ -278,7 +290,7 @@ class ClaimIntimate extends React.Component {
                 bankAccounts: [],
                 AdditionalDetails: {},
             },
-
+            selected: [],
             bankDetails: {
                 accountHolderName: "",
                 accountNumber: "",
@@ -294,39 +306,8 @@ class ClaimIntimate extends React.Component {
                 documentType: "",
             },
 
-
-            //ClaimResetData: {
-            //    lossDateTime: "",
-            //    locationOfLoss: "",
-            //    lossIntimatedBy: "",
-            //    causeOfLoss: "",
-            //    insurableItems: "",
-            //    lossDescription: "",
-            //    claimAmount: "",
-            //    accHolderName: "",
-            //    accNumber: "",
-            //    bankName: "",
-            //    bankBranchAdd: "",
-            //    ifscCode: "",
-            //},
-
             ClaimAmountReset: [],
 
-            //ClaimInsurable: {
-
-            //    insurableItem: "",
-            //    coverName: "",
-            //    identificationNo: "",
-            //    typeOfLoss: "",
-            //    benefitAmount: "",
-            //    claimAmounts: "",
-            //    name: "",
-            //    coverValue: "",
-            //    insurableId: "",
-            //    policyId: "",
-            //    vehicleNo: "",
-            //    makeModel: "",
-            //},
             showtable: false,
             ClaimIntimationDetails: {},
             tabledata: {},
@@ -401,7 +382,7 @@ class ClaimIntimate extends React.Component {
         evt.preventDefault();
         this.UIValidation();
         this.IsValidProductDetails();
-
+       
         if (this.state.validateUI === true) {
 
             if (this.state.ValidationUI === true) {
@@ -413,18 +394,13 @@ class ClaimIntimate extends React.Component {
 
                 for (var i = 0; i < this.state.ClaimsAmountData.length; i++) {
                     console.log("amt:", this.state.ClaimsAmountData[i].claimAmounts);
-                    //if (this.state.ClaimsAmountData[i].claimAmounts != null) {
-                    this.state.DataAmount.push(this.state.ClaimsAmountData[i]);
-                    //}
-                    //else {
-
-                    //}
+                    this.state.DataAmount.push(this.state.ClaimsAmountData[i].claimAmounts);
                 }
-
 
                 console.log("123:", this.state.DataAmount);
                 console.log("123456:", this.state.ClaimsAmountData);
-                detailsdto['ClaimInsurable'] = this.state.DataAmount;
+
+                detailsdto['ClaimInsurable'] = this.state.selected;
 
                 this.setState({ detailsdto });
 
@@ -435,7 +411,7 @@ class ClaimIntimate extends React.Component {
                 this.setState({});
 
                 console.log("bankAccounts", this.state.DetailsDTO.bankAccounts);
-                debugger;
+
                 fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimIntimate`, {
                     method: 'post',
                     headers: {
@@ -467,46 +443,116 @@ class ClaimIntimate extends React.Component {
                         }
                     });
 
-                //this.state.DetailsDTO.lossDateTime = Ldate;
-                //this.state.PolicysearchDTO.eventDate = Cdate;
-
 
             }
             else {
-                this.setState({ errormessage: true });
-                //this.setState({ erroramt: true });
-                swal("", "Some fields are missing", "error");
+
+                if (this.state.DetailsDTO.lossDateTime == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ lossdateflag: true });
+                    swal("", "Please enter Loss date time", "error");
+                }
+                else if (this.state.DetailsDTO.locationOfLoss == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ locationflag: true });
+                    swal("", "Please enter Location of loss", "error");
+                }
+                else if (this.state.DetailsDTO.lossDescription == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ descriptionflag: true });
+                    swal("", "Please enter Loss description ", "error");
+                }
+                else if (this.state.DetailsDTO.lossIntimatedBy == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ lossintimatedflag: true });
+                    swal("", "Please select dropdown Loss intimated by", "error");
+                }
+                else if (this.state.DetailsDTO.causeOfLoss == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ causeflag: true });
+                    swal("", "Please select dropdown Cause of loss", "error");
+                }
+                else if (this.state.DetailsDTO.insurableItems == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ insurableitemflag: true });
+                    swal("", "Please select dropdown Insurable item", "error");
+                }
+                else if (this.state.bankDetails.accountHolderName == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ accholdernameflag: true });
+                    
+                    swal("", "Please enter Account holder name", "error");
+                }
+                else if (this.state.bankDetails.accountNumber == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ accnumflag: true });
+                    swal("", "Please enter Account number", "error");
+                }
+                else if (this.state.bankDetails.accountType == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ acctypeflag: true });
+                    swal("", "Please select dropdown Account Type", "error");
+                }
+                else if (this.state.bankDetails.bankName == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ banknameflag: true });
+                    swal("", "Please enter Bank name", "error");
+                }
+                else if (this.state.bankDetails.ifscCode == "") {
+                    this.setState({ errormessage: true });
+                    this.setState({ ifsccodeflag: true });
+                    swal("", "Please enter Bank ifsc code", "error");
+                }
+
+                else {
+
+                }
+
             }
         } else {
-            swal("", "Input fields are not valid, Please enter valid input", "error");
+
+            this.setState({ errorifsccode: true });
+            this.setState({ erroraccno: true });
+
         }
 
     };
 
     IsValidProductDetails = () => {
-        //  console.log("lossdatedetails", this.state.ClaimsAmountData[0].claimAmounts)
+      
+       // console.log("lossdatedetails", this.state.DetailsDTO.locationOfLoss)
         if (this.state.DetailsDTO.lossDateTime !== "" && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== "" && this.state.bankDetails.accountHolderName !== ""
             && this.state.bankDetails.accountNumber !== "" && this.state.bankDetails.bankName !== "" && this.state.bankDetails.ifscCode !== "" && this.state.bankDetails.accountType !== "" && this.state.DetailsDTO.causeOfLoss !== "") {
-        } else {
+            this.state.validateUI = true;
+        }
+        else {
+
             this.state.ValidationUI = false;
             this.state.errormessage = true;
             this.setState({});
         }
 
 
+
+
     }
 
     UIValidation = () => {
+
+        console.log("lossDateTimeState", this.state.lossDateTimeState, "locationOfLossState", this.state.locationOfLossState, "lossDescriptionState", this.state.lossDescriptionState);
+
         if (this.state.locationOfLossState == false && this.state.lossDescriptionState == false && this.state.accountHolderNameState == false
             && this.state.accountNumberState == false && this.state.bankNameState == false && this.state.ifscCodeState == false) {
-            //&& this.state.bankBranchAddState == false
-            //  if (this.state.contractNameState == "success") {
+
             this.state.validateUI = true;
-            // }
 
         }
         else {
             this.state.validateUI = false;
+            this.state.errorifsccode = true;
+            this.state.erroraccno = true;
+            // this.state.errorlossdate = true;
+            this.setState({});
         }
     }
 
@@ -587,15 +633,15 @@ class ClaimIntimate extends React.Component {
         claim[name] = value;
         this.setState({ claim });
 
-       // if (this.state.policyflag === true) {
-            if (name === "insurableItems") {
-                console.log('grid setup', this.state.DetailsDTO.insurableItems)
-                if (value != "") {
-                    this.setState({ showInsGrid: true });
-                }
-                this.claimAmountTable();
-
+        // if (this.state.policyflag === true) {
+        if (name === "insurableItems") {
+            console.log('grid setup', this.state.DetailsDTO.insurableItems)
+            if (value != "") {
+                this.setState({ showInsGrid: true });
             }
+            this.claimAmountTable();
+
+        }
         //}
         //else {
         //    swal("", "Policy Insurable data is missing", "error");
@@ -851,13 +897,13 @@ class ClaimIntimate extends React.Component {
             TableData: this.state.ClaimsAmountData.map((prop, key) => {
 
                 return {
-                    id: key + 1,
+                    insurableitemId: key + 1,
                     insurableItem: prop.insurableItem,
                     name: prop.name,
                     identificationNo: prop.identificationNo,
                     typeOfLoss: prop.coverName,
                     coverValue: prop.coverDynamic.map((c) => {
-                        return (<h6> <b>{c.Header}</b> : {c.Details} </ h6>)
+                        return (<p className="gridparagraph"> {c.Header} : {c.Details} </p>)
                     }),
                     // coverValue: prop.coverValue,
                     // benefitAmount: prop.benefitAmount,
@@ -866,7 +912,7 @@ class ClaimIntimate extends React.Component {
                             <CustomInput
                                 // success={this.state.claimAmountsState === "success"}
                                 error={this.state.claimAmountsState}
-                                // required={true}
+                                // disabled={this.state.claimamtdisable}
                                 labelText=""
                                 id="padding-input"
                                 value={this.state.ClaimsAmountData.claimAmounts}
@@ -881,12 +927,34 @@ class ClaimIntimate extends React.Component {
                             }*/}
 
 
-                        </GridItem>
+                        </GridItem>,
+                    select: <CustomCheckbox key={key}
+                        name="select"
+                        value={this.state.selected}
+                        onChange={(e) => this.SetclauseValue(key, e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
                 };
             })
         });
 
         console.log("TableData", this.state.TableData);
+    }
+
+    SetclauseValue = (index, event) => {
+
+        let state = this.state;
+        if (event.target.checked == true) {
+            state.selected.push(this.state.ClaimsAmountData[index]);
+            // this.setState({ claimamtdisable: false });
+        } else if (event.target.checked == false) {
+            console.log("selected array: ", this.state.ClaimsAmountData[index].insurableitemId);
+            state.selected = state.selected.filter(item => item.insurableitemId !== this.state.ClaimsAmountData[index].insurableitemId);
+        }
+        this.setState({ state });
+        console.log("selected: ", this.state.selected);
     }
 
     editFunction(id, pid) {
@@ -910,19 +978,19 @@ class ClaimIntimate extends React.Component {
         }).then(response => response.json())
             .then(cdata => {
                 console.log("cdata", cdata);
-              
-               if (cdata.status === 0) {
-                   this.setState({ policyflag: true });
+
+                if (cdata.status === 0) {
+                    this.setState({ policyflag: true });
                     that.setState({ ClaimsAmountData: cdata.policyInsurableDetails, InsurableItemData: cdata.insurableItems });
                     console.log("PolicyInsurableDetails: ", that.state.ClaimsAmountData);
 
-                    
+
                 } else {
-                   this.setState({ policyflag: false });
-                   swal("", "Policy Insurable data is missing", "error");
+                    this.setState({ policyflag: false });
+                    swal("", "Policy Insurable data is missing", "error");
                 }
 
-        });
+            });
         console.log("PolicytArr", PolicyArr);
         this.state.prodId = PolicyArr[0].productIdPk;
         console.log("prodId", this.state.prodId);
@@ -979,7 +1047,7 @@ class ClaimIntimate extends React.Component {
         this.state.DetailsDTO.policyNo = this.state.PolicyNumber;
 
 
-        //this.setState({ BenefitAmount : userArr[0].sumInsured });
+        //this.setState({BenefitAmount : userArr[0].sumInsured });
         console.log("BenefitAmount", this.state.BenefitAmount, this.state.PolicyNumber);
         let claim = this.state.DetailsDTO;
         claim.policyNumber = PolicyArr[0].policyNo;
@@ -1258,7 +1326,7 @@ class ClaimIntimate extends React.Component {
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
-                                <GridItem xs={4} sm={4} md={3}>
+                                {/*<GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         // success={this.state.insuredreferenceState === "success"}
                                         error={this.state.insuredreferenceState}
@@ -1269,7 +1337,7 @@ class ClaimIntimate extends React.Component {
                                         onChange={(e) => this.SetValue("insuredreference", e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
-                                </GridItem>
+                                </GridItem>*/}
                                 <GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         // success={this.state.mobileNumberState === "success"}
@@ -1283,7 +1351,7 @@ class ClaimIntimate extends React.Component {
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
-                                <GridItem xs={4} sm={4} md={3}>
+                                {/* <GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
                                         //success={this.state.emailState === "success"}
                                         error={this.state.emailState}
@@ -1294,7 +1362,7 @@ class ClaimIntimate extends React.Component {
                                         onChange={(e) => this.SetValue("email", e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
-                                </GridItem>
+                                </GridItem>*/}
                                 {/* <GridItem xs={4} sm={4} md={4}>
                                     <CustomDatetime
                                         success={this.state.eventDateState === "success"}
@@ -1452,7 +1520,10 @@ class ClaimIntimate extends React.Component {
                                     errorstatus={this.state.errorstatus} errordate={this.state.errordate} erroramt={this.state.erroramt} validateUI={this.state.validateUI} SelfSurveydata={this.state.SelfSurveydata}
                                     LocationDTO={this.state.LocationDTO} GetLocation={this.GetLocation} regAddress={this.state.regAddress} disableView={this.state.disableView} renderPage={this.renderPage} selfsurvey={this.state.selfsurvey}
                                     masterList={this.state.masterList} master={this.state.master} addressDTO={this.state.addressDTO} ProductClaimData={this.state.ProductClaimData} stateMasterList={this.state.stateMasterList}
-                                    onModelChange={this.onModelChange} AdditionalDetails={this.state.AdditionalDetails} onDateChange={this.onDateChange} />
+                                    onModelChange={this.onModelChange} AdditionalDetails={this.state.AdditionalDetails} onDateChange={this.onDateChange} locationflag={this.state.locationflag} descriptionflag={this.state.descriptionflag}
+                                    lossdateflag={this.state.lossdateflag} lossintimatedflag={this.state.lossintimatedflag} causeflag={this.state.causeflag} accholdernameflag={this.state.accholdernameflag}
+                                    accnumflag={this.state.accnumflag} acctypeflag={this.state.acctypeflag} banknameflag={this.state.banknameflag} ifsccodeflag={this.state.ifsccodeflag} insurableitemflag={this.state.insurableitemflag}
+                                />
 
                                 <ClaimAmount TableData={this.state.TableData} ClaimAmountSum={this.ClaimAmountSum} ClaimsAmountData={this.state.ClaimsAmountData} claimAmountState={this.state.claimAmountState} validateUI={this.state.validateUI} InsurableItemData={this.state.InsurableItemData} policyflag={this.state.policyflag}
                                     claims={this.state.claims} handleChange={this.handleChange} DetailsDTO={this.state.DetailsDTO} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} classes={classes}
@@ -1460,7 +1531,7 @@ class ClaimIntimate extends React.Component {
 
                                 <BankDetails BankData={this.state.BankData} AccountTypedata={this.state.AccountTypedata} DetailsDTO={this.state.DetailsDTO} handleChange={this.handleChange} fields={this.state.fields} details={this.state.details} onInputParamChange={this.onInputParamChange}
                                     accountHolderNameState={this.state.accountHolderNameState} accountNumberState={this.state.accountNumberState} bankNameState={this.state.bankNameState} bankBranchAddState={this.state.bankBranchAddState} ifscCodeState={this.state.ifscCodeState}
-                                    validateUI={this.state.validateUI} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} classes={this.classes} bankDetails={this.state.bankDetails} handleChangebank={this.handleChangebank} />
+                                    validateUI={this.state.validateUI} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} errorifsccode={this.state.errorifsccode} erroraccno={this.state.erroraccno} classes={this.classes} bankDetails={this.state.bankDetails} handleChangebank={this.handleChangebank} />
 
 
                                 <Document DocumentData={this.state.DocumentData} docidfunc={this.docidfunc} doc={this.state.doc} dmsdocId={this.state.dmsdocId} documentName={this.state.documentName} claimId={this.state.claimId} handleChange={this.handleChange} DetailsDTO={this.state.DetailsDTO} getUploadParams={this.state.getUploadParams} onChangeStatus={this.state.handleChangeStatus} onSubmit={this.state.handleSubmit} fields={this.state.fields} onInputParamChange={this.onInputParamChange} />

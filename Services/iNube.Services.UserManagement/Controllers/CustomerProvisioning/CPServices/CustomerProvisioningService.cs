@@ -21,6 +21,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
     {
         IEnumerable<ddDTOs> GetMaster(string lMasterlist);
         Task<CustomerResponse> createProvision(CustomerProvisioningDTO customerProvisioningDTO, ApiContext apiContext);
+        CustomerSettingsDTO GetCustomerSettings(int customerid, string type, int envid, ApiContext apiContext);
 
     }
     public class CustomerProvisioningService : ICustomerProvisioningService
@@ -109,7 +110,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             var userdetails = _spocdetails.CustSpocDetails.FirstOrDefault();
             var useradress = _spocdetails.CustAddress.FirstOrDefault();
             var envid = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).FirstOrDefault();
-            
+
 
 
             UserDTO userDTO = new UserDTO();
@@ -175,6 +176,29 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             //return responsedata;
             return new CustomerResponse { Status = BusinessStatus.Created, ResponseMessage = $"Customer user created successfully!" };
 
+        }
+
+        public CustomerSettingsDTO GetCustomerSettings(int customerid, string type, int envid, ApiContext apiContext)
+        {
+            var data = _cpcontext.TblCustomerSettings.FirstOrDefault(a => a.CustomerId == customerid && a.Type == type);
+
+            if (envid != 0)
+            {
+                data = _cpcontext.TblCustomerSettings.FirstOrDefault(a => a.CustomerId == customerid && a.Type == type && a.EnvId == envid);
+            }
+
+            CustomerSettingsDTO customer = new CustomerSettingsDTO();
+
+            customer.Id = data.Id;
+            customer.Key = data.Key;
+            customer.KeyValue = data.KeyValue;
+            customer.Type = data.Type;
+            customer.CustomerId = data.CustomerId;
+            customer.IsActive = data.IsActive;
+            customer.ModifiedDate = data.ModifiedDate;
+            customer.EnvId = data.EnvId;
+
+            return customer;
         }
     }
 }

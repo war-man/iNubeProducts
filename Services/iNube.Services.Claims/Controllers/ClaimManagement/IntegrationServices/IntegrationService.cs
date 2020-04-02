@@ -39,6 +39,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<decimal> UpdatePolicySumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
         Task<List<dynamic>> CheckRuleSets(string EventId, AllocDTO allocDTO, ApiContext apiContext);
         Task<IEnumerable<ClaimdocDTO>> GetPolicyDocuments(string policyNo, ApiContext apiContext);
+        Task<decimal> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -87,7 +88,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
 
         public async Task<List<dynamic>> CheckRuleSets(String EventId, AllocDTO allocDTO, ApiContext apiContext)
         {
-            var uri = AllocRuleEngineUrl + "/CheckRuleSets/CheckRuleSets/" + EventId;
+            var uri = RuleEngineUrl + "/api/AllocationConfig/CheckRuleSets/CheckRuleSets/" + EventId;
             return await PostApiInvoke<AllocDTO, List<dynamic>>(uri, allocDTO, apiContext);
         }
 
@@ -99,6 +100,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         public async Task<decimal> UpdatePolicySumInsuredAsync(string PolicyNumber,decimal amount,ApiContext apiContext)
         {
             var uri = PolicyUrl + "/api/Policy/UpdateSumInsured?PolicyNumber="+ PolicyNumber+"&amount="+ amount;
+            return await GetApiInvoke<decimal>(uri, apiContext);
+        }
+
+        public async Task<decimal> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/UpdateBalanceSumInsured?PolicyNumber=" + PolicyNumber + "&amount=" + amount;
             return await GetApiInvoke<decimal>(uri, apiContext);
         }
 

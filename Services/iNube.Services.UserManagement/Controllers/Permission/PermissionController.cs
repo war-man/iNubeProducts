@@ -240,12 +240,26 @@ namespace iNube.Services.UserManagement.Controllers.Permission
 
         }
 
-        [HttpGet]
-        public IActionResult GetReportOnRole(UserRoleReportDTO reportDTO)
+        [HttpPost]
+        public IActionResult GetReportOnRoles(UserRoleReportDTO reportDTO)
         {
-            var reports = _permissionService.GetReportOnRole(reportDTO,Context);
+            var reports = _permissionService.GetReportOnRoles(reportDTO, Context);
             return Ok(reports);
         }
 
+        //fetching reports based on role
+        [HttpPost]
+        public async Task<IActionResult> GetReportByRole(RoleReportDTO reportDTO)
+        {
+            var response = await _permissionService.GetReportByRole(reportDTO, Context);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveAssignReports(UserRoleReportsDTO reportDTO)
+        {
+            var response = await _permissionService.SaveAssignReports(reportDTO, Context);
+            return Ok(response);
+        }
     }
 }

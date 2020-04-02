@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using iNube.Utility.Framework.Model;
 
 namespace iNube.Components.RuleEngine.Models
 {
@@ -20,31 +21,38 @@ namespace iNube.Components.RuleEngine.Models
             public string mType { get; set; }
             public string mValue { get; set; }
         }
+
         public class ParameterSetDTO
         {
             public ParameterSetDTO()
             {
                 TblAllocParameterSet = new HashSet<ParameterSetDetailsDTO>();
-                
+                TblAllocParameterSetDetails = new HashSet<ParamSetDetailsDTO>();
             }
 
-           // public decimal AllocParametersId { get; set; }
+            // public decimal AllocParametersId { get; set; }
             public string Type { get; set; }
             public string AllocParamName { get; set; }
 
 
             public virtual ICollection<ParameterSetDetailsDTO> TblAllocParameterSet { get; set; }
+            public virtual ICollection<ParamSetDetailsDTO> TblAllocParameterSetDetails { get; set; }
 
+        }
+        public class HandleModel
+        {
+            public decimal? AllocParametersID { get; set; }
+            public string Parameter { get; set; }
         }
 
         public class ParameterSetDetailsDTO
         {
-            public ParameterSetDetailsDTO()
-            {
-                TblAllocParameterSetDetails = new HashSet<ParamSetDetailsDTO>();
+            //public ParameterSetDetailsDTO()
+            //{
+            //    TblAllocParameterSetDetails = new HashSet<ParamSetDetailsDTO>();
 
-            }
-           
+            //}
+
 
             public decimal AllocParamSetId { get; set; }
             public string Input { get; set; }
@@ -53,26 +61,26 @@ namespace iNube.Components.RuleEngine.Models
             public string DataType { get; set; }
             public string Output { get; set; }
 
-           // public virtual ParameterSetDTO AllocParameters { get; set; }
-            public virtual ICollection<ParamSetDetailsDTO> TblAllocParameterSetDetails { get; set; }
+            // public virtual ParameterSetDTO AllocParameters { get; set; }
+            //public virtual ICollection<ParamSetDetailsDTO> TblAllocParameterSetDetails { get; set; }
         }
         public class ParamSetDetailsDTO
         {
             public decimal AllocParamSetDetId { get; set; }
             public string Output { get; set; }
-            //public decimal? AllocParamSetId { get; set; }
+            public decimal? AllocParametersId { get; set; }
         }
 
 
         //GetrateRule
         public class GetParamSetDetailDTO
         {
-            public decimal AllocParamSetID { get; set; }
+            public decimal? AllocParamSetID { get; set; }
             public decimal? AllocParametersID { get; set; }
             public string Type { get; set; }
             public string Input { get; set; }
             public string Output { get; set; }
-           
+
         }
         public class RatingParametersDTO
         {
@@ -98,12 +106,13 @@ namespace iNube.Components.RuleEngine.Models
                 TblAllocationRules = new HashSet<AllocationRulesDTO>();
             }
 
-         //   public decimal AllocationId { get; set; }
+            public decimal AllocationId { get; set; }
             public string AllocationObj { get; set; }
             public string AllocationName { get; set; }
             public List<dynamic> DynamicList { get; set; }
 
             public virtual ICollection<AllocationRulesDTO> TblAllocationRules { get; set; }
+            public BusinessStatus Status { get; internal set; }
         }
         public partial class AllocationRulesDTO
         {
@@ -112,23 +121,23 @@ namespace iNube.Components.RuleEngine.Models
                 TblAllocationRuleConditions = new HashSet<AllocationRuleConditionsDTO>();
             }
 
-          //  public decimal AllocationRuleId { get; set; }
+            //  public decimal AllocationRuleId { get; set; }
             public string Input { get; set; }
             public string Output { get; set; }
             public string IsMulti { get; set; }
-         //   public decimal? AllocationId { get; set; }
+            //   public decimal? AllocationId { get; set; }
 
-           // public virtual TblAllocation Allocation { get; set; }
+            // public virtual TblAllocation Allocation { get; set; }
             public virtual ICollection<AllocationRuleConditionsDTO> TblAllocationRuleConditions { get; set; }
         }
 
         public partial class AllocationRuleConditionsDTO
         {
-           // public decimal AllocationRuleConditionId { get; set; }
-          //  public decimal? AllocationRuleId { get; set; }
+            // public decimal AllocationRuleConditionId { get; set; }
+            //  public decimal? AllocationRuleId { get; set; }
             public string Output { get; set; }
 
-           // public virtual TblAllocationRules AllocationRule { get; set; }
+            // public virtual TblAllocationRules AllocationRule { get; set; }
         }
         //public class AllocationDTO
         //{
@@ -215,6 +224,16 @@ namespace iNube.Components.RuleEngine.Models
             public string ConditionOperator { get; set; }
             public string ConditionValueFrom { get; set; }
         }
+        public class AllocationResponse : ResponseStatus
+        {
+            public AllocationDTO createRules { get; set; }
+        }
+        public class AllocParamSetResponce : ResponseStatus
+        {
+            public ParameterSetDTO createParam { get; set; }
+        }
+
+
 
     }
 }

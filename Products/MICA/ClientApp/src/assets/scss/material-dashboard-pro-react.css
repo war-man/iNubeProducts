@@ -5052,6 +5052,12 @@ img {
 #white {
   color: #fff !important; }
 
+.gridparagraph {
+  margin: 0px 0px 0px 0px !important; }
+
+.payeetxttransform {
+  text-transform: capitalize; }
+
 .btn-file {
   position: relative;
   overflow: hidden;

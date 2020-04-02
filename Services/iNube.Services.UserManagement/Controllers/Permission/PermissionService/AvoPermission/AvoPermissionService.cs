@@ -453,11 +453,20 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DynamicResponse> GetReportOnRole(UserRoleReportDTO reportDTO, ApiContext apiContext)
+        public DynamicReportResponse GetReportOnRoles(UserRoleReportDTO reportDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
 
+        public async Task<DynamicReportResponse> GetReportByRole(RoleReportDTO reportDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<UserReportPermissionResponse> SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

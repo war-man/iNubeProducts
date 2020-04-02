@@ -76,6 +76,7 @@ const ViewCDAccount = AsyncComponent(() => { return import("modules/Partners/Acc
 
 /*Policy Module*/
 const PolicyCancellation = AsyncComponent(() => { return import("modules/Policy/views/PolicyCancellation.jsx"); });
+const RefundUpload = AsyncComponent(() => { return import("modules/Policy/views/RefundUpload.jsx"); });
 
 /*Billing Module*/
 const CreateBilling = AsyncComponent(() => { return import("modules/Billing/BillingConfiguration/CreateBilling.jsx"); });
@@ -165,6 +166,12 @@ const ModifyMapping = AsyncComponent(() => { return import("modules/Reinsurance/
 //Dynamic Reports
 const ReportConfiguration = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportConfiguration.jsx"); });
 const ReportExecution = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportExecution.jsx"); });
+const ReportUpdate = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportUpdate.jsx"); });
+
+/*Allocation Module*/
+const AllocationExecution = AsyncComponent(() => { return import("modules/Allocation/views/AllocationExecution.jsx"); });
+const AllocationConfig = AsyncComponent(() => { return import("modules/Allocation/views/AllocationConfig.jsx"); });
+const AllocationRules = AsyncComponent(() => { return import("modules/Allocation/views/AllocationRules.jsx"); });
 
 export const ComponentsList = {
     Uwdashboard: Uwdashboard,
@@ -275,7 +282,13 @@ export const ComponentsList = {
     UserDashboard: UserDashboard,
     ReportConfig: ReportConfiguration,
     ReportExecution: ReportExecution,
+    ReportUpdate: ReportUpdate,
     ClaimInbox: ClaimInbox,
+    //Allocation
+    AllocationConfig: AllocationConfig,
+    AllocationRules: AllocationRules,
+    AllocationExecution: AllocationExecution,
+    RefundUpload: RefundUpload 
 }
 
 export default ComponentsList

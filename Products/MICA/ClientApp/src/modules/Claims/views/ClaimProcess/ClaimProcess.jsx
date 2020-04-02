@@ -134,6 +134,15 @@ class ClaimProcess extends React.Component {
             base64: [],
             pageloader: false,
             nodata: false,
+            emptyobject: {},
+            Workshop: {},
+            Customer: {},
+            Financier: {},
+            Nominee: {},
+            Surveyor: {},
+            BankDetails: {},
+            index: 0,
+            Bankarray: [],
             loader: true,
             errormessage: false,
             ValidationUI: true,
@@ -162,7 +171,7 @@ class ClaimProcess extends React.Component {
             claimsdecisionshow: false,
             documentName: "",
             masterList: [],
-            
+
             ClaimDataDTO: [],
             ClaimAmountdetailsdata: [],
             ClaimStatusData: [],
@@ -179,9 +188,16 @@ class ClaimProcess extends React.Component {
             insuredMobileNoState: false,
             insuredEmailState: false,
             eventDateState: false,
+            displaywork: false,
+            displaycust: false,
+            displayfinancier: false,
+            displaynominee: false,
+            displaysurveyor: false,
+            selectedcheckbox: "",
             lossDateTimeState: false,
             claimStatusIdState: "",
             claimStatusId: "",
+            DocumentData: [],
             approvedClaimAmountState: false,
             // approvedClaimAmount: "",
             claimManagerRemarksState: false,
@@ -252,7 +268,7 @@ class ClaimProcess extends React.Component {
                 alldoc: [],
                 ClaimInsurable: [],
                 payeeTypeId: "",
-                DataModelDTO: {},
+                DataModelDTO: [],
             },
 
             docs: {
@@ -342,7 +358,18 @@ class ClaimProcess extends React.Component {
                 "approvedClaimAmount": ""
             },
 
-
+            Bankdata: {
+                "Customer": {
+                    "Bank Name": "",
+                    "Account Holder Name": "",
+                    "Account No.": "",
+                    "Account Type": "",
+                    "IFSC Code": "",
+                    "Bank Branch Address": "",
+                    "Amount Paid": "",
+                    "Date Of Payment": "",
+                }
+            },
 
             Payee: [
                 { mID: 1, mValue: "Workshop", mType: "Payee", mIsRequired: false, disable: false },
@@ -362,7 +389,31 @@ class ClaimProcess extends React.Component {
             StatusType: [],
             DecisionType: [],
             AccountTypedata: [],
-            ActivityData: []
+            ActivityData: [],
+            Bankdata1: {
+                "type": "",
+                "Bank Name": "",
+                "Account Holder Name": "",
+                "Account No.": "",
+                "Account Type": "",
+                "IFSC Code": "",
+                "Bank Branch Address": "",
+                "Amount Paid": "",
+                "Date Of Payment": "",
+            },
+            BankDataModelDTO: [],
+            displaywork: false,
+            displaycust: false,
+            displayfinancier: false,
+            displaynominee: false,
+            displaysurveyor: false,
+            vehicleActivity: {
+                "policyNumber": "",
+                "vehicleNumbers": [""],
+            },
+            popopen: false,
+            vehicleActivitydata: [],
+
         };
         this.dataTable = this.dataTable.bind(this);
         this.SetValue = this.SetValue.bind(this);
@@ -372,7 +423,7 @@ class ClaimProcess extends React.Component {
 
     handleClose = () => {
         this.setState({ openpop: false });
-        
+
     };
 
     handleActivityClose = () => {
@@ -400,14 +451,28 @@ class ClaimProcess extends React.Component {
             let field = this.state.fields;
             field.emailId = this.state.email;
             this.setState({ field });
-
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Workshop"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Workshop"]);
+            }
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Customer"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Customer"]);
+            }
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Financier"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Financier"]);
+            }
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Nominee"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Nominee"]);
+            }
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Surveyor"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Surveyor"]);
+            }
             let detailsdto = this.state.fields;
 
 
             for (var i = 0; i < this.state.claimTableData.length; i++) {
-               // if (this.state.claimTableData[i].approvedClaimAmounts != null) {
-                    this.state.DataAmount.push(this.state.claimTableData[i]);
-               // }
+                // if (this.state.claimTableData[i].approvedClaimAmounts != null) {
+                this.state.DataAmount.push(this.state.claimTableData[i]);
+                // }
             }
             detailsdto['ClaimInsurable'] = this.state.DataAmount;
 
@@ -427,9 +492,9 @@ class ClaimProcess extends React.Component {
                 .then(data => {
                     //if (data.status == 200) {
                     this.state.claimId = data.claimId;
-                    this.setState({ claimnumber: data.claimNumber });
+                    //this.setState({ claimnumber: data.claimNumber });
                     swal({
-                        text: "Claim Processed successfully! \n Your Claim Number: " + this.state.claimnumber,
+                        text: "Claim Status updated successfully! \n Your Claim Number: " + data.claimNumber,
                         icon: "success"
                     });
 
@@ -523,7 +588,7 @@ class ClaimProcess extends React.Component {
 
         this.claimDetailsfun(ClaimArr[0].claimId);
         this.claimAmountTable();
-        this.documentView(oid, false , true);
+        this.documentView(oid, false, true);
 
         // this.paymentDetailsfun(ClaimArr[0].claimId);
         this.state.PolicyNumber = ClaimArr[0].policyNo;
@@ -541,7 +606,7 @@ class ClaimProcess extends React.Component {
             this.setState({ approved: true });
 
         }
-       
+
         if (ClaimArr[0].claimStatus == "Approved") {
             this.setState({ approved: false });
             swal("", "Claim is already approved!", "success");
@@ -564,8 +629,8 @@ class ClaimProcess extends React.Component {
 
     componentDidMount() {
 
-        let claimdecision = "Claims Decision";
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + claimdecision + ``, {
+        let ClaimDecision = "Claims Decision";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + ClaimDecision + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -577,6 +642,8 @@ class ClaimProcess extends React.Component {
             .then(data => {
                 this.setState({ ClaimsDecisionData: data });
 
+                console.log("ClaimsDecisionData", data);
+
                 const statusdata = this.state.ClaimsDecisionData[0].mdata;
                 const status1 = statusdata.filter(i => i.mID === 16);
                 const status2 = statusdata.filter(i => i.mID === 17);
@@ -586,6 +653,8 @@ class ClaimProcess extends React.Component {
                 // state.concat(this.state.ClaimsDecisionData[0].mdata[3]);
 
                 this.setState({});
+                console.log("StatusType: ", status2, this.state.StatusType);
+
 
                 const decisiondata = this.state.ClaimsDecisionData[0].mdata;
                 const decision1 = decisiondata.filter(x => x.mID === 9);
@@ -593,9 +662,11 @@ class ClaimProcess extends React.Component {
                 const decision3 = decisiondata.filter(x => x.mID === 17);
                 this.state.DecisionType.push(decision1[0], decision2[0], decision3[0]);
                 this.setState({});
+                console.log("DecisionType", this.state.DecisionType, decisiondata);
             });
-        let accounttype = "Account Type";
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + accounttype + ``, {
+
+        let AccountType = "Account Type";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + AccountType + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -606,10 +677,11 @@ class ClaimProcess extends React.Component {
             .then(data => {
                 this.setState({ AccountTypedata: data });
 
+                console.log("AccountTypedata", data);
             });
 
-        let Claimstatus = "Claim Decision";
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + Claimstatus + ``, {
+        let ClaimStatus = "Claim Status";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + ClaimStatus + ``, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -620,8 +692,8 @@ class ClaimProcess extends React.Component {
             .then(data => {
                 this.setState({ ClaimStatusData: data });
 
+                console.log("ClaimStatusData", data);
             });
-
 
         setTimeout(
             function () {
@@ -630,52 +702,100 @@ class ClaimProcess extends React.Component {
         );
 
         this.setState({ Bankfieldsmodel: BankdetailsFields });
-
+        let datamodel = this.state.BankDataModelDTO;
+        datamodel["Workshop"] = {};
+        datamodel["Customer"] = {};
+        datamodel["Financier"] = {};
+        datamodel["Nominee"] = {};
+        datamodel["Surveyor"] = {};
+        //datamodel["Workshop"] = {};
+        //datamodel["Workshop"] = {};
+        //datamodel["Workshop"] = {};
+        //datamodel.push(this.state.Workshop);
+        //datamodel.push(this.state.Customer);
+        //datamodel.push(this.state.Financier);
+        //datamodel.push(this.state.Nominee);
+        //datamodel.push(this.state.Surveyor);
+        this.setState({ datamodel });
+        console.log("datamodel ", datamodel);
     }
 
-    onModelChange = (evt) => {
-        let DataModelDTO = this.state.fields.DataModelDTO;
-        DataModelDTO[evt.target.name] = evt.target.value;
-        this.setState({ DataModelDTO });
+    onModelChange = (evt, name) => {
+        let BankDataModelDTO = this.state.BankDataModelDTO;
+        let data = BankDataModelDTO[name];
+        data.type = name;
+        //let data = this.state.Bankfieldsmodel.filter(e => e.Name == evt.target.name);
+        data[evt.target.name] = evt.target.value;
+        if (name == "Customer") {
+            let bank = this.state.Bankarray;
+            let index = bank.findIndex(e => e.name == name);
+            //let bank = this.state.Bankarray(e => e.name == name)
+            let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
+            bankvalue[0].Value = evt.target.value;
+            this.setState({ bank });
+        }
+        this.setState({ /*bank,*/ data, BankDataModelDTO });
+        //this.setState({ BankDataModelDTO });
+
     };
 
-    renderPage = (Bankfieldsmodel) => {
+    oncustomerselect = () => {
+        console.log("Data: ", this.state.BankDetails);
+        let bank = this.state.BankDataModelDTO;
+        //BankDataModelDTO[this.state.selectedcheckbox] = {};
+        //let data = BankDataModelDTO[this.state.selectedcheckbox];
+        let bankdata = this.state.Bankdata.Customer;
+        let cbank = this.state.BankDetails;
+        let jsondata = this.state.Bankfieldsmodel;
+        bankdata["Account Holder Name"] = cbank.accountHolderName;
+        bankdata["Account No."] = cbank.accountNumber;
+        bankdata["Account Type"] = cbank.accountType;
+        bankdata["Bank Name"] = cbank.bankName;
+        bankdata["IFSC Code"] = cbank.ifsccode;
+        bankdata["Bank Branch Address"] = cbank.bankBranchAddress;
+        bankdata.type = "Customer";
+        //bankdata["Amount Paid"] = "";
+        //bankdata["Date Of Payment"] = "";
+        jsondata[0].Value = cbank.accountHolderName;
+        jsondata[1].Value = cbank.accountNumber;
+        jsondata[2].Value = cbank.accountType;
+        jsondata[3].Value = cbank.bankName;
+        jsondata[4].Value = cbank.ifsccode;
+        jsondata[5].Value = cbank.bankBranchAddress;
+        //jsondata[6].Value = "";
+        //jsondata[7].Value = "";
+        bank.Customer = bankdata;
+        this.setState({ bankdata, jsondata, bank });
+        console.log("bankdata: ", this.state.Bankfieldsmodel);
+    }
 
-
+    renderPage = (Bankfieldsmodel, name) => {
         if (Bankfieldsmodel.UIControl == "TextField") {
-
             return (<CustomInput
                 labelText={Bankfieldsmodel.Name}
                 //  required={true}
                 name={Bankfieldsmodel.Name}
-                onChange={(e) => this.onModelChange(e)}
+                // value={Bankfieldsmodel.Value}
+                onChange={(e) => this.onModelChange(e, name)}
                 formControlProps={{ fullWidth: true }}
             />
-
             );
-
-
         }
         else if (Bankfieldsmodel.UIControl == "Datetime") {
-
             return (
                 <CustomDatetime
                     labelText={Bankfieldsmodel.Name}
                     // id='dob'
                     name={Bankfieldsmodel.Name}
+                    //value={Bankfieldsmodel.Value}
                     // Futuredatevalidate={true}
                     //required={true}
-                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, event)}
+                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)}
                     value={Bankfieldsmodel.Name}
                     formControlProps={{ fullWidth: true }} />
-
             );
-
-
         }
-
         else if (Bankfieldsmodel.UIControl == "Dropdown") {
-
             return (
                 <MasterDropdown
                     // required={true}
@@ -683,47 +803,80 @@ class ClaimProcess extends React.Component {
                     // id="Type"
                     lstObject={this.state.AccountTypedata}
                     filterName='Account Type'
-                    // value={this.state.selectedType}
+                    //value={Bankfieldsmodel.Value}
                     name={Bankfieldsmodel.Name}
-                    onChange={(e) => this.onModelChange(e)}
+                    onChange={(e) => this.onModelChange(e, name)}
                     formControlProps={{ fullWidth: true }}
                 />
-
             );
-
-
         }
-
     }
 
-    onDateChange = (formate, type, name, event) => {
+    renderPage1 = (Bankfieldsmodel, name) => {
+        if (Bankfieldsmodel.UIControl == "TextField") {
+            return (<CustomInput
+                labelText={Bankfieldsmodel.Name}
+                //  required={true}
+                name={Bankfieldsmodel.Name}
+                value={Bankfieldsmodel.Value}
+                onChange={(e) => this.onModelChange(e, name)}
+                formControlProps={{ fullWidth: true }}
+            />
+            );
+        }
+        else if (Bankfieldsmodel.UIControl == "Datetime") {
+            return (
+                <CustomDatetime
+                    labelText={Bankfieldsmodel.Name}
+                    // id='dob'
+                    name={Bankfieldsmodel.Name}
+                    value={Bankfieldsmodel.Value}
+                    // Futuredatevalidate={true}
+                    //required={true}
+                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)}
+                    //value={Bankfieldsmodel.Name}
+                    formControlProps={{ fullWidth: true }} />
+            );
+        }
+        else if (Bankfieldsmodel.UIControl == "Dropdown") {
+            return (
+                <MasterDropdown
+                    // required={true}
+                    labelText={Bankfieldsmodel.Name}
+                    // id="Type"
+                    lstObject={this.state.AccountTypedata}
+                    filterName='Account Type'
+                    value={Bankfieldsmodel.Value}
+                    name={Bankfieldsmodel.Name}
+                    onChange={(e) => this.onModelChange(e, name)}
+                    formControlProps={{ fullWidth: true }}
+                />
+            );
+        }
+    }
+
+    onDateChange = (formate, type, name, objname, event) => {
         const { validdate } = this.state;
         this.setState({ validdate: false });
         var today = event.toDate();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-        //var dd = today.getDate();
-        //var mm = today.getMonth() + 1;
-        //if (mm < 10) {
-        //    mm = '0' + mm;
-
-        //}
-        //if (dd < 10) {
-        //    dd = '0' + dd;
-        //}
-
-        //var date = dd + '/' + mm + '/' + today.getFullYear();
-
         const ClaimDataDTO = this.state.ClaimDTO;
         ClaimDataDTO[name] = date;
         this.setState({ ClaimDataDTO });
+        let BankDataModelDTO = this.state.BankDataModelDTO;
+        let data = BankDataModelDTO[objname];
+        data[name] = date;
+        if (objname == "Customer") {
+            let bank = this.state.Bankarray;
+            let index = bank.findIndex(e => e.name == objname);
+            let bankvalue = bank[index].BankDetails.filter(a => a.Name == name)
+            bankvalue[0].Value = date;
+            this.setState({ bank });
+        }
 
-        const DataModelDTO = this.state.fields.DataModelDTO;
-        DataModelDTO[name] = date;
-        this.setState({ DataModelDTO });
-
+        this.setState({ data });
         this.change(event, name, formate, date, type);
-
     };
 
     datechange = (date) => {
@@ -777,15 +930,8 @@ class ClaimProcess extends React.Component {
 
             that.setState({ Claimlist: data.claimSearch });
             that.setState({ officelist: data.claimSearch });
-
-            // that.claimAmountTable(data);
-
-
         });
-
-
         this.state.ClaimDTO.eventDate = Cdate;
-
     };
 
     setstatus = (type, event) => {
@@ -828,7 +974,7 @@ class ClaimProcess extends React.Component {
                 return {
                     id: key + 1,
                     documentName: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>,
-                    
+
                 };
 
             })
@@ -849,7 +995,7 @@ class ClaimProcess extends React.Component {
                     typeOfLoss: prop.coverName,
                     //coverValue: prop.coverValue,
                     coverValue: prop.coverDynamic.map((c) => {
-                        return (<h6> <b>{c.Header}</b> : {c.Details} </ h6>)
+                        return (<p className="gridparagraph"> {c.Header} : {c.Details} </ p>)
                     }),
                     claimAmounts: prop.claimAmounts,
                     approvedClaimAmounts:
@@ -915,7 +1061,7 @@ class ClaimProcess extends React.Component {
 
                     this.setState({ vehicleclaim: true });
                 }
-               
+
 
                 this.setState({ claimTableData: data[1] });
 
@@ -945,7 +1091,7 @@ class ClaimProcess extends React.Component {
             .then(response => response.json())
             .then(data => {
                 // this.setState({ policyDetailsData: data });
-               
+
                 this.state.policyDetailsData.customerId = data[0][1];
                 this.state.policyDetailsData.coverNoteNo = data[1][1];
                 this.state.policyDetailsData.mobileNumber = data[2][1];
@@ -957,15 +1103,15 @@ class ClaimProcess extends React.Component {
                 this.state.policyDetailsData.totalSumInsured = data[8][1];
                 this.state.policyDetailsData.balanceSumInsured = data[9][1];
 
-               
+
             });
         this.setState({ disabled: true });
     }
 
     documentView = (oid, isDoc, isPolicy) => {
 
-       fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid + `&isDoc=` + isDoc + `&isPolicy=` + isPolicy, {
-           method: 'get',
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid + `&isDoc=` + isDoc + `&isPolicy=` + isPolicy, {
+            method: 'get',
 
             headers: {
 
@@ -980,17 +1126,18 @@ class ClaimProcess extends React.Component {
             .then(data => {
                 this.setState({ docDetailsData: data });
 
-                
+                if (data.length > 0) {
                     const doc = this.state.Datapic[0];
 
                     doc.document = data[0].document;
 
                     this.setState({ doc });
-               
-                for (let i = 0; i < this.state.docDetailsData.length; i++) {
-                    if (this.state.docDetailsData[i].dmsdocId != null) {
-                        this.state.DocumentData.push(this.state.docDetailsData[i]);
-                        this.docTable(this.state.DocumentData);
+
+                    for (let i = 0; i < this.state.docDetailsData.length; i++) {
+                        if (this.state.docDetailsData[i].dmsdocId != null) {
+                            this.state.DocumentData.push(this.state.docDetailsData[i]);
+                            this.docTable(this.state.DocumentData);
+                        }
                     }
                 }
             });
@@ -998,7 +1145,7 @@ class ClaimProcess extends React.Component {
 
     documentLinkView = (dmsdocId) => {
         let that = this;
-       
+
         fetch("https://inubeservicesnotification.azurewebsites.net/api/DMS/DownloadView?id=" + dmsdocId, {
 
             method: 'get',
@@ -1012,9 +1159,9 @@ class ClaimProcess extends React.Component {
         }).then(response => response.json())
 
             .then(data => {
-               
+
                 that.setState({ bytearr: data.data });
-            
+
                 if (data.contentType == "pdf") {
                     that.setState({ isimage: true });
                 }
@@ -1025,7 +1172,6 @@ class ClaimProcess extends React.Component {
                 this.setState({ openpop: true });
             });
     }
-
 
     uint8ToImageData = (uint8, width, height) => {
 
@@ -1044,7 +1190,7 @@ class ClaimProcess extends React.Component {
     SetDecision(setValue) {
 
         this.setState({ decision: setValue });
-       
+
     }
 
     searchagain = () => {
@@ -1169,7 +1315,7 @@ class ClaimProcess extends React.Component {
 
     }
 
-   
+
 
     onGet = () => {
         let claimprocess = "Claim Process";
@@ -1190,45 +1336,148 @@ class ClaimProcess extends React.Component {
             });
     }
 
-    handleCheckbox = (event, name) => {
-
+    handleCheckbox = (event, name, i) => {
         let ProductClaimData = this.state.ProductClaimData;
+        //let BankDataModelDTO = this.state.BankDataModelDTO;
+        let array = [];
+        array.name = name;
+        array.data = {};
+        console.log("")
+        //name = {};
+        //BankDataModelDTO.push(name);
+        ////let data = BankDataModelDTO[name];
+        //this.setState({});
         //let name = event.target.name;
         let check = event.target.checked;
-
+        console.log("values: ", this.state.ProductClaimData, 'chk data ', event, event.target.checked, name);
+        this.setState({ selectedcheckbox: name });
         if (event.target.checked == "undefined") {
         } else {
             const index = this.state.ProductClaimData.findIndex(item => item.inputType === name);
             if (index != -1) {
-
-
                 let data = [...this.state.ProductClaimData];
                 data[index].mIsRequired = event.target.checked;
-
                 let searchname = "";
                 if (name == "Workshop") {
                     searchname = "Customer";
-                    this.state.displaybank = true;
-                    this.setState({});
-
+                    if (event.target.checked == true) {
+                        // this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
+                        //this.state.displaybank = true;
+                        //this.state.BankDataModelDTO.push(this.state.Bankfieldsmodel);
+                        this.state.displaywork = true;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = false;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    }
+                    if (event.target.checked == false) {
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Workshop);
+                        //delete this.state.BankDataModelDTO[name];
+                        this.state.displaywork = false;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = false;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    }
                 } else {
                     searchname = "Workshop";
-                    this.state.displaybank = true;
+                    //this.state.displaybank = true;
+                    this.state.displaywork = false;
+                    this.state.displaycust = false;
+                    this.state.displayfinancier = false;
+                    this.state.displaynominee = false;
+                    this.state.displaysurveyor = false;
                     this.setState({});
                 }
-
-                //if (event.target.checked == true) {
-                //    this.state.fields.payeeTypeId = data[index].mID;
-                //    this.setState({});
-
-
-                //}
-
-
+                if (name == "Customer") {
+                    if (event.target.checked === true) {
+                        this.oncustomerselect();
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata.Customer);
+                        this.state.BankDataModelDTO[name] = this.state.Bankdata.Customer;
+                        this.state.displaywork = false;
+                        this.state.displaycust = true;
+                        this.state.displayfinancier = false;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    } if (event.target.checked === false) {
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Customer);
+                        //delete this.state.BankDataModelDTO[name];
+                        this.state.displaywork = false;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = false;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    }
+                }
+                if (name == "Financier") {
+                    if (event.target.checked === true) {
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
+                        this.state.displaywork = false;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = true;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    } if (event.target.checked === false) {
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Financier);
+                        //delete this.state.BankDataModelDTO[name];
+                        this.state.displaywork = false;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = false;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    }
+                }
+                if (name == "Nominee") {
+                    if (event.target.checked === true) {
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
+                        //this.state.BankDataModelDTO[name] = this.state.Bankdata1;
+                        this.state.displaywork = false;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = true;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    } if (event.target.checked === false) {
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Nominee);
+                        //delete this.state.BankDataModelDTO[name];
+                        this.state.displaywork = false;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = false;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    }
+                }
+                if (name == "Surveyor") {
+                    if (event.target.checked === true) {
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
+                        //this.state.BankDataModelDTO[name] = this.state.Bankdata1;
+                        this.state.displaywork = false;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = false;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = true;
+                        this.setState({});
+                    } if (event.target.checked === false) {
+                        //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Surveyor);
+                        //delete this.state.BankDataModelDTO[name];
+                        this.state.displaywork = false;
+                        this.state.displaycust = false;
+                        this.state.displayfinancier = false;
+                        this.state.displaynominee = false;
+                        this.state.displaysurveyor = false;
+                        this.setState({});
+                    }
+                }
                 const key = this.state.ProductClaimData.findIndex(item => item.inputType === searchname);
                 if (key != -1) {
                     data[key].disable = true;
-
                     if (event.target.checked == false) {
                         data[key].disable = false;
                         //this.state.displaybank = false;
@@ -1236,33 +1485,86 @@ class ClaimProcess extends React.Component {
                     }
                 }
                 this.setState({ data });
-
             }
-
-            //if (event.target.checked === true) {
-            //    this.state.displaybank = true;
-            //    this.setState({});
-            //}
-            //else {
-            //   this.state.displaybank = false;
-            //    this.setState({});
-            //}
-
-            //debugger;
-            //var eventname = document.getElementsByName(event.target.name); 
-            //for (var i = 0; i < eventname.length; i++) {
-            //    if (!eventname[i].mIsRequired==true) {
-            //        eventname[i].disable = true;
-            //    } else {
-            //        eventname[i].disable = false;
-            //    }
-            //} 
-
+            console.log("values: ", this.state.ProductClaimData);
         }
-        //ProductClaimData[name] = check;
-        //this.setState({ ProductClaimData });
+        let element = this.state.Bankarray;
+        if (event.target.checked == true) {
+            if (name != "Customer") {
+                this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
+            }
+            let Bankelement = {};
+            Bankelement.name = name;
+            Bankelement.BankDetails = this.state.Bankfieldsmodel
+            element.push(Bankelement);
+            console.log("Bankarray: ", this.state.Bankarray);
+        }
+        if (event.target.checked == false) {
+            this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.emptyobject);
+            let index = element.findIndex(e => e.name == name);
+            element.splice(index, 1);
+            console.log("Bankarray: ", element);
+        }
+        this.setState({ element });
+        console.log("BankDataModelDTO: ", this.state.BankDataModelDTO);
+        //console.log("name", event.target.name);
+    }
+
+    renderRedirect = () => {
+        const Claimdata = this.state.ClaimResetData;
+        this.state.fields = Claimdata;
+        this.setState({ Claimdata });
+    }
+handleActivitylog = () => {
+        let that = this;
+        that.state.vehicleActivity.policyNumber = that.state.PolicyNumber;
+    fetch(`${ClaimConfig.claimConfigUrl}/api/Mica_EGI/VehicleActivityLog`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(that.state.vehicleActivity)
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log("ActivityVehciledata", data);
+
+            that.setState({ vehicleActivitydata: data.vehicleData });
+            console.log("vehicleActivitydata", that.state.vehicleActivitydata);
+            that.activityTable();
+            //that.setState({ popopen: true });
+           
+
+            });
+       
 
     }
+activityTable = () => {
+
+        this.setState({
+            ActivityData: this.state.vehicleActivitydata.map((prop, key) => {
+
+                return {
+                    id: key + 1,
+                    dateTime: prop.dateTime,
+                    vehicleNo: prop.vehicleNo,
+                    switchState: prop.switchState,
+                    switchType: prop.switchType,
+                  
+                };
+            })
+        });
+
+    }
+handleActivityClose = () => {
+        this.setState({ popopen: false });
+    };
+
+
+
+
 
     render() {
         const { classes } = this.props;
@@ -1539,12 +1841,14 @@ class ClaimProcess extends React.Component {
                                     claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} dmsdocId={this.state.fields.dmsdocId} docidfunc={this.docidfunc} documentName={this.state.fields.documentName}
                                     ClaimIntimationDetails={this.state.ClaimIntimationDetails} handledatechange={this.handledatechange} bytearr={this.state.bytearr}
                                     ClaimsDecisionData={this.state.ClaimsDecisionData} handleChange={this.handleChange} onFormSubmit={this.onFormSubmit}
-                                    approved={this.state.approved} handleCheckbox={this.handleCheckbox} fields={this.state.fields}
-                                    errormessage={this.state.errormessage} ValidationUI={this.state.ValidationUI} classes={this.classes} renderPage={this.renderPage}
+                                    approved={this.state.approved} handleCheckbox={this.handleCheckbox} fields={this.state.fields} selectedcheckbox={this.state.selectedcheckbox}
+                                    errormessage={this.state.errormessage} ValidationUI={this.state.ValidationUI} classes={this.classes} renderPage={this.renderPage} renderPage1={this.renderPage1}
                                     errorstatus={this.state.errorstatus} DecisionType={this.state.DecisionType} PayeeType={this.state.PayeeType} displaybank={this.state.displaybank} handleddlChange={this.handleddlChange}
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
                                     SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
-                                    />
+                                    displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
+                                    handleActivitylog={this.handleActivitylog}
+                                />
 
                             </CardBody>
                         </Card>
@@ -1588,6 +1892,89 @@ class ClaimProcess extends React.Component {
 
                     </div>
                 </Modal>
+
+<Modal
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                    open={this.state.popopen}
+                    onClose={this.handleActivityClose}>
+
+                    <div className={classes.paper} id="modal">
+                        <h4><small className="center-text">Activity Log</small></h4>
+
+                        <Button color="info"
+                            round
+                            className={classes.marginRight}
+                            id="close-bnt"
+                            onClick={this.handleActivityClose}>
+                            &times;
+                        </Button>
+
+                        <div id="disp">
+                            <GridContainer justify="center" >
+                                <GridItem xs={12}>
+
+                                    <ReactTable
+                                        data={this.state.ActivityData}
+                                        filterable
+                                        columns={[
+                                            {
+                                                Header: "SerialNo",
+                                                accessor: "id",
+                                                headerClassName: 'react-table-center',
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                minWidth: 200,
+                                                sortable: false,
+                                                //  filterable: false 
+                                            },
+                                            {
+                                               
+                                                Header: "Date Time",
+                                                accessor: "dateTime",
+                                                minWidth: 40,
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center'
+                                            },
+                                            {
+                                                Header: "Vehicle No",
+                                                accessor: "vehicleNo",
+                                                minWidth: 40,
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center'
+                                            },
+                                            {
+                                                Header: "Switch State",
+                                                accessor: "switchState",
+                                                minWidth: 40,
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center'
+                                            },
+                                            {
+                                                Header: "Switch Type",
+                                                accessor: "switchType",
+                                                minWidth: 40,
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center'
+                                            },
+
+
+                                        ]}
+                                        defaultPageSize={4}
+                                        pageSize={([this.state.ActivityData.length + 1] < 4) ? [this.state.ActivityData.length + 1] : 4}
+                                        showPaginationTop={false}
+                                        //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                        showPaginationBottom={true}
+                                        className="-striped -highlight discription-tab"
+
+                                    />
+
+                                </GridItem>
+                            </GridContainer>
+                        </div>
+
+                    </div>
+                </Modal>
+
             </div>
         );
     }

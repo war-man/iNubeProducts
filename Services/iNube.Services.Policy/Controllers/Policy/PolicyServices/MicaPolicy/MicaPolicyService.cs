@@ -6,6 +6,7 @@ using iNube.Services.Policy.Models;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -19,7 +20,10 @@ using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
@@ -32,7 +36,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         private IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
-
+        public DbHelper dbHelper;
+    
         public MicaPolicyService(MICAPOContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
@@ -40,7 +45,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _integrationService = integrationService;
             _configuration = configuration;
             _emailService = emailService;
+            dbHelper = new DbHelper(new IntegrationService(configuration));
+           
         }
+
         //Fetching Properties
         private static PropertyInfo[] GetProperties(object obj)
         {
@@ -256,6 +264,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<PolicyResponse> CreatePolicy(dynamic policyDetail, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
 
@@ -307,7 +317,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 if (Errors.Count == 0)
                 {
-                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail);
+                  
+                   DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow);
                     logMsg = logMsg + ",4";
                     var Amount = productDetails.PremiumAmount;
                     policyNumber = mappedPolicy.PolicyNo;
@@ -328,7 +341,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         TblPolicyPayment policyPayment = new TblPolicyPayment()
                         {
                             PaidAmount = Amount,
-                            CreatedDate = DateTime.Now,
+                            CreatedDate = DatetimeNow,
                             PolicyId = PolicyId
                         };
                         _context.TblPolicyPayment.Add(policyPayment);
@@ -426,6 +439,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         private async Task<PolicyDTO> MapAndValidatePolicy(dynamic policyDetail, ProductDTO productDTO, PartnersDTO partnersDTO, IEnumerable<ProductRcbdetailsDTO> riskDetails, List<ErrorInfo> Errors, ApiContext apiContext, string type)
         {
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
             PolicyDTO policyDTO = new PolicyDTO();
             // validation of risk details
             var colName = "";
@@ -472,9 +488,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //    return null;
             //}
             // some other calculated value
+
+           DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+
+
             policyDTO.CreatedBy = new Guid();
-            policyDTO.CreatedDate = DateTime.Now;
-            policyDTO.PolicyIssueDate = DateTime.Now;
+            policyDTO.CreatedDate = DatetimeNow;
+            policyDTO.PolicyIssueDate = DatetimeNow;
             policyDTO.IsUploadedToIcm = 0;
             policyDTO.PremiumAmount = productDTO.PremiumAmount;
             // policyDTO.MasterPolicyNo = "ABC";//ToDo service req
@@ -608,9 +629,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //}
             return Errors;
         }
-        private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail)
+        private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail,DateTime dateTime)
         {
-            mappedPolicy.PolicyIssueDate = DateTime.Now;
+            mappedPolicy.PolicyIssueDate = dateTime;
 
             TblPolicy policy = _mapper.Map<TblPolicy>(mappedPolicy);
 
@@ -629,7 +650,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 tblEndorsementDetails.IsPremiumRegister = true;
                 tblEndorsementDetails.PolicyId = policy.PolicyId;
                 tblEndorsementDetails.Action = action;
-                tblEndorsementDetails.EndorsementEffectivedate = DateTime.Now;
+                tblEndorsementDetails.EndorsementEffectivedate = dateTime;
                 tblEndorsementDetails.UpdatedResponse = policyDetail.ToString();
                 TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(tblEndorsementDetails);
 
@@ -646,6 +667,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         private async Task<List<ErrorInfo>> DoCDTransactionAsync(decimal productId, decimal partnerId, string policyNumber, int Amount, decimal PolicyId, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var cdAccount = string.Concat(productId.ToString().PadLeft(5, '0'), "/" + partnerId.ToString().PadLeft(5, '0'));
@@ -659,10 +682,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
                 policyUpdate.BundleTxnId = transaction.cdTransactions.TxnId.ToString();
                 // Add payment table 
+              DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
                 TblPolicyPayment policyPayment = new TblPolicyPayment()
                 {
                     PaidAmount = Amount,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DatetimeNow,
                     PolicyId = PolicyId
                 };
                 _context.TblPolicyPayment.Add(policyPayment);
@@ -852,7 +877,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate)
+            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true && s.PolicyNo!= null)
                           select P;
             if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
             {
@@ -1644,6 +1669,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //  var id = 18;
             // var ps = await _integrationService.GetCustomerById(id, apiContext);
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             SingleCover singleCover = new SingleCover();
@@ -1714,7 +1741,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         mappedPolicy.CustomerId = Convert.ToInt32(productDetails.OrganizationId).ToString();
                     }
-                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail);
+                   DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow);
                     logMsg = logMsg + ",4";
                     var Amount = mappedPolicy.PremiumAmount;
                     policyNumber = mappedPolicy.PolicyNo;
@@ -1779,7 +1808,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         TblPolicyPayment policyPayment = new TblPolicyPayment()
                         {
                             PaidAmount = Amount,
-                            CreatedDate = DateTime.Now,
+                            CreatedDate = DatetimeNow,
                             PolicyId = PolicyId
                         };
                         _context.TblPolicyPayment.Add(policyPayment);
@@ -1831,6 +1860,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //  var id = 18;
             // var ps = await _integrationService.GetCustomerById(id, apiContext);
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             SingleCover singleCover = new SingleCover();
@@ -1894,7 +1925,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         mappedPolicy.CustomerId = Convert.ToInt32(productDetails.OrganizationId).ToString();
                     }
-                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail);
+                   DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow);
                     logMsg = logMsg + ",4";
                     var Amount = mappedPolicy.PremiumAmount;
                     policyNumber = mappedPolicy.PolicyNo;
@@ -1923,7 +1956,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     TblPolicyPayment policyPayment = new TblPolicyPayment()
                     {
                         PaidAmount = Amount,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DatetimeNow,
                         PolicyId = PolicyId
                     };
                     _context.TblPolicyPayment.Add(policyPayment);
@@ -2200,6 +2233,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             PolicyDTO policyDTO = new PolicyDTO();
             // validation of risk details
             var colName = "";
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
             foreach (var item in riskDetails.ProductRcbDetails)
             {
@@ -2253,8 +2288,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 policyDTO.MobileNumber = policyDetail["Mobile Number"].ToString();
             }
+           DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
             policyDTO.CreatedBy = new Guid();
-            policyDTO.CreatedDate = DateTime.Now;
+            policyDTO.CreatedDate = DatetimeNow;
             //policyDTO.PolicyIssueDate = DateTime.Now;
             policyDTO.IsUploadedToIcm = 0;
             //policyDTO.SumInsured = productDTO.PremiumAmount;
@@ -2264,8 +2301,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             if (type == "ProposalNo")
             {
                 policyDTO.ProposalNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
-                policyDTO.ProposalDate = DateTime.Now;
-                policyDTO.PolicyStageId = ModuleConstants.PolicyStageQuote;
+                policyDTO.ProposalDate = DatetimeNow;
+                policyDTO.PolicyStageId = ModuleConstants.PolicyStageProposal;
                 policyDTO.PolicyStatusId = ModuleConstants.PolicyStatusInActive;
             }
             else
@@ -2282,7 +2319,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     policyDTO.PolicyNo = await GetPolicyNumberAsync(0, productDTO.ProductId, apiContext, type);
 
                 }
-                policyDTO.PolicyIssueDate = DateTime.Now;
+                policyDTO.PolicyIssueDate = DatetimeNow;
 
             }
             policyDTO.PolicyVersion = 1;
@@ -2309,12 +2346,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
         private async Task<InsuranceCertificateModel> GetInsuranceCertificateModel(dynamic policyDetail, ProductDTO productDTO, TblPolicy tblpolicyDTO, PolicyDTO policyDTO, PartnersDTO partnersDTO, SingleCover singleCover, ApiContext apiContext)
         {
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+           DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
 
             InsuranceCertificateModel model = new InsuranceCertificateModel();
             var ps = await _integrationService.GetCustomerById(Convert.ToDecimal(tblpolicyDTO.CustomerId), apiContext);
             //model.cweDetails = new System.Collections.Generic.List<CweDetails>();
             model.cweproductDetails = new System.Collections.Generic.List<CweProductDetails>();
-            model.Date = DateTime.Now;
+            model.Date = DatetimeNow;
             //INSURER DETAILS
             model.InsurerDetails = new InsurerDetails();
             model.InsurerDetails.ContactName = ps.CustomerName;
@@ -2827,6 +2868,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+           DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+
             List<ErrorInfo> Errors = new List<ErrorInfo>();
 
             string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
@@ -2873,9 +2919,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 if (insurableItemRequest["si"] != null)
                                 {
 
-                                    json1["Balance SumInsued"] = Convert.ToInt64(json1["Balance SumInsued"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
+                                    json1["Balance SumInsured"] = Convert.ToInt64(json1["Balance SumInsured"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
 
-                                    tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsued"]);
+                                    tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
 
                                 }
 
@@ -2924,16 +2970,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 var CDmap = await _integrationService.CDMapperList(cDMappers, "EndorsementAdd", apiContext);
                                 if (CDmap.Count > 0)
                                 {
-
-                                    var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                                    var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0 &&s.TxnType=="Credit");
 
                                     //Step3:Check Premium vs Payment Amount
                                     var paymentinfo = insurableItemRequest["PaymentInfo"];
                                     if (paymentinfo != null)
                                     {
                                         var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
-
-                                        if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 || (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                                        var paymentdiff = (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount);
+                                        if (paymentdiff <= 1 && paymentdiff >= -1)
                                         {
 
                                             MicaCD micaCD = new MicaCD();
@@ -3012,9 +3057,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                                             var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
-                                            expObj.PremiumDetails = CalculatePremiumResponse;
-                                            // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
-                                            var tempobj = JsonConvert.SerializeObject(expObj);
+                                          //  AddProperty(expObj, "PremiumDetails", CDmap);
+                                            expObj.PaymentInfo = paymentinfo;
+                                            expObj.PremiumDetails = CDmap;
+                                             var tempobj = JsonConvert.SerializeObject(expObj);
                                             json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
                                             tblPolicyDetailsdata.PolicyRequest = json1.ToString();
@@ -3030,7 +3076,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             endorsementDetailsDTO.EndorsementNo = EndorsementNo;
                                             endorsementDetailsDTO.IsPremiumRegister = true;
                                             endorsementDetailsDTO.UpdatedResponse = json1.ToString();
-                                            endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                                            endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
                                             endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
                                             endorsementDetailsDTO.PolicyId = policy.PolicyId;
 
@@ -3174,13 +3220,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         if (insurableItemRequest["si"] != null)
                                         {
 
-                                            json1["Balance SumInsued"] = Convert.ToInt64(json1["Balance SumInsued"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
+                                            json1["Balance SumInsured"] = Convert.ToInt64(json1["Balance SumInsured"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
 
 
                                         }
 
 
-                                        tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsued"]);
+                                        tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
 
 
 
@@ -3252,7 +3298,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         }
 
                                         var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
-                                        expObj.PremiumDetails = CalculatePremiumResponse;
+                                        expObj.PremiumDetails = CDmap;
                                         // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
                                         var tempobj = JsonConvert.SerializeObject(expObj);
                                         json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
@@ -3266,7 +3312,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
                                         endorsementDetailsDTO.Action = EndorsmentType;
                                         endorsementDetailsDTO.EndorsementNo = EndorsementNo;
-                                        endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                                        endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
                                         endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
                                         TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
                                         _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
@@ -3352,6 +3398,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //_context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+           DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             string PolicyNo = insurableItemRequest["PolicyNumber"].ToString();
             string endoresementtype = insurableItemRequest["EndorsementType"];
@@ -3410,11 +3460,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     if (insurableItemRequest["si"] != null)
                     {
 
-                        json1["Balance SumInsued"] = Convert.ToInt64(json1["Balance SumInsued"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
+                        json1["Balance SumInsured"] = Convert.ToInt64(json1["Balance SumInsured"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
 
 
                     }
-                    tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsued"]);
+                    tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
 
                     //Step2:Validate of Request Object
                     List<CDMapper> cDMappers = new List<CDMapper>();
@@ -3458,18 +3508,19 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                     //step:3 Call CD mapper
                     var CDmap = await _integrationService.CDMapperList(cDMappers, "EndorsementDel", apiContext);
+                    MicaCD micaCD = new MicaCD();
 
                     if (CDmap.Count > 0)
                     {
-                        MicaCD micaCD = new MicaCD();
+                       
                         micaCD.AccountNo = policy.CdaccountNumber;
                         micaCD.micaCDDTO = CDmap;
                         micaCD.Description = "Endorsement-Deletion-" + EndorsementNo;
 
+                    }
 
 
-
-                        var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                       // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
 
 
                         foreach (var item in insurableItemRequest.InsurableItem)
@@ -3529,13 +3580,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         }
 
-
+                    if (CDmap.Count > 0)
+                    {
                         var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
-                        expObj.PremiumDetails = CalculatePremiumResponse;
+
+                        expObj.PremiumDetails = CDmap;
                         // AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
                         var tempobj = JsonConvert.SerializeObject(expObj);
                         json1 = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
-
+                    }
 
                         tblPolicyDetailsdata.PolicyRequest = json1.ToString();
                         var x1 = _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
@@ -3543,7 +3596,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
                         endorsementDetailsDTO.Action = endoresementtype;
                         endorsementDetailsDTO.EndorsementNo = EndorsementNo;
-                        endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+                        endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
                         endorsementDetailsDTO.EnddorsementRequest = insurableItemRequest.ToString();
                         endorsementDetailsDTO.IsPremiumRegister = true;
                         endorsementDetailsDTO.UpdatedResponse = json1.ToString();
@@ -3556,7 +3609,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         var x2 = await _context.SaveChangesAsync();
 
-                        //Step5:CD Transaction for the policy
+                    //Step5:CD Transaction for the policy
+                    if (micaCD.micaCDDTO.Count > 0)
+                    {
                         var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
                         BusinessStatus businessStatus = 0;
                         businessStatus = transaction.Status;
@@ -3572,7 +3627,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             return new EndorsmentDTO { Status = BusinessStatus.Error, Id = policy.PolicyNo, ResponseMessage = $"CD Transaction Failed for this Policy Number {policy.PolicyNo}" };
 
                         }
-
+                    }
 
                         if (x2 > 0)
                         {
@@ -3582,13 +3637,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         {
                             return new EndorsmentDTO() { Status = BusinessStatus.Error, ResponseMessage = "Somthing went wrong while deleting" };
                         }
-                    }
-                    else
-                    {
-                        return new EndorsmentDTO { Status = BusinessStatus.InputValidationFailed, Id = policy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
+                    //}
+                    //else
+                    //{
+                    //    return new EndorsmentDTO { Status = BusinessStatus.InputValidationFailed, Id = policy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
 
 
-                    }
+                    //}
                 }
 
 
@@ -3675,6 +3730,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<PolicyDTO> ModifyInsurabableItem(dynamic modifydata, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
             var policyNo = (string)modifydata["PolicyNumber"];
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == policyNo);
@@ -3682,11 +3740,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var type = "Update Proposal";
-            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
+
+            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata,DatetimeNow, Errors, apiContext);
             return _mapper.Map<PolicyDTO>(tblPolicy);
         }
 
-        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata, string type, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails, List<ErrorInfo> Errors, ApiContext apiContext)
+        private async Task<TblPolicy> ModifyUpdateInsurabableItem(dynamic modifydata, string type, TblPolicy tblPolicy, TblPolicyDetails tblPolicyDetails,DateTime DatetimeNow, List<ErrorInfo> Errors, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -3786,13 +3845,19 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 endorsementDetailsDTO.Action = type;
                 if (type == "Update Proposal")
                 {
+                  
                     endorsementDetailsDTO.IsPremiumRegister = false;
+                    endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
                 }
                 if (type == "Issue Policy")
                 {
+
                     endorsementDetailsDTO.IsPremiumRegister = true;
+                    endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
                 }
-                endorsementDetailsDTO.EndorsementEffectivedate = DateTime.Now;
+               
+
+               
                 endorsementDetailsDTO.EnddorsementRequest = modifydata.ToString();
                 endorsementDetailsDTO.UpdatedResponse = json1.ToString();
                 //policyId
@@ -3814,7 +3879,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         {
 
                             //dynamic polFields = new ExpandoObject();
-                         
+
                             foreach (var temp in insurabledetails)
                             {
                                 dynamic polFields = JsonConvert.DeserializeObject<ExpandoObject>(temp.CoverValue);
@@ -3824,18 +3889,18 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 {
                                     foreach (var insItem in Data)
                                     {
-                                        if (insItem.Name == "Documents")
+                                        if (insItem.Name == "Documents" || insItem.Name == "Identification Number" || insItem.Name == "Name")
                                         {
 
                                         }
                                         else
                                         {
-                                            
+
                                             AddProperty(polFields, insItem.Name, Data[insItem.Name].ToString());
                                         }
 
 
-                                       
+
 
                                     }
                                     temp.CoverValue = JsonConvert.SerializeObject(polFields);
@@ -3848,8 +3913,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                    _context.SaveChanges();
-                }
+                _context.SaveChanges();
+            }
             catch (Exception e)
             {
 
@@ -3961,6 +4026,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         dynamicPolicyrequest["Balance SumInsured"] = dynamicPolicyrequest["Balance SumInsured"] - amount;
                         policy.PolicyRequest = dynamicPolicyrequest.ToString();
+                        policydetails.BalanceSumInsued = policydetails.BalanceSumInsued - Convert.ToInt32(amount);
                     }
                     else
                     {
@@ -3971,6 +4037,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
+                _context.TblPolicy.Update(policydetails);
                 _context.TblPolicyDetails.Update(policy);
                 _context.SaveChanges();
                 return new PolicyResponse { Status = BusinessStatus.Updated, ResponseMessage = $"balance SumInsured Updated for this policy number {PolicyNumber}" };
@@ -3992,6 +4059,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone= UserDateTime.KeyValue;
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
 
@@ -4064,7 +4133,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
 
-                        if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 || (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                        if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
                         {
                             var expObj = JsonConvert.DeserializeObject<ExpandoObject>(ProposalDetail.ToString());
 
@@ -4152,6 +4221,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 AddProperty(expObj, "ProposalNumber", mappedPolicy.ProposalNo);
                                 AddProperty(expObj, "Balance SumInsured", ProposalDetail["si"]);
                                 AddProperty(expObj, "No. of Claim", 0);
+                                AddProperty(expObj, "PolicyStatus", "InActive");
 
                                 var Proposaltempobj = JsonConvert.SerializeObject(expObj);
                                 ProposalDetail = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
@@ -4173,13 +4243,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 //Step7:Add payment section Inside Proposal Json
                                 logMsg = logMsg + ",4";
 
-                                AddProperty(expObj, "PremiumDetails", CalculatePremiumResponse);
+                                AddProperty(expObj, "PremiumDetails", CDmap);
                                 var tempobj = JsonConvert.SerializeObject(expObj);
                                 ProposalDetail = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
                                 //Step8:Save Proposal in all relevant table
 
-                                PolicyId = SavePolicyDetails(mappedPolicy, ProposalDetail);
+                                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+
+
+                                PolicyId = SavePolicyDetails(mappedPolicy, ProposalDetail, DatetimeNow);
 
                                 //Step9:Post CD Account entries 
 
@@ -4236,14 +4310,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         policyUpdate.IsActive = true;
 
                                         // Add payment table
-
+                                   
                                         TblPolicyPayment policyPayment = new TblPolicyPayment()
 
                                         {
 
                                             PaidAmount = Amount,
 
-                                            CreatedDate = DateTime.Now,
+                                            CreatedDate = DatetimeNow,
 
                                             PolicyId = PolicyId
 
@@ -4434,9 +4508,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             try
             {
                 _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+                CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+                dbHelper._TimeZone = UserDateTime.KeyValue;
 
+                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
                 List<ErrorInfo> Errors = new List<ErrorInfo>();
-                var PolicyObj = JsonConvert.DeserializeObject<ExpandoObject>(IssuepolicyDTO.ToString());
+               var PolicyObj = JsonConvert.DeserializeObject<ExpandoObject>(IssuepolicyDTO.ToString());
+             
+
 
                 var PolicyStartDate = Convert.ToDateTime(IssuepolicyDTO["StartDate"]);
 
@@ -4445,11 +4524,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     System.TimeSpan Stateduration = new System.TimeSpan(0, 0, 00, 00);
                     DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
                     PolicyStartDate = startdateTime.Add(Stateduration);
+                    
+
                 }
-                else {
-                    System.TimeSpan Stateduration = DateTime.Now.TimeOfDay;
-                    DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
-                    PolicyStartDate = startdateTime.Add(Stateduration);
+                else
+                {
+                    //  System.TimeSpan Stateduration = DateTime.Now.TimeOfDay;
+                    //DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
+                    //PolicyStartDate = startdateTime.Add(Stateduration);
+                 
+
+                    PolicyStartDate = DatetimeNow;
                 }
                 System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
                 DateTime dateTime = Convert.ToDateTime(PolicyStartDate).Date;
@@ -4506,91 +4591,118 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         //step:3 update the insurable fileds
                         if (tblPolicy != null)
                         {
-                            var policyId = tblPolicy.PolicyId;
-                            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-
-                            //Step:4 Calling CD mapping API
-
-                            var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                            dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-
-                            List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
-                            tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
-                            var type = "Issue Policy";
-
-
-
-                            var tblPolicy1 = await ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata, Errors, apiContext);
-                            if (tblPolicy1 == null && Errors.Count > 0)
+                            if (tblPolicy.PolicyStageId == ModuleConstants.PolicyStageProposal)
                             {
-                                return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
-                            }
 
+                                var policyId = tblPolicy.PolicyId;
+                                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
 
+                                //Step:4 Calling CD mapping API
 
+                                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                                dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                                dynamic jsonObj = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                                List<MicaCDDTO> CDmap = await _integrationService.CDMapper(json, "Policy", apiContext);
 
+                                tblPolicy.PolicyNo = await GetPolicyNumberAsync(0, Convert.ToDecimal(tblPolicy.ProductIdPk), apiContext, "PolicyNo");
+                                var type = "Issue Policy";
 
-                            if (CDmap.Count > 0)
-                            {
-                                MicaCD micaCD = new MicaCD();
-                                micaCD.AccountNo = tblPolicy.CdaccountNumber;
-                                micaCD.micaCDDTO = CDmap;
-                                micaCD.Description = "Policy Issue-" + tblPolicy.PolicyNo;
-                                BusinessStatus businessStatus = 0;
-
-
-                                //Step5:CD Transaction for the policy
-                                var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
-
-                                businessStatus = transaction.Status;
-                                if (businessStatus == BusinessStatus.Created)
+                                if (CDmap.Count > 0)
                                 {
-                                    //Status for Txn
-                                    TblPolicy policyUpdate = _context.TblPolicy.Find(tblPolicy.PolicyId);
+                                    MicaCD micaCD = new MicaCD();
+                                    micaCD.AccountNo = tblPolicy.CdaccountNumber;
+                                    micaCD.micaCDDTO = CDmap;
+                                    micaCD.Description = "Policy Issue-" + tblPolicy.PolicyNo;
+                                    BusinessStatus businessStatus = 0;
 
 
-                                    //policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
-                                    policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStageQuoteCreated;
-                                    policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
-                                    policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
+                                    //Step5:CD Transaction for the policy
+                                    var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
+
+                                    // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                                    if (CDmap.Count>0) {
+                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                    var premium = JsonConvert.DeserializeObject <List<MicaCDDTO>>(jsonObj.PremiumDetails.ToString());
+                                        //expObj.PremiumDetails = CDmap;
+                                        AddProperty(expObj, "Policy Start Date", PolicyStartDate);
+                                        AddProperty(expObj, "Policy End Date", PolicyEndDate);
+                                        AddProperty(expObj, "PolicyStatus", "Active");
+
+                                        expObj.PremiumDetails.AddRange(CDmap);
+                                    var tempobj = JsonConvert.SerializeObject(expObj);
+                                    json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+                                    tblPolicyDetailsdata.PolicyRequest = json.ToString();
+                                }
+
+                            
 
 
-                                    policyUpdate.IsActive = true;
-                                    //string[] Separate = (policyUpdate.PolicyStartDate.ToString()).Split(' ');
-                                    //string desiredDate = Separate[1];
-
-                                    //string[] SeparateTime = (desiredDate.ToString()).Split(':');
-                                    //var hour = Convert.ToInt32(SeparateTime[0]);
-                                    //var minute= Convert.ToInt32(SeparateTime[1]);
-                                    //var second = Convert.ToInt32(SeparateTime[2];
+                                var tblPolicy1 = await ModifyUpdateInsurabableItem(IssuepolicyDTO, type, tblPolicy, tblPolicyDetailsdata,DatetimeNow, Errors, apiContext);
+                                if (tblPolicy1 == null && Errors.Count > 0)
+                                {
+                                    return new PolicyResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                                }
 
 
 
-                                    policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
-
-                                    policyUpdate.PolicyStartDate = PolicyStartDate;
-                                    //System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
-                                    //DateTime dateTime = Convert.ToDateTime(policyUpdate.PolicyStartDate).Date;
-
-                                    //policyUpdate.PolicyEndDate = dateTime.Add(duration);
-                                    policyUpdate.PolicyEndDate = PolicyEndDate;
 
 
-                                    _context.SaveChanges();
+                              
+                                    businessStatus = transaction.Status;
+                                    if (businessStatus == BusinessStatus.Created)
+                                    {
+                                        //Status for Txn
+                                        TblPolicy policyUpdate = _context.TblPolicy.Find(tblPolicy.PolicyId);
 
+
+                                        //policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
+                                        policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStageQuoteCreated;
+                                        policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
+                                        policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
+
+
+                                        policyUpdate.IsActive = true;
+                                        //string[] Separate = (policyUpdate.PolicyStartDate.ToString()).Split(' ');
+                                        //string desiredDate = Separate[1];
+
+                                        //string[] SeparateTime = (desiredDate.ToString()).Split(':');
+                                        //var hour = Convert.ToInt32(SeparateTime[0]);
+                                        //var minute= Convert.ToInt32(SeparateTime[1]);
+                                        //var second = Convert.ToInt32(SeparateTime[2];
+
+
+
+                                        policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
+
+                                        policyUpdate.PolicyStartDate = PolicyStartDate;
+                                        //System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 59);
+                                        //DateTime dateTime = Convert.ToDateTime(policyUpdate.PolicyStartDate).Date;
+
+                                        //policyUpdate.PolicyEndDate = dateTime.Add(duration);
+                                        policyUpdate.PolicyEndDate = PolicyEndDate;
+
+
+                                        _context.SaveChanges();
+
+                                    }
+                                    else
+                                    {
+
+                                        return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
+
+                                    }
+                                    return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number {tblPolicy.PolicyNo} Issued for this Proposal Number {tblPolicy.ProposalNo} Successfully" };
                                 }
                                 else
                                 {
+                                    return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
 
-                                    return new PolicyResponse { Status = BusinessStatus.Error, Id = tblPolicy.ProposalNo, ResponseMessage = $"CD Transaction Failed for this Proposal Number {tblPolicy.ProposalNo}" };
 
                                 }
-                                return new PolicyResponse { Status = BusinessStatus.Created, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Number {tblPolicy.PolicyNo} Issued for this Proposal Number {tblPolicy.ProposalNo} Successfully" };
                             }
                             else
                             {
-                                return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy Request is not valid for CD Transaction" };
-
+                                return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Id = tblPolicy.PolicyNo, ResponseMessage = $"Policy is already issued for this Proposal Number{tblPolicy.ProposalNo}" };
 
                             }
                         }
@@ -4652,6 +4764,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var proposalNo = (string)modifydata["ProposalNumber"];
@@ -4664,7 +4780,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var policyId = tbl_particiant.PolicyId;
                 var type = "Update Proposal";
                 var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, Errors, apiContext);
+                var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata,DatetimeNow, Errors, apiContext);
                 if (tblPolicy1 == null && Errors.Count > 0)
                 {
                     return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
@@ -4793,6 +4909,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
 
             ProposalResponse proposalResponse = new ProposalResponse();
@@ -4941,6 +5059,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     }
                                 }
 
+                                var endObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                AddProperty(endObj, "PolicyNumber", tbl_particiant.PolicyNo);
+                                AddProperty(endObj, "CDAccountNumber", tbl_particiant.CdaccountNumber);
+
+                                var exptempobj = JsonConvert.SerializeObject(endObj);
+                                json = JsonConvert.DeserializeObject<dynamic>(exptempobj.ToString());
+
+
+
                                 //step:3 Call CD mapper
                                 var CDmap = await _integrationService.CDMapperList(json, "PolicyCancellation", apiContext);
                                 if (CDmap.Count > 0)
@@ -4951,13 +5078,21 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     micaCD.micaCDDTO = CDmap;
                                     micaCD.Description = "Endorsement-Cancellation-" + EndorsementNo;
 
+                                    //Replace Premium details
+                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                                    expObj.PremiumDetails = CDmap;
+                                    AddProperty(expObj, "PolicyStatus", "Cancel");
+                                    var tempobj = JsonConvert.SerializeObject(expObj);
+                                    json = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+
                                     //Step5:CD Transaction for the policy
                                     var transaction = await _integrationService.CreateMasterCDAccount(micaCD, apiContext);
                                     BusinessStatus businessStatus = 0;
                                     businessStatus = transaction.Status;
 
 
-
+                                    tblPolicyDetailsdata.PolicyRequest= json.ToString();
+                                    _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
 
                                     if (businessStatus == BusinessStatus.Created)
                                     {
@@ -4965,17 +5100,63 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         // _tblPolicy.PolicyRemarks = policycancel.Remarks;
 
                                     }
+                                    //Endrosment
+                                    DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+
+
+                                    string EndorsmentType = "Cancel Policy";
+                                    EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
+                                    endorsementDetailsDTO.Action = EndorsmentType;
+                                    endorsementDetailsDTO.EndorsementNo = EndorsementNo;
+                                    endorsementDetailsDTO.IsPremiumRegister = true;
+                                    endorsementDetailsDTO.UpdatedResponse = json.ToString();
+                                    endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
+                                    endorsementDetailsDTO.EnddorsementRequest = endoresementDto.ToString();
+                                    endorsementDetailsDTO.PolicyId = policyId;
+
+                                    TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
+
+                                    _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+                                  
+                                 
 
                                     tbl_particiant.IsActive = false;
                                     tbl_particiant.PolicyStatus = ModuleConstants.PolicyCancelStatus;
                                     tbl_particiant.PolicyStatusId = ModuleConstants.PolicyStatusCancelled;
                                     tbl_particiant.PolicyStageId = ModuleConstants.PolicyStagePolicy;
                                     tbl_particiant.PolicyStageStatusId = ModuleConstants.EndorsementStageCancelled;
-                                    tbl_particiant.PolicyCancelDate = DateTime.Now;
+                                    tbl_particiant.PolicyCancelDate = DatetimeNow;
                                     _context.TblPolicy.Update(tbl_particiant);
 
+
+
+                                    //Refund Txn
+                                    PolicyCancelRequest policyCancelRequest = new PolicyCancelRequest();
+                                    policyCancelRequest.EffectiveDate = DatetimeNow;
+                                    policyCancelRequest.CancelRequestDate = DatetimeNow;
+                                    policyCancelRequest.PolicyNumber = tbl_particiant.PolicyNo;
+                                    PolicyCancelResponse RefundDetails = await _integrationService.GetRefundDetails(policyCancelRequest,apiContext);
+
+
+                                    PolicyRefund policyRefund = new PolicyRefund();
+                                    policyRefund.EndorsementEffectivedate = DatetimeNow;
+                                    policyRefund.TxnDate = DatetimeNow;
+                                    policyRefund.TotalRefundAmount = RefundDetails.TotalPremium;
+                                    policyRefund.EndorsementNumber = EndorsementNo;
+                                    policyRefund.UpdatedResponse = json.ToString();
+                                    policyRefund.PolicyId = policyId;
+
+                                    TblPolicyRefund tblpolicyRefund_mapper = _mapper.Map<TblPolicyRefund>(policyRefund);
+
+                                    _context.TblPolicyRefund.Add(tblpolicyRefund_mapper);
+
+
+
+
                                     _context.SaveChanges();
-                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy cancelled Successfully for this PolicyNumber " + policyNo + " With Endoresement Number " + EndorsementNo };
+
+                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
 
                                 }
                                 else
@@ -4990,7 +5171,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         }
                         else if (tbl_particiant.IsActive == false)
                         {
-                            return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = "Policy is already inActive" };
+                            return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is already Cancelled" };
 
                         }
                     }
@@ -5013,7 +5194,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         }
 
-        public async Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext)
+
+        public async Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+           var policydetails= _context.TblPolicy.FirstOrDefault(s => s.PolicyNo == endorsementSearch.PolicyNumber);
+            if (endorsementSearch.FromDate == null) {
+
+                endorsementSearch.FromDate = policydetails.PolicyStartDate;
+            }
+            if (endorsementSearch.ToDate == null) {
+
+                CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+                dbHelper._TimeZone = UserDateTime.KeyValue;
+
+                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+
+                endorsementSearch.ToDate = DatetimeNow;
+            }
+
+            List<EndorsementResponse> endorsementResponse= _context.TblEndorsementDetails.Where(s => s.EndorsementEffectivedate.Value.Date >= endorsementSearch.FromDate.Value.Date && s.EndorsementEffectivedate.Value.Date <= endorsementSearch.ToDate.Value.Date && s.PolicyId== policydetails.PolicyId).Select(p=>new EndorsementResponse { EndorsementEffectivedate=p.EndorsementEffectivedate,UpdatedResponse=p.UpdatedResponse,EndorsementNo=p.EndorsementNo}).ToList();
+
+
+            return endorsementResponse;
+        }
+
+
+            public async Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext)
         {
             var riskparmeters = await _integrationService.GetMappingParams(mappingname, apiContext);
             List<dynamic> targetdto = new List<dynamic>();
@@ -5466,12 +5674,439 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             return lstDocuments;
         }
+        public async Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
+            var files = httpRequest.Form.Files;
+            //var docId = GetActiveResult(file.Name); HttpRequest
+            DataTable dt = new DataTable();
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            /*
+             
+                foreach (var file in files)
+                {
+                    filename = ContentDispositionHeaderValue
+                                    .Parse(file.ContentDisposition)
+                                    .FileName
+                                    .Trim('"');
+                    filename = "\\UploadFiles\\" + filename;
+                    size += file.Length;
+                    var fileBasepath = System.IO.Directory.GetCurrentDirectory() + "\\ClientApp\\public";
+                    string filePath = fileBasepath + "" + filename;
+                    
+                    using (FileStream fs = System.IO.File.Create(filePath))
+                    {
+                        file.CopyTo(fs);
+                        //BinaryReader reader = new BinaryReader(fs);
+                        //stringVal = reader.ReadString();
+                        //sb.Append(stringVal);
+                        fs.Flush();
+                    }
+             
+             
+             */
+
+            foreach (var file in files)
+                {
+
+                var filename = ContentDispositionHeaderValue
+                                    .Parse(file.ContentDisposition)
+                                    .FileName
+                                    .Trim('"');
+                filename = "\\UploadFiles\\" + filename;
+              // var  size += file.Length;
+                var fileBasepath = System.IO.Directory.GetCurrentDirectory() + "";
+                string filePath = fileBasepath + "" + filename;
+
+                using (FileStream fs = System.IO.File.Create(filePath))
+                {
+                    file.CopyTo(fs);
+                    //BinaryReader reader = new BinaryReader(fs);
+                    //stringVal = reader.ReadString();
+                    //sb.Append(stringVal);
+                    fs.Flush();
+                }
+
+
+
+
+               // var filename = file.Name;
+
+                    var fileExt = Path.GetExtension(file.FileName);
+
+                    if(fileExt==".CSV" || fileExt==".csv")
+                    {
+                   // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
+                    var res = await ConvertCSVtoDataTable(filePath, apiContext);
+                    return res;
+                    }
+                    //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
+                    if (file == null || file.Length <= 0)
+                    {
+                        return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
+                    }
+                    if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
+                    {
+                        bool sms = true;
+                        bool email = true;
+                        //dt.Columns.Add("BankFileId", typeof(int));
+                        // dt.Columns.Add("Id", typeof(string));
+                        dt.Columns.Add("EndorsementNumber", typeof(string));
+                        dt.Columns.Add("EndorsementEffectivedate", typeof(DateTime));
+                        dt.Columns.Add("TxnDate", typeof(DateTime));
+                        dt.Columns.Add("TotalRefundAmount", typeof(decimal));
+                        dt.Columns.Add("PaymentGatewayReferenceId", typeof(string));
+                        dt.Columns.Add("AmountPaid", typeof(decimal));
+                        dt.Columns.Add("DateOfPayment", typeof(DateTime));
+                        dt.Columns.Add("PolicyId", typeof(decimal));
+                        dt.Columns.Add("PaymentStatus", typeof(string));
+                        dt.Columns.Add("UpdatedResponse", typeof(string));
+                        using (var stream = new MemoryStream())
+                        {
+                            await file.CopyToAsync(stream, cancellationToken);
+                            try
+                            {
+                                using (var package = new ExcelPackage(stream))
+                                {
+                                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                                    // EPPlusHelper.GetColumnByName()
+                                    int endrsId = worksheet.GetColumnByName("endorsement Number");
+                                    int refundId = worksheet.GetColumnByName("total Refund Amount");
+                                    int endrEffDtId = worksheet.GetColumnByName("endorsement Effective Date");
+                                    int pmtRefId = worksheet.GetColumnByName("payment Gateway Reference Id");
+                                    int amtId = worksheet.GetColumnByName("amount Paid");
+                                    int dtPmtId = worksheet.GetColumnByName("date Of Payment");
+                                    int pmtStatId = worksheet.GetColumnByName("payment Status");
+                                    if (worksheet != null)
+                                    {
+                                        var rowCount = worksheet.Dimension.Rows;
+                                        for (int row = 2; row <= rowCount; row++)
+                                        {
+                                            var endrsNum = "";
+                                            if (worksheet.Cells[row, endrsId].Value != null)
+                                            {
+                                                endrsNum = worksheet.Cells[row, endrsId].Value.ToString().Trim();
+                                            }
+                                            if (endrsNum == "")
+                                            {
+                                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber can not be empty for row {row}" };
+                                                Errors.Add(errorInfo);
+                                            }
+                                            else
+                                            {
+                                                var EndorsementDetails = _context.TblEndorsementDetails.FirstOrDefault(et => et.EndorsementNo == endrsNum);
+                                                if (EndorsementDetails == null)
+                                                {
+                                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber {endrsNum} does not exist for row {row} " };
+                                                    Errors.Add(errorInfo);
+                                                }
+                                                else
+                                                {
+                                                    DataRow dr = dt.NewRow();
+                                                    dr["EndorsementNumber"] = endrsNum;
+                                                    if (worksheet.Cells[row, endrEffDtId].Value != null)
+                                                    {
+                                                        dr["EndorsementEffectivedate"] = Convert.ToDateTime(worksheet.Cells[row, endrEffDtId].Value.ToString().Trim());
+                                                    }
+
+                                                    dr["TxnDate"] = DateTime.Now;
+
+                                                    if (worksheet.Cells[row, refundId].Value != null)
+                                                    {
+                                                        dr["TotalRefundAmount"] = Convert.ToDecimal(worksheet.Cells[row, refundId].Value);
+                                                    }
+                                                    if (worksheet.Cells[row, pmtRefId].Value != null)
+                                                    {
+                                                        dr["PaymentGatewayReferenceId"] = worksheet.Cells[row, pmtRefId].Value.ToString().Trim();
+                                                    }
+                                                    if (worksheet.Cells[row, amtId].Value != null)
+                                                    {
+                                                        dr["AmountPaid"] = Convert.ToDecimal(worksheet.Cells[row, amtId].Value);
+                                                    }
+                                                    if (worksheet.Cells[row, dtPmtId].Value != null)
+                                                    {
+                                                        dr["DateOfPayment"] = Convert.ToDateTime(worksheet.Cells[row, dtPmtId].Value.ToString().Trim());
+                                                    }
+                                                    if (worksheet.Cells[row, pmtStatId].Value != null)
+                                                    {
+                                                        dr["PaymentStatus"] = worksheet.Cells[row, pmtStatId].Value.ToString().Trim();
+                                                    }
+                                                    dr["PolicyId"] = EndorsementDetails.PolicyId;
+                                                    dr["UpdatedResponse"] = EndorsementDetails.UpdatedResponse;
+
+                                                    dt.Rows.Add(dr);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                var error = ex.ToString();
+                                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx/csv file" };
+                    }
+                }
+
+            
+            try
+            {
+                // add list to db ..
+                // here just read and return
+                var envResponse = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+                //string connetionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
+                using (var bulkCopy = new SqlBulkCopy(envResponse.Dbconnection, SqlBulkCopyOptions.KeepIdentity))
+                {
+                    // my DataTable column names match my SQL Column names, so I simply made this loop. However if your column names don't match, just pass in which datatable name matches the SQL column name in Column Mappings
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        bulkCopy.ColumnMappings.Add(col.ColumnName, col.ColumnName);
+                    }
+                    bulkCopy.BulkCopyTimeout = 600;
+                    bulkCopy.DestinationTableName = "[PO].[tblPolicyRefund]";
+                    bulkCopy.WriteToServer(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                var error = ex.ToString();
+                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                //return DemoResponse<List<BankFileDTO>>.GetResult(-1, error);
+            }
+            if (Errors.Count > 0)
+            {
+                return new FileUploadResponse { Status = BusinessStatus.Ok, Errors = Errors, ResponseMessage = $" {dt.Rows.Count }Document uploaded succefully with {Errors.Count} records having issues" };
+            }
+            else
+            {
+                return new FileUploadResponse { Status = BusinessStatus.Ok, ResponseMessage = $"Document uploaded succefully!" };
+            }
+        }
+
+        public async Task<FileUploadResponse> ConvertCSVtoDataTable(string strFilePath,ApiContext apiContext)
+        {
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            StreamReader sr = new StreamReader(strFilePath);
+            string[] headers = sr.ReadLine().Split(',');
+            DataTable dt = new DataTable();
+            foreach (string header in headers)
+            {
+                dt.Columns.Add(header);
+            }
+            //finding index of every column
+            var endorsementindex = FindIndex(strFilePath,"endorsement Number");
+            var EndorsementEffectivedateIndex= FindIndex(strFilePath,"endorsement Effective Date");
+
+            //need to put current date time
+           // var TxnDateIndex = FindIndex("endorsement Effective Date");
+            var TotalRefundAmountIndex = FindIndex(strFilePath,"total Refund Amount");
+            var PaymentGatewayReferenceIdIndex = FindIndex(strFilePath,"payment Gateway Reference Id");
+            var AmountPaidIndex = FindIndex(strFilePath,"amount Paid");
+            var DateOfPaymentIndex = FindIndex(strFilePath,"date Of Payment");
+            var PaymentStatusIndex = FindIndex(strFilePath,"payment Status");
+          
+            try
+            {
+                while (!sr.EndOfStream)
+                {
+                    string[] rows = Regex.Split(sr.ReadLine(), ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    DataRow dr = dt.NewRow();
+
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        dr[i] = rows[i];
+
+                        //dr1[i] = dt.Rows[i+1]["endorsement Number"];
+                    }
+                    dt.Rows.Add(dr);
+                }
+               // var c = dt.Rows[0][2];
+                var count = dt.Rows.Count;
+                
+               
+                var endrsNum = "";
+                var updatedResponse = "";
+                DateTime endorsementeffectivedate = Convert.ToDateTime("1/1/1754 12:00:00");
+                DateTime txndate = Convert.ToDateTime("1/1/1754 12:00:00");
+                var paymentstatus= "";
+                DateTime dateofpayment = Convert.ToDateTime("1/1/1754 12:00:00");
+                decimal totalRefundAmount =0;
+                decimal ammountpaid = 0;
+                var paymentrefId = "";
+
+                for (var i=0;i< count;i++)
+                {
+                   // var s = dt.Rows[i][10].ToString().Trim();
+                    var s0 = dt.Rows[i][endorsementindex].ToString().Trim();
+                    if (s0 != null || s0 != "")
+                    {
+                        if(s0== "")
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber can not be empty for row {i+1}" };
+                            Errors.Add(errorInfo);
+                        }
+                        endrsNum = s0.Replace("\"", "");
+                    }
+
+                    var s = dt.Rows[i][EndorsementEffectivedateIndex].ToString().Trim();
+
+                    if (s != null || s != "")
+                    {
+                        if (s == "\"\"")
+                        {
+                            s= Convert.ToDateTime("1/1/1754 12:00:00").ToString();
+                        }
+                        else
+                        {
+                            endorsementeffectivedate = Convert.ToDateTime(s.Replace("\"", ""));
+                        }
+                      
+                    }
+                    txndate = DateTime.Now;
+
+                    var s1 = dt.Rows[i][TotalRefundAmountIndex].ToString().Trim();
+                    if (s1 != null || s1 != "")
+                    {
+                        if (s1 == "\"\"")
+                        {
+                            totalRefundAmount = 0;
+                        }
+                        else
+                        {
+
+                            totalRefundAmount = Convert.ToDecimal(s1.Replace("\"", ""));
+                        }
+                    }
+                    var s2 = dt.Rows[i][PaymentGatewayReferenceIdIndex].ToString().Trim();
+                    if (s2 != null || s2 != "")
+                    {
+                        if (s2 == "\"\"")
+                        {
+                            s1 = "0.0";
+                        }
+                        else
+                        {
+                            paymentrefId = s2.Replace("\"", "");
+                        }
+                    }
+                    var s3 = dt.Rows[i][AmountPaidIndex].ToString().Trim();
+                    if (s3 != null || s3 != "")
+                    {
+                        if (s3 == "\"\"")
+                        {
+                            s3 = "0.0";
+                        }
+                        else
+                        {
+                            ammountpaid = Convert.ToDecimal(s3.Replace("\"", ""));
+                        }
+                    }
+                    var s4 = dt.Rows[i][PaymentStatusIndex].ToString().Trim();
+                    if (s4 != null || s4 != "")
+                    {
+                        if (s4 == "\"\"")
+                        {
+                            s4 = "Pending";
+                        }
+                        else
+                        {
+                            paymentstatus = s4.Replace("\"", "");
+                        }
+                    }
+
+                    var s5 = dt.Rows[i][DateOfPaymentIndex].ToString().Trim();
+                    if (s5 != null || s5 != "")
+                    {
+                        if (s5 == "\"\"")
+                        {
+                            s5 = Convert.ToDateTime("1/1/1754 12:00:00").ToString();
+                        }
+                        else
+                        {
+                            dateofpayment = Convert.ToDateTime(s5.Replace("\"", ""));
+                        }
+
+                    }
+
+                    var PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == endrsNum);
+                    if (PolicyRefundDetails == null)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber does not exist for row {i+1} in database" };
+                        Errors.Add(errorInfo);
+                    }
+                    else
+                    {
+
+                        //updating the details from csv to table
+                        PolicyRefundDetails.EndorsementEffectivedate = endorsementeffectivedate;
+                        PolicyRefundDetails.TotalRefundAmount = totalRefundAmount;
+                        PolicyRefundDetails.TxnDate = txndate;
+                        PolicyRefundDetails.PaymentGatewayReferenceId = paymentrefId;
+                        PolicyRefundDetails.PaymentStatus = paymentstatus;
+                        PolicyRefundDetails.AmountPaid = ammountpaid;
+                        PolicyRefundDetails.DateOfPayment = dateofpayment;
+
+
+                        _context.TblPolicyRefund.Update(PolicyRefundDetails);
+                        _context.SaveChanges();
+                    }
+
+                }
+                if (Errors.Count > 0)
+                {
+                    return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded with following Erros",Errors=Errors };
+                }
+                else
+                {
+                    return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded Successfully" };
+                }
+            }
+            catch(Exception e)
+            {
+
+            }
+            return new FileUploadResponse { Status = BusinessStatus.Ok, ResponseMessage = $"Document Uploaded" }; ;
+        }
+    
+    public int FindIndex(string filepath,string columnName)
+        {
+           // string filepath = @"C:\Users\brajesh.kumar\Desktop\test11.csv";
+            var lines = File.ReadLines(filepath);
+
+            var lineIdx = 0;
+            var colIdx = 0;
+
+            foreach (var line in lines)
+            {
+                lineIdx++;
+                foreach (var column in line.Split(','))
+                { // split cols here
+                    colIdx++;
+                    if (column.Contains(columnName))
+                    {
+                        return colIdx-1;
+                    }
+                }
+                colIdx = 0; // reset col index
+            }
+            return colIdx;
+        }
     }
 
 
 
-}
+    }
 
 
 

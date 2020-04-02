@@ -11,12 +11,22 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.AvoRep
 {
     public class AvoReportService : IReportProductService
     {
+        public void DeleteParameter(int ReportConfigParamId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext context)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<string>> GetParameters(int ReportConfigId, ApiContext apiContext)
+        public Task<IEnumerable<ReportConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ReportParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -42,6 +52,11 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.ReportServices.AvoRep
         }
 
         public Task<ReportConfigResonse> SaveConfigParameters(ReportConfigDTO reportConfigDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReportConfigDTO> UpdateReport(ReportConfigDTO reportConfigDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

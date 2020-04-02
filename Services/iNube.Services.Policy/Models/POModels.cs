@@ -117,14 +117,14 @@ namespace iNube.Services.Policy.Models
         public string MasterType { get; set; }
         public int? BalanceSumInsued { get; set; }
         public DateTime? PolicyCancelDate { get; set; }
-      
+
 
 
         public List<PolicyInsurableDetailsDTO> PolicyInsurableDetails { get; set; }
         public virtual ICollection<EndorsementDetailsDTO> EndorsementDetails { get; set; }
     }
 
-  
+
 
     public partial class PartnersDTO
     {
@@ -487,7 +487,7 @@ namespace iNube.Services.Policy.Models
     }
     public class PolicyResponse : ResponseStatus
     {
-        public Dictionary<string,string> policy { get; set; }
+        public Dictionary<string, string> policy { get; set; }
     }
     public class PolicyProposalResponse : ResponseStatus
     {
@@ -1148,7 +1148,7 @@ namespace iNube.Services.Policy.Models
     {
         public CustomersDTO()
         {
-           // Contract = new HashSet<ContractDTO>();
+            // Contract = new HashSet<ContractDTO>();
             CustAddress = new HashSet<CustAddressDTO>();
             CustSpocDetails = new HashSet<CustSpocDetailsDTO>();
         }
@@ -1178,7 +1178,7 @@ namespace iNube.Services.Policy.Models
         public DateTime? ModifiedDate { get; set; }
         public string Code { get; set; }
 
-       // public virtual ICollection<ContractDTO> Contract { get; set; }
+        // public virtual ICollection<ContractDTO> Contract { get; set; }
         public virtual ICollection<CustAddressDTO> CustAddress { get; set; }
         public virtual ICollection<CustSpocDetailsDTO> CustSpocDetails { get; set; }
     }
@@ -1265,7 +1265,7 @@ namespace iNube.Services.Policy.Models
     public partial class EndorsmentDTO : ResponseStatus
     {
         public string PolicyNo { get; set; }
-     
+
     }
 
 
@@ -1288,7 +1288,7 @@ namespace iNube.Services.Policy.Models
         public string TxnType { get; set; }
         public decimal Amount { get; set; }
         public string PaymentReferenceNo { get; set; }
-        public Dictionary<string, decimal> RatingConfig { get;set; }
+        public Dictionary<string, decimal> RatingConfig { get; set; }
 
     }
     public class DynamicData
@@ -1331,7 +1331,7 @@ namespace iNube.Services.Policy.Models
     public class RiskField
     {
         public string insurableName { get; set; }
-        public dynamic  Riskfields{ get; set; }
+        public dynamic Riskfields { get; set; }
 
     }
     public class InsurableField
@@ -1345,7 +1345,7 @@ namespace iNube.Services.Policy.Models
         public string StartDate { get; set; }
         public string ProposalNumber { get; set; }
         public List<RiskField> RiskFields { get; set; }
-}
+    }
     public class PaymentInfo
 
     {
@@ -1396,8 +1396,8 @@ namespace iNube.Services.Policy.Models
         public decimal Total { get; set; }
         public decimal MonthlyPremium { get; set; }
         public decimal FinalAmount { get; set; }
-       
-        
+
+
         public decimal FTTax { get; set; }
         public decimal ADTax { get; set; }
         public decimal TotalFTAmount { get; set; }
@@ -1474,6 +1474,8 @@ namespace iNube.Services.Policy.Models
         public string TxnType { get; set; }
         public string Type { get; set; }
         public string AccountNo { get; set; }
+        public decimal FtPerDay { get; set; }
+        public decimal AdPerDay { get; set; }
         public decimal TxnAmount { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal TotalAmount { get; set; }
@@ -1495,7 +1497,8 @@ namespace iNube.Services.Policy.Models
         public string AccountNo { get; set; }
         public List<MicaCDDTO> micaCDDTO { get; set; }
     }
-    public class CDMapper {
+    public class CDMapper
+    {
         public string Type { get; set; }
         public dynamic Data { get; set; }
     }
@@ -1513,7 +1516,90 @@ namespace iNube.Services.Policy.Models
         public string DmsdocId { get; set; }
         public string DocumentView { get; set; }
         public string DocumentType { get; set; }
-        public string DocumentName { get; set; }       
+        public string DocumentName { get; set; }
+    }
+   
+    public class PolicyCancelResponse
+    {
+        public double NoofDayRemaining { get; set; }
+        public double NoofUnusedDays { get; set; }
+        public decimal? FTPremium { get; set; }
+        public decimal? ADPremium { get; set; }
+        public decimal? TotalPremium { get; set; }
+
+    }
+
+    public partial class PolicyCancelReturnDto : ResponseStatus
+    {
+        public decimal FireTheft { get; set; }
+        public decimal FTFromTax { get; set; }
+        public decimal FTToTax { get; set; }
+        public decimal Total { get; set; }
+        public decimal FinalTotal { get; set; }
+        public string FromTaxType { get; set; }
+        public string ToTaxType { get; set; }
+
+    }
+    public class CDBalanceDTO : ResponseStatus
+    {
+        public string AccountNo { get; set; }
+        public string TxnEventType { get; set; }
+        public DateTime? TxnDateTime { get; set; }
+        public decimal? TxnAmountBalance { get; set; }
+        public decimal? TaxAmountBalance { get; set; }
+        public decimal? TotalAvailableBalance { get; set; }
+
+
+
+    }
+    public class PolicyRefund
+    {
+        public decimal RefundId { get; set; }
+        public string EndorsementNumber { get; set; }
+        public DateTime? EndorsementEffectivedate { get; set; }
+        public DateTime? TxnDate { get; set; }
+        public decimal? TotalRefundAmount { get; set; }
+        public string PaymentGatewayReferenceId { get; set; }
+        public decimal? AmountPaid { get; set; }
+        public DateTime? DateOfPayment { get; set; }
+        public decimal? PolicyId { get; set; }
+        public string PaymentStatus { get; set; }
+        public string UpdatedResponse { get; set; }
+    }
+    public class PolicyCancelRequest
+    {
+        public string PolicyNumber { get; set; }
+        public DateTime? EffectiveDate { get; set; }
+        public DateTime? CancelRequestDate { get; set; }
+    }
+    public class FileUploadResponse : ResponseStatus
+    {
+        
+    }
+
+    public partial class CustomerSettingsDTO
+    {
+        public decimal Id { get; set; }
+        public decimal? CustomerId { get; set; }
+        public string Type { get; set; }
+        public string Key { get; set; }
+        public string KeyValue { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public decimal? EnvId { get; set; }
+    }
+    public class EndorsementResponse
+    {
+        public string EndorsementNo { get; set; }
+        public DateTime? EndorsementEffectivedate { get; set; }
+        public string UpdatedResponse { get; set; }
+    }
+    public class EndorsementSearch
+    {
+        public string PolicyNumber { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
     }
 }
 

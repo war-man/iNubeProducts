@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using iNube.Services.Policy.Controllers.Policy.PolicyServices;
@@ -601,5 +603,19 @@ namespace iNube.Services.Policy.Controllers.Policy
             return Ok(searchPolicyDetails);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> RefundUpload(CancellationToken cancellationToken)
+        {
+            var response = await _policyService.RefundUpload(Request, cancellationToken, Context);
+            return Ok(response);
+        }
+       
+
+        [HttpPost]
+        public async Task<IActionResult> GetEndoresementDetails(EndorsementSearch endorsementSearch)
+        {
+            var response = await _policyService.GetEndoresementDetails(endorsementSearch, Context);
+            return Ok(response);
+        }
     }
 }

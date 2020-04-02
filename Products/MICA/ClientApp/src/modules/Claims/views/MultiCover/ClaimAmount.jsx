@@ -16,7 +16,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 // @material-ui/icons
 import CardBody from "components/Card/CardBody.jsx";
-import AmountData from "modules/Claims/views/ClaimIntimate/AmountData.json";
+
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 //import ReactTable from "react-table";
 import ReactTable from "components/MuiTable/MuiTable.jsx";
@@ -121,6 +121,8 @@ const ClaimAmount = (props) => {
 
                     {props.errormessage && (props.DetailsDTO.insurableItems == "") ? <p className="error">*Required field cannot be left blank</p> : null}
 
+                    {props.insurableitemflag && (props.DetailsDTO.insurableItems == "") ? <p className="error"> </p> : null}
+
                 </GridItem>
             </GridContainer>
 
@@ -131,74 +133,70 @@ const ClaimAmount = (props) => {
                             data={props.TableData}
                             filterable
                             columns={[
+
                                 {
-                            Header: "SerialNo",
-                        accessor: "id",
-                        headerClassName: 'react-table-center',
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        minWidth: 20,
-                        sortable: false,
-                        //  filterable: false
-                    },
-                            {
-                            // Header: "Cover Event Factor - From Value",
-                            Header: "InsurableItem",
-                        accessor: "insurableItem",
-                        minWidth: 40,
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        headerClassName: 'react-table-center'
-                    },
-                            {
-                            Header: "Name",
-                        accessor: "name",
-                        minWidth: 40,
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        headerClassName: 'react-table-center'
-                    },
-                            {
-                            Header: "IdentificationNo",
-                        accessor: "identificationNo",
-                        minWidth: 40,
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        headerClassName: 'react-table-center'
-                    },
-                            {
-                            Header: "TypeOfLoss",
-                        accessor: "typeOfLoss",
-                        minWidth: 40,
-                                setCellProps: (value) => ({style: {textAlign: "left" } }),
-                        headerClassName: 'react-table-center'
-                    },
-                            {
-                            Header: "CoverValue",
-                        accessor: "coverValue",
-                        minWidth: 20,
-                                setCellProps: (value) => ({style: {textAlign: "center" } }),
-                        headerClassName: 'react-table-center'
+                                    Header: "Select",
+                                    accessor: "select",
+                                    minWidth: 60,
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    headerClassName: 'react-table-center',
+                                    sortable: false,
+                                    resizable: false,
+                                },
+                                {
+                                    Header: "SerialNo",
+                                    accessor: "insurableitemId",
+                                    headerClassName: 'react-table-center',
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    minWidth: 20,
+                                    sortable: false,
+                                    //  filterable: false
+                                },
+                                
+                                {
+                                    Header: "IdentificationNo",
+                                    accessor: "identificationNo",
+                                    minWidth: 40,
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    headerClassName: 'react-table-center'
+                                },
+                                {
+                                    Header: "TypeOfLoss",
+                                    accessor: "typeOfLoss",
+                                    minWidth: 40,
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    headerClassName: 'react-table-center'
+                                },
+                                {
+                                    Header: "Risk Details",
+                                    accessor: "coverValue",
+                                    minWidth: 20,
+                                    setCellProps: (value) => ({ style: { textAlign: "center" } }),
+                                    headerClassName: 'react-table-center'
 
-                    },
-                    //        {
-                    //        Header: "BenefitAmount",
-                    //    accessor: "benefitAmount",
-                    //    minWidth: 40,
-                    //            setCellProps: (value) => ({style: {textAlign: "center" } }),
-                    //    headerClassName: 'react-table-center',
+                                },
+                                //        {
+                                //        Header: "BenefitAmount",
+                                //    accessor: "benefitAmount",
+                                //    minWidth: 40,
+                                //            setCellProps: (value) => ({style: {textAlign: "center" } }),
+                                //    headerClassName: 'react-table-center',
 
-                    //},
-                            {
-                            Header: "ClaimAmount",
-                        accessor: "claimAmounts",
-                                setCellProps: (value) => ({style: {textAlign: "right" } }),
-                        minWidth: 40,
-                        headerClassName: 'react-table-center',
-                        //sortable: false,
-                        //filterable: false
+                                //},
+                                {
+                                    Header: "ClaimAmount",
+                                    accessor: "claimAmounts",
+                                    setCellProps: (value) => ({ style: { textAlign: "right" } }),
+                                    minWidth: 40,
+                                    headerClassName: 'react-table-center',
+                                    //sortable: false,
+                                    //filterable: false
 
-                    },  
- 
+                                },
 
 
-                    ]}
+
+                            ]}
                             defaultPageSize={4}
                             pageSize={([props.TableData.length + 1] < 4) ? [props.TableData.length + 1] : 4}
                             showPaginationTop={false}

@@ -22,6 +22,7 @@ namespace iNube.Services.Policy.Entities
         public virtual DbSet<TblPolicyDetails> TblPolicyDetails { get; set; }
         public virtual DbSet<TblPolicyInsurableDetails> TblPolicyInsurableDetails { get; set; }
         public virtual DbSet<TblPolicyPayment> TblPolicyPayment { get; set; }
+        public virtual DbSet<TblPolicyRefund> TblPolicyRefund { get; set; }
         public virtual DbSet<TblmasPocommonTypes> TblmasPocommonTypes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -410,6 +411,43 @@ namespace iNube.Services.Policy.Entities
                     .WithMany(p => p.TblPolicyPayment)
                     .HasForeignKey(d => d.PolicyId)
                     .HasConstraintName("FK_tblPolicyPayment_tblPolicy");
+            });
+
+            modelBuilder.Entity<TblPolicyRefund>(entity =>
+            {
+                entity.HasKey(e => e.RefundId);
+
+                entity.ToTable("tblPolicyRefund", "PO");
+
+                entity.Property(e => e.RefundId)
+                    .HasColumnName("RefundID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AmountPaid).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.DateOfPayment).HasColumnType("datetime");
+
+                entity.Property(e => e.EndorsementEffectivedate).HasColumnType("datetime");
+
+                entity.Property(e => e.EndorsementNumber).HasMaxLength(50);
+
+                entity.Property(e => e.PaymentGatewayReferenceId)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentStatus).HasMaxLength(100);
+
+                entity.Property(e => e.PolicyId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.TotalRefundAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TxnDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Policy)
+                    .WithMany(p => p.TblPolicyRefund)
+                    .HasForeignKey(d => d.PolicyId)
+                    .HasConstraintName("FK_tblPolicyRefund_tblPolicy");
             });
 
             modelBuilder.Entity<TblmasPocommonTypes>(entity =>

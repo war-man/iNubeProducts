@@ -11,12 +11,13 @@
 //policyConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com:9006';
 let productConfigUrl = config.productConfigUrl;
 let partnerconfigUrl = config.partnerconfigUrl;
-let policyConfigUrl = config.policyConfigUrl;
-
+let PolicyconfigUrl = config.policyconfigUrl;
+let ExtensionUrl = config.ExtensionUrl
 export const policyConfig = {
-    policyConfigUrl,
+    PolicyconfigUrl,
     productConfigUrl,
-    partnerconfigUrl
+    partnerconfigUrl,
+    ExtensionUrl
 }
 
 export default policyConfig

@@ -369,7 +369,9 @@ namespace iNube.Services.MicaExtension_EGI.Models
         }
 
         public string TxnType { get; set; }
-        public string Type { get; set; }     
+        public string Type { get; set; }    
+        public decimal FtPerDay { get; set; }
+        public decimal AdPerDay { get; set; }
         public decimal TxnAmount { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal TotalAmount { get; set; }
@@ -479,7 +481,9 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     public partial class PolicyCancelReturnDto : ResponseStatus
     {
-        public decimal FireTheft { get; set; }       
+        public decimal FireTheft { get; set; }   
+        public decimal FtPerDay { get; set; }
+        public decimal AdPerDay { get; set; }
         public decimal FTFromTax { get; set; }
         public decimal FTToTax { get; set; }
         public decimal Total { get; set; }
@@ -499,13 +503,67 @@ namespace iNube.Services.MicaExtension_EGI.Models
     {
         public ResponseVehicleActivity()
         {
-            VehicleData = new Dictionary<string, List<ActivityDTO>>();
+            VehicleData = new List<VehicleActivity>();
         }
 
         public string PolicyNumber { get; set; }
-        public Dictionary<string,List<ActivityDTO>> VehicleData { get; set; }
+         public List<VehicleActivity> VehicleData { get; set; }
+    }
+    public class VehicleActivity
+    {
+        public VehicleActivity()
+        {
+            activityDTOs = new List<ActivityDTO>();
+        }
+        public string VehicleNumber { get; set; }
+        public List<ActivityDTO> activityDTOs { get; set; }
+    }
+    public class PolicyCancelRequest
+    {
+        public string PolicyNumber { get; set; }
+        public DateTime? EffectiveDate { get; set; }
+        public DateTime? CancelRequestDate { get; set; }
+    }
+    public class PolicyCancelResponse
+    {
+        public double NoofDayRemaining { get; set; }
+        public double NoofUnusedDays { get; set; }
+        public decimal? FTPremium { get; set; }
+        public decimal? ADPremium { get; set; }
+        public decimal? TotalPremium { get; set; }
+
     }
 
+  
+    public class CDBalanceDTO : ResponseStatus
+    {
+        public string AccountNo { get; set; }
+        public string TxnEventType { get; set; }
+        public DateTime? TxnDateTime { get; set; }
+        public decimal? TxnAmountBalance { get; set; }
+        public decimal? TaxAmountBalance { get; set; }
+        public decimal? TotalAvailableBalance { get; set; }
 
+
+
+    }
+
+    public class PolicyStatusDTO
+    {
+        public int Id { get; set; }
+        public string PolicyNumber { get; set; }
+        public int? PolicyStatus { get; set; }
+        public DateTime? TxnDateTime { get; set; }
+
+    }
+
+    public class PolicyStatusResponseDTO : ResponseStatus
+    {
+        public PolicyStatusResponseDTO()
+        {
+            PolicyStatus = new PolicyStatusDTO();
+        }
+        public PolicyStatusDTO PolicyStatus { get; set; }
+    }
 }
 

@@ -465,15 +465,15 @@ class Sidebar extends React.Component {
             });
         var brand = (
             <div className={logoClasses}>
-                {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
-                <a href="https://micav0002.azurewebsites.net/dashboard/home" className={logoMini}>
+                {/*<a href="https://micav0002.azurewebsites.net/dashboard/home" className = { logoMini } >*/}
+                <a className={logoMini}>
                     <img src={logo} alt="logo" className={classes.img} />
                 </a>
-                {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
-                <a href="https://micav0002.azurewebsites.net/dashboard/home" className={logoNormal}>
+                {/* <a href="https://micav0002.azurewebsites.net/dashboard/home" className = { logoNormal } > */}
+                <a className={logoNormal}>
                     <img src={logoText} alt="logo" className={classes.imgNormal} />
                 </a>
-            </div>
+            </div >
         );
         const drawerPaper =
             classes.drawerPaper +

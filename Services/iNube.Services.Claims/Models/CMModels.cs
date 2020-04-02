@@ -136,19 +136,19 @@ namespace iNube.Services.Claims.Models
         {
             ClaimSearch = new List<SearchDTO>();
         }
-        public  List<SearchDTO> ClaimSearch { get; set; }
+        public List<SearchDTO> ClaimSearch { get; set; }
 
         // public SearchDTO ClaimSearch { get; set; }
     }
 
-        public partial class SearchDTO
+    public partial class SearchDTO
     {
         public int ClaimId { get; set; }
-       // public decimal? PolicyId { get; set; }
+        // public decimal? PolicyId { get; set; }
         public string PolicyNo { get; set; }
         public string ClaimNumber { get; set; }
         public string ClaimStatus { get; set; }
-       // public string CoverEvent { get; set; }
+        // public string CoverEvent { get; set; }
         public dynamic CoverValue { get; set; }
         public string TypeOfLoss { get; set; }
         public string InsuredReference { get; set; }
@@ -156,11 +156,13 @@ namespace iNube.Services.Claims.Models
         public string InsuredMobileNo { get; set; }
         public DateTime EventDate { get; set; }
         public DateTime? lossDateTime { get; set; }
-       // public string AccountHolderName { get; set; }
+        // public string AccountHolderName { get; set; }
         public int ClaimStatusId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string InsuredName { get; set; }
         public int? ProductIdPk { get; set; }
+        public string LocationOfEvent { get; set; }
+        public int? ClaimAmount { get; set; }
     }
 
     public partial class ClaimResponseDTO
@@ -347,7 +349,7 @@ namespace iNube.Services.Claims.Models
         public virtual ICollection<ClaimAllocationDetailsDTO> ClaimAllocationDetails { get; set; }
     }
 
-    
+
     public class ClaimResponses : ResponseStatus
     {
         public string PolicyNo { get; set; }
@@ -404,10 +406,10 @@ namespace iNube.Services.Claims.Models
 
     public partial class BankDTO
     {
-    //    public BankDTO()
-    //    {
-    //        ClaimTransactionNewDTOs = new HashSet<ClaimTransactionNewDTOs>();
-    //    }
+        //    public BankDTO()
+        //    {
+        //        ClaimTransactionNewDTOs = new HashSet<ClaimTransactionNewDTOs>();
+        //    }
 
         public int BankId { get; set; }
         public string AccountHolderName { get; set; }
@@ -420,7 +422,7 @@ namespace iNube.Services.Claims.Models
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
 
-       // public virtual ICollection<ClaimTransactionNewDTOs> ClaimTransactionNewDTOs { get; set; }
+        // public virtual ICollection<ClaimTransactionNewDTOs> ClaimTransactionNewDTOs { get; set; }
     }
 
 
@@ -429,7 +431,7 @@ namespace iNube.Services.Claims.Models
 
         public masCmcommonTypesDTO()
         {
-          //  ClaimTransactionNewDTOs = new HashSet<ClaimTransactionNewDTOs>();
+            //  ClaimTransactionNewDTOs = new HashSet<ClaimTransactionNewDTOs>();
             ClaimsClaimStatusDTO = new HashSet<ClaimsDTO>();
             ClaimsHistoryDTO = new HashSet<ClaimsHistoryDTO>();
             ClaimsLossDTO = new HashSet<ClaimsDTO>();
@@ -440,7 +442,7 @@ namespace iNube.Services.Claims.Models
         public string TypeCode { get; set; }
         public string Value { get; set; }
 
-       // public virtual ICollection<ClaimTransactionNewDTOs> ClaimTransactionNewDTOs { get; set; }
+        // public virtual ICollection<ClaimTransactionNewDTOs> ClaimTransactionNewDTOs { get; set; }
         public virtual ICollection<ClaimsDTO> ClaimsClaimStatusDTO { get; set; }
         public virtual ICollection<ClaimsHistoryDTO> ClaimsHistoryDTO { get; set; }
         public virtual ICollection<ClaimsDTO> ClaimsLossDTO { get; set; }
@@ -471,7 +473,7 @@ namespace iNube.Services.Claims.Models
         public virtual ICollection<ClaimTransactionnewDTO> ClaimTransactionNewDTO { get; set; }
     }
 
-   
+
     public class ClaimDocUpload : ResponseStatus
     {
         public ClaimdocDTO claimdocDTO { get; set; }
@@ -625,7 +627,6 @@ namespace iNube.Services.Claims.Models
 
     public partial class BankAccountsDTO
     {
-
         public int BankId { get; set; }
         public string AccountHolderName { get; set; }
         public string AccountNumber { get; set; }
@@ -639,31 +640,33 @@ namespace iNube.Services.Claims.Models
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int? PayeeTypeId { get; set; }
-
+        public string PayeeType { get; set; }
+        public decimal? AmountPaid { get; set; }
+        public DateTime? DataOfPayment { get; set; }
         //public virtual ClaimsDTO Claim { get; set; }
     }
     public partial class BankFileDTO
     {
-            public int BankFileId { get; set; }
-            public string PolicyNo { get; set; }
-            public string ClaimNo { get; set; }
-            public string ClaimStatus { get; set; }
-            public string InsuredName { get; set; }
-            public string InsuredRefNo { get; set; }
-            public string BankAccountHolderName { get; set; }
-            public string BankName { get; set; }
-            public string BankAccountNumber { get; set; }
-            public string BankBranchAddress { get; set; }
-            public string BankIfsccode { get; set; }
-            public decimal Amount { get; set; }
-            public string Utrno { get; set; }
-            public string PaymentStatus { get; set; }
-            public string PaymentDate { get; set; }
-            public int? Active { get; set; }
-            public string CreatedBy { get; set; }
-            public decimal? BankDocId { get; set; }
-            public string FailedReason { get; set; }
-     }
+        public int BankFileId { get; set; }
+        public string PolicyNo { get; set; }
+        public string ClaimNo { get; set; }
+        public string ClaimStatus { get; set; }
+        public string InsuredName { get; set; }
+        public string InsuredRefNo { get; set; }
+        public string BankAccountHolderName { get; set; }
+        public string BankName { get; set; }
+        public string BankAccountNumber { get; set; }
+        public string BankBranchAddress { get; set; }
+        public string BankIfsccode { get; set; }
+        public decimal Amount { get; set; }
+        public string Utrno { get; set; }
+        public string PaymentStatus { get; set; }
+        public string PaymentDate { get; set; }
+        public int? Active { get; set; }
+        public string CreatedBy { get; set; }
+        public decimal? BankDocId { get; set; }
+        public string FailedReason { get; set; }
+    }
 
     public partial class AccountDTO
     {
@@ -792,120 +795,120 @@ namespace iNube.Services.Claims.Models
     }
 
     public class DemoResponse<T>
-     {
-            public int Code { get; set; }
+    {
+        public int Code { get; set; }
 
-            public string Msg { get; set; }
+        public string Msg { get; set; }
 
-            public T Data { get; set; }
+        public T Data { get; set; }
 
-            public static DemoResponse<T> GetResult(int code, string msg, T data = default(T))
+        public static DemoResponse<T> GetResult(int code, string msg, T data = default(T))
+        {
+            return new DemoResponse<T>
             {
-                return new DemoResponse<T>
-                {
-                    Code = code,
-                    Msg = msg,
-                    Data = data
-                };
-            }
-     }
-
-        #region Integration Model
-        public class ProductRcbdetailsDTO
-        {
-            public decimal RcbdetailsId { get; set; }
-            public int? ProductId { get; set; }
-            public int InputId { get; set; }
-            public string InputType { get; set; }
-            public bool? IsReqired { get; set; }
+                Code = code,
+                Msg = msg,
+                Data = data
+            };
         }
-
-        public partial class PolicyListDTO
-        {
-            public string ProductId { get; set; }
-            public string PartnerId { get; set; }
-            public string PolicyId { get; set; }
-        }
-        public partial class PolicyDTO
-        {
-            public decimal PolicyId { get; set; }
-            public string PolicyNo { get; set; }
-            public short? PolicyVersion { get; set; }
-            public int? AgentBusinessTypeId { get; set; }
-            public decimal? AgentId { get; set; }
-            public int? SubAgentId { get; set; }
-            public DateTime? PolicyStartDate { get; set; }
-            public DateTime? PolicyEndDate { get; set; }
-            public TimeSpan? InceptionTime { get; set; }
-            public decimal? SumInsured { get; set; }
-            public int? BranchIdPk { get; set; }
-            public int? ProductIdPk { get; set; }
-            public string PolicyTypeId { get; set; }
-            public string CreatedBy { get; set; }
-            public DateTime CreatedDate { get; set; }
-            public string Channel { get; set; }
-            public string DocumentType { get; set; }
-            public int? PolicyStatusId { get; set; }
-            public int? BusinessTypeId { get; set; }
-            public string QuoteNo { get; set; }
-            public DateTime? QuoteDate { get; set; }
-            public string ProposalNo { get; set; }
-            public DateTime? ProposalDate { get; set; }
-            public string CoverNoteNo { get; set; }
-            public DateTime? CoverNoteIssueDate { get; set; }
-            public int? PolicyStageStatusId { get; set; }
-            public DateTime PolicyIssueDate { get; set; }
-            public int? PolicyStageId { get; set; }
-            public string MasterPolicyNo { get; set; }
-            public string PolicyRemarks { get; set; }
-            public string Smcode { get; set; }
-            public int? Irccode { get; set; }
-            public string CustomerId { get; set; }
-            public int? Csoid { get; set; }
-            public short IsUploadedToIcm { get; set; }
-            public decimal? CorporateId { get; set; }
-            public decimal? BundleId { get; set; }
-            public string BundleTxnId { get; set; }
-            public decimal? BundleParentId { get; set; }
-            public bool? IsIrdaupdated { get; set; }
-            public string Currency { get; set; }
-            public string Rate { get; set; }
-            public string MobileNumber { get; set; }
-            public string Email { get; set; }
-            public string CoverEvent { get; set; }
-            public string CoverName { get; set; }
-            public decimal? OrganizationId { get; set; }
     }
 
-        #endregion
-        public class EmailTest
-        {
-            public string To { get; set; }
-            public string Subject { get; set; }
-            public string Message { get; set; }
-        }
+    #region Integration Model
+    public class ProductRcbdetailsDTO
+    {
+        public decimal RcbdetailsId { get; set; }
+        public int? ProductId { get; set; }
+        public int InputId { get; set; }
+        public string InputType { get; set; }
+        public bool? IsReqired { get; set; }
+    }
 
-        public class FileRequest
-        {
-            public int Id { get; set; }
-            public string FileName { get; set; }
-            public byte[] Content { get; set; }
-        }
+    public partial class PolicyListDTO
+    {
+        public string ProductId { get; set; }
+        public string PartnerId { get; set; }
+        public string PolicyId { get; set; }
+    }
+    public partial class PolicyDTO
+    {
+        public decimal PolicyId { get; set; }
+        public string PolicyNo { get; set; }
+        public short? PolicyVersion { get; set; }
+        public int? AgentBusinessTypeId { get; set; }
+        public decimal? AgentId { get; set; }
+        public int? SubAgentId { get; set; }
+        public DateTime? PolicyStartDate { get; set; }
+        public DateTime? PolicyEndDate { get; set; }
+        public TimeSpan? InceptionTime { get; set; }
+        public decimal? SumInsured { get; set; }
+        public int? BranchIdPk { get; set; }
+        public int? ProductIdPk { get; set; }
+        public string PolicyTypeId { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string Channel { get; set; }
+        public string DocumentType { get; set; }
+        public int? PolicyStatusId { get; set; }
+        public int? BusinessTypeId { get; set; }
+        public string QuoteNo { get; set; }
+        public DateTime? QuoteDate { get; set; }
+        public string ProposalNo { get; set; }
+        public DateTime? ProposalDate { get; set; }
+        public string CoverNoteNo { get; set; }
+        public DateTime? CoverNoteIssueDate { get; set; }
+        public int? PolicyStageStatusId { get; set; }
+        public DateTime PolicyIssueDate { get; set; }
+        public int? PolicyStageId { get; set; }
+        public string MasterPolicyNo { get; set; }
+        public string PolicyRemarks { get; set; }
+        public string Smcode { get; set; }
+        public int? Irccode { get; set; }
+        public string CustomerId { get; set; }
+        public int? Csoid { get; set; }
+        public short IsUploadedToIcm { get; set; }
+        public decimal? CorporateId { get; set; }
+        public decimal? BundleId { get; set; }
+        public string BundleTxnId { get; set; }
+        public decimal? BundleParentId { get; set; }
+        public bool? IsIrdaupdated { get; set; }
+        public string Currency { get; set; }
+        public string Rate { get; set; }
+        public string MobileNumber { get; set; }
+        public string Email { get; set; }
+        public string CoverEvent { get; set; }
+        public string CoverName { get; set; }
+        public decimal? OrganizationId { get; set; }
+    }
 
-        public class ClaimDTOGWP
-        {
-            public decimal ProductId { get; set; }
-            public string ProductName { get; set; }
-            public string ClaimStatusId { get; set; }
-        }
+    #endregion
+    public class EmailTest
+    {
+        public string To { get; set; }
+        public string Subject { get; set; }
+        public string Message { get; set; }
+    }
 
-        public partial class ddDTO
-        {
-            public int mID { get; set; }
-            public string mValue { get; set; }
-            public string mType { get; set; }
-            public bool mIsRequired { get; set; }
-        }
+    public class FileRequest
+    {
+        public int Id { get; set; }
+        public string FileName { get; set; }
+        public byte[] Content { get; set; }
+    }
+
+    public class ClaimDTOGWP
+    {
+        public decimal ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string ClaimStatusId { get; set; }
+    }
+
+    public partial class ddDTO
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+        public bool mIsRequired { get; set; }
+    }
 
     public partial class commonddDTO
     {
@@ -924,273 +927,273 @@ namespace iNube.Services.Claims.Models
     //}
 
     public partial class PartnersDTO
+    {
+        public decimal PartnerId { get; set; }
+        public int? PartnerTypeId { get; set; }
+        public int? PartnerClassId { get; set; }
+        public int? SalutationId { get; set; }
+        public string PartnerName { get; set; }
+        public string Fax { get; set; }
+        public string Telephone { get; set; }
+        public string Mobile { get; set; }
+        public string Email { get; set; }
+        public string Pan { get; set; }
+        public string Website { get; set; }
+        public bool? Gst { get; set; }
+        public string Gstnumber { get; set; }
+        public string Pannumber { get; set; }
+        public string Cinnumber { get; set; }
+        public string PartnerCode { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifyBy { get; set; }
+        public DateTime? ModifyDate { get; set; }
+        public string PartnerType { get; set; }
+        public string PartnerClass { get; set; }
+    }
+    /// <summary>
+    /// for invoice generation
+    /// </summary>
+    public class BillingEventDataDTO
+    {
+        public int Count { get; set; }
+        public string ProductCode { get; set; }
+        public string ProductName { get; set; }
+        public decimal SumInsured { get; set; }
+        public int? ProductId { get; set; }
+        public decimal Premium { get; set; }
+    }
+    public class PolicyDataForClaims
+    {
+        public decimal PolicyId { get; set; }
+        public string PolicyNo { get; set; }
+        public string ProductName { get; set; }
+        public string InsuredName { get; set; }
+        public string InsuredRefNo { get; set; }
+    }
+
+    public class BillingEventResponseDTO
+    {
+        public BillingEventResponseDTO()
         {
-            public decimal PartnerId { get; set; }
-            public int? PartnerTypeId { get; set; }
-            public int? PartnerClassId { get; set; }
-            public int? SalutationId { get; set; }
-            public string PartnerName { get; set; }
-            public string Fax { get; set; }
-            public string Telephone { get; set; }
-            public string Mobile { get; set; }
-            public string Email { get; set; }
-            public string Pan { get; set; }
-            public string Website { get; set; }
-            public bool? Gst { get; set; }
-            public string Gstnumber { get; set; }
-            public string Pannumber { get; set; }
-            public string Cinnumber { get; set; }
-            public string PartnerCode { get; set; }
-            public string CreatedBy { get; set; }
-            public DateTime? CreatedDate { get; set; }
-            public int? ModifyBy { get; set; }
-            public DateTime? ModifyDate { get; set; }
-            public string PartnerType { get; set; }
-            public string PartnerClass { get; set; }
+            billingEventDataDTOs = new List<BillingEventDataDTO>();
+            claimEventDTOs = new List<ClaimEventDTO>();
         }
-        /// <summary>
-        /// for invoice generation
-        /// </summary>
-        public class BillingEventDataDTO
-        {
-            public int Count { get; set; }
-            public string ProductCode { get; set; }
-            public string ProductName { get; set; }
-            public decimal SumInsured { get; set; }
-            public int? ProductId { get; set; }
-            public decimal Premium { get; set; }
-        }
-        public class PolicyDataForClaims
-        {
-            public decimal PolicyId { get; set; }
-            public string PolicyNo { get; set; }
-            public string ProductName { get; set; }
-            public string InsuredName { get; set; }
-            public string InsuredRefNo { get; set; }
-        }
+        public List<BillingEventDataDTO> billingEventDataDTOs { get; set; }
+        public List<ClaimEventDTO> claimEventDTOs { get; set; }
+    }
+    public class ClaimEventDTO
+    {
+        public string ClaimNo { get; set; }
+        public string PolicyNo { get; set; }//policyId
+        public string ProductName { get; set; }//
+        public DateTime? LossDate { get; set; }
+        public string InsuredName { get; set; }//
+        public string InsuredRefNo { get; set; }//customerId
+        public DateTime? CreatedDate { get; set; }
+    }
+    public class BillingEventRequest
+    {
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
+        public decimal CustomerId { get; set; }
+        public decimal EvtId { get; set; }
+    }
 
-        public class BillingEventResponseDTO
-        {
-            public BillingEventResponseDTO()
-            {
-                billingEventDataDTOs = new List<BillingEventDataDTO>();
-                claimEventDTOs = new List<ClaimEventDTO>();
-            }
-            public List<BillingEventDataDTO> billingEventDataDTOs { get; set; }
-            public List<ClaimEventDTO> claimEventDTOs { get; set; }
-        }
-        public class ClaimEventDTO
-        {
-            public string ClaimNo { get; set; }
-            public string PolicyNo { get; set; }//policyId
-            public string ProductName { get; set; }//
-            public DateTime? LossDate { get; set; }
-            public string InsuredName { get; set; }//
-            public string InsuredRefNo { get; set; }//customerId
-            public DateTime? CreatedDate { get; set; }
-        }
-        public class BillingEventRequest
-        {
-            public DateTime FromDate { get; set; }
-            public DateTime ToDate { get; set; }
-            public decimal CustomerId { get; set; }
-            public decimal EvtId { get; set; }
-        }
-
-        public partial class ProductDTO
-        {
-            public int ProductId { get; set; }
-            public int? Lobid { get; set; }
-            public int? Cobid { get; set; }
-            public int? ProductStatusId { get; set; }
-            public string ProductName { get; set; }
-            public string ProductCode { get; set; }
-            public DateTime? ActiveFrom { get; set; }
-            public DateTime? ActiveTo { get; set; }
-            public decimal? PremiumAmount { get; set; }
-            public string CreatedBy { get; set; }
-            public DateTime? CreatedDate { get; set; }
-            public int? ModifyBy { get; set; }
-            public DateTime? ModifyDate { get; set; }
-            public decimal? PartnerId { get; set; }
-            public decimal OrganizationId { get; set; }
-            public string Value { get; set; }
-            public string Label { get; set; }
-            public string LOB1 { get; set; }
-            public string COB1 { get; set; }
+    public partial class ProductDTO
+    {
+        public int ProductId { get; set; }
+        public int? Lobid { get; set; }
+        public int? Cobid { get; set; }
+        public int? ProductStatusId { get; set; }
+        public string ProductName { get; set; }
+        public string ProductCode { get; set; }
+        public DateTime? ActiveFrom { get; set; }
+        public DateTime? ActiveTo { get; set; }
+        public decimal? PremiumAmount { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifyBy { get; set; }
+        public DateTime? ModifyDate { get; set; }
+        public decimal? PartnerId { get; set; }
+        public decimal OrganizationId { get; set; }
+        public string Value { get; set; }
+        public string Label { get; set; }
+        public string LOB1 { get; set; }
+        public string COB1 { get; set; }
 
 
-            //public virtual ICollection<ProductBenefitsDTO> ProductBenefits { get; set; }
-            public virtual ICollection<ProductChannelsDTO> ProductChannels { get; set; }
-            public virtual ICollection<ProductClausesWarrentiesExclusionsDTO> ProductClausesWarrentiesExclusions { get; set; }
-            // public virtual ICollection<ProductCoversDTO> ProductCovers { get; set; }
-            public virtual ICollection<ProductInsurableItemsDTO> ProductInsurableItems { get; set; }
-            public virtual ICollection<ProductRcbdetailsDTO> ProductRcbdetails { get; set; }
-            //public virtual ICollection<ProductPremiumDTO> ProductPremium { get; set; }
-            public virtual ICollection<ddDTOs> RiskDetails { get; set; }
-            public virtual ICollection<ddDTOs> ClaimDetails { get; set; }
-        }
-        public partial class ProductCoversDTO
-        {
-            //public ProductCoversDTO()
-            //{
-            //    TblProductBenefits = new HashSet<ProductBenefitsDTO>();
-            //    TblProductPremium = new HashSet<ProductPremiumDTO>();
-            //}
-            public decimal CoverId { get; set; }
-            public int ProductId { get; set; }
-            public int CoverTypeId { get; set; }
-            public string CoverDescription { get; set; }
-            public bool? SingleValue { get; set; }
-            public string CoverEventFactorValueFrom { get; set; }
-            public string CoverEventFactorValueTo { get; set; }
-            public string CoverPeriod { get; set; }
-            public int MaximumBenefitAmount { get; set; }
-            public int CoverEventId { get; set; }
-            public int CoverEventFactorId { get; set; }
-            public int CoverEventFactorValueUnitId { get; set; }
-            public string Cover { get; set; }
-            public string CoverEvent { get; set; }
-            public string CoverEventFactor { get; set; }
-            public string CoverEventFactorValue { get; set; }
-            public virtual ICollection<ProductBenefitsDTO> ProductBenefits { get; set; }
-            public virtual ICollection<ProductPremiumDTO> ProductPremium { get; set; }
+        //public virtual ICollection<ProductBenefitsDTO> ProductBenefits { get; set; }
+        public virtual ICollection<ProductChannelsDTO> ProductChannels { get; set; }
+        public virtual ICollection<ProductClausesWarrentiesExclusionsDTO> ProductClausesWarrentiesExclusions { get; set; }
+        // public virtual ICollection<ProductCoversDTO> ProductCovers { get; set; }
+        public virtual ICollection<ProductInsurableItemsDTO> ProductInsurableItems { get; set; }
+        public virtual ICollection<ProductRcbdetailsDTO> ProductRcbdetails { get; set; }
+        //public virtual ICollection<ProductPremiumDTO> ProductPremium { get; set; }
+        public virtual ICollection<ddDTOs> RiskDetails { get; set; }
+        public virtual ICollection<ddDTOs> ClaimDetails { get; set; }
+    }
+    public partial class ProductCoversDTO
+    {
+        //public ProductCoversDTO()
+        //{
+        //    TblProductBenefits = new HashSet<ProductBenefitsDTO>();
+        //    TblProductPremium = new HashSet<ProductPremiumDTO>();
+        //}
+        public decimal CoverId { get; set; }
+        public int ProductId { get; set; }
+        public int CoverTypeId { get; set; }
+        public string CoverDescription { get; set; }
+        public bool? SingleValue { get; set; }
+        public string CoverEventFactorValueFrom { get; set; }
+        public string CoverEventFactorValueTo { get; set; }
+        public string CoverPeriod { get; set; }
+        public int MaximumBenefitAmount { get; set; }
+        public int CoverEventId { get; set; }
+        public int CoverEventFactorId { get; set; }
+        public int CoverEventFactorValueUnitId { get; set; }
+        public string Cover { get; set; }
+        public string CoverEvent { get; set; }
+        public string CoverEventFactor { get; set; }
+        public string CoverEventFactorValue { get; set; }
+        public virtual ICollection<ProductBenefitsDTO> ProductBenefits { get; set; }
+        public virtual ICollection<ProductPremiumDTO> ProductPremium { get; set; }
 
 
-        }
-        public partial class ProductChannelsDTO
-        {
-            public decimal ChannelId { get; set; }
-            public int? ProductId { get; set; }
-            public int? ChannelTypeId { get; set; }
-            public DateTime? EffectiveFrom { get; set; }
-            public DateTime? EffectiveTo { get; set; }
-            public double? Brokage { get; set; }
+    }
+    public partial class ProductChannelsDTO
+    {
+        public decimal ChannelId { get; set; }
+        public int? ProductId { get; set; }
+        public int? ChannelTypeId { get; set; }
+        public DateTime? EffectiveFrom { get; set; }
+        public DateTime? EffectiveTo { get; set; }
+        public double? Brokage { get; set; }
 
-            //public virtual string ChannelType { get; set; }
-            //public virtual string ProductName { get; set; }
-        }
+        //public virtual string ChannelType { get; set; }
+        //public virtual string ProductName { get; set; }
+    }
 
-        public partial class ProductBenefitsDTO
-        {
-            public decimal BenefitId { get; set; }
-            public int? ProductId { get; set; }
-            public int? BenefitTypeId { get; set; }
-            public double? BenefitAmount { get; set; }
-            public int? BenefitCriteria { get; set; }
-            public int? BenefitCriteriaValue { get; set; }
-            public int? MaxBenefitAmount { get; set; }
-            public bool? SingleValue { get; set; }
-            public string CurrencyId { get; set; }
-            //public string BenefitType { get; set; }
-            //public string Product { get; set; }
-            public decimal? CoverId { get; set; }
-            public string BenefitType { get; set; }
+    public partial class ProductBenefitsDTO
+    {
+        public decimal BenefitId { get; set; }
+        public int? ProductId { get; set; }
+        public int? BenefitTypeId { get; set; }
+        public double? BenefitAmount { get; set; }
+        public int? BenefitCriteria { get; set; }
+        public int? BenefitCriteriaValue { get; set; }
+        public int? MaxBenefitAmount { get; set; }
+        public bool? SingleValue { get; set; }
+        public string CurrencyId { get; set; }
+        //public string BenefitType { get; set; }
+        //public string Product { get; set; }
+        public decimal? CoverId { get; set; }
+        public string BenefitType { get; set; }
 
 
-            public virtual ICollection<BenifitRangeDetails> BenifitRangeDetails { get; set; }
-        }
+        public virtual ICollection<BenifitRangeDetails> BenifitRangeDetails { get; set; }
+    }
 
-        public partial class ProductClausesWarrentiesExclusionsDTO
-        {
-            public decimal Cweid { get; set; }
-            public int? ProductId { get; set; }
-            public int? CwetypeId { get; set; }
-            public string TypeName { get; set; }
-            public string Description { get; set; }
-            public bool IsPrint { get; set; }
-            public string Label { get; set; }
-            public string Cwetypes { get; set; }
-            //public string ProductName { get; set; }
-        }
+    public partial class ProductClausesWarrentiesExclusionsDTO
+    {
+        public decimal Cweid { get; set; }
+        public int? ProductId { get; set; }
+        public int? CwetypeId { get; set; }
+        public string TypeName { get; set; }
+        public string Description { get; set; }
+        public bool IsPrint { get; set; }
+        public string Label { get; set; }
+        public string Cwetypes { get; set; }
+        //public string ProductName { get; set; }
+    }
 
-        public partial class ProductInsurableItemsDTO
-        {
-            //public ProductInsurableItemsDTO()
-            //{
-            //    TblProductCovers = new HashSet<ProductCoversDTO>();
-            //}
+    public partial class ProductInsurableItemsDTO
+    {
+        //public ProductInsurableItemsDTO()
+        //{
+        //    TblProductCovers = new HashSet<ProductCoversDTO>();
+        //}
 
-            public decimal InsurableItemId { get; set; }
-            public int ProductId { get; set; }
-            public int InsurableItemTypeId { get; set; }
+        public decimal InsurableItemId { get; set; }
+        public int ProductId { get; set; }
+        public int InsurableItemTypeId { get; set; }
 
-            //  public virtual ProductMasterDTO InsurableItemType { get; set; }
+        //  public virtual ProductMasterDTO InsurableItemType { get; set; }
 
-            public virtual ICollection<ProductCoversDTO> ProductCovers { get; set; }
-        }
+        public virtual ICollection<ProductCoversDTO> ProductCovers { get; set; }
+    }
 
 
 
-        public partial class BenifitRangeDetails
-        {
-            public decimal BenefitRangeId { get; set; }
-            public decimal BenifitId { get; set; }
-            public double FromValue { get; set; }
-            public double ToValue { get; set; }
-            public double BenefitAmount { get; set; }
-        }
-        public partial class ProductPremiumDTO
-        {
-            public decimal PremiumId { get; set; }
-            public int? ProductId { get; set; }
-            public int? CurrencyId { get; set; }
-            public decimal? PremiumAmount { get; set; }
-            public decimal? CoverId { get; set; }
-        }
-        public class PolicyBookingTransaction
-        {
-            public decimal PartnerId { get; set; }
-            public decimal ProductId { get; set; }
-            public string AccountNo { get; set; }
-            public string PolicyNo { get; set; }
-            public string TxnType { get; set; }
-            public decimal TxnAmount { get; set; }
-            public decimal PaymentId { get; set; }
-            public bool IsRefund { get; set; }
-        }
-        public partial class ddDTOs
-        {
-            //public int mID { get; set; }
-            //public string mValue { get; set; }
-            //public string mType { get; set; }
-            //public bool mIsRequired { get; set; }
-            public int mID { get; set; }
-            public string mValue { get; set; }
-            public string mType { get; set; }
-            public bool mIsRequired { get; set; }
-            public string planCode { get; set; }
-            public string lob { get; set; }
-            public string cob { get; set; }
-            public bool disable { get; set; }
-            public string Value { get; set; }
-            public string Label { get; set; }
+    public partial class BenifitRangeDetails
+    {
+        public decimal BenefitRangeId { get; set; }
+        public decimal BenifitId { get; set; }
+        public double FromValue { get; set; }
+        public double ToValue { get; set; }
+        public double BenefitAmount { get; set; }
+    }
+    public partial class ProductPremiumDTO
+    {
+        public decimal PremiumId { get; set; }
+        public int? ProductId { get; set; }
+        public int? CurrencyId { get; set; }
+        public decimal? PremiumAmount { get; set; }
+        public decimal? CoverId { get; set; }
+    }
+    public class PolicyBookingTransaction
+    {
+        public decimal PartnerId { get; set; }
+        public decimal ProductId { get; set; }
+        public string AccountNo { get; set; }
+        public string PolicyNo { get; set; }
+        public string TxnType { get; set; }
+        public decimal TxnAmount { get; set; }
+        public decimal PaymentId { get; set; }
+        public bool IsRefund { get; set; }
+    }
+    public partial class ddDTOs
+    {
+        //public int mID { get; set; }
+        //public string mValue { get; set; }
+        //public string mType { get; set; }
+        //public bool mIsRequired { get; set; }
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+        public bool mIsRequired { get; set; }
+        public string planCode { get; set; }
+        public string lob { get; set; }
+        public string cob { get; set; }
+        public bool disable { get; set; }
+        public string Value { get; set; }
+        public string Label { get; set; }
 
 
 
 
-        }
-        public partial class ProductSearchDTO
-        {
-            public int ProductId { get; set; }
-            public int? Lobid { get; set; }
-            public int? Cobid { get; set; }
-            public int? ProductStatusId { get; set; }
-            public string ProductName { get; set; }
-            public string ProductCode { get; set; }
-            public DateTime? ActiveFrom { get; set; }
-            public DateTime? ActiveTo { get; set; }
-            public int? PremiumAmount { get; set; }
-            public string CreatedBy { get; set; }
-            public DateTime? CreatedDate { get; set; }
-            public int? ModifyBy { get; set; }
-            public DateTime? ModifyDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public string SortOn { get; set; }
-            public string SortDirection { get; set; }
+    }
+    public partial class ProductSearchDTO
+    {
+        public int ProductId { get; set; }
+        public int? Lobid { get; set; }
+        public int? Cobid { get; set; }
+        public int? ProductStatusId { get; set; }
+        public string ProductName { get; set; }
+        public string ProductCode { get; set; }
+        public DateTime? ActiveFrom { get; set; }
+        public DateTime? ActiveTo { get; set; }
+        public int? PremiumAmount { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifyBy { get; set; }
+        public DateTime? ModifyDate { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public string SortOn { get; set; }
+        public string SortDirection { get; set; }
 
-        }
+    }
 
     public partial class ClaimInsurableDTO
     {
@@ -1411,5 +1414,5 @@ namespace iNube.Services.Claims.Models
     }
 
 
-    
+
 }

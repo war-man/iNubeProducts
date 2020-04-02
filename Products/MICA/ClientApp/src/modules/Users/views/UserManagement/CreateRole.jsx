@@ -100,6 +100,7 @@ class CreateRole extends React.Component {
             dashboardvalue: "",
             listData: [],
             reports: [],
+            dynamicReport: [],
             rolemenupermissions: {
                 "roleId": ""
             },
@@ -110,7 +111,24 @@ class CreateRole extends React.Component {
             rolepermissions: {
                 "roleId": "",
                 "permissionIds": []
-            }
+            },
+            selectdreports: [],
+            //ReportDynamic: {
+            //    DynamicPermissionId: "",
+            //    DynamicId: "",
+            //    DynamicName: "",
+            //    DynamicType: "",
+            //    Userid: "",
+            //    Roleid: "",
+            //    UserorRole: "",
+            //    IsActive: "",
+            //    SortOrderBy: "",
+            //    CreatedBy: "",
+            //    CreatedDate: "",
+            //    mID: "",
+            //    mValue: "",
+            //    mType: "",
+            //}
         };
         this.CreateRole = this.CreateRole.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -148,6 +166,7 @@ class CreateRole extends React.Component {
                             text: data.errors[0].errorMessage,
                             icon: "error"
                         });
+                        this.handleRolepermission();
                     } else if (data.status == 400) {
                         swal({
                             text: "Some fields are missing",
@@ -196,7 +215,6 @@ class CreateRole extends React.Component {
     componentDidMount() {
         this.setState({ menuname: false });
         this.handleAllRoles();
-        this.handleRolepermission();
     }
 
     handleRolepermission = () => {
@@ -227,7 +245,20 @@ class CreateRole extends React.Component {
                 console.log("permission data", this.state.dashboard);
             });
 
-        fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetReports`, {
+        //fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetReports`, {
+        //    method: 'Get',
+        //    headers: {
+        //        'Accept': 'application/json',
+        //        'Content-Type': 'application/json',
+        //        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+        //    },
+        //}).then(response => response.json())
+        //    .then(data => {
+        //        this.setState({ reports: data });
+        //        console.log("permission data", this.state.reports);
+        //    });
+
+        fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicConfig`, {
             method: 'Get',
             headers: {
                 'Accept': 'application/json',
@@ -236,8 +267,10 @@ class CreateRole extends React.Component {
             },
         }).then(response => response.json())
             .then(data => {
-                this.setState({ reports: data });
-                console.log("permission data", this.state.reports);
+                console.log("permission data ", data);
+                this.setState({ dynamicReport: data });
+                //this.setState({ reports: data });
+                console.log("permission data", this.state.dynamicReport);
             });
     }
 
@@ -290,8 +323,26 @@ class CreateRole extends React.Component {
                 console.log("dashboards: ", this.state.dashboard);
             });
 
-        this.state.reports = [];
-        fetch(`${UserConfig.UserConfigUrl}/api/Permission/RoleReports`, {
+        //this.state.reports = [];
+        //fetch(`${UserConfig.UserConfigUrl}/api/Permission/RoleReports`, {
+        //    method: 'POST',
+        //    headers: {
+        //        'Accept': 'application/json',
+        //        'Content-Type': 'application/json',
+        //        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+        //    },
+        //    body: JSON.stringify(perm)
+        //})
+        //    .then(response => response.json())
+        //    .then(data => {
+
+        //        this.setState({ reports: data });
+        //        console.log("reports: ", this.state.reports);
+        //        this.handleOpen();
+        //    });
+
+        this.state.dynamicreports = [];
+        fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetReportByRole`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -303,8 +354,8 @@ class CreateRole extends React.Component {
             .then(response => response.json())
             .then(data => {
 
-                this.setState({ reports: data });
-                console.log("reports: ", this.state.reports);
+                this.setState({ dynamicReport: data.dynamicResponse });
+                console.log("reports: ", this.state.dynamicReport);
                 this.handleOpen();
             });
     };
@@ -381,17 +432,19 @@ class CreateRole extends React.Component {
     }
 
     testCheck2 = (index, location, c, event) => {
+        let responses = [...this.state.dynamicReport[c].mdata];
         if (location.length > 0) {
-            let responses = [...this.state.reports[c].mdata];
+            responses = [...this.state.dynamicReport[c].mdata];
             responses[location[0]]['children'][index]['status'] = !responses[location[0]]['children'][index]['status'];
             this.setState({ responses });
         } else {
-            let responses = [...this.state.reports[c].mdata];
+            responses = [...this.state.dynamicReport[c].mdata];
             responses[index].status = !responses[index].status;
             this.setState({ responses });
             this.setChildren(responses[index]['children'], responses[index].status);
         }
         event.preventDefault();
+        console.log("selected data: ", responses);
     }
 
     changeCollapse = (index, location, c) => {
@@ -470,16 +523,21 @@ class CreateRole extends React.Component {
     handleSubmit = () => {
         const that = this;
         let x = {};
+        let rp = {};
         let listData = that.state.listData;
         let dashboard = that.state.dashboard;
-        let reports = that.state.reports;
+        let dynamicReport = that.state.dynamicReport;
         console.log("new Roleid", that.state.newroleid);
         if (this.state.newroleid != "") {
             x.roleId = that.state.newroleid;
+            rp.roleId = that.state.newroleid;
         } else {
             x.roleId = that.state.searchRequest.roleid;
+            rp.roleId = that.state.searchRequest.roleid;
         }
         x.permissionIds = [];
+        rp.permissionIds = [];
+
         let RolesDTO = that.state.RolesDTO;//for converting rolename to roleid
         for (let i = 0; i < listData.length; i++) {
             let y = {};
@@ -515,31 +573,31 @@ class CreateRole extends React.Component {
                 console.log("dashboards changes: ", x.permissionIds);
             }
         }
-        debugger;
-        for (let i = 0; i < reports.length; i++) {
+
+        for (let i = 0; i < dynamicReport.length; i++) {
             let y = {};
             y.newpermissionIds = [];
-            for (let j = 0; j < reports[i].mdata.length; j++) {
-                if (reports[i].mdata[j].status == true) {
-                    y.newpermissionIds = y.newpermissionIds.concat([reports[i].mdata[j].permissionId]);
+            for (let j = 0; j < dynamicReport[i].mdata.length; j++) {
+                if (dynamicReport[i].mdata[j].status == true) {
+                    y.newpermissionIds = y.newpermissionIds.concat([dynamicReport[i].mdata[j]]);
                 }
-                y.newpermissionIds = this.handleSubmitForChildren(reports[i].mdata[j].children, y.newpermissionIds);
+                y.newpermissionIds = this.handleSubmitForChildren(dynamicReport[i].mdata[j].children, y.newpermissionIds);
             }
 
             if (y.newpermissionIds.length > 0 || y.newpermissionIds.length == 0) {
                 y.newpermissionIds = [...new Set(y.newpermissionIds)];
-                console.log("y.newpermissionIds: ", y.newpermissionIds);
-                x.permissionIds = x.permissionIds.concat(y.newpermissionIds);
-                console.log("x.permissionIds: ", x.permissionIds);
+                rp.permissionIds = rp.permissionIds.concat(y.newpermissionIds);
             }
         }
-
+        console.log("x.permissionIds: ", rp);
         x.permissionIds = [...new Set(x.permissionIds)];
         //if (this.state.searchRequest.roleid == "") {
         //    x.permissionIds.push(this.state.dashboardvalue);
         //}
         console.log("Final data", x);
-        this.setState({ btnload1: true });
+
+        that.setState({ btnload1: true });
+        this.handleReportPermissions(rp);
         fetch(`${UserConfig.UserConfigUrl}/api/Permission/AssignRolePermissions`, {
             method: 'POST',
             headers: {
@@ -561,7 +619,7 @@ class CreateRole extends React.Component {
                 });
                 that.setState({ permissionpage: false });
                 console.log("data", data);
-                this.handleClose();
+                //this.handleClose();
             }
             else if (data.status == 8) {
                 swal({
@@ -581,6 +639,50 @@ class CreateRole extends React.Component {
             }
         });
 
+    }
+
+    handleReportPermissions = (reports) => {
+        let that = this;
+        fetch(`${UserConfig.UserConfigUrl}/api/Role/SaveDynamicPermission`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(reports)
+        }).then(function (response) {
+            console.log("response", response);
+            return response.json();
+        }).then(function (data) {
+            console.log("data", data);
+            //this.setState({ btnload1: false });
+            if (data.status == 2) {
+                swal({
+                    text: "Privileges assigned successfully",
+                    icon: "success"
+                });
+                that.setState({ open: false });
+                console.log("data", data);
+                //this.handleClose();
+            }
+            else if (data.status == 8) {
+                swal({
+                    title: "Error",
+                    text: data.errors[0].errorMessage,
+                    icon: "error"
+                });
+            }
+            else if (data.status == 400) {
+                swal({
+                    title: "Sorry",
+                    text: "Please try again",
+                    icon: "error"
+                });
+            }
+            else {
+            }
+        });
     }
 
     handleSubmitForChildren(parent, y) {
@@ -732,7 +834,7 @@ class CreateRole extends React.Component {
                                         </div>
                                     </GridContainer>
                                     <div id="disp" >
-                                        <Permission handleSubmit={this.handleSubmit} reports={this.state.reports} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ dashboard={this.state.dashboard} handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                        <Permission handleSubmit={this.handleSubmit} reports={this.state.reports} dynamicReport={this.state.dynamicReport} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ dashboard={this.state.dashboard} handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
                                     </div>
                                 </div>
 
@@ -862,7 +964,7 @@ class CreateRole extends React.Component {
                         </CardHeader>
                         <CardBody>
                             <GridContainer justify="center" >
-                                <Permission handleSubmit={this.handleSubmit} dashboard={this.state.dashboard} reports={this.state.reports} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} />
+                                <Permission handleSubmit={this.handleSubmit} dashboard={this.state.dashboard} dynamicReport={this.state.dynamicReport} reports={this.state.reports} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} />
                             </GridContainer>
                         </CardBody>
                     </Card>

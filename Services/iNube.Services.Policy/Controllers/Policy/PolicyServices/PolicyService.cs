@@ -17,6 +17,8 @@ using Newtonsoft.Json;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.Threading;
 
 namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 {
@@ -77,6 +79,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
         Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext);
         Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext);
+
+        Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext);
     }
     public class PolicyService : IPolicyService
     {
@@ -748,6 +753,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<List<object>> SearchPolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).SearchPolicyDetailsByNumber(PolicyNumber, apiContext);
+        }
+
+        public async Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).RefundUpload(httpRequest, cancellationToken, apiContext);
+        }
+
+        public async Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetEndoresementDetails(endorsementSearch, apiContext);
         }
     }
 }

@@ -1042,7 +1042,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var ClaimNumber = GetClaimNumber(0, Convert.ToDecimal(claims.ProductIdPk));
             ClaimsDTO _claims = new ClaimsDTO();
 
-            claims.ClaimStatusId = 16;
+            claims.ClaimStatusId = 33;
             claims.ClaimNumber = ClaimNumber;
             claims.CreatedDate = DateTime.Now;
             claims.CreatedBy = apiContext.UserId;
@@ -1652,15 +1652,23 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
 
 
-            TblBankAccounts _bankAccounts = new TblBankAccounts();
-            _bankAccounts.AccountHolderName = claimsDTO.DataModelDTO["Account Holder Name"];
-            _bankAccounts.AccountNumber = claimsDTO.DataModelDTO["Account No."];
-            _bankAccounts.ClaimId = ClaimApproval.ClaimId;
-            _bankAccounts.BankBranchAddress = claimsDTO.DataModelDTO["Bank Branch Address"];
-            _bankAccounts.BankName = claimsDTO.DataModelDTO["Bank Name"];
-            _bankAccounts.Ifsccode = claimsDTO.DataModelDTO["IFSC Code"];
-            _bankAccounts.AccountType = claimsDTO.DataModelDTO["Account Type"];
-            _context.TblBankAccounts.Add(_bankAccounts);
+
+
+            foreach (var item in claimsDTO.DataModelDTO)
+            {
+                TblBankAccounts _bankAccounts = new TblBankAccounts();
+                _bankAccounts.AccountHolderName = item["Account Holder Name"];
+                _bankAccounts.AccountNumber = item["Account No."];
+                _bankAccounts.ClaimId = ClaimApproval.ClaimId;
+                _bankAccounts.BankBranchAddress = item["Bank Branch Address"];
+                _bankAccounts.BankName = item["Bank Name"];
+                _bankAccounts.Ifsccode = item["IFSC Code"];
+                _bankAccounts.AccountType = item["Account Type"];
+                _bankAccounts.AmountPaid = item["Amount Paid"];
+                _bankAccounts.DataOfPayment = item["Date Of Payment"];
+                _bankAccounts.PayeeType = item.type;
+                _context.TblBankAccounts.Add(_bankAccounts);
+            }
 
             if (claimsprocess.ClaimStatusId == 9)
             {
@@ -1682,7 +1690,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             foreach (var item in Insurable)
             {
                 // item.ApprovedClaimAmounts = claimsDTO.ApprovedClaimAmounts ;
-                item.ApprovedClaimAmounts = claimsDTO.ClaimInsurable.SingleOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId).ApprovedClaimAmounts;
+                item.ApprovedClaimAmounts = claimsDTO.ClaimInsurable.FirstOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId).ApprovedClaimAmounts;
                 _context.TblClaimInsurable.Update(item);
             }
 
@@ -1730,9 +1738,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var amount = (decimal)claimsprocess.ApprovedClaimAmount;
 
             var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
-            
+
             //Balance Sum Insured
-            var balanceSumInsured = await _integrationService.UpdatePolicySumInsuredAsync(claimsprocess.PolicyNo, amount, apiContext);
+            var balanceSumInsured = await _integrationService.UpdatePolicyBalanceSumInsuredAsync(claimsprocess.PolicyNo, amount, apiContext);
 
             //Accouting Transaction 
             var account = AccountMapApproval(apiContext, claimsDTO);
@@ -1853,6 +1861,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         public async Task<List<object>> ClaimDetailsAsync(decimal ClaimId, ApiContext apiContext)
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            _CNContext = (MICACNContext)(await DbManager.GetNewContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var DATA = _context.TblClaims.SingleOrDefault(x => x.ClaimId == ClaimId);
             List<object> FullfinalData = new List<object>();
             try
@@ -1898,7 +1908,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 {
                     var json = JsonConvert.DeserializeObject<dynamic>(DATA.ClaimFields);
 
+                    var state = json["Vehicle Location State"];
+
+                    var stateid = (int)state.Value;
+
+                    var statevalue = _CNContext.TblMasState.SingleOrDefault(x => x.StateId == stateid).StateName;
+
                     finaldata.Add("Vehicle Location", json["Vehicle Location"]);
+                    finaldata.Add("Vehicle Location State", statevalue);
                     finaldata.Add("Driver Name", json["Driver Name"]);
                     finaldata.Add("Self-Survey Required", json["Self-Survey Required"]);
                 }
@@ -1999,11 +2016,18 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         public async Task<List<object>> ClaimEnquiryAsync(decimal ClaimId, ApiContext apiContext)
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            _CNContext = (MICACNContext)(await DbManager.GetNewContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var DATA = _context.TblClaims.SingleOrDefault(x => x.ClaimId == ClaimId);
 
-            var bank = _context.TblBankAccounts.SingleOrDefault(x => x.ClaimId == ClaimId);
+            // var bank = _context.TblBankAccounts.SingleOrDefault(x => x.ClaimId == ClaimId);
 
             var insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == ClaimId).ToList();
+
+            var tblClaim = _context.TblClaims.Where(item => item.ClaimId == ClaimId)
+                      .Include(add => add.TblClaimInsurable).FirstOrDefault();
+            var _claimInsurableDTOs = _mapper.Map<IEnumerable<ClaimInsurableDTO>>(tblClaim.TblClaimInsurable);
 
             var doc = _context.TblClaimdoc.Where(x => x.ClaimId == ClaimId);
             var status = (from a in _context.TblClaims.Where(x => x.ClaimId == ClaimId)
@@ -2019,19 +2043,34 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             finaldata.Add("Loss Date", DATA.LossDateTime);
             finaldata.Add("Location Of Event", DATA.LocationOfEvent);
             finaldata.Add("Loss Description", DATA.LossOfDescription);
-            // finaldata.Add("Created Date", DATA.CreatedDate);
-
             finaldata.Add("Total Claim Amount", DATA.ClaimAmount);
             finaldata.Add("Total Approved Amount", DATA.ApprovedClaimAmount);
-            finaldata.Add("Account Holder Name", bank.AccountHolderName);
-            finaldata.Add("Account Number", bank.AccountNumber);
-            finaldata.Add("Bank Name", bank.BankName);
-            finaldata.Add("Bank IFSC", bank.Ifsccode);
+            //finaldata.Add("Account Holder Name", bank.AccountHolderName);
+            //finaldata.Add("Account Number", bank.AccountNumber);
+            //finaldata.Add("Bank Name", bank.BankName);
+            //finaldata.Add("Bank IFSC", bank.Ifsccode);
 
-            finaldata.Add("Bank Branch Address", bank.BankBranchAddress);
+            //finaldata.Add("Bank Branch Address", bank.BankBranchAddress);
 
             finaldata.Add("Claim Status", status.Value);
             finaldata.Add("Claim Manager Remarks", DATA.ClaimManagerRemarks);
+
+            if (!string.IsNullOrEmpty(DATA.ClaimFields))
+            {
+                var json = JsonConvert.DeserializeObject<dynamic>(DATA.ClaimFields);
+
+                var state = json["Vehicle Location State"];
+
+                var stateid = (int)state.Value;
+
+                var statevalue = _CNContext.TblMasState.SingleOrDefault(x => x.StateId == stateid).StateName;
+
+                finaldata.Add("Vehicle Location", json["Vehicle Location"]);
+                finaldata.Add("Vehicle Location State", statevalue);
+                finaldata.Add("Driver Name", json["Driver Name"]);
+                finaldata.Add("Self-Survey Required", json["Self-Survey Required"]);
+            }
+
 
             foreach (var item in finaldata)
             {
@@ -2044,40 +2083,46 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             }
 
-            FullfinalData.Add(finalData);
-            FullfinalData.Add(insurable);
+            var insurabledata = _claimInsurableDTOs.ToList();
 
-            return FullfinalData;
-
-        }
-
-        public async Task<List<object>> BankDetailsAsync(decimal ClaimId, ApiContext apiContext)
-        {
-            _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var bank = _context.TblBankAccounts.SingleOrDefault(x => x.ClaimId == ClaimId);
-
-            // JObject json = JObject.Parse(DATA.ToString());
-
-            Dictionary<object, object> finaldata = new Dictionary<object, object>();
-            //List<object> finaldata = new List<object>();
-            List<object> FullfinalData = new List<object>();
-            finaldata.Add("Bank Name", bank.BankName);
-            finaldata.Add("Bank Branch Address", bank.BankBranchAddress);
-            finaldata.Add("Account Holder Name", bank.AccountHolderName);
-            finaldata.Add("Account Number", bank.AccountNumber);
-            finaldata.Add("Bank Ifsccode", bank.Ifsccode);
-
-            foreach (var item in finaldata)
+            for (int i = 0; i < insurabledata.Count(); i++)
             {
-                List<object> data = new List<object>();
+                List<Dictionary<string, string>> dict1 = new List<Dictionary<string, string>>();
+                if (!string.IsNullOrEmpty(insurabledata[i].CoverValue))
+                {
+                    var T = JsonConvert.DeserializeObject<dynamic>(insurabledata[i].CoverValue);
+                    var m = JsonConvert.SerializeObject(T);
 
-                data.Add(item.Key);
-                data.Add(item.Value);
+                    var json = JsonConvert.SerializeObject(insurabledata[i].CoverValue);
+                    var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(m);
 
-                FullfinalData.Add(data);
+
+                    foreach (KeyValuePair<string, string> each in dictionary)
+                    {
+                        var dict = new Dictionary<string, string>();
+                        dict.Add("Header", each.Key);
+                        dict.Add("Details", each.Value);
+                        dict1.Add(dict);
+
+                    }
+
+                    insurabledata[i].coverDynamic = dict1;
+                }
+                else
+                {
+                    insurabledata[i].coverDynamic = dict1;
+                }
+
             }
+
+            FullfinalData.Add(finalData);
+            FullfinalData.Add(insurabledata.ToList());
+
             return FullfinalData;
+
         }
+
+        
 
         public async Task<List<object>> ClaimStatusAsync(decimal ClaimId, decimal statusId, ApiContext apiContext)
         {
@@ -2216,7 +2261,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                                 join c in _context.TblmasCmcommonTypes on a.ClaimStatusId equals c.CommonTypeId
                                 select c).FirstOrDefault();
 
-                    var insurabledata = _context.TblClaimInsurable.SingleOrDefault(x => x.ClaimId == item.ClaimId);
+                    var insurabledata = _context.TblClaimInsurable.FirstOrDefault(x => x.ClaimId == item.ClaimId);
 
                     var covervalue = JsonConvert.DeserializeObject<dynamic>(insurabledata.CoverValue);
 
@@ -2233,8 +2278,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.ProductIdPk = pk[0].ProductIdPk;
 
 
+
                 }
-                catch (Exception ex) { }
+                catch (Exception ex)
+                {
+
+                }
             }
 
             var _claimsearchDTOs = new ClaimSearchResponseDTO();
@@ -2291,15 +2340,15 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var policyDetails = await _integrationService.PolicySearch(sdto, apiContext);
 
             // var _policy = await _integrationService.GetPolicyDetails(apiContext);
-
             if (searchclaim.ClaimStatusId > 0)
             {
                 _claims = _claims.Where(p => p.ClaimStatusId == searchclaim.ClaimStatusId);
             }
 
-            if (searchclaim.ClaimStatusId == 38)
+            if (searchclaim.ClaimStatusId == 0)
             {
-                _claims = _claims.Where(p => p.ClaimStatusId == searchclaim.ClaimStatusId);
+                int[] lstOthers = { 34, 35, 36, 37 };
+                _claims = _claims.Where(p => lstOthers.Contains(p.ClaimStatusId));
             }
 
             var _ClaimSearchData = _mapper.Map<List<SearchDTO>>(_claims);
@@ -2726,7 +2775,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         }
 
         //view the uploaded document
-        public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc,bool isPolicy, ApiContext apiContext)
+        public async Task<IEnumerable<ClaimdocDTO>> DocumentView(decimal ClaimId, bool isDoc, bool isPolicy, ApiContext apiContext)
 
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -2734,7 +2783,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var tblClaimDoc = _context.TblClaimdoc.Where(s => s.ClaimId == ClaimId).ToList();
             if (tblClaimDoc != null)
             {
-                if(isPolicy)
+                if (isPolicy)
                 {
                     var tblClaim = _context.TblClaims.FirstOrDefault(s => s.ClaimId == ClaimId);
                     var polDocs = await _integrationService.GetPolicyDocuments(tblClaim.PolicyNo, apiContext);
@@ -2974,10 +3023,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             ClaimCounts counts = new ClaimCounts();
 
-            counts.Intimated = _ClaimSearchData.Where(g => g.ClaimStatusId == 16).Count();
+            counts.Intimated = _ClaimSearchData.Where(g => g.ClaimStatusId == 33).Count();
             counts.Approved = _ClaimSearchData.Where(g => g.ClaimStatusId == 9).Count();
             counts.Document = _ClaimSearchData.Where(g => g.ClaimStatusId == 17).Count();
-            counts.Rejected = _ClaimSearchData.Where(g => g.ClaimStatusId == 11).Count();
+            counts.Rejected = _ClaimSearchData.Where(g => g.ClaimStatusId == 34).Count();
+            counts.Rejected = counts.Rejected + _ClaimSearchData.Where(g => g.ClaimStatusId == 35).Count();
+            counts.Rejected = counts.Rejected + _ClaimSearchData.Where(g => g.ClaimStatusId == 36).Count();
+            counts.Rejected = counts.Rejected + _ClaimSearchData.Where(g => g.ClaimStatusId == 37).Count();
             counts.Setteled = _ClaimSearchData.Where(g => g.ClaimStatusId == 38).Count();
 
             return counts;

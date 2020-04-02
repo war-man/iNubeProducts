@@ -158,8 +158,18 @@ export const TRANSLATIONS = {
         DynamicProduct: 'Dynamic Product',
         DynamicProd: 'Dynamic Product',
         //Dynamic Reports
+        DynamicReports:'Reports',
         ReportConfig: 'Report Config',
+        ReportExecution:'Report Generation',
+        ReportUpdate:'Report Update',
+
         ClaimInbox: 'Claim Inbox',
+        //Allocation
+        Allocation: "Allocation",
+        AllocationConfig: 'Allocation Config',
+        AllocationRules: 'Allocation Rules',
+        AllocationExecution: 'Allocation Execution',
+        EllustrationConfig: 'Ellustration Config',
         /**********************************************************************/
 
         //UserManagement
@@ -734,6 +744,16 @@ export const TRANSLATIONS = {
         //Buttons
         AddParameter: 'Add Parameter',
         Save: 'Save',
+
+        //Policy 
+        /****************************************************************/
+        SearchPolicy: 'Search Policy',
+        PolicyDetails: 'Policy Details',
+        ClaimDetails:'Claim Details',
+        PolicyCancellation: 'Policy Cancellation',
+        RefundDetails: 'Refund Details',
+        //ClaimEnquiry
+        IntimationDate:'Intimation Date'
     },
     hi_IN: TRANSLATIONS_HN,
     kn_IN: TRANSLATIONS_KN,

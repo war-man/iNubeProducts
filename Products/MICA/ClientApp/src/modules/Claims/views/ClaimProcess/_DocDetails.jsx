@@ -38,7 +38,7 @@ const DocDetails = (props) => {
     // const { classes } = this.props;
     const docDetailsprops = props.componentData;
     var ClaimId = docDetailsprops.claimId;
-
+    console.log("docDetailsprops.docdata", docDetailsprops.docdata);
     return (
         <div>
             
@@ -77,12 +77,32 @@ const DocDetails = (props) => {
                                 },
                                 {
                                     // Header: "Cover Event Factor - From Value",
-                                    Header: "DocumentName",
-                                    accessor: "documentName",
+                                    Header: "File Type",
+                                    accessor: "documentType",
                                     minWidth: 40,
+                                    headerClassName: 'react-table-center',
                                     setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                     headerClassName: 'react-table-center'
                                 },
+                                {
+                                    // Header: "Cover Event Factor - From Value",
+                                    Header: "File Name",
+                                    accessor: "documentName",
+                                    minWidth: 40,
+                                    headerClassName: 'react-table-center',
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    headerClassName: 'react-table-center'
+                                },
+                                {
+                                    // Header: "Cover Event Factor - From Value",
+                                    Header: "Document View",
+                                    accessor: "documentView",
+                                    minWidth: 40,
+                                    headerClassName: 'react-table-center',
+                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                    headerClassName: 'react-table-center'
+                                },
+
                                 //{
                                 //    Header: "Document Type",
                                 //    accessor: "documentType",

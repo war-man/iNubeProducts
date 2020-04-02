@@ -25,7 +25,7 @@ import TranslationContainer from "components/Translation/TranslationContainer.js
 import CustomDropDownTree from "components/CustomDropdownTree/CustomDropDownTree.jsx";
 import CustomCheckbox from "components/Checkbox/CustomCheckbox";
 import Button from "components/CustomButtons/Button.jsx";
-
+import ClaimBankDetails from "./ClaimBankDetails.jsx";
 
 
 const style = {
@@ -70,7 +70,12 @@ const CustomTableCell = withStyles(theme => ({
 }))(TableCell);
 
 const ClaimDetails = (props) => {
+    console.log("claimDetailsData123", props);
+    // const { classes } = this.props;
     const claimDetailsprops = props.componentData;
+    //console.log('claimDetailsprops.typeList', claimDetailsprops.typeList);
+    console.log("claimDetailsprops.ClaimStatusData", claimDetailsprops.ClaimStatusData);
+    // const claimAmountData = props;
 
     return (
         <div>
@@ -182,7 +187,15 @@ const ClaimDetails = (props) => {
                         />
                     </GridItem>
                 }
+                <GridContainer justify="center">
+                    <GridItem xs={3} sm={3} md={3}>
 
+                        <Button color="warning" onClick={claimDetailsprops.handleActivitylog} id="claims" round>
+                            Activity Log
+                            </Button>
+
+                    </GridItem>
+                </GridContainer>
 
 
 
@@ -204,23 +217,23 @@ const ClaimDetails = (props) => {
                                 sortable: false,
                                 //  filterable: false 
                             },
+                            //{
+                            //    // Header: "Cover Event Factor - From Value",
+                            //    Header: "InsurableItem",
+                            //    accessor: "insurableItem",
+                            //    minWidth: 40,
+                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                            //    headerClassName: 'react-table-center'
+                            //},
+                            //{
+                            //    Header: "Name",
+                            //    accessor: "name",
+                            //    minWidth: 40,
+                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                            //    headerClassName: 'react-table-center'
+                            //},
                             {
-                                // Header: "Cover Event Factor - From Value",
-                                Header: "InsurableItem",
-                                accessor: "insurableItem",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                headerClassName: 'react-table-center'
-                            },
-                            {
-                                Header: "Name",
-                                accessor: "name",
-                                minWidth: 40,
-                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                headerClassName: 'react-table-center'
-                            },
-                            {
-                                Header: "IdentificationNo",
+                                Header: "Identification No",
                                 accessor: "identificationNo",
                                 minWidth: 40,
                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
@@ -234,14 +247,13 @@ const ClaimDetails = (props) => {
                                 headerClassName: 'react-table-center'
                             },
                             {
-                                Header: "CoverValue",
+                                Header: "Risk Details",
                                 accessor: "coverValue",
-                                setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                minWidth: 40,
-                                headerClassName: 'react-table-center',
+                                setCellProps: (value) => ({ style: { textAlign: "center" } }),
+                                minWidth: 200,
+                                headerClassName: 'react-table-center'
                                 //sortable: false,
                                 //filterable: false
-
                             },
                             //{
                             //    Header: "BenefitAmount",
@@ -249,7 +261,6 @@ const ClaimDetails = (props) => {
                             //    minWidth: 40,
                             //    setCellProps: (value) => ({ style: { textAlign: "center" } }),
                             //    headerClassName: 'react-table-center',
-
                             //},
                             {
                                 Header: "ClaimAmount",
@@ -259,20 +270,16 @@ const ClaimDetails = (props) => {
                                 headerClassName: 'react-table-center',
                                 //sortable: false,
                                 //filterable: false
-
                             },
-
                             {
                                 Header: "ApprovedAmount",
                                 accessor: "approvedClaimAmounts",
                                 setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                minWidth: 50,
+                                minWidth: 20,
                                 headerClassName: 'react-table-center',
                                 //sortable: false,
                                 //filterable: false
-
                             },
-
 
                         ]}
                         defaultPageSize={4}
@@ -319,51 +326,41 @@ const ClaimDetails = (props) => {
 
 
             </GridContainer>
-
-            {claimDetailsprops.ProductClaimData.map((item,i) =>
-                <GridItem xs={12} sm={12} md={3} className="downlevel">
-                    <CustomCheckbox key={i}
-                        name={item.inputType}
-                        labelText={item.inputType}
-                        value={item.inputType}
-                        // checked={false}
-                        // onChange={(e) => claimDetailsprops.SetRiskClaimsDetailsValue('Claim Process', e)}
-                        onChange={(e) => claimDetailsprops.handleCheckbox(e, item.inputType)}
-                        disabled={(item.disable == true) ? true : null}
-                        formControlProps={{
-                            fullWidth: true
-                        }} />
-                </GridItem>
-            )}
-
-            {claimDetailsprops.displaybank &&
-                <GridContainer>
-                    <div>
-                <CardHeader color="info" icon >
-                    {
-                        <h3 >
-                            <small><TranslationContainer translationKey="BankDetails" /></small>
-                        </h3>
-                    }
-                        </CardHeader>
-                </div>
-
-                {claimDetailsprops.Bankfieldsmodel.map(m =>
-
-                    <GridItem xs={8} sm={5} md={3}>
-                            {claimDetailsprops.renderPage(m)}
-
-                </GridItem>
-                    )
-                }
+            <GridContainer>
+                <h4>Payment Details</h4>
             </GridContainer>
-            }
-
+            <GridContainer>
+                <GridContainer>
+                    <h6 className="payeetxttransform">Select Payee</h6>
+                </GridContainer>
+                <GridContainer>
+                    {claimDetailsprops.ProductClaimData.map((item, i) =>
+                        <GridItem xs={12} sm={4} md={3} className="downlevel">
+                            <CustomCheckbox key={i}
+                                name={item.inputType}
+                                labelText={item.inputType}
+                                value={item.inputType}
+                                // checked={false}
+                                // onChange={(e) => claimDetailsprops.SetRiskClaimsDetailsValue('Claim Process', e)}
+                                onChange={(e) => claimDetailsprops.handleCheckbox(e, item.inputType, i)}
+                                disabled={(item.disable == true) ? true : null}
+                                formControlProps={{
+                                    fullWidth: true
+                                }} />
+                        </GridItem>
+                    )}
+                </GridContainer>
+            </GridContainer>
+            <GridContainer /*key={i}*/>
+                <GridItem>
+                    <ClaimBankDetails claimDetailsprops={claimDetailsprops} />
+                </GridItem>
+            </GridContainer>
 
             <ClaimsDecision claimStatusIdState={claimDetailsprops.claimStatusIdState} claimManagerRemarksState={claimDetailsprops.claimManagerRemarksState}
                 fields={claimDetailsprops.fields} ClaimsDecisionData={claimDetailsprops.ClaimsDecisionData} handleChange={claimDetailsprops.handleChange} onFormSubmit={claimDetailsprops.onFormSubmit}
                 approved={claimDetailsprops.approved} onInputParamChange={claimDetailsprops.onInputParamChange} fields={claimDetailsprops.fields} errormessage={claimDetailsprops.errormessage}
-                ValidationUI={claimDetailsprops.ValidationUI} classes={claimDetailsprops.classes} errorstatus={claimDetailsprops.errorstatus} DecisionType={claimDetailsprops.DecisionType} ClaimStatusData={claimDetailsprops.ClaimStatusData}/>
+                ValidationUI={claimDetailsprops.ValidationUI} classes={claimDetailsprops.classes} errorstatus={claimDetailsprops.errorstatus} DecisionType={claimDetailsprops.DecisionType} ClaimStatusData={claimDetailsprops.ClaimStatusData} />
 
 
 
