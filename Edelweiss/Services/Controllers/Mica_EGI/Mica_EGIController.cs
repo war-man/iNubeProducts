@@ -171,5 +171,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return Ok(searchPolicyDetails);
         }
 
+        [HttpPost]
+        public IActionResult PolicyStatusUpdate(PolicyStatusDTO policyStatus)
+        {
+            var response = _quotationService.PolicyStatusUpdate(policyStatus);
+            return ServiceResponse(response);
+        }
+
     }
 }

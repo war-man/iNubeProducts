@@ -53,6 +53,8 @@ const ClaimComponent = (props) => {
                     {props.errormessage && (props.DetailsDTO.lossDateTime == "") ? <p className="error">*Required field cannot be left blank</p> : null}
 
                     {props.errordate && (props.DetailsDTO.lossDateTime > props.PolicyEndDate || props.DetailsDTO.lossDateTime < props.PolicyStartDate) ? <p className="error">*Loss Date must be within Policy Tenure </p> : null}
+
+                    {props.lossdateflag && (props.DetailsDTO.lossDateTime == "") ? <p className="error"> </p> : null}
                 </GridItem>
                 <GridItem xs={8} sm={5} md={3}>
                     <CustomInput
@@ -68,6 +70,8 @@ const ClaimComponent = (props) => {
                     />
                     {props.errormessage && (props.DetailsDTO.locationOfLoss == "") ? <p className="error">*Required field cannot be left blank</p> : null}
 
+                    {props.locationflag && (props.DetailsDTO.locationOfLoss == "") ? <p className="error"> </p> : null}
+
                 </GridItem>
                 <GridItem xs={12} sm={12} md={3}>
                     <MasterDropdown
@@ -82,6 +86,8 @@ const ClaimComponent = (props) => {
                         formControlProps={{ fullWidth: true }}
                     />
                     {props.errormessage && (props.DetailsDTO.lossIntimatedBy == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                    {props.lossintimatedflag && (props.DetailsDTO.lossIntimatedBy == "") ? <p className="error"> </p> : null}
                 </GridItem>
 
                 <GridItem xs={12} sm={12} md={3}>
@@ -97,6 +103,8 @@ const ClaimComponent = (props) => {
                         formControlProps={{ fullWidth: true }}
                     />
                     {props.errormessage && (props.DetailsDTO.causeOfLoss == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                    {props.causeflag && (props.DetailsDTO.causeOfLoss == "") ? <p className="error"> </p> : null}
                 </GridItem>
                 <GridItem xs={12} sm={12} md={12}>
                     <CustomInput
@@ -113,6 +121,8 @@ const ClaimComponent = (props) => {
                         }}
                         formControlProps={{ fullWidth: true }} />
                     {props.errormessage && (props.DetailsDTO.lossDescription == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                    {props.descriptionflag && (props.DetailsDTO.lossDescription == "") ? <p className="error"> </p> : null}
                 </GridItem>
 
 

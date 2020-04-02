@@ -155,7 +155,24 @@ const ClaimDetails = (props) => {
                 }
 
                 {
-                    claimDetailsprops.vehicleclaim &&
+                    claimDetailsprops.vehicleclaimstate &&
+
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
+                            disabled={claimDetailsprops.disabled}
+                            labelText="Vehicle Location State"
+                            value={claimDetailsprops.claimDetailsData.vehicleLocationState}
+                            name='vehicleLocationState'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+
+                }
+
+                {
+                    claimDetailsprops.vehicleclaimdriver &&
 
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
@@ -171,7 +188,7 @@ const ClaimDetails = (props) => {
                 }
 
                 {
-                    claimDetailsprops.vehicleclaim &&
+                    claimDetailsprops.vehicleclaimsurvey &&
 
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
@@ -198,28 +215,14 @@ const ClaimDetails = (props) => {
                         columns={[
                             {
                                 Header: "SerialNo",
-                                accessor: "id",
+                                accessor: "insurableitemId",
                                 headerClassName: 'react-table-center',
                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                 minWidth: 20,
                                 sortable: false,
                                 //  filterable: false 
                             },
-                            //{
-                            //    // Header: "Cover Event Factor - From Value",
-                            //    Header: "InsurableItem",
-                            //    accessor: "insurableItem",
-                            //    minWidth: 40,
-                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                            //    headerClassName: 'react-table-center'
-                            //},
-                            //{
-                            //    Header: "Name",
-                            //    accessor: "name",
-                            //    minWidth: 40,
-                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                            //    headerClassName: 'react-table-center'
-                            //},
+                            
                             {
                                 Header: "IdentificationNo",
                                 accessor: "identificationNo",

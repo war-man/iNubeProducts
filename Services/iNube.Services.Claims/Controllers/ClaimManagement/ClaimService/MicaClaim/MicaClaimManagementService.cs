@@ -1652,9 +1652,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
 
 
-            TblBankAccounts _bankAccounts = new TblBankAccounts();
+
+
             foreach (var item in claimsDTO.DataModelDTO)
             {
+                TblBankAccounts _bankAccounts = new TblBankAccounts();
                 _bankAccounts.AccountHolderName = item["Account Holder Name"];
                 _bankAccounts.AccountNumber = item["Account No."];
                 _bankAccounts.ClaimId = ClaimApproval.ClaimId;
@@ -1859,6 +1861,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         public async Task<List<object>> ClaimDetailsAsync(decimal ClaimId, ApiContext apiContext)
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            _CNContext = (MICACNContext)(await DbManager.GetNewContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var DATA = _context.TblClaims.SingleOrDefault(x => x.ClaimId == ClaimId);
             List<object> FullfinalData = new List<object>();
             try
@@ -1904,7 +1908,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 {
                     var json = JsonConvert.DeserializeObject<dynamic>(DATA.ClaimFields);
 
+                    var state = json["Vehicle Location State"];
+
+                    var stateid = (int)state.Value;
+
+                    var statevalue = _CNContext.TblMasState.SingleOrDefault(x => x.StateId == stateid).StateName;
+
                     finaldata.Add("Vehicle Location", json["Vehicle Location"]);
+                    finaldata.Add("Vehicle Location State", statevalue);
                     finaldata.Add("Driver Name", json["Driver Name"]);
                     finaldata.Add("Self-Survey Required", json["Self-Survey Required"]);
                 }
@@ -2005,6 +2016,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         public async Task<List<object>> ClaimEnquiryAsync(decimal ClaimId, ApiContext apiContext)
         {
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            _CNContext = (MICACNContext)(await DbManager.GetNewContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var DATA = _context.TblClaims.SingleOrDefault(x => x.ClaimId == ClaimId);
 
             // var bank = _context.TblBankAccounts.SingleOrDefault(x => x.ClaimId == ClaimId);
@@ -2045,7 +2059,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 var json = JsonConvert.DeserializeObject<dynamic>(DATA.ClaimFields);
 
+                var state = json["Vehicle Location State"];
+
+                var stateid = (int)state.Value;
+
+                var statevalue = _CNContext.TblMasState.SingleOrDefault(x => x.StateId == stateid).StateName;
+
                 finaldata.Add("Vehicle Location", json["Vehicle Location"]);
+                finaldata.Add("Vehicle Location State", statevalue);
                 finaldata.Add("Driver Name", json["Driver Name"]);
                 finaldata.Add("Self-Survey Required", json["Self-Survey Required"]);
             }
@@ -2101,33 +2122,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
         }
 
-        public async Task<List<object>> BankDetailsAsync(decimal ClaimId, ApiContext apiContext)
-        {
-            _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var bank = _context.TblBankAccounts.SingleOrDefault(x => x.ClaimId == ClaimId);
-
-            // JObject json = JObject.Parse(DATA.ToString());
-
-            Dictionary<object, object> finaldata = new Dictionary<object, object>();
-            //List<object> finaldata = new List<object>();
-            List<object> FullfinalData = new List<object>();
-            finaldata.Add("Bank Name", bank.BankName);
-            finaldata.Add("Bank Branch Address", bank.BankBranchAddress);
-            finaldata.Add("Account Holder Name", bank.AccountHolderName);
-            finaldata.Add("Account Number", bank.AccountNumber);
-            finaldata.Add("Bank Ifsccode", bank.Ifsccode);
-
-            foreach (var item in finaldata)
-            {
-                List<object> data = new List<object>();
-
-                data.Add(item.Key);
-                data.Add(item.Value);
-
-                FullfinalData.Add(data);
-            }
-            return FullfinalData;
-        }
+        
 
         public async Task<List<object>> ClaimStatusAsync(decimal ClaimId, decimal statusId, ApiContext apiContext)
         {
@@ -2281,11 +2276,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.InsuredEmail = pk[0].Email;
                     item.InsuredMobileNo = pk[0].MobileNumber;
                     item.ProductIdPk = pk[0].ProductIdPk;
-                  
+
 
 
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
 
                 }
             }

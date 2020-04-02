@@ -120,6 +120,9 @@ class InboxClaimProcess extends React.Component {
             VehicleNoList:[],
             prodId: "",
             vehicleclaim: false,
+            vehicleclaimstate: false,
+            vehicleclaimdriver: false,
+            vehicleclaimsurvey: false,
             displaybank: false,
             isimage: false,
             openpop: false,
@@ -296,6 +299,7 @@ class InboxClaimProcess extends React.Component {
                 "locationOfEvent": "",
                 "lossDescription": "",
                 "vehicleLocation": "",
+                "vehicleLocationState": "",
                 "driverName": "",
                 "selfSurvey": "",
                 "totalClaimedAmount": "",
@@ -366,7 +370,7 @@ class InboxClaimProcess extends React.Component {
                 "Amount Paid": "",
                 "Date Of Payment": "",
             },
-            DataModelDTO: [],
+            BankDataModelDTO: [],
             displaywork: false,
             displaycust: false,
             displayfinancier: false,
@@ -398,20 +402,20 @@ class InboxClaimProcess extends React.Component {
             let field = this.state.fields;
             field.emailId = this.state.email;
 
-            if (!$.isEmptyObject(this.state.DataModelDTO["Workshop"])) {
-                field.DataModelDTO.push(this.state.DataModelDTO["Workshop"]);
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Workshop"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Workshop"]);
             }
-            if (!$.isEmptyObject(this.state.DataModelDTO["Customer"])) {
-                field.DataModelDTO.push(this.state.DataModelDTO["Customer"]);
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Customer"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Customer"]);
             }
-            if (!$.isEmptyObject(this.state.DataModelDTO["Financier"])) {
-                field.DataModelDTO.push(this.state.DataModelDTO["Financier"]);
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Financier"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Financier"]);
             }
-            if (!$.isEmptyObject(this.state.DataModelDTO["Nominee"])) {
-                field.DataModelDTO.push(this.state.DataModelDTO["Nominee"]);
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Nominee"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Nominee"]);
             }
-            if (!$.isEmptyObject(this.state.DataModelDTO["Surveyor"])) {
-                field.DataModelDTO.push(this.state.DataModelDTO["Surveyor"]);
+            if (!$.isEmptyObject(this.state.BankDataModelDTO["Surveyor"])) {
+                field.DataModelDTO.push(this.state.BankDataModelDTO["Surveyor"]);
             }
             this.setState({ field });
             console.log("fields: ", field);
@@ -443,9 +447,9 @@ class InboxClaimProcess extends React.Component {
                     console.log("response: ", data)
                     //      if (data.status == 200) {
                     this.state.claimId = data.claimId;
-                  //  this.setState({ claimnumber: data.claimNumber });
+                    //  this.setState({ claimnumber: data.claimNumber });
                     swal({
-                        text: "Claim Processed successfully! \n Your Claim Number: " + data.claimNumber ,
+                        text: "Claim Processed successfully! \n Your Claim Number: " + data.claimNumber,
                         icon: "success",
                         buttons: [false, "OK"],
                     }).then((willDelete) => {
@@ -643,55 +647,37 @@ class InboxClaimProcess extends React.Component {
         );
         this.setState({ Bankfieldsmodel: BankdetailsFields });
 
-        let datamodel = this.state.DataModelDTO;
+        let datamodel = this.state.BankDataModelDTO;
         datamodel["Workshop"] = {};
         datamodel["Customer"] = {};
         datamodel["Financier"] = {};
         datamodel["Nominee"] = {};
         datamodel["Surveyor"] = {};
-        //datamodel["Workshop"] = {};
-        //datamodel["Workshop"] = {};
-        //datamodel["Workshop"] = {};
-        //datamodel.push(this.state.Workshop);
-        //datamodel.push(this.state.Customer);
-        //datamodel.push(this.state.Financier);
-        //datamodel.push(this.state.Nominee);
-        //datamodel.push(this.state.Surveyor);
         this.setState({ datamodel });
 
         console.log("datamodel ", datamodel);
     }
 
     onModelChange = (evt, name) => {
-        let DataModelDTO = this.state.DataModelDTO;
-        let data = DataModelDTO[name];
+        let BankDataModelDTO = this.state.BankDataModelDTO;
+        let data = BankDataModelDTO[name];
         data.type = name;
-        //let data = this.state.Bankfieldsmodel.filter(e => e.Name == evt.target.name);
         data[evt.target.name] = evt.target.value;
 
         if (name == "Customer") {
             let bank = this.state.Bankarray;
             let index = bank.findIndex(e => e.name == name);
-            //let bank = this.state.Bankarray(e => e.name == name)
             let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
             bankvalue[0].Value = evt.target.value;
             this.setState({ bank });
         }
 
-        this.setState({ /*bank,*/ data, DataModelDTO });
-
-        //this.setState({ DataModelDTO });
-        console.log("DataModelDTO: ", this.state.DataModelDTO);
-        console.log("DataModelDTO: ", this.state.Bankarray);
-        console.log("DataModelDTO: ", this.state.Bankfieldsmodel);
-        console.log("name", evt.target.name);
+        this.setState({ /*bank,*/ data, BankDataModelDTO });
     };
 
     oncustomerselect = () => {
         console.log("Data: ", this.state.BankDetails);
-        let bank = this.state.DataModelDTO;
-        //DataModelDTO[this.state.selectedcheckbox] = {};
-        //let data = DataModelDTO[this.state.selectedcheckbox];
+        let bank = this.state.BankDataModelDTO;
         let bankdata = this.state.Bankdata.Customer;
         let cbank = this.state.BankDetails;
         let jsondata = this.state.Bankfieldsmodel;
@@ -703,8 +689,6 @@ class InboxClaimProcess extends React.Component {
         bankdata["IFSC Code"] = cbank.ifsccode;
         bankdata["Bank Branch Address"] = cbank.bankBranchAddress;
         bankdata.type = "Customer";
-        //bankdata["Amount Paid"] = "";
-        //bankdata["Date Of Payment"] = "";
 
         jsondata[0].Value = cbank.accountHolderName;
         jsondata[1].Value = cbank.accountNumber;
@@ -712,8 +696,6 @@ class InboxClaimProcess extends React.Component {
         jsondata[3].Value = cbank.bankName;
         jsondata[4].Value = cbank.ifsccode;
         jsondata[5].Value = cbank.bankBranchAddress;
-        //jsondata[6].Value = "";
-        //jsondata[7].Value = "";
 
         bank.Customer = bankdata;
 
@@ -841,24 +823,12 @@ class InboxClaimProcess extends React.Component {
         var today = event.toDate();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 
-        //var dd = today.getDate();
-        //var mm = today.getMonth() + 1;
-        //if (mm < 10) {
-        //    mm = '0' + mm;
-
-        //}
-        //if (dd < 10) {
-        //    dd = '0' + dd;
-        //}
-
-        //var date = dd + '/' + mm + '/' + today.getFullYear();
-
         const ClaimDataDTO = this.state.ClaimDTO;
         ClaimDataDTO[name] = date;
         this.setState({ ClaimDataDTO });
 
-        let DataModelDTO = this.state.DataModelDTO;
-        let data = DataModelDTO[objname];
+        let BankDataModelDTO = this.state.BankDataModelDTO;
+        let data = BankDataModelDTO[objname];
         data[name] = date;
 
         if (objname == "Customer") {
@@ -869,9 +839,6 @@ class InboxClaimProcess extends React.Component {
             this.setState({ bank });
         }
 
-        //const DataModelDTO = this.state.fields.DataModelDTO;
-        //let data = DataModelDTO[this.state.selectedcheckbox];
-        //data[name] = date;
         this.setState({ data });
 
         this.change(event, name, formate, date, type);
@@ -1051,11 +1018,6 @@ class InboxClaimProcess extends React.Component {
 
     }
 
-    //handleClose = () => {
-    //    this.setState({ open: false });
-
-    //};
-
     Editopen = () => {
         this.setState({ disabled: false });
         this.setState({ open: true });
@@ -1078,36 +1040,42 @@ class InboxClaimProcess extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                // this.setState({ claimDetailsData: data[0] });
-                console.log("details of claims", data);
+
+                this.setState({ claimTableData: data[1] });
+
+                this.claimAmountTable(this.state.claimTableData);
+
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
                 this.state.claimDetailsData.totalClaimedAmount = data[0][3][1];
 
-                if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
+                //if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
 
+                //    this.state.claimDetailsData.vehicleLocation = data[0][4][1];
+                //    this.state.claimDetailsData.driverName = data[0][5][1];
+                //    this.state.claimDetailsData.selfSurvey = data[0][6][1];
+
+                //    this.setState({ vehicleclaim: true });
+                //}
+
+                if (data[0][4][1].length != 0) {
                     this.state.claimDetailsData.vehicleLocation = data[0][4][1];
-                    this.state.claimDetailsData.driverName = data[0][5][1];
-                    this.state.claimDetailsData.selfSurvey = data[0][6][1];
-
                     this.setState({ vehicleclaim: true });
                 }
-                //this.state.claimDetailsData.totalClaimedAmount = data[0][6][1];
-                //this.state.claimDetailsData.accountHolderName = data[0][7][1];
-                //this.state.claimDetailsData.accountNumber = data[0][8][1];
-                //this.state.claimDetailsData.bankName = data[0][9][1];
-                //this.state.claimDetailsData.ifscCode = data[0][10][1];
-                //this.state.claimDetailsData.bankAddress = data[0][11][1];
-                console.log("###", this.state.claimDetailsData);
-
-                this.setState({ claimTableData: data[1] });
-
-                console.log("this.state.claimTableData", this.state.claimTableData);
-
-                this.claimAmountTable(this.state.claimTableData);
-
-                console.log("DATA", this.state.claimDetailsData, this.state.claimTableData);
+                if (data[0][5][1].length != 0) {
+                    this.state.claimDetailsData.vehicleLocationState = data[0][5][1];
+                    this.setState({ vehicleclaimstate: true });
+                }
+                if (data[0][6][1].length != 0) {
+                    this.state.claimDetailsData.driverName = data[0][6][1];
+                    this.setState({ vehicleclaimdriver: true });
+                }
+                if (data[0][7][1].length != 0) {
+                    this.state.claimDetailsData.selfSurvey = data[0][7][1];
+                    this.setState({ vehicleclaimsurvey: true });
+                }
+               
 
             });
 
@@ -1414,16 +1382,10 @@ class InboxClaimProcess extends React.Component {
     handleCheckbox = (event, name, i) => {
 
         let ProductClaimData = this.state.ProductClaimData;
-        //let DataModelDTO = this.state.fields.DataModelDTO;
         let array = [];
         array.name = name;
         array.data = {};
         console.log("")
-        //name = {};
-        //DataModelDTO.push(name);
-        ////let data = DataModelDTO[name];
-        //this.setState({});
-        //let name = event.target.name;
         let check = event.target.checked;
         console.log("values: ", this.state.ProductClaimData, 'chk data ', event, event.target.checked, name);
         this.setState({ selectedcheckbox: name });
@@ -1439,117 +1401,53 @@ class InboxClaimProcess extends React.Component {
                 if (name == "Workshop") {
                     searchname = "Customer";
                     if (event.target.checked == true) {
-                        // this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Bankdata1);
-                        //this.state.displaybank = true;
-                        //this.state.fields.DataModelDTO.push(this.state.Bankfieldsmodel);
-                        this.state.displaywork = true;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                     if (event.target.checked == false) {
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Workshop);
-                        //delete this.state.fields.DataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 } else {
                     searchname = "Workshop";
-                    //this.state.displaybank = true;
-                    this.state.displaywork = false;
                     this.state.displaycust = false;
-                    this.state.displayfinancier = false;
-                    this.state.displaynominee = false;
-                    this.state.displaysurveyor = false;
                     this.setState({});
                 }
                 if (name == "Customer") {
                     if (event.target.checked === true) {
                         this.oncustomerselect();
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Bankdata.Customer);
-                        this.state.DataModelDTO[name] = this.state.Bankdata.Customer;
-                        this.state.displaywork = false;
+                        this.state.BankDataModelDTO[name] = this.state.Bankdata.Customer;
                         this.state.displaycust = true;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     } if (event.target.checked === false) {
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Customer);
-                        //delete this.state.fields.DataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 }
                 if (name == "Financier") {
                     if (event.target.checked === true) {
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Bankdata1);
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = true;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     } if (event.target.checked === false) {
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Financier);
-                        //delete this.state.fields.DataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 }
                 if (name == "Nominee") {
                     if (event.target.checked === true) {
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Bankdata1);
-                        //this.state.fields.DataModelDTO[name] = this.state.Bankdata1;
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = true;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     } if (event.target.checked === false) {
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Nominee);
-                        //delete this.state.fields.DataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 }
                 if (name == "Surveyor") {
                     if (event.target.checked === true) {
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Bankdata1);
-                        //this.state.fields.DataModelDTO[name] = this.state.Bankdata1;
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = true;
                         this.setState({});
                     } if (event.target.checked === false) {
-                        //this.state.fields.DataModelDTO[name] = Object.assign(this.state.fields.DataModelDTO[name], this.state.Surveyor);
-                        //delete this.state.fields.DataModelDTO[name];
-                        this.state.displaywork = false;
                         this.state.displaycust = false;
-                        this.state.displayfinancier = false;
-                        this.state.displaynominee = false;
-                        this.state.displaysurveyor = false;
                         this.setState({});
                     }
                 }
@@ -1574,7 +1472,7 @@ class InboxClaimProcess extends React.Component {
         let element = this.state.Bankarray;
         if (event.target.checked == true) {
             if (name != "Customer") {
-                this.state.DataModelDTO[name] = Object.assign(this.state.DataModelDTO[name], this.state.Bankdata1);
+                this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
             }
             let Bankelement = {};
             Bankelement.name = name;
@@ -1583,13 +1481,14 @@ class InboxClaimProcess extends React.Component {
             console.log("Bankarray: ", this.state.Bankarray);
         }
         if (event.target.checked == false) {
-            this.state.DataModelDTO[name] = Object.assign(this.state.DataModelDTO[name], this.state.emptyobject);
+            this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.emptyobject);
+            this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.emptyobject);
             let index = element.findIndex(e => e.name == name);
             element.splice(index, 1);
             console.log("Bankarray: ", element);
         }
         this.setState({ element });
-        console.log("DataModelDTO: ", this.state.DataModelDTO);
+        console.log("BankDataModelDTO: ", this.state.BankDataModelDTO);
         //console.log("name", event.target.name);
     }
 
@@ -1780,7 +1679,8 @@ handleActivityClose = () => {
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
                                     SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
                                     displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
-                                    Bankarray={this.state.Bankarray} handleActivitylog={this.handleActivitylog}
+                                    handleActivitylog={this.handleActivitylog}
+                                    Bankarray={this.state.Bankarray} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}
                                 />
                             </CardBody>
                         </Card>

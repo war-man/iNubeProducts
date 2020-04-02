@@ -20,6 +20,7 @@ namespace MicaExtension_EGI.Entities
         public virtual DbSet<TblMasState> TblMasState { get; set; }
         public virtual DbSet<TblMonthlyBalance> TblMonthlyBalance { get; set; }
         public virtual DbSet<TblPayment> TblPayment { get; set; }
+        public virtual DbSet<TblPolicyStatus> TblPolicyStatus { get; set; }
         public virtual DbSet<TblPremiumBookingLog> TblPremiumBookingLog { get; set; }
         public virtual DbSet<TblQuotation> TblQuotation { get; set; }
         public virtual DbSet<TblSchedule> TblSchedule { get; set; }
@@ -177,6 +178,13 @@ namespace MicaExtension_EGI.Entities
                     .HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.TransactionReferenceNumber).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TblPolicyStatus>(entity =>
+            {
+                entity.ToTable("TblPolicyStatus", "QM");
+
+                entity.Property(e => e.TxnDateTime).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<TblPremiumBookingLog>(entity =>
