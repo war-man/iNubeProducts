@@ -34,7 +34,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         private IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
-
+        public DbHelper dbHelper;
         public MicaClaimManagementService(MICACMContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
@@ -42,6 +42,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             _integrationService = integrationService;
             _configuration = configuration;
             _emailService = emailService;
+            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
         }
 
         //Accountig Transaction
@@ -52,6 +53,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         }
         public async Task<String> AccountMapPayment(ApiContext apiContext, object claimData)
         {
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             // FOR ACCOUNT MAPPING TRANSACTION
             //var status = AccountingTransactionResponse(apiContext);
             //TO Get the Details of PolicyUpdate as Status
@@ -65,7 +70,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 List<TransactionDto> transactiondtObj = new List<TransactionDto>();
                 List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
 
-                string dateTime = DateTime.Now.ToString();
+                string dateTime = DateTimeNow.ToString();
                 string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
                 DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
                 //Storing All Transaction Header Value
@@ -246,6 +251,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
         public async Task<String> AccountMapIntimation(ApiContext apiContext, object claimData)
         {
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             // FOR ACCOUNT MAPPING TRANSACTION
             //var status = AccountingTransactionResponse(apiContext);
             //TO Get the Details of PolicyUpdate as Status
@@ -258,7 +267,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 List<TransactionDto> transactiondtObj = new List<TransactionDto>();
                 List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
 
-                string dateTime = DateTime.Now.ToString();
+                string dateTime = DateTimeNow.ToString();
                 string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
                 DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
                 //Storing All Transaction Header Value
@@ -439,6 +448,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
         public async Task<String> AccountMapApproval(ApiContext apiContext, object claimData)
         {
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             // FOR ACCOUNT MAPPING TRANSACTION
             //var status = AccountingTransactionResponse(apiContext);
             //TO Get the Details of PolicyUpdate as Status
@@ -451,7 +464,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 List<TransactionDto> transactiondtObj = new List<TransactionDto>();
                 List<TransactionSubLedgerDto> transactionLedgerObj = new List<TransactionSubLedgerDto>();
 
-                string dateTime = DateTime.Now.ToString();
+                string dateTime = DateTimeNow.ToString();
                 string createddate = Convert.ToDateTime(dateTime).ToString("yyyy-MM-dd h:mm tt");
                 DateTime date = DateTime.ParseExact(createddate, "yyyy-MM-dd h:mm tt", CultureInfo.InvariantCulture);
                 //Storing All Transaction Header Value
@@ -707,6 +720,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
         private ClaimDTO MapAndValidateClaim(dynamic policyDetail, IEnumerable<ProductRcbdetailsDTO> claimsDetails, List<ErrorInfo> Errors, decimal PolicyId)
         {
+
             ClaimDTO claimDTO = new ClaimDTO();
 
             var claimTransactionModel = new ClaimTransactionDTO();
@@ -1038,13 +1052,17 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         private async Task<ClaimDataDTO> UpdateClaimData(ClaimDataDTO claims, ApiContext apiContext)
         {
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
             var ClaimNumber = GetClaimNumber(0, Convert.ToDecimal(claims.ProductIdPk));
             ClaimsDTO _claims = new ClaimsDTO();
 
             claims.ClaimStatusId = 33;
             claims.ClaimNumber = ClaimNumber;
-            claims.CreatedDate = DateTime.Now;
+            claims.CreatedDate = DateTimeNow;
             claims.CreatedBy = apiContext.UserId;
             claims.PartnerId = apiContext.PartnerId;
             claims.OrganizationId = apiContext.OrgId;
@@ -1633,6 +1651,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         {
 
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             var ClaimApproval = _context.TblClaims.SingleOrDefault(x => x.ClaimNumber == claimsDTO.ClaimNumber);
             var Insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == claimsDTO.ClaimId).ToList();
             EmailTest emailTest = new EmailTest();
@@ -1646,7 +1669,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             TblClaims claimsprocess = _mapper.Map<TblClaims>(ClaimApproval);
 
             claimsprocess.ModifiedBy = apiContext.UserId;
-            claimsprocess.ModifiedDate = DateTime.Now;
+            claimsprocess.ModifiedDate = DateTimeNow;
             claimsprocess.ClaimStatusId = claimsDTO.ClaimStatusId;
             claimsprocess.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
             claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
@@ -1753,6 +1776,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //var claimdetails = _context.TblClaimdoc.SingleOrDefault(x => x.ClaimId == ClaimId);
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             var claimdata = _context.TblClaimdoc.Select(a => a.ClaimId == claimdoc.ClaimId);
             TblClaimdoc claimdocDTO = new TblClaimdoc();
             if (claimdata == null)
@@ -1772,7 +1799,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 claimdocDTO.DocumentName = claimdoc.DocumentName;
                 claimdocDTO.ClaimId = claimdoc.ClaimId;
                 claimdocDTO.ModifiedBy = apiContext.UserId;
-                claimdocDTO.ModifiedDate = DateTime.Now;
+                claimdocDTO.ModifiedDate = DateTimeNow;
                 //claimdetails.ProfileImage = fileBytes;
                 claimdocDTO.DmsdocId = claimdoc.DmsdocId;
                 var _claimDoc = _mapper.Map<TblClaimdoc>(claimdocDTO);
@@ -2265,8 +2292,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                     var covervalue = JsonConvert.DeserializeObject<dynamic>(insurabledata.CoverValue);
 
-                    //item.ClaimStatus = data.Value;
-                    item.ClaimStatus = _context.TblmasCmcommonTypes.FirstOrDefault(a => a.CommonTypeId == item.ClaimStatusId).Value;
+                    item.ClaimStatus = data.Value;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
@@ -2366,8 +2392,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                     var data1 = _context.TblClaimInsurable.SingleOrDefault(x => x.ClaimId == item.ClaimId);
 
-                    //item.ClaimStatus = data.Value;
-                    item.ClaimStatus = _context.TblmasCmcommonTypes.FirstOrDefault(a => a.CommonTypeId == item.ClaimStatusId).Value;
+                    item.ClaimStatus = data.Value;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
