@@ -703,9 +703,8 @@ namespace iNube.Components.RuleEngine.Controllers
             }
             catch (Exception ex)
             {
-
+                return Ok(ex.Message.ToString());
             }
-            return null;
         }
 
         public static DateTime ConvertUTCToZone(string utcDateTime, string userTimeZone)
