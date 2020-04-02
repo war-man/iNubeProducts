@@ -24,6 +24,8 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal productId, ApiContext apiContext);
         Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext);
+        Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -104,6 +106,15 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             var uri = RatingUrl + "/api/RatingConfig/GetHandleEvents?EventId=" + rateId;
             return await GetApiInvoke<dynamic>(uri, apiContext);
         }
+        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
+        {
+
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
+
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();

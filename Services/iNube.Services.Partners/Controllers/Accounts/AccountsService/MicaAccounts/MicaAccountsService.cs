@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using iNube.Services.Partners.Entities;
+using iNube.Services.Partners.Helpers;
 using iNube.Services.Partners.Models;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
@@ -23,6 +24,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         private IIntegrationService _integrationService;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        public DbHelper dbHelper;
         public MicaAccountsService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService, IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
@@ -30,11 +32,18 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             _integrationService = integrationService;
             _emailService = emailService;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration));
         }
         public async Task<CDAccountResponse> CreateCdAccountAsync(CdAccountsDTO cdAccountsDTO, ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var Errors = new List<ErrorInfo>();
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+
             //Check for product assign 
             var cdAccountNumber = GetAccountNumber(cdAccountsDTO.ProductId, cdAccountsDTO.PartnerId);
             var cdaccount = _context.TblCdaccounts.FirstOrDefault(p => p.AccountNo == cdAccountNumber);
@@ -55,7 +64,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 cdAccountsDTO.AvailableBalance = 0;
                 cdAccountsDTO.LedgerBalance = 0;
                 cdAccountsDTO.CreatedBy = apiContext.UserId;
-                cdAccountsDTO.CreatedDate = DateTime.Now;
+                cdAccountsDTO.CreatedDate = DateTimeNow;
                 var account = _mapper.Map<TblCdaccounts>(cdAccountsDTO);
                 _context.TblCdaccounts.Add(account);
                 _context.SaveChanges();
@@ -557,6 +566,10 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //First Check for A/C exist 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             if (string.IsNullOrEmpty(cdTransactions.AccountNo))
             {
                 cdTransactions.AccountNo = GetAccountNumber(cdTransactions.ProductId, cdTransactions.PartnerId);
@@ -572,7 +585,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 cdTransactions.AvailableAmount = availableAmount + cdTransactions.TxnAmount;
                 cdTransactions.LedgerBalance = ledgerBalance;
                 // cdTransactions.TransactionDate = Convert.ToDateTime(DateTime.Now.ToString("dd/mm/yyyy"));
-                cdTransactions.TransactionDate = DateTime.Now;
+                cdTransactions.TransactionDate = DateTimeNow;
                
                 cdTransactions.Description = $"CD Replenish- {cdTransactions.TxnAmount}";
 
@@ -585,7 +598,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 }
                 var accountTransaction = _mapper.Map<TblCdtransactions>(cdTransactions);
                 accountTransaction.TxnType = "Credit";
-                accountTransaction.CreatedDate = DateTime.Now;
+                accountTransaction.CreatedDate = DateTimeNow;
                 _context.TblCdtransactions.Add(accountTransaction);
                 cdAccount.LedgerBalance = ledgerBalance + cdTransactions.TxnAmount;
                 cdAccount.AvailableBalance = availableAmount + cdTransactions.TxnAmount;
@@ -650,6 +663,10 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
             //Check for the transaction record
             TblCdtransactions cdTransaction;
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             if (reverseCdAccount.PaymentId > 0)
             {
                 cdTransaction = _context.TblCdtransactions.FirstOrDefault(t => t.PaymentId == reverseCdAccount.PaymentId);
@@ -677,14 +694,14 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 var reverseTransactions = new TblCdtransactions();
                 reverseTransactions.AccountNo = cdAccount.AccountNo;
                 reverseTransactions.CreatedBy = apiContext.UserId;
-                reverseTransactions.CreatedDate = DateTime.Now;
-                reverseTransactions.ModifiedDate = DateTime.Now;
+                reverseTransactions.CreatedDate = DateTimeNow;
+                reverseTransactions.ModifiedDate = DateTimeNow;
                 reverseTransactions.ModifiedBy = apiContext.UserId;
                 reverseTransactions.TxnAmount = (decimal)amount;
                 reverseTransactions.InitialAmount = availableAmount;
                 reverseTransactions.AvailableAmount = availableAmount + amount;
                 reverseTransactions.LedgerBalance = ledgerBalance + amount;
-                reverseTransactions.TransactionDate = DateTime.Now;
+                reverseTransactions.TransactionDate = DateTimeNow;
                 // reverseTransactions.TransactionDate = Convert.ToDateTime(DateTime.Now.ToString("dd/mm/yyyy"));
                 reverseTransactions.TxnType = "Credit";
                 // reverseTransactions.CreditAccountNo = cdTransaction.TxnId;
@@ -705,6 +722,10 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             //Check for the transaction record
             if (string.IsNullOrEmpty(policyBooking.AccountNo))
             {
@@ -759,13 +780,13 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 cdTransaction.InitialAmount = availableAmount;
                 cdTransaction.LedgerBalance = ledgerBalance;
                 // cdTransaction.TransactionDate = Convert.ToDateTime(DateTime.Now.ToString("dd/mm/yyyy"));
-                cdTransaction.TransactionDate = DateTime.Now;
+                cdTransaction.TransactionDate = DateTimeNow;
                 cdTransaction.TxnAmount = policyBooking.TxnAmount;
                 cdTransaction.TxnType = "Debit";
                 cdTransaction.CreatedBy = apiContext.UserId;
-                cdTransaction.CreatedDate = DateTime.Now;
+                cdTransaction.CreatedDate = DateTimeNow;
                 cdTransaction.ModifiedBy = apiContext.UserId;
-                cdTransaction.ModifiedDate = DateTime.Now;
+                cdTransaction.ModifiedDate = DateTimeNow;
                 cdAccount.AvailableBalance = availableAmount - cdTransaction.TxnAmount;
                 cdAccount.LedgerBalance = ledgerBalance - cdTransaction.TxnAmount;
                 _context.TblCdtransactions.Add(cdTransaction);
@@ -1128,7 +1149,10 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         private async Task<MasterCDDTO> MasterCD(MasterCDDTO masterCDDTO, ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             var cdAccountsDTO = masterCDDTO;
 
             var cdTransactionDTO = masterCDDTO.CdTransactionsDTO;
@@ -1153,7 +1177,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 account.AvailableBalance = 0;
                 account.LedgerBalance = 0;
                 account.CreatedBy = apiContext.UserId;
-                account.CreatedDate = DateTime.Now;
+                account.CreatedDate = DateTimeNow;
                 account.ThresholdValue = 0;
                 account.DropLimit = 0;
                 account.Remark = "Intial Setup" + account.InitialAmount;
@@ -1311,7 +1335,10 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
            
             var cdaccount = _context.TblCdaccounts.FirstOrDefault(p => p.AccountNo == cDDTO.AccountNo);
 
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             if (cdaccount != null)
             {
                 if (cDDTO.cdTransactionsMasterDTO.Count() > 0)
@@ -1331,12 +1358,12 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                 var initalAmount = cdaccount.AvailableBalance;
                                 cdaccount.AvailableBalance = initalAmount + (CDData.TotalAmount + CDData.TotalGSTAmount);
                                 cdaccount.LedgerBalance = initalAmount + (CDData.TotalAmount + CDData.TotalGSTAmount);
-                                cdaccount.CreatedDate = DateTime.Now;
+                                cdaccount.CreatedDate = DateTimeNow;
 
 
                                 TblCdtransaction tblCdtransaction = new TblCdtransaction();
                                 tblCdtransaction.AccountNo = cdaccount.AccountNo;
-                                tblCdtransaction.TxnDateTime = DateTime.Now;
+                                tblCdtransaction.TxnDateTime = DateTimeNow;
                                 tblCdtransaction.TxnType = CDData.TxnType;
 
                                 tblCdtransaction.InitialBalance = initalAmount;
@@ -1360,7 +1387,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                 {
                                     //CD Transaction Details Table
                                     cdtransactionDetails = new TblCdtransactionDetails();
-                                    cdtransactionDetails.TransactionDateTime = DateTime.Now;
+                                    cdtransactionDetails.TransactionDateTime = DateTimeNow;
                                     cdtransactionDetails.TxnAmount = data.Value.Amount;
                                     cdtransactionDetails.TaxAmount = data.Value.TaxAmount;
                                     cdtransactionDetails.TotalAmount = data.Value.Amount + data.Value.TaxAmount;
@@ -1376,7 +1403,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                     {
                                         cdAccountDetails = new TblCdaccountDetails();
                                         cdAccountDetails.AccountNo = cdaccount.AccountNo;
-                                        cdAccountDetails.TxnDateTime = DateTime.Now;
+                                        cdAccountDetails.TxnDateTime = DateTimeNow;
                                         cdAccountDetails.TxnEventType = data.Key;
                                         cdAccountDetails.TxnAmountBalance = data.Value.Amount;
                                         cdAccountDetails.TaxAmountBalance = data.Value.TaxAmount;
@@ -1396,7 +1423,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                         {
                                             if (cditem.TxnEventType == data.Key)
                                             {
-                                                cditem.TxnDateTime = DateTime.Now;
+                                                cditem.TxnDateTime = DateTimeNow;
                                                 cditem.TaxAmountBalance = cditem.TaxAmountBalance + data.Value.TaxAmount;
                                                 cditem.TxnAmountBalance = cditem.TxnAmountBalance + data.Value.Amount;
                                                 cditem.TotalAvailableBalance = cditem.TotalAvailableBalance + data.Value.Total;
@@ -1440,7 +1467,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                     /*CD Account table */
                                     cdaccount.AvailableBalance = cdaccount.AvailableBalance - (CDData.TotalAmount + CDData.TotalGSTAmount);
                                     cdaccount.LedgerBalance = cdaccount.LedgerBalance - (CDData.TotalAmount + CDData.TotalGSTAmount);
-                                    cdaccount.CreatedDate = DateTime.Now;
+                                    cdaccount.CreatedDate = DateTimeNow;
 
                                     List<TblCdaccountDetails> tblCdaccountDetails = new List<TblCdaccountDetails>();
                                     TblCdaccountDetails cdAccountDetails = new TblCdaccountDetails();
@@ -1458,7 +1485,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                             {
 
 
-                                                cditem.TxnDateTime = DateTime.Now;
+                                                cditem.TxnDateTime = DateTimeNow;
                                                 cditem.TxnAmountBalance = cditem.TxnAmountBalance - data.Value.Amount;
                                                 cditem.TaxAmountBalance = cditem.TaxAmountBalance - data.Value.TaxAmount;
                                                 cditem.TotalAvailableBalance = cditem.TotalAvailableBalance - data.Value.Total;
@@ -1484,7 +1511,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
                                     TblCdtransaction tblCdtransaction = new TblCdtransaction();
                                     tblCdtransaction.AccountNo = cdaccount.AccountNo;
-                                    tblCdtransaction.TxnDateTime = DateTime.Now;
+                                    tblCdtransaction.TxnDateTime = DateTimeNow;
                                     tblCdtransaction.TxnType = CDData.TxnType;
 
                                     tblCdtransaction.InitialBalance = initalAmount;
@@ -1499,7 +1526,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                     {
 
                                         cdtransactionDetails = new TblCdtransactionDetails();
-                                        cdtransactionDetails.TransactionDateTime = DateTime.Now;
+                                        cdtransactionDetails.TransactionDateTime = DateTimeNow;
                                         cdtransactionDetails.TxnAmount = data.Value.Amount;
                                         cdtransactionDetails.TaxAmount = data.Value.TaxAmount;
                                         cdtransactionDetails.TotalAmount = data.Value.Amount + data.Value.TaxAmount;
@@ -1531,7 +1558,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                             foreach (var data in CDData.PremiumDetails)
                             {
 
-                                var tblDailyCdtransaction = DaliyTransaction(data.Value, data.Key, CDData, CDData.TxnType, cdaccount.AccountNo, cDDTO.Description);
+                                var tblDailyCdtransaction = DaliyTransaction(data.Value, data.Key, CDData, CDData.TxnType, cdaccount.AccountNo, cDDTO.Description, DateTimeNow);
 
                             }
 
@@ -1570,7 +1597,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
 
 
-        private TblDailyCdtransaction DaliyTransaction(TxnParameterDTO data, string key, CdTransactionsMasterDTO masterCDDTO, string type,string accountno, string frequency)
+        private TblDailyCdtransaction DaliyTransaction(TxnParameterDTO data, string key, CdTransactionsMasterDTO masterCDDTO, string type,string accountno, string frequency,DateTime DateTimeNow)
         {
          
             TblDailyCdtransaction tblDailyCdtransaction = new TblDailyCdtransaction();
@@ -1584,7 +1611,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 tblDailyCdtransaction = new TblDailyCdtransaction();
 
                 tblDailyCdtransaction.AccountNo = accountno;
-                tblDailyCdtransaction.TransactionDateTime = DateTime.Now;
+                tblDailyCdtransaction.TransactionDateTime = DateTimeNow;
                 tblDailyCdtransaction.TxnEventType = key;
 
                 tblDailyCdtransaction.AvailableBalance = data.Amount + data.TaxAmount;
@@ -1599,7 +1626,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             {
                 TblDailyCdtransaction DailyData = _context.TblDailyCdtransaction.LastOrDefault(s => s.AccountNo == accountno);
                 var date = DailyData.TransactionDateTime;
-                if (date.Value.Date == DateTime.Today)
+                if (date.Value.Date == DateTimeNow.Date)
                 {
 
                     //foreach (var temp in DailyTanscation)
@@ -1610,14 +1637,14 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                         if (type == "Credit")
                         {
 
-                            DailyTanscation.TransactionDateTime = DateTime.Now;
+                            DailyTanscation.TransactionDateTime = DateTimeNow;
                             DailyTanscation.AvailableBalance = DailyTanscation.AvailableBalance + data.Total;
                             DailyTanscation.LedgerBalance = DailyTanscation.LedgerBalance + data.Total;
                         }
                         else if (type == "Debit")
                         {
 
-                            DailyTanscation.TransactionDateTime = DateTime.Now;
+                            DailyTanscation.TransactionDateTime = DateTimeNow;
                             DailyTanscation.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
                             DailyTanscation.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
                             //   DailyTanscation.LedgerBalance = DailyTanscation.LedgerBalance - (masterCDDTO.TotalAmount + masterCDDTO.TotalGSTAmount);
@@ -1631,7 +1658,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                         tblDailyCdtransaction = new TblDailyCdtransaction();
 
                         tblDailyCdtransaction.AccountNo = accountno;
-                        tblDailyCdtransaction.TransactionDateTime = DateTime.Now;
+                        tblDailyCdtransaction.TransactionDateTime = DateTimeNow;
                         tblDailyCdtransaction.TxnEventType = key;
                         tblDailyCdtransaction.Frequency = frequency;
                         tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
@@ -1652,7 +1679,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                     tblDailyCdtransaction = new TblDailyCdtransaction();
 
                     tblDailyCdtransaction.AccountNo = accountno;
-                    tblDailyCdtransaction.TransactionDateTime = DateTime.Now;
+                    tblDailyCdtransaction.TransactionDateTime = DateTimeNow;
                     tblDailyCdtransaction.TxnEventType = key;
                     tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
                     tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
@@ -1671,7 +1698,10 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         public async Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)
         {
             var Errors = new List<ErrorInfo>();
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             var cdaccount = _context.TblCdaccounts.FirstOrDefault(p => p.AccountNo == accountnumber);
             if (cdaccount != null)
             {
@@ -1695,7 +1725,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 tblCdaccounts.AvailableBalance = 0;
                 tblCdaccounts.LedgerBalance = 0;
                 tblCdaccounts.CreatedBy = apiContext.UserId;
-                tblCdaccounts.CreatedDate = DateTime.Now;
+                tblCdaccounts.CreatedDate = DateTimeNow;
                 tblCdaccounts.ThresholdValue = 0;
                 tblCdaccounts.DropLimit = 0;
                 tblCdaccounts.Remark = $"Intial Setup  {0}";
