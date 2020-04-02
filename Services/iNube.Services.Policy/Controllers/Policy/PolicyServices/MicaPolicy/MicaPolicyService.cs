@@ -20,6 +20,7 @@ using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -5657,23 +5658,63 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-       
-            
-               
-
-
-
-           
+            /*
+             
                 foreach (var file in files)
                 {
-                    var filename = file.Name;
+                    filename = ContentDispositionHeaderValue
+                                    .Parse(file.ContentDisposition)
+                                    .FileName
+                                    .Trim('"');
+                    filename = "\\UploadFiles\\" + filename;
+                    size += file.Length;
+                    var fileBasepath = System.IO.Directory.GetCurrentDirectory() + "\\ClientApp\\public";
+                    string filePath = fileBasepath + "" + filename;
+                    
+                    using (FileStream fs = System.IO.File.Create(filePath))
+                    {
+                        file.CopyTo(fs);
+                        //BinaryReader reader = new BinaryReader(fs);
+                        //stringVal = reader.ReadString();
+                        //sb.Append(stringVal);
+                        fs.Flush();
+                    }
+             
+             
+             */
+
+            foreach (var file in files)
+                {
+
+                var filename = ContentDispositionHeaderValue
+                                    .Parse(file.ContentDisposition)
+                                    .FileName
+                                    .Trim('"');
+                filename = "\\UploadFiles\\" + filename;
+              // var  size += file.Length;
+                var fileBasepath = System.IO.Directory.GetCurrentDirectory() + "";
+                string filePath = fileBasepath + "" + filename;
+
+                using (FileStream fs = System.IO.File.Create(filePath))
+                {
+                    file.CopyTo(fs);
+                    //BinaryReader reader = new BinaryReader(fs);
+                    //stringVal = reader.ReadString();
+                    //sb.Append(stringVal);
+                    fs.Flush();
+                }
+
+
+
+
+               // var filename = file.Name;
 
                     var fileExt = Path.GetExtension(file.FileName);
 
                     if(fileExt==".CSV" || fileExt==".csv")
-                {
-                    string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
-                    var res = await ConvertCSVtoDataTable(filepath, apiContext);
+                    {
+                   // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
+                    var res = await ConvertCSVtoDataTable(filePath, apiContext);
                     return res;
                     }
                     //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
