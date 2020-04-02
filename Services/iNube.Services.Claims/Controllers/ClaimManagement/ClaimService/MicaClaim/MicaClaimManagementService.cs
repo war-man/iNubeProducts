@@ -2122,7 +2122,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
         }
 
-        
+
 
         public async Task<List<object>> ClaimStatusAsync(decimal ClaimId, decimal statusId, ApiContext apiContext)
         {
@@ -2265,7 +2265,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                     var covervalue = JsonConvert.DeserializeObject<dynamic>(insurabledata.CoverValue);
 
-                    item.ClaimStatus = data.Value;
+                    //item.ClaimStatus = data.Value;
+                    item.ClaimStatus = _context.TblmasCmcommonTypes.FirstOrDefault(a => a.CommonTypeId == item.ClaimStatusId).Value;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
@@ -2365,7 +2366,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                     var data1 = _context.TblClaimInsurable.SingleOrDefault(x => x.ClaimId == item.ClaimId);
 
-                    item.ClaimStatus = data.Value;
+                    //item.ClaimStatus = data.Value;
+                    item.ClaimStatus = _context.TblmasCmcommonTypes.FirstOrDefault(a => a.CommonTypeId == item.ClaimStatusId).Value;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;

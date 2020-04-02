@@ -979,6 +979,7 @@ class InboxClaimProcess extends React.Component {
          
         });
         this.state.vehicleActivity.vehicleNumbers  = Array.from(new Set(arr));
+        this.state.vehicleActivity.policyNumber = this.state.PolicyNumber;
         console.log("TableData#007", this.state.claimTableData, this.state.vehicleActivity.vehicleNumbers);
         this.setState({
             TableData: this.state.claimTableData.map((prop, key) => {

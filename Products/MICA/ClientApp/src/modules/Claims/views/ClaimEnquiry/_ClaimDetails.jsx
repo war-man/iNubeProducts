@@ -80,15 +80,9 @@ const ClaimDetails = (props) => {
 
                     <CustomInput
 
-                        // success={this.state.firstNameState == "success"}
-                        // error={this.state.firstNameState == "error"}
                         labelText="LossDate"
-                        // required={true}
-                        // id="fName"
                         value={claimDetailsprops.claimDetailsData.lossDate}
                         name='lossDate'
-                        // onChange={(e) => claimDetailsprops.SetClaimValues("string", e)}
-                        //modelbind={model('UserDetailsDTO.FirstName')}
                         disabled={claimDetailsprops.disabled}
                         formControlProps={{
                             fullWidth: true
@@ -102,15 +96,9 @@ const ClaimDetails = (props) => {
 
                     <CustomInput
                         disabled={claimDetailsprops.disabled}
-                        // success={this.state.firstNameState == "success"}
-                        // error={this.state.firstNameState == "error"}
                         labelText="LocationOfLoss"
-                        // required={true}
-                        // id="fName"
                         value={claimDetailsprops.claimDetailsData.locationOfEvent}
                         name='locationOfEvent'
-                        // onChange={(e) => claimDetailsprops.SetClaimValues("string", e)}
-                        //modelbind={model('UserDetailsDTO.FirstName')}
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -122,15 +110,10 @@ const ClaimDetails = (props) => {
 
                     <CustomInput
                         disabled={claimDetailsprops.disabled}
-                        // success={this.state.firstNameState == "success"}
-                        // error={this.state.firstNameState == "error"}
                         labelText="LossDescription"
-                        // required={true}
-                        // id="fName"
                         value={claimDetailsprops.claimDetailsData.lossDescription}
                         name='lossDescription'
                         onChange={(e) => claimDetailsprops.SetClaimValues("string", e)}
-                        //modelbind={model('UserDetailsDTO.FirstName')}
                         formControlProps={{
                             fullWidth: true
                         }}
@@ -154,7 +137,7 @@ const ClaimDetails = (props) => {
 
                 }
 
-                {
+                 {
                     claimDetailsprops.vehicleclaimstate &&
 
                     <GridItem xs={12} sm={4} md={3}>
@@ -291,10 +274,8 @@ const ClaimDetails = (props) => {
                         disabled={claimDetailsprops.disabled}
                         labelText="TotalClaimAmt"
                         name="totalClaimedAmount"
-                        // required={true}
                         type="numeric"
                         value={claimDetailsprops.claimDetailsData.totalClaimedAmount}
-                        //onChange={(e) => claimDetailsprops.handleClaimAmount(e)}
                         formControlProps={{ fullWidth: true }}
                     />
                 </GridItem>
@@ -306,10 +287,8 @@ const ClaimDetails = (props) => {
                         disabled={claimDetailsprops.disabled}
                         labelText="ApprovedAmt"
                         name="totalApprovedAmount"
-                        // required={true}
                         type="numeric"
                         value={claimDetailsprops.claimDetailsData.totalApprovedAmount}
-                        //onChange={(e) => claimDetailsprops.handleClaimAmount(e)}
                         formControlProps={{ fullWidth: true }}
                     />
                 </GridItem>

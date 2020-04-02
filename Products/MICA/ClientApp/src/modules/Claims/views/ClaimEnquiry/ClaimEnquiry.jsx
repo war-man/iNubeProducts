@@ -599,6 +599,8 @@ class ClaimEnquiry extends React.Component {
                 return {
                     id: key + 1,
                     documentName: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>,
+                    documentType: prop.documentType,
+                    documentView: prop.documentView
                 };
             })
         });
@@ -642,7 +644,7 @@ class ClaimEnquiry extends React.Component {
                 this.state.claimDetailsData.claimStatus = data[0][5][1];
                 this.state.claimDetailsData.claimManagerRemarks = data[0][6][1];
 
-                debugger;
+          
 
                 if (data[0][8][1].length != 0) {
                     this.state.claimDetailsData.vehicleLocationState = data[0][8][1];

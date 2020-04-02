@@ -10,17 +10,18 @@
         }
         return false;
     },
-    
-    verifypass(value) {
-            //Input Password and Submit[7 to 15 characters which contain at least one numeric digit and a special character]
-   // var dateRex = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
-    var dateRex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,15}$/;
-    if (dateRex.test(value)) {
-        console.log("date coming");
-        return true;
 
-    }
-    return false;
+    verifypass(value) {
+        //Input Password and Submit[7 to 15 characters which contain at least one numeric digit and a special character]
+        // var dateRex = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
+        //var dateRex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,15}$/;
+        var dateRex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+        if (dateRex.test(value)) {
+            console.log("date coming");
+            return true;
+
+        }
+        return false;
     },
     verifyPanIndNum(value, length) {
         var panNum = /^[A-Z]{3}[ABCEFGHLJPT]{1}[A-Z]{1}[0-9]{4}[A-Z]$/;
@@ -31,7 +32,7 @@
     },
 
     verifydatetime(value) {
-        var dateRex = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/; 
+        var dateRex = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
         if (dateRex.test(value)) {
             console.log("date coming");
             return true;
@@ -42,11 +43,11 @@
     // function that returns true if value is name, false otherwise
     verifyName(value) {
         var nameRex = /^[0-9a-zA-Z\s-\, ,#,/]+$/;
-        
+
         if (nameRex.test(value)) {
             console.log("data coming name");
             return true;
-           
+
         }
         return false;
     },
@@ -63,8 +64,8 @@
     },
     // function that verifies if a string has a given length or not
     verifyPanNum(value, length) {
-     
-       // var panNum = /^([a-zA-Z]){3}([A-CE-HLJPT]){1}([a-zA-Z]){1}([0-9]){4}([a-zA-Z]){1}?$/;
+
+        // var panNum = /^([a-zA-Z]){3}([A-CE-HLJPT]){1}([a-zA-Z]){1}([0-9]){4}([a-zA-Z]){1}?$/;
         var panNum = /^[A-Z]{3}[ABCEFGHLJPT]{1}[A-Z]{1}[0-9]{4}[A-Z]$/;
         if (panNum.test(value)) {
             return true;
@@ -95,13 +96,13 @@
     },
     // function that verifies if value contains only numbers
     verifyNumber(value) {
-     //   var numberRex = new RegExp("^[0-9]+$");
+        //   var numberRex = new RegExp("^[0-9]+$");
         var numberRex = /^[0-9]\d{9}$/;
         if (numberRex.test(value)) {
             return true;
         }
         return false;
-       
+
     },
     verifyID(value) {
         //   var numberRex = new RegExp("^[0-9]+$");
