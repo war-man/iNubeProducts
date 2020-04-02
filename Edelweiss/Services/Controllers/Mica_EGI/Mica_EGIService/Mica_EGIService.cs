@@ -50,6 +50,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         ResponseVehicleActivity GetVehicleActivity(VehicleActivityDTO vehicleActivity);
         //refurnd Details
         Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext);
+
+        //Policy Cancellation Status Update
+        PolicyStatusResponseDTO PolicyStatusUpdate(PolicyStatusDTO policyStatus);
+
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -2158,6 +2162,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             var Endreport = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
             Endreport.ScheduleEndDate = System.DateTime.UtcNow.AddMinutes(330);
+            Endreport.IsActive = false;
 
             _context.TblScheduleReport.Update(Endreport);
             _context.SaveChanges();
@@ -2704,32 +2709,32 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 DeserilizedPremiumData = CallNewEndo;
 
-                var CDData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
+                //var CDData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
 
-                var CdaccountNumber = (string)CDData["CDAccountNumber"];
+                //var CdaccountNumber = (string)CDData["CDAccountNumber"];
 
 
-                if (CdaccountNumber != null)
-                {
-                    CDBalanceDTO FtAccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
-                    CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
-                    var ADPremium = Convert.ToDecimal(accountdetails.TxnAmountBalance + FtAccountdetails.TxnAmountBalance);
-                    var GST = Convert.ToDecimal(accountdetails.TaxAmountBalance + FtAccountdetails.TaxAmountBalance);
-                    var Total = ADPremium + GST;
+                //if (CdaccountNumber != null)
+                //{
+                //    CDBalanceDTO FtAccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
+                //    CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
+                //    var ADPremium = Convert.ToDecimal(accountdetails.TxnAmountBalance + FtAccountdetails.TxnAmountBalance);
+                //    var GST = Convert.ToDecimal(accountdetails.TaxAmountBalance + FtAccountdetails.TaxAmountBalance);
+                //    var Total = ADPremium + GST;
 
-                    CalculationResult calculation = new CalculationResult();
+                //    CalculationResult calculation = new CalculationResult();
 
-                    calculation.Entity = "ADPremium";
-                    calculation.EValue = ADPremium.ToString();
-                    DeserilizedPremiumData.Add(calculation);
+                //    calculation.Entity = "ADPremium";
+                //    calculation.EValue = ADPremium.ToString();
+                //    DeserilizedPremiumData.Add(calculation);
 
-                    calculation = new CalculationResult();
+                //    calculation = new CalculationResult();
 
-                    calculation.Entity = "ADGST";
-                    calculation.EValue = GST.ToString();
-                    DeserilizedPremiumData.Add(calculation);
+                //    calculation.Entity = "ADGST";
+                //    calculation.EValue = GST.ToString();
+                //    DeserilizedPremiumData.Add(calculation);
 
-                }
+                //}
 
 
 
@@ -2805,6 +2810,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     MICACDModel.PremiumDTO.Add(ADPremiumDTO);
                     MICACDModel.Type = "PolicyCancellation";
                     MICACDModel.TxnType = "Balance";
+                    MICACDModel.FtPerDay = CallCancleCalculator.FtPerDay;
+                    MICACDModel.AdPerDay = CallCancleCalculator.AdPerDay;
                     MICACDModel.TxnAmount = ADPremiumDTO.TxnAmount;
                     MICACDModel.TaxAmount = ADtaxAmountDTO.TaxAmount;
                     MICACDModel.TotalAmount = MICACDModel.TxnAmount + MICACDModel.TaxAmount;
@@ -2820,6 +2827,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 MICACDModel.PremiumDTO.Add(FTModel);
                 MICACDModel.Type = "PolicyCancellation";
                 MICACDModel.TxnType = "Credit";
+                MICACDModel.FtPerDay = CallCancleCalculator.FtPerDay;
+                MICACDModel.AdPerDay = CallCancleCalculator.AdPerDay;
                 MICACDModel.TxnAmount = CallCancleCalculator.FireTheft * (-1);
                 MICACDModel.TaxAmount = CallCancleCalculator.FTFromTax * (-1) + CallCancleCalculator.FTToTax * (-1);
                 MICACDModel.TotalAmount = MICACDModel.TxnAmount + MICACDModel.TaxAmount;
@@ -2901,6 +2910,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //FireTheft [FT] - 365Days 
                 var Ft365days = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "FT365").EValue);
 
+                //FT-PerDay [Without Tax] [Rating Module]
+                var FtPerDay = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "FTPM").EValue);
+
+                //AD-PerDay [Without Tax] [Rating Module]
+                var AdPerDay = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "ADPMPD").EValue);
+
+
                 decimal FinalTaxTotal = 0;
 
                 CDPremiumDTO FTPremium = new CDPremiumDTO();
@@ -2920,6 +2936,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.PremiumDTO.Add(FTPremium);
                             CdModel.Type = "Proposal";
                             CdModel.TxnType = "Credit";
+                            CdModel.FtPerDay = FtPerDay;
+                            CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ad60days + Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
                             CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -2935,6 +2953,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.PremiumDTO.Add(FTPremium);
                             CdModel.Type = "Policy";
                             CdModel.TxnType = "Debit";
+                            CdModel.FtPerDay = FtPerDay;
+                            CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
                             CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -2957,6 +2977,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.PremiumDTO.Add(FTPremium);
                             CdModel.Type = "Proposal";
                             CdModel.TxnType = "Credit";
+                            CdModel.FtPerDay = FtPerDay;
+                            CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ad365days + Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
                             CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -2971,6 +2993,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.PremiumDTO.Add(FTPremium);
                             CdModel.Type = "Policy";
                             CdModel.TxnType = "Debit";
+                            CdModel.FtPerDay = FtPerDay;
+                            CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
                             CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3235,12 +3259,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //FTPremium = FTYearly(DeserilizedPremiumData, taxType);
                 var FinalTaxTotal = ADPremiumDTO.TaxAmount.TaxAmount + FTPremiumDTO.TaxAmount.TaxAmount;
 
+                //FT-PerDay [Without Tax] [Rating Module]
+                var FtPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "DifferentialFTPerDay").EValue);
+
+                //AD-PerDay [Without Tax] [Rating Module]
+                var AdPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "DifferentialADPerDay").EValue);
+
+
                 ////AD & FT Credit Object
 
                 CdModel.PremiumDTO.Add(ADPremiumDTO);
                 CdModel.PremiumDTO.Add(FTPremiumDTO);
                 CdModel.Type = "EndorsementAdd";
                 CdModel.TxnType = "Credit";
+                CdModel.FtPerDay = FtPerDay;
+                CdModel.AdPerDay = AdPerDay;
                 CdModel.TxnAmount = ADPremiumDTO.TxnAmount + FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FinalTaxTotal;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3251,6 +3284,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.PremiumDTO.Add(FTPremiumDTO);
                 CdModel.Type = "EndorsementAdd";
                 CdModel.TxnType = "Debit";
+                CdModel.FtPerDay = FtPerDay;
+                CdModel.AdPerDay = AdPerDay;
                 CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3259,12 +3294,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             if (TxnType == "Deletion")
             {
+
+                //FT-PerDay [Without Tax] [Rating Module]
+                var FtPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "DifferentialFTPerDay").EValue);
+
+                //AD-PerDay [Without Tax] [Rating Module]
+                var AdPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "DifferentialADPerDay").EValue);
+
+
                 decimal TotalTax = 0;
 
                 //AD TAX
                 //From State 
                 taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
-                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADGST").EValue);
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
 
                 TotalTax = taxTypeDTO.TaxAmount;
 
@@ -3275,7 +3318,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //TO State
                 taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
-                taxTypeDTO.TaxAmount = 0;
+                taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
 
                 TotalTax += taxTypeDTO.TaxAmount;
 
@@ -3286,7 +3329,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //AD
                 ADPremiumDTO.Type = "AD";
-                ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPremium").EValue);
+                ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
                 ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
                 ADPremiumDTO.TaxAmount = taxAmountDTO;
 
@@ -3296,6 +3339,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 	            CdModel.PremiumDTO.Add(ADPremiumDTO);
                 CdModel.Type = "EndorsementDel";
                 CdModel.TxnType = "Balance";
+                CdModel.FtPerDay = FtPerDay;
+                CdModel.AdPerDay = AdPerDay;
                 CdModel.TxnAmount = ADPremiumDTO.TxnAmount;
                 CdModel.TaxAmount =  taxAmountDTO.TaxAmount;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3347,6 +3392,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.PremiumDTO.Add(FTPremiumDTO);
                 CdModel.Type = "EndorsementDel";
                 CdModel.TxnType = "Credit";
+                CdModel.FtPerDay = FtPerDay;
+                CdModel.AdPerDay = AdPerDay;
                 CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FinalTaxTotal;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3853,6 +3900,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         ///This is Used for CD Mapper Method 
                         /// for giving the CD Mapping Entries
                         /// </summary>
+
+                        CalculationResult calculation = new CalculationResult();
+
+                        calculation.Entity = "DifferentialFTPerDay";
+                        calculation.EValue = DifferentialFireTheft.ToString();
+                        CallEndorsmentCalculator.Add(calculation);
+
+                        calculation = new CalculationResult();
+                        calculation.Entity = "DifferentialADPerDay";
+                        calculation.EValue = DifferentialADPremium.ToString();
+                        CallEndorsmentCalculator.Add(calculation);
+
                         return CallEndorsmentCalculator;
                     }
                     else
@@ -4083,11 +4142,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (NewPremiumData.Total > 0 && OldPremiumData.Total > 0)
                 {
                     var DifferentialFireTheft = NewPremiumData.FtPerDay - OldPremiumData.FtPerDay;
-                    
-                    //Because the Difference is not relevant in this vehicle deletion case - ravi sir 
-                    //var DifferentialADPremium = NewPremiumData.AdPerDay - OldPremiumData.AdPerDay;
 
-                    var DifferentialADPremium = 0;
+                    //Before
+                    //Because the Difference is not relevant in this vehicle deletion case - ravi sir 
+                    //var DifferentialADPremium = 0;
+
+                    //After
+                    var DifferentialADPremium = NewPremiumData.AdPerDay - OldPremiumData.AdPerDay;
 
                     EndoRuleDTO endoRule = new EndoRuleDTO
                     {
@@ -4106,6 +4167,22 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     if (callType == "CDUpdate")
                     {
+                        ///<summary>
+                        ///This is Used for CD Mapper Method 
+                        /// for giving the CD Mapping Entries
+                        /// </summary>
+
+                        CalculationResult calculation = new CalculationResult();
+
+                        calculation.Entity = "DifferentialFTPerDay";
+                        calculation.EValue = DifferentialFireTheft.ToString();
+                        CallEndorsmentCalculator.Add(calculation);
+
+                        calculation = new CalculationResult();
+                        calculation.Entity = "DifferentialADPerDay";
+                        calculation.EValue = DifferentialADPremium.ToString();
+                        CallEndorsmentCalculator.Add(calculation);
+
                         return CallEndorsmentCalculator;
                     }
                     else
@@ -4194,7 +4271,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 var Ftperday = 0.00;
+                //FT-PerDay [Without Tax] [Rating Module]
                 var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
+                //AD-PerDay [Without Tax] [Rating Module]
                 var AD = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
                 Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(AD);
 
@@ -4378,6 +4457,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             endorsementCalDTO.dictionary_rule.AD = "0";
             endorsementCalDTO.dictionary_rule.ADDAYS= "0";
 
+            cancelReturnDto.FtPerDay = CallRatingCalculator.FtPerDay;
+            cancelReturnDto.AdPerDay = CallRatingCalculator.AdPerDay;
+
 
             var CallEndoCalculator = await EndorsementCalculator(endorsementCalDTO);
 
@@ -4506,6 +4588,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             return policyCancelResponse;
         }
+
+        public PolicyStatusResponseDTO PolicyStatusUpdate(PolicyStatusDTO policyStatus)
+        {
+
+            PolicyStatusResponseDTO responseDTO = new PolicyStatusResponseDTO();
+            if (!String.IsNullOrEmpty(policyStatus.PolicyNumber) && policyStatus.PolicyStatus != null)
+            {
+                var tblstatus = _mapper.Map<TblPolicyStatus>(policyStatus);
+                _context.TblPolicyStatus.Add(tblstatus);
+                _context.SaveChanges();
+
+                responseDTO.PolicyStatus = policyStatus;
+                responseDTO.Status = BusinessStatus.Created;
+                responseDTO.MessageKey = "Success";
+            }
+            else
+            {
+                responseDTO.Status = BusinessStatus.PreConditionFailed;
+                responseDTO.MessageKey = "Policy Number or Status is Null";
+            }
+
+            return responseDTO;
+        }
+
     }
 }
 

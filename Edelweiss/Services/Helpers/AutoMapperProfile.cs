@@ -13,6 +13,7 @@ namespace iNube.Services.MicaExtension_EGI.Helpers
         {
             CreateMap<TblSchedule, ScheduleDTO>().ReverseMap();
             CreateMap<TblMonthlyBalance, BillingDTO>().ReverseMap();
+            CreateMap<TblPolicyStatus, PolicyStatusDTO>().ReverseMap();
 
         }
     }

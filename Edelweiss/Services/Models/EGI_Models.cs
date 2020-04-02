@@ -369,7 +369,9 @@ namespace iNube.Services.MicaExtension_EGI.Models
         }
 
         public string TxnType { get; set; }
-        public string Type { get; set; }     
+        public string Type { get; set; }    
+        public decimal FtPerDay { get; set; }
+        public decimal AdPerDay { get; set; }
         public decimal TxnAmount { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal TotalAmount { get; set; }
@@ -479,7 +481,9 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     public partial class PolicyCancelReturnDto : ResponseStatus
     {
-        public decimal FireTheft { get; set; }       
+        public decimal FireTheft { get; set; }   
+        public decimal FtPerDay { get; set; }
+        public decimal AdPerDay { get; set; }
         public decimal FTFromTax { get; set; }
         public decimal FTToTax { get; set; }
         public decimal Total { get; set; }
@@ -544,6 +548,22 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     }
 
+    public class PolicyStatusDTO
+    {
+        public int Id { get; set; }
+        public string PolicyNumber { get; set; }
+        public int? PolicyStatus { get; set; }
+        public DateTime? TxnDateTime { get; set; }
 
+    }
+
+    public class PolicyStatusResponseDTO : ResponseStatus
+    {
+        public PolicyStatusResponseDTO()
+        {
+            PolicyStatus = new PolicyStatusDTO();
+        }
+        public PolicyStatusDTO PolicyStatus { get; set; }
+    }
 }
 
