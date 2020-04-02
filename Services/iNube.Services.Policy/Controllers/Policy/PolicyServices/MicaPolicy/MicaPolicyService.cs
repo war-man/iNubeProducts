@@ -5678,38 +5678,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
             dbHelper._TimeZone = UserDateTime.KeyValue;
-
+            int step1 = 0;
             var files = httpRequest.Form.Files;
             //var docId = GetActiveResult(file.Name); HttpRequest
             DataTable dt = new DataTable();
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            /*
-             
-                foreach (var file in files)
-                {
-                    filename = ContentDispositionHeaderValue
-                                    .Parse(file.ContentDisposition)
-                                    .FileName
-                                    .Trim('"');
-                    filename = "\\UploadFiles\\" + filename;
-                    size += file.Length;
-                    var fileBasepath = System.IO.Directory.GetCurrentDirectory() + "\\ClientApp\\public";
-                    string filePath = fileBasepath + "" + filename;
-                    
-                    using (FileStream fs = System.IO.File.Create(filePath))
-                    {
-                        file.CopyTo(fs);
-                        //BinaryReader reader = new BinaryReader(fs);
-                        //stringVal = reader.ReadString();
-                        //sb.Append(stringVal);
-                        fs.Flush();
-                    }
-             
-             
-             */
-
             foreach (var file in files)
                 {
 
@@ -5717,11 +5691,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     .Parse(file.ContentDisposition)
                                     .FileName
                                     .Trim('"');
-                filename = "\\UploadFiles\\" + filename;
-              // var  size += file.Length;
-                var fileBasepath = System.IO.Directory.GetCurrentDirectory() + "";
-                string filePath = fileBasepath + "" + filename;
-
+                // filename = "\\UploadFiles\\" + filename;
+                // var  size += file.Length;
+                // var fileBasepath = System.IO.Directory.GetCurrentDirectory() + "";
+                //string filePath = fileBasepath + "" + filename;
+                step1++;
+                var path = Path.Combine("UploadFiles", filename);
+                string filePath = Path.GetFullPath(path);
                 using (FileStream fs = System.IO.File.Create(filePath))
                 {
                     file.CopyTo(fs);
@@ -5731,16 +5707,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     fs.Flush();
                 }
 
+                step1++;
 
 
+                // var filename = file.Name;
 
-               // var filename = file.Name;
-
-                    var fileExt = Path.GetExtension(file.FileName);
+                var fileExt = Path.GetExtension(file.FileName);
 
                     if(fileExt==".CSV" || fileExt==".csv")
                     {
-                   // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
+                    step1++;
+                    // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
                     var res = await ConvertCSVtoDataTable(filePath, apiContext);
                     return res;
                     }
@@ -5848,7 +5825,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             catch (Exception ex)
                             {
                                 var error = ex.ToString();
-                                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" };
+                                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter" , MessageKey=step1.ToString() };
                             }
                         }
                     }
@@ -5896,6 +5873,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<FileUploadResponse> ConvertCSVtoDataTable(string strFilePath,ApiContext apiContext)
         {
             List<ErrorInfo> Errors = new List<ErrorInfo>();
+            int logx = 0;
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             StreamReader sr = new StreamReader(strFilePath);
             string[] headers = sr.ReadLine().Split(',');
@@ -5904,6 +5882,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 dt.Columns.Add(header);
             }
+            logx++;
             //finding index of every column
             var endorsementindex = FindIndex(strFilePath,"endorsement Number");
             var EndorsementEffectivedateIndex= FindIndex(strFilePath,"endorsement Effective Date");
@@ -5915,7 +5894,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var AmountPaidIndex = FindIndex(strFilePath,"amount Paid");
             var DateOfPaymentIndex = FindIndex(strFilePath,"date Of Payment");
             var PaymentStatusIndex = FindIndex(strFilePath,"payment Status");
-          
+            logx++;
             try
             {
                 while (!sr.EndOfStream)
@@ -6038,11 +6017,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         }
 
                     }
-
+                    logx++;
                     var PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == endrsNum);
                     if (PolicyRefundDetails == null)
                     {
-                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber does not exist for row {i+1} in database" };
+                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber does not exist for row {i+1} in database" , ErrorCode=logx.ToString()};
                         Errors.Add(errorInfo);
                     }
                     else
@@ -6072,11 +6051,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded Successfully" };
                 }
             }
-            catch(Exception e)
+            catch(Exception ex)
             {
-
+                logx++;
+                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document uploaded with following Erros " + ex.ToString(), MessageKey = logx.ToString() }; 
             }
-            return new FileUploadResponse { Status = BusinessStatus.Ok, ResponseMessage = $"Document Uploaded" }; ;
         }
     
     public int FindIndex(string filepath,string columnName)
