@@ -5703,7 +5703,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
                     }
-                    var path = Path.Combine("UploadFiles", filename);
+                    var path = Path.Combine("", filename);
                     filePath = Path.GetFullPath(path);
                     using (FileStream fs = System.IO.File.Create(filePath))
                     {
