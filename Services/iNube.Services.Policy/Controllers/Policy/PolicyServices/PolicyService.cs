@@ -81,6 +81,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext);
 
         Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext);
     }
     public class PolicyService : IPolicyService
     {
@@ -757,6 +758,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).RefundUpload(httpRequest, cancellationToken, apiContext);
+        }
+
+        public async Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GetEndoresementDetails(endorsementSearch, apiContext);
         }
     }
 }

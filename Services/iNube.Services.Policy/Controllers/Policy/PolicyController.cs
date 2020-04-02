@@ -609,14 +609,13 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = await _policyService.RefundUpload(Request, cancellationToken, Context);
             return Ok(response);
         }
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<IActionResult> GetUTCDateTime()
-        {
-            var date1 = DateTime.UtcNow;
-            string date = DateTime.UtcNow.ToString();
+       
 
-            return Ok(date);
+        [HttpPost]
+        public async Task<IActionResult> GetEndoresementDetails(EndorsementSearch endorsementSearch)
+        {
+            var response = await _policyService.GetEndoresementDetails(endorsementSearch, Context);
+            return Ok(response);
         }
     }
 }

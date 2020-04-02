@@ -117,6 +117,7 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            VehicleNoList:[],
             prodId: "",
             vehicleclaim: false,
             displaybank: false,
@@ -371,6 +372,13 @@ class InboxClaimProcess extends React.Component {
             displayfinancier: false,
             displaynominee: false,
             displaysurveyor: false,
+            vehicleActivity: {
+                "policyNumber": "",
+                "vehicleNumbers": [],
+            },
+            popopen: false,
+            vehicleActivitydata: [],
+
         };
     }
 
@@ -987,6 +995,8 @@ class InboxClaimProcess extends React.Component {
                 return {
                     id: key + 1,
                     documentName: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>,
+                    documentType: prop.documentType,
+                    documentView: prop.documentView
                 };
 
             })
@@ -996,7 +1006,11 @@ class InboxClaimProcess extends React.Component {
 
     claimAmountTable = () => {
 
-        console.log("TableData#007", this.state.claimTableData);
+       
+        this.state.VehicleNoList = this.state.claimTableData.map((prop, key) => {
+            return prop.coverDynamic.map((c) => { if (c.Header =="Vehicle Number") { return c.Details } })
+        });
+        console.log("TableData#007", this.state.claimTableData, this.state.VehicleNoList);
         this.setState({
             TableData: this.state.claimTableData.map((prop, key) => {
                 return {
@@ -1585,6 +1599,47 @@ class InboxClaimProcess extends React.Component {
         this.setState({ Claimdata });
 
     }
+    handleActivitylog = () => {
+       
+
+        let that = this;
+      
+        
+        fetch(`${ClaimConfig.claimConfigUrl}/api/Mica_EGI/GetVehicleActivity`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(that.state.vehicleActivity)
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log("ActivityVehciledata", data);
+            if (data.status == 1) {
+                if (data.vehicleData.length > 0) {
+                    that.setState({ popopen: true });
+                    that.setState({ vehicleActivitydata: data.vehicleData });
+                }
+            }
+            console.log("vehicleActivitydata", that.state.vehicleActivitydata);
+           
+            //that.setState({ popopen: true });
+           
+
+            });
+       
+
+    }
+   
+handleActivityClose = () => {
+        this.setState({ popopen: false });
+    };
+
+
+
+
 
     render() {
         const { classes } = this.props;
@@ -1725,7 +1780,7 @@ class InboxClaimProcess extends React.Component {
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
                                     SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
                                     displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
-                                    Bankarray={this.state.Bankarray}
+                                    Bankarray={this.state.Bankarray} handleActivitylog={this.handleActivitylog}
                                 />
                             </CardBody>
                         </Card>
@@ -1762,6 +1817,94 @@ class InboxClaimProcess extends React.Component {
 
                     </div>
                 </Modal>
+
+
+<Modal
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                    open={this.state.popopen}
+                    onClose={this.handleActivityClose}>
+
+                    <div className={classes.paper} id="modal">
+                        <h4><small className="center-text">Activity Log</small></h4>
+
+                        <Button color="info"
+                            round
+                            className={classes.marginRight}
+                            id="close-bnt"
+                            onClick={this.handleActivityClose}>
+                            &times;
+                        </Button>
+
+                        <div id="disp">
+                            {(this.state.vehicleActivitydata.length>0)?this.state.vehicleActivitydata.map((item, i) => (
+                                <GridContainer justify="center" >
+                                    <GridItem xs={12}>
+
+                                        <ReactTable
+                                            title={<h5><TranslationContainer translationKey={"Vehicle Number:"+item.vehicleNumber} /></h5>}
+
+                                            data={item.activityDTOs}
+                                            filterable
+                                            columns={[
+                                                {
+                                                    Header: "SerialNo",
+                                                    accessor: "id",
+                                                    headerClassName: 'react-table-center',
+                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                    minWidth: 200,
+                                                    sortable: false,
+                                                    //  filterable: false 
+                                                },
+                                                {
+
+                                                    Header: "Date Time",
+                                                    accessor: "dateTime",
+                                                    minWidth: 40,
+                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                    headerClassName: 'react-table-center'
+                                                },
+                                                {
+                                                    Header: "Vehicle No",
+                                                    accessor: "vehicleNo",
+                                                    minWidth: 40,
+                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                    headerClassName: 'react-table-center'
+                                                },
+                                                {
+                                                    Header: "Switch State",
+                                                    accessor: "switchState",
+                                                    minWidth: 40,
+                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                    headerClassName: 'react-table-center'
+                                                },
+                                                {
+                                                    Header: "Switch Type",
+                                                    accessor: "switchType",
+                                                    minWidth: 40,
+                                                    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                    headerClassName: 'react-table-center'
+                                                },
+
+
+                                            ]}
+                                            defaultPageSize={4}
+                                            pageSize={([this.state.ActivityData.length + 1] < 4) ? [this.state.ActivityData.length + 1] : 4}
+                                            showPaginationTop={false}
+                                            //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                            showPaginationBottom={true}
+                                            className="-striped -highlight discription-tab"
+
+                                        />
+
+                                    </GridItem>
+                                </GridContainer>
+                            )):null}
+                        </div>
+
+                    </div>
+                </Modal>
+
             </div>
         );
     }

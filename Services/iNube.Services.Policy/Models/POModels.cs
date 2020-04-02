@@ -1474,6 +1474,8 @@ namespace iNube.Services.Policy.Models
         public string TxnType { get; set; }
         public string Type { get; set; }
         public string AccountNo { get; set; }
+        public decimal FtPerDay { get; set; }
+        public decimal AdPerDay { get; set; }
         public decimal TxnAmount { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal TotalAmount { get; set; }
@@ -1586,6 +1588,18 @@ namespace iNube.Services.Policy.Models
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public decimal? EnvId { get; set; }
+    }
+    public class EndorsementResponse
+    {
+        public string EndorsementNo { get; set; }
+        public DateTime? EndorsementEffectivedate { get; set; }
+        public string UpdatedResponse { get; set; }
+    }
+    public class EndorsementSearch
+    {
+        public string PolicyNumber { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
     }
 }
 

@@ -407,6 +407,13 @@ class ClaimProcess extends React.Component {
             displayfinancier: false,
             displaynominee: false,
             displaysurveyor: false,
+            vehicleActivity: {
+                "policyNumber": "",
+                "vehicleNumbers": [""],
+            },
+            popopen: false,
+            vehicleActivitydata: [],
+
         };
         this.dataTable = this.dataTable.bind(this);
         this.SetValue = this.SetValue.bind(this);
@@ -1521,6 +1528,56 @@ class ClaimProcess extends React.Component {
         this.state.fields = Claimdata;
         this.setState({ Claimdata });
     }
+handleActivitylog = () => {
+        let that = this;
+        that.state.vehicleActivity.policyNumber = that.state.PolicyNumber;
+    fetch(`${ClaimConfig.claimConfigUrl}/api/Mica_EGI/VehicleActivityLog`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(that.state.vehicleActivity)
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log("ActivityVehciledata", data);
+
+            that.setState({ vehicleActivitydata: data.vehicleData });
+            console.log("vehicleActivitydata", that.state.vehicleActivitydata);
+            that.activityTable();
+            //that.setState({ popopen: true });
+           
+
+            });
+       
+
+    }
+activityTable = () => {
+
+        this.setState({
+            ActivityData: this.state.vehicleActivitydata.map((prop, key) => {
+
+                return {
+                    id: key + 1,
+                    dateTime: prop.dateTime,
+                    vehicleNo: prop.vehicleNo,
+                    switchState: prop.switchState,
+                    switchType: prop.switchType,
+                  
+                };
+            })
+        });
+
+    }
+handleActivityClose = () => {
+        this.setState({ popopen: false });
+    };
+
+
+
+
 
     render() {
         const { classes } = this.props;
@@ -1803,6 +1860,7 @@ class ClaimProcess extends React.Component {
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
                                     SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
                                     displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
+                                    handleActivitylog={this.handleActivitylog}
                                 />
 
                             </CardBody>
@@ -1847,6 +1905,89 @@ class ClaimProcess extends React.Component {
 
                     </div>
                 </Modal>
+
+<Modal
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                    open={this.state.popopen}
+                    onClose={this.handleActivityClose}>
+
+                    <div className={classes.paper} id="modal">
+                        <h4><small className="center-text">Activity Log</small></h4>
+
+                        <Button color="info"
+                            round
+                            className={classes.marginRight}
+                            id="close-bnt"
+                            onClick={this.handleActivityClose}>
+                            &times;
+                        </Button>
+
+                        <div id="disp">
+                            <GridContainer justify="center" >
+                                <GridItem xs={12}>
+
+                                    <ReactTable
+                                        data={this.state.ActivityData}
+                                        filterable
+                                        columns={[
+                                            {
+                                                Header: "SerialNo",
+                                                accessor: "id",
+                                                headerClassName: 'react-table-center',
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                minWidth: 200,
+                                                sortable: false,
+                                                //  filterable: false 
+                                            },
+                                            {
+                                               
+                                                Header: "Date Time",
+                                                accessor: "dateTime",
+                                                minWidth: 40,
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center'
+                                            },
+                                            {
+                                                Header: "Vehicle No",
+                                                accessor: "vehicleNo",
+                                                minWidth: 40,
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center'
+                                            },
+                                            {
+                                                Header: "Switch State",
+                                                accessor: "switchState",
+                                                minWidth: 40,
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center'
+                                            },
+                                            {
+                                                Header: "Switch Type",
+                                                accessor: "switchType",
+                                                minWidth: 40,
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center'
+                                            },
+
+
+                                        ]}
+                                        defaultPageSize={4}
+                                        pageSize={([this.state.ActivityData.length + 1] < 4) ? [this.state.ActivityData.length + 1] : 4}
+                                        showPaginationTop={false}
+                                        //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                        showPaginationBottom={true}
+                                        className="-striped -highlight discription-tab"
+
+                                    />
+
+                                </GridItem>
+                            </GridContainer>
+                        </div>
+
+                    </div>
+                </Modal>
+
             </div>
         );
     }

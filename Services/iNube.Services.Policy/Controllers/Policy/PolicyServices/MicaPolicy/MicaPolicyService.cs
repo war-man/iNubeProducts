@@ -2968,7 +2968,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 var CDmap = await _integrationService.CDMapperList(cDMappers, "EndorsementAdd", apiContext);
                                 if (CDmap.Count > 0)
                                 {
-                                    var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                                    var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0 &&s.TxnType=="Credit");
 
                                     //Step3:Check Premium vs Payment Amount
                                     var paymentinfo = insurableItemRequest["PaymentInfo"];
@@ -5192,7 +5192,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         }
 
-        public async Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext)
+
+        public async Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+           var policydetails= _context.TblPolicy.FirstOrDefault(s => s.PolicyNo == endorsementSearch.PolicyNumber);
+            if (endorsementSearch.FromDate == null) {
+
+                endorsementSearch.FromDate = policydetails.PolicyStartDate;
+            }
+            if (endorsementSearch.ToDate == null) {
+
+                CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+                dbHelper._TimeZone = UserDateTime.KeyValue;
+
+                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+
+                endorsementSearch.ToDate = DatetimeNow;
+            }
+
+            List<EndorsementResponse> endorsementResponse= _context.TblEndorsementDetails.Where(s => s.EndorsementEffectivedate.Value.Date >= endorsementSearch.FromDate.Value.Date && s.EndorsementEffectivedate.Value.Date <= endorsementSearch.ToDate.Value.Date && s.PolicyId== policydetails.PolicyId).Select(p=>new EndorsementResponse { EndorsementEffectivedate=p.EndorsementEffectivedate,UpdatedResponse=p.UpdatedResponse,EndorsementNo=p.EndorsementNo}).ToList();
+
+
+            return endorsementResponse;
+        }
+
+
+            public async Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext)
         {
             var riskparmeters = await _integrationService.GetMappingParams(mappingname, apiContext);
             List<dynamic> targetdto = new List<dynamic>();
