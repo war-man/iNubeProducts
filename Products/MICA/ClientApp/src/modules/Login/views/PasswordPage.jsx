@@ -240,9 +240,9 @@ class PasswordPage extends React.Component {
                         firsttimelogin: data.firstTimeLogin,
                     });
                     if (data.firstTimeLogin != 0) {
-                        this.setState({ redirect: true });
+                        that.setState({ redirect: true });
                     } else {
-                        this.setState({ redirecttofirst: true });
+                        that.setState({ redirecttofirst: true });
                     }
 
                     localStorage.setItem('partnerid', data.partnerId);
