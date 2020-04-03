@@ -127,10 +127,10 @@ class PolicyCancellation extends React.Component {
 
     showPolicyTable = () => {
         console.log("PolicysearchDTO", this.state.PolicysearchDTO);
+       
 
 
-
-        this.setState({ loader: false });
+        this.setState({ loader: false, ShowRefundDetails: false, Claimdetailsdata:[] });
         fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/PolicySearch`, {
             method: 'post',
             headers: {
@@ -927,7 +927,7 @@ class PolicyCancellation extends React.Component {
                                         <GridContainer justify="center">
                                             <GridItem xs={8} sm={3} md={3} lg={2}>
                                                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                    <Button id="center-modify-user" color="info" round className={classes.marginRight} onClick={this.CancelPolicyFun}>
+                                                    <Button id="center-modify-user" color="info" round disabled={this.state.Claimdetailsdata.length > 0?true:false} className={classes.marginRight} onClick={this.CancelPolicyFun}>
                                                         <TranslationContainer translationKey="Cancel Policy" />
                                                     </Button>
                                                 </Animated>
