@@ -17,6 +17,7 @@ using System.Globalization;
 using System.Data.SqlClient;
 using System.Data;
 
+
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
     public interface IMicaEGIService
@@ -53,6 +54,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         //Policy Cancellation Status Update
         PolicyStatusResponseDTO PolicyStatusUpdate(PolicyStatusDTO policyStatus);
+
+        //MonthlySIScheduler
+        Task<bool> MonthlySIScheduler(DateTime? dateTime);
+
 
     }
 
@@ -4709,11 +4714,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 responseDTO.PolicyStatus = policyStatus;
                 responseDTO.Status = BusinessStatus.Created;
                 responseDTO.MessageKey = "Success";
+                responseDTO.ResponseMessage = "Success";
             }
             else
             {
                 responseDTO.Status = BusinessStatus.PreConditionFailed;
                 responseDTO.MessageKey = "Policy Number or Status is Null";
+                responseDTO.ResponseMessage = "Fail-PreConditionFailed";
             }
 
             return responseDTO;
@@ -4727,7 +4734,57 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 return check;
             }
                return false;           
-        }      
+        }
+
+        public async Task<bool> MonthlySIScheduler(DateTime? dateTime)
+        {
+
+            PolicyMonthlySiDTO monthlySiDTO = new PolicyMonthlySiDTO();
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
+            ApiContext apiContext = new ApiContext();
+            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
+            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
+            apiContext.Token = _configuration["Mica_ApiContext:Token"];
+            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
+            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+
+            DateTime PolicyStartDate = new DateTime(2021, 2, 1, 11, 09, 52);
+            DateTime NextMonth = PolicyStartDate.AddMonths(1);
+            DateTime DueDate = NextMonth.AddDays(-1);
+            DateTime ReportDate = DueDate.AddDays(-2);
+
+            //Step-1:Get All Active Policy's 
+            var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, apiContext);
+
+
+            if (PolicyDetails == null || PolicyDetails.Count == 0)
+            {
+                return false;
+            }
+
+            var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
+
+            PolicyNumberList.Distinct();
+
+            //Step-2:Start the Loop Based On Policy Number
+            foreach (var policy in PolicyNumberList)
+            {
+                CDDetailsRequestDTO detailsRequestDTO = new CDDetailsRequestDTO
+                {
+
+                    PolicyNumber = policy,
+                    FromDate = Convert.ToDateTime("2020-04-02T10:37:29.518Z"),
+                    ToDate = Convert.ToDateTime("2020-04-03T10:37:29.518Z"),
+
+                };
+
+                //Step-3 Get Entire Policy Details
+                var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO,apiContext);
+            }
+
+                return false;
+
+        } 
 
     }
 }

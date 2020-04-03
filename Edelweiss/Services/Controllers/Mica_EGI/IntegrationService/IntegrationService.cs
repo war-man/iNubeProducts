@@ -41,6 +41,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         //AD Call In CD Account Details table
         Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string TxnEventType, ApiContext apiContext);
+
+        //Get All the Policy + CD Data entire Policy Object 
+        Task<IEnumerable<CDDetailsResponseDTO>> GetCDMapperDetails(CDDetailsRequestDTO detailsRequestDTO,ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -166,6 +169,14 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             var uri = PartnerUrl + "/api/Accounts/GetAccountBalance?accountnumber=" + accountnumber + "&TxnEventType=" + TxnEventType;
             return await GetApiInvoke<CDBalanceDTO>(uri, apiContext);
         }
+
+        public async Task<IEnumerable<CDDetailsResponseDTO>> GetCDMapperDetails(CDDetailsRequestDTO detailsRequestDTO, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/GetCDMapperDetails";
+            return await PostListApiInvoke<CDDetailsRequestDTO, CDDetailsResponseDTO>(uri, apiContext, detailsRequestDTO);
+        }
+
+
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();

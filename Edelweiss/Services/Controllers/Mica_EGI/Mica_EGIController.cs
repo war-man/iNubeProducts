@@ -178,5 +178,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return ServiceResponse(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> MonthlySIScheduler(DateTime? dateTime)
+        {
+            var response = await _quotationService.MonthlySIScheduler(dateTime);
+            return ServiceResponse(response);
+        }
+
     }
 }
