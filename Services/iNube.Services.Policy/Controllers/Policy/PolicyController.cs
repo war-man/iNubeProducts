@@ -612,7 +612,7 @@ namespace iNube.Services.Policy.Controllers.Policy
        
 
         [HttpPost]
-        public async Task<IActionResult> GetEndoresementDetails(EndorsementSearch endorsementSearch)
+        public async Task<IActionResult> GetCDMapperDetails(EndorsementSearch endorsementSearch)
         {
             var response = await _policyService.GetEndoresementDetails(endorsementSearch, Context);
             return Ok(response);

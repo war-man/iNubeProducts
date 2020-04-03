@@ -5155,6 +5155,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                                     _context.SaveChanges();
+                                    PolicyStatusDTO policyStatusDTO = new PolicyStatusDTO();
+                                    policyStatusDTO.PolicyNumber = tbl_particiant.PolicyNo;
+                                    policyStatusDTO.PolicyStatus = tbl_particiant.PolicyStatusId;
+                                    policyStatusDTO.TxnDateTime = DatetimeNow;
+                                    var result = await _integrationService.PolicyStatusUpdate(policyStatusDTO, apiContext);
+                                    if (result.Status == BusinessStatus.Created) {
+                                        //Success
+                                    }
 
                                     return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
 
@@ -5214,7 +5222,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 endorsementSearch.ToDate = DatetimeNow;
             }
 
-            List<EndorsementResponse> endorsementResponse= _context.TblEndorsementDetails.Where(s => s.EndorsementEffectivedate.Value.Date >= endorsementSearch.FromDate.Value.Date && s.EndorsementEffectivedate.Value.Date <= endorsementSearch.ToDate.Value.Date && s.PolicyId== policydetails.PolicyId).Select(p=>new EndorsementResponse { EndorsementEffectivedate=p.EndorsementEffectivedate,UpdatedResponse=p.UpdatedResponse,EndorsementNo=p.EndorsementNo}).ToList();
+            List<EndorsementResponse> endorsementResponse= _context.TblEndorsementDetails.Where(s => s.EndorsementEffectivedate.Value.Date >= endorsementSearch.FromDate.Value.Date && s.EndorsementEffectivedate.Value.Date <= endorsementSearch.ToDate.Value.Date && s.PolicyId== policydetails.PolicyId).Select(p=>new EndorsementResponse { EndorsementEffectivedate=p.EndorsementEffectivedate,UpdatedResponse=p.UpdatedResponse,EndorsementNo=p.EndorsementNo,Action=p.Action}).ToList();
 
 
             return endorsementResponse;

@@ -55,6 +55,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string type, ApiContext apiContext);
         Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyCancelRequest, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
+        Task<PolicyStatusResponseDTO> PolicyStatusUpdate(PolicyStatusDTO policyStatusDTO, ApiContext apiContext);
         //GetMappingParams(string mappingname, ApiContext apiContext)
     }
     public class IntegrationService : IIntegrationService
@@ -315,6 +316,14 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             var uri = ExtensionUrl + "/api/Mica_EGI/CDMapper?TxnType=" + type;
 
             return await PostApiInvoke<dynamic, List<MicaCDDTO>>(uri, apiContext, PolicyRequest);
+
+        }
+        public async Task<PolicyStatusResponseDTO> PolicyStatusUpdate(PolicyStatusDTO policyStatusDTO, ApiContext apiContext)
+        {
+
+            var uri = ExtensionUrl + "/api/Mica_EGI/PolicyStatusUpdate";
+
+            return await PostApiInvoke<dynamic, PolicyStatusResponseDTO>(uri, apiContext, policyStatusDTO);
 
         }
         public async Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)
