@@ -244,10 +244,7 @@ class PasswordPage extends React.Component {
                     } else {
                         this.setState({ redirecttofirst: true });
                     }
-                    //that.setState({ redirect: true });
 
-                    //console.log("rid: ", this.state.rid);
-                    //console.log("partnerid: ", data.partnerId);
                     localStorage.setItem('partnerid', data.partnerId);
                     localStorage.setItem('userId', data.userId);
                     localStorage.setItem('roleId', data.roleId);
