@@ -1,6 +1,8 @@
 ﻿using iNube.Services.UserManagement.Entities;
 using iNube.Services.UserManagement.Entities.AVO;
 using iNube.Services.UserManagement.Entities.MICACP;
+using iNube.Services.UserManagement.Models;
+using iNube.Utility.Framework.Model;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -47,7 +49,7 @@ namespace iNube.Services.UserManagement.Helpers
     public static class DbManager
     {
         public static string DbName;
-
+        public static string _TimeZone { get; set; }
         public static string GetDbConnectionString(string dbName)
         {
             var dbConnectionString = "";
@@ -172,6 +174,21 @@ namespace iNube.Services.UserManagement.Helpers
             }
 
             return context;
+        }
+        public static CustomerSettingsDTO GetCustomerSettings(string type, ApiContext apiContext)
+        {
+
+            DbHelper dbHelper = new DbHelper();
+            var result = dbHelper.GetCustomerSettings(apiContext.OrgId, type, apiContext.ProductType,0, apiContext);
+            return result;
+        }
+
+        public static  DateTime GetDateTimeByZone(string userTimeZone)
+        {
+
+            DateTime zonelocalDateTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            return zonelocalDateTime;
         }
     }
 }

@@ -277,7 +277,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile
 
         // Post: api/UserProfile/ChangePassword
         [HttpPost]
-        [AllowAnonymous]
+      
         public IActionResult ChangePassword(Password pass)
         {
             var response = _userService.ChangePassword(pass, Context);

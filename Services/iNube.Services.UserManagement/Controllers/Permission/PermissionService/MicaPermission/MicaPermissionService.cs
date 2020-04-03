@@ -24,7 +24,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         private MICAUMContext _context;
         private IMapper _mapper;
         private IIntegrationService _integrationService;
-
+      
         public MicaPermissionService(IMapper mapper, IIntegrationService integrationService)
         {
             _integrationService = integrationService;
@@ -165,6 +165,10 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             UserPermissionsDTO userPermissions = null;
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             for (int i = 0; i < permissionIds.PermissionIds.Length; i++)
             {
                 userPermissions = new UserPermissionsDTO();
@@ -173,7 +177,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                 userPermissions.UserorRole = "User";
                 // userPermissions.CreatedBy = CreatedBy;
                 userPermissions.CreatedBy = apiContext.UserId;
-                userPermissions.CreatedDate = DateTime.Now;
+                userPermissions.CreatedDate = DatetimeNow;
                 userPermissions.Status = true;
                 var _usersPer = _mapper.Map<TblUserPermissions>(userPermissions);
                 _context.TblUserPermissions.Add(_usersPer);
@@ -194,6 +198,10 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             TblUserPermissions userPermissions = null;
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             foreach (var item in permissionIds.RolePermissionIds)
             {
                 var newPermission = item.PermissionIds.ToList();
@@ -219,7 +227,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                     userPermissions.RoleId = item.RoleId;
                     userPermissions.UserorRole = "User";
                     // userPermissions.CreatedBy = CreatedBy;
-                    userPermissions.CreatedDate = DateTime.Now;
+                    userPermissions.CreatedDate = DatetimeNow;
                     userPermissions.Status = true;
                     _context.TblUserPermissions.Add(userPermissions);
                 }
@@ -368,6 +376,11 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             TblUserPermissions newRolePermissions = null;
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             var permission = _context.TblUserPermissions.Where(p => p.RoleId == permissionIds.RoleId).Select(p => p);
             if (permission != null)
             {
@@ -387,7 +400,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                 newRolePermissions.RoleId = permissionIds.RoleId;
                 newRolePermissions.UserorRole = "Role";
                 // userPermissions.CreatedBy = CreatedBy;
-                newRolePermissions.CreatedDate = DateTime.Now;
+                newRolePermissions.CreatedDate = DatetimeNow;
                 newRolePermissions.Status = true;
                 _context.TblUserPermissions.Add(newRolePermissions);
             }
@@ -618,6 +631,10 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
 
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Report");
             var rresponse = await _integrationService.GetReportNameForPermissionsDetails(data.Url, apiContext);
 
@@ -650,7 +667,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                     reportPermissions.Roleid = item.RoleId;
                     reportPermissions.UserorRole = "User";
                     reportPermissions.CreatedBy = apiContext.UserId;
-                    reportPermissions.CreatedDate = DateTime.Now;
+                    reportPermissions.CreatedDate = DatetimeNow;
 
                     _context.TblDynamicPermissions.Add(reportPermissions);
                 }

@@ -67,6 +67,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
             // _cpcontext = (MICACPContext)(DbManager.GetContext(apiContext.ProductType, apiContext.ServerType));
             CustomerSettingsDTO customerSettings = new CustomerSettingsDTO();
+
             var count = 0;
             foreach (var item in customerProvisioningDTO.customerSettings)
             {

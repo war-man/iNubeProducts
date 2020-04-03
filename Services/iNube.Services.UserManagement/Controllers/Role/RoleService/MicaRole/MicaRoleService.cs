@@ -19,6 +19,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         private IIntegrationService _integrationService;
         //private RoleIntegrationService _integrationService;
         public IConfiguration _config;
+       
         //public MicaRoleService(MICAUMContext context, RoleIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
         public MicaRoleService(MICAUMContext context, IIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
         {
@@ -268,12 +269,17 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         public RoleResponse CreateRole(RolesDTO role, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             var _roles = _mapper.Map<AspNetRoles>(role);
             if (string.IsNullOrEmpty(_roles.Id))
             {
                 _roles.Id = Guid.NewGuid().ToString();
 
-                DateTime now = DateTime.Now;
+                DateTime now = DateTimeNow;
                 var date = now.Day;
                 var month = now.Month;
                 var year = now.Year;
@@ -354,6 +360,11 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         {
             var data = _context.TblDynamicPermissions.Where(a => a.Roleid == configDTO.RoleId && a.UserorRole == "Role").ToList();
 
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+
             TblDynamicPermissions dynamicPermissions = null;
             foreach (var item in data)
             {
@@ -371,7 +382,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
                 dynamicPermissions.IsActive = true;
                 dynamicPermissions.UserorRole = "Role";
                 dynamicPermissions.CreatedBy = apiContext.UserId;
-                dynamicPermissions.CreatedDate = DateTime.Now;
+                dynamicPermissions.CreatedDate = DateTimeNow;
 
                 _context.TblDynamicPermissions.Add(dynamicPermissions);
             }

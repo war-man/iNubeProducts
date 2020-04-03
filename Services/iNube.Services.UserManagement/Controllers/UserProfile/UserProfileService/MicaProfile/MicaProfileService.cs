@@ -21,6 +21,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         private bool Result;
         public static int otpvalue { get; set; }
         private readonly IEmailService _emailService;
+       
         public MicaProfileService(IMapper mapper, IEmailService emailService)
         {
             _mapper = mapper;
@@ -47,6 +48,12 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public UserResponse CreateProfileUser(UserDTO user, ApiContext apiContext)
         {
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+
             if (user.EnvId > 0)
             {
                 _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, user.EnvId.ToString());
@@ -55,6 +62,8 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             {
                 _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             }
+
+
             var userDetails = user.UserDetails.First();
             //var userAddress = user.UserAddress.FirstOrDefault();
             EmailTest emailTest = new EmailTest();
@@ -65,7 +74,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 {
                     userDetails.UserName = userDetails.Email;
                     userDetails.CreatedBy = apiContext.UserId;
-                    userDetails.CreatedDate = DateTime.Now;
+                    userDetails.CreatedDate = DateTimeNow;
                     userDetails.IsActive = true;
                     if (userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
                     {
@@ -83,7 +92,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _users.UserName = userDetails.Email;
                         _users.Email = userDetails.Email;
                         _users.FirstTimeLogin = 0;
-                        _users.LastPasswordChanged = DateTime.Now;
+                        _users.LastPasswordChanged = DateTimeNow;
                         _users.PasswordHash = Utilities.GenerateDefaultPassword();
                         emailTest.To = userDetails.Email;
                         emailTest.Subject = "User profile creation";
@@ -108,7 +117,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     }
                     customerUsers.UserName = userDetails.Email;
                     customerUsers.Email = userDetails.Email;
-                    customerUsers.CreatedDate = DateTime.Now;
+                    customerUsers.CreatedDate = DateTimeNow;
                     customerUsers.ContactNumber = userDetails.ContactNumber;
                     customerUsers.UserId = _users.Id;
                     customerUsers.IsActive = true;
@@ -130,7 +139,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             {
                 AspNetUsers _users = _mapper.Map<AspNetUsers>(user);
                 userDetails.ModifiedBy = apiContext.UserId;
-                userDetails.ModifiedDate = DateTime.Now;
+                userDetails.ModifiedDate = DateTimeNow;
 
                 var useraddr = _context.TblUserAddress.Where(p => p.Id == userDetails.UserId);
                 foreach (var item in useraddr)
@@ -155,7 +164,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 var cpdata = _cpcontext.TblCustomerUsers.SingleOrDefault(a => a.UserName == userDetails.Email);
                 TblCustomerUsers customerUsers = new TblCustomerUsers();
 
-                customerUsers.ModifiedDate = DateTime.Now;
+                customerUsers.ModifiedDate = DateTimeNow;
                 customerUsers.Email = userDetails.Email;
                 customerUsers.ContactNumber = userDetails.ContactNumber;
 
@@ -416,6 +425,11 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             {
                 _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             }
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             byte[] passwordHash;
             byte[] passwordSalt;
@@ -435,7 +449,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     }
                     _aspNet.PasswordHash = passwordHash;
                     _aspNet.FirstTimeLogin = 1;
-                    _aspNet.LastPasswordChanged = DateTime.Now;
+                    _aspNet.LastPasswordChanged = DateTimeNow;
                     _context.AspNetUsers.Update(_aspNet);
                     _context.SaveChanges();
                     var _usersDTOs = _mapper.Map<UserDTO>(_aspUsers);
@@ -472,7 +486,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(pass.ConfirmPassword));
                         }
                         _aspNet.PasswordHash = passwordHash;
-                        _aspNet.LastPasswordChanged = DateTime.Now;
+                        _aspNet.LastPasswordChanged = DateTimeNow;
                         _context.AspNetUsers.Update(_aspNet);
                         _context.SaveChanges();
                         var _usersDTOs = _mapper.Map<UserDTO>(_aspUsers);
