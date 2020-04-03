@@ -80,6 +80,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         public GetScheduleResponse GetSchedule(string VehicleRegistrationNo, string PolicyNo)
         {
             GetScheduleResponse response = new GetScheduleResponse();
+
+            var Check = CheckPolicyStatus(PolicyNo);          
+
+
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
             var CurrentTimeHour = IndianTime.Hour;
             var CurrentDay = IndianTime.DayOfWeek.ToString();
@@ -87,6 +91,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo))
             {
+
+                if (Check == true)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy is Cancelled";
+                    response.Status = BusinessStatus.Ok;
+                    errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is Cancelled";
+                    errorInfo.ErrorCode = "ExtCUS";
+                    errorInfo.PropertyName = "PolicyCancelled";
+                    response.Errors.Add(errorInfo);
+                    return response;
+                }
+
                 var checkdata = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
 
                 if (checkdata)
@@ -181,6 +199,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         public ScheduleResponseDTO CreateSchedule(ScheduleDTO scheduleDTO)
         {
             ScheduleResponseDTO response = new ScheduleResponseDTO();
+
+            var Check = CheckPolicyStatus(scheduleDTO.PolicyNo);
+
+            if (Check == true)
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Policy is Cancelled";
+                response.Status = BusinessStatus.Ok;
+                errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is Cancelled";
+                errorInfo.ErrorCode = "ExtCUS";
+                errorInfo.PropertyName = "PolicyCancelled";
+                response.Errors.Add(errorInfo);
+                return response;
+            }          
 
             if (String.IsNullOrEmpty(scheduleDTO.PolicyNo))
             {
@@ -694,8 +727,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
         public async Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff)
-        {
-
+        {         
 
             string VehicleRegistrationNo = switchOnOff.VehicleRegistrationNo;
             string PolicyNo = switchOnOff.PolicyNo;
@@ -719,6 +751,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo) && SwitchStatus == true)
             {
+                var Check = CheckPolicyStatus(switchOnOff.PolicyNo);
+                if (Check == true)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    SuccessResponse.ResponseMessage = "Policy is Cancelled";
+                    SuccessResponse.Status = BusinessStatus.Ok;
+                    errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is Cancelled";
+                    errorInfo.ErrorCode = "ExtCUS";
+                    errorInfo.PropertyName = "PolicyCancelled";
+                    SuccessResponse.Errors.Add(errorInfo);
+                    return SuccessResponse;
+                }
 
                 bool verifydata = false;
 
@@ -1395,6 +1440,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             else if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo) && SwitchStatus == false)
             {
+                var Check = CheckPolicyStatus(switchOnOff.PolicyNo);
+                if (Check == true)
+                {
+                    SwitchOnOffResponse response = new SwitchOnOffResponse();
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy is Cancelled";
+                    response.Status = BusinessStatus.Ok;
+                    errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is Cancelled";
+                    errorInfo.ErrorCode = "ExtCUS";
+                    errorInfo.PropertyName = "PolicyCancelled";
+                    response.Errors.Add(errorInfo);
+                    return response;
+                }
 
                 bool verifydata = false;
 
@@ -4613,6 +4672,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return responseDTO;
         }
+
+        private bool CheckPolicyStatus(string PolicyNo)
+        {
+            if (!String.IsNullOrEmpty(PolicyNo))
+            {
+                var check = _context.TblPolicyStatus.Any(x => x.PolicyNumber == PolicyNo);
+                return check;
+            }
+               return false;           
+        }      
 
     }
 }
