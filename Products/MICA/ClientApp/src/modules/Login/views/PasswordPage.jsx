@@ -89,8 +89,11 @@ class PasswordPage extends React.Component {
             capslock: false,
             logintoken: "",
             environment: [],
+            redirecttoback: false,
+            redirecttofirst: false,
             environmentvalue: "",
             dropdownDisplay: true,
+            firsttimelogin: "",
         };
         this.changeEvent = this.changeEvent.bind(this);
         this.handleToggle = this.handleToggle.bind(this);
@@ -105,11 +108,25 @@ class PasswordPage extends React.Component {
         if (this.state.redirect == true) {
             return <Redirect to={{
                 pathname: '/dashboard/home',
-                state: { loginuserid: this.state.loginuserid, loginroleid: this.state.loginroleid, logintoken: this.state.logintoken },
+                state: {
+                    loginuserid: this.state.loginuserid,
+                    loginroleid: this.state.loginroleid,
+                    logintoken: this.state.logintoken,
+                },
             }} />
-        } else if (this.state.redirect == "Back") {
+        } else if (this.state.redirecttoback == true) {
             return <Redirect to={{
                 pathname: '/pages/login-page',
+            }} />
+        }
+        else if (this.state.redirecttofirst == true) {
+            return <Redirect to={{
+                pathname: '/pages/FirstTimeLogin',
+                state: {
+                    environmentvalue: this.state.environmentvalue,
+                    UserName: this.state.UserName,
+                    environment: this.state.environment,
+                }
             }} />
         }
         else { }
@@ -170,7 +187,7 @@ class PasswordPage extends React.Component {
 
     handleBack() {
         //console.log("go back to login page");
-        this.setState({ redirect: "Back" });
+        this.setState({ redirecttoback: true });
     }
 
     handleforgot() {
@@ -218,15 +235,19 @@ class PasswordPage extends React.Component {
                     that.setState({
                         loginuserid: data.userId,
                         loginroleid: data.roleId,
-                        redirect: true,
                         attemptFlag: false,
-                        logintoken: data.token
+                        logintoken: data.token,
+                        firsttimelogin: data.firstTimeLogin,
                     });
-                    //that.setState({
-                    //    redirect: true
-                    //})
-                    console.log("rid: ", this.state.rid);
-                    console.log("partnerid: ", data.partnerId);
+                    if (data.firstTimeLogin == 1) {
+                        this.setState({ redirect: true });
+                    } else {
+                        this.setState({ redirecttofirst: true });
+                    }
+                    //that.setState({ redirect: true });
+
+                    //console.log("rid: ", this.state.rid);
+                    //console.log("partnerid: ", data.partnerId);
                     localStorage.setItem('partnerid', data.partnerId);
                     localStorage.setItem('userId', data.userId);
                     localStorage.setItem('roleId', data.roleId);
@@ -240,11 +261,11 @@ class PasswordPage extends React.Component {
 
                     if (data.profileImage == "" || data.profileImage == null || data.profileImage == undefined) {
                         localStorage.setItem('profilepicture', image);
-                        console.log("Profile image: ", localStorage.getItem('profilepicture'));
+                        //console.log("Profile image: ", localStorage.getItem('profilepicture'));
                     }
                     else {
                         localStorage.setItem('profilepicture', data.profileImage);
-                        console.log("Profile image: ", localStorage.getItem('profilepicture'));
+                        //console.log("Profile image: ", localStorage.getItem('profilepicture'));
                     }
                 }
                 else {
@@ -277,7 +298,7 @@ class PasswordPage extends React.Component {
         }
         //console.log("length: ", this.props.location.state.environment.length);
         //console.log("mID: ", this.props.location.state.environment[0].mID);
-        if (this.props.location.state.environmentvalue == "" || this.props.location.state.environmentvalue==undefined) {
+        if (this.props.location.state.environmentvalue == "" || this.props.location.state.environmentvalue == undefined) {
             if (this.props.location.state.environment.length == 1) {
                 this.setState({ environmentvalue: this.props.location.state.environment[0].mID, dropdownDisplay: false });
             }

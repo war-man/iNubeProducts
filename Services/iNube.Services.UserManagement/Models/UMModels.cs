@@ -109,6 +109,7 @@ namespace iNube.Services.UserManagement.Models
         public string LastName { get; set; }
         public string DisplayName { get; set; }
         public bool IsMale { get; set; }
+        public int? FirstTimeLogin { get; set; }
         public byte[] ProfileImage { get; set; }
     }
 
@@ -183,6 +184,7 @@ namespace iNube.Services.UserManagement.Models
         public decimal CustomerID { get; set; }
         public decimal EnvId { get; set; }
         public bool? IsActive { get; set; }
+        public DateTime? LastPasswordChanged { get; set; }
 
         public virtual ICollection<UserDetailsDTO> UserDetails { get; set; }
         public virtual ICollection<UserAddressDTO> UserAddress { get; set; }
@@ -602,6 +604,7 @@ namespace iNube.Services.UserManagement.Models
         public bool LockoutEnabled { get; set; }
         public int AccessFailedCount { get; set; }
         public int? FirstTimeLogin { get; set; }
+        public DateTime? LastPasswordChanged { get; set; }
 
         public virtual ICollection<AspNetUserClaimsDTO> AspNetUserClaims { get; set; }
         public virtual ICollection<AspNetUserLoginsDTO> AspNetUserLogins { get; set; }

@@ -49,9 +49,9 @@ const pagesRoutes = [
         component: PasswordPage
     },
     {
-        path: "/pages/Firsttimelogin",
+        path: "/pages/FirstTimeLogin",
         name: "First Time Login",
-        short: "Firsttimelogin",
+        short: "FirstTimeLogin",
         mini: "FL",
         icon: PersonAdd,
         component: Firsttimelogin

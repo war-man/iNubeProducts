@@ -153,8 +153,8 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                                    LoginProvider = cu.LoginProvider,
                                    UserName = cu.UserName,
                                    IsActive = cu.IsActive,
-                                   //IsFirstTimeLogin = cu.IsFirstTimeLogin,
-                                   IsFirstTimeLogin = 1,
+                                   IsFirstTimeLogin = cu.IsFirstTimeLogin,
+                                   //IsFirstTimeLogin = 1,
                                    UserId = cu.UserId,
                                    //Dbconnection= ce.Dbconnection,
                                    //CustomerId =cu.CustomerId,
@@ -207,7 +207,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             var roleName = _context.AspNetRoles.FirstOrDefault(u => u.Id == userDetails.RoleId).Name;
             var issuer = _config["Jwt:Issuer"];
             var audience = _config["Jwt:Audience"];
-            var expiry = isTokenExpire ? DateTime.Now.AddMinutes(120) :DateTime.Now.AddYears(3);
+            var expiry = isTokenExpire ? DateTime.Now.AddMinutes(120) : DateTime.Now.AddYears(3);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             // Add standard claims
@@ -240,6 +240,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             loginResponse.ProfileImage = userDetails.ProfileImage;
             loginResponse.DisplayName = loginResponse.FirstName + "  " + loginResponse.LastName;
             loginResponse.ProfileImage = userDetails.ProfileImage;
+            loginResponse.FirstTimeLogin = user.FirstTimeLogin;
 
             loginResponse.Status = BusinessStatus.Ok;
             return loginResponse;

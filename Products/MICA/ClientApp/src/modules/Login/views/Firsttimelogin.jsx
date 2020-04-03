@@ -47,7 +47,7 @@ class Frsttimelogin extends React.Component {
             newPasswordState: "",
             confirmPassword: "",
             confirmPasswordState: "",
-            servertype:"",
+            servertype: "",
             userid: "",
             sucess: false,
             error: false,
@@ -65,6 +65,7 @@ class Frsttimelogin extends React.Component {
                 "userName": ""
             },
             UName: "",
+            environment: [],
             Verifyotp: {
                 "otp": "",
                 "userId": ""
@@ -152,17 +153,25 @@ class Frsttimelogin extends React.Component {
         if (this.state.redirect == true) {
             return <Redirect to={{
                 pathname: '/pages/password-page',
-                state: { UName: this.state.oneotp.userName, servertype: this.props.location.state.servertype }
+                state: {
+                    UName: this.props.location.state.UserName,
+                    environmentvalue: this.props.location.state.environmentvalue,
+                    environment: this.props.location.state.environment,
+                }
             }} />
         }
     }
 
     componentDidMount() {
         if (this.props.location.state != null) {
-            this.setState({ userid: this.props.location.state.userId, servertype: this.props.location.state.servertype });
+            this.setState({
+                UName: this.props.location.state.UserName,
+                environmentvalue: this.props.location.state.environmentvalue,
+                environment: this.props.location.state.environment,
+            });
         }
-        console.log("servertype: ", this.state.servertype);
-        console.log("servertype: ", this.props.location.state.servertype);
+        //console.log("servertype: ", this.state.servertype);
+        //console.log("servertype: ", this.props.location.state.servertype);
     }
 
     SendOtp() {
@@ -175,21 +184,37 @@ class Frsttimelogin extends React.Component {
             this.setState({ blanknewpassword: true, blankconfirmpassword: true, newPasswordState: '', confirmPasswordState: '' });
         }
         else if (this.state.Password.newPassword === this.state.Password.confirmPassword) {
-            fetch(`${LoginConfig.UserConfigUrl}/api/UserProfile/SendOTP`, {
-                //fetch('https://localhost:44367/api/UserProfile/SendOTP', {
+            let pass = this.state.Password;
+            pass.id = localStorage.getItem('userId');;
+            pass.isChangePassword = true;
+            this.setState({ pass });
+            fetch(`${LoginConfig.UserConfigUrl}/api/UserProfile/ChangePassword`, {
                 method: 'Post',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                 },
-                body: JSON.stringify(oneotp)
+                body: JSON.stringify(pass)
             }).then(response => {
+                console.log("response", response)
                 return response.json()
             }).then(data => {
-                if (data) {
-                    this.setState({ otpvisbility: true });
+                console.log("data", data);
+                if (data.status === 2) {
+                    swal({
+                        text: "Password changed successfully",
+                        icon: "success",
+                        buttons: [false, "OK"],
+                    }).then((willDelete) => {
+                        if (willDelete) {
+                            this.setState({ redirect: true });
+                        }
+                    });
+                } else {
+                    this.setState({ errormessage: true });
                 }
-            })
+            });
         } else {
         }
     }
@@ -275,7 +300,7 @@ class Frsttimelogin extends React.Component {
                             <CardBody>
                                 <GridContainer>
                                     <GridItem>
-                                        <p><b>*Note: </b>The Password should contain 8-16 characters with at least one alphabets, one numeric digit and a special character.</p>
+                                        <p><b>*Note: </b>The Password should contain more than 8 characters with at least one lowercase alphabet, one upper case alphabet, one numeric digit and a special character.</p>
                                     </GridItem>
                                 </GridContainer>
                                 <CustomInput
@@ -325,10 +350,7 @@ class Frsttimelogin extends React.Component {
                                 {this.state.errormessage ? <p className="error">*Password not Matching</p> : null}
                                 <div>
                                     <GridContainer justify="center">
-                                        <Button
-                                            color="info" simple size="lg" onClick={this.SendOtp} >
-                                            Submit
-                                    </Button>
+                                        {this.renderRedirect()} <Button color="info" simple size="lg" onClick={this.SendOtp} > Submit </Button>
                                     </GridContainer>
                                 </div>
                                 {this.state.otpvisbility ?

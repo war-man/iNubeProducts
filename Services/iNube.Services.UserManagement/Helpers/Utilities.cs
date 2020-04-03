@@ -37,7 +37,7 @@ namespace iNube.Services.UserManagement.Helpers
 
         public static byte[] GenerateDefaultPassword()
         {
-            string password = "mica123";
+            string password = "Mica@123";
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
             return passwordHash;

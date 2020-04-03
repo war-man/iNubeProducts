@@ -83,10 +83,11 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _users.UserName = userDetails.Email;
                         _users.Email = userDetails.Email;
                         _users.FirstTimeLogin = 0;
+                        _users.LastPasswordChanged = DateTime.Now;
                         _users.PasswordHash = Utilities.GenerateDefaultPassword();
                         emailTest.To = userDetails.Email;
                         emailTest.Subject = "User profile creation";
-                        emailTest.Message = "Your account has been created with Username:" + _users.UserName + " and password: mica123 \n" + "This is a system generated password. Kindly reset the same after log in.";
+                        emailTest.Message = "Your account has been created with Username:" + _users.UserName + " and password: Mica@123 \n" + "This is a system generated password. Kindly reset the same after log in.";
                         _context.AspNetUsers.Add(_users);
                     }
                     _context.SaveChanges();
@@ -433,6 +434,8 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(pass.ConfirmPassword));
                     }
                     _aspNet.PasswordHash = passwordHash;
+                    _aspNet.FirstTimeLogin = 1;
+                    _aspNet.LastPasswordChanged = DateTime.Now;
                     _context.AspNetUsers.Update(_aspNet);
                     _context.SaveChanges();
                     var _usersDTOs = _mapper.Map<UserDTO>(_aspUsers);
@@ -469,6 +472,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(pass.ConfirmPassword));
                         }
                         _aspNet.PasswordHash = passwordHash;
+                        _aspNet.LastPasswordChanged = DateTime.Now;
                         _context.AspNetUsers.Update(_aspNet);
                         _context.SaveChanges();
                         var _usersDTOs = _mapper.Map<UserDTO>(_aspUsers);

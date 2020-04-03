@@ -173,15 +173,15 @@ class ResetPassword extends React.Component {
 
         if (this.props.location.state != null) {
             this.setState({
-                userid: this.props.location.state.userid,
-                UserName: this.props.location.state.UserName,
-                servertype: this.props.location.state.servertype,
-                environmentvalue: this.props.location.state.environmentvalue,
-                environment: this.props.location.state.environment,
+                //userid: this.props.location.state.userid,
+                //UserName: this.props.location.state.UserName,
+                //servertype: this.props.location.state.servertype,
+                //environmentvalue: this.props.location.state.environmentvalue,
+                //environment: this.props.location.state.environment,
             });
         }
-        console.log("servertype: ", this.state.servertype);
-        console.log("servertype1: ", this.props.location.state.servertype);
+        //console.log("servertype: ", this.state.servertype);
+        //console.log("servertype1: ", this.props.location.state.servertype);
         //console.log("id: ", this.state.userid);
     }
 
