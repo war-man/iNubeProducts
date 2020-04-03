@@ -598,9 +598,9 @@ class ClaimEnquiry extends React.Component {
                 
                 return {
                     id: key + 1,
-                    documentName: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>,
+                    documentName: prop.documentView,
                     documentType: prop.documentType,
-                    documentView: prop.documentView
+                    documentView: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>
                 };
             })
         });
@@ -1170,7 +1170,7 @@ class ClaimEnquiry extends React.Component {
                                 />
 
 
-                                : <img style={{ width: "65rem" }}
+                                : <img style={{ width: "40rem" }}
                                     src={
                                         this.state.docbyte = "data:image;base64," + this.state.bytearr
                                     }

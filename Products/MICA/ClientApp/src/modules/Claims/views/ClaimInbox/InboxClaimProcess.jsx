@@ -961,9 +961,9 @@ class InboxClaimProcess extends React.Component {
                 const { classes } = this.props;
                 return {
                     id: key + 1,
-                    documentName: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>,
+                    documentName: prop.documentView,
                     documentType: prop.documentType,
-                    documentView: prop.documentView
+                    documentView: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>
                 };
 
             })
@@ -1723,7 +1723,7 @@ handleActivityClose = () => {
                                         base64: this.state.bytearr,
                                     }}
                                 />
-                                : <img style={{ width: "80rem" }}
+                                : <img style={{ width: "40rem" }}
                                     src={
                                         this.state.docbyte = "data:image;base64," + this.state.bytearr
                                     }
