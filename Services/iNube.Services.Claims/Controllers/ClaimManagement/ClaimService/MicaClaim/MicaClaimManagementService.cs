@@ -2280,35 +2280,32 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
 
             var _ClaimSearchData = _mapper.Map<List<SearchDTO>>(_claims);
-
+            var claimstatus = _context.TblmasCmcommonTypes.Select(a => a);
             List<SearchDTO> claimlist = new List<SearchDTO>();
             foreach (var item in _ClaimSearchData)
             {
                 try
                 {
                     var pk = policyDetails.Where(s => s.PolicyNo == item.PolicyNo).ToList();
-                    var data = (from a in _context.TblClaims.Where(x => x.ClaimId == item.ClaimId)
-                                join c in _context.TblmasCmcommonTypes on a.ClaimStatusId equals c.CommonTypeId
-                                select c).FirstOrDefault();
 
                     var insurabledata = _context.TblClaimInsurable.FirstOrDefault(x => x.ClaimId == item.ClaimId);
 
                     var covervalue = JsonConvert.DeserializeObject<dynamic>(insurabledata.CoverValue);
 
-                    item.ClaimStatus = data.Value;
+                    item.ClaimStatus = claimstatus.FirstOrDefault(a => a.CommonTypeId == item.ClaimStatusId).Value;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
                     // item.CoverEvent = pk[0].CoverEvent;
                     item.CoverValue = covervalue;
-                    item.TypeOfLoss = insurabledata.TypeOfLoss;
+                    if (insurabledata != null)
+                    {
+                        item.TypeOfLoss = insurabledata.TypeOfLoss;
+                    }
                     item.EventDate = pk[0].CreatedDate;
                     item.InsuredEmail = pk[0].Email;
                     item.InsuredMobileNo = pk[0].MobileNumber;
                     item.ProductIdPk = pk[0].ProductIdPk;
-
-
-
                 }
                 catch (Exception ex)
                 {
@@ -2382,25 +2379,25 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
 
             var _ClaimSearchData = _mapper.Map<List<SearchDTO>>(_claims);
-
+            var claimstatus = _context.TblmasCmcommonTypes.Select(a => a);
             List<SearchDTO> claimlist = new List<SearchDTO>();
             foreach (var item in _ClaimSearchData)
             {
                 try
                 {
                     var pk = policyDetails.Where(s => s.PolicyNo == item.PolicyNo).ToList();
-                    var data = (from a in _context.TblClaims.Where(x => x.ClaimId == item.ClaimId)
-                                join c in _context.TblmasCmcommonTypes on a.ClaimStatusId equals c.CommonTypeId
-                                select c).FirstOrDefault();
 
-                    var data1 = _context.TblClaimInsurable.SingleOrDefault(x => x.ClaimId == item.ClaimId);
+                    var data1 = _context.TblClaimInsurable.FirstOrDefault(x => x.ClaimId == item.ClaimId);
 
-                    item.ClaimStatus = data.Value;
+                    item.ClaimStatus = claimstatus.FirstOrDefault(a => a.CommonTypeId == item.ClaimStatusId).Value;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
                     // item.CoverEvent = pk[0].CoverEvent;
-                    item.TypeOfLoss = data1.TypeOfLoss;
+                    if (data1 != null)
+                    {
+                        item.TypeOfLoss = data1.TypeOfLoss;
+                    }
                     item.EventDate = pk[0].CreatedDate;
                     item.InsuredEmail = pk[0].Email;
                     item.InsuredMobileNo = pk[0].MobileNumber;
