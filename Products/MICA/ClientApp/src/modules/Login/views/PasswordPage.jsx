@@ -239,7 +239,7 @@ class PasswordPage extends React.Component {
                         logintoken: data.token,
                         firsttimelogin: data.firstTimeLogin,
                     });
-                    if (data.firstTimeLogin == 1) {
+                    if (data.firstTimeLogin != 0) {
                         this.setState({ redirect: true });
                     } else {
                         this.setState({ redirecttofirst: true });
