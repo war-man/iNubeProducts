@@ -407,12 +407,14 @@ class ClaimProcess extends React.Component {
             displayfinancier: false,
             displaynominee: false,
             displaysurveyor: false,
+            
             vehicleActivity: {
                 "policyNumber": "",
-                "vehicleNumbers": [""],
+                "vehicleNumbers": [],
             },
             popopen: false,
             vehicleActivitydata: [],
+            TableDataList: [],
 
         };
         this.dataTable = this.dataTable.bind(this);
@@ -973,7 +975,9 @@ class ClaimProcess extends React.Component {
 
                 return {
                     id: key + 1,
-                    documentName: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>,
+                    documentName: prop.documentView,
+                    documentType: prop.documentType,
+                    documentView: <a onClick={() => this.documentLinkView(prop.dmsdocId)}> {prop.documentName} </a>
 
                 };
 
@@ -983,7 +987,13 @@ class ClaimProcess extends React.Component {
     }
 
     claimAmountTable = () => {
+        let arr = this.state.claimTableData.map((prop, key) => {
+            return prop.coverDynamic.filter(c => c.Header == "Vehicle Number")[0].Details;
 
+        });
+        this.state.vehicleActivity.vehicleNumbers = Array.from(new Set(arr));
+        this.state.vehicleActivity.policyNumber = this.state.PolicyNumber;
+        console.log("TableData#007", this.state.claimTableData, this.state.vehicleActivity.vehicleNumbers);
         this.setState({
             TableData: this.state.claimTableData.map((prop, key) => {
 
@@ -1526,10 +1536,14 @@ class ClaimProcess extends React.Component {
         this.state.fields = Claimdata;
         this.setState({ Claimdata });
     }
-handleActivitylog = () => {
+    handleActivitylog = () => {
+
+
         let that = this;
-        that.state.vehicleActivity.policyNumber = that.state.PolicyNumber;
-    fetch(`${ClaimConfig.claimConfigUrl}/api/Mica_EGI/VehicleActivityLog`, {
+
+
+
+        fetch(`${ClaimConfig.claimConfigUrl}/api/Mica_EGI/GetVehicleActivity`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json',
@@ -1541,39 +1555,39 @@ handleActivitylog = () => {
             return response.json();
         }).then(function (data) {
             console.log("ActivityVehciledata", data);
-
-            that.setState({ vehicleActivitydata: data.vehicleData });
+            if (data.status == 1) {
+                if (data.vehicleData.length > 0) {
+                    that.setState({ popopen: true });
+                    that.setState({ vehicleActivitydata: data.vehicleData });
+                    that.ActivityTableHeader(data.vehicleData[0].activityDTOs);
+                }
+            }
             console.log("vehicleActivitydata", that.state.vehicleActivitydata);
-            that.activityTable();
+
             //that.setState({ popopen: true });
-           
 
-            });
-       
 
-    }
-activityTable = () => {
-
-        this.setState({
-            ActivityData: this.state.vehicleActivitydata.map((prop, key) => {
-
-                return {
-                    id: key + 1,
-                    dateTime: prop.dateTime,
-                    vehicleNo: prop.vehicleNo,
-                    switchState: prop.switchState,
-                    switchType: prop.switchType,
-                  
-                };
-            })
         });
 
+
     }
-handleActivityClose = () => {
+
+    handleActivityClose = () => {
         this.setState({ popopen: false });
     };
 
-
+    ActivityTableHeader = (activityDTOs) => {
+        this.setState({
+            TableDataList: Object.keys(activityDTOs[0]).map((prop, key) => {
+                return {
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                    accessor: prop,
+                };
+                this.setState({});
+            })
+        });
+        console.log("table data", this.state.TableDataList);
+    }
 
 
 
@@ -1858,7 +1872,7 @@ handleActivityClose = () => {
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
                                     SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
                                     displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
-                                    handleActivitylog={this.handleActivitylog} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}
+                                    handleActivitylog={this.handleActivitylog} Bankarray={this.state.Bankarray} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}
                                 />
 
                             </CardBody>
@@ -1904,7 +1918,7 @@ handleActivityClose = () => {
                     </div>
                 </Modal>
 
-<Modal
+                <Modal
                     aria-labelledby="simple-modal-title"
                     aria-describedby="simple-modal-description"
                     open={this.state.popopen}
@@ -1922,69 +1936,34 @@ handleActivityClose = () => {
                         </Button>
 
                         <div id="disp">
-                            <GridContainer justify="center" >
-                                <GridItem xs={12}>
+                            {(this.state.vehicleActivitydata.length > 0) ? this.state.vehicleActivitydata.map((item, i) => (
+                                <GridContainer justify="center" >
+                                    <GridItem xs={12}>
 
-                                    <ReactTable
-                                        data={this.state.ActivityData}
-                                        filterable
-                                        columns={[
-                                            {
-                                                Header: "SerialNo",
-                                                accessor: "id",
-                                                headerClassName: 'react-table-center',
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                minWidth: 200,
-                                                sortable: false,
-                                                //  filterable: false 
-                                            },
-                                            {
-                                               
-                                                Header: "Date Time",
-                                                accessor: "dateTime",
-                                                minWidth: 40,
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                headerClassName: 'react-table-center'
-                                            },
-                                            {
-                                                Header: "Vehicle No",
-                                                accessor: "vehicleNo",
-                                                minWidth: 40,
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                headerClassName: 'react-table-center'
-                                            },
-                                            {
-                                                Header: "Switch State",
-                                                accessor: "switchState",
-                                                minWidth: 40,
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                headerClassName: 'react-table-center'
-                                            },
-                                            {
-                                                Header: "Switch Type",
-                                                accessor: "switchType",
-                                                minWidth: 40,
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                headerClassName: 'react-table-center'
-                                            },
+                                        <ReactTable
+                                            title={<h5><TranslationContainer translationKey={"Vehicle Number:" + item.vehicleNumber} /></h5>}
 
+                                            data={item.activityDTOs}
+                                            filterable
+                                            columns={this.state.TableDataList}
+                                            defaultPageSize={4}
+                                            pageSize={([item.activityDTOs.length + 1] < 4) ? [item.activityDTOs.length + 1] : 4}
+                                            showPaginationTop={false}
+                                            //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                            showPaginationBottom={true}
+                                            className="-striped -highlight discription-tab"
 
-                                        ]}
-                                        defaultPageSize={4}
-                                        pageSize={([this.state.ActivityData.length + 1] < 4) ? [this.state.ActivityData.length + 1] : 4}
-                                        showPaginationTop={false}
-                                        //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
-                                        showPaginationBottom={true}
-                                        className="-striped -highlight discription-tab"
+                                        />
 
-                                    />
+                                    </GridItem>
 
-                                </GridItem>
-                            </GridContainer>
+                                </GridContainer>
+                            )) : null}
                         </div>
 
                     </div>
                 </Modal>
+
 
             </div>
         );

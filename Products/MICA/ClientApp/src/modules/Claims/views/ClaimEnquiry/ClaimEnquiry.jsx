@@ -284,6 +284,13 @@ class ClaimEnquiry extends React.Component {
                 "totalSumInsured": "",
                 "balanceSumInsured": ""
             },
+            vehicleActivity: {
+                "policyNumber": "",
+                "vehicleNumbers": [],
+            },
+            popopen: false,
+            vehicleActivitydata: [],
+            TableDataList: [],
             claimTableData: [],
             paymentDetailsData: [],
             docDetailsData: [],
@@ -566,6 +573,13 @@ class ClaimEnquiry extends React.Component {
 
     claimAmountTable = () => {
 
+        let arr = this.state.claimTableData.map((prop, key) => {
+            return prop.coverDynamic.filter(c => c.Header == "Vehicle Number")[0].Details;
+
+        });
+        this.state.vehicleActivity.vehicleNumbers = Array.from(new Set(arr));
+        this.state.vehicleActivity.policyNumber = this.state.PolicyNumber;
+        console.log("TableData#007", this.state.claimTableData, this.state.vehicleActivity.vehicleNumbers);
         console.log("this.state.claimTableData", this.state.claimTableData);
         this.setState({
             TableData: this.state.claimTableData.map((prop, key) => {
@@ -867,6 +881,60 @@ class ClaimEnquiry extends React.Component {
         }
     }
 
+    handleActivitylog = () => {
+
+
+        let that = this;
+
+
+
+        fetch(`${ClaimConfig.claimConfigUrl}/api/Mica_EGI/GetVehicleActivity`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(that.state.vehicleActivity)
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log("ActivityVehciledata", data);
+            if (data.status == 1) {
+                if (data.vehicleData.length > 0) {
+                    that.setState({ popopen: true });
+                    that.setState({ vehicleActivitydata: data.vehicleData });
+                    that.ActivityTableHeader(data.vehicleData[0].activityDTOs);
+                }
+            }
+            console.log("vehicleActivitydata", that.state.vehicleActivitydata);
+
+            //that.setState({ popopen: true });
+
+
+        });
+
+
+    }
+
+    handleActivityClose = () => {
+        this.setState({ popopen: false });
+    };
+
+    ActivityTableHeader = (activityDTOs) => {
+        this.setState({
+            TableDataList: Object.keys(activityDTOs[0]).map((prop, key) => {
+                return {
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                    accessor: prop,
+                };
+                this.setState({});
+            })
+        });
+        console.log("table data", this.state.TableDataList);
+    }
+
+
     render() {
         const { classes } = this.props;
         return (
@@ -1132,7 +1200,7 @@ class ClaimEnquiry extends React.Component {
                             </GridContainer>
                            
                                         <ClaimSearch TableData={this.state.TableData} handleDisappear={this.handleDisappear} refreshData={this.refreshData} ClaimAmountSum={this.ClaimAmountSum} ClaimDTO={this.state.ClaimDTO} fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount} disabled={this.state.disabled} claimId={this.state.claimId} SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} policyDetailsData={this.state.policyDetailsData} decision={this.state.decision} claimDetailsData={this.state.claimDetailsData}
-                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}/>
+                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey} handleActivitylog={this.handleActivitylog}/>
 
                         </CardBody>
                             </Card>
@@ -1182,6 +1250,53 @@ class ClaimEnquiry extends React.Component {
 
                     </div>
                 </Modal>
+
+                <Modal
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                    open={this.state.popopen}
+                    onClose={this.handleActivityClose}>
+
+                    <div className={classes.paper} id="modal">
+                        <h4><small className="center-text">Activity Log</small></h4>
+
+                        <Button color="info"
+                            round
+                            className={classes.marginRight}
+                            id="close-bnt"
+                            onClick={this.handleActivityClose}>
+                            &times;
+                        </Button>
+
+                        <div id="disp">
+                            {(this.state.vehicleActivitydata.length > 0) ? this.state.vehicleActivitydata.map((item, i) => (
+                                <GridContainer justify="center" >
+                                    <GridItem xs={12}>
+
+                                        <ReactTable
+                                            title={<h5><TranslationContainer translationKey={"Vehicle Number:" + item.vehicleNumber} /></h5>}
+
+                                            data={item.activityDTOs}
+                                            filterable
+                                            columns={this.state.TableDataList}
+                                            defaultPageSize={4}
+                                            pageSize={([item.activityDTOs.length + 1] < 4) ? [item.activityDTOs.length + 1] : 4}
+                                            showPaginationTop={false}
+                                            //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                            showPaginationBottom={true}
+                                            className="-striped -highlight discription-tab"
+
+                                        />
+
+                                    </GridItem>
+
+                                </GridContainer>
+                            )) : null}
+                        </div>
+
+                    </div>
+                </Modal>
+
                 
             </div>
         );

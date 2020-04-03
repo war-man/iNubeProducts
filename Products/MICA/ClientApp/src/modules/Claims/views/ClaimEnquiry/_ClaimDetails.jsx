@@ -186,6 +186,16 @@ const ClaimDetails = (props) => {
                     </GridItem>
                 }
 
+                <GridContainer justify="center">
+                    <GridItem xs={3} sm={3} md={3}>
+
+                        <Button color="warning" onClick={claimDetailsprops.handleActivitylog} id="claims" round>
+                            Activity Log
+                            </Button>
+
+                    </GridItem>
+                </GridContainer>
+
 
             </GridContainer>
 
