@@ -1402,7 +1402,7 @@ class InboxClaimProcess extends React.Component {
 
                 let searchname = "";
                 if (name == "Workshop") {
-                    searchname = "Customer";
+                   // searchname = "Customer";
                     if (event.target.checked == true) {
                         this.state.displaycust = false;
                         this.setState({});
@@ -1412,7 +1412,7 @@ class InboxClaimProcess extends React.Component {
                         this.setState({});
                     }
                 } else {
-                    searchname = "Workshop";
+                   // searchname = "Workshop";
                     this.state.displaycust = false;
                     this.setState({});
                 }
