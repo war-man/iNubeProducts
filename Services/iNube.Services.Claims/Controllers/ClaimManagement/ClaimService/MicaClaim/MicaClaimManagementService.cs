@@ -1008,22 +1008,25 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             _claimsDTOs.Status = BusinessStatus.Created;
             _claimsDTOs.ResponseMessage = "record created..";
 
+            if (!string.IsNullOrEmpty(policyDetails.Email))
+            {
+                EmailTest emailTest = new EmailTest();
+                emailTest.To = policyDetails.Email;
+                emailTest.Subject = "Claim successfully registered";
+                emailTest.Message = "Claim Number: " + claims.ClaimNumber + " successfully registered against policy No: " + claims.PolicyNumber + " \n Your Claim will be processed in accordance with the Policy terms and Conditions. \n \n Assuring the best of services always. \n \nRegards, \nTeam MICA";
+                // New changes 
+               // SendEmailAsync(emailTest);
+            }
 
-            EmailTest emailTest = new EmailTest();
-            emailTest.To = policyDetails.Email;
-            emailTest.Subject = "Claim successfully registered";
-            emailTest.Message = "Claim Number: " + claims.ClaimNumber + " successfully registered against policy No: " + claims.PolicyNumber + " \n Your Claim will be processed in accordance with the Policy terms and Conditions. \n \n Assuring the best of services always. \n \nRegards, \nTeam MICA";
 
-            // New changes 
-            SendEmailAsync(emailTest);
-
-
-            EmailTest manangerEmail = new EmailTest();
-            manangerEmail.To = "rashmidevi.p@inubesolutions.com";
-            // manangerEmail.Subject = "";
-            manangerEmail.Message = " Dear Sir/Madam " + " \n Vehicle Number " + "(KA 36 AR 0522)" + " has met with accident on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n Thanks ";
-            SendEmailAsync(manangerEmail);
-
+            if (!string.IsNullOrEmpty(_claimAllocationDetailsDTO.EmailId))
+            {
+                EmailTest manangerEmail = new EmailTest();
+                manangerEmail.To = _claimAllocationDetailsDTO.EmailId;
+                // manangerEmail.Subject = "";
+                manangerEmail.Message = " Dear Sir/Madam " + " \n Vehicle Number " + "(KA 36 AR 0522)" + " has met with accident on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n Thanks ";
+                SendEmailAsync(manangerEmail);
+            }
             //Models.SMSRequest request = new Models.SMSRequest();
             //request.RecipientNumber = "8197521528";
             //request.SMSMessage = "Hi rashmi";

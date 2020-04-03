@@ -1424,6 +1424,9 @@ namespace iNube.Services.Claims.Models
         public DateTime? ModifiedDate { get; set; }
         public decimal? EnvId { get; set; }
     }
-
+    public class PolicyResponse : ResponseStatus
+    {
+        public Dictionary<string, string> policy { get; set; }
+    }
 
 }

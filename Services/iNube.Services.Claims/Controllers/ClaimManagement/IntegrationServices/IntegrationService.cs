@@ -39,7 +39,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<decimal> UpdatePolicySumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
         Task<List<dynamic>> CheckRuleSets(string EventId, AllocDTO allocDTO, ApiContext apiContext);
         Task<IEnumerable<ClaimdocDTO>> GetPolicyDocuments(string policyNo, ApiContext apiContext);
-        Task<decimal> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
+        Task<PolicyResponse> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
@@ -104,10 +104,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
             return await GetApiInvoke<decimal>(uri, apiContext);
         }
 
-        public async Task<decimal> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext)
+        public async Task<PolicyResponse> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext)
         {
             var uri = PolicyUrl + "/api/Policy/UpdateBalanceSumInsured?PolicyNumber=" + PolicyNumber + "&amount=" + amount;
-            return await GetApiInvoke<decimal>(uri, apiContext);
+            return await PutApiInvoke<dynamic,PolicyResponse> (uri, apiContext, null);
         }
 
         private Task<T> GetApiInvoke<T>(string uri)
@@ -315,6 +315,37 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
             {
 
                 return new List<TResponse>();
+            }
+
+        }
+        private async Task<TResponse> PutApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+
+                HttpContent contentPost = null;
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                if (request != null)
+                {
+                    string postBody = JsonConvert.SerializeObject(request);
+                    var content = new StringContent(postBody, Encoding.UTF8, "application/json");
+                    contentPost = content;
+                }
+                using (var response = await client.PutAsync(requestUri, contentPost))
+                {
+                    using (var content = response.Content)
+                    {
+                        return await content.ReadAsAsync<TResponse>();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return new TResponse();
             }
 
         }
