@@ -20,6 +20,7 @@ namespace MicaExtension_EGI.Entities
         public virtual DbSet<TblMasState> TblMasState { get; set; }
         public virtual DbSet<TblMonthlyBalance> TblMonthlyBalance { get; set; }
         public virtual DbSet<TblPayment> TblPayment { get; set; }
+        public virtual DbSet<TblPolicyMonthlySi> TblPolicyMonthlySi { get; set; }
         public virtual DbSet<TblPolicyStatus> TblPolicyStatus { get; set; }
         public virtual DbSet<TblPremiumBookingLog> TblPremiumBookingLog { get; set; }
         public virtual DbSet<TblQuotation> TblQuotation { get; set; }
@@ -178,6 +179,58 @@ namespace MicaExtension_EGI.Entities
                     .HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.TransactionReferenceNumber).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TblPolicyMonthlySi>(entity =>
+            {
+                entity.HasKey(e => e.ReportId)
+                    .HasName("PK__TblPolic__D5BD4805588E7418");
+
+                entity.ToTable("TblPolicyMonthlySI", "QM");
+
+                entity.Property(e => e.Amount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.DueDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.GstOnPremiumChargeable).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.InsuredName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PayAmount).IsUnicode(false);
+
+                entity.Property(e => e.PayStatus).IsUnicode(false);
+
+                entity.Property(e => e.PayUid).IsUnicode(false);
+
+                entity.Property(e => e.PerDayPremium).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PolicyNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PolicyStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PremiumChargeable).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.ReportCreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.TotalAmountChargeable).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.UserCredentials)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<TblPolicyStatus>(entity =>

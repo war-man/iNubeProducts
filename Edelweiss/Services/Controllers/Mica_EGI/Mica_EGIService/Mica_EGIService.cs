@@ -3324,6 +3324,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //AD-PerDay [Without Tax] [Rating Module]
                 var AdPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "DifferentialADPerDay").EValue);
 
+                //Cumulative FT-PerDay [Without Tax] [Rating Module] -- NEW PREMIUM FROM ENDORSEMENT 
+                var CumFtPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "NewFTPerDay").EValue);
+
+
+                //Cumulative AD-PerDay [Without Tax] [Rating Module] -- NEW PREMIUM FROM ENDORSEMENT 
+                var CumAdPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "NewADPerDay").EValue);
+                
 
                 ////AD & FT Credit Object
 
@@ -3333,6 +3340,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.TxnType = "Credit";
                 CdModel.FtPerDay = FtPerDay;
                 CdModel.AdPerDay = AdPerDay;
+                CdModel.CumFtPerDay = CumFtPerDay;
+                CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = ADPremiumDTO.TxnAmount + FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FinalTaxTotal;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3345,6 +3354,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.TxnType = "Debit";
                 CdModel.FtPerDay = FtPerDay;
                 CdModel.AdPerDay = AdPerDay;
+                CdModel.CumFtPerDay = CumFtPerDay;
+                CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3359,6 +3370,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //AD-PerDay [Without Tax] [Rating Module]
                 var AdPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "DifferentialADPerDay").EValue);
+
+
+                //Cumulative FT-PerDay [Without Tax] [Rating Module] -- NEW PREMIUM FROM ENDORSEMENT 
+                var CumFtPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "NewFTPerDay").EValue);
+
+
+                //Cumulative FT-PerDay [Without Tax] [Rating Module] -- NEW PREMIUM FROM ENDORSEMENT 
+                var CumAdPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "NewADPerDay").EValue);
+
 
 
                 decimal TotalTax = 0;
@@ -3400,6 +3420,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.TxnType = "Balance";
                 CdModel.FtPerDay = FtPerDay;
                 CdModel.AdPerDay = AdPerDay;
+                CdModel.CumFtPerDay = CumFtPerDay;
+                CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = ADPremiumDTO.TxnAmount;
                 CdModel.TaxAmount =  taxAmountDTO.TaxAmount;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3453,6 +3475,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.TxnType = "Credit";
                 CdModel.FtPerDay = FtPerDay;
                 CdModel.AdPerDay = AdPerDay;
+                CdModel.CumFtPerDay = CumFtPerDay;
+                CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FinalTaxTotal;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
@@ -3971,6 +3995,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         calculation.EValue = DifferentialADPremium.ToString();
                         CallEndorsmentCalculator.Add(calculation);
 
+                        calculation = new CalculationResult();
+                        calculation.Entity = "NewFTPerDay";
+                        calculation.EValue = NewPremiumData.FtPerDay.ToString();
+                        CallEndorsmentCalculator.Add(calculation);
+
+                        calculation = new CalculationResult();
+                        calculation.Entity = "NewADPerDay";
+                        calculation.EValue = NewPremiumData.AdPerDay.ToString();
+                        CallEndorsmentCalculator.Add(calculation);
+
+
                         return CallEndorsmentCalculator;
                     }
                     else
@@ -4241,6 +4276,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         calculation.Entity = "DifferentialADPerDay";
                         calculation.EValue = DifferentialADPremium.ToString();
                         CallEndorsmentCalculator.Add(calculation);
+
+                        calculation = new CalculationResult();
+                        calculation.Entity = "NewFTPerDay";
+                        calculation.EValue = NewPremiumData.FtPerDay.ToString();
+                        CallEndorsmentCalculator.Add(calculation);
+
+                        calculation = new CalculationResult();
+                        calculation.Entity = "NewADPerDay";
+                        calculation.EValue = NewPremiumData.AdPerDay.ToString();
+                        CallEndorsmentCalculator.Add(calculation);
+
 
                         return CallEndorsmentCalculator;
                     }

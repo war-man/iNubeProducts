@@ -372,6 +372,8 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string Type { get; set; }    
         public decimal FtPerDay { get; set; }
         public decimal AdPerDay { get; set; }
+        public decimal CumFtPerDay { get; set; }
+        public decimal CumAdPerDay { get; set; }
         public decimal TxnAmount { get; set; }
         public decimal TaxAmount { get; set; }
         public decimal TotalAmount { get; set; }
