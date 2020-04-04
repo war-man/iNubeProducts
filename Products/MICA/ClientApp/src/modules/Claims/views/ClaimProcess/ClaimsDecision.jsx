@@ -65,7 +65,10 @@ const ClaimsDecision = (props) => {
                                 onChange={(evt) => props.onInputParamChange("claimStatusId", evt)}
                                 formControlProps={{ fullWidth: true }}
                             />
-                            {props.errormessage && (props.fields.claimStatusId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {props.errormessage && (props.fields.claimStatusId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                        {props.claimstatusflag && (props.fields.claimStatusId == "") ? <p className="error"> </p> : null}
+
                         </GridItem>
 
                         {/* <GridItem xs={12} sm={12} md={4}>
@@ -98,7 +101,9 @@ const ClaimsDecision = (props) => {
                                     //type: "number"
                                 }}
                                 formControlProps={{ fullWidth: true }} />
-                            {props.errormessage && (props.fields.claimManagerRemarks == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {props.errormessage && (props.fields.claimManagerRemarks == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                        {props.claimsremarksflag && (props.fields.claimManagerRemarks == "") ? <p className="error"> </p> : null}
                         </GridItem>
 
                         <GridContainer lg={12} justify="center">

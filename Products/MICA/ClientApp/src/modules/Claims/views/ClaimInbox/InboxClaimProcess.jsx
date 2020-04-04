@@ -117,7 +117,8 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-           
+            claimsremarksflag: false,
+            claimstatusflag: false,
             prodId: "",
             vehicleclaim: false,
             vehicleclaimstate: false,
@@ -449,7 +450,7 @@ class InboxClaimProcess extends React.Component {
                     this.state.claimId = data.claimId;
                     //  this.setState({ claimnumber: data.claimNumber });
                     swal({
-                        text: "Claim Processed successfully! \n Your Claim Number: " + data.claimNumber,
+                        text: "Claim Processed successfully! \n Your Claim Number: " + this.state.ClaimNumber,
                         icon: "success",
                         buttons: [false, "OK"],
                     }).then((willDelete) => {
@@ -460,8 +461,20 @@ class InboxClaimProcess extends React.Component {
                     //this.renderRedirect();
                 });
         } else {
-            this.setState({ errormessage: true });
-            swal("", "Some fields are missing", "error");
+            //this.setState({ errormessage: true });
+            if (this.state.fields.claimStatusId == "") {
+                this.setState({ errormessage: true });
+                this.setState({ claimstatusflag: true });
+                swal("", "Please select Claim status", "error");
+            }
+            else if (this.state.fields.claimManagerRemarks == "") {
+                this.setState({ errormessage: true });
+                this.setState({ claimsremarksflag: true });
+                swal("", "Please enter Claim manager remarks", "error");
+            }
+            else {
+
+            }
         }
 
     };
@@ -1695,7 +1708,7 @@ handleActivityClose = () => {
                                     typeList={this.state.typeList} Bankfieldsmodel={this.state.Bankfieldsmodel} Payee={this.state.Payee} onModelChange={this.onModelChange} onDateChange={this.onDateChange}
                                     SetRiskClaimsDetailsValue={this.SetRiskClaimsDetailsValue} ProductClaimData={this.state.ProductClaimData} vehicleclaim={this.state.vehicleclaim} ClaimStatusData={this.state.ClaimStatusData}
                                     displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
-                                    handleActivitylog={this.handleActivitylog}
+                                    handleActivitylog={this.handleActivitylog} claimstatusflag={this.state.claimstatusflag} claimsremarksflag={this.state.claimsremarksflag}
                                     Bankarray={this.state.Bankarray} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}
                                 />
                             </CardBody>

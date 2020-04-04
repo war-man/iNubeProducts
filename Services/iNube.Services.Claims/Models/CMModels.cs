@@ -754,6 +754,7 @@ namespace iNube.Services.Claims.Models
         public string IfscCode { get; set; }
         public int? AccountType { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public string PayeeType { get; set; }
     }
     public partial class ClaimInsurable
     {

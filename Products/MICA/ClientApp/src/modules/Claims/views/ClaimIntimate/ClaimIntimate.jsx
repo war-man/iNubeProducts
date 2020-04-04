@@ -298,6 +298,7 @@ class ClaimIntimate extends React.Component {
                 bankBranchAddress: "",
                 ifscCode: "",
                 accountType: "",
+                payeeType: "Customer"
             },
             //DataModel: [],
             doc: {
@@ -662,7 +663,7 @@ class ClaimIntimate extends React.Component {
     }
 
     handleClaimAmount = (type, event, index) => {
-
+      
         let claim = this.state.ClaimsAmountData[index];
         let name = event.target.name;
         let value = event.target.value;
