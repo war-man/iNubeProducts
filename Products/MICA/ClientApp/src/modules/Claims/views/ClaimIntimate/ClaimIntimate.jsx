@@ -678,11 +678,12 @@ class ClaimIntimate extends React.Component {
             }
             console.log("ClaimIntimationDetails ", this.state.ClaimsAmountData[i]);
         }
-        this.state.DetailsDTO.claimAmount = amt;
+       // this.state.DetailsDTO.claimAmount = amt;
         this.setState({});
 
         console.log(" ClaimIntimationDetails claimAmount ", this.state.DetailsDTO.claimAmount);
         this.claimAmountTable();
+        this.CommontotalAmountUpdate();
         this.change(event, name, type);
 
     }
@@ -792,7 +793,7 @@ class ClaimIntimate extends React.Component {
 
         let that = this;
 
-        that.setState({ loader: false });
+        that.setState({ loader: false, details:false });
         fetch(`${ClaimConfig.policyconfigUrl}/api/Policy/PolicySearch`, {
             method: 'post',
             headers: {
@@ -944,17 +945,29 @@ class ClaimIntimate extends React.Component {
     }
 
     SetclauseValue = (index, event) => {
-
+       
         let state = this.state;
         if (event.target.checked == true) {
             state.selected.push(this.state.ClaimsAmountData[index]);
             // this.setState({ claimamtdisable: false });
         } else if (event.target.checked == false) {
-            console.log("selected array: ", this.state.ClaimsAmountData[index].insurableitemId);
-            state.selected = state.selected.filter(item => item.insurableitemId !== this.state.ClaimsAmountData[index].insurableitemId);
+            console.log("selected array: ", index, this.state.ClaimsAmountData, this.state.ClaimsAmountData[index].insurableitemId);
+            state.selected = state.selected.filter(item => item.insurableId !== this.state.ClaimsAmountData[index].insurableId);
         }
+        this.CommontotalAmountUpdate();
         this.setState({ state });
         console.log("selected: ", this.state.selected);
+    }
+    CommontotalAmountUpdate = () => {
+
+        let claimdetails = this.state.selected.map((item, i) => { if (eval(item.claimAmounts>0)) { return eval(item.claimAmounts) } else { return 0; } });
+
+        console.log("claimdetails", claimdetails, this.state.selected, this.state.ClaimsAmountData)
+        if (claimdetails.length > 0) {
+            this.state.DetailsDTO.claimAmount = claimdetails.reduce((result, number) => result + number);
+        } else {
+            this.state.DetailsDTO.claimAmount = 0;
+        }
     }
 
     editFunction(id, pid) {
@@ -1394,7 +1407,7 @@ class ClaimIntimate extends React.Component {
                 }
                 {this.state.loader ?
                     <GridContainer xl={12}>
-                        {this.state.showtable ?
+                        {(this.state.showtable && !this.state.details) ?
                             <GridItem xs={12}>
                                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                     <ReactTable
