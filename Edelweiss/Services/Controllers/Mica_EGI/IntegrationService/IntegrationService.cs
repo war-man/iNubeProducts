@@ -44,6 +44,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         //Get All the Policy + CD Data entire Policy Object 
         Task<IEnumerable<CDDetailsResponseDTO>> GetCDMapperDetails(CDDetailsRequestDTO detailsRequestDTO,ApiContext apiContext);
+        Task<ClaimDataDTO> GetClaimByNumber(string claimNumber, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -176,7 +177,11 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             return await PostListApiInvoke<CDDetailsRequestDTO, CDDetailsResponseDTO>(uri, apiContext, detailsRequestDTO);
         }
 
-
+        public async Task<ClaimDataDTO> GetClaimByNumber(string claimNumber, ApiContext apiContext)
+        {
+            var uri = ClaimUrl + "/api/ClaimManagement/GetClaimByNumber?claimNumber=" + claimNumber ;
+            return await GetApiInvoke<ClaimDataDTO>(uri, apiContext);
+        }
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();

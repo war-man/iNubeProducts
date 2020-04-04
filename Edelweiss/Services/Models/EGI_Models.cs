@@ -498,6 +498,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
     public partial class VehicleActivityDTO
     {
         public string PolicyNumber { get; set; }
+        public string ClaimNumber { get; set; }
         public List<string> VehicleNumbers { get; set; }
     }
 
@@ -617,6 +618,21 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string UpdatedResponse { get; set; }
     }
 
-
+    public  class ClaimDataDTO
+    {
+        public string PolicyNumber { get; set; }
+        public DateTime? lossDateTime { get; set; }
+        public string locationOfLoss { get; set; }
+        public int lossIntimatedBy { get; set; }
+        public string lossDescription { get; set; }
+        public int? ClaimAmount { get; set; }
+        public int ClaimStatusId { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+        public decimal? PartnerId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public int? ProductIdPk { get; set; }
+        public string ClaimNumber { get; set; }
+    }
 }
 
