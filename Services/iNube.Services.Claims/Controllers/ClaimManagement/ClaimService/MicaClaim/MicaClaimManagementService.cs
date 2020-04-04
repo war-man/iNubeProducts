@@ -1008,6 +1008,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             _claimsDTOs.Status = BusinessStatus.Created;
             _claimsDTOs.ResponseMessage = "record created..";
 
+           var CoverDetails= claims.ClaimInsurable.FirstOrDefault(s => s.InsurableItem == "Vehicle").CoverValue;
+           var CoverValue=JsonConvert.DeserializeObject<object>(CoverDetails);
+        
             if (!string.IsNullOrEmpty(policyDetails.Email))
             {
                 EmailTest emailTest = new EmailTest();
@@ -1015,7 +1018,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 emailTest.Subject = "Claim successfully registered";
                 emailTest.Message = "Claim Number: " + claims.ClaimNumber + " successfully registered against policy No: " + claims.PolicyNumber + " \n Your Claim will be processed in accordance with the Policy terms and Conditions. \n \n Assuring the best of services always. \n \nRegards, \nTeam MICA";
                 // New changes 
-               // SendEmailAsync(emailTest);
+               await SendEmailAsync(emailTest);
             }
 
 
@@ -1024,7 +1027,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 EmailTest manangerEmail = new EmailTest();
                 manangerEmail.To = _claimAllocationDetailsDTO.EmailId;
                 // manangerEmail.Subject = "";
-                manangerEmail.Message = " Dear Sir/Madam " + " \n Vehicle Number " + "(KA 36 AR 0522)" + " has met with accident on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n Thanks ";
+                manangerEmail.Message = " Dear Sir/Madam " + " \n\n Vehicle Number " + CoverValue["Vehicle Number"] + " has met with accident on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n\n Thanks ";
               await  SendEmailAsync(manangerEmail);
             }
             //Models.SMSRequest request = new Models.SMSRequest();
