@@ -588,8 +588,8 @@ class ClaimEnquiry extends React.Component {
                     insurableitemId: key + 1,
                     insurableItem: prop.insurableItem,
                     //name: prop.name,
-                    //identificationNo: prop.identificationNo,
-                    typeOfLoss: prop.typeOfLoss,
+                    identificationNo: prop.identificationNo,
+                    typeOfLoss: prop.coverName,
                     coverValue: prop.coverDynamic.map((c) => {
                         return (<p className="gridparagraph"> {c.Header} : {c.Details} </p>)
                     }),
