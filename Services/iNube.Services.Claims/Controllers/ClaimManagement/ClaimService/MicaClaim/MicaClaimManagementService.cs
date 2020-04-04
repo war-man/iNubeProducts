@@ -1025,7 +1025,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 manangerEmail.To = _claimAllocationDetailsDTO.EmailId;
                 // manangerEmail.Subject = "";
                 manangerEmail.Message = " Dear Sir/Madam " + " \n Vehicle Number " + "(KA 36 AR 0522)" + " has met with accident on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n Thanks ";
-                SendEmailAsync(manangerEmail);
+              await  SendEmailAsync(manangerEmail);
             }
             //Models.SMSRequest request = new Models.SMSRequest();
             //request.RecipientNumber = "8197521528";
@@ -1712,7 +1712,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             _context.TblClaims.Update(claimsprocess);
             _context.SaveChanges();
-            SendEmailAsync(emailTest);
+            await SendEmailAsync(emailTest);
             foreach (var item in Insurable)
             {
                 // item.ApprovedClaimAmounts = claimsDTO.ApprovedClaimAmounts ;
