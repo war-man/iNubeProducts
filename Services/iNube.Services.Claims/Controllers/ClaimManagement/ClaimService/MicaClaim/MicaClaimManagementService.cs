@@ -971,7 +971,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             claims.OrganizationId = Convert.ToDecimal(policyDetails.CustomerId);
             claims.ProductIdPk = policyDetails.ProductIdPk;
 
-            UpdateClaimData(claims, apiContext);
+            var claim=await UpdateClaimData(claims, apiContext);
 
 
 
