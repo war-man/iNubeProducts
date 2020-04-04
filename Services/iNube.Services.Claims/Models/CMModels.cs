@@ -116,7 +116,10 @@ namespace iNube.Services.Claims.Models
         public virtual List<Alldoc> Alldoc { get; set; }
         public virtual List<BankAccountsDTO> BankAccounts { get; set; }
     }
-
+    public partial class ClaimProcessResponseDTO : ResponseStatus
+    {
+         public ClaimProcessDTO ClaimProcess { get; set; }
+    }
     public partial class SearchClaimDTO
     {
         public string PolicyNo { get; set; }

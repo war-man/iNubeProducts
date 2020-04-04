@@ -11,15 +11,15 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
     public interface IClaimProductService
     {
         Task<ClaimResponse> CreateClaimAsync(dynamic policyDetail, ApiContext apiContext);
-        Task<ClaimDTO> GetClaimById(decimal claimId, ApiContext apiContext);
-        Task<ClaimDTO> GetClaimByNumber(string claimNumber, ApiContext apiContext);
+        Task<ClaimDataDTO> GetClaimById(decimal claimId, ApiContext apiContext);
+        Task<ClaimDataDTO> GetClaimByNumber(string claimNumber, ApiContext apiContext);
         Task<IEnumerable<ClaimDTO>> GetSearchClaims(ClaimSearchDTO claim, ApiContext apiContext);
         Task<List<FinanceProcessDTO>> GetFinanceBankDataAsync(SearchFinanceRequest financeRequest,ApiContext apiContext);
         //Task<ClaimDTO> SendRequestAsync(ApiContext apiContext);
         Task<ClaimDTOGWP> GetClaimGWP(ClaimDTOGWP claimgwp, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetMaster(string sMasterlist, ApiContext apiContext);
         Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext);
-        Task<ClaimProcessDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext);
+        Task<ClaimProcessResponseDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext);
         Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext);
         Task<ClaimSearchResponseDTO> SearchClaim(SearchClaimDTO searchclaim, ApiContext apiContext);
         Task<List<object>> ClaimStatusAsync(decimal claimId, decimal statusId, ApiContext apiContext);

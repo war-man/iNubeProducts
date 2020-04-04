@@ -197,7 +197,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
         public async Task<IActionResult> ClaimProcess(ClaimProcessDTO claimsDTO)
         {
             var response = await _claimService.ClaimProcess(claimsDTO, Context);
-            return Ok(response);
+            return ServiceResponse(response);
         }
 
         [HttpPost]
