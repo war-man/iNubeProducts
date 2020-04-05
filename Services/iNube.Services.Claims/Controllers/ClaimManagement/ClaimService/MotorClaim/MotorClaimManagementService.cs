@@ -17,7 +17,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
 
-        public async Task<ClaimDTO> GetClaimById(decimal claimId, ApiContext apiContext)
+        public async Task<ClaimDataDTO> GetClaimById(decimal claimId, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -37,7 +37,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
 
-        public async Task<ClaimDTO> GetClaimByNumber(string claimNumber, ApiContext apiContext)
+        public async Task<ClaimDataDTO> GetClaimByNumber(string claimNumber, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -77,7 +77,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService
             throw new NotImplementedException();
         }
 
-        public async Task<ClaimProcessDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext)
+        public async Task<ClaimProcessResponseDTO> ClaimProcess(ClaimProcessDTO claimsDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

@@ -38,7 +38,7 @@ namespace iNube.Services.Claims.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
@@ -93,13 +93,13 @@ namespace iNube.Services.Claims.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.AccountNumber)
-                    .HasMaxLength(20)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.AmountPaid).HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.BankBranchAddress)
-                    .HasMaxLength(100)
+                    .HasMaxLength(350)
                     .IsUnicode(false);
 
                 entity.Property(e => e.BankName)
@@ -114,7 +114,7 @@ namespace iNube.Services.Claims.Entities
 
                 entity.Property(e => e.Ifsccode)
                     .HasColumnName("IFSCCode")
-                    .HasMaxLength(11)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ModifiedBy).HasMaxLength(450);
@@ -758,7 +758,7 @@ namespace iNube.Services.Claims.Entities
                 entity.ToTable("tblClaims", "CM");
 
                 entity.Property(e => e.ClaimManagerRemarks)
-                    .HasMaxLength(100)
+                    .HasMaxLength(350)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ClaimNumber)
@@ -770,7 +770,7 @@ namespace iNube.Services.Claims.Entities
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.LocationOfEvent)
-                    .HasMaxLength(200)
+                    .HasMaxLength(500)
                     .IsUnicode(false);
 
                 entity.Property(e => e.LossDateTime).HasColumnType("datetime");

@@ -158,9 +158,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpPost]
-        public IActionResult GetVehicleActivity(VehicleActivityDTO vehicleActivity)
+        public async Task<IActionResult> GetVehicleActivity(VehicleActivityDTO vehicleActivity)
         {
-            var response = _quotationService.GetVehicleActivity(vehicleActivity);
+            var response = await _quotationService.GetVehicleActivity(vehicleActivity,Context);
             return ServiceResponse(response);
 
         }

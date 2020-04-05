@@ -48,7 +48,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber, dynamic PolicyObject);
 
         //Claims needs Activity of Vehicle
-        ResponseVehicleActivity GetVehicleActivity(VehicleActivityDTO vehicleActivity);
+        Task<ResponseVehicleActivity> GetVehicleActivity(VehicleActivityDTO vehicleActivity, ApiContext apiContext);
         //refurnd Details
         Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext);
 
@@ -4590,7 +4590,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public ResponseVehicleActivity GetVehicleActivity(VehicleActivityDTO vehicleActivity)
+        public async Task<ResponseVehicleActivity> GetVehicleActivity(VehicleActivityDTO vehicleActivity,ApiContext apiContext)
         {
 
             ResponseVehicleActivity response = new ResponseVehicleActivity();
@@ -4599,9 +4599,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             VehicleActivity vehicle = null;
             if (checkPolicyNo)
             {
+                DateTime clmDate = DateTime.Now;
+                //check for claim--
+                if (!string.IsNullOrEmpty(vehicleActivity.ClaimNumber))
+                {
+                    var claim = await _integrationService.GetClaimByNumber(vehicleActivity.ClaimNumber, apiContext);
+                    if(claim != null)
+                    {
+                        clmDate =(DateTime) claim.CreatedDate;
+                        if(claim.PolicyNumber != vehicleActivity.PolicyNumber)
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+                            response.ResponseMessage = $"Mismatch between data requested --PolicyNumber {vehicleActivity.PolicyNumber} and Claim PolicyNumber {claim.PolicyNumber} are different!!";
+                            response.Status = BusinessStatus.PreConditionFailed;
+                            errorInfo.ErrorMessage = "No Records for this Policy Number: " + vehicleActivity.PolicyNumber;
+                            errorInfo.ErrorCode = "GEN001";
+                            errorInfo.PropertyName = "NoRecords";
+                            response.Errors.Add(errorInfo);
+                            return response;
+                        }
+                    }
+                }
                 foreach (var VehicleNumber in vehicleActivity.VehicleNumbers)
                 {
-                    var logData = _context.TblSwitchLog.Where(x => x.PolicyNo == vehicleActivity.PolicyNumber && x.VehicleNumber == VehicleNumber)
+                    var logData = _context.TblSwitchLog.Where(x => x.PolicyNo == vehicleActivity.PolicyNumber && x.VehicleNumber == VehicleNumber && x.CreatedDate <= clmDate)
                                                  .Select(x => new VehActivityDTO
                                                  {
                                                      DateTime = x.CreatedDate,
@@ -4609,7 +4630,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                     // SwitchState = x.SwitchStatus.ToString(),
                                                     TriggerSwitch = x.SwitchType,
                                                      Activity = Convert.ToBoolean(x.SwitchStatus) ? "Switch On" : "Switch Off",
-                                                     Status = Convert.ToBoolean(x.SwitchStatus) ? "Active" : "InActive"
+                                                     Status = Convert.ToBoolean(x.SwitchStatus) ? "Active" : "Inactive"
                                                  }).ToList();
 
                     if (logData.Count > 0)
