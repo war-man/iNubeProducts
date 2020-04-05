@@ -379,6 +379,7 @@ class InboxClaimProcess extends React.Component {
             displaysurveyor: false,
             vehicleActivity: {
                 "policyNumber": "",
+                "claimNumber": "",
                 "vehicleNumbers": [],
             },
             popopen: false,
@@ -447,19 +448,39 @@ class InboxClaimProcess extends React.Component {
                 .then(data => {
                     console.log("response: ", data)
                     //      if (data.status == 200) {
-                    this.state.claimId = data.claimId;
+                  //  this.state.claimId = data.claimId;
                     //  this.setState({ claimnumber: data.claimNumber });
-                    swal({
-                        text: "Claim Processed successfully! \n Your Claim Number: " + this.state.ClaimNumber,
-                        icon: "success",
-                        buttons: [false, "OK"],
-                    }).then((willDelete) => {
-                        if (willDelete) {
-                            this.handlepagereload();
+                    if (data.status == 3) {
+                        swal({
+                            text: data.responseMessage,
+                            icon: "success",
+                            buttons: [false, "OK"],
+                        }).then((willDelete) => {
+                            if (willDelete) {
+                                this.handlepagereload();
+                            }
+                        });
+                    } else if (data.status == 7) {
+
+                        if (data.errors.length > 0) {
+                            swal({
+
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        } else {
+                            swal({
+
+                                text: data.responseMessage,
+                                icon: "error"
+                            });
                         }
+
+
+                    }
+                        //this.renderRedirect();
                     });
-                    //this.renderRedirect();
-                });
+        
         } else {
             //this.setState({ errormessage: true });
             if (this.state.fields.claimStatusId == "") {
@@ -993,6 +1014,8 @@ class InboxClaimProcess extends React.Component {
         });
         this.state.vehicleActivity.vehicleNumbers  = Array.from(new Set(arr));
         this.state.vehicleActivity.policyNumber = this.state.PolicyNumber;
+        this.state.vehicleActivity.claimNumber = this.state.ClaimNumber;
+
         console.log("TableData#007", this.state.claimTableData, this.state.vehicleActivity.vehicleNumbers);
         this.setState({
             TableData: this.state.claimTableData.map((prop, key) => {
