@@ -872,7 +872,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             catch (Exception ex)
             {
 
-                
+
             }
             return true;
         }
@@ -953,7 +953,6 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
         public async Task<ClaimResponses> ClaimIntimate(ClaimDataDTO claims, ApiContext apiContext)
         {
-
             List<ClaimInsurableDTO> claimInsurableDTO = new List<ClaimInsurableDTO>();
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -971,15 +970,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             claims.OrganizationId = Convert.ToDecimal(policyDetails.CustomerId);
             claims.ProductIdPk = policyDetails.ProductIdPk;
 
-            var claim=await UpdateClaimData(claims, apiContext);
-
-
+            var claim = await UpdateClaimData(claims, apiContext);
 
             var _tblclaims = _mapper.Map<TblClaims>(claims);
-            _context.TblClaims.Add(_tblclaims);
-            _context.SaveChanges();
 
-            var claimid = _tblclaims.ClaimId;
             var StrStateId = claims.AdditionalDetails["Vehicle Location State"].ToString();
             int StateId = Convert.ToInt32(StrStateId);
             var statecode = await GetStateAbbrevation(StateId, apiContext);
@@ -987,6 +981,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             alloc.State = statecode;
             string EventId = "1";
             var allocationdata = await _integrationService.CheckRuleSets(EventId, alloc, apiContext);
+
             var allocationdetails = JsonConvert.SerializeObject(allocationdata);
             // var allocdata = JsonConvert.DeserializeObject<dynamic>(json);
             TblClaimAllocationDetails _claimAllocationDetailsDTO = new TblClaimAllocationDetails();
@@ -998,19 +993,28 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 _claimAllocationDetailsDTO.EmailId = item["Mail Id"];
                 _claimAllocationDetailsDTO.MobileNumber = item["Contact Number"];
                 _claimAllocationDetailsDTO.AllocationType = "Individual";
-                _claimAllocationDetailsDTO.ClaimId = claimid;
+                //_claimAllocationDetailsDTO.ClaimId = _tblclaims.ClaimId;
                 _claimAllocationDetailsDTO.AllocationDetails = allocationdetails;
-                _context.TblClaimAllocationDetails.Add(_claimAllocationDetailsDTO);
-                _context.SaveChanges();
+                //_context.TblClaimAllocationDetails.Add(_claimAllocationDetailsDTO);
+                _tblclaims.TblClaimAllocationDetails.Add(_claimAllocationDetailsDTO);
             }
 
+            _context.TblClaims.Add(_tblclaims);
+            _context.SaveChanges();
             var _claimsDTOs = _mapper.Map<ClaimResponses>(_tblclaims);
             _claimsDTOs.Status = BusinessStatus.Created;
             _claimsDTOs.ResponseMessage = "record created..";
 
-           var CoverDetails= claims.ClaimInsurable.FirstOrDefault(s => s.InsurableItem == "Vehicle").CoverValue;
-           var CoverValue=JsonConvert.DeserializeObject<object>(CoverDetails);
-        
+            var CoverDetails = claims.ClaimInsurable.FirstOrDefault(s => s.InsurableItem == "Vehicle");
+            var vehiclenumber = "";
+
+            dynamic CoverValue;
+            if (CoverDetails != null)
+            {
+                CoverValue = JsonConvert.DeserializeObject<object>(CoverDetails.CoverValue.ToString());
+                vehiclenumber = CoverValue["Vehicle Number"];
+            }
+
             if (!string.IsNullOrEmpty(policyDetails.Email))
             {
                 EmailTest emailTest = new EmailTest();
@@ -1018,7 +1022,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 emailTest.Subject = "Claim successfully registered";
                 emailTest.Message = "Claim Number: " + claims.ClaimNumber + " successfully registered against policy No: " + claims.PolicyNumber + " \n Your Claim will be processed in accordance with the Policy terms and Conditions. \n \n Assuring the best of services always. \n \nRegards, \nTeam MICA";
                 // New changes 
-               await SendEmailAsync(emailTest);
+                await SendEmailAsync(emailTest);
             }
 
 
@@ -1027,8 +1031,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 EmailTest manangerEmail = new EmailTest();
                 manangerEmail.To = _claimAllocationDetailsDTO.EmailId;
                 // manangerEmail.Subject = "";
-                manangerEmail.Message = " Dear Sir/Madam " + " \n\n Vehicle Number " + CoverValue["Vehicle Number"] + " is damaged on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n\n Thanks ";
-              await  SendEmailAsync(manangerEmail);
+                manangerEmail.Message = " Dear Sir/Madam " + " \n\n Vehicle Number " + vehiclenumber + " is damaged on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n\n Thanks ";
+                await SendEmailAsync(manangerEmail);
             }
             //Models.SMSRequest request = new Models.SMSRequest();
             //request.RecipientNumber = "8197521528";
@@ -1802,7 +1806,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             catch (Exception ex)
             {
-                return new ClaimProcessResponseDTO() { Status =BusinessStatus.Error, ResponseMessage="Error Details"+ex.ToString()};
+                return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, ResponseMessage = "Error Details" + ex.ToString() };
             }
         }
 
