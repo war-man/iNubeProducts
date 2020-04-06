@@ -5936,16 +5936,18 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 // var c = dt.Rows[0][2];
                 var count = dt.Rows.Count;
 
-
+                var errorflag = false;
                 var endrsNum = "";
                 var updatedResponse = "";
                 DateTime endorsementeffectivedate = Convert.ToDateTime("1/1/1754 12:00:00");
                 DateTime txndate = Convert.ToDateTime("1/1/1754 12:00:00");
                 var paymentstatus = "";
+                var paymentstatus1 = "";
                 DateTime dateofpayment = Convert.ToDateTime("1/1/1754 12:00:00");
                 decimal totalRefundAmount = 0;
                 decimal ammountpaid = 0;
                 var paymentrefId = "";
+                DateTime dateofpayment1 = Convert.ToDateTime("1/1/1754 12:00:00");
 
                 for (var i = 0; i < count; i++)
                 {
@@ -5956,6 +5958,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                             ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber can not be empty for row {i + 1}" };
                             Errors.Add(errorInfo);
+                        errorflag = true;
                     }
                     else
                     {
@@ -5964,9 +5967,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         if (s != null || s != "")
                         {
-                            if (s == "\"\"")
+                            if (string.IsNullOrEmpty(s))
                             {
-                                s = Convert.ToDateTime("1/1/1754 12:00:00").ToString();
+                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Endorsement Effective date can not be empty for row {i + 1}" };
+                                Errors.Add(errorInfo);
+                                errorflag = true;
                             }
                             else
                             {
@@ -5979,9 +5984,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         var s1 = dt.Rows[i][TotalRefundAmountIndex].ToString().Trim();
                         if (s1 != null || s1 != "")
                         {
-                            if (s1 == "\"\"")
+                            if (string.IsNullOrEmpty(s1))
                             {
-                                totalRefundAmount = 0;
+                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"TotalRefundAmount can not be empty for row {i + 1}" };
+                                Errors.Add(errorInfo);
+                                errorflag = true;
                             }
                             else
                             {
@@ -5992,9 +5999,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         var s2 = dt.Rows[i][PaymentGatewayReferenceIdIndex].ToString().Trim();
                         if (s2 != null || s2 != "")
                         {
-                            if (s2 == "\"\"")
+                            if (string.IsNullOrEmpty(s2))
                             {
-                                s1 = "0.0";
+                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PaymentReferenceGatwayId  can not be empty for row {i + 1}" };
+                                Errors.Add(errorInfo);
+                                errorflag = true;
                             }
                             else
                             {
@@ -6004,9 +6013,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         var s3 = dt.Rows[i][AmountPaidIndex].ToString().Trim();
                         if (s3 != null || s3 != "")
                         {
-                            if (s3 == "\"\"")
+                            if (string.IsNullOrEmpty(s3))
                             {
-                                s3 = "0.0";
+                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Total Amount can not be empty for row {i + 1}" };
+                                Errors.Add(errorInfo);
+                                errorflag = true;
                             }
                             else
                             {
@@ -6016,53 +6027,129 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         var s4 = dt.Rows[i][PaymentStatusIndex].ToString().Trim();
                         if (s4 != null || s4 != "")
                         {
-                            if (s4 == "\"\"")
+                            if (string.IsNullOrEmpty(s4))
                             {
-                                s4 = "Pending";
+                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Payment status  can not be empty for row {i + 1}" };
+                                Errors.Add(errorInfo);
+                                errorflag = true;
                             }
                             else
                             {
                                 paymentstatus = s4.Replace("\"", "");
+                                var succ = "successful";
+                                var fail = "failure";
+                                var value1= string.Equals(paymentstatus, succ, StringComparison.CurrentCultureIgnoreCase);
+                                var value2 = string.Equals(paymentstatus, fail, StringComparison.CurrentCultureIgnoreCase);
+                                if (value1==true)
+                                {
+                                    paymentstatus1 = paymentstatus;
+                                }
+                                else if(value2==true)
+                                {
+                                    paymentstatus1 = paymentstatus;
+                                }
+                                else
+                                {
+                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Payment status can be only successful or failure can not be other for row {i + 1}" };
+                                    Errors.Add(errorInfo);
+                                    errorflag = true;
+                                }
+                               
                             }
                         }
-
+                        var PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == endrsNum);
                         var s5 = dt.Rows[i][DateOfPaymentIndex].ToString().Trim();
                         if (s5 != null || s5 != "")
                         {
-                            if (s5 == "\"\"")
+                            if (string.IsNullOrEmpty(s5))
                             {
-                                s5 = Convert.ToDateTime("1/1/1754 12:00:00").ToString();
+                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Date of Payment can not be empty for row {i + 1}" };
+                                Errors.Add(errorInfo);
+                                errorflag = true;
                             }
                             else
                             {
-                                dateofpayment = Convert.ToDateTime(s5.Replace("\"", ""));
+                                var endeffectivedate = PolicyRefundDetails.EndorsementEffectivedate;//22/03/2020
+
+                                //Checking format of dd/mm/yy
+                               
+                                dateofpayment = Convert.ToDateTime(s5.Replace("\"", ""));//23/03/2020
+                                var strdayofpayment = dateofpayment.ToString();
+
+                                string inputString = strdayofpayment;
+                                DateTime dDate;
+
+                                if (DateTime.TryParse(inputString, out dDate))
+                                {
+                                    String.Format("{0:d/MM/yyyy}", dDate);
+                                }
+                                else
+                                {
+                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment is not dd/mm/yyyy format  for row {i + 1}" };
+                                    Errors.Add(errorInfo); // <-- Control flow goes here
+                                    errorflag = true;
+                                }
+
+
+                                //if value greter then 0 means first date is greater then second one
+                                //if value less then 0 it means first date is less then second date
+                                int value1 = DateTime.Compare(dateofpayment, Convert.ToDateTime(endeffectivedate));
+                                int value2 = DateTime.Compare(dateofpayment,DateTime.Now );
+                                if (value1<0)
+                                {
+                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment can not be less then endorsementeffectivedate for row {i + 1}" };
+                                    Errors.Add(errorInfo);
+                                    errorflag = true;
+                                }
+                                else if (value2 > 0)
+                                {
+                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment can not be the future date for row {i + 1}" };
+                                    Errors.Add(errorInfo);
+                                    errorflag = true;
+                                }
+                                else
+                                {
+                                    dateofpayment1 = dateofpayment;
+                                }
                             }
 
                         }
                         logx++;
-                        var PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == endrsNum);
+                        
                         if (PolicyRefundDetails == null)
                         {
                             ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber does not exist for row {i + 1} in database", ErrorCode = logx.ToString() };
                             Errors.Add(errorInfo);
+                            errorflag = true;
+
                         }
-                        else
+
+                        if (errorflag == false)
                         {
 
                             //updating the details from csv to table
                             // PolicyRefundDetails.EndorsementEffectivedate = endorsementeffectivedate;
                             // PolicyRefundDetails.TotalRefundAmount = totalRefundAmount;
+                            
                             PolicyRefundDetails.TxnDate = txndate;
                             PolicyRefundDetails.PaymentGatewayReferenceId = paymentrefId;
-                            PolicyRefundDetails.PaymentStatus = paymentstatus;
+                            PolicyRefundDetails.PaymentStatus = paymentstatus1;
                             PolicyRefundDetails.AmountPaid = ammountpaid;
-                            PolicyRefundDetails.DateOfPayment = dateofpayment;
+                            PolicyRefundDetails.DateOfPayment = dateofpayment1;
 
 
                             _context.TblPolicyRefund.Update(PolicyRefundDetails);
                             _context.SaveChanges();
+                            
+                        }
+                        else
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $" Can not be updated for row {i + 1}" };
+                            Errors.Add(errorInfo);
+                            errorflag = true;
                         }
                     }
+                    errorflag = false;
                 }
                 if (Errors.Count > 0)
                 {

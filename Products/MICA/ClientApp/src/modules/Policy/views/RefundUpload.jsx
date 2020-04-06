@@ -33,6 +33,8 @@ const RefundUpload = (props) => {
         $.ajax({
             type: "POST",
             url: `${policyConfig.PolicyconfigUrl}/api/Policy/RefundUpload`,
+            //https://localhost:44351/api/Policy/RefundUpload
+           // url: `https://localhost:44351/api/Policy/RefundUpload`,
             contentType: false,
             processData: false,
 
@@ -43,15 +45,17 @@ const RefundUpload = (props) => {
             },
             success: function (response) {
                 console.log("response ", response);
+             
                 if (response.status == 1) {
                     swal({
+
                         text: response.responseMessage,
                         icon: "success"
                     });
                 } else if (response.status == 7) {
                     swal({
                         text: response.responseMessage,
-                        icon: "error"
+                        icon: "success"
                     });
                 }
                 else {
