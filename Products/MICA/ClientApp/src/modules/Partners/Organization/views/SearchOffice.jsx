@@ -178,7 +178,8 @@ class SearchOffice extends React.Component {
 
     tableshow = () => {
         this.setState({ showtable: true });
-        fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode, {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode, {
+      //  fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode, {
             //  fetch(`https://localhost:44315/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode,{
             method: 'GET',
             headers: {
@@ -193,7 +194,7 @@ class SearchOffice extends React.Component {
                 this.setState({ officelist: data });
                 this.dataTable(data);
             });
-        console.log("officelist", this.state.officelist);
+        console.log("officelist1", this.state.officelist);
 
         //if (this.state.count > 0) {
         //    this.setState({ react: true });
@@ -218,9 +219,9 @@ class SearchOffice extends React.Component {
                     orgOfficeId: prop.orgOfficeId,
                     officeCode: prop.officeCode,
                     officePhoneNo: prop.officePhoneNo,
-                    officeId: prop.tblOfficeSpocDetails[0].officeId,
-                    spocname: prop.tblOfficeSpocDetails[0].spocname,
-                    spocemailId: prop.tblOfficeSpocDetails[0].spocemailId,
+                    officeId: prop.officeSpocDetails[0].officeId,
+                    spocname: prop.officeSpocDetails[0].spocname,
+                    spocemailId: prop.officeSpocDetails[0].spocemailId,
                     officeAddressLine1: prop.officeAddressLine1,
                     radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.orgOfficeId)} />
 

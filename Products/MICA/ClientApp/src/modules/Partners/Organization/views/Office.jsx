@@ -125,8 +125,8 @@ class Profile extends React.Component {
                 spocname: "",
 
             },
-
-            officeId: "",
+            OfficeCode: "",
+           // officeId: "",
             open: false,
             officelist: [],
             list: [],
@@ -148,7 +148,7 @@ class Profile extends React.Component {
                 "officeAddressLine2": "",
                 "officeAddressLine3": "",
                 "officePincodeId": 0,
-                "tblOfficeSpocDetails": [
+                "officeSpocDetails": [
                     {
                         //"officeSpocid": 0,
                         "officeId": 0,
@@ -287,10 +287,10 @@ class Profile extends React.Component {
         this.setState({ officeDTO })
         console.log("officeDTO", this.state.officeDTO);
         //this.change(event, name, type);
-        if (name == "officeId") {
-            let { officeId } = this.state;
-            officeId = value;
-            this.setState({ officeId });
+        if (name == "OfficeCode") {
+            let { OfficeCode } = this.state;
+            OfficeCode = value;
+            this.setState({ OfficeCode });
         }
         if (type == "spoc") {
             let reg = this.state.addressDTO[type];
@@ -351,7 +351,7 @@ class Profile extends React.Component {
         address.push(this.state.addressDTO.spoc);
         console.log("push in adreess", address);
         let offceDTO = this.state.officeDTO;
-        offceDTO['tblOfficeSpocDetails'] = address;
+        offceDTO['officeSpocDetails'] = address;
         this.setState({ offceDTO });
         console.log("table office", this.state.officeDTO);
         
@@ -426,7 +426,7 @@ class Profile extends React.Component {
     }
 
     tableshow = () => {
-        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/GetOffice?officeID=` + this.state.officeId, {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/GetOffice?OfficeCode=` + this.state.OfficeCode, {
         //fetch(`https://localhost:44315/api/Office/GetOffice?officeID=` + this.state.officeId, {
        // fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/GetOffice?officeID=` + this.state.officeId, {
             method: 'GET',
@@ -513,15 +513,15 @@ class Profile extends React.Component {
                 this.setState({ demo });
                 console.log("demo", demo);
 
-                console.log("offorg", this.props.officesendlist[0].tblOfficeSpocDetails[0]);
+                console.log("offorg", this.props.officesendlist[0].officeSpocDetails[0]);
                 //   this.props.officesendlist[0].tblOfficeSpocDetails[0].officeId = "";
                 // this.props.officesendlist[0].tblOfficeSpocDetails[0].officeSpocid = 0;
-                let tblOfficeSpocDetails = this.props.officesendlist[0].tblOfficeSpocDetails[0];
+                let officeSpocDetails = this.props.officesendlist[0].officeSpocDetails[0];
 
 
-                console.log("tblOfficeSpocDetails", tblOfficeSpocDetails);
+                console.log("officeSpocDetails", officeSpocDetails);
                 let addressDTO = this.state.addressDTO;
-                addressDTO["spoc"] = tblOfficeSpocDetails;
+                addressDTO["spoc"] = officeSpocDetails;
 
 
                 //  this.setState({ officeDTO });
