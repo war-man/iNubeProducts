@@ -163,7 +163,6 @@ class ReportExecution extends React.Component {
     };
 
     onDateChange = (formate, name, event) => {
-        debugger;
         var today = event.toDate();
         if (today.getDate() < 10) {
             var dt = '0' + today.getDate();
@@ -177,8 +176,9 @@ class ReportExecution extends React.Component {
         else {
             var mm = (today.getMonth() + 1);
         }
-        var date = dt + '/' + mm + '/' + today.getFullYear();
+        //var date = dt + '/' + mm + '/' + today.getFullYear();
           //  + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+        var date = today.getFullYear() + '-' + mm + '-' + dt;
         var date2 = new Date();
         var date1 = new Date(today);
         //let state = this.state.CheckCondition;
@@ -346,6 +346,14 @@ class ReportExecution extends React.Component {
         this.setState({ nodata: false });
         window.scrollTo(0, 0);
     }
+    datechange = (date) => {
+        if (date != undefined) {
+            const _date = date.split('-');
+            const dateObj = { month: _date[1], year: _date[0], day: _date[2] };
+
+            return dateObj.day + '/' + dateObj.month + '/' + dateObj.year;
+        }
+    }
 
     render() {
         return (
@@ -435,7 +443,7 @@ class ReportExecution extends React.Component {
                                                                                             id='date'
                                                                                             name={item.parameterName}
                                                                                             onChange={(evt) => this.onDateChange('datetime', item.parameterName, evt)}
-                                                                                            value={this.state.CheckCondition[item.parameterName]}
+                                                                                            value={this.datechange(this.state.CheckCondition[item.parameterName])}
                                                                                             formControlProps={{ fullWidth: true }} />
 
                                                                                     </GridItem>
