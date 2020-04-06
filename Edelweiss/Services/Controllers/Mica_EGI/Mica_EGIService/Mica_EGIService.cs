@@ -4759,8 +4759,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<bool> MonthlySIScheduler(DateTime? dateTime)
         {
+            DateTime? CurrentIndianTime = null;
 
-            PolicyMonthlySiDTO monthlySiDTO = new PolicyMonthlySiDTO();
+            CurrentIndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            DateTime CurrentDate = CurrentIndianTime.Value.Date;
+
+
+            if (dateTime != null)
+            {
+                CurrentIndianTime = dateTime;
+                CurrentDate = dateTime.Value.Date;            
+            }
+            
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
             ApiContext apiContext = new ApiContext();
             apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
@@ -4769,16 +4779,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
             apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
 
-            DateTime PolicyStartDate = new DateTime(2021, 2, 1, 11, 09, 52);
-            DateTime NextMonth = PolicyStartDate.AddMonths(1);
-            DateTime DueDate = NextMonth.AddDays(-1);
-            DateTime ReportDate = DueDate.AddDays(-2);
-
+            TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
+            DateTime PolicyStartDate, NextMonth, CDFromDate;
+           
             //Step-1:Get All Active Policy's 
             var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, apiContext);
 
 
-            if (PolicyDetails == null || PolicyDetails.Count == 0)
+            if(PolicyDetails == null || PolicyDetails.Count == 0)
             {
                 return false;
             }
@@ -4790,22 +4798,249 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             //Step-2:Start the Loop Based On Policy Number
             foreach (var policy in PolicyNumberList)
             {
-                CDDetailsRequestDTO detailsRequestDTO = new CDDetailsRequestDTO
+                PolicyStartDate = Convert.ToDateTime(PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).PolicyStartDate);
+
+                var checkLastBilling = _context.TblPolicyMonthlySi.LastOrDefault(x => x.PolicyNo == policy);
+                
+                //Policy Has Started and has no billing transaction yet
+                if (checkLastBilling == null)
                 {
+                    CDFromDate = PolicyStartDate;
+                    NextMonth = PolicyStartDate.AddMonths(1);
+                    monthlySiDTO.DueDate = NextMonth.AddDays(-1);
+                    monthlySiDTO.ReportCreatedDate = monthlySiDTO.DueDate.Value.AddDays(-2);
+                }
+                else
+                {
+                    //Last Policy Transaction Exsists
+                    DateTime LastMonthDueDate = checkLastBilling.DueDate.Value;
+                    CDFromDate = LastMonthDueDate; //Verify Should it be +1 or not..?!
+                    NextMonth = LastMonthDueDate.AddMonths(1);
+                    monthlySiDTO.DueDate = NextMonth.AddDays(-1);
+                    monthlySiDTO.ReportCreatedDate = monthlySiDTO.DueDate.Value.AddDays(-2);
+                }               
 
-                    PolicyNumber = policy,
-                    FromDate = Convert.ToDateTime("2020-04-02T10:37:29.518Z"),
-                    ToDate = Convert.ToDateTime("2020-04-03T10:37:29.518Z"),
+                if (monthlySiDTO.ReportCreatedDate.Value.Date != CurrentDate.Date)
+                {
+                    //Report Date is not matching with the current 
+                    //date so move to next policy.
+                    continue;
+                }
+                else
+                {
+                    //This Policy Number has the Reporting Date today
+                    //so Insert the Monthly SI billing details.
 
-                };
+                    CDDetailsRequestDTO detailsRequestDTO = new CDDetailsRequestDTO
+                    {
+                        PolicyNumber = policy,
+                        FromDate = CDFromDate,
+                        ToDate = CurrentIndianTime,
+                    };
 
-                //Step-3 Get Entire Policy Details
-                var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO,apiContext);
+                    //Step-3 Get Entire Policy Details
+                    var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, apiContext);
+
+                    int DaysChargeable = TotalUsage(policy, CDFromDate,CurrentIndianTime.Value);
+
+                    if (CDDetails.Count() > 0 && DaysChargeable > 0)
+                    {
+                        try
+                        {
+                            decimal ADRatePerDay = 0;
+
+                            var CheckEndorsement = CDDetails.Any(x => x.Action == "Addition of vehicle" || x.Action == "Deletion of vehicle");
+
+                            dynamic LatestAction = JsonConvert.DeserializeObject(CDDetails.Select(x=>x).OrderByDescending(x => x.EndorsementEffectivedate).FirstOrDefault().UpdatedResponse);
+                          
+                            dynamic PolicyData = JsonConvert.DeserializeObject(CDDetails.FirstOrDefault(x => x.Action == "Issue Policy").UpdatedResponse);
+
+                            string StateCode = PolicyData["stateCode"];
+                            TaxTypeDTO TaxType = TaxTypeForStateCode(StateCode);
+
+                            monthlySiDTO.PolicyNo = policy;
+                            //PolicyData
+                            monthlySiDTO.PolicyStatus = PolicyData["PolicyStatus"];
+                            monthlySiDTO.InsuredName = PolicyData["Name"];
+                            monthlySiDTO.Phone = PolicyData["Mobile Number"];
+                            monthlySiDTO.AuthPayUid = PolicyData["PaymentInfo"][0]["RefrenceNumber"];
+
+                            //Total Usage Method
+                            monthlySiDTO.NumberOfDaysChargeable = DaysChargeable;                          
+
+                            if (CheckEndorsement)
+                            {
+                                var CumAdPerDay = LatestAction["PremiumDetails"][0]["CumAdPerDay"];
+                                if (CumAdPerDay != null)
+                                    ADRatePerDay = CumAdPerDay;
+                                else
+                                    ADRatePerDay = 0;
+                            }
+                            else
+                            {                                
+                                var AdPerDay = LatestAction["PremiumDetails"][0]["AdPerDay"];
+                                if (AdPerDay != null)
+                                    ADRatePerDay = Convert.ToDecimal(AdPerDay.ToString());
+                                else
+                                    ADRatePerDay = 0;
+                            }
+
+                            //AdPerDay
+                            monthlySiDTO.PerDayPremium = ADRatePerDay;  
+
+                            EndorsementCalDTO endorsementCalDTO = new EndorsementCalDTO();
+                            //Rate
+                            endorsementCalDTO.dictionary_rate.FSTTAX_TAXTYPE = TaxType.FSTTAX_TAXTYPE;
+                            endorsementCalDTO.dictionary_rate.TSTTAX_TAXTYPE = TaxType.TSTTAX_TAXTYPE;
+
+                            //Rule
+                            endorsementCalDTO.dictionary_rule.AD = monthlySiDTO.PerDayPremium.ToString();
+                            endorsementCalDTO.dictionary_rule.ADDAYS = DaysChargeable.ToString();
+                            endorsementCalDTO.dictionary_rule.FT = "0";
+                            endorsementCalDTO.dictionary_rule.FTDAYS = "0";
+
+
+
+                            var CalculatePremium = await EndorsementCalculator(endorsementCalDTO); 
+
+                            if(CalculatePremium.Count > 0)
+                            {                                
+                                monthlySiDTO.PremiumChargeable = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+
+                                monthlySiDTO.GstOnPremiumChargeable = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue) + Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+                                monthlySiDTO.TotalAmountChargeable = Convert.ToDecimal(monthlySiDTO.PremiumChargeable + monthlySiDTO.GstOnPremiumChargeable);
+
+                                monthlySiDTO.Amount = monthlySiDTO.TotalAmountChargeable;
+
+                                Guid guid = Guid.NewGuid();
+                                monthlySiDTO.Txnid = guid.ToString();
+
+                                var PremiumDetails = ADMonthlySI(CalculatePremium);
+                                monthlySiDTO.PremiumDetails = JsonConvert.SerializeObject(PremiumDetails);                        
+                                
+                                _context.TblPolicyMonthlySi.Add(monthlySiDTO);
+                                _context.SaveChanges();
+
+                            }
+                            else
+                            {
+                               continue;
+                            }
+
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                }
             }
-
                 return false;
 
         } 
+
+        private int TotalUsage(string PolicyNo,DateTime FromDate,DateTime ToDate)
+        {
+            var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
+
+            var checkswitchLog = _context.TblSwitchLog.Any(x => x.PolicyNo == PolicyNo);
+
+
+            if (checkswitchLog)
+            {
+                var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("dd/MM/yyyy") + "' and '" + ToDate.Date.ToString("dd/MM/yyyy") + "' group by Month(CreatedDate) , PolicyNo";
+
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
+
+                        //TBLSWITCHLOG
+                        SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
+                        DataSet Switchds = new DataSet();
+                        SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
+                        switchadapter.Fill(Switchds, "Query1");
+
+                        var Result = Switchds.Tables[0];
+                        var Days = Result.Rows[0].ItemArray[0];
+
+                        //Total Usage Shown
+                        int TotalUsage = Convert.ToInt32(Days);
+                         return TotalUsage;
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return 0; 
+                }
+
+            }
+            else
+            {
+                 return 0;
+            }
+        }
+
+
+        private MicaCDDTO ADMonthlySI(List<CalculationResult> EndoRatingObject)
+        {
+            MicaCDDTO CdModel = new MicaCDDTO();
+            CDPremiumDTO ADPremiumDTO = new CDPremiumDTO();
+            CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
+            CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
+            decimal TotalTax = 0;
+            //AD TAX
+            //From State 
+            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+            TotalTax = taxTypeDTO.TaxAmount;
+
+            //ARRAY
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+            taxTypeDTO = new CDTaxTypeDTO();
+
+            //TO State
+            taxTypeDTO.Type = EndoRatingObject.FirstOrDefault(x => x.Entity == "TSTTAX_TAXTYPE").EValue;
+            taxTypeDTO.TaxAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+            TotalTax += taxTypeDTO.TaxAmount;
+
+
+            taxAmountDTO.TaxAmount = TotalTax;
+            taxAmountDTO.Tax.Add(taxTypeDTO);
+
+
+            //AD
+            ADPremiumDTO.Type = "AD";
+            ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+            ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+            ADPremiumDTO.TaxAmount = taxAmountDTO;
+            
+
+            ////AD Credit Object
+
+            CdModel.PremiumDTO.Add(ADPremiumDTO);            
+            CdModel.Type = "MonthlySIScheduler";
+            CdModel.TxnType = "Credit";
+            CdModel.TxnAmount = ADPremiumDTO.TxnAmount;
+            CdModel.TaxAmount = TotalTax;
+            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+
+            return CdModel;
+
+        }
 
     }
 }
