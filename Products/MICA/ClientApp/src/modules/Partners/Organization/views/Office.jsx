@@ -27,7 +27,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import swal from 'sweetalert';
-
+import partnerconfig from "modules/Partners/PartnerConfig.js";
+import $ from 'jquery';
 const CustomTableCell = withStyles(theme => ({
     head: {
         backgroundColor: "#00acc1",
@@ -304,14 +305,14 @@ class Profile extends React.Component {
     };
 
     GetLocation = (type, addType, event) => {
-      
+     
         console.log("addType", addType);
         if (addType != 'spoc') {
             this.SetValue(type, event);
         }
       
         let reg = this.state.addressDTO[addType];
-        console.log("reg", reg);
+        console.log("regAdress", reg);
         console.log("regtype", addType);
         let name = event.target.name;
         let value = event.target.value;
@@ -325,7 +326,8 @@ class Profile extends React.Component {
 
     GetLocationService = (type, pID) => {
         console.log("off");
-        fetch(`https://inubeservicespartners.azurewebsites.net/api/Organization/GetLocation?locationType=` + type + `&parentID=` + pID, {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetLocation?locationType=` + type + `&parentID=` + pID, {
+       // fetch(`https://inubeservicespartners.azurewebsites.net/api/Organization/GetLocation?locationType=` + type + `&parentID=` + pID, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -352,23 +354,23 @@ class Profile extends React.Component {
         offceDTO['tblOfficeSpocDetails'] = address;
         this.setState({ offceDTO });
         console.log("table office", this.state.officeDTO);
-
+        
+            fetch(`${partnerconfig.partnerconfigUrl}/api/Office/CreateOffice`, {
        // fetch(`https://localhost:44315/api/Office/CreateOffice`, {
-       fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/CreateOffice`, {
-            method: 'POST',
+            method: 'post',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
-            body: JSON.stringify(this.state.offceDTO)
-        }).then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            console.log('Response data', data);
+                body: JSON.stringify(this.state.offceDTO)
+            }).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                console.log('Response data', data);
                 if (data.status == 1) {
                     swal({
-                      //  title: "Perfect",
+                        //  title: "Perfect",
                         text: data.responseMessage,
                         icon: "success"
                     });
@@ -379,6 +381,44 @@ class Profile extends React.Component {
                     });
                 }
             });
+            //}).then(response => response.json())
+            //    .then(data => {
+            //      //  this.setState({ result: data });
+            //        //console.log(this.state.data, 'AlocPara');
+            //});
+
+   
+
+
+
+    //  //  fetch(`${partnerconfigUrl.partnerconfigUrl}//api/Office/CreateOffice`, {
+    //    fetch(`https://localhost:44315/api/Office/CreateOffice`, {
+    ////   fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/CreateOffice`, {
+    //        method: 'POST',
+    //        headers: {
+    //            'Accept': 'application/json',
+    //            'Content-Type': 'application/json',
+    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+    //        },
+    //       // body: JSON.stringify(data)
+    //        body: JSON.stringify(this.state.offceDTO)
+    //    }).then(function (response) {
+    //        return response.json();
+    //    }).then(function (data) {
+    //        console.log('Response data', data);
+    //            if (data.status == 1) {
+    //                swal({
+    //                  //  title: "Perfect",
+    //                    text: data.responseMessage,
+    //                    icon: "success"
+    //                });
+    //            } else if (data.status == 8) {
+    //                swal({
+    //                    text: data.errors[0].errorMessage,
+    //                    icon: "error"
+    //                });
+    //            }
+    //        });
     }
     searchofficebtn = () => {
         this.setState({ open: true });
@@ -386,7 +426,9 @@ class Profile extends React.Component {
     }
 
     tableshow = () => {
-        fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/GetOffice?officeID=` + this.state.officeId, {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/GetOffice?officeID=` + this.state.officeId, {
+        //fetch(`https://localhost:44315/api/Office/GetOffice?officeID=` + this.state.officeId, {
+       // fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/GetOffice?officeID=` + this.state.officeId, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -406,11 +448,14 @@ class Profile extends React.Component {
 
     };
     componentDidMount() {
+        debugger
         // $.getJSON('api/SampleData/GetDropDownFromList', function (response) {
         //     console.log(response);
         // });
 
-        fetch(`https://inubeservicespartners.azurewebsites.net/api/Organization/GetMasterData?sMasterlist=OrgCategory`, {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetMasterData?sMasterlist=OrgCategory`, {
+       // fetch(`https://localhost:44315/api/Organization/GetMasterData?sMasterlist=OrgCategory`, {
+        //fetch(`https://inubeservicespartners.azurewebsites.net/api/Organization/GetMasterData?sMasterlist=OrgCategory`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -423,7 +468,9 @@ class Profile extends React.Component {
                 this.setState({ masterList: data });
                 console.log("organizationId", data);
             });
-        fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/GetAllOffice`, {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/GetAllOffice`, {
+      //  fetch(`https://localhost:44315/api/Office/GetAllOffice`, {
+     //   fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/GetAllOffice`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -436,7 +483,7 @@ class Profile extends React.Component {
                 console.log("recived", data);
                 this.setState({ list: data });
             });
-        console.log("recived1", this.state.list);
+      //  console.log("recived1", this.state.list);
 
         this.GetLocationService('Country', 0);
         if (this.props.offdata != null) {
@@ -499,9 +546,10 @@ class Profile extends React.Component {
                     <div style={{ marginLeft: '28%' }} >
                         <Button color="info" onClick={this.handleofficeSub} id="round">Submit</Button>
                     </div>
+                    {/*
                     <div style={{ marginLeft: '28%' }} >
                         <Button color="danger" id="round">Cancel</Button>
-                    </div>
+                    </div>*/}
                 </GridContainer>
             </div>
         );

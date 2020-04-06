@@ -34,7 +34,9 @@ import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import searchproduct from "assets/img/search-product.png";
 import Profile from "./Office.jsx";
-import ReactTable from "react-table";
+//import ReactTable from "react-table";
+import "react-table/react-table.css";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
 
 
 //import ReactTables from "./ReactTables.jsx"
@@ -118,7 +120,7 @@ class SearchOffice extends React.Component {
             react: false,
             orgid: "",
             open: false,
-            officeId: "",
+            OfficeCode: "",
             officelist: [],
             officesendlist: [],
             newofficesendlist: [],
@@ -141,10 +143,10 @@ class SearchOffice extends React.Component {
 
         let value = event.target.value;
 
-        let { officeId } = this.state;
+        let { OfficeCode } = this.state;
         // officeId = value;
-        this.setState({ officeId: value });
-        console.log("office id ", this.state.officeId);
+        this.setState({ OfficeCode: value });
+        console.log("OfficeCode ", this.state.OfficeCode);
 
     };
     editFunction(id, oid) {
@@ -176,8 +178,8 @@ class SearchOffice extends React.Component {
 
     tableshow = () => {
         this.setState({ showtable: true });
-        fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/SearchOffice?officeID=` + this.state.officeId, {
-            //  fetch(`https://localhost:44315/api/Office/SearchOffice?officeID=` + this.state.officeId,{
+        fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode, {
+            //  fetch(`https://localhost:44315/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode,{
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -330,9 +332,9 @@ class SearchOffice extends React.Component {
                         <GridContainer>
 
                             <GridItem xs={12} sm={12} md={4}> <CustomInput
-                                labelText="Office ID"
-                                name="officeId"
-                                value={this.state.officeId}
+                                labelText="Office Code"
+                                name="OfficeCode"
+                                value={this.state.OfficeCode}
                                 onChange={(e) => this.SetValue("office", e)}
                                 formControlProps={{
                                     fullWidth: true

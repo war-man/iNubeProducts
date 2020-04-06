@@ -118,6 +118,7 @@ const RegAddress = (props) => {
 
     else if (data == "offAddress") {
         addType = 'off';
+        //debugger
         //console.log("regdata",regData);
         Country = regData.LocationDTO.Country;
         State = regData.LocationDTO.State;
@@ -132,7 +133,7 @@ const RegAddress = (props) => {
         addLine1 = regData.addressDTO.off.officeAddressLine1;
         addLine2 = regData.addressDTO.off.officeAddressLine2;
         addLine3 = regData.addressDTO.off.officeAddressLine3;
-        //console.log("value off", countryValue);
+        console.log("value off", countryValue);
     }
     else if (data == "spocDet") {
         addType = 'spoc';
@@ -217,17 +218,18 @@ const RegAddress = (props) => {
         addLine2Name = 'partnerAddressLine2';
         addLine3Name = 'partnerAddressLine3';
     }
-    //} else if (data == "offAddress") {
-    //    countryName = 'officeCountryId';
-    //    stateName = 'officeStateId';
-    //    distName = 'officeDistrictId';
-    //    cityName = 'officeCityId';
-    //    pinCodeName = 'officePincodeId';
-    //    addLine1Name = 'officeAddressLine1';
-    //    addLine2Name = 'officeAddressLine2';
-    //    addLine3Name = 'officeAddressLine3';
-    //}
-    console.log(countryValue);
+   else if (data == "offAddress") {
+   // debugger
+        countryName = 'officeCountryId';
+        stateName = 'officeStateId';
+        distName = 'officeDistrictId';
+        cityName = 'officeCityId';
+        pinCodeName = 'officePincodeId';
+        addLine1Name = 'officeAddressLine1';
+        addLine2Name = 'officeAddressLine2';
+        addLine3Name = 'officeAddressLine3';
+    }
+console.log("Cname",countryName,countryValue);
 
     return (
         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
@@ -402,7 +404,6 @@ const RegAddress = (props) => {
                             </div>
                         </div>
                     </GridItem> : ""}
-
 
                 <GridContainer id="regAddress" disabled={true}>
                     <GridItem xs={12} sm={12} md={4}>

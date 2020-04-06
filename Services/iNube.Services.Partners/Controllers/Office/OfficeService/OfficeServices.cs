@@ -14,9 +14,9 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
     public interface IOfficeService
     {
         Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext);
-        Task<OrgOfficeDTO> GetOffice(int officeID, ApiContext apiContext);
+        Task<OrgOfficeDTO> GetOffice(string OfficeCode, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext);
-        Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(int officeID, ApiContext apiContext);
+        Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(string OfficeCode, ApiContext apiContext);
 
         int TestMethod();
     }
@@ -38,13 +38,13 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             return await _officeProductService(apiContext.ProductType).CreateOffice(officeDTO, apiContext);
         }
 
-        public async Task<OrgOfficeDTO> GetOffice(int officeID, ApiContext apiContext)
+        public async Task<OrgOfficeDTO> GetOffice(string OfficeCode, ApiContext apiContext)
         {
-            return await _officeProductService(apiContext.ProductType).GetOffice(officeID, apiContext);
+            return await _officeProductService(apiContext.ProductType).GetOffice(OfficeCode, apiContext);
         }
-        public async Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(int officeID, ApiContext apiContext)
+        public async Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(string OfficeCode, ApiContext apiContext)
         {
-            return await _officeProductService(apiContext.ProductType).SearchOfficeData(officeID, apiContext);
+            return await _officeProductService(apiContext.ProductType).SearchOfficeData(OfficeCode, apiContext);
         }
         public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
         {

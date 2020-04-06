@@ -32,9 +32,12 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
 //import bindModel from 'components/ModelBinding/bindModel.js';
 import $ from 'jquery';
 import swal from 'sweetalert';
-import ReactTable from "react-table";
+//import ReactTable from "react-table";
 import searchproduct from "assets/img/search-product.png";
 import Organization from "./Organization.jsx";
+import "react-table/react-table.css";
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
+
 
 const styles = theme => ({
     paper: {
@@ -59,6 +62,9 @@ class SearchOrganization extends React.Component {
             rowData: {},
             orgId: "",
             orglist: [],
+
+            dataLength: [],
+
             open: false,
             searchOrg: {
                 "organizationId": 0,
@@ -151,7 +157,8 @@ class SearchOrganization extends React.Component {
             .then(data => {
                 this.setState({ orglist: data })
                 this.setState({
-                    data: this.state.orglist.map((prop, key) => {
+                    dataLength: this.state.orglist.map((prop, key) => {
+                      //  console.log("Orgdata", dataLength);
                         const { classes } = this.props;
                         return {
                             orgid: prop.organizationId,
@@ -162,6 +169,7 @@ class SearchOrganization extends React.Component {
                             radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.organizationId)} />
                         };
                     })
+                    
                 });
             });
     }
@@ -272,7 +280,8 @@ class SearchOrganization extends React.Component {
                                 </GridItem>
                                 <GridContainer>
                                     <GridItem className="search-bnt" xs={3} sm={3} md={3}>
-                                        <Button color="info" round className={classes.marginRight} onClick={this.SearchOrg}>
+                                        <Button style={{ marginTop: "1rem" }} className={classes.marginRight}  id="button-search-partner" color="info" onClick={this.SearchOrg}>
+                                   
                                             Search Organization
                                 </Button>
                                     </GridItem>
@@ -282,9 +291,9 @@ class SearchOrganization extends React.Component {
                                 <div id="searchTableSec" style={{ display: 'none' }}>
                                     <br />
                                     <GridItem xs={12}>
-                                        <CardBody className="search-organization">
+                                        <CardBody>
                                             <ReactTable
-                                                data={this.state.data}
+                                                data={this.state.dataLength}
                                                 filterable
                                                 columns={[
                                                     {
@@ -302,38 +311,39 @@ class SearchOrganization extends React.Component {
                                                         Header: "Organization Name",
                                                         accessor: "orgName",
                                                         //style: { textAlign: "center" },
-                                                        // minWidth: 150,
+                                                        // minWidth: 35,
                                                         //headerClassName: 'react-table-center'
                                                     },
                                                     {
                                                         Header: "Website",
                                                         accessor: "orgWebsite",
                                                         //style: { textAlign: "center" },
-                                                        //minWidth: 150,
-                                                        //headerClassName: 'react-table-center'
+                                                       // minWidth: 75,
+                                                         //headerClassName: 'react-table-center'
                                                     },
                                                     {
                                                         Header: "Phone Number",
                                                         accessor: "orgPhoneNo",
                                                         //style: { textAlign: "center" },
-                                                        // minWidth: 150,
+                                                      //  minWidth: 35,
                                                         //headerClassName: 'react-table-center'
                                                     },
                                                     {
                                                         Header: "Registration Number",
                                                         accessor: "orgRegistrationNo",
                                                         //style: { textAlign: "center" },
-                                                        // minWidth: 150,
+                                                       // minWidth: 35,
                                                         //headerClassName: 'react-table-center'
                                                     },
 
                                                 ]}
                                                 defaultPageSize={5}
                                                 showPaginationTop={false}
-                                                pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
-                                                showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                              pageSize={([this.state.dataLength.length + 1] < 5) ? [this.state.dataLength.length + 1] : 5}
+                                              showPaginationBottom={([this.state.dataLength.length + 1] <= 5) ? false : true}
                                                 className="-striped -highlight"
                                             />
+
                                         </CardBody>
 
                                     </GridItem>

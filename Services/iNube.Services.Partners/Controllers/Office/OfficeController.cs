@@ -59,18 +59,18 @@ namespace iNube.Services.Partners.Controllers.Office
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOffice(int officeID)
+        public async Task<IActionResult> GetOffice(string OfficeCode)
 
         {
-            OrgOfficeDTO _OfficeDTOs =await _officeService.GetOffice(officeID,Context);
+            OrgOfficeDTO _OfficeDTOs =await _officeService.GetOffice(OfficeCode, Context);
             
             return Ok(_OfficeDTOs);
         }
         [HttpGet]
-        public async Task<IActionResult> SearchOffice(int officeID)
+        public async Task<IActionResult> SearchOffice(string OfficeCode)
 
         {
-            var _OfficeDTOs =await _officeService.SearchOfficeData(officeID, Context);
+            var _OfficeDTOs =await _officeService.SearchOfficeData(OfficeCode, Context);
 
             return Ok(_OfficeDTOs);
         }

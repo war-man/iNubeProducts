@@ -10,9 +10,9 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
     {
 
         Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO,ApiContext apiContext);
-        Task<OrgOfficeDTO> GetOffice(int officeID, ApiContext apiContext);
+        Task<OrgOfficeDTO> GetOffice(string OfficeCode, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext);
-        Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(int officeID, ApiContext apiContext);
+        Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(string OfficeCode, ApiContext apiContext);
 
         int TestMethod();
     }
