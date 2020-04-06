@@ -33,6 +33,7 @@ phases:
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
+      - aws s3 sync s3://codepipeline-ap-south-1-296688833593/iNube-Billing-CI.zip s3://codepipeline-ap-south-1-536439774410/
     
   
 artifacts:
