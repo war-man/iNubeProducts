@@ -10,13 +10,13 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
 import Icon from "@material-ui/core/Icon";
 import ReactTable from "components/MuiTable/MuiTable.jsx";
-//import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
+import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import $ from 'jquery';
 import money from "assets/img/money.png";
 import swal from 'sweetalert';
-import CustomDatetime from "components/CustomComponent/CustomDatetimeFormate.jsx";
+//import CustomDatetime from "components/CustomComponent/CustomDatetimeFormate.jsx";
 
 import Visibility from "@material-ui/icons/Visibility";
 import GetApp from "@material-ui/icons/GetApp";
@@ -162,28 +162,37 @@ class ReportExecution extends React.Component {
         console.log(this.state.paramList, "Array List");
     };
 
-    //onDateChange = (formate, name, event) => {
-    //    var today = event.toDate();
-    //    if (today.getDate() < 10) {
-    //        var dt = '0' + today.getDate();
-    //    }
-    //    else {
-    //        var dt = today.getDate();
-    //    }
-    //    if (today.getMonth() < 10) {
-    //        var mm = '0' + (today.getMonth() + 1)
-    //    }
-    //    else {
-    //        var mm = (today.getMonth() + 1);
-    //    }
-    //    var date = dt + '/' + mm + '/' + today.getFullYear();
-    //    var date2 = new Date();
-    //    var date1 = new Date(today);
-    //    let state = this.state.fields;
-    //    state[name] = date;
-    //    this.setState({ state });
+    onDateChange = (formate, name, event) => {
+        debugger;
+        var today = event.toDate();
+        if (today.getDate() < 10) {
+            var dt = '0' + today.getDate();
+        }
+        else {
+            var dt = today.getDate();
+        }
+        if (today.getMonth() < 10) {
+            var mm = '0' + (today.getMonth() + 1)
+        }
+        else {
+            var mm = (today.getMonth() + 1);
+        }
+        var date = dt + '/' + mm + '/' + today.getFullYear();
+          //  + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+        var date2 = new Date();
+        var date1 = new Date(today);
+        //let state = this.state.CheckCondition;
+        //state[name] = date;
+        //this.setState({ state });
 
-    //};
+        // var today = event.toDate();
+        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+            //+ ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+
+        var fields = this.state.CheckCondition;
+        fields[name] = date;
+        this.setState({ fields });
+    };
 
     handleParameterCheck = event => {
         let param = this.state.paramList;
@@ -291,7 +300,8 @@ class ReportExecution extends React.Component {
             });
     }
 
-    onDateChange = (name, event) => {
+    
+    /*onDateChange = (name, event) => {
         var today = event.toDate();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
 
@@ -306,7 +316,7 @@ class ReportExecution extends React.Component {
         dparam[name] = tempDate;
         this.setState({ dparam });
         console.log("fields", fields);
-    };
+    };*/
 
     reset = () => {
         //let check = this.state.CheckCondition;
@@ -407,15 +417,27 @@ class ReportExecution extends React.Component {
                                                                             }
                                                                             else {
                                                                                 return (
-                                                                                    <GridItem xs={12} sm={12} md={3} key={index}>
-                                                                                        <CustomDatetime style="ddl"
+                                                                                    //<GridItem xs={12} sm={12} md={3} key={index}>
+                                                                                    //    <CustomDatetime
+                                                                                    //        //style="ddl"
+                                                                                    //        labelText={item.parameterName}
+                                                                                    //        id='dob'
+                                                                                    //        //Futuredatevalidate={true}
+                                                                                    //        name={item.parameterName}
+                                                                                    //        onChange={(evt) => this.onDateChange('datetime',item.parameterName, evt)}
+                                                                                    //        value={this.state.CheckCondition[item.parameterName]}
+                                                                                    //        formControlProps={{ fullWidth: true }} />
+                                                                                    //</GridItem>
+
+                                                                                    <GridItem xs={12} sm={12} md={4}>
+                                                                                        <CustomDatetime
                                                                                             labelText={item.parameterName}
-                                                                                            id='dob'
-                                                                                            //Futuredatevalidate={true}
+                                                                                            id='date'
                                                                                             name={item.parameterName}
-                                                                                            onChange={(evt) => this.onDateChange(item.parameterName, evt)}
+                                                                                            onChange={(evt) => this.onDateChange('datetime', item.parameterName, evt)}
                                                                                             value={this.state.CheckCondition[item.parameterName]}
                                                                                             formControlProps={{ fullWidth: true }} />
+
                                                                                     </GridItem>
                                                                                 )
                                                                             }
