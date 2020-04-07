@@ -72,7 +72,7 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<ClaimDataDTO, TblClaims>()
             .ForMember(dest => dest.TblClaimInsurable, opt => opt.MapFrom(src => src.ClaimInsurable))
             .ForMember(dest => dest.TblBankAccounts, opt => opt.MapFrom(src => src.BankAccounts))
-            .ForMember(dest => dest.TblClaimPayments, opt => opt.MapFrom(src => src.ClaimPayments))
+            //.ForMember(dest => dest.TblClaimPayments, opt => opt.MapFrom(src => src.ClaimPayments))
             .ForMember(dest => dest.TblClaimdoc, opt => opt.MapFrom(src => src.Alldoc))
             .ForMember(dest => dest.LossId, opt => opt.MapFrom(src => src.lossIntimatedBy))
             .ForMember(dest => dest.LocationOfEvent, opt => opt.MapFrom(src => src.locationOfLoss))
@@ -91,7 +91,7 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<ClaimInsurableDTO, TblClaimInsurable>()
                 .ForMember(dest => dest.TypeOfLoss, opt => opt.MapFrom(src => src.CoverName)).ReverseMap();
 
-            
+
             CreateMap<TblClaimdoc, Alldoc>()
                 .ForMember(dest => dest.DocumentID, opt => opt.MapFrom(src => src.DmsdocId))
                 .ForMember(dest => dest.FileName, opt => opt.MapFrom(src => src.DocumentName))
@@ -124,7 +124,7 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<TblClaimdoc, ClaimdocDTO>();
             CreateMap<ClaimdocDTO, TblClaimdoc>();
 
-           
+
 
             //CreateMap<TblClaimdoc, ClaimdocumentDTO>();
             //CreateMap<ClaimdocumentDTO, TblClaimdoc>();
