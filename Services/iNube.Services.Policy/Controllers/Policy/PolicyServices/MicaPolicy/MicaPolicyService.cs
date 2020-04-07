@@ -5078,6 +5078,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     micaCD.micaCDDTO = CDmap;
                                     micaCD.Description = "Endorsement-Cancellation-" + EndorsementNo;
 
+                                    DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+                                    //Refund Txn
+                                    PolicyCancelRequest policyCancelRequest = new PolicyCancelRequest();
+                                    policyCancelRequest.EffectiveDate = DatetimeNow;
+                                    policyCancelRequest.CancelRequestDate = DatetimeNow;
+                                    policyCancelRequest.PolicyNumber = tbl_particiant.PolicyNo;
+                                    PolicyCancelResponse RefundDetails = await _integrationService.GetRefundDetails(policyCancelRequest,apiContext);
+
+
                                     //Replace Premium details
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
                                     expObj.PremiumDetails = CDmap;
@@ -5101,8 +5111,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                     }
                                     //Endrosment
-                                    DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
-
+                                 
 
 
                                     string EndorsmentType = "Cancel Policy";
@@ -5120,7 +5129,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
                                   
                                  
-
+                                    
                                     tbl_particiant.IsActive = false;
                                     tbl_particiant.PolicyStatus = ModuleConstants.PolicyCancelStatus;
                                     tbl_particiant.PolicyStatusId = ModuleConstants.PolicyStatusCancelled;
@@ -5131,13 +5140,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                                    //Refund Txn
-                                    PolicyCancelRequest policyCancelRequest = new PolicyCancelRequest();
-                                    policyCancelRequest.EffectiveDate = DatetimeNow;
-                                    policyCancelRequest.CancelRequestDate = DatetimeNow;
-                                    policyCancelRequest.PolicyNumber = tbl_particiant.PolicyNo;
-                                    PolicyCancelResponse RefundDetails = await _integrationService.GetRefundDetails(policyCancelRequest,apiContext);
-
+                                   
 
                                     PolicyRefund policyRefund = new PolicyRefund();
                                     policyRefund.EndorsementEffectivedate = DatetimeNow;
@@ -5164,7 +5167,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         //Success
                                     }
 
-                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
+                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow.ToString("dd/mm/yyyy hh:mm:ss")} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
 
                                 }
                                 else

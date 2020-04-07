@@ -1562,6 +1562,20 @@ class InboxClaimProcess extends React.Component {
                     that.setState({ vehicleActivitydata: data.vehicleData });
                     that.ActivityTableHeader(data.vehicleData[0].activityDTOs);
                 }
+                else {
+                    swal({
+
+                        text: data.responseMessage,
+                        icon: "error"
+                    });
+                }
+            } else if (status == 8) {
+
+                swal({
+
+                    text: data.responseMessage,
+                    icon: "error"
+                });
             }
             console.log("vehicleActivitydata", that.state.vehicleActivitydata);
            
