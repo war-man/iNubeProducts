@@ -1716,7 +1716,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     claimPayments.AmountPaid = item["Amount Paid"];
                     claimPayments.DataOfPayment = item["Date Of Payment"];
                     claimPayments.PayeeType = item.type;
-                    //_context.TblClaimPayments.Add(claimPayments);                    //_context.TblClaimPayments.Add(claimPayments);
+                    _context.TblClaimPayments.Add(claimPayments);
                     //}
                 }
 
