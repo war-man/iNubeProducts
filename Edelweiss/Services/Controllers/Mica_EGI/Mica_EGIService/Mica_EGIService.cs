@@ -34,7 +34,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
         List<ddDTO> GetVehicleMaster(string lMasterlist);
-        Task<BillingResponse> BillingDetails(string PolicyNo, string Month,int Year);
+        Task<BillingResponse> BillingDetails(string PolicyNo, string Month, int Year);
         Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata);
         TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
 
@@ -86,7 +86,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
             GetScheduleResponse response = new GetScheduleResponse();
 
-            var Check = CheckPolicyStatus(PolicyNo);          
+            var Check = CheckPolicyStatus(PolicyNo);
 
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
@@ -218,7 +218,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 errorInfo.PropertyName = "PolicyCancelled";
                 response.Errors.Add(errorInfo);
                 return response;
-            }          
+            }
 
             if (String.IsNullOrEmpty(scheduleDTO.PolicyNo))
             {
@@ -299,8 +299,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 _context.SaveChanges();
 
-                response.ScheduleDTO = scheduleDTO;                
-                 return response;
+                response.ScheduleDTO = scheduleDTO;
+                return response;
             }
             else
             {
@@ -732,7 +732,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
         public async Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff)
-        {         
+        {
 
             string VehicleRegistrationNo = switchOnOff.VehicleRegistrationNo;
             string PolicyNo = switchOnOff.PolicyNo;
@@ -1177,7 +1177,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     decimal ADPERDAY = 0;
                     decimal ADFROMTAXPERDAY = 0;
                     decimal ADTOTAXPERDAY = 0;
-                  
+
                     try
                     {
 
@@ -1185,7 +1185,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         {
                             DeserilizedPremiumData = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
                         }
-                    }catch(Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
 
@@ -1265,8 +1266,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             response.Errors.Add(errorInfo);
 
                             return response;
-                        }                     
-                       
+                        }
+
                         var NewPremium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                         TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
@@ -1873,7 +1874,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
             TblDailyActiveVehicles dailyActiveVehicles = new TblDailyActiveVehicles();
             TblScheduleReport scheduleReport = new TblScheduleReport();
-            
+
             scheduleReport.ScheduleStartDate = IndianTime;
             scheduleReport.SuccessCount = 0;
             scheduleReport.FailCount = 0;
@@ -1884,9 +1885,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             var ReportID = scheduleReport.ReportId;
-         
+
             var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
-         
+
             foreach (var policy in PolicyNumberList)
             {
 
@@ -2025,13 +2026,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 if (DeserilizedPremiumData.Count() > 0)
-                {                  
+                {
                     //ADPMPD IS THE PER DAY AD RATE CONFIG IN RATING CONFIG MODULE
                     ADPERDAY = Convert.ToDecimal(DeserilizedPremiumData.FirstOrDefault(x => x.Entity == "ADPMPD").EValue);
 
 
                     EndorsementCalDTO endorsementCal = new EndorsementCalDTO();
-                    
+
                     //Rule
                     endorsementCal.dictionary_rule.FT = "0";
                     endorsementCal.dictionary_rule.FTDAYS = "0";
@@ -2080,7 +2081,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         continue;
                     }
-                                       
+
                     var Premium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Success";
@@ -2452,9 +2453,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return obj;
         }
 
-        public async Task<BillingResponse> BillingDetails(string PolicyNo, string Month,int Year)
+        public async Task<BillingResponse> BillingDetails(string PolicyNo, string Month, int Year)
         {
-           
+
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
             var CurrentMonth = IndianTime.Month;
@@ -2508,7 +2509,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (CdDailyDTO.Status == BusinessStatus.Ok)
                 {
                     billingDTO.BalanceCarryForward = CdDailyDTO.AvailableAmount;
-                }else
+                }
+                else
                 {
                     billingDTO.BalanceCarryForward = 0;
                 }
@@ -2592,7 +2594,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 else
                 {
                     billingDTO.Billing = 0;
-                    billingDTO.Gst =0;
+                    billingDTO.Gst = 0;
                     billingDTO.Total = 0;
                 }
 
@@ -2601,7 +2603,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 response.Status = BusinessStatus.Ok;
                 return response;
 
-            }             
+            }
             else
             {
                 response.ResponseMessage = "Null/Empty Inputs";
@@ -2693,7 +2695,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (EndoresementSI != null)
                 {
                     SumInsured = EndoresementSI;
-                }                
+                }
 
                 PolicyNumber = EndorsmentItem["Data"]["PolicyNumber"];
                 BillingFrequency = PolicyData["billingFrequency"].ToString();
@@ -2815,7 +2817,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 MicaCDDTO MICACDModel = new MicaCDDTO();
 
-                PolicyCancelReturnDto CallCancleCalculator = await PolicyCancellationCalculator(null,SourceObject);
+                PolicyCancelReturnDto CallCancleCalculator = await PolicyCancellationCalculator(null, SourceObject);
 
                 PolicyNumber = (string)SourceObject["PolicyNumber"];
 
@@ -2885,7 +2887,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
 
-                var FTModel =  PolicyCancelFT(CallCancleCalculator);
+                var FTModel = PolicyCancelFT(CallCancleCalculator);
 
                 MICACDModel = new MicaCDDTO();
                 MICACDModel.PremiumDTO.Add(FTModel);
@@ -3209,7 +3211,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             CDPremiumDTO FTYearlyObj = new CDPremiumDTO();
             CDTaxAmountDTO taxAmountDTO = new CDTaxAmountDTO();
             CDTaxTypeDTO taxTypeDTO = new CDTaxTypeDTO();
-                      
+
 
             decimal TotalTax = 0;
             //AD TAX
@@ -3335,7 +3337,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //Cumulative AD-PerDay [Without Tax] [Rating Module] -- NEW PREMIUM FROM ENDORSEMENT 
                 var CumAdPerDay = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "NewADPerDay").EValue);
-                
+
 
                 ////AD & FT Credit Object
 
@@ -3417,10 +3419,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
                 ADPremiumDTO.TaxAmount = taxAmountDTO;
 
-     
-	 
-	 
-	            CdModel.PremiumDTO.Add(ADPremiumDTO);
+
+
+
+                CdModel.PremiumDTO.Add(ADPremiumDTO);
                 CdModel.Type = "EndorsementDel";
                 CdModel.TxnType = "Balance";
                 CdModel.FtPerDay = FtPerDay;
@@ -3428,7 +3430,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.CumFtPerDay = CumFtPerDay;
                 CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = ADPremiumDTO.TxnAmount;
-                CdModel.TaxAmount =  taxAmountDTO.TaxAmount;
+                CdModel.TaxAmount = taxAmountDTO.TaxAmount;
                 CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
                 FinalDto.Add(CdModel);
 
@@ -4248,7 +4250,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     //After
                     //Because the Difference is not relevant in this vehicle deletion case - ravi sir 
                     var DifferentialADPremium = 0;
-                    
+
                     EndoRuleDTO endoRule = new EndoRuleDTO
                     {
                         AD = DifferentialADPremium.ToString(),
@@ -4327,7 +4329,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         //    DifferentialPremium.Total = Math.Round((DifferentialPremium.FireTheft + DifferentialPremium.ADPremium + DifferentialPremium.GST), 2);
                         //    DifferentialPremium.FinalAmount = Math.Round(DifferentialPremium.Total);
                         //}
-                                               
+
                     }
 
                     DifferentialPremium.Status = BusinessStatus.Ok;
@@ -4470,7 +4472,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber,dynamic PolicyObject)
+        public async Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber, dynamic PolicyObject)
         {
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
@@ -4492,7 +4494,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 //Get the Policy Details by PolicyNumber
                 //In response from Policy
-                 PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
+                PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
             }
             else
             {
@@ -4554,7 +4556,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             EndorsementCalDTO endorsementCalDTO = new EndorsementCalDTO();
-          
+
             var CallRatingCalculator = await NewInternalCalculatePremium(premiumDTO, BillingFrequency);
 
 
@@ -4565,7 +4567,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             endorsementCalDTO.dictionary_rule.FT = CallRatingCalculator.FtPerDay.ToString();
             endorsementCalDTO.dictionary_rule.FTDAYS = RemainingDays.ToString(); //Get from Policy Object
             endorsementCalDTO.dictionary_rule.AD = "0";
-            endorsementCalDTO.dictionary_rule.ADDAYS= "0";
+            endorsementCalDTO.dictionary_rule.ADDAYS = "0";
 
             cancelReturnDto.FtPerDay = CallRatingCalculator.FtPerDay;
             cancelReturnDto.AdPerDay = CallRatingCalculator.AdPerDay;
@@ -4577,7 +4579,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             cancelReturnDto.ToTaxType = premiumDTO.dictionary_rate.TSTTAX_TAXTYPE;
             cancelReturnDto.FireTheft = Math.Round(Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTPREM").EValue) * (-1), 2);
             cancelReturnDto.FTFromTax = Math.Round(Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTFMTAX").EValue) * (-1), 2);
-            cancelReturnDto.FTToTax = Math.Round(Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue) * (-1),2);
+            cancelReturnDto.FTToTax = Math.Round(Convert.ToDecimal(CallEndoCalculator.FirstOrDefault(x => x.Entity == "FTTSTAX").EValue) * (-1), 2);
             cancelReturnDto.Total = cancelReturnDto.FireTheft + cancelReturnDto.FTFromTax + cancelReturnDto.FTToTax;
             cancelReturnDto.FinalTotal = Math.Round(cancelReturnDto.Total);
 
@@ -4590,7 +4592,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<ResponseVehicleActivity> GetVehicleActivity(VehicleActivityDTO vehicleActivity,ApiContext apiContext)
+        public async Task<ResponseVehicleActivity> GetVehicleActivity(VehicleActivityDTO vehicleActivity, ApiContext apiContext)
         {
 
             ResponseVehicleActivity response = new ResponseVehicleActivity();
@@ -4604,10 +4606,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (!string.IsNullOrEmpty(vehicleActivity.ClaimNumber))
                 {
                     var claim = await _integrationService.GetClaimByNumber(vehicleActivity.ClaimNumber, apiContext);
-                    if(claim != null)
+                    if (claim != null)
                     {
-                        clmDate =(DateTime) claim.CreatedDate;
-                        if(claim.PolicyNumber != vehicleActivity.PolicyNumber)
+                        clmDate = (DateTime)claim.CreatedDate;
+                        if (claim.PolicyNumber != vehicleActivity.PolicyNumber)
                         {
                             ErrorInfo errorInfo = new ErrorInfo();
                             response.ResponseMessage = $"Mismatch between data requested --PolicyNumber {vehicleActivity.PolicyNumber} and Claim PolicyNumber {claim.PolicyNumber} are different!!";
@@ -4626,16 +4628,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                  .Select(x => new VehActivityDTO
                                                  {
                                                      DateTime = x.CreatedDate,
-                                                    // VehicleNo = x.VehicleNumber,Status
-                                                    // SwitchState = x.SwitchStatus.ToString(),
-                                                    TriggerSwitch = x.SwitchType,
+                                                     // VehicleNo = x.VehicleNumber,Status
+                                                     // SwitchState = x.SwitchStatus.ToString(),
+                                                     TriggerSwitch = x.SwitchType,
                                                      Activity = Convert.ToBoolean(x.SwitchStatus) ? "Switch On" : "Switch Off",
                                                      Status = Convert.ToBoolean(x.SwitchStatus) ? "Active" : "Inactive"
                                                  }).ToList();
 
                     if (logData.Count > 0)
                     {
-                        vehicle = new VehicleActivity() ;
+                        vehicle = new VehicleActivity();
                         vehicle.VehicleNumber = VehicleNumber;
                         vehicle.activityDTOs.AddRange(logData);
                         response.VehicleData.Add(vehicle);
@@ -4647,7 +4649,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 response.Status = BusinessStatus.Ok;
                 response.ResponseMessage = "Success";
                 return response;
-                
+
             }
             else
             {
@@ -4662,21 +4664,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
         }
-               
+
 
         public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
         {
             var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apiContext);
             // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();
-            var CdaccountNumber=(string)PolicyData["CDAccountNumber"];
+            var CdaccountNumber = (string)PolicyData["CDAccountNumber"];
             var PolicyEndDate = (DateTime)PolicyData["Policy End Date"];
             var BillingFrequency = (string)PolicyData["billingFrequency"];
             PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
 
-            PolicyCancelReturnDto canceldetails =await PolicyCancellationCalculator(policyRequest.PolicyNumber,null);
-            
+            PolicyCancelReturnDto canceldetails = await PolicyCancellationCalculator(policyRequest.PolicyNumber, null);
+
             policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
-                                 
+
             if (CdaccountNumber != null)
             {
                 CDBalanceDTO FTaccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
@@ -4690,7 +4692,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from[QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + policyRequest.PolicyNumber + "'group by Month(CreatedDate) , PolicyNo";
 
-            
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -4704,19 +4706,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     switchadapter.Fill(Switchds, "Query1");
 
                     var Result = Switchds.Tables[0];
-                    var Days = (Result.Rows.Count>0)?Result.Rows[0].ItemArray[0]:0;
+                    var Days = (Result.Rows.Count > 0) ? Result.Rows[0].ItemArray[0] : 0;
 
                     //Total Usage Shown
-                    var usedays= Convert.ToInt32(Days);
+                    var usedays = Convert.ToInt32(Days);
                     // No. of days for AD
-                    if ( BillingFrequency == "Monthly")
+                    if (BillingFrequency == "Monthly")
                         policyCancelResponse.NoofUnusedDays = 60 - usedays;
                     else
                         policyCancelResponse.NoofUnusedDays = 365 - usedays;
 
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
 
             }
             return policyCancelResponse;
@@ -4754,7 +4757,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var check = _context.TblPolicyStatus.Any(x => x.PolicyNumber == PolicyNo);
                 return check;
             }
-               return false;           
+            return false;
         }
 
         public async Task<bool> MonthlySIScheduler(DateTime? dateTime)
@@ -4768,9 +4771,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             if (dateTime != null)
             {
                 CurrentIndianTime = dateTime;
-                CurrentDate = dateTime.Value.Date;            
+                CurrentDate = dateTime.Value.Date;
             }
-            
+
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
             ApiContext apiContext = new ApiContext();
             apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
@@ -4781,12 +4784,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
             DateTime PolicyStartDate, NextMonth, CDFromDate;
-           
+
             //Step-1:Get All Active Policy's 
             var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, apiContext);
 
 
-            if(PolicyDetails == null || PolicyDetails.Count == 0)
+            if (PolicyDetails == null || PolicyDetails.Count == 0)
             {
                 return false;
             }
@@ -4797,62 +4800,64 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             //Step-2:Start the Loop Based On Policy Number
             foreach (var policy in PolicyNumberList)
-            {
-                PolicyStartDate = Convert.ToDateTime(PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).PolicyStartDate);
+            {              
+                try
+                {
 
-                var checkLastBilling = _context.TblPolicyMonthlySi.LastOrDefault(x => x.PolicyNo == policy);
-                
-                //Policy Has Started and has no billing transaction yet
-                if (checkLastBilling == null)
-                {
-                    CDFromDate = PolicyStartDate;
-                    NextMonth = PolicyStartDate.AddMonths(1);
-                    monthlySiDTO.DueDate = NextMonth.AddDays(-1);
-                    monthlySiDTO.ReportCreatedDate = monthlySiDTO.DueDate.Value.AddDays(-2);
-                }
-                else
-                {
-                    //Last Policy Transaction Exsists
-                    DateTime LastMonthDueDate = checkLastBilling.DueDate.Value;
-                    CDFromDate = LastMonthDueDate; //Verify Should it be +1 or not..?!
-                    NextMonth = LastMonthDueDate.AddMonths(1);
-                    monthlySiDTO.DueDate = NextMonth.AddDays(-1);
-                    monthlySiDTO.ReportCreatedDate = monthlySiDTO.DueDate.Value.AddDays(-2);
-                }               
+                    PolicyStartDate = Convert.ToDateTime(PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).PolicyStartDate);
 
-                if (monthlySiDTO.ReportCreatedDate.Value.Date != CurrentDate.Date)
-                {
-                    //Report Date is not matching with the current 
-                    //date so move to next policy.
-                    continue;
-                }
-                else
-                {
-                    //This Policy Number has the Reporting Date today
-                    //so Insert the Monthly SI billing details.
+                    var checkLastBilling = _context.TblPolicyMonthlySi.LastOrDefault(x => x.PolicyNo == policy);
 
-                    CDDetailsRequestDTO detailsRequestDTO = new CDDetailsRequestDTO
+                    //Policy Has Started and has no billing transaction yet
+                    if (checkLastBilling == null)
                     {
-                        PolicyNumber = policy,
-                        FromDate = CDFromDate,
-                        ToDate = CurrentIndianTime,
-                    };
-
-                    //Step-3 Get Entire Policy Details
-                    var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, apiContext);
-
-                    int DaysChargeable = TotalUsage(policy, CDFromDate,CurrentIndianTime.Value);
-
-                    if (CDDetails.Count() > 0 && DaysChargeable > 0)
+                        CDFromDate = PolicyStartDate;
+                        NextMonth = PolicyStartDate.AddMonths(1);
+                        monthlySiDTO.DueDate = NextMonth.AddDays(-1);
+                        monthlySiDTO.ReportCreatedDate = monthlySiDTO.DueDate.Value.AddDays(-2);
+                    }
+                    else
                     {
-                        try
+                        //Last Policy Transaction Exsists
+                        DateTime LastMonthDueDate = checkLastBilling.DueDate.Value;
+                        CDFromDate = LastMonthDueDate; //Verify Should it be +1 or not..?!
+                        NextMonth = LastMonthDueDate.AddMonths(1);
+                        monthlySiDTO.DueDate = NextMonth.AddDays(-1);
+                        monthlySiDTO.ReportCreatedDate = monthlySiDTO.DueDate.Value.AddDays(-2);
+                    }
+
+                    if (monthlySiDTO.ReportCreatedDate.Value.Date != CurrentDate.Date)
+                    {
+                        //Report Date is not matching with the current 
+                        //date so move to next policy.
+                        continue;
+                    }
+                    else
+                    {
+                        //This Policy Number has the Reporting Date today
+                        //so Insert the Monthly SI billing details.
+
+                        CDDetailsRequestDTO detailsRequestDTO = new CDDetailsRequestDTO
                         {
+                            PolicyNumber = policy,
+                            FromDate = CDFromDate,
+                            ToDate = CurrentIndianTime,
+                        };
+
+                        //Step-3 Get Entire Policy Details
+                        var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, apiContext);
+
+                        int DaysChargeable = TotalUsage(policy, CDFromDate, CurrentIndianTime.Value);
+
+                        if (CDDetails.Count() > 0 && DaysChargeable > 0)
+                        {
+
                             decimal ADRatePerDay = 0;
 
                             var CheckEndorsement = CDDetails.Any(x => x.Action == "Addition of vehicle" || x.Action == "Deletion of vehicle");
 
-                            dynamic LatestAction = JsonConvert.DeserializeObject(CDDetails.Select(x=>x).OrderByDescending(x => x.EndorsementEffectivedate).FirstOrDefault().UpdatedResponse);
-                          
+                            dynamic LatestAction = JsonConvert.DeserializeObject(CDDetails.Select(x => x).OrderByDescending(x => x.EndorsementEffectivedate).FirstOrDefault().UpdatedResponse);
+
                             dynamic PolicyData = JsonConvert.DeserializeObject(CDDetails.FirstOrDefault(x => x.Action == "Issue Policy").UpdatedResponse);
 
                             string StateCode = PolicyData["stateCode"];
@@ -4866,7 +4871,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             monthlySiDTO.AuthPayUid = PolicyData["PaymentInfo"][0]["RefrenceNumber"];
 
                             //Total Usage Method
-                            monthlySiDTO.NumberOfDaysChargeable = DaysChargeable;                          
+                            monthlySiDTO.NumberOfDaysChargeable = DaysChargeable;
 
                             if (CheckEndorsement)
                             {
@@ -4877,7 +4882,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                     ADRatePerDay = 0;
                             }
                             else
-                            {                                
+                            {
                                 var AdPerDay = LatestAction["PremiumDetails"][0]["AdPerDay"];
                                 if (AdPerDay != null)
                                     ADRatePerDay = Convert.ToDecimal(AdPerDay.ToString());
@@ -4886,7 +4891,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             }
 
                             //AdPerDay
-                            monthlySiDTO.PerDayPremium = ADRatePerDay;  
+                            monthlySiDTO.PerDayPremium = ADRatePerDay;
 
                             EndorsementCalDTO endorsementCalDTO = new EndorsementCalDTO();
                             //Rate
@@ -4901,10 +4906,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
 
-                            var CalculatePremium = await EndorsementCalculator(endorsementCalDTO); 
+                            var CalculatePremium = await EndorsementCalculator(endorsementCalDTO);
 
-                            if(CalculatePremium.Count > 0)
-                            {                                
+                            if (CalculatePremium.Count > 0)
+                            {
                                 monthlySiDTO.PremiumChargeable = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
 
                                 monthlySiDTO.GstOnPremiumChargeable = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue) + Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
@@ -4917,37 +4922,40 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 monthlySiDTO.Txnid = guid.ToString();
 
                                 var PremiumDetails = ADMonthlySI(CalculatePremium);
-                                monthlySiDTO.PremiumDetails = JsonConvert.SerializeObject(PremiumDetails);                        
-                                
+                                monthlySiDTO.PremiumDetails = JsonConvert.SerializeObject(PremiumDetails);
+
                                 _context.TblPolicyMonthlySi.Add(monthlySiDTO);
                                 _context.SaveChanges();
 
                             }
                             else
                             {
-                               continue;
+                                continue;
                             }
 
 
 
+
                         }
-                        catch (Exception ex)
+                        else
                         {
                             continue;
                         }
-                    }
-                    else
-                    {
-                        continue;
+
                     }
 
                 }
+                catch (Exception ex)
+                {
+                    continue;
+                }
             }
-                return false;
 
-        } 
+            return true;
 
-        private int TotalUsage(string PolicyNo,DateTime FromDate,DateTime ToDate)
+        }
+
+        private int TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate)
         {
             var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
 
@@ -4975,19 +4983,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         //Total Usage Shown
                         int TotalUsage = Convert.ToInt32(Days);
-                         return TotalUsage;
+                        return TotalUsage;
 
                     }
                 }
                 catch (Exception ex)
                 {
-                    return 0; 
+                    return 0;
                 }
 
             }
             else
             {
-                 return 0;
+                return 0;
             }
         }
 
@@ -5027,11 +5035,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
             ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
             ADPremiumDTO.TaxAmount = taxAmountDTO;
-            
+
 
             ////AD Credit Object
 
-            CdModel.PremiumDTO.Add(ADPremiumDTO);            
+            CdModel.PremiumDTO.Add(ADPremiumDTO);
             CdModel.Type = "MonthlySIScheduler";
             CdModel.TxnType = "Credit";
             CdModel.TxnAmount = ADPremiumDTO.TxnAmount;
