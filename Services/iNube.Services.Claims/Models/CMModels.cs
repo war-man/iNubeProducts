@@ -118,7 +118,7 @@ namespace iNube.Services.Claims.Models
     }
     public partial class ClaimProcessResponseDTO : ResponseStatus
     {
-         public ClaimProcessDTO ClaimProcess { get; set; }
+        public ClaimProcessDTO ClaimProcess { get; set; }
     }
     public partial class SearchClaimDTO
     {
@@ -312,6 +312,7 @@ namespace iNube.Services.Claims.Models
             TblBankAccounts = new HashSet<BankAccountsDTO>();
             TblClaimdoc = new HashSet<ClaimdocDTO>();
             TblPayment = new HashSet<PaymentDTO>();
+            ClaimPayments = new HashSet<ClaimPaymentDTO>();
             ClaimInsurable = new HashSet<ClaimInsurableDTO>();
             ClaimsHistory = new HashSet<ClaimsHistoryDTO>();
             ClaimAllocationDetails = new HashSet<ClaimAllocationDetailsDTO>();
@@ -345,6 +346,7 @@ namespace iNube.Services.Claims.Models
         public virtual TblmasCmcommonTypes ClaimStatus { get; set; }
         public virtual TblmasCmcommonTypes Loss { get; set; }
         public virtual ICollection<BankAccountsDTO> TblBankAccounts { get; set; }
+        public virtual ICollection<ClaimPaymentDTO> ClaimPayments { get; set; }
         public virtual ICollection<ClaimdocDTO> TblClaimdoc { get; set; }
         public virtual ICollection<PaymentDTO> TblPayment { get; set; }
         public virtual ICollection<ClaimInsurableDTO> ClaimInsurable { get; set; }
@@ -628,6 +630,26 @@ namespace iNube.Services.Claims.Models
         public virtual TblPayment Payment { get; set; }
     }
 
+    public partial class ClaimPaymentDTO
+    {
+        public int BankId { get; set; }
+        public string AccountHolderName { get; set; }
+        public string AccountNumber { get; set; }
+        public string BankName { get; set; }
+        public string BankBranchAddress { get; set; }
+        public string Ifsccode { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int ClaimId { get; set; }
+        public int? AccountType { get; set; }
+        public string CreatedBy { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public int? PayeeTypeId { get; set; }
+        public string PayeeType { get; set; }
+        public decimal? AmountPaid { get; set; }
+        public DateTime? DataOfPayment { get; set; }
+    }
+
     public partial class BankAccountsDTO
     {
         public int BankId { get; set; }
@@ -702,6 +724,7 @@ namespace iNube.Services.Claims.Models
         public ClaimDataDTO()
         {
             ClaimInsurable = new List<ClaimInsurable>();
+            //ClaimPayments = new List<ClaimPaymentDTO>();
             BankAccounts = new List<BankAccounts>();
             Alldoc = new List<Alldoc>();
             ClaimAllocationDetails = new HashSet<ClaimAllocationDetailsDTO>();
@@ -736,6 +759,7 @@ namespace iNube.Services.Claims.Models
         public int? ProductIdPk { get; set; }
         public string ClaimNumber { get; set; }
         public virtual ICollection<ClaimAllocationDetailsDTO> ClaimAllocationDetails { get; set; }
+        //public virtual List<ClaimPaymentDTO> ClaimPayments { get; set; }
         public virtual List<BankAccounts> BankAccounts { get; set; }
         public virtual List<ClaimInsurable> ClaimInsurable { get; set; }
         // public virtual List<ClaimdocDTO> Claimdocument { get; set; }

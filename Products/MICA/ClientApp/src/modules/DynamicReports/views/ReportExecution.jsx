@@ -97,7 +97,7 @@ class ReportExecution extends React.Component {
             2000
         );*/}
 
-        /////////////////
+        /////////////////From UserManagement //////////////////////////
         let userid = "";
         let roleid = "";
         userid = localStorage.getItem('userId');
@@ -146,19 +146,6 @@ class ReportExecution extends React.Component {
         let param = this.state.displayparameter;
         param[evt.target.name] = evt.target.value;
         this.setState({ param });
-        //let paramindex = this.state.paramList.findIndex(s => s.parameterName == evt.target.name);
-        ///*Create obj*/
-        //if (paramindex == -1) {
-        //    let pArray = this.state.paramList; 
-        //  //  this.setState({ paramList: pArray });
-        //    pArray.push({
-        //        "parameterName": evt.target.name,
-        //        "parameterValue": evt.target.value,
-        //    });
-        //} else {
-        //    this.state.paramList[paramindex].parameterName = evt.target.name;
-        //    this.state.paramList[paramindex].parameterValue = evt.target.value;
-        //}
         console.log(this.state.paramList, "Array List");
     };
 
@@ -176,22 +163,22 @@ class ReportExecution extends React.Component {
         else {
             var mm = (today.getMonth() + 1);
         }
-        //var date = dt + '/' + mm + '/' + today.getFullYear();
-          //  + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
         var date = today.getFullYear() + '-' + mm + '-' + dt;
         var date2 = new Date();
         var date1 = new Date(today);
-        //let state = this.state.CheckCondition;
-        //state[name] = date;
-        //this.setState({ state });
-
-        // var today = event.toDate();
-        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-            //+ ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
 
         var fields = this.state.CheckCondition;
         fields[name] = date;
         this.setState({ fields });
+
+        var temp = event.toDate();
+       // var tempDate = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+        var tempDate = dt + '/' + mm + '/' + today.getFullYear();
+
+        var dparam = this.state.displayparameter;
+        dparam[name] = tempDate;
+        this.setState({ dparam });
+        console.log("fields", fields);
     };
 
     handleParameterCheck = event => {
@@ -228,8 +215,6 @@ class ReportExecution extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                //this.setState({ parameterList: [] });   //item is my state variable
-                //this.setState({ parameterList: parameterList }) 
                 this.setState({ parameterList: data });
                 console.log("rparameter: ", data);
                 this.setState({ otFlag: true });
@@ -282,7 +267,6 @@ class ReportExecution extends React.Component {
             .then(data => {
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
-                //var emptyarray = {};
                 //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {
                     this.setState({ tableFlag: false, flagParam: false, loader: false});
@@ -319,9 +303,6 @@ class ReportExecution extends React.Component {
     };*/
 
     reset = () => {
-        //let check = this.state.CheckCondition;
-        //var emptyarray = {};
-        //check = Object.assign(check, emptyarray);
         let resetField = this.state.ReportConfigDto;
         resetField['ReportName'] = "";
         this.setState({ resetField/* check */ });
@@ -425,28 +406,19 @@ class ReportExecution extends React.Component {
                                                                             }
                                                                             else {
                                                                                 return (
-                                                                                    //<GridItem xs={12} sm={12} md={3} key={index}>
-                                                                                    //    <CustomDatetime
-                                                                                    //        //style="ddl"
-                                                                                    //        labelText={item.parameterName}
-                                                                                    //        id='dob'
-                                                                                    //        //Futuredatevalidate={true}
-                                                                                    //        name={item.parameterName}
-                                                                                    //        onChange={(evt) => this.onDateChange('datetime',item.parameterName, evt)}
-                                                                                    //        value={this.state.CheckCondition[item.parameterName]}
-                                                                                    //        formControlProps={{ fullWidth: true }} />
-                                                                                    //</GridItem>
-
-                                                                                    <GridItem xs={12} sm={12} md={4}>
+                                                                                    <GridItem xs={12} sm={12} md={3} key={index}>
                                                                                         <CustomDatetime
+                                                                                            style="ddl"
                                                                                             labelText={item.parameterName}
-                                                                                            id='date'
+                                                                                            id='dob'
                                                                                             name={item.parameterName}
+                                                                                            //onChange={(evt) => this.onDateChange('datetime',item.parameterName, evt)}
+                                                                                            //value={this.state.CheckCondition[item.parameterName]}
                                                                                             onChange={(evt) => this.onDateChange('datetime', item.parameterName, evt)}
                                                                                             value={this.datechange(this.state.CheckCondition[item.parameterName])}
                                                                                             formControlProps={{ fullWidth: true }} />
-
                                                                                     </GridItem>
+
                                                                                 )
                                                                             }
                                                                         }

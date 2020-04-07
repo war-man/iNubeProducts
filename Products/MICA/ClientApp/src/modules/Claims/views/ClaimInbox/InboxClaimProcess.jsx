@@ -34,6 +34,7 @@ import TranslationContainer from "components/Translation/TranslationContainer.js
 import Modal from '@material-ui/core/Modal';
 import PDFViewer from 'pdf-viewer-reactjs';
 import BankdetailsFields from "modules/Claims/views/ClaimProcess/BankdetailsFields.json";
+import CustomerBankDetails from "modules/Claims/views/ClaimProcess/CustomerBankDetails.json";
 //import Data from "./Data.json";
 
 const CustomTableCell = withStyles(theme => ({
@@ -384,7 +385,7 @@ class InboxClaimProcess extends React.Component {
             },
             popopen: false,
             vehicleActivitydata: [],
-            TableDataList:[]
+            TableDataList: []
         };
     }
 
@@ -448,7 +449,7 @@ class InboxClaimProcess extends React.Component {
                 .then(data => {
                     console.log("response: ", data)
                     //      if (data.status == 200) {
-                  //  this.state.claimId = data.claimId;
+                    //  this.state.claimId = data.claimId;
                     //  this.setState({ claimnumber: data.claimNumber });
                     if (data.status == 3) {
                         swal({
@@ -478,9 +479,9 @@ class InboxClaimProcess extends React.Component {
 
 
                     }
-                        //this.renderRedirect();
-                    });
-        
+                    //this.renderRedirect();
+                });
+
         } else {
             //this.setState({ errormessage: true });
             if (this.state.fields.claimStatusId == "") {
@@ -679,6 +680,7 @@ class InboxClaimProcess extends React.Component {
                 this.setState({ pageloader: true });
             }.bind(this), 2000
         );
+
         this.setState({ Bankfieldsmodel: BankdetailsFields });
 
         let datamodel = this.state.BankDataModelDTO;
@@ -697,24 +699,21 @@ class InboxClaimProcess extends React.Component {
         let data = BankDataModelDTO[name];
         data.type = name;
         data[evt.target.name] = evt.target.value;
-
-        if (name == "Customer") {
-            let bank = this.state.Bankarray;
-            let index = bank.findIndex(e => e.name == name);
-            let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
-            bankvalue[0].Value = evt.target.value;
-            this.setState({ bank });
-        }
-
+        //if (name == "Customer") {
+        let bank = this.state.Bankarray;
+        let index = bank.findIndex(e => e.name == name);
+        let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
+        bankvalue[0].Value = evt.target.value;
+        this.setState({ bank });
+        //}
         this.setState({ /*bank,*/ data, BankDataModelDTO });
     };
 
     oncustomerselect = () => {
-        console.log("Data: ", this.state.BankDetails);
         let bank = this.state.BankDataModelDTO;
         let bankdata = this.state.Bankdata.Customer;
         let cbank = this.state.BankDetails;
-        let jsondata = this.state.Bankfieldsmodel;
+        let jsondata = CustomerBankDetails;
 
         bankdata["Account Holder Name"] = cbank.accountHolderName;
         bankdata["Account No."] = cbank.accountNumber;
@@ -731,10 +730,10 @@ class InboxClaimProcess extends React.Component {
         jsondata[4].Value = cbank.ifsccode;
         jsondata[5].Value = cbank.bankBranchAddress;
 
-        bank.Customer = bankdata;
+        bank["Customer"] = bankdata;
 
         this.setState({ bankdata, jsondata, bank });
-        console.log("bankdata: ", this.state.Bankfieldsmodel);
+        console.log("bankdata: ", CustomerBankDetails);
     }
 
     renderPage = (Bankfieldsmodel, name) => {
@@ -865,13 +864,13 @@ class InboxClaimProcess extends React.Component {
         let data = BankDataModelDTO[objname];
         data[name] = date;
 
-        if (objname == "Customer") {
-            let bank = this.state.Bankarray;
-            let index = bank.findIndex(e => e.name == objname);
-            let bankvalue = bank[index].BankDetails.filter(a => a.Name == name)
-            bankvalue[0].Value = date;
-            this.setState({ bank });
-        }
+        //if (objname == "Customer") {
+        let bank = this.state.Bankarray;
+        let index = bank.findIndex(e => e.name == objname);
+        let bankvalue = bank[index].BankDetails.filter(a => a.Name == name)
+        bankvalue[0].Value = date;
+        this.setState({ bank });
+        //}
 
         this.setState({ data });
 
@@ -1007,12 +1006,12 @@ class InboxClaimProcess extends React.Component {
 
     claimAmountTable = () => {
 
-       
+
         let arr = this.state.claimTableData.map((prop, key) => {
             return prop.coverDynamic.filter(c => c.Header == "Vehicle Number")[0].Details;
-         
+
         });
-        this.state.vehicleActivity.vehicleNumbers  = Array.from(new Set(arr));
+        this.state.vehicleActivity.vehicleNumbers = Array.from(new Set(arr));
         this.state.vehicleActivity.policyNumber = this.state.PolicyNumber;
         this.state.vehicleActivity.claimNumber = this.state.ClaimNumber;
 
@@ -1114,7 +1113,7 @@ class InboxClaimProcess extends React.Component {
                     this.state.claimDetailsData.selfSurvey = data[0][7][1];
                     this.setState({ vehicleclaimsurvey: true });
                 }
-               
+
 
             });
 
@@ -1419,116 +1418,38 @@ class InboxClaimProcess extends React.Component {
     }
 
     handleCheckbox = (event, name, i) => {
-
-        let ProductClaimData = this.state.ProductClaimData;
-        let array = [];
-        array.name = name;
-        array.data = {};
-        console.log("")
-        let check = event.target.checked;
-        console.log("values: ", this.state.ProductClaimData, 'chk data ', event, event.target.checked, name);
-        this.setState({ selectedcheckbox: name });
-        if (event.target.checked == "undefined") {
-        } else {
-            const index = this.state.ProductClaimData.findIndex(item => item.inputType === name);
-            if (index != -1) {
-
-                let data = [...this.state.ProductClaimData];
-                data[index].mIsRequired = event.target.checked;
-
-                let searchname = "";
-                if (name == "Workshop") {
-                   // searchname = "Customer";
-                    if (event.target.checked == true) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    }
-                    if (event.target.checked == false) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    }
-                } else {
-                   // searchname = "Workshop";
-                    this.state.displaycust = false;
-                    this.setState({});
-                }
-                if (name == "Customer") {
-                    if (event.target.checked === true) {
-                        this.oncustomerselect();
-                        this.state.BankDataModelDTO[name] = this.state.Bankdata.Customer;
-                        this.state.displaycust = true;
-                        this.setState({});
-                    } if (event.target.checked === false) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    }
-                }
-                if (name == "Financier") {
-                    if (event.target.checked === true) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    } if (event.target.checked === false) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    }
-                }
-                if (name == "Nominee") {
-                    if (event.target.checked === true) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    } if (event.target.checked === false) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    }
-                }
-                if (name == "Surveyor") {
-                    if (event.target.checked === true) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    } if (event.target.checked === false) {
-                        this.state.displaycust = false;
-                        this.setState({});
-                    }
-                }
-
-                const key = this.state.ProductClaimData.findIndex(item => item.inputType === searchname);
-                if (key != -1) {
-                    data[key].disable = true;
-
-                    if (event.target.checked == false) {
-                        data[key].disable = false;
-                        //this.state.displaybank = false;
-                        //this.setState({});
-                    }
-                }
-                this.setState({ data });
-
-            }
-            console.log("values: ", this.state.ProductClaimData);
-        }
-
-
         let element = this.state.Bankarray;
         if (event.target.checked == true) {
             if (name != "Customer") {
                 this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
+                let Bankelement = {};
+                let array = [];
+                Bankelement.name = name;
+                //Bankelement.BankDetails = [...array, ...BankdetailsFields];
+                Bankelement.BankDetails = JSON.parse(JSON.stringify(BankdetailsFields));;
+                element.push(Bankelement);
             }
-            let Bankelement = {};
-            Bankelement.name = name;
-            Bankelement.BankDetails = this.state.Bankfieldsmodel
-            element.push(Bankelement);
+            else {
+                this.oncustomerselect();
+                //this.state.BankDataModelDTO[name] = this.state.Bankdata.Customer;
+                this.setState({ displaycust: true });
+                let CustBankelement = {};
+                CustBankelement.name = name;
+                CustBankelement.BankDetails = CustomerBankDetails;
+                element.push(CustBankelement);
+            }
             console.log("Bankarray: ", this.state.Bankarray);
         }
         if (event.target.checked == false) {
-            this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.emptyobject);
-            this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.emptyobject);
+            let empty = {};
+            //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], empty);
+            this.state.BankDataModelDTO[name] = empty;
             let index = element.findIndex(e => e.name == name);
             element.splice(index, 1);
             console.log("Bankarray: ", element);
         }
         this.setState({ element });
         console.log("BankDataModelDTO: ", this.state.BankDataModelDTO);
-        //console.log("name", event.target.name);
     }
 
     renderRedirect = () => {
@@ -1537,13 +1458,9 @@ class InboxClaimProcess extends React.Component {
         this.setState({ Claimdata });
 
     }
+
     handleActivitylog = () => {
-       
-
         let that = this;
-     
-
-       
         fetch(`${ClaimConfig.claimConfigUrl}/api/Mica_EGI/GetVehicleActivity`, {
             method: 'post',
             headers: {
@@ -1562,18 +1479,25 @@ class InboxClaimProcess extends React.Component {
                     that.setState({ vehicleActivitydata: data.vehicleData });
                     that.ActivityTableHeader(data.vehicleData[0].activityDTOs);
                 }
+                else {
+                    swal({
+                        text: data.responseMessage,
+                        icon: "error"
+                    });
+                }
+            }
+            else if (data.status == 8) {
+                swal({
+                    text: data.responseMessage,
+                    icon: "error"
+                });
             }
             console.log("vehicleActivitydata", that.state.vehicleActivitydata);
-           
-            //that.setState({ popopen: true });
-           
-
-            });
-       
-
+            //that.setState({ popopen: true });	
+        });
     }
-   
-handleActivityClose = () => {
+
+    handleActivityClose = () => {
         this.setState({ popopen: false });
     };
 
@@ -1589,8 +1513,6 @@ handleActivityClose = () => {
         });
         console.log("table data", this.state.TableDataList);
     }
-
-
 
     render() {
         const { classes } = this.props;
@@ -1771,7 +1693,7 @@ handleActivityClose = () => {
                 </Modal>
 
 
-<Modal
+                <Modal
                     aria-labelledby="simple-modal-title"
                     aria-describedby="simple-modal-description"
                     open={this.state.popopen}
@@ -1789,12 +1711,12 @@ handleActivityClose = () => {
                         </Button>
 
                         <div id="disp">
-                            {(this.state.vehicleActivitydata.length>0)?this.state.vehicleActivitydata.map((item, i) => (
+                            {(this.state.vehicleActivitydata.length > 0) ? this.state.vehicleActivitydata.map((item, i) => (
                                 <GridContainer justify="center" >
                                     <GridItem xs={12}>
 
                                         <ReactTable
-                                            title={<h5><TranslationContainer translationKey={"Vehicle Number:"+item.vehicleNumber} /></h5>}
+                                            title={<h5><TranslationContainer translationKey={"Vehicle Number:" + item.vehicleNumber} /></h5>}
 
                                             data={item.activityDTOs}
                                             filterable
@@ -1811,7 +1733,7 @@ handleActivityClose = () => {
                                     </GridItem>
 
                                 </GridContainer>
-                            )):null}
+                            )) : null}
                         </div>
 
                     </div>

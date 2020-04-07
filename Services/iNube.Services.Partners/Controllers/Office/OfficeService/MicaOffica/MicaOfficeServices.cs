@@ -33,26 +33,26 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             _configuration = configuration;
             dbHelper = new DbHelper(new IntegrationService(configuration)); ;
         }
-
         public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
-            dbHelper._TimeZone = UserDateTime.KeyValue;
+            //_context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
-            var office = _mapper.Map<TblOrgOffice>(officeDTO);
+            try
+            {
+
+                var office = _mapper.Map<TblOrgOffice>(officeDTO);
+
             //_context.Entry(office).State=(office.OrgOfficeId == 0)?EntityState.Added : EntityState.Modified;
             if (office.OrgOfficeId == 0)
             {
                 office.CreatedBy = apiContext.UserId;
-                office.CreatedDate = DateTimeNow;
+                office.CreatedDate = DateTime.Now;
                 _context.TblOrgOffice.Add(office);
             }
             else
             {
                 office.ModifiedBy = apiContext.UserId;
-                office.ModifiedDate = DateTimeNow;
+                office.ModifiedDate = DateTime.Now;
                 //_context.Entry(office).State = EntityState.Modified;
                 _context.Update(office);
             }
@@ -60,21 +60,59 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             var pDTO = _mapper.Map<OrgOfficeDTO>(office);
             return new OfficeResponse { Status = BusinessStatus.Ok, ResponseMessage = $" Office ID {office.OrgOfficeId} successfully {(officeDTO.OrgOfficeId == 0 ? "created " : "modified")}  for {officeDTO.OfficeName}!" };
         }
+            catch (Exception ex)
+            {
+                return null;
+            }
+}
+
+        //public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext)
+        //{
+        //    //_context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+        //    CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+        //    dbHelper._TimeZone = UserDateTime.KeyValue;
+
+        //    DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+        //    var office = _mapper.Map<TblOrgOffice>(officeDTO);
+        //    //_context.Entry(office).State=(office.OrgOfficeId == 0)?EntityState.Added : EntityState.Modified;
+        //    if (office.OrgOfficeId == 0)
+        //    {
+        //        office.CreatedBy = apiContext.UserId;
+        //        office.CreatedDate = DateTimeNow;
+        //        _context.TblOrgOffice.Add(office);
+        //    }
+        //    else
+        //    {
+        //        office.ModifiedBy = apiContext.UserId;
+        //        office.ModifiedDate = DateTimeNow;
+        //        //_context.Entry(office).State = EntityState.Modified;
+        //        _context.Update(office);
+        //    }
+        //    _context.SaveChanges();
+        //    var pDTO = _mapper.Map<OrgOfficeDTO>(office);
+        //    return new OfficeResponse { Status = BusinessStatus.Ok, ResponseMessage = $" Office ID {office.OrgOfficeId} successfully {(officeDTO.OrgOfficeId == 0 ? "created " : "modified")}  for {officeDTO.OfficeName}!" };
+        //}
 
         public async Task<OrgOfficeDTO> GetOffice(string OfficeCode, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
+            //_context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+                OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
             TblOrgOffice _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
                                     .Include(add => add.TblOfficeSpocDetails)
                                     .FirstOrDefault();
             OrgOfficeDTO _officeDTO = _mapper.Map<OrgOfficeDTO>(_tblOrgOffice);
             return _officeDTO;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
         public async Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(string OfficeCode, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+          //  _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
            try {
             // OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
             var _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
