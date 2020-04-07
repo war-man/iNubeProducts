@@ -39,7 +39,7 @@ const RefundUpload = (props) => {
             type: "POST",
             url: `${policyConfig.PolicyconfigUrl}/api/Policy/RefundUpload`,
             //https://localhost:44351/api/Policy/RefundUpload
-           // url: `https://localhost:44351/api/Policy/RefundUpload`,
+            //url: `https://localhost:44351/api/Policy/RefundUpload`,
             contentType: false,
             processData: false,
 
@@ -59,9 +59,11 @@ const RefundUpload = (props) => {
                         icon: "success"
                     });
                 } else if (response.status == 7) {
-                    GridFun(true);
-                    errorListFun(response.errorDetails);
-                    RefundTableHeader(response.errorDetails);
+                    if (response.errorDetails.length > 0) {
+                        GridFun(true);
+                        errorListFun(response.errorDetails);
+                        RefundTableHeader(response.errorDetails);
+                    }
                     swal({
                         text: response.responseMessage,
                         icon: "success"
