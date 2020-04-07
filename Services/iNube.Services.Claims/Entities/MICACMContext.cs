@@ -24,6 +24,7 @@ namespace iNube.Services.Claims.Entities
         public virtual DbSet<TblClaimDetails> TblClaimDetails { get; set; }
         public virtual DbSet<TblClaimHistory> TblClaimHistory { get; set; }
         public virtual DbSet<TblClaimInsurable> TblClaimInsurable { get; set; }
+        public virtual DbSet<TblClaimPayments> TblClaimPayments { get; set; }
         public virtual DbSet<TblClaimTransaction> TblClaimTransaction { get; set; }
         public virtual DbSet<TblClaimTransactionNew> TblClaimTransactionNew { get; set; }
         public virtual DbSet<TblClaimdoc> TblClaimdoc { get; set; }
@@ -38,7 +39,7 @@ namespace iNube.Services.Claims.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
@@ -556,6 +557,64 @@ namespace iNube.Services.Claims.Entities
                     .HasForeignKey(d => d.ClaimId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tblClaimInsurable_tblClaims");
+            });
+
+            modelBuilder.Entity<TblClaimPayments>(entity =>
+            {
+                entity.HasKey(e => e.BankId);
+
+                entity.ToTable("tblClaimPayments", "CM");
+
+                entity.Property(e => e.AccountHolderName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountNumber)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AmountPaid).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.BankBranchAddress)
+                    .HasMaxLength(350)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DataOfPayment).HasColumnType("datetime");
+
+                entity.Property(e => e.Ifsccode)
+                    .HasColumnName("IFSCCode")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedBy).HasMaxLength(450);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PayeeType).HasMaxLength(50);
+
+                entity.HasOne(d => d.AccountTypeNavigation)
+                    .WithMany(p => p.TblClaimPaymentsAccountTypeNavigation)
+                    .HasForeignKey(d => d.AccountType)
+                    .HasConstraintName("FK__tblClaimP__Accou__3296789C");
+
+                entity.HasOne(d => d.Claim)
+                    .WithMany(p => p.TblClaimPayments)
+                    .HasForeignKey(d => d.ClaimId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tblClaimPayments_tblClaims");
+
+                entity.HasOne(d => d.PayeeTypeNavigation)
+                    .WithMany(p => p.TblClaimPaymentsPayeeTypeNavigation)
+                    .HasForeignKey(d => d.PayeeTypeId)
+                    .HasConstraintName("FK__tblClaimP__Payee__338A9CD5");
             });
 
             modelBuilder.Entity<TblClaimTransaction>(entity =>

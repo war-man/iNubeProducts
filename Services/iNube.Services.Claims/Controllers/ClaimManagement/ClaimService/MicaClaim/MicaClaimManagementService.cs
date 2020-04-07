@@ -1689,35 +1689,35 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                 foreach (var item in claimsDTO.DataModelDTO)
                 {
-                    if (item.type.ToString() == "Customer")
-                    {
-                        var custBankdetail = _context.TblBankAccounts.FirstOrDefault(x => x.ClaimId == claimsDTO.ClaimId && x.PayeeType == "Customer");
-                        custBankdetail.AccountHolderName = item["Account Holder Name"];
-                        custBankdetail.AccountNumber = item["Account No."];
-                        custBankdetail.ClaimId = ClaimApproval.ClaimId;
-                        custBankdetail.BankBranchAddress = item["Bank Branch Address"];
-                        custBankdetail.BankName = item["Bank Name"];
-                        custBankdetail.Ifsccode = item["IFSC Code"];
-                        custBankdetail.AccountType = item["Account Type"];
-                        custBankdetail.AmountPaid = item["Amount Paid"];
-                        custBankdetail.DataOfPayment = item["Date Of Payment"];
-                        _context.TblBankAccounts.Update(custBankdetail);
-                    }
-                    else
-                    {
-                        TblBankAccounts _bankAccounts = new TblBankAccounts();
-                        _bankAccounts.AccountHolderName = item["Account Holder Name"];
-                        _bankAccounts.AccountNumber = item["Account No."];
-                        _bankAccounts.ClaimId = ClaimApproval.ClaimId;
-                        _bankAccounts.BankBranchAddress = item["Bank Branch Address"];
-                        _bankAccounts.BankName = item["Bank Name"];
-                        _bankAccounts.Ifsccode = item["IFSC Code"];
-                        _bankAccounts.AccountType = item["Account Type"];
-                        _bankAccounts.AmountPaid = item["Amount Paid"];
-                        _bankAccounts.DataOfPayment = item["Date Of Payment"];
-                        _bankAccounts.PayeeType = item.type;
-                        _context.TblBankAccounts.Add(_bankAccounts);
-                    }
+                    //if (item.type.ToString() == "Customer")
+                    //{
+                    //    var custBankdetail = _context.TblBankAccounts.FirstOrDefault(x => x.ClaimId == claimsDTO.ClaimId && x.PayeeType == "Customer");
+                    //    custBankdetail.AccountHolderName = item["Account Holder Name"];
+                    //    custBankdetail.AccountNumber = item["Account No."];
+                    //    custBankdetail.ClaimId = ClaimApproval.ClaimId;
+                    //    custBankdetail.BankBranchAddress = item["Bank Branch Address"];
+                    //    custBankdetail.BankName = item["Bank Name"];
+                    //    custBankdetail.Ifsccode = item["IFSC Code"];
+                    //    custBankdetail.AccountType = item["Account Type"];
+                    //    custBankdetail.AmountPaid = item["Amount Paid"];
+                    //    custBankdetail.DataOfPayment = item["Date Of Payment"];
+                    //    _context.TblBankAccounts.Update(custBankdetail);
+                    //}
+                    //else
+                    //{
+                    TblClaimPayments claimPayments = new TblClaimPayments();
+                    claimPayments.AccountHolderName = item["Account Holder Name"];
+                    claimPayments.AccountNumber = item["Account No."];
+                    claimPayments.ClaimId = ClaimApproval.ClaimId;
+                    claimPayments.BankBranchAddress = item["Bank Branch Address"];
+                    claimPayments.BankName = item["Bank Name"];
+                    claimPayments.Ifsccode = item["IFSC Code"];
+                    claimPayments.AccountType = item["Account Type"];
+                    claimPayments.AmountPaid = item["Amount Paid"];
+                    claimPayments.DataOfPayment = item["Date Of Payment"];
+                    claimPayments.PayeeType = item.type;
+                    //_context.TblClaimPayments.Add(claimPayments);                    //_context.TblClaimPayments.Add(claimPayments);
+                    //}
                 }
 
 
@@ -2088,6 +2088,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var DATA = _context.TblClaims.SingleOrDefault(x => x.ClaimId == ClaimId);
 
             // var bank = _context.TblBankAccounts.SingleOrDefault(x => x.ClaimId == ClaimId);
+            //var bank = _context.TblClaimPayments.SingleOrDefault(x => x.ClaimId == ClaimId);
 
             var insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == ClaimId).ToList();
 

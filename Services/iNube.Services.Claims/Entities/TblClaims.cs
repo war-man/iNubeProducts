@@ -12,6 +12,7 @@ namespace iNube.Services.Claims.Entities
             TblClaimDetails = new HashSet<TblClaimDetails>();
             TblClaimHistory = new HashSet<TblClaimHistory>();
             TblClaimInsurable = new HashSet<TblClaimInsurable>();
+            TblClaimPayments = new HashSet<TblClaimPayments>();
             TblClaimTransactionNew = new HashSet<TblClaimTransactionNew>();
             TblClaimdoc = new HashSet<TblClaimdoc>();
             TblPayment = new HashSet<TblPayment>();
@@ -46,6 +47,7 @@ namespace iNube.Services.Claims.Entities
         public virtual ICollection<TblClaimDetails> TblClaimDetails { get; set; }
         public virtual ICollection<TblClaimHistory> TblClaimHistory { get; set; }
         public virtual ICollection<TblClaimInsurable> TblClaimInsurable { get; set; }
+        public virtual ICollection<TblClaimPayments> TblClaimPayments { get; set; }
         public virtual ICollection<TblClaimTransactionNew> TblClaimTransactionNew { get; set; }
         public virtual ICollection<TblClaimdoc> TblClaimdoc { get; set; }
         public virtual ICollection<TblPayment> TblPayment { get; set; }

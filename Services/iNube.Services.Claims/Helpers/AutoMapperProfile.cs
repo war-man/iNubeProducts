@@ -46,6 +46,9 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<TblBankAccounts, BankAccountsDTO>();
             CreateMap<BankAccountsDTO, TblBankAccounts>();
 
+            CreateMap<TblClaimPayments, ClaimPaymentDTO>();
+            CreateMap<ClaimPaymentDTO, TblClaimPayments>();
+
             CreateMap<TblClaimHistory, ClaimsHistoryDTO>();
             CreateMap<ClaimsHistoryDTO, TblClaimHistory>();
 
@@ -69,6 +72,7 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<ClaimDataDTO, TblClaims>()
             .ForMember(dest => dest.TblClaimInsurable, opt => opt.MapFrom(src => src.ClaimInsurable))
             .ForMember(dest => dest.TblBankAccounts, opt => opt.MapFrom(src => src.BankAccounts))
+            .ForMember(dest => dest.TblClaimPayments, opt => opt.MapFrom(src => src.ClaimPayments))
             .ForMember(dest => dest.TblClaimdoc, opt => opt.MapFrom(src => src.Alldoc))
             .ForMember(dest => dest.LossId, opt => opt.MapFrom(src => src.lossIntimatedBy))
             .ForMember(dest => dest.LocationOfEvent, opt => opt.MapFrom(src => src.locationOfLoss))
