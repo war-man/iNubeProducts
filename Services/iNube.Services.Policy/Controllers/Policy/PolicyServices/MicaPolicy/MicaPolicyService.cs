@@ -5167,7 +5167,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         //Success
                                     }
 
-                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow.ToString("dd/mm/yyyy hh:mm:ss")} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
+                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow.ToString()} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
 
                                 }
                                 else
