@@ -37,9 +37,10 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
         {
             //_context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-         
+            try
+            {
 
-            var office = _mapper.Map<TblOrgOffice>(officeDTO);
+                var office = _mapper.Map<TblOrgOffice>(officeDTO);
 
             //_context.Entry(office).State=(office.OrgOfficeId == 0)?EntityState.Added : EntityState.Modified;
             if (office.OrgOfficeId == 0)
@@ -59,6 +60,11 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             var pDTO = _mapper.Map<OrgOfficeDTO>(office);
             return new OfficeResponse { Status = BusinessStatus.Ok, ResponseMessage = $" Office ID {office.OrgOfficeId} successfully {(officeDTO.OrgOfficeId == 0 ? "created " : "modified")}  for {officeDTO.OfficeName}!" };
         }
+            catch (Exception ex)
+            {
+                return null;
+            }
+}
 
         //public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext)
         //{
@@ -90,13 +96,19 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
         public async Task<OrgOfficeDTO> GetOffice(string OfficeCode, ApiContext apiContext)
         {
             //_context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
+            try
+            {
+                OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
             TblOrgOffice _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
                                     .Include(add => add.TblOfficeSpocDetails)
                                     .FirstOrDefault();
             OrgOfficeDTO _officeDTO = _mapper.Map<OrgOfficeDTO>(_tblOrgOffice);
             return _officeDTO;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
         public async Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(string OfficeCode, ApiContext apiContext)
         {
