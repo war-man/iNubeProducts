@@ -1,5 +1,5 @@
 ﻿import Dropzone from 'react-dropzone-uploader';
-import React, { Component } from 'react';
+import React, { useState, Component } from 'react';
 import $ from 'jquery'
 import swal from 'sweetalert';
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -7,11 +7,16 @@ import GridItem from "components/Grid/GridItem.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import Card from "components/Card/Card.jsx";
 import CardBody from "components/Card/CardBody.jsx";
-
+import ReactTable from "components/MuiTable/MuiTable.jsx";
 import policyConfig from 'modules/Policy/PolicyConfig.js';
-
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 const RefundUpload = (props) => {
 
+
+    let [TableDataCopy, RefundTableHeaderFun] = React.useState([]);
+    let [ShowGrid, GridFun] = React.useState(false);
+    let [errorList, errorListFun] = React.useState([]);
+    let TableDataList = [];
     console.log("doc props ", props)
     // specify upload params and url for your files
     const getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
@@ -47,21 +52,27 @@ const RefundUpload = (props) => {
                 console.log("response ", response);
              
                 if (response.status == 1) {
+                    GridFun(false);
                     swal({
 
                         text: response.responseMessage,
                         icon: "success"
                     });
                 } else if (response.status == 7) {
+                    GridFun(true);
+                    errorListFun(response.errorDetails);
+                    RefundTableHeader(response.errorDetails);
                     swal({
                         text: response.responseMessage,
                         icon: "success"
                     });
+                  
                 }
                 else {
                 }
             },
             error: function () {
+                GridFun(false);
                 swal({
                     text: "File uploading unsuccessful",
                     icon: "error"
@@ -72,6 +83,22 @@ const RefundUpload = (props) => {
 
     }
 
+   const RefundTableHeader = (activityDTOs) => {
+      
+            TableDataList= Object.keys(activityDTOs[0]).map((prop, key) => {
+                return {
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                    accessor: prop,
+                };
+             
+       })
+       RefundTableHeaderFun(TableDataList);
+      
+       console.log("table data", TableDataList, errorList);
+    }
+
+
+    console.log("table data1", TableDataCopy, errorList);
     return (
 
         <GridContainer lg={12}>
@@ -100,7 +127,30 @@ const RefundUpload = (props) => {
                 //accept="image/*,audio/*,video/*,application/pdf/*,word/*"
                 />
                 </GridItem>
-            </GridContainer>
+                    </GridContainer>
+
+                  
+                    {ShowGrid && <GridContainer justify="center" >
+                        <GridItem xs={12}>
+
+                            <ReactTable
+                                title={<h5><TranslationContainer translationKey={"Refund Upload Errors"} /></h5>}
+
+                                data={errorList}
+                                filterable
+                                columns={TableDataCopy}
+                                defaultPageSize={4}
+                                pageSize={([errorList.length + 1] < 4) ? [errorList.length + 1] : 4}
+                                showPaginationTop={false}
+                                //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                showPaginationBottom={true}
+                                className="-striped -highlight discription-tab"
+
+                            />
+
+                        </GridItem>
+
+                    </GridContainer>}
                 </CardBody>
                 </Card>
         </GridContainer>
