@@ -4022,9 +4022,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 }
                 else if (dynamicPolicyrequest["Balance SumInsured"] != null)
                 {
-                    if (dynamicPolicyrequest["Balance SumInsured"] >= amount)
+                    if (policydetails.BalanceSumInsued >= amount)
                     {
-                        dynamicPolicyrequest["Balance SumInsured"] = dynamicPolicyrequest["Balance SumInsured"] - amount;
+                        dynamicPolicyrequest["Balance SumInsured"] = Convert.ToDecimal(dynamicPolicyrequest["Balance SumInsured"]) - amount;
                         policy.PolicyRequest = dynamicPolicyrequest.ToString();
                         policydetails.BalanceSumInsued = policydetails.BalanceSumInsued - Convert.ToInt32(amount);
                     }
@@ -4040,7 +4040,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 _context.TblPolicy.Update(policydetails);
                 _context.TblPolicyDetails.Update(policy);
                 _context.SaveChanges();
-                return new PolicyResponse { Status = BusinessStatus.Updated, ResponseMessage = $"balance SumInsured Updated for this policy number {PolicyNumber}" };
+                return new PolicyResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Balance SumInsured Updated for this policy number {PolicyNumber}" };
 
             }
             return new PolicyResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this policy number {PolicyNumber}" };
@@ -5167,7 +5167,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         //Success
                                     }
 
-                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow.ToString()} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
+                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow.ToString("dd/mm/yyyy hh:mm:ss")} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
 
                                 }
                                 else
