@@ -1615,7 +1615,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                   .Include(add => add.TblPolicyInsurableDetails).FirstOrDefault();
             var _policySearchDTOs = _mapper.Map<IEnumerable<PolicyInsurableDetailsDTO>>(tblPolicy.TblPolicyInsurableDetails);
 
-            var data = _policySearchDTOs.ToList();
+            var data = _policySearchDTOs.Where(p => (Boolean)p.IsActive).ToList();
 
             for (int i = 0; i < data.Count(); i++)
             {
