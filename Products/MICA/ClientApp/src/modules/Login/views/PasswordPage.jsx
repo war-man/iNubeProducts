@@ -93,9 +93,7 @@ class PasswordPage extends React.Component {
             redirecttofirst: false,
             environmentvalue: "",
             dropdownDisplay: true,
-            passwordexpired: false,
             firsttimelogin: "",
-            accountlock: false,
         };
         this.changeEvent = this.changeEvent.bind(this);
         this.handleToggle = this.handleToggle.bind(this);
@@ -128,7 +126,6 @@ class PasswordPage extends React.Component {
                     environmentvalue: this.state.environmentvalue,
                     UserName: this.state.UserName,
                     environment: this.state.environment,
-                    passwordexpired: this.state.passwordexpired,
                 }
             }} />
         }
@@ -242,9 +239,6 @@ class PasswordPage extends React.Component {
                         logintoken: data.token,
                         firsttimelogin: data.firstTimeLogin,
                     });
-                    if (data.passwordExpire == true) {
-                        that.setState({ redirecttofirst: true, passwordexpired: true });
-                    }
                     if (data.firstTimeLogin != 0) {
                         that.setState({ redirect: true });
                     } else {
@@ -271,19 +265,10 @@ class PasswordPage extends React.Component {
                         //console.log("Profile image: ", localStorage.getItem('profilepicture'));
                     }
                 }
-                if (data.status == 4) {
-                    if (this.state.count != 5) {
-                        that.setState({ count: that.state.count + 1 });
-                    }
+                else {
+                    that.setState({ count: that.state.count + 1 });
                     //console.log('count:', that.state.count);
                     that.setState({ redirect: false, attemptFlag: true, errormessage: true })
-                }
-                if (data.status == 4) {
-                        //swal({
-                        //    text: 'Your user account has been Locked please contact admin.',
-                        //    icon: 'error'
-                        //})
-                    that.setState({ redirect: false, accountlock: true });
                 }
             });
     }
@@ -366,8 +351,6 @@ class PasswordPage extends React.Component {
                                     </div>
                                 </CardHeader>
                                 <CardBody>
-                                    {this.state.accountlock ? <p className="error">*Your accont has been Locked, please contact Admin.</p> : null}
-
                                     <CustomInput
                                         required={true}
                                         labelText="User Name"

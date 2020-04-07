@@ -125,8 +125,9 @@ namespace iNube.Services.UserManagement.Helpers
         public static DbContext GetCPContext(string product)
         {
             DbContext context = null;
-            string dbConnectionString = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Initial Catalog=iNubeCommon;User Id=admin;Password=micaadmin";
-            //string dbConnectionString = "Data Source=edelweissuat.c1dhcfinjghj.ap-south-1.rds.amazonaws.com,1433;Initial Catalog=iNubeCommon;User Id=admin;Password=micaadmin";
+            //string dbConnectionString = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Initial Catalog=iNubeCommon;User Id=admin;Password=micaadmin";
+            string dbConnectionString = "Data Source=edelweissuat.c1dhcfinjghj.ap-south-1.rds.amazonaws.com,1433;Initial Catalog=iNubeCommon;User Id=admin;Password=micaadmin";
+
 
             var optionsCPBuilder = new DbContextOptionsBuilder<MICACPContext>();
             optionsCPBuilder.UseSqlServer(dbConnectionString);
@@ -180,11 +181,11 @@ namespace iNube.Services.UserManagement.Helpers
         {
 
             DbHelper dbHelper = new DbHelper();
-            var result = dbHelper.GetCustomerSettings(apiContext.OrgId, type, apiContext.ProductType, 0, apiContext);
+            var result = dbHelper.GetCustomerSettings(apiContext.OrgId, type, apiContext.ProductType,0, apiContext);
             return result;
         }
 
-        public static DateTime GetDateTimeByZone(string userTimeZone)
+        public static  DateTime GetDateTimeByZone(string userTimeZone)
         {
 
             DateTime zonelocalDateTime = System.DateTime.UtcNow.AddMinutes(330);
