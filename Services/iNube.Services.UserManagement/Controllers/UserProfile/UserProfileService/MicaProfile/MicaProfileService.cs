@@ -21,7 +21,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         private bool Result;
         public static int otpvalue { get; set; }
         private readonly IEmailService _emailService;
-       
+
         public MicaProfileService(IMapper mapper, IEmailService emailService)
         {
             _mapper = mapper;
@@ -415,11 +415,21 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             return true;
         }
 
+        public decimal GetCustomerId(decimal envid, string product)
+        {
+            _cpcontext = (MICACPContext)DbManager.GetCPContext(product);
+            var data = _cpcontext.TblCustomerEnvironment.FirstOrDefault(a => a.Id == envid);
+            return Convert.ToDecimal(data.CustomerId);
+        }
+
         public PasswordResponse ChangePassword(Password pass, ApiContext apiContext)
         {
             if (pass.EnvId > 0)
             {
                 _context = (MICAUMContext)DbManager.GetContext(pass.ProductType, pass.EnvId.ToString());
+                apiContext.ProductType = pass.ProductType;
+                apiContext.ServerType = pass.EnvId.ToString();
+                apiContext.OrgId = GetCustomerId(pass.EnvId, pass.ProductType);
             }
             else
             {
@@ -449,6 +459,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     }
                     _aspNet.PasswordHash = passwordHash;
                     _aspNet.FirstTimeLogin = 1;
+                    _aspNet.AccessFailedCount = 0;
                     _aspNet.LastPasswordChanged = DateTimeNow;
                     _context.AspNetUsers.Update(_aspNet);
                     _context.SaveChanges();
@@ -487,6 +498,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         }
                         _aspNet.PasswordHash = passwordHash;
                         _aspNet.LastPasswordChanged = DateTimeNow;
+                        _aspNet.AccessFailedCount = 0;
                         _context.AspNetUsers.Update(_aspNet);
                         _context.SaveChanges();
                         var _usersDTOs = _mapper.Map<UserDTO>(_aspUsers);
