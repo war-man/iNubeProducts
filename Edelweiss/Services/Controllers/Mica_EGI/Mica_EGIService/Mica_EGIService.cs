@@ -2285,7 +2285,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                         VehicleNo = x.VehicleNumber,
                                                         SwitchState = x.SwitchStatus.ToString(),
                                                         SwitchType = x.SwitchType
-                                                    }).ToList();
+                        
+                            }).ToList();
+
+                   // var filter = logData.Where(x => x.DateTime.Value.Date == (Convert.ToDateTime(2020 - 04 - 01).Date)).Select(c => c);
                     if (logData.Count > 0)
                     {
                         response.ActivityDTO = logData;
@@ -3510,6 +3513,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var Currentdate = System.DateTime.UtcNow.AddMinutes(330);
 
+            int successcount = 0;
+            int failcount = 0;
 
             //  RuleThreeDTO ruleThreeDTO = new RuleThreeDTO();
 
@@ -3530,15 +3535,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         RuleEngine = await _integrationService.RuleEngine(ruleOneDTO, apiContext);
                         engineResponses = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(RuleEngine.ToString());
 
-
+                        // bool res = IntegrationValidation(engineResponses, "List", "ValidatorName");
 
                         RuleEngineResponse resobj = new RuleEngineResponse();
-                        if (SourceObject["driverExp"] < 1 && SourceObject["driverExp"] > SourceObject["driverAge"])
+                        if (SourceObject["driverExp"] < 1)
                         {
 
                             resobj.ValidatorName = "driverExp";
                             resobj.Outcome = "Fail";
-                            resobj.Message = "Invalid";
+                            resobj.Message = "Driver Experience is less than one year";
                             resobj.Code = "EXP001";
                             engineResponses.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
                         }
@@ -3547,11 +3552,48 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             resobj.ValidatorName = "driverExp";
                             resobj.Outcome = "Success";
-                            resobj.Message = "Validation done for driver experiance";
+                            resobj.Message = "Validation done for driver experiance greater than one year";
                             resobj.Code = "EXP002";
 
                         }
                         engineResponses.Add(resobj);
+                        RuleEngineResponse resobj1 = new RuleEngineResponse();
+                        if (Convert.ToInt32(SourceObject["driverExp"]) > Convert.ToInt32(SourceObject["driverAge"]) - 18)
+                        {
+                            resobj1.ValidatorName = "driverExp";
+                            resobj1.Outcome = "Fail";
+                            resobj1.Message = "Driver Experience is greater than driver age -18";
+                            resobj1.Code = "EXP003";
+                            engineResponses.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+                        }
+                        else
+                        {
+                            resobj1.ValidatorName = "driverExp";
+                            resobj1.Outcome = "Success";
+                            resobj1.Message = "Validation done for driver experiance";
+                            resobj1.Code = "EXP004";
+
+                        }
+                        engineResponses.Add(resobj1);
+                        RuleEngineResponse resobj2 = new RuleEngineResponse();
+                        DateTime Startdate = Convert.ToDateTime(SourceObject["Policy Start Date"]);
+                        if (Startdate >= Currentdate)
+                        {
+                            resobj2.ValidatorName = "Policy Start Date";
+                            resobj2.Outcome = "Fail";
+                            resobj2.Message = "Policy Start Date is greater than current date";
+                            resobj2.Code = "EXP005";
+                            engineResponses.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+                        }
+                        else
+                        {
+                            resobj2.ValidatorName = "Policy Start Date";
+                            resobj2.Outcome = "Success";
+                            resobj2.Message = "Validation done for Policy Start Date";
+                            resobj2.Code = "EXP006";
+
+                        }
+                        engineResponses.Add(resobj2);
                     }
                     catch (Exception Ex)
                     {
@@ -3582,90 +3624,121 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         DateTime Startdate = Convert.ToDateTime(SourceObject["Policy Start Date"]);
                         DateTime Enddate = Convert.ToDateTime(SourceObject["Policy End Date"]);
-                        int successcount = 0;
-                        int failcount = 0;
+                        //int successcount = 0;
+                        //int failcount = 0;
 
                         if (Enddate > Startdate)
                         {
-                            if (Startdate >= Currentdate || Startdate <= (Currentdate.AddDays(30)))
-                            {
-                                RuleEngineResponse resobj = new RuleEngineResponse();
-                                resobj.ValidatorName = "Policy Start Date";
-                                resobj.Outcome = "Success";
-                                resobj.Message = "Validation done for Policy Start Date";
-                                resobj.Code = "EXPO001";
+                            RuleEngineResponse resobj = new RuleEngineResponse();
+                            resobj.ValidatorName = "Policy Start Date";
+                            resobj.Outcome = "Success";
+                            resobj.Message = "Validation done for Policy Start Date";
+                            resobj.Code = "EXPO001";
 
-                                engineResponse.Add(resobj);
-                                successcount++;
-                            }
-                            else
-                            {
-                                RuleEngineResponse resobj = new RuleEngineResponse();
-                                resobj.ValidatorName = "Policy Start Date";
-                                resobj.Outcome = "Fail";
-                                resobj.Message = "Start date is not within one month";
-                                resobj.Code = "EXPO002";
-                                engineResponse.Add(resobj);
-                                failcount++;
-                            }
+                            engineResponse.Add(resobj);
+                            successcount++;
                         }
                         else
                         {
                             RuleEngineResponse resobj = new RuleEngineResponse();
                             resobj.ValidatorName = "Policy Start Date";
                             resobj.Outcome = "Fail";
-                            resobj.Message = "Start date is less than End date";
+                            resobj.Message = "Start date is greater than End date";
+                            resobj.Code = "EXPO002";
+                            engineResponse.Add(resobj);
+                            failcount++;
+                        }
+                        if (Startdate >= Currentdate)
+                        {
+                            RuleEngineResponse resobj = new RuleEngineResponse();
+                            resobj.ValidatorName = "Policy Start Date";
+                            resobj.Outcome = "Success";
+                            resobj.Message = "Validation done for Policy Start Date";
                             resobj.Code = "EXPO003";
+
+                            engineResponse.Add(resobj);
+                            successcount++;
+                        }
+                        else
+                        {
+                            RuleEngineResponse resobj = new RuleEngineResponse();
+                            resobj.ValidatorName = "Policy Start Date";
+                            resobj.Outcome = "Fail";
+                            resobj.Message = "Start date is not greater then current date";
+                            resobj.Code = "EXPO004";
                             engineResponse.Add(resobj);
                             failcount++;
                         }
 
-                        //if (Enddate == Startdate.AddDays(364))
-                        //{
-                        //    RuleEngineResponse res1obj = new RuleEngineResponse();
-                        //    res1obj.ValidatorName = "Policy End Date";
-                        //    res1obj.Outcome = "Success";
-                        //    res1obj.Message = "Validation done for Policy End Date";
-                        //    res1obj.Code = "EXPO004";
+                        if (Startdate <= (Currentdate.AddDays(30)))
+                        {
+                            RuleEngineResponse resobj = new RuleEngineResponse();
+                            resobj.ValidatorName = "Policy Start Date";
+                            resobj.Outcome = "Success";
+                            resobj.Message = "Validation done for Policy Start Date";
+                            resobj.Code = "EXPO005";
 
-                        //    engineResponse.Add(res1obj);
-                        //    successcount++;
-                        //}
-                        //else
-                        //{
-                        //    RuleEngineResponse res1obj = new RuleEngineResponse();
-                        //    res1obj.ValidatorName = "Policy End Date";
-                        //    res1obj.Outcome = "Fail";
-                        //    res1obj.Message = "End date is not equal to 364 days from Start date";
-                        //    res1obj.Code = "EXPO005";
+                            engineResponse.Add(resobj);
+                            successcount++;
+                        }
+                        else
+                        {
+                            RuleEngineResponse resobj = new RuleEngineResponse();
+                            resobj.ValidatorName = "Policy Start Date";
+                            resobj.Outcome = "Fail";
+                            resobj.Message = "Start date is not within one month";
+                            resobj.Code = "EXPO006";
+                            engineResponse.Add(resobj);
+                            failcount++;
+                        }
 
-                        //    engineResponse.Add(res1obj);
-                        //    failcount++;
-                        //}
-                        //var Endtime = Enddate.ToString("HH:mm");
-                        //string tm = "23:59";
-                        //if (Endtime == tm)
-                        //{
-                        //    RuleEngineResponse res3obj = new RuleEngineResponse();
-                        //    res3obj.ValidatorName = "Policy End Time";
-                        //    res3obj.Outcome = "Success";
-                        //    res3obj.Message = "Validation done for Policy End Date";
-                        //    res3obj.Code = "EXPO006";
 
-                        //    engineResponse.Add(res3obj);
-                        //    successcount++;
-                        //}
-                        //else
-                        //{
-                        //    RuleEngineResponse res3obj = new RuleEngineResponse();
-                        //    res3obj.ValidatorName = "Policy End Time";
-                        //    res3obj.Outcome = "Fail";
-                        //    res3obj.Message = "Policy End time is not valid";
-                        //    res3obj.Code = "EXPO007";
+                        if (Enddate == Startdate.AddDays(364))
+                        {
+                            RuleEngineResponse res1obj = new RuleEngineResponse();
+                            res1obj.ValidatorName = "Policy End Date";
+                            res1obj.Outcome = "Success";
+                            res1obj.Message = "Validation done for Policy End Date";
+                            res1obj.Code = "EXPO007";
 
-                        //    engineResponse.Add(res3obj);
-                        //    failcount++;
-                        //}
+                            engineResponse.Add(res1obj);
+                            successcount++;
+                        }
+                        else
+                        {
+                            RuleEngineResponse res1obj = new RuleEngineResponse();
+                            res1obj.ValidatorName = "Policy End Date";
+                            res1obj.Outcome = "Fail";
+                            res1obj.Message = "End date is not equal to 364 days from Start date";
+                            res1obj.Code = "EXPO008";
+
+                            engineResponse.Add(res1obj);
+                            failcount++;
+                        }
+                        var Endtime = Enddate.ToString("HH:mm");
+                        string tm = "23:59";
+                        if (Endtime == tm)
+                        {
+                            RuleEngineResponse res3obj = new RuleEngineResponse();
+                            res3obj.ValidatorName = "Policy End Time";
+                            res3obj.Outcome = "Success";
+                            res3obj.Message = "Validation done for Policy End Date";
+                            res3obj.Code = "EXPO009";
+
+                            engineResponse.Add(res3obj);
+                            successcount++;
+                        }
+                        else
+                        {
+                            RuleEngineResponse res3obj = new RuleEngineResponse();
+                            res3obj.ValidatorName = "Policy End Time";
+                            res3obj.Outcome = "Fail";
+                            res3obj.Message = "Policy End time is not valid";
+                            res3obj.Code = "EXPO010";
+
+                            engineResponse.Add(res3obj);
+                            failcount++;
+                        }
 
                         if (failcount > 0)
                         {
@@ -3673,7 +3746,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Fail";
                             res4obj.Message = "One or More conditions failed";
-                            res4obj.Code = "EXPO008";
+                            res4obj.Code = "EXPO011";
                             engineResponse.Add(res4obj);
                         }
                         else
@@ -3682,7 +3755,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Success";
                             res4obj.Message = "Conditions Successful";
-                            res4obj.Code = "EXPO009";
+                            res4obj.Code = "EXPO012";
                             engineResponse.Add(res4obj);
 
                         }
@@ -3693,24 +3766,131 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
 
                     return engineResponse;
-
-                    //case "EndorementAdd":
-
-
-                    //    return RuleEngine;
-
-                    //case "EndorementDel":
+                //case "EndorementAdd":
 
 
-                    //    return CdModel;
+                //    return RuleEngine;
 
-                    //case "SwitchOnOff":
+                //case "EndorementDel":
 
-                    //    return CdModel;
 
-                    //case "Schedule":
+                //    return CdModel;
 
-                    //    return CdModel;
+                //case "SwitchOnOff":
+
+                //    return CdModel;
+
+                //case "Schedule":
+
+                //    return CdModel;
+
+                case "Claim":
+
+                    var claiminsurable = SourceObject["claimInsurable"];
+                    var policyno = SourceObject["policyNumber"].ToString();
+                  //  var lossdatetime = SourceObject["lossDateTime"].ToString();
+
+                    DateTime lossdatetime = Convert.ToDateTime(SourceObject["lossDateTime"]);
+                    //var month = lossdatetime.Month;
+                    var month = lossdatetime.ToString("MMMM");
+                    List<RuleEngineResponse> engineResponse3 = new List<RuleEngineResponse>();
+                    //int successcount = 0;
+                    //int failcount = 0;
+
+                    try
+                    {
+                       if(claiminsurable.Count > 1)
+                        {
+                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                            res4obj.ValidatorName = "Claim Insurable";
+                            res4obj.Outcome = "Fail";
+                            res4obj.Message = "Claim Intimation cannot be done for more than one cover at a time";
+                            res4obj.Code = "EXPO011";
+                            engineResponse3.Add(res4obj);
+                            failcount++;
+                        }
+                        else
+                        {
+                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                            res4obj.ValidatorName = "Claim Insurable";
+                            res4obj.Outcome = "Success";
+                            res4obj.Message = "Claim Intimation successful";
+                            res4obj.Code = "EXPO012";
+                            engineResponse3.Add(res4obj);
+                            successcount++;
+
+
+                        }
+                       for(int i=0; i < claiminsurable.Count; i++) { 
+                       if(claiminsurable[i].coverName == "Accidental Damage") {
+                        ActivityResponse status = ActivityReport(policyno, month);
+                                if(status.ActivityDTO.Count > 0)
+                                {                
+                                    var filter = status.ActivityDTO.Where(x => x.DateTime.Value.Date == lossdatetime.Date).LastOrDefault();
+                                    
+                                   
+                                        if (filter.SwitchState == "0")
+                                        {
+                                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                                            res4obj.ValidatorName = "Claim Vehicle Status";
+                                            res4obj.Outcome = "Fail";
+                                            res4obj.Message = "Claim cannot be intimated as the Vehicle Status is switched off";
+                                            res4obj.Code = "EXPO011";
+                                            engineResponse3.Add(res4obj);
+                                            failcount++;
+                                        }
+                                      
+                                        else
+                                        {
+                                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                                            res4obj.ValidatorName = "Claim Vehicle Status";
+                                            res4obj.Outcome = "Success";
+                                            res4obj.Message = "Claim Intimation successful";
+                                            res4obj.Code = "EXPO012";
+                                            engineResponse3.Add(res4obj);
+                                            successcount++;
+
+                                        }
+                                    }
+                              
+                                else
+                                {
+                                    RuleEngineResponse res4obj = new RuleEngineResponse();
+                                    res4obj.ValidatorName = "Claim Vehicle Activity";
+                                    res4obj.Outcome = "Fail";
+                                    res4obj.Message = "No records found in activity log";
+                                    res4obj.Code = "EXPO012";
+                                    engineResponse3.Add(res4obj);
+                                    failcount++;
+                                }
+                            }
+                        }
+                        if (failcount > 0)
+                        {
+                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                            res4obj.ValidatorName = "Final Result";
+                            res4obj.Outcome = "Fail";
+                            res4obj.Message = "One or More conditions failed";
+                            res4obj.Code = "EXPO011";
+                            engineResponse3.Add(res4obj);
+                        }
+                        else
+                        {
+                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                            res4obj.ValidatorName = "Final Result";
+                            res4obj.Outcome = "Success";
+                            res4obj.Message = "Conditions Successful";
+                            res4obj.Code = "EXPO012";
+                            engineResponse3.Add(res4obj);
+
+                        }
+                    }
+                    catch (Exception Ex)
+                    {
+                        throw Ex;
+                    }
+
+                    return engineResponse3;
             }
 
             return new List<RuleEngineResponse>();
