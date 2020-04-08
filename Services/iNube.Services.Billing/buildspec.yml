@@ -33,10 +33,10 @@ phases:
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
-      - aws s3 cp s3://inubeartifacts/iNube-Billing-CI  s3://codepipeline-ap-south-1-536439774410/
+      - aws s3 cp s3://inubeartifacts/iNube-Billing-CI  s3://edartifacts/
     
   
-artifacts:
+artifacts:  
     files:
     - Services/iNube.Services.Billing/appspec.yml
     - Services/iNube.Services.Billing/taskdef.json
