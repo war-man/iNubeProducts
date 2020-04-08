@@ -278,7 +278,7 @@ class PasswordPage extends React.Component {
                     //console.log('count:', that.state.count);
                     that.setState({ redirect: false, attemptFlag: true, errormessage: true })
                 }
-                if (data.status == 4) {
+                if (data.status == 7) {
                     //swal({
                     //    text: 'Your user account has been Locked please contact admin.',
                     //    icon: 'error'
@@ -366,7 +366,7 @@ class PasswordPage extends React.Component {
                                     </div>
                                 </CardHeader>
                                 <CardBody>
-                                    {this.state.accountlock ? <p className="error">*Your accont has been Locked, please contact Admin.</p> : null}
+
                                     <CustomInput
                                         required={true}
                                         labelText="User Name"
@@ -409,6 +409,7 @@ class PasswordPage extends React.Component {
                                     />
                                     {this.state.capslock ? <p id="password-caps-warning" >Warning: Caps lock is on</p> : null}
                                     {this.state.errormessage ? <p className="error">*Invalid Password</p> : null}
+
                                     {attemptFlag == true &&
                                         <div className="help-block"> <h5>Failed attempts : {this.state.count}</h5>  </div>
                                     }
@@ -423,6 +424,7 @@ class PasswordPage extends React.Component {
                                             formControlProps={{ fullWidth: true }}
                                         />
                                         : null}
+                                    {this.state.accountlock ? <p className="error">*Your accont has been Locked, please contact Admin.</p> : null}
                                     <GridContainer>
                                         {this.renderRedirectpassword()}
                                         <Button id="text-captalize" color="rose" simple size="sm" onClick={this.handleforgot} >

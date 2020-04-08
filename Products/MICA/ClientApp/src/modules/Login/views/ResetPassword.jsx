@@ -173,11 +173,11 @@ class ResetPassword extends React.Component {
 
         if (this.props.location.state != null) {
             this.setState({
-                //userid: this.props.location.state.userid,
-                //UserName: this.props.location.state.UserName,
-                //servertype: this.props.location.state.servertype,
-                //environmentvalue: this.props.location.state.environmentvalue,
-                //environment: this.props.location.state.environment,
+                userid: this.props.location.state.userid,
+                UserName: this.props.location.state.UserName,
+                servertype: this.props.location.state.servertype,
+                environmentvalue: this.props.location.state.environmentvalue,
+                environment: this.props.location.state.environment,
             });
         }
         //console.log("servertype: ", this.state.servertype);
@@ -192,7 +192,7 @@ class ResetPassword extends React.Component {
         }
         else if (this.state.Password.newPassword == this.state.Password.confirmPassword) {
             let pass = this.state.Password;
-            pass.id = this.state.userid;
+            pass.id = this.props.location.state.userid;
             pass.envId = this.props.location.state.environmentvalue;
             pass.isChangePassword = true;
             this.setState({ pass });

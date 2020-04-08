@@ -50,7 +50,7 @@ class RecoverPassword extends React.Component {
             userId: "",
             UserName: "",
             environmentvalue: "",
-            environment:[],
+            environment: [],
             Mailotp: {
                 id: 0,
                 userId: "",
@@ -203,15 +203,15 @@ class RecoverPassword extends React.Component {
             body: JSON.stringify(mail)
         })
             .then(response => {
-            if (response.status == 200) {
-                //console.log('success');
-                swal({
-                    text: "OTP sent to your mail",
-                    icon: "success"
-                });
-            }
-            return response.json()
-        })
+                if (response.status == 200) {
+                    //console.log('success');
+                    swal({
+                        text: "OTP sent to your mail",
+                        icon: "success"
+                    });
+                }
+                return response.json()
+            })
             .then((data) => {
                 console.log("response data: ", data);
                 if (data.status == 1) {
@@ -230,7 +230,7 @@ class RecoverPassword extends React.Component {
                     });
                 }
             });
-        
+
     }
 
     Sendotp(event) {
@@ -282,7 +282,7 @@ class RecoverPassword extends React.Component {
                     environment: this.props.location.state.environment,
                 }
             }} />
-        } 
+        }
     }
 
     SubmitOtp() {

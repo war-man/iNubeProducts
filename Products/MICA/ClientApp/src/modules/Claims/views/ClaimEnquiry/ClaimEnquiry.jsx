@@ -625,7 +625,7 @@ class ClaimEnquiry extends React.Component {
    
 
     Editopen = () => {
-        this.setState({ disabled: false });
+        //this.setState({ disabled: false });
         this.setState({ open: true });
         console.log("officesendlist: ", this.state.officesendlist);
 
