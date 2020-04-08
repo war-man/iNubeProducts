@@ -50,10 +50,8 @@ artifacts:
     
         iNubeBillingCI:
             files:
-            - Services/iNube.Services.Billing/appspec.yml
-            - Services/iNube.Services.Billing/taskdef.json
-            - Services/iNube.Services.Billing/edappspec.yml
-            - Services/iNube.Services.Billing/edtaskdef.json
+            - Services/iNube.Services.Billing/edappspecChild.yml
+            - Services/iNube.Services.Billing/edtaskdefChild.json
             - imagedefinitions.json
             - productionimagedefinition.json
             - imageDetail.json      
