@@ -111,6 +111,7 @@ namespace iNube.Services.UserManagement.Models
         public bool IsMale { get; set; }
         public int? FirstTimeLogin { get; set; }
         public byte[] ProfileImage { get; set; }
+        public bool PasswordExpire { get; set; }
     }
 
     public class SendOtpResponse : ResponseStatus

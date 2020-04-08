@@ -101,7 +101,7 @@ export const TRANSLATIONS = {
         SearchBilling: "Search Billing",
         CreateContract: "Create Contract",
         SearchContract: "Search Contract",
-       // CreateCustomer: "Create Customer",
+        // CreateCustomer: "Create Customer",
         SearchCustomer: "View / Modify Customer",
         GenerateInvoice: "Generate Invoice",
         InvoiceConfiguration: "Invoice Configuration",
@@ -158,10 +158,10 @@ export const TRANSLATIONS = {
         DynamicProduct: 'Dynamic Product',
         DynamicProd: 'Dynamic Product',
         //Dynamic Reports
-        DynamicReports:'Reports',
+        DynamicReports: 'Reports',
         ReportConfig: 'Report Config',
-        ReportExecution:'Report Generation',
-        ReportUpdate:'Report Update',
+        ReportExecution: 'Report Generation',
+        ReportUpdate: 'Report Update',
 
         ClaimInbox: 'Claim Inbox',
         //Allocation
@@ -170,6 +170,8 @@ export const TRANSLATIONS = {
         AllocationRules: 'Allocation Rules',
         AllocationExecution: 'Allocation Execution',
         EllustrationConfig: 'Ellustration Config',
+        FileUpload: 'File Upload',
+        Upload: 'Upload',
         /**********************************************************************/
 
         //UserManagement
@@ -288,12 +290,12 @@ export const TRANSLATIONS = {
         Month: "Month",
         Year: "Year",
         Partner: "Partner",
-        CDAccountNumber:"CD Account Number",
+        CDAccountNumber: "CD Account Number",
         lob: "LOB",
         TotalPolicyCount: "Total Policy Count",
         ProductDetails: "Product Details",
-        PolicyCount:"Policy Count",
-        
+        PolicyCount: "Policy Count",
+
         //sweetalert
         NoRecords: "There are No Records for selected Month: ",
 
@@ -532,7 +534,7 @@ export const TRANSLATIONS = {
         CustomerDetails: 'Customer Details',
         CreateCustomer: 'Create Customer',
         Customer: 'Customer',
-      //  SearchCustomer: 'Search Customer',
+        //  SearchCustomer: 'Search Customer',
         CustomerName: 'Customer Name',
         WebSite: 'Web Site',
         PhoneNo: 'Phone No',
@@ -567,12 +569,12 @@ export const TRANSLATIONS = {
 
         //Invoice
         /***************************************************************/
-        SearchInvoice:'Search Invoice',
+        SearchInvoice: 'Search Invoice',
         CustomerName: 'Customer Name',
         Status: 'Status',
         InvoiceNo: 'Invoice No',
         StartDate: 'Start Date',
-        EndDate:'End Date',
+        EndDate: 'End Date',
         Search: "Search",
         OrgName: 'Org Name',
         InvoiceDate: 'Invoice Date',
@@ -602,10 +604,10 @@ export const TRANSLATIONS = {
         RevisedPenaltyRate: 'Revised Penalty Rate',
         RevisedPenaltyAmount: 'Revised Penalty Amount',
         //swal
-        RegInvoiceSwal:'Invoice Regenerated Successfully',
+        RegInvoiceSwal: 'Invoice Regenerated Successfully',
 
 
-     
+
 
         //Contract Details
         Contract: 'Contract',
@@ -717,14 +719,14 @@ export const TRANSLATIONS = {
         BranchDetails: 'Branch Details',
         EmailDetails: 'Email Details',
         Address1: 'Address 1',
-        Address2:'Address 2',
+        Address2: 'Address 2',
         Address3: 'Address 3',
         Inactive: 'Inactive',
         Active: 'Active',
         branches: 'branches',
         SearchParticipant: 'Search Participant',
         ParticipantType: 'Participant Type',
-        ParticipantCode:'Participant Code',
+        ParticipantCode: 'Participant Code',
         ParticipantName: 'Participant Name',
         Participantdetails: 'Participant details',
         BusinessType: 'Business Type',
@@ -749,11 +751,11 @@ export const TRANSLATIONS = {
         /****************************************************************/
         SearchPolicy: 'Search Policy',
         PolicyDetails: 'Policy Details',
-        ClaimDetails:'Claim Details',
+        ClaimDetails: 'Claim Details',
         PolicyCancellation: 'Policy Cancellation',
         RefundDetails: 'Refund Details',
         //ClaimEnquiry
-        IntimationDate:'Intimation Date'
+        IntimationDate: 'Intimation Date'
     },
     hi_IN: TRANSLATIONS_HN,
     kn_IN: TRANSLATIONS_KN,

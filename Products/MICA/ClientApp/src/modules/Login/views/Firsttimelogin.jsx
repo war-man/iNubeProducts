@@ -73,7 +73,8 @@ class Frsttimelogin extends React.Component {
             errormessage: false,
             blanknewpassword: false,
             successmessage: false,
-            blankconfirmpassword: false
+            blankconfirmpassword: false,
+            passwordexpired: false,
         };
         this.SendOtp = this.SendOtp.bind(this);
         this.VerifyOtp = this.VerifyOtp.bind(this);
@@ -168,8 +169,10 @@ class Frsttimelogin extends React.Component {
                 UName: this.props.location.state.UserName,
                 environmentvalue: this.props.location.state.environmentvalue,
                 environment: this.props.location.state.environment,
+                passwordexpired: this.props.location.state.passwordexpired,
             });
         }
+
         //console.log("servertype: ", this.state.servertype);
         //console.log("servertype: ", this.props.location.state.servertype);
     }
@@ -303,6 +306,13 @@ class Frsttimelogin extends React.Component {
                                         <p><b>*Note: </b>The Password should contain more than 8 characters with at least one lowercase alphabet, one upper case alphabet, one numeric digit and a special character.</p>
                                     </GridItem>
                                 </GridContainer>
+
+                                {this.state.passwordexpired ?
+                                    <GridContainer justify="center">
+                                        <p className="error">*your password has been expired. Please set a new password.</p>
+                                    </GridContainer>
+                                    : null}
+
                                 <CustomInput
                                     success={this.state.newPasswordState === "success"}
                                     error={this.state.newPasswordState === "error"}

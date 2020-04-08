@@ -50,14 +50,20 @@ namespace iNube.Services.UserManagement.Controllers.Login
         [AllowAnonymous]
         public IActionResult Authenticate([FromBody]LoginDTO loginDTO)
         {
-
             var user = _loginService.Authenticate(loginDTO);
 
             if (user == null)
                 return BadRequest(new LoginResponse { Status = iNube.Utility.Framework.Model.BusinessStatus.NotFound, ResponseMessage = "Username or password is incorrect" });
-
-            var response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId,true);
-
+            //var response = ""; 
+            LoginResponse response = new LoginResponse();
+            if (user.AccessFailedCount < 5)
+            {
+                response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId, true);
+            }
+            else
+            {
+                response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId, false);
+            }
             // return basic user info (without password) and token to store client side
             return Ok(response);
         }
@@ -72,7 +78,7 @@ namespace iNube.Services.UserManagement.Controllers.Login
             if (user == null)
                 return BadRequest(new LoginResponse { Status = iNube.Utility.Framework.Model.BusinessStatus.NotFound, ResponseMessage = "Username or password is incorrect" });
 
-            var response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId,true);
+            var response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId, true);
 
             // return basic user info (without password) and token to store client side
             return Ok(response);
@@ -95,8 +101,6 @@ namespace iNube.Services.UserManagement.Controllers.Login
 
         }
 
-
-
         // POST: api/Login/Logout
         [HttpPost]
         public string Logout([FromBody] string value)
@@ -117,13 +121,13 @@ namespace iNube.Services.UserManagement.Controllers.Login
         [HttpPost]
         public IActionResult GenerateToken(RequestToken request)
         {
-            LoginDTO loginDTO = new LoginDTO() {Username=request.Username , EnvId=request.EnvId, ProductType=request.ProductType };
+            LoginDTO loginDTO = new LoginDTO() { Username = request.Username, EnvId = request.EnvId, ProductType = request.ProductType };
             var user = _loginService.Authenticate(loginDTO);
 
             if (user == null)
                 return BadRequest(new LoginResponse { Status = iNube.Utility.Framework.Model.BusinessStatus.NotFound, ResponseMessage = "Username or password is incorrect" });
 
-            var response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId,true);
+            var response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId, true);
 
             // return basic user info (without password) and token to store client side
             return Ok(response);
@@ -225,13 +229,13 @@ namespace iNube.Services.UserManagement.Controllers.Login
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult GetEnvironmentConnection(string product,decimal EnvId)
+        public IActionResult GetEnvironmentConnection(string product, decimal EnvId)
         {
-            var result = _loginService.GetEnvironmentConnection(product,EnvId, Context);
+            var result = _loginService.GetEnvironmentConnection(product, EnvId, Context);
             return ServiceResponse(result);
         }
-		
-		  [HttpGet]
+
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
         {
