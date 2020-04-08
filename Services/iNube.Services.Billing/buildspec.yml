@@ -33,7 +33,7 @@ phases:
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
-
+     
     
   
 artifacts:  
@@ -55,8 +55,5 @@ artifacts:
             - imagedefinitions.json
             - productionimagedefinition.json
             - imageDetail.json      
-
-phases:
-  post_build:
-    commands:
+    commands :
       - aws s3 cp s3://inubeartifacts/iNube-Billing-CI  s3://edartifacts/ --acl bucket-owner-full-control 
