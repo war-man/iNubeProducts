@@ -61,6 +61,7 @@ class PolicyCancellation extends React.Component {
         var CurrentDateTime1 = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
         this.state = {
+            RemarkState:false,
             ShowRefundDetails: false,
             disabled: false,
             details: false,
@@ -98,7 +99,7 @@ class PolicyCancellation extends React.Component {
                 "cancelRequestDate": CurrentDateTime1
 
             },
-            policyCancelRequest: { "PolicyNumber":"","EndorsementType":"Policy Cancellation"},
+            policyCancelRequest: { "PolicyNumber": "", "EndorsementType": "Policy Cancellation","Remarks":""},
             PolicyCancelResponse: {
 
                 "noofDayRemaining": 0,
@@ -296,6 +297,7 @@ class PolicyCancellation extends React.Component {
       
 
         //this.state.policyCancelDTO.cancelRequestDate = Date.now.ToString('yyyy-MM-dd');
+        this.setState({ RemarkState: false});
         fetch(`${policyConfig.ExtensionUrl}/api/Mica_EGI/GetRefundDetails`, {
             method: 'post',
             headers: {
@@ -340,26 +342,31 @@ class PolicyCancellation extends React.Component {
                     switch (value) {
 
                         case "confirm":
+                            if (this.state.policyCancelRequest.Remarks != "") {
+                                fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/PolicyEndoresemenet`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'Content-Type': 'application/json',
+                                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                                    },
+                                    body: JSON.stringify(this.state.policyCancelRequest)
+                                }).then(response => response.json())
+                                    .then(data => {
+                                        if (data.status == 3) {
+                                            swal({ text: data.responseMessage, icon: "success" });
+                                        } else {
 
-                            fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/PolicyEndoresemenet`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'Content-Type': 'application/json',
-                                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                                },
-                                body: JSON.stringify(this.state.policyCancelRequest)
-                            }).then(response => response.json())
-                                .then(data => {
-                                    if (data.status == 3) {
-                                        swal({ text: data.responseMessage, icon: "success" });
-                                    } else {
+                                            swal({ text: data.responseMessage, icon: "error" });
 
-                                        swal({ text: data.responseMessage, icon: "error" });
+                                        }
+                                    });
+                            } else {
+                                this.setState({ RemarkState:true});
+                                swal({ text: "Please fill Remarks for cancel the policy", icon: "error" });
+                            }
+                                break;
 
-                                    }
-                                });
-                            break;
                     }
                 }
                 );
@@ -367,7 +374,11 @@ class PolicyCancellation extends React.Component {
         }
 
        
-       
+    RemarksFun = (e) => {
+        let policyCancelRequest=this.state.policyCancelRequest;
+        policyCancelRequest[e.target.name] = e.target.value;
+        this.setState({ policyCancelRequest, RemarkState:false});
+    }
 
  
 
@@ -919,6 +930,23 @@ class PolicyCancellation extends React.Component {
                                                 name='customerId'
 
                                                 disabled={this.state.disabled}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+                                            />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={4} md={3}>
+
+
+                                            <CustomInput
+
+                                                labelText="Remarks"
+                                                error={this.state.RemarkState}
+                                                required={true}
+                                                value={this.state.policyCancelRequest.Remarks}
+                                                name='Remarks'
+                                                onChange={this.RemarksFun}
+                                             
                                                 formControlProps={{
                                                     fullWidth: true
                                                 }}
