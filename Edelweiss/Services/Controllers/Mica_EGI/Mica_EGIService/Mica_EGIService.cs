@@ -3648,7 +3648,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             engineResponse.Add(resobj);
                             failcount++;
                         }
-                        if (Startdate >= Currentdate)
+                        if (Startdate.Date >= Currentdate.Date)
                         {
                             RuleEngineResponse resobj = new RuleEngineResponse();
                             resobj.ValidatorName = "Policy Start Date";
@@ -3670,7 +3670,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             failcount++;
                         }
 
-                        if (Startdate <= (Currentdate.AddDays(30)))
+                        if (Startdate.Date <= (Currentdate.Date.AddDays(30)))
                         {
                             RuleEngineResponse resobj = new RuleEngineResponse();
                             resobj.ValidatorName = "Policy Start Date";
@@ -3693,7 +3693,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
 
 
-                        if (Enddate == Startdate.AddDays(364))
+                        if (Enddate.Date == Startdate.Date.AddDays(364))
                         {
                             RuleEngineResponse res1obj = new RuleEngineResponse();
                             res1obj.ValidatorName = "Policy End Date";
