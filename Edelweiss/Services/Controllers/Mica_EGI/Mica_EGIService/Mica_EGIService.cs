@@ -16,7 +16,11 @@ using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using System.Data.SqlClient;
 using System.Data;
-
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using System.Threading;
+using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -58,6 +62,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         //MonthlySIScheduler
         Task<bool> MonthlySIScheduler(DateTime? dateTime);
 
+        Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken);
 
     }
 
@@ -4980,7 +4985,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             //Step-2:Start the Loop Based On Policy Number
             foreach (var policy in PolicyNumberList)
-            {              
+            {
                 try
                 {
 
@@ -5229,6 +5234,191 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return CdModel;
 
         }
+
+        public async Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken)
+        {
+            string filePath = "";
+            int step1 = 0;
+            try
+            {
+
+                var files = httpRequest.Form.Files;
+                //var docId = GetActiveResult(file.Name); HttpRequest
+                DataTable dt = new DataTable();
+                List<ErrorInfo> Errors = new List<ErrorInfo>();
+
+
+                foreach (var file in files)
+                {
+                    step1++;
+                    var filename = ContentDispositionHeaderValue
+                                        .Parse(file.ContentDisposition)
+                                        .FileName
+                                        .Trim('"');
+
+                    if (file == null || file.Length <= 0)
+                    {
+                        return new MonthlySIUploadDTO { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
+                    }
+                    var path = Path.Combine("", filename);
+                    filePath = Path.GetFullPath(path);
+                    using (FileStream fs = System.IO.File.Create(filePath))
+                    {
+                        file.CopyTo(fs);
+                        fs.Flush();
+                    }
+
+                    step1++;
+
+                    var fileExt = Path.GetExtension(file.FileName);
+
+                    if (fileExt == ".CSV" || fileExt == ".csv")
+                    {
+                        step1++;
+                        // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
+                        var res = await ConvertCSVtoDataTable(filePath);
+                        return res;
+                    }
+
+
+                }
+                if (Errors.Count > 0)
+                {
+                    return new MonthlySIUploadDTO { Status = BusinessStatus.Ok, Errors = Errors, ResponseMessage = $" {dt.Rows.Count }Document uploaded succefully with {Errors.Count} records having issues" };
+                }
+                else
+                {
+                    return new MonthlySIUploadDTO { Status = BusinessStatus.Ok, ResponseMessage = $"Document uploaded succefully!" };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new MonthlySIUploadDTO { Status = BusinessStatus.Error, ResponseMessage = $"Document upload error!" + ex.ToString(), MessageKey = step1.ToString() + " " + filePath };
+            }
+        }
+
+        public async Task<MonthlySIUploadDTO> ConvertCSVtoDataTable(string strFilePath)
+        {
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+
+            int logx = 0;
+
+            StreamReader sr = null;
+            try
+            {
+                sr = new StreamReader(strFilePath);
+                string[] headers = sr.ReadLine().Split(',');
+                DataTable dt = new DataTable();
+                foreach (string header in headers)
+                {
+                    dt.Columns.Add(header);
+                }
+                logx++;
+
+                //finding index of every column
+                var TxnidIndex = FindIndex(strFilePath, "txnid");
+                var payUidindex = FindIndex(strFilePath, "payUid");
+                var payAmountIndex = FindIndex(strFilePath, "payAmount");
+                var payStatusIndex = FindIndex(strFilePath, "payStatus");
+                var paymentDateIndex = FindIndex(strFilePath, "paymentDate");
+
+                logx++;
+
+                while (!sr.EndOfStream)
+                {
+                    string[] rows = Regex.Split(sr.ReadLine(), ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    DataRow dr = dt.NewRow();
+
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        dr[i] = rows[i];
+                    }
+                    dt.Rows.Add(dr);
+                }
+
+                var count = dt.Rows.Count;
+
+                var errorflag = false;
+
+
+                for (var i = 0; i < count; i++)
+                {
+                    var payUid = dt.Rows[i][payUidindex].ToString();
+                    var payAmount = dt.Rows[i][payAmountIndex].ToString();
+                    var payStatus = dt.Rows[i][payStatusIndex].ToString();
+                    var paymentDate = Convert.ToDateTime(dt.Rows[i][paymentDateIndex]);
+                    var txnid = dt.Rows[i][TxnidIndex].ToString();
+
+
+                    if (errorflag == false)
+                    {
+                        var TblData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
+
+                        TblData.PayUid = payUid;
+                        TblData.PayAmount = payAmount;
+                        TblData.PayStatus = payStatus;
+                        TblData.PaymentDate = paymentDate;               
+                        
+                        _context.TblPolicyMonthlySi.Update(TblData);
+                        _context.SaveChanges();
+
+                    }
+                    else
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $" Can not be updated for row {i + 1}" };
+                        Errors.Add(errorInfo);                        
+                        errorflag = true;
+                    }
+
+
+                    errorflag = false;
+                    var errorRowNo = i + 1;
+
+                }
+                if (Errors.Count > 0)
+                {
+                    return new MonthlySIUploadDTO { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded with following Erros", Errors = Errors };
+                }
+                else
+                {
+                    return new MonthlySIUploadDTO { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded Successfully" };
+                }
+            }
+            catch (Exception ex)
+            {
+                logx++;
+                return new MonthlySIUploadDTO { Status = BusinessStatus.Error, ResponseMessage = $"Document uploaded with following Erros " + ex.ToString(), MessageKey = logx.ToString() };
+            }
+            finally
+            {
+                sr.Dispose();
+            }
+        }
+
+        public int FindIndex(string filepath, string columnName)
+        {
+            // string filepath = @"C:\Users\brajesh.kumar\Desktop\test11.csv";
+            var lines = File.ReadLines(filepath);
+
+            var lineIdx = 0;
+            var colIdx = 0;
+
+            foreach (var line in lines)
+            {
+                lineIdx++;
+                foreach (var column in line.Split(','))
+                { // split cols here
+                    colIdx++;
+                    if (column.Contains(columnName))
+                    {
+                        return colIdx - 1;
+                    }
+                }
+                colIdx = 0; // reset col index
+            }
+            return colIdx;
+        }
+
 
     }
 }

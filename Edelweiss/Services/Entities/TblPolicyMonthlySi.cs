@@ -27,5 +27,6 @@ namespace MicaExtension_EGI.Entities
         public string PayStatus { get; set; }
         public DateTime? ReportCreatedDate { get; set; }
         public string PremiumDetails { get; set; }
+        public DateTime? PaymentDate { get; set; }
     }
 }
