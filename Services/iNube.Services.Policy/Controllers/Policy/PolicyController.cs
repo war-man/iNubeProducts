@@ -302,6 +302,15 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HCTest()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok, ResponseMessage = "Working as expected" };
+            return Ok(response);
+        }
+
         [HttpPost]
         public async Task<IActionResult> PolicySearchDashboard([FromBody]PolicySearchDashboardDTO policysearch)
         {

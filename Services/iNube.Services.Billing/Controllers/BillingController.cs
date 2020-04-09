@@ -577,13 +577,7 @@ namespace iNube.Services.Billing.Controllers.Billing
             return Ok(document);
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult HCTest()
-        {
-            var response = new ResponseStatus() { Status = BusinessStatus.Ok, ResponseMessage = "Working as expected" };
-            return Ok(response);
-        }
+       
 
     }
 }
