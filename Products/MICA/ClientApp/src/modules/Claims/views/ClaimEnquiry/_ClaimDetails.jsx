@@ -64,22 +64,17 @@ const ClaimDetails = (props) => {
     console.log("claimDetailsData123", props);
     // const { classes } = this.props;
     const claimDetailsprops = props.componentData;
-
+    const BankArray = props.componentData.BankArray;
+    const renderBankDetails = props.componentData.renderBankDetails;
     console.log('Claims', props);
-
     // const claimAmountData = props;
 
     return (
         <div>
 
             <GridContainer>
-
-
                 <GridItem xs={12} sm={4} md={3}>
-
-
                     <CustomInput
-
                         labelText="LossDate"
                         value={claimDetailsprops.claimDetailsData.lossDate}
                         name='lossDate'
@@ -90,10 +85,7 @@ const ClaimDetails = (props) => {
                     />
                 </GridItem>
 
-
                 <GridItem xs={12} sm={4} md={3}>
-
-
                     <CustomInput
                         disabled={claimDetailsprops.disabled}
                         labelText="LocationOfLoss"
@@ -106,8 +98,6 @@ const ClaimDetails = (props) => {
                 </GridItem>
 
                 <GridItem xs={12} sm={4} md={3}>
-
-
                     <CustomInput
                         disabled={claimDetailsprops.disabled}
                         labelText="LossDescription"
@@ -120,9 +110,7 @@ const ClaimDetails = (props) => {
                     />
                 </GridItem>
 
-                {
-                    claimDetailsprops.vehicleclaim &&
-
+                {claimDetailsprops.vehicleclaim &&
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             disabled={claimDetailsprops.disabled}
@@ -134,12 +122,9 @@ const ClaimDetails = (props) => {
                             }}
                         />
                     </GridItem>
-
                 }
 
-                 {
-                    claimDetailsprops.vehicleclaimstate &&
-
+                {claimDetailsprops.vehicleclaimstate &&
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             disabled={claimDetailsprops.disabled}
@@ -151,12 +136,9 @@ const ClaimDetails = (props) => {
                             }}
                         />
                     </GridItem>
-
                 }
 
-                {
-                    claimDetailsprops.vehicleclaimdriver &&
-
+                {claimDetailsprops.vehicleclaimdriver &&
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             disabled={claimDetailsprops.disabled}
@@ -170,9 +152,7 @@ const ClaimDetails = (props) => {
                     </GridItem>
                 }
 
-                {
-                    claimDetailsprops.vehicleclaimsurvey &&
-
+                {claimDetailsprops.vehicleclaimsurvey &&
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             disabled={claimDetailsprops.disabled}
@@ -188,20 +168,15 @@ const ClaimDetails = (props) => {
 
                 <GridContainer justify="center">
                     <GridItem xs={3} sm={3} md={3}>
-
                         <Button color="warning" onClick={claimDetailsprops.handleActivitylog} id="claims" round>
                             Activity Log
                             </Button>
-
                     </GridItem>
                 </GridContainer>
 
-
             </GridContainer>
-
             <GridContainer justify="center" >
                 <GridItem xs={12}>
-
                     <ReactTable
                         data={claimDetailsprops.TableData}
                         filterable
@@ -215,7 +190,6 @@ const ClaimDetails = (props) => {
                                 sortable: false,
                                 //  filterable: false 
                             },
-                            
                             {
                                 Header: "IdentificationNo",
                                 accessor: "identificationNo",
@@ -238,7 +212,6 @@ const ClaimDetails = (props) => {
                                 headerClassName: 'react-table-center',
                                 //sortable: false,
                                 //filterable: false
-
                             },
                             {
                                 Header: "ClaimAmount",
@@ -248,9 +221,7 @@ const ClaimDetails = (props) => {
                                 headerClassName: 'react-table-center',
                                 //sortable: false,
                                 //filterable: false
-
                             },
-
                             {
                                 Header: "ApprovedAmount",
                                 accessor: "approvedClaimAmounts",
@@ -259,26 +230,18 @@ const ClaimDetails = (props) => {
                                 headerClassName: 'react-table-center',
                                 //sortable: false,
                                 //filterable: false
-
                             },
-
-
                         ]}
                         defaultPageSize={4}
                         pageSize={([claimDetailsprops.TableData.length + 1] < 4) ? [claimDetailsprops.TableData.length + 1] : 4}
                         showPaginationTop={false}
                         showPaginationBottom={true}
                         className="-striped -highlight discription-tab"
-
                     />
-
                 </GridItem>
             </GridContainer>
 
-
-
             <GridContainer lg={12} justify="flex-end">
-
                 <GridItem xs={5} sm={3} md={3} lg={4}>
                     <CustomInput
                         disabled={claimDetailsprops.disabled}
@@ -289,9 +252,6 @@ const ClaimDetails = (props) => {
                         formControlProps={{ fullWidth: true }}
                     />
                 </GridItem>
-
-
-
                 <GridItem xs={5} sm={3} md={3} lg={4}>
                     <CustomInput
                         disabled={claimDetailsprops.disabled}
@@ -302,11 +262,32 @@ const ClaimDetails = (props) => {
                         formControlProps={{ fullWidth: true }}
                     />
                 </GridItem>
-
             </GridContainer>
-
-
             <br />
+            {(BankArray.length > 0) ?
+                <GridContainer>
+                    {BankArray.map((item, key) =>
+                        <GridContainer >
+                            <GridItem lg={12}>
+                                <CardHeader color="info" icon >
+                                    {
+                                        <h3 >
+                                            <small> {item.name}&nbsp;<TranslationContainer translationKey="BankDetails" /></small>
+                                        </h3>
+                                    }
+                                </CardHeader>
+                            </GridItem>
+                            {item.BankDetails.map(item1 =>
+                                <GridContainer>
+                                    {renderBankDetails(item1)}
+                                </GridContainer>
+                            )}
+                        </GridContainer>
+                    )}
+                </GridContainer>
+                :
+                <h4>No Bank Details Available for this Claim</h4>
+            }
             <GridContainer>
                 <CardHeader color="info" icon >
                     {
@@ -315,43 +296,34 @@ const ClaimDetails = (props) => {
                         </h3>
                     }
                 </CardHeader>
+                <GridContainer>
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
+                            labelText="ClaimStatus"
+                            value={claimDetailsprops.claimDetailsData.claimStatus}
+                            name='claimStatus'
+                            disabled={claimDetailsprops.disabled}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
 
-
-
-            <GridContainer>
-                <GridItem xs={12} sm={4} md={3}>
-
-
-                    <CustomInput
-
-                        labelText="ClaimStatus"
-                        value={claimDetailsprops.claimDetailsData.claimStatus}
-                        name='claimStatus'
-                        disabled={claimDetailsprops.disabled}
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                    />
-                </GridItem>
-
-                <GridItem xs={12} sm={12} md={8}>
-
-
-                    <CustomInput
-                        labelText="ManagerRemarks"
-                        value={claimDetailsprops.claimDetailsData.claimManagerRemarks}
-                        name='claimManagerRemarks'
-                        disabled={claimDetailsprops.disabled}
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                    />
-                </GridItem>
+                    <GridItem xs={12} sm={12} md={8}>
+                        <CustomInput
+                            labelText="ManagerRemarks"
+                            value={claimDetailsprops.claimDetailsData.claimManagerRemarks}
+                            name='claimManagerRemarks'
+                            disabled={claimDetailsprops.disabled}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
 
                 </GridContainer>
-
                 <br />
-                <br/>
+                <br />
                 <GridContainer justify="center">
                     <GridItem xs={5} sm={3} md={3} lg={1}>
                         <Button color="info" round onClick={claimDetailsprops.handleDisappear}>
@@ -359,10 +331,7 @@ const ClaimDetails = (props) => {
                         </Button>
                     </GridItem>
                 </GridContainer>
-
             </GridContainer>
-
-
         </div>
     );
 
