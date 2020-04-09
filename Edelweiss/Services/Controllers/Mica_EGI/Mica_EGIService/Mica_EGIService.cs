@@ -3791,8 +3791,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 case "Claim":
 
-                    var claiminsurable = SourceObject["claimInsurable"];
-                    var policyno = SourceObject["policyNumber"].ToString();
+                    var claiminsurable = SourceObject["ClaimInsurable"];
+                    var policyno = SourceObject["PolicyNumber"].ToString();
                   //  var lossdatetime = SourceObject["lossDateTime"].ToString();
 
                     DateTime lossdatetime = Convert.ToDateTime(SourceObject["lossDateTime"]);
