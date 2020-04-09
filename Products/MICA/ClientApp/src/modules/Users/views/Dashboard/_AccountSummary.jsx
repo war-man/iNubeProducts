@@ -93,7 +93,7 @@ class AccountSummary extends React.Component {
             graphwidth: 0,
             graphheight: 0,
             loader: false,
-            PolicyPage:true,
+            PolicyPage: true,
         };
     }
     setValue = (event) => {
@@ -118,7 +118,7 @@ class AccountSummary extends React.Component {
                 this.setState({ selectedMonth: this.state.Month[i].mID })
         }
 
-        fetch(`${policyConfig.policyConfigUrl}/api/Policy/PolicyDashboardMaster`, {
+        fetch(`${policyConfig.PolicyConfigUrl}/api/Policy/PolicyDashboardMaster`, {
             //  fetch(`https://localhost:44351/api/Policy/PolicyDashboardMaster`, {
             method: 'GET',
             headers: {
@@ -143,8 +143,8 @@ class AccountSummary extends React.Component {
         this.setState({ graphwidth: 800 });
         this.setState({ graphheight: 375 });
 
-       fetch(`${policyConfig.policyConfigUrl}/api/Policy/GetPolicyGrossWrittenPremium`, {
-         //fetch(`https://localhost:44351/api/Policy/GetPolicyGrossWrittenPremium`, {
+        fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/GetPolicyGrossWrittenPremium`, {
+            //fetch(`https://localhost:44351/api/Policy/GetPolicyGrossWrittenPremium`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -159,7 +159,7 @@ class AccountSummary extends React.Component {
                     /* First I Used ""StackData"" to set data */
                     let ProductData = data[0];
 
-                   let CountData = data[data.length - 1];
+                    let CountData = data[data.length - 1];
 
 
                     let index = [];
@@ -177,7 +177,7 @@ class AccountSummary extends React.Component {
                     }
                     this.state.NEWSTACKDATA.push(Array1);
                     this.state.NEWSTACKDATA.push(Array2);
-                    this.setState({ columnChartflag : true});
+                    this.setState({ columnChartflag: true });
                 } else {
                     this.setState({ loader: true });
                 }
@@ -201,7 +201,7 @@ class AccountSummary extends React.Component {
 
         let data = this.state.StackData;
 
-        console.log("PolicyData",data);
+        console.log("PolicyData", data);
 
         let index = [];
         let Final = [];
@@ -263,7 +263,7 @@ class AccountSummary extends React.Component {
 
     handleYear = (e) => {
         this.setState({ [e.target.name]: e.target.value });
-       
+
         fetch(`${policyConfig.policyConfigUrl}/api/Policy/GetPolicyGrossWrittenPremium?Year=` + e.target.value, {
             //fetch(`https://localhost:44351/api/Policy/GetPolicyGrossWrittenPremium?Year=` + e.target.value, {
             method: 'GET',
@@ -556,7 +556,7 @@ class AccountSummary extends React.Component {
                         </GridContainer>
                         : <DashboardContentLoader />
                     }
-                </GridContainer> :null}
+                </GridContainer> : null}
         </div>
         );
     }
