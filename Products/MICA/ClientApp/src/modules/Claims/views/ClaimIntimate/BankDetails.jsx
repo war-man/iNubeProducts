@@ -102,14 +102,16 @@ const BankDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                         //success={props.ifscCodeState === "success"}
-                      //  error={props.ifscCodeState}
+                        error={props.ifscCodeState}
                             labelText="IFSCCode"
                             value={props.bankDetails.ifscCode}
                             name="ifscCode"
                             onChange={(e) => props.handleChangebank("ifscCode",e)}
 
                         formControlProps={{ fullWidth: true }} />
-                       
+
+                        {props.errorifsccode && (props.ifscCodeState == true) ? <p className="error"> IFSC Code should be in correct formate (eg: CNBK1234567)</p> : null}
+
                     </GridItem>
 
                     <GridItem xs={12} sm={8} md={9}>

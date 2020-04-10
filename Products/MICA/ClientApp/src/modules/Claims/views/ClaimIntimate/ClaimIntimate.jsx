@@ -387,7 +387,7 @@ class ClaimIntimate extends React.Component {
         evt.preventDefault();
         this.UIValidation();
         this.IsValidProductDetails();
-       
+        debugger;
         if (this.state.validateUI === true) {
 
             if (this.state.ValidationUI === true) {
@@ -501,7 +501,7 @@ class ClaimIntimate extends React.Component {
             }
         } else {
 
-            //this.setState({ errorifsccode: true });
+            this.setState({ errorifsccode: true });
             //this.setState({ erroraccno: true });
 
         }
@@ -513,7 +513,7 @@ class ClaimIntimate extends React.Component {
        // console.log("lossdatedetails", this.state.DetailsDTO.locationOfLoss)
         if (this.state.DetailsDTO.lossDateTime !== "" && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== "" 
             && this.state.DetailsDTO.causeOfLoss !== "" && this.state.DetailsDTO.insurableItems !== "") {
-            this.state.validateUI = true;
+            this.state.ValidationUI = true;
         }
         else {
 
@@ -524,16 +524,15 @@ class ClaimIntimate extends React.Component {
     }
 
     UIValidation = () => {
-
-        console.log("lossDateTimeState", this.state.lossDateTimeState, "locationOfLossState", this.state.locationOfLossState, "lossDescriptionState", this.state.lossDescriptionState);
-
-        if (this.state.locationOfLossState == false && this.state.lossDescriptionState == false) {
+        debugger;
+        if (this.state.locationOfLossState === false && this.state.lossDescriptionState === false && this.state.ifscCodeState === false) {
 
             this.state.validateUI = true;
 
         }
         else {
             this.state.validateUI = false;
+            this.state.errorifsccode = true;
             this.setState({});
         }
     }
