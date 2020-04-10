@@ -208,6 +208,8 @@ namespace MicaExtension_EGI.Entities
 
                 entity.Property(e => e.PayUid).IsUnicode(false);
 
+                entity.Property(e => e.PaymentDate).HasColumnType("datetime");
+
                 entity.Property(e => e.PerDayPremium).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.Phone)

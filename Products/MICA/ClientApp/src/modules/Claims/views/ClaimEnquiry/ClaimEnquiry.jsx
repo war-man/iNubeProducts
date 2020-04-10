@@ -30,6 +30,7 @@ import data_Not_found from "assets/img/data-not-found-new.png";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import Modal from '@material-ui/core/Modal';
 import PDFViewer from 'pdf-viewer-reactjs';
+import BankDetails from "../ClaimIntimate/BankDetails";
 
 
 const CustomTableCell = withStyles(theme => ({
@@ -107,9 +108,9 @@ const searchBtn = {
 }
 
 const paddingCard =
-{
-    padding: "10px",
-};
+    {
+        padding: "10px",
+    };
 
 class ClaimEnquiry extends React.Component {
     constructor(props) {
@@ -151,7 +152,7 @@ class ClaimEnquiry extends React.Component {
             ClaimsDecisionData: [],
             claimsdecisionshow: false,
             Claimdetailsdata: [],
-          
+
             ClaimDataDTO: [],
             claimId: 0,
             documentName: "",
@@ -192,6 +193,7 @@ class ClaimEnquiry extends React.Component {
             file: null,
             dropFlag: false,
             status: "",
+            AccountTypedata: [],
             ClaimDTO: {
                 insuredName: "",
                 insuredReference: "",
@@ -218,6 +220,7 @@ class ClaimEnquiry extends React.Component {
             ],
 
             email: "",
+            BankArray: [],
             fields: {
                 claimStatusId: "",
                 approvedClaimAmount: "",
@@ -254,6 +257,7 @@ class ClaimEnquiry extends React.Component {
                 eventDate: "",
                 lossDateTime: "",
             },
+            BankDetails: [],
             claimDetailsData: {
                 "lossDate": "",
                 "locationOfEvent": "",
@@ -319,7 +323,6 @@ class ClaimEnquiry extends React.Component {
 
     };
 
-
     onFormSubmit = (evt) => {
 
 
@@ -375,7 +378,6 @@ class ClaimEnquiry extends React.Component {
 
     };
 
-
     onInputParamChange = (type, evt) => {
         console.log('Event', evt);
         let fields = this.state.fields;
@@ -386,8 +388,6 @@ class ClaimEnquiry extends React.Component {
         this.setState({ fields });
         this.change(evt, name, type);
     };
-
-
 
     editFunction(id, oid) {
         console.log("pid", oid);
@@ -421,8 +421,6 @@ class ClaimEnquiry extends React.Component {
         this.claimAmountTable();
     }
 
-
-
     componentDidMount() {
 
         let claimdecision = "Claim Decision";
@@ -441,6 +439,20 @@ class ClaimEnquiry extends React.Component {
                 console.log("ClaimsDecisionData", data);
             });
 
+        let accounttype = "Account Type";
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + accounttype + ``, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({ AccountTypedata: data });
+
+                console.log("AccountTypedata", data);
+            });
 
         setTimeout(
             function () {
@@ -448,7 +460,6 @@ class ClaimEnquiry extends React.Component {
             }.bind(this), 2000
         );
     }
-
 
     onDateChange = (formate, type, name, event) => {
         const { validdate } = this.state;
@@ -474,7 +485,6 @@ class ClaimEnquiry extends React.Component {
 
     };
 
-
     datechange = (date) => {
         const _date = date.split('/');
         const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
@@ -482,23 +492,16 @@ class ClaimEnquiry extends React.Component {
         return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
     }
 
-
-
-
     tableshow = () => {
 
         console.log("ClaimDTO", this.state.ClaimDTO);
-
         console.log("ClaimSearchDTO", this.state.ClaimSearchDTO);
-
         console.log("1234567", this.state.fields.claimId);
         const Cdate = this.state.ClaimDTO.eventDate;
 
         if (this.state.ClaimDTO.eventDate != "") {
             this.state.ClaimDTO.eventDate = this.datechange(this.state.ClaimDTO.eventDate);
         }
-
-
         let that = this;
         that.setState({ loader: false });
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaim`, {
@@ -512,32 +515,27 @@ class ClaimEnquiry extends React.Component {
             body: JSON.stringify(this.state.ClaimDTO)
         }).then(function (response) {
             return response.json();
-            }).then(function (data) {
-                that.setState({ showtable: false, loader: false });
-                if (data.claimSearch.length > 0) {
-                    that.dataTable(data.claimSearch);
-                    that.setState({ email: data.claimSearch[0].insuredEmail });
-                } else {
-                    setTimeout(
-                        function () {
-                            that.setState({ loader: true, showtable: false, nodata: true });
-                        }.bind(this), 2000
-                    );
-                }
+        }).then(function (data) {
+            that.setState({ showtable: false, loader: false });
+            if (data.claimSearch.length > 0) {
+                that.dataTable(data.claimSearch);
+                that.setState({ email: data.claimSearch[0].insuredEmail });
+            } else {
+                setTimeout(
+                    function () {
+                        that.setState({ loader: true, showtable: false, nodata: true });
+                    }.bind(this), 2000
+                );
+            }
 
-                that.setState({ Claimlist: data.claimSearch });
-                that.setState({ officelist: data.claimSearch });
+            that.setState({ Claimlist: data.claimSearch });
+            that.setState({ officelist: data.claimSearch });
 
-                 that.claimAmountTable(data);
-
-
-            });
-
+            that.claimAmountTable(data);
+        });
 
         this.state.ClaimDTO.eventDate = Cdate;
-
     };
-
 
     setstatus = (type, event) => {
         this.setState({ [event.target.name]: event.target.value });
@@ -553,7 +551,7 @@ class ClaimEnquiry extends React.Component {
                 console.log("prop data", prop);
                 console.log("send data", key);
                 return {
-                    
+
                     insuredName: prop.insuredName,
                     policyNo: prop.policyNo,
                     claimNumber: prop.claimNumber,
@@ -609,7 +607,7 @@ class ClaimEnquiry extends React.Component {
             docdata: this.state.DocumentData.map((prop, key) => {
                 console.log("coming", this.state.docdata);
                 const { classes } = this.props;
-                
+
                 return {
                     id: key + 1,
                     documentName: prop.documentView,
@@ -621,8 +619,110 @@ class ClaimEnquiry extends React.Component {
         console.log("docdata", this.state.docdata);
     }
 
-
-   
+    renderBankDetails = (item) => {
+        return (
+            <GridContainer>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Account Holder Name"
+                        //  required={true}
+                        disabled={true}
+                        //name={item.accountHolderName}
+                        value={item.accountHolderName}
+                        //value={Bankfieldsmodel.Value}
+                        //onChange={(e) => this.onModelChange(e, name)}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Account No."
+                        //  required={true}
+                        disabled={true}
+                        //name={item.accountHolderName}
+                        value={item.accountNumber}
+                        //value={Bankfieldsmodel.Value}
+                        //onChange={(e) => this.onModelChange(e, name)}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <MasterDropdown
+                        // required={true}
+                        labelText="Account Type"
+                        // id="Type"
+                        disabled={true}
+                        lstObject={this.state.AccountTypedata}
+                        filterName='Account Type'
+                        value={item.accountType}
+                        //name={Bankfieldsmodel.Name}
+                        //onChange={(e) => this.onModelChange(e, name)}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Bank Name"
+                        //  required={true}
+                        disabled={true}
+                        //name={item.accountHolderName}
+                        value={item.bankName}
+                        //value={Bankfieldsmodel.Value}
+                        //onChange={(e) => this.onModelChange(e, name)}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="IFSC Code"
+                        //  required={true}
+                        disabled={true}
+                        //name={item.accountHolderName}
+                        value={item.ifsccode}
+                        //value={Bankfieldsmodel.Value}
+                        //onChange={(e) => this.onModelChange(e, name)}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Bank Branch Address"
+                        //  required={true}
+                        disabled={true}
+                        //name={item.accountHolderName}
+                        value={item.bankBranchAddress}
+                        //value={Bankfieldsmodel.Value}
+                        //onChange={(e) => this.onModelChange(e, name)}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Amount Paid"
+                        //  required={true}
+                        disabled={true}
+                        //name={item.accountHolderName}
+                        value={item.amountPaid}
+                        //value={Bankfieldsmodel.Value}
+                        //onChange={(e) => this.onModelChange(e, name)}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Date Of Payment"
+                        //  required={true}
+                        disabled={true}
+                        //name={item.accountHolderName}
+                        value={new Date(item.dataOfPayment).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        //value={Bankfieldsmodel.Value}
+                        //onChange={(e) => this.onModelChange(e, name)}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+            </GridContainer>
+        );
+    }
 
     Editopen = () => {
         //this.setState({ disabled: false });
@@ -646,8 +746,8 @@ class ClaimEnquiry extends React.Component {
             .then(data => {
                 console.log("claimDetailsfndata", data);
 
-                this.setState({ claimTableData: data[1] });
-                
+                this.setState({ claimTableData: data[1], BankDetails: data[2] });
+                console.log("Bank Array: ", this.state.BankDetails)
                 this.claimAmountTable(this.state.claimTableData);
 
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -658,31 +758,40 @@ class ClaimEnquiry extends React.Component {
                 this.state.claimDetailsData.claimStatus = data[0][5][1];
                 this.state.claimDetailsData.claimManagerRemarks = data[0][6][1];
 
-          
+                let bankarray = this.state.BankArray;
+                if (this.state.BankDetails.length > 0) {
+                    console.log("Bank Array: ", this.state.BankDetails)
+                    for (var i = 0; i < this.state.BankDetails.length; i++) {
+                        var Bankelement = {};
+                        console.log("Bank Array: ", this.state.BankDetails[i]);
+                        Bankelement.name = this.state.BankDetails[i].payeeType;
+                        let array = [];
+                        array.push(this.state.BankDetails[i])
+                        Bankelement.BankDetails = array;
+                        bankarray.push(Bankelement);
+                    }
+                }
+                this.setState({ bankarray });
+                console.log("Bank Array: ", bankarray)
 
-                if (data[0][8][1].length != 0) {
+                if (data[0][8][1].length > 0) {
                     this.state.claimDetailsData.vehicleLocationState = data[0][8][1];
                     this.setState({ vehicleclaimstate: true });
                 }
-                if (data[0][7][1].length != 0) {
+                if (data[0][7][1].length > 0) {
                     this.state.claimDetailsData.vehicleLocation = data[0][7][1];
                     this.setState({ vehicleclaim: true });
                 }
-                if (data[0][10][1].length != 0) {
+                if (data[0][10][1].length > 0) {
                     this.state.claimDetailsData.selfSurvey = data[0][10][1];
                     this.setState({ vehicleclaimsurvey: true });
                 }
-                if (data[0][9][1].length != 0) {
+                if (data[0][9][1].length > 0) {
                     this.state.claimDetailsData.driverName = data[0][9][1];
                     this.setState({ vehicleclaimdriver: true });
                 }
-                
                 console.log("insurablegrid vaalue", this.state.claimTableData);
             });
-
-
-
-
     }
 
     policyDetailsfun = (policyNo) => {
@@ -709,7 +818,6 @@ class ClaimEnquiry extends React.Component {
 
             });
     }
-
 
     documentView = (oid, isDoc, isPolicy) => {
 
@@ -777,13 +885,12 @@ class ClaimEnquiry extends React.Component {
                     this.setState({ isimage: false });
                 }
 
-               
+
                 this.setState({ openpop: true });
             });
-        
+
     }
 
-    
     uint8ToImageData = (uint8, width, height) => {
 
         let iData = this.context.createImageData(width, height);
@@ -797,7 +904,6 @@ class ClaimEnquiry extends React.Component {
         return iData;
 
     }
-
 
     SetDecision(setValue) {
 
@@ -823,7 +929,6 @@ class ClaimEnquiry extends React.Component {
         this.state.ClaimDTO = Claimsearchdata;
         this.setState({ Claimsearchdata });
     }
-
 
     change(event, stateName, type, stateNameEqualTo, maxValue) {
         switch (type) {
@@ -866,7 +971,7 @@ class ClaimEnquiry extends React.Component {
                 }
                 break;
 
-            
+
 
             case "claimManagerRemarks":
                 if (validationPage.verifyName(event.target.value)) {
@@ -882,12 +987,7 @@ class ClaimEnquiry extends React.Component {
     }
 
     handleActivitylog = () => {
-
-
         let that = this;
-
-
-
         fetch(`${ClaimConfig.claimConfigUrl}/api/Mica_EGI/GetVehicleActivity`, {
             method: 'post',
             headers: {
@@ -908,13 +1008,8 @@ class ClaimEnquiry extends React.Component {
                 }
             }
             console.log("vehicleActivitydata", that.state.vehicleActivitydata);
-
             //that.setState({ popopen: true });
-
-
         });
-
-
     }
 
     handleActivityClose = () => {
@@ -934,39 +1029,38 @@ class ClaimEnquiry extends React.Component {
         console.log("table data", this.state.TableDataList);
     }
 
-
     render() {
         const { classes } = this.props;
         return (
             <div>
                 {this.state.pageloader ?
 
-                <Card>
-                    <CardHeader color="rose" icon>
-                        <CardIcon color="rose">
+                    <Card>
+                        <CardHeader color="rose" icon>
+                            <CardIcon color="rose">
 
-                            <Icon><img src={claimenquiry} /></Icon>
+                                <Icon><img src={claimenquiry} /></Icon>
 
-                        </CardIcon>
-                        <h4 className={this.props.cardIconTitle}>
+                            </CardIcon>
+                            <h4 className={this.props.cardIconTitle}>
                                 <small><TranslationContainer translationKey="ClaimEnquiry" /></small>
-                        </h4>
-                    </CardHeader>
-                    <CardBody>
-                        <GridContainer>
-                            <GridItem xs={12} sm={4} md={3}> <CustomInput
-                                //success={this.state.policyNoState === "success"}
-                                error={this.state.policyNoState}
-                                labelText="PolicyNo"
-                                name="policyNo"
-                                value={this.state.ClaimDTO.policyNo}
-                                onChange={(e) => this.SetValue("policyNo", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            {/*<GridItem xs={12} sm={4} md={3}> <CustomInput
+                            </h4>
+                        </CardHeader>
+                        <CardBody>
+                            <GridContainer>
+                                <GridItem xs={12} sm={4} md={3}> <CustomInput
+                                    //success={this.state.policyNoState === "success"}
+                                    error={this.state.policyNoState}
+                                    labelText="PolicyNo"
+                                    name="policyNo"
+                                    value={this.state.ClaimDTO.policyNo}
+                                    onChange={(e) => this.SetValue("policyNo", e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
+                                </GridItem>
+                                {/*<GridItem xs={12} sm={4} md={3}> <CustomInput
                                 //success={this.state.insuredreferencestate === "success"}
                                 error={this.state.insuredreferencestate}
                                 labeltext="insuredreferenceno"
@@ -979,18 +1073,18 @@ class ClaimEnquiry extends React.Component {
                             />
                             </griditem>*/}
 
-                            <GridItem xs={12} sm={4} md={3}> <CustomInput
-                               // success={this.state.insuredMobileNoState === "success"}
-                                error={this.state.insuredMobileNoState}
-                                labelText="InsuredMobileNo"
-                                name="insuredMobileNo"
-                                value={this.state.ClaimDTO.insuredMobileNo}
-                                onChange={(e) => this.SetValue("insuredMobileNo", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
+                                <GridItem xs={12} sm={4} md={3}> <CustomInput
+                                    // success={this.state.insuredMobileNoState === "success"}
+                                    error={this.state.insuredMobileNoState}
+                                    labelText="InsuredMobileNo"
+                                    name="insuredMobileNo"
+                                    value={this.state.ClaimDTO.insuredMobileNo}
+                                    onChange={(e) => this.SetValue("insuredMobileNo", e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
+                                </GridItem>
                                 {/*<GridItem xs={12} sm={4} md={3}> <CustomInput
                                // success={this.state.insuredEmailState === "success"}
                                 error={this.state.insuredEmailState}
@@ -1003,53 +1097,53 @@ class ClaimEnquiry extends React.Component {
                                 }}
                             />
                             </GridItem>*/}
-                            <GridItem xs={12} sm={4} md={3}> <CustomInput
-                               // success={this.state.claimNumberState === "success"}
-                                error={this.state.claimNumberState}
-                                labelText="ClaimNo"
-                                name="claimNumber"
-                                value={this.state.ClaimDTO.claimNumber}
-                                onChange={(e) => this.SetValue("claimNumber", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
+                                <GridItem xs={12} sm={4} md={3}> <CustomInput
+                                    // success={this.state.claimNumberState === "success"}
+                                    error={this.state.claimNumberState}
+                                    labelText="ClaimNo"
+                                    name="claimNumber"
+                                    value={this.state.ClaimDTO.claimNumber}
+                                    onChange={(e) => this.SetValue("claimNumber", e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
+                                </GridItem>
 
-                            <GridItem xs={12} sm={4} md={3}>
-                                <CustomDatetime
-                                    onFocus={this.onClick}
-                                    //success={this.state.lossDateTimeState === "success"}
-                                    error={this.state.lossDateTimeState}
+                                <GridItem xs={12} sm={4} md={3}>
+                                    <CustomDatetime
+                                        onFocus={this.onClick}
+                                        //success={this.state.lossDateTimeState === "success"}
+                                        error={this.state.lossDateTimeState}
                                         labelText="LossDate"
                                         Futuredatevalidate={true}
-                                    id='dtActiveFrom'
-                                    name='lossDateTime'
-                                        onChange={(evt) => this.onDateChange('datetime','ClaimDTO' ,'lossDateTime', evt)}
-                                    value={this.state.ClaimDTO.lossDateTime}
-                                    formControlProps={{ fullWidth: true }} />
-                            </GridItem>
+                                        id='dtActiveFrom'
+                                        name='lossDateTime'
+                                        onChange={(evt) => this.onDateChange('datetime', 'ClaimDTO', 'lossDateTime', evt)}
+                                        value={this.state.ClaimDTO.lossDateTime}
+                                        formControlProps={{ fullWidth: true }} />
+                                </GridItem>
 
 
-                            <GridItem xs={12} sm={4} md={3}>
+                                <GridItem xs={12} sm={4} md={3}>
 
-                                <MasterDropdown
-                                   // succes={this.state.claimStatusIdState === "success"}
-                                    error={this.state.claimStatusIdState}
-                                    labelText="ClaimStatus"
-                                    id="ddlstatus"
-                                    lstObject={this.state.ClaimsDecisionData}
-                                    filterName='Claim Status'
-                                    value={this.state.ClaimDTO.claimStatusId}
-                                    name='claimStatusId'
-                                    onChange={(e) => this.SetValue("claimStatusId", e)}
-                                    formControlProps={{ fullWidth: true }}
-                                />
+                                    <MasterDropdown
+                                        // succes={this.state.claimStatusIdState === "success"}
+                                        error={this.state.claimStatusIdState}
+                                        labelText="ClaimStatus"
+                                        id="ddlstatus"
+                                        lstObject={this.state.ClaimsDecisionData}
+                                        filterName='Claim Status'
+                                        value={this.state.ClaimDTO.claimStatusId}
+                                        name='claimStatusId'
+                                        onChange={(e) => this.SetValue("claimStatusId", e)}
+                                        formControlProps={{ fullWidth: true }}
+                                    />
 
 
-                            </GridItem>
+                                </GridItem>
 
-                            <GridContainer justify="center">
+                                <GridContainer justify="center">
                                     <GridItem xs={3} sm={3} md={3}>
                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                             <Button color="warning" onClick={this.tableshow} id="claims" round>
@@ -1057,11 +1151,11 @@ class ClaimEnquiry extends React.Component {
                                             </Button>
                                         </Animated>
 
-                                </GridItem>
+                                    </GridItem>
+                                </GridContainer>
                             </GridContainer>
-                        </GridContainer>
-                    </CardBody>
-                        </Card>
+                        </CardBody>
+                    </Card>
                     : <PageContentLoader />
                 }
                 {this.state.disappear ?
@@ -1183,31 +1277,31 @@ class ClaimEnquiry extends React.Component {
                                 <TableContentLoader />
                             </Card>
                         }
-                  
-                    {this.state.open ?
-                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                    <Card>
-                        <CardBody>
-                            <GridContainer justify="center" lg={12}>
-                                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                <div className="banner">
+
+                        {this.state.open ?
+                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                <Card>
+                                    <CardBody>
+                                        <GridContainer justify="center" lg={12}>
+                                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                <div className="banner">
                                                     <label><TranslationContainer translationKey="PolicyNumber" /></label>&nbsp;<h5>{this.state.PolicyNumber}</h5>
                                                     <label><TranslationContainer translationKey="ClaimNumber" /></label>&nbsp;<h5>{this.state.ClaimNumber}</h5>
 
-                                </div>
+                                                </div>
 
-                                        </Animated>
-                            </GridContainer>
-                           
-                                        <ClaimSearch TableData={this.state.TableData} handleDisappear={this.handleDisappear} refreshData={this.refreshData} ClaimAmountSum={this.ClaimAmountSum} ClaimDTO={this.state.ClaimDTO} fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount} disabled={this.state.disabled} claimId={this.state.claimId} SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} policyDetailsData={this.state.policyDetailsData} decision={this.state.decision} claimDetailsData={this.state.claimDetailsData}
-                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey} handleActivitylog={this.handleActivitylog}/>
+                                            </Animated>
+                                        </GridContainer>
 
-                        </CardBody>
-                            </Card>
-                        </Animated>
+                                        <ClaimSearch TableData={this.state.TableData} BankArray={this.state.BankArray} renderBankDetails={this.renderBankDetails} handleDisappear={this.handleDisappear} refreshData={this.refreshData} ClaimAmountSum={this.ClaimAmountSum} ClaimDTO={this.state.ClaimDTO} fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount} disabled={this.state.disabled} claimId={this.state.claimId} SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} policyDetailsData={this.state.policyDetailsData} decision={this.state.decision} claimDetailsData={this.state.claimDetailsData}
+                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey} handleActivitylog={this.handleActivitylog} />
+
+                                    </CardBody>
+                                </Card>
+                            </Animated>
                             : null}
 
-                        
+
 
                     </div>
                     : null}
@@ -1297,7 +1391,7 @@ class ClaimEnquiry extends React.Component {
                     </div>
                 </Modal>
 
-                
+
             </div>
         );
     }

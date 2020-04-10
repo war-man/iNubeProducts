@@ -967,6 +967,35 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 return new ClaimResponses { Status = BusinessStatus.NotFound, Errors = claimsDTO.Errors };
             }
 
+            string TxnType = "Claim";
+
+            var ruleMapperErrorMsg = await _integrationService.RuleMapperAsync(TxnType, claims, apiContext);
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            var seriaizeListofres = JsonConvert.SerializeObject(ruleMapperErrorMsg);
+            List<RuleEngineResponse> Listofres = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(seriaizeListofres.ToString());
+
+            var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+
+            if (Listofres != null)
+            {
+                foreach (var item in Listofres)
+                {
+
+                    if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
+                    {
+
+                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+                        Errors.Add(errorInfo);
+
+                    }
+
+                }
+                if (Errors.Count > 0)
+                {
+                    return new ClaimResponses { Status = BusinessStatus.Error, Errors = Errors };
+                }
+            }
+
             claims.OrganizationId = Convert.ToDecimal(policyDetails.CustomerId);
             claims.ProductIdPk = policyDetails.ProductIdPk;
 
@@ -2085,16 +2114,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             _CNContext = (MICACNContext)(await DbManager.GetNewContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var DATA = _context.TblClaims.SingleOrDefault(x => x.ClaimId == ClaimId);
-
-            // var bank = _context.TblBankAccounts.SingleOrDefault(x => x.ClaimId == ClaimId);
-            //var bank = _context.TblClaimPayments.SingleOrDefault(x => x.ClaimId == ClaimId);
+            var DATA = _context.TblClaims.FirstOrDefault(x => x.ClaimId == ClaimId);
 
             var insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == ClaimId).ToList();
 
             var tblClaim = _context.TblClaims.Where(item => item.ClaimId == ClaimId)
-                      .Include(add => add.TblClaimInsurable).FirstOrDefault();
+                      .Include(add => add.TblClaimInsurable)
+                      .Include(add1 => add1.TblClaimPayments)
+                      .FirstOrDefault();
             var _claimInsurableDTOs = _mapper.Map<IEnumerable<ClaimInsurableDTO>>(tblClaim.TblClaimInsurable);
+            var _bankDTOs = _mapper.Map<IEnumerable<ClaimPaymentDTO>>(tblClaim.TblClaimPayments);
 
             var doc = _context.TblClaimdoc.Where(x => x.ClaimId == ClaimId);
             var status = (from a in _context.TblClaims.Where(x => x.ClaimId == ClaimId)
@@ -2104,7 +2133,6 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             Dictionary<object, object> finaldata = new Dictionary<object, object>();
 
             List<object> finalData = new List<object>();
-
             List<object> FullfinalData = new List<object>();
 
             finaldata.Add("Loss Date", DATA.LossDateTime);
@@ -2112,25 +2140,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             finaldata.Add("Loss Description", DATA.LossOfDescription);
             finaldata.Add("Total Claim Amount", DATA.ClaimAmount);
             finaldata.Add("Total Approved Amount", DATA.ApprovedClaimAmount);
-            //finaldata.Add("Account Holder Name", bank.AccountHolderName);
-            //finaldata.Add("Account Number", bank.AccountNumber);
-            //finaldata.Add("Bank Name", bank.BankName);
-            //finaldata.Add("Bank IFSC", bank.Ifsccode);
-
-            //finaldata.Add("Bank Branch Address", bank.BankBranchAddress);
-
             finaldata.Add("Claim Status", status.Value);
             finaldata.Add("Claim Manager Remarks", DATA.ClaimManagerRemarks);
 
             if (!string.IsNullOrEmpty(DATA.ClaimFields))
             {
                 var json = JsonConvert.DeserializeObject<dynamic>(DATA.ClaimFields);
-
                 var state = json["Vehicle Location State"];
-
                 var stateid = (int)state.Value;
 
-                var statevalue = _CNContext.TblMasState.SingleOrDefault(x => x.StateId == stateid).StateName;
+                var statevalue = _CNContext.TblMasState.FirstOrDefault(x => x.StateId == stateid).StateName;
 
                 finaldata.Add("Vehicle Location", json["Vehicle Location"]);
                 finaldata.Add("Vehicle Location State", statevalue);
@@ -2138,18 +2157,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 finaldata.Add("Self-Survey Required", json["Self-Survey Required"]);
             }
 
-
             foreach (var item in finaldata)
             {
                 List<object> data = new List<object>();
-
                 data.Add(item.Key);
                 data.Add(item.Value);
 
                 finalData.Add(data);
-
             }
-
             var insurabledata = _claimInsurableDTOs.ToList();
 
             for (int i = 0; i < insurabledata.Count(); i++)
@@ -2163,33 +2178,28 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     var json = JsonConvert.SerializeObject(insurabledata[i].CoverValue);
                     var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(m);
 
-
                     foreach (KeyValuePair<string, string> each in dictionary)
                     {
                         var dict = new Dictionary<string, string>();
                         dict.Add("Header", each.Key);
                         dict.Add("Details", each.Value);
                         dict1.Add(dict);
-
                     }
-
                     insurabledata[i].coverDynamic = dict1;
                 }
                 else
                 {
                     insurabledata[i].coverDynamic = dict1;
                 }
-
             }
+            var bankdata = _bankDTOs.ToList();
 
             FullfinalData.Add(finalData);
             FullfinalData.Add(insurabledata.ToList());
+            FullfinalData.Add(bankdata);
 
             return FullfinalData;
-
         }
-
-
 
         public async Task<List<object>> ClaimStatusAsync(decimal ClaimId, decimal statusId, ApiContext apiContext)
         {

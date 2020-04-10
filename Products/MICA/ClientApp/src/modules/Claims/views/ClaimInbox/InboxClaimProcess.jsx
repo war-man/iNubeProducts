@@ -1421,6 +1421,7 @@ class InboxClaimProcess extends React.Component {
         let element = this.state.Bankarray;
         if (event.target.checked == true) {
             if (name != "Customer") {
+                this.state.Bankdata1.type = name;
                 this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
                 let Bankelement = {};
                 let array = [];

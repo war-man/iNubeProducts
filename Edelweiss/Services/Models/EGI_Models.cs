@@ -634,5 +634,10 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public int? ProductIdPk { get; set; }
         public string ClaimNumber { get; set; }
     }
+
+    public class MonthlySIUploadDTO : ResponseStatus
+    {
+
+    }
 }
 

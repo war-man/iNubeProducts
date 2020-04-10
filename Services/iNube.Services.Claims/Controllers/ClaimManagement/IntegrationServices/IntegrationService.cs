@@ -41,6 +41,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<IEnumerable<ClaimdocDTO>> GetPolicyDocuments(string policyNo, ApiContext apiContext);
         Task<PolicyResponse> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
+        Task<List<RuleEngineResponse>> RuleMapperAsync(string TxnType, dynamic SourceObject, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -108,6 +109,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         {
             var uri = PolicyUrl + "/api/Policy/UpdateBalanceSumInsured?PolicyNumber=" + PolicyNumber + "&amount=" + amount;
             return await PutApiInvoke<dynamic,PolicyResponse> (uri, apiContext, null);
+        }
+
+        public async Task<List<RuleEngineResponse>> RuleMapperAsync(string TxnType, dynamic SourceObject, ApiContext apiContext)
+        {
+            var uri = ExtensionUrl + "/api/Mica_EGI/RuleMapper?TxnType=" + TxnType;
+            return await PostApiInvoke<dynamic, List<RuleEngineResponse>>(uri, SourceObject, apiContext);
         }
 
         private Task<T> GetApiInvoke<T>(string uri)

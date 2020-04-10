@@ -576,6 +576,8 @@ namespace iNube.Services.Billing.Controllers.Billing
             var document = await _billingService.GetBillingEntries(customerId, EventType, Context);
             return Ok(document);
         }
-        
+
+       
+
     }
 }

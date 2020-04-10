@@ -168,6 +168,10 @@ const ReportConfiguration = AsyncComponent(() => { return import("modules/Dynami
 const ReportExecution = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportExecution.jsx"); });
 const ReportUpdate = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportUpdate.jsx"); });
 
+//File Upload
+const Upload = AsyncComponent(() => { return import("modules/FileUpload/views/Upload.jsx"); });
+
+
 /*Allocation Module*/
 const AllocationExecution = AsyncComponent(() => { return import("modules/Allocation/views/AllocationExecution.jsx"); });
 const AllocationConfig = AsyncComponent(() => { return import("modules/Allocation/views/AllocationConfig.jsx"); });
@@ -288,7 +292,8 @@ export const ComponentsList = {
     AllocationConfig: AllocationConfig,
     AllocationRules: AllocationRules,
     AllocationExecution: AllocationExecution,
-    RefundUpload: RefundUpload 
+    RefundUpload: RefundUpload,
+    Upload: Upload,
 }
 
 export default ComponentsList
