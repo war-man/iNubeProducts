@@ -59,7 +59,7 @@
     "Name": "Date Of Payment",
     "DataType": "datetime",
     "Validation": "",
-    "Value": "",
+    "Value": null,
     "ValidationType": "",
     "UIControl": "Datetime"
   }

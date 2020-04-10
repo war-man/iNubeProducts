@@ -266,7 +266,7 @@ class ClaimIntimate extends React.Component {
             DetailsDTO: {
                 emailId: "",
                 insuredName: "",
-                lossDateTime: "",
+                lossDateTime: null,
                 locationOfLoss: "",
                 lossIntimatedBy: "",
                 causeOfLoss: "",
@@ -1299,7 +1299,25 @@ class ClaimIntimate extends React.Component {
 
             });
     }
+    handleDateChange = (e, name) => {
 
+        //let _State = this.state;
+
+        var today = e.toDate();
+
+        var date = today.toISOString();
+        //_State[name] = date;
+        //this.setState({ _State });
+
+        let DetailsDataDTO = this.state.DetailsDTO;
+        DetailsDataDTO[name] = date;
+        this.setState({ DetailsDataDTO });
+        let PolicyDataDTO = this.state.PolicysearchDTO;
+        PolicyDataDTO[name] = date;
+        this.setState({ PolicyDataDTO });
+
+        console.log("Datetimepicker", this.state.PolicysearchDTO)
+    }
 
     render() {
         const { classes } = this.props;
@@ -1525,8 +1543,8 @@ class ClaimIntimate extends React.Component {
                                     LocationDTO={this.state.LocationDTO} GetLocation={this.GetLocation} regAddress={this.state.regAddress} disableView={this.state.disableView} renderPage={this.renderPage} selfsurvey={this.state.selfsurvey}
                                     masterList={this.state.masterList} master={this.state.master} addressDTO={this.state.addressDTO} ProductClaimData={this.state.ProductClaimData} stateMasterList={this.state.stateMasterList}
                                     onModelChange={this.onModelChange} AdditionalDetails={this.state.AdditionalDetails} onDateChange={this.onDateChange} locationflag={this.state.locationflag} descriptionflag={this.state.descriptionflag}
-                                    lossdateflag={this.state.lossdateflag} lossintimatedflag={this.state.lossintimatedflag} causeflag={this.state.causeflag} 
-                                     insurableitemflag={this.state.insurableitemflag}
+                                    lossdateflag={this.state.lossdateflag} lossintimatedflag={this.state.lossintimatedflag} causeflag={this.state.causeflag}
+                                    insurableitemflag={this.state.insurableitemflag} handleDateChange={this.handleDateChange}
                                 />
 
                                 <ClaimAmount TableData={this.state.TableData} ClaimAmountSum={this.ClaimAmountSum} ClaimsAmountData={this.state.ClaimsAmountData} claimAmountState={this.state.claimAmountState} validateUI={this.state.validateUI} InsurableItemData={this.state.InsurableItemData} policyflag={this.state.policyflag}

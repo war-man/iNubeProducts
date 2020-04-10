@@ -32,6 +32,7 @@ import Modal from '@material-ui/core/Modal';
 import PDFViewer from 'pdf-viewer-reactjs';
 import BankDetails from "../ClaimIntimate/BankDetails";
 
+import CustomDateTimePicker from "components/CustomDateTimePicker/DateTimePicker.jsx";
 
 const CustomTableCell = withStyles(theme => ({
     head: {
@@ -204,7 +205,7 @@ class ClaimEnquiry extends React.Component {
                 coverName: "",
                 createBy: "",
                 eventDate: "",
-                lossDateTime: "",
+                lossDateTime: null,
                 claimId: "",
                 claimStatusId: "",
                 insuredMobileNo: "",
@@ -484,7 +485,20 @@ class ClaimEnquiry extends React.Component {
         this.change(event, name, formate, date, type);
 
     };
+    handleDateChange = (e, name) => {
+        const { validdate } = this.state;
+        this.setState({ validdate: false });
+        var today = e.toDate();
 
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+       
+        const ClaimDataDTO = this.state.ClaimDTO;
+        ClaimDataDTO[name] = date;
+        this.setState({ ClaimDataDTO });
+
+
+        console.log("Datetimepicker", this.state.ClaimDTO)
+    }
     datechange = (date) => {
         const _date = date.split('/');
         const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
@@ -1078,6 +1092,7 @@ class ClaimEnquiry extends React.Component {
                                     error={this.state.insuredMobileNoState}
                                     labelText="InsuredMobileNo"
                                     name="insuredMobileNo"
+                                    inputType="number" type="numeric"
                                     value={this.state.ClaimDTO.insuredMobileNo}
                                     onChange={(e) => this.SetValue("insuredMobileNo", e)}
                                     formControlProps={{
@@ -1111,7 +1126,7 @@ class ClaimEnquiry extends React.Component {
                                 </GridItem>
 
                                 <GridItem xs={12} sm={4} md={3}>
-                                    <CustomDatetime
+                                    {/*  <CustomDatetime
                                         onFocus={this.onClick}
                                         //success={this.state.lossDateTimeState === "success"}
                                         error={this.state.lossDateTimeState}
@@ -1122,6 +1137,10 @@ class ClaimEnquiry extends React.Component {
                                         onChange={(evt) => this.onDateChange('datetime', 'ClaimDTO', 'lossDateTime', evt)}
                                         value={this.state.ClaimDTO.lossDateTime}
                                         formControlProps={{ fullWidth: true }} />
+                                        */}
+
+                                    <CustomDateTimePicker timeformate={false} disabled={false} width='13rem' required={true} labelText="LossDate" name='lossDateTime' value={this.state.ClaimDTO.lossDateTime} onChange={(e) => this.handleDateChange(e, "lossDateTime")} />
+
                                 </GridItem>
 
 

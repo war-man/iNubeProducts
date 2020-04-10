@@ -43,6 +43,7 @@ const ClaimBankDetails = (props) => {
                         <GridContainer >
                             {claimDetailsprops.displaycust == true ?
                                 <GridContainer lg={12}>
+                                    <GridContainer lg={12}>
                                     <GridItem lg={12}>
                                         <CardHeader color="info" icon >
                                             {
@@ -51,7 +52,9 @@ const ClaimBankDetails = (props) => {
                                                 </h3>
                                             }
                                         </CardHeader>
-                                    </GridItem>
+                                        </GridItem>
+                                        </GridContainer>
+
                                     {
                                         item.BankDetails.map(m =>
                                             <GridItem xs={8} sm={5} md={3}>
@@ -63,6 +66,7 @@ const ClaimBankDetails = (props) => {
                                 </GridContainer>
                                 :
                                 <GridContainer lg={12}>
+                                    <GridContainer lg={12}>
                                     <GridItem lg={12}>
                                         <CardHeader color="info" icon >
                                             {
@@ -71,7 +75,8 @@ const ClaimBankDetails = (props) => {
                                                 </h3>
                                             }
                                         </CardHeader>
-                                    </GridItem>
+                                        </GridItem>
+                                    </GridContainer>
 
                                     {
                                         item.BankDetails.map(m =>

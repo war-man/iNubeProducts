@@ -35,6 +35,8 @@ import Modal from '@material-ui/core/Modal';
 import PDFViewer from 'pdf-viewer-reactjs';
 import BankdetailsFields from "modules/Claims/views/ClaimProcess/BankdetailsFields.json";
 import CustomerBankDetails from "modules/Claims/views/ClaimProcess/CustomerBankDetails.json";
+
+import CustomDateTimePicker from "components/CustomDateTimePicker/DateTimePicker.jsx";
 //import Data from "./Data.json";
 
 const CustomTableCell = withStyles(theme => ({
@@ -756,16 +758,18 @@ class InboxClaimProcess extends React.Component {
         else if (Bankfieldsmodel.UIControl == "Datetime") {
 
             return (
-                <CustomDatetime
-                    labelText={Bankfieldsmodel.Name}
-                    // id='dob'
-                    name={Bankfieldsmodel.Name}
-                    //value={Bankfieldsmodel.Value}
-                    // Futuredatevalidate={true}
+                
+
+                < CustomDateTimePicker
+                    timeformate={true}
+                    disabled={false}
+                    width='13rem'
                     //required={true}
-                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)}
-                    value={Bankfieldsmodel.Name}
-                    formControlProps={{ fullWidth: true }} />
+                    labelText={Bankfieldsmodel.Name}
+                    name={Bankfieldsmodel.Name}
+                    value={Bankfieldsmodel.Value}
+                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)} />
+
 
             );
 
@@ -793,7 +797,7 @@ class InboxClaimProcess extends React.Component {
         }
 
     }
-
+    
     renderPage1 = (Bankfieldsmodel, name) => {
         if (Bankfieldsmodel.UIControl == "TextField") {
             return (<CustomInput
@@ -812,16 +816,18 @@ class InboxClaimProcess extends React.Component {
         else if (Bankfieldsmodel.UIControl == "Datetime") {
 
             return (
-                <CustomDatetime
+               
+                < CustomDateTimePicker
+                    timeformate={true}
+                    disabled={false}
+                    width='13rem'
+                   // required={true}
                     labelText={Bankfieldsmodel.Name}
-                    // id='dob'
-                    name={Bankfieldsmodel.Name}
-                    value={Bankfieldsmodel.Value}
-                    // Futuredatevalidate={true}
-                    //required={true}
-                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)}
-                    //value={Bankfieldsmodel.Name}
-                    formControlProps={{ fullWidth: true }} />
+                    name = { Bankfieldsmodel.Name }
+                    value = { Bankfieldsmodel.Value }
+                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)
+        } />
+
 
             );
 
@@ -848,13 +854,17 @@ class InboxClaimProcess extends React.Component {
 
         }
 
-    }
+}
+
+
 
     onDateChange = (formate, type, name, objname, event) => {
         const { validdate } = this.state;
         this.setState({ validdate: false });
+        //var today = event.toDate();
+        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         var today = event.toDate();
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        var date = today.toISOString();
 
         const ClaimDataDTO = this.state.ClaimDTO;
         ClaimDataDTO[name] = date;
@@ -877,6 +887,8 @@ class InboxClaimProcess extends React.Component {
         this.change(event, name, formate, date, type);
 
     };
+
+   
 
     datechange = (date) => {
         const _date = date.split('/');

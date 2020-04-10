@@ -1,55 +1,58 @@
 ﻿
-import React, { useState } from "react";
-import { DatePicker, DateTimePicker, KeyboardDateTimePicker } from "@material-ui/pickers";
-
+import React from "react";
+import { DatePicker, DateTimePicker } from "@material-ui/pickers";
 import MomentUtils from '@date-io/moment';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-
 function CustomDateTimePicker(props) {
-    const { timeformate, labelText, disabled, name, required, id, onChange,value} = props;
+    const { timeformate, labelText, disabled, name, required, id, onChange, value, width, disableFuture} = props;
+    
   
-
     return (
         <MuiPickersUtilsProvider utils={MomentUtils} >
-            {(timeformate) ? <div >
+            {(timeformate) ?
                 <DateTimePicker
                     variant="inline"
                     label={labelText}
+                    className="DateTimePicker"
                     name={name}
-                    id={id}
+                    id="DateTimePicker"
                     required={required}
                     value={(value == undefined) ? null : value}
                     format="DD/MM/YYYY hh:mm a"
                     autoOk
-                    disabled={disabled}
-                    style={{ 'top': '8px' }}
+                        disabled={disabled}
+                        disableFuture={disableFuture}
+                        style={{ 'top': '11px', 'width': width }}
                     //  editFormat={formatter} 
                     onChange={onChange}
 
 
                 />
-            </div> :
-                <div>
+            :
+                
                     <DatePicker
                         variant="inline"
                         label={labelText}
                         value={(value == undefined) ? null : value}
                         name={name}
-                        id={id}
+                        className="DateTimePicker"
+                        id="DateTimePicker"
                         format="DD/MM/YYYY"
                         autoOk
                         disabled={disabled}
+                        disableFuture={disableFuture}
+                        style={{ 'top': '10px', 'width': width }}
                         //  editFormat={formatter} 
                         onChange={onChange}
 
 
                     />
-                </div>
+                
             }
           
 
             </MuiPickersUtilsProvider>
-        
+      
     );
 }
 

@@ -22,6 +22,7 @@ import Radio from "@material-ui/core/Radio";
 import FiberManualRecord from "@material-ui/icons/FiberManualRecord";
 import { Animated } from "react-animated-css";
 
+import CustomDateTimePicker from "components/CustomDateTimePicker/DateTimePicker.jsx";
 const ClaimComponent = (props) => {
     
    // console.log("ProductClaimData1111", props.ProductClaimData1);
@@ -37,7 +38,7 @@ const ClaimComponent = (props) => {
 
             <GridContainer>
                 <GridItem xs={12} sm={12} md={3}>
-                    <CustomDatetime
+                    {/*  <CustomDatetime
                         //success={props.lossDateTimeState === "success"}
                         error={props.lossDateTimeState}
                         required={true}
@@ -50,6 +51,9 @@ const ClaimComponent = (props) => {
                         value={props.DetailsDTO.lossDateTime}
                         formControlProps={{ fullWidth: true }}
                     />
+                    */}
+                    <CustomDateTimePicker timeformate={true} disabled={false} width='13rem' disableFuture={true} required={true} labelText="LossDateTime" name='lossDateTime' value={props.DetailsDTO.lossDateTime} onChange={(e) => props.handleDateChange(e, "lossDateTime")} />
+
                     {props.errormessage && (props.DetailsDTO.lossDateTime == "") ? <p className="error">*Required field cannot be left blank</p> : null}
 
                     {props.errordate && (props.DetailsDTO.lossDateTime > props.PolicyEndDate || props.DetailsDTO.lossDateTime < props.PolicyStartDate) ? <p className="error">*Loss Date must be within Policy Tenure </p> : null}
