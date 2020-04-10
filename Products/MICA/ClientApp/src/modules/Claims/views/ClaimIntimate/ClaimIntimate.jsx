@@ -148,6 +148,8 @@ class ClaimIntimate extends React.Component {
             lossintimatedflag: false,
             causeflag: false,
             insurableitemflag: false,
+            vehlocationflag: false,
+            vehlocStateflag: false,
             erroraccno: false,
             errorstatus: false,
             errordate: false,
@@ -387,7 +389,7 @@ class ClaimIntimate extends React.Component {
         evt.preventDefault();
         this.UIValidation();
         this.IsValidProductDetails();
-       
+        debugger;
         if (this.state.validateUI === true) {
 
             if (this.state.ValidationUI === true) {
@@ -492,7 +494,17 @@ class ClaimIntimate extends React.Component {
                     this.setState({ insurableitemflag: true });
                     swal("", "Please select dropdown Insurable item", "error");
                 }
-                
+                else if (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined)
+                {
+                    this.setState({ errormessage: true });
+                    this.setState({ vehlocationflag: true });
+                    swal("", "Please enter Vehicle location", "error");
+                }
+                else if (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined) {
+                    this.setState({ errormessage: true });
+                    this.setState({ vehlocStateflag: true });
+                    swal("", "Please enter Vehicle location state", "error");
+                }
 
                 else {
 
@@ -501,7 +513,7 @@ class ClaimIntimate extends React.Component {
             }
         } else {
 
-            //this.setState({ errorifsccode: true });
+            this.setState({ errorifsccode: true });
             //this.setState({ erroraccno: true });
 
         }
@@ -509,11 +521,12 @@ class ClaimIntimate extends React.Component {
     };
 
     IsValidProductDetails = () => {
-      
-       // console.log("lossdatedetails", this.state.DetailsDTO.locationOfLoss)
-        if (this.state.DetailsDTO.lossDateTime !== "" && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== "" 
-            && this.state.DetailsDTO.causeOfLoss !== "" && this.state.DetailsDTO.insurableItems !== "") {
-            this.state.validateUI = true;
+        
+        console.log("ValidationAdditionalDetails", this.state.DetailsDTO.AdditionalDetails['Vehicle Location'])
+
+        if (this.state.DetailsDTO.lossDateTime !== "" && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== ""
+            && this.state.DetailsDTO.causeOfLoss !== "" && this.state.DetailsDTO.insurableItems !== "" && this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] != undefined && this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] != undefined) {
+            this.state.ValidationUI = true;
         }
         else {
 
@@ -524,16 +537,15 @@ class ClaimIntimate extends React.Component {
     }
 
     UIValidation = () => {
-
-        console.log("lossDateTimeState", this.state.lossDateTimeState, "locationOfLossState", this.state.locationOfLossState, "lossDescriptionState", this.state.lossDescriptionState);
-
-        if (this.state.locationOfLossState == false && this.state.lossDescriptionState == false) {
+        
+        if (this.state.locationOfLossState === false && this.state.lossDescriptionState === false && this.state.ifscCodeState === false) {
 
             this.state.validateUI = true;
 
         }
         else {
             this.state.validateUI = false;
+            this.state.errorifsccode = true;
             this.setState({});
         }
     }
@@ -1241,8 +1253,23 @@ class ClaimIntimate extends React.Component {
 
     renderPage = (ProductClaimData) => {
 
+        if (ProductClaimData.userInputType == "String") {
 
-        if (ProductClaimData.userInputType == "string") {
+            return (
+                <GridItem xs={12} sm={12} md={12}>
+                <CustomInput
+                labelText={ProductClaimData.inputType}
+                name={ProductClaimData.inputType}
+                required={true}
+                onChange={(e) => this.onModelChange(e)}
+                formControlProps={{ fullWidth: true }}
+                />
+                    {this.state.errormessage && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined) ? <p className="error">*Required field cannot be left blank</p> : null}
+                    {this.state.vehlocationflag && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined) ? <p className="error"> </p> : null}
+                </GridItem>
+                    );
+        }
+        else if (ProductClaimData.userInputType == "string") {
 
             return (<CustomInput
                 labelText={ProductClaimData.inputType}
@@ -1266,14 +1293,18 @@ class ClaimIntimate extends React.Component {
         }
         else if (ProductClaimData.userInputType == "Dropdown") {
             return (
+                <GridItem xs={12} sm={12} md={12}>
                 <Dropdown
                     labelText={ProductClaimData.inputType}
                     name={ProductClaimData.inputType}
                     lstObject={this.state.stateMasterList}
+                    required={true}
                     onChange={(e) => this.onModelChange(e)}
                     formControlProps={{ fullWidth: true }}
-                />
-
+                    />
+                    {this.state.errormessage && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined) ? <p className="error">*Required field cannot be left blank</p> : null}
+                    {this.state.vehlocStateflag && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined) ? <p className="error"> </p> : null}
+                </GridItem>
             );
         }
     }

@@ -637,7 +637,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     public class MonthlySIUploadDTO : ResponseStatus
     {
-
+       
     }
 }
 
