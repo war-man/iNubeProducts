@@ -967,6 +967,35 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 return new ClaimResponses { Status = BusinessStatus.NotFound, Errors = claimsDTO.Errors };
             }
 
+            string TxnType = "Claim";
+
+            var ruleMapperErrorMsg = await _integrationService.RuleMapperAsync(TxnType, claims, apiContext);
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            var seriaizeListofres = JsonConvert.SerializeObject(ruleMapperErrorMsg);
+            List<RuleEngineResponse> Listofres = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(seriaizeListofres.ToString());
+
+            var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+
+            if (Listofres != null)
+            {
+                foreach (var item in Listofres)
+                {
+
+                    if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
+                    {
+
+                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message };
+                        Errors.Add(errorInfo);
+
+                    }
+
+                }
+                if (Errors.Count > 0)
+                {
+                    return new ClaimResponses { Status = BusinessStatus.Error, Errors = Errors };
+                }
+            }
+
             claims.OrganizationId = Convert.ToDecimal(policyDetails.CustomerId);
             claims.ProductIdPk = policyDetails.ProductIdPk;
 

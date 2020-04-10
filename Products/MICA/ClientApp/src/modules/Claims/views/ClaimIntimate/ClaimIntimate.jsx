@@ -295,7 +295,7 @@ class ClaimIntimate extends React.Component {
                 accountType: "",
                 payeeType: "Customer"
             },
-            //DataModel: [],
+            BankDataArray: [],
             doc: {
                 documentID: "",
                 fileName: "",
@@ -315,6 +315,15 @@ class ClaimIntimate extends React.Component {
                 email: "",
                 eventDate: "",
 
+            },
+            BankdataReset: {
+                "accountHolderName": "",
+                "accountNumber": "",
+                "bankName": "",
+                "bankBranchAddress": "",
+                "ifscCode": "",
+                "accountType": "",
+                "payeeType": "Customer",
             },
             claimdata: [],
             PolicyResetdata: {
@@ -392,7 +401,6 @@ class ClaimIntimate extends React.Component {
                     console.log("amt:", this.state.ClaimsAmountData[i].claimAmounts);
                     this.state.DataAmount.push(this.state.ClaimsAmountData[i].claimAmounts);
                 }
-
                 console.log("123:", this.state.DataAmount);
                 console.log("123456:", this.state.ClaimsAmountData);
 
@@ -431,11 +439,22 @@ class ClaimIntimate extends React.Component {
                                 this.renderRedirect();
                             });
                             // this.setState({ redirect: true });
-                        } else {
-                            swal({
-                                text: "Claim is not intimated! Try again",
-                                icon: "error"
-                            })
+                        } else if (data.status == 7)
+                        {
+
+                            if (data.errors.length > 0) {
+                                swal({
+
+                                    text: data.errors[0].errorMessage,
+                                    icon: "error"
+                                });
+                            } else {
+                                swal({
+                                    text: "Claim is not intimated! Try again",
+                                    icon: "error"
+                                })
+                            }
+                            this.onBankdataReset(); 
                         }
                     });
 
@@ -502,10 +521,6 @@ class ClaimIntimate extends React.Component {
             this.state.errormessage = true;
             this.setState({});
         }
-
-
-
-
     }
 
     UIValidation = () => {
@@ -521,6 +536,15 @@ class ClaimIntimate extends React.Component {
             this.state.validateUI = false;
             this.setState({});
         }
+    }
+
+    onBankdataReset = () => {
+        const Bankdata = this.state.BankdataReset;
+        this.state.bankDetails = Bankdata;
+        this.setState({ Bankdata });
+        const BankDataArr = this.state.BankDataArray;
+        this.state.DetailsDTO.bankAccounts = BankDataArr;
+        this.setState({ BankDataArr });
     }
 
     onDateChange = (formate, type, name, event) => {

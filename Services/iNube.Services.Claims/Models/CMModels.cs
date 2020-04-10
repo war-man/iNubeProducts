@@ -735,23 +735,7 @@ namespace iNube.Services.Claims.Models
         public int lossIntimatedBy { get; set; }
         public string lossDescription { get; set; }
         public int? ClaimAmount { get; set; }
-        //public string AccHolderName { get; set; }
-        //public string AccNumber { get; set; }
-        //public string BankName { get; set; }
-        //public string BankBranchAdd { get; set; }
-        //public string IfscCode { get; set; }
-        // public string EmailId { get; set; }
-        // public int? AccType { get; set; }
         public int ClaimStatusId { get; set; }
-        // public bool? Active { get; set; }
-        //public decimal? PolicyId { get; set; }
-        //public int ClaimInsurableId { get; set; }
-        //public string InsurableItem { get; set; }
-        //public string Name { get; set; }
-        //public string IdentificationNo { get; set; }
-        //public string TypeOfLoss { get; set; }
-        //public decimal? BenefitAmount { get; set; }
-        //public int? ClaimAmounts { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public decimal? PartnerId { get; set; }
@@ -820,6 +804,14 @@ namespace iNube.Services.Claims.Models
         public string MobileNumber { get; set; }
         public string EmailId { get; set; }
         public int ClaimId { get; set; }
+    }
+
+    public class RuleEngineResponse
+    {
+        public string ValidatorName { get; set; }
+        public string Outcome { get; set; }
+        public string Message { get; set; }
+        public string Code { get; set; }
     }
 
     public class DemoResponse<T>
