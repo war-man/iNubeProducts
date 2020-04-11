@@ -32,7 +32,7 @@ phases:
       - cat imageDetail.json
     
 artifacts:
-    files:
+    files: 
     - Services/iNube.Services.Accounting/appspec.yml
     - Services/iNube.Services.Accounting/taskdef.json
     - Services/iNube.Services.Accounting/edappspec.yml
