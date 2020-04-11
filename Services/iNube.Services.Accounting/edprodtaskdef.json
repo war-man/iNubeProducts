@@ -1,0 +1,47 @@
+{
+  "family": "ed-mica-accounting",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "ed-mica-accounting",
+      "image": "<edaccounting>",
+
+      "cpu": 512,
+      "memory": 512,
+
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/ed-mica-accounting",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "containerPort": 9011,
+          "hostPort": 9011,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+
+    }
+
+  ],
+
+  "requiresCompatibilities": [ "EC2" ],
+  "cpu": "512",
+  "memory": "512",
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/ed-mica-accounting",
+      "awslogs-region": "ap-south-1",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
+
+}
