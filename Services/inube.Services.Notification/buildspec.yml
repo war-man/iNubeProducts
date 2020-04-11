@@ -41,3 +41,10 @@ artifacts:
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json
+
+    secondary-artifacts:
+    
+        iNubeNotificationCI:
+            files:
+            - Services/iNube.Services.Notification/edprodappspec.yml
+            - Services/iNube.Services.Notification/edprodtaskdef.json
