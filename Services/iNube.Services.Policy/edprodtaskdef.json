@@ -1,11 +1,11 @@
 {
-  "family": "ed-mica-policy",
+  "family": "ed-prod-mica-policy",
   "taskRoleArn": "",
-  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "ed-mica-policy",
+      "name": "ed-prod-mica-policy",
       "image": "<edpolicy>",
 
       "cpu": 512,

@@ -1,12 +1,12 @@
 {
-  "family": "ed-mica-notification",
+  "family": "ed-prod-mica-notification",
   "taskRoleArn": "",
-  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "ed-mica-notification",
-      "image": "<ednotification>", 
+      "name": "ed-prod-mica-notification",
+      "image": "<ednotification>",
 
       "cpu": 512,
       "memory": 512,

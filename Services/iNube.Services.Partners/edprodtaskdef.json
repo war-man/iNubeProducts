@@ -1,11 +1,11 @@
 {
-  "family": "ed-mica-partner",
+  "family": "ed-prod-mica-partner",
   "taskRoleArn": "",
-  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "ed-mica-partner",
+      "name": "ed-prod-mica-partner",
       "image": "<edpartner>",
 
       "cpu": 512,

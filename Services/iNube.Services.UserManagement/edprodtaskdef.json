@@ -1,33 +1,33 @@
 {
-    "family": "ed-mica-user",
-    "taskRoleArn": "",
-    "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
-    "networkMode": "awsvpc",
-    "containerDefinitions": [
+  "family": "ed-prod-mica-user",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "ed-prod-mica-user",
+      "image": "<eduser>",
+
+      "cpu": 512,
+      "memory": 512,
+
+      "portMappings": [
         {
-            "name": "ed-mica-user",
-            "image": "<eduser>",
-            
-            "cpu": 512,
-            "memory": 512,
-                     
-            "portMappings": [
-                {
-                    "containerPort": 9009,
-                    "hostPort": 9009,
-                    "protocol": "tcp"
-                }
-            ],
-            "essential": true
-            
+          "containerPort": 9009,
+          "hostPort": 9009,
+          "protocol": "tcp"
         }
-    ],
-    
-    
-    "requiresCompatibilities": [
-        "EC2"
-    ],
-    "cpu": "512",
-    "memory": "512"
-    
+      ],
+      "essential": true
+
+    }
+  ],
+
+
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "512",
+  "memory": "512"
+
 }

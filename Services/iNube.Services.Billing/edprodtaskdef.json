@@ -1,11 +1,11 @@
 ﻿{
-  "family": "ed-mica-billing",
+  "family": "ed-prod-mica-billing",
   "taskRoleArn": "",
-  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "ed-mica-billing",
+      "name": "ed-prod-mica-billing",
       "image": "<edtaskdef>",
 
       "cpu": 512,
@@ -14,7 +14,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/ed-mica-billing",
+          "awslogs-group": "/ecs/ed-prod-mica-billing",
           "awslogs-region": "ap-south-1",
           "awslogs-stream-prefix": "ecs"
         }
@@ -40,7 +40,7 @@
   "logConfiguration": {
     "logDriver": "awslogs",
     "options": {
-      "awslogs-group": "/ecs/ed-mica-billing",
+      "awslogs-group": "/ecs/ed-prod-mica-billing",
       "awslogs-region": "ap-south-1",
       "awslogs-stream-prefix": "ecs"
     }

@@ -1,11 +1,11 @@
 {
-  "family": "ed-mica-claims",
+  "family": "ed-prod-mica-claims",
   "taskRoleArn": "",
-  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "ed-mica-claims",
+      "name": "ed-prod-mica-claims",
       "image": "<edclaims>",
 
       "cpu": 512,
