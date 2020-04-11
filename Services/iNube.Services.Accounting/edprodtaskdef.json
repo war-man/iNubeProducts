@@ -1,11 +1,11 @@
 {
-  "family": "ed-mica-accounting",
+  "family": "ed-prod-mica-accounting",
   "taskRoleArn": "",
-  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "ed-mica-accounting",
+      "name": "ed-prod-mica-accounting",
       "image": "<edaccounting>",
 
       "cpu": 512,
@@ -14,7 +14,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/ed-mica-accounting",
+          "awslogs-group": "/ecs/ed-prod-mica-accounting",
           "awslogs-region": "ap-south-1",
           "awslogs-stream-prefix": "ecs"
         }
@@ -38,7 +38,7 @@
   "logConfiguration": {
     "logDriver": "awslogs",
     "options": {
-      "awslogs-group": "/ecs/ed-mica-accounting",
+      "awslogs-group": "/ecs/ed-prod-mica-accounting",
       "awslogs-region": "ap-south-1",
       "awslogs-stream-prefix": "ecs"
     }

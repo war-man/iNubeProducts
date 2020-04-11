@@ -30,7 +30,7 @@ phases:
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
-    
+     - aws s3 cp s3://inubeartifacts/iNube-Accounting-CI  s3://edartifacts/ --acl bucket-owner-full-control
  
 artifacts:
     files:
@@ -40,6 +40,15 @@ artifacts:
     - Services/iNube.Services.Accounting/edtaskdef.json
     - Services/iNube.Services.Accounting/demoappspec.yml
     - Services/iNube.Services.Accounting/demotaskdef.json
+    - Services/iNube.Services.Accounting/edprodappspec.yml
+    - Services/iNube.Services.Accounting/edprodtaskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json      
+
+    secondary-artifacts:
+    
+        iNubeAccountingCI:
+            files:
+            - Services/iNube.Services.Accounting/edprodappspec.yml
+            - Services/iNube.Services.Accounting/edprodtaskdef.json
