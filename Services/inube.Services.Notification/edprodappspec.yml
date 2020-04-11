@@ -7,3 +7,4 @@ Resources:
         LoadBalancerInfo:
           ContainerName: "ed-prod-mica-notification"
           ContainerPort: 9004
+           

@@ -44,5 +44,5 @@ artifacts:
     secondary-artifacts:
         iNubeNotificationCI:
             files:
-            - Services/iNube.Services.Notification/edprodappspec.yml
-            - Services/iNube.Services.Notification/edprodtaskdef.json
+            - Services/inube.Services.Notification/edprodappspec.yml
+            - Services/inube.Services.Notification/edprodtaskdef.json
