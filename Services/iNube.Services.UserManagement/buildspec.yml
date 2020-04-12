@@ -47,3 +47,4 @@ artifacts:
             files:
             - Services/iNube.Services.UserManagement/edprodappspec.yml
             - Services/iNube.Services.UserManagement/edprodtaskdef.json
+            - imageDetail.json

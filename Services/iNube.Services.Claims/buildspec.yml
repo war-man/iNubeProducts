@@ -51,3 +51,4 @@ artifacts:
             files:
             - Services/iNube.Services.Claims/edprodappspec.yml
             - Services/iNube.Services.Claims/edprodtaskdef.json
+            - imageDetail.json
