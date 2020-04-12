@@ -15,6 +15,6 @@ export const LoginConfig = {
     LoginUrl,
     UserConfigUrl,
     ProductType
-}
+} 
 
 export default LoginConfig
