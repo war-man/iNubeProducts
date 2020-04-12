@@ -43,6 +43,6 @@ artifacts:
     
         iNubeRuleCI:
             files:
-            - Services/iNube.Services.RuleEngine/edprodappspec.yml
-            - Services/iNube.Services.RuleEngine/edprodtaskdef.json
+            - Services/iNube.Components.RuleEngine/edprodappspec.yml
+            - Services/iNube.Components.RuleEngine/edprodtaskdef.json
             - imageDetail.json
