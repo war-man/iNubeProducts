@@ -6,6 +6,7 @@ using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -1766,6 +1767,78 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             }
             return new CDBalanceDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this Account Number {accountnumber}" };
 
+        }
+
+        public async Task<CDAccountDTO> GetAccountDeatils(CDAccountRequest cDAccountRequest, ApiContext apiContext)
+        {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+                var ValidDate = _context.TblCdtransaction.Any(p => p.TxnDateTime.Value.Date >= cDAccountRequest.FromDate && p.TxnDateTime.Value.Date <= cDAccountRequest.ToDate && p.AccountNo == cDAccountRequest.accountnumber);
+                if (ValidDate)
+                {
+                    var tblCdtransactionDetails = _context.TblCdtransaction.Where(p => p.TxnDateTime.Value.Date >= cDAccountRequest.FromDate && p.TxnDateTime.Value.Date <= cDAccountRequest.ToDate && p.AccountNo == cDAccountRequest.accountnumber).Include(add => add.TblCdtransactionDetails).ToList();
+
+                    CDAccountDTO cDAccountDTO = new CDAccountDTO();
+                    AccountDetails AccountDetailsObj = new AccountDetails();
+                    List<AccountDetails> AccountDetails = new List<AccountDetails>();
+
+                    if (tblCdtransactionDetails.Count() > 0)
+                    {
+                        foreach (var item in tblCdtransactionDetails)
+                        {
+
+                            if (item.TblCdtransactionDetails.Count() > 0)
+                            {
+
+                                foreach (var Data in item.TblCdtransactionDetails)
+                                {
+                                    AccountDetailsObj = new AccountDetails();
+                                    AccountDetailsObj.Date = Data.TransactionDateTime;
+                                    AccountDetailsObj.TransactionType = item.TxnType;
+                                    AccountDetailsObj.Description = Data.Description;
+                                    AccountDetailsObj.Gst = Data.TaxAmount;
+                                    AccountDetailsObj.TotalAmount = Data.TotalAmount;
+
+                                    if (item.TxnType == "Credit")
+                                    {
+                                        AccountDetailsObj.TransactionAmountCredit = Data.TxnAmount;
+
+
+                                    }
+                                    else if (item.TxnType == "Debit")
+                                    {
+                                        AccountDetailsObj.TransactionAmountDebit = Data.TxnAmount;
+                                    }
+                                    AccountDetails.Add(AccountDetailsObj);
+                                }
+                            }
+
+
+                        }
+                        cDAccountDTO.AccountDetails = AccountDetails;
+                        cDAccountDTO.OpeningBalance = _context.TblCdtransaction.LastOrDefault(s => s.AccountNo == cDAccountRequest.accountnumber && s.TxnDateTime.Value.Date <= cDAccountRequest.FromDate).FinalBalance;
+                        cDAccountDTO.ClosingBalance = _context.TblCdtransaction.LastOrDefault(s => s.AccountNo == cDAccountRequest.accountnumber && s.TxnDateTime.Value.Date <= cDAccountRequest.ToDate).FinalBalance;
+                        cDAccountDTO.Status = BusinessStatus.Ok;
+                        return cDAccountDTO;
+                    }
+                    else
+                    {
+                        return new CDAccountDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this Account Number {cDAccountRequest.accountnumber}" };
+
+
+                    }
+                }
+                else {
+                    return new CDAccountDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this Account Number {cDAccountRequest.accountnumber}" };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new CDAccountDTO { Status = BusinessStatus.Error, ResponseMessage = ex.InnerException.ToString() };
+
+            }
         }
     }
 }

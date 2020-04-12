@@ -1302,6 +1302,33 @@ namespace iNube.Services.Partners.Models
         public DateTime? ModifiedDate { get; set; }
         public decimal? EnvId { get; set; }
     }
-}
+    public partial class AccountDetails
+    {
+        public DateTime? Date { get; set; }
+        public string TransactionType { get; set; }
+        public string Description { get; set; }
+        public decimal? TransactionAmountDebit { get; set; }
+        public decimal? TransactionAmountCredit { get; set; }
+        public decimal? Gst { get; set; }
+        public decimal? TotalAmount { get; set; }
+     
+    }
+    public partial class CDAccountDTO:ResponseStatus
+    {
+        
+        public decimal? OpeningBalance { get; set; }
+        public decimal? ClosingBalance { get; set; }
+        public List<AccountDetails> AccountDetails { get; set; }
+      
+    }
+    public partial class CDAccountRequest
+    {
+        public string accountnumber { get; set; }
+        public string TxnEventType { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+     
+    }
+    }
 
 

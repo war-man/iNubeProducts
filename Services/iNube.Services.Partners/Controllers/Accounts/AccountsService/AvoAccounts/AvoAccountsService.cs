@@ -552,5 +552,10 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         {
             throw new NotImplementedException();
         }
+
+        public Task<CDAccountDTO> GetAccountDeatils(CDAccountRequest cDAccountRequest, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

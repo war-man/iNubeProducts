@@ -255,9 +255,33 @@ namespace iNube.Services.Partners.Controllers.Accounts
         [HttpGet]
         public async Task<IActionResult> GetAccountBalance(string accountnumber, string TxnEventType)
         {
-            //MicaCDDTO
+          
             var response = (await _accountService.GetAccountBalance(accountnumber,TxnEventType, Context));
             return Ok(response);
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> GetAccountDeatils(CDAccountRequest cDAccountRequest)
+        {
+            
+            var response = (await _accountService.GetAccountDeatils(cDAccountRequest, Context));
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Ok:
+                    return Ok(response);
+                case BusinessStatus.NotFound:
+                    return NotFound(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                case BusinessStatus.Error:
+                    return BadRequest();
+                case BusinessStatus.PreConditionFailed:
+                    return BadRequest(response);
+                default:
+                    return Forbid();
+            }
 
         }
 
