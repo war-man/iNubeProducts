@@ -309,7 +309,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
-
+         
         
     }
 }
