@@ -21,4 +21,4 @@ phases:
         - echo clearing s3 bucket
         - aws s3 rm s3://mica.edelweissinsurance.com
         - echo $CODEBUILD_SRC_DIR
-        - aws s3 sync ./build/ s3://mica.edelweissinsurance.com
+        - aws s3 sync ./build/ s3://mica.edelweissinsurance.com 
