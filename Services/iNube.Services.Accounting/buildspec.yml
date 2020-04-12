@@ -54,4 +54,4 @@ artifacts:
             - productionimagedefinition.json
             - imageDetail.json  
             - Services/iNube.Services.Accounting/edprodappspec.yml
-            - Services/iNube.Services.Accounting/edprodtaskdef.json
+            - Services/iNube.Services.Accounting/edprodtaskdef.json 
