@@ -114,7 +114,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpGet]
-        public async Task<IActionResult> BillingDetails(string PolicyNo, string Month,int Year)
+        public async Task<IActionResult> BillingDetails(string PolicyNo, int Month,int Year)
         {
             var response = await _quotationService.BillingDetails(PolicyNo, Month,Year);
             return ServiceResponse(response);
