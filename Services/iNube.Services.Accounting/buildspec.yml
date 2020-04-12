@@ -30,7 +30,6 @@ phases:
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
-      - aws s3 cp s3://inubeartifacts/iNube-Accounting-CI  s3://edartifacts/ --acl bucket-owner-full-control
     
 artifacts:
     files: 
