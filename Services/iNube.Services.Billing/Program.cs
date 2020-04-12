@@ -30,6 +30,7 @@ namespace iNube.Services.Billing
                 //.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .Build();
             return WebHost.CreateDefaultBuilder(args)
+                .UseKestrel(options => options.AddServerHeader = false)
                 .UseUrls($"http://*:{config.GetValue<int>("Host:Port")}")
                 .UseStartup<Startup>();
         }

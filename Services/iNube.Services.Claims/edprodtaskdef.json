@@ -1,0 +1,33 @@
+{
+  "family": "ed-prod-mica-claims",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "ed-prod-mica-claims",
+      "image": "<edclaims>",
+
+      "cpu": 512,
+      "memory": 512,
+
+      "portMappings": [
+        {
+          "containerPort": 9002,
+          "hostPort": 9002,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+
+    }
+  ],
+
+
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "512",
+  "memory": "512"
+
+}

@@ -41,3 +41,9 @@ artifacts:
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json      
+    secondary-artifacts:
+    
+        iNubeProductConfigurationCI:
+            files:
+            - Services/iNube.Services.ProductConfiguration/edprodappspec.yml
+            - Services/iNube.Services.ProductConfiguration/edprodtaskdef.json

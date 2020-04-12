@@ -40,4 +40,10 @@ artifacts:
     - Services/iNube.Services.UserManagement/edtaskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
-    - imageDetail.json      
+    - imageDetail.json
+    secondary-artifacts:
+    
+        iNubeUserManagementCI:
+            files:
+            - Services/iNube.Services.UserManagement/edprodappspec.yml
+            - Services/iNube.Services.UserManagement/edprodtaskdef.json

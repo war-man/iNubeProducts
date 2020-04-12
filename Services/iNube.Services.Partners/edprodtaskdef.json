@@ -1,0 +1,33 @@
+{
+  "family": "ed-prod-mica-partner",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "ed-prod-mica-partner",
+      "image": "<edpartner>",
+
+      "cpu": 512,
+      "memory": 512,
+
+      "portMappings": [
+        {
+          "containerPort": 9005,
+          "hostPort": 9005,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+
+    }
+  ],
+
+
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "512",
+  "memory": "512"
+
+}

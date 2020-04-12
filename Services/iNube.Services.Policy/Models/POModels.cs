@@ -16,6 +16,8 @@ namespace iNube.Services.Policy.Models
         public decimal TotalRefundAmount { get; set; }
         public DateTime DateofPayment { get; set; }
         public DateTime EndorsementEffectiveDate{get;set;}
+
+        
     }
     public partial class ddDTOs
     {
