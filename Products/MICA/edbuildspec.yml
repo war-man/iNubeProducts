@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install: 
+    commands:
+      - npm i npm@latest -g
+     
+  pre_build:
+    commands:
+      - cd  $CODEBUILD_SRC_DIR
+      - cd Products/MICA/ClientApp
+      - npm install
+  build:
+    commands:
+      - cd  $CODEBUILD_SRC_DIR
+      - cd Products/MICA/ClientApp
+      - npm run build
+      
+  post_build:
+    commands:
+        - echo clearing s3 bucket for Edelweiss Production UI
+        - aws s3 rm s3://mica.edelweissinsurance.com
+        - echo $CODEBUILD_SRC_DIR
+        - aws s3 sync ./build/ s3://mica.edelweissinsurance.com 
+
+
