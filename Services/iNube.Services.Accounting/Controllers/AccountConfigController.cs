@@ -304,7 +304,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
 		
 		 [HttpGet]
         [AllowAnonymous]
-        public IActionResult HC()
+        public IActionResult HC() 
         {
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
