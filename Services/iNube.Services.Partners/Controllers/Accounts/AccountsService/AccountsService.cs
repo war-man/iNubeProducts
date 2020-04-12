@@ -30,7 +30,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
         Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext);
         Task<DailyDTO> GetDailyTransaction(string accountnumber, int month, int year, string TxnEventType, ApiContext apiContext);
         Task<CDBalanceDTO> GetAccountBalance(string accountnumber, string TxnEventType, ApiContext apiContext);
-        Task<CDAccountDTO> GetAccountDeatils(CDAccountRequest cDAccountRequest, ApiContext apiContext);
+        Task<CDAccountDTO> GetAccountDetails(CDAccountRequest cDAccountRequest, ApiContext apiContext);
         //Task<List<ddDTO>> GetProductName();
     }
 
@@ -211,9 +211,9 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             return await _accountsProductService(apiContext.ProductType).GetAccountBalance(accountnumber,TxnEventType, apiContext);
 
         }
-        public async Task<CDAccountDTO> GetAccountDeatils(CDAccountRequest cDAccountRequest, ApiContext apiContext)
+        public async Task<CDAccountDTO> GetAccountDetails(CDAccountRequest cDAccountRequest, ApiContext apiContext)
         {
-            return await _accountsProductService(apiContext.ProductType).GetAccountDeatils(cDAccountRequest, apiContext);
+            return await _accountsProductService(apiContext.ProductType).GetAccountDetails(cDAccountRequest, apiContext);
 
         }
     }

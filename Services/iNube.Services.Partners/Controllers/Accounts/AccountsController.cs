@@ -261,10 +261,10 @@ namespace iNube.Services.Partners.Controllers.Accounts
 
         }
         [HttpPost]
-        public async Task<IActionResult> GetAccountDeatils(CDAccountRequest cDAccountRequest)
+        public async Task<IActionResult> GetAccountDetails(CDAccountRequest cDAccountRequest)
         {
             
-            var response = (await _accountService.GetAccountDeatils(cDAccountRequest, Context));
+            var response = (await _accountService.GetAccountDetails(cDAccountRequest, Context));
             switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:

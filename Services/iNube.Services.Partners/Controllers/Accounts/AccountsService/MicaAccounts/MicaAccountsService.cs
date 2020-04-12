@@ -1769,7 +1769,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         }
 
-        public async Task<CDAccountDTO> GetAccountDeatils(CDAccountRequest cDAccountRequest, ApiContext apiContext)
+        public async Task<CDAccountDTO> GetAccountDetails(CDAccountRequest cDAccountRequest, ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
