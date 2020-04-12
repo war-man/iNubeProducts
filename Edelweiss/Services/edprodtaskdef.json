@@ -1,11 +1,11 @@
 {
   "family": "ed-prod-mica-extension",
   "taskRoleArn": "",
-  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::471379395009:role/ECSTaskDefinitionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "ed-prod-mica-extension", 
+      "name": "ed-prod-mica-extension",
       "image": "<IMAGE1_NAME>",
 
       "cpu": 512,
