@@ -8,12 +8,12 @@ phases:
   pre_build:
     commands:
       - cd  $CODEBUILD_SRC_DIR
-      - cd UI/MICA/ClientApp
+      - cd MICA/ClientApp
       - npm install
   build:
     commands:
       - cd  $CODEBUILD_SRC_DIR
-      - cd UI/MICA/ClientApp
+      - cd MICA/ClientApp
       - npm run build
       
   post_build:
