@@ -127,7 +127,6 @@ class ClaimIntimate extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
             policyflag: false,
             productflag: false,
             claimamtdisable: true,
@@ -142,6 +141,9 @@ class ClaimIntimate extends React.Component {
             validateUI: false,
             errormessage: false,
             errorifsccode: false,
+            erroraccName: false,
+            errorlossloc: false,
+            errorbankName: false,
             locationflag: false,
             descriptionflag: false,
             lossdateflag: false,
@@ -514,6 +516,9 @@ class ClaimIntimate extends React.Component {
         } else {
 
             this.setState({ errorifsccode: true });
+            this.setState({ errorbankName: true });
+            this.setState({ erroraccName: true });
+            this.setState({ errorlossloc: true });
             //this.setState({ erroraccno: true });
 
         }
@@ -537,15 +542,19 @@ class ClaimIntimate extends React.Component {
     }
 
     UIValidation = () => {
-        
-        if (this.state.locationOfLossState === false && this.state.lossDescriptionState === false && this.state.ifscCodeState === false) {
+
+        if (this.state.locationOfLossState === false && this.state.lossDescriptionState === false && this.state.ifscCodeState === false && this.state.accountHolderNameState === false
+            && this.state.bankNameState === false) {
 
             this.state.validateUI = true;
 
         }
         else {
             this.state.validateUI = false;
+            this.state.erroraccName = true;
             this.state.errorifsccode = true;
+            this.state.errorbankName = true;
+            this.state.errorlossloc = true;
             this.setState({});
         }
     }
@@ -616,6 +625,7 @@ class ClaimIntimate extends React.Component {
 
 
         }
+        
         this.change(event, name, formate, date, type);
     };
 
@@ -783,7 +793,7 @@ class ClaimIntimate extends React.Component {
         console.log("name", evt.target.name);
     };
 
-
+    
     onInputChange = (evt) => {
         const fields = this.state.fields;
         fields[evt.target.name] = evt.target.value;
@@ -1150,7 +1160,7 @@ class ClaimIntimate extends React.Component {
             //    break;
 
             case "locationOfLoss":
-                if (validationPage.verifyName(event.target.value)) {
+                if (validationPage.verifyname(event.target.value)) {
                     this.setState({ [stateName + "State"]: false });
                 } else {
                     this.setState({ [stateName + "State"]: true });
@@ -1190,7 +1200,7 @@ class ClaimIntimate extends React.Component {
                 break;
 
             case "bankName":
-                if (validationPage.verifyBankName(event.target.value)) {
+                if (validationPage.verifyname(event.target.value)) {
                     this.setState({ [stateName + "State"]: false });
                 } else {
                     this.setState({ [stateName + "State"]: true });
@@ -1575,7 +1585,7 @@ class ClaimIntimate extends React.Component {
                                     masterList={this.state.masterList} master={this.state.master} addressDTO={this.state.addressDTO} ProductClaimData={this.state.ProductClaimData} stateMasterList={this.state.stateMasterList}
                                     onModelChange={this.onModelChange} AdditionalDetails={this.state.AdditionalDetails} onDateChange={this.onDateChange} locationflag={this.state.locationflag} descriptionflag={this.state.descriptionflag}
                                     lossdateflag={this.state.lossdateflag} lossintimatedflag={this.state.lossintimatedflag} causeflag={this.state.causeflag}
-                                    insurableitemflag={this.state.insurableitemflag} handleDateChange={this.handleDateChange}
+                                    insurableitemflag={this.state.insurableitemflag} handleDateChange={this.handleDateChange} errorlossloc={this.state.errorlossloc}
                                 />
 
                                 <ClaimAmount TableData={this.state.TableData} ClaimAmountSum={this.ClaimAmountSum} ClaimsAmountData={this.state.ClaimsAmountData} claimAmountState={this.state.claimAmountState} validateUI={this.state.validateUI} InsurableItemData={this.state.InsurableItemData} policyflag={this.state.policyflag}
@@ -1584,7 +1594,7 @@ class ClaimIntimate extends React.Component {
 
                                 <BankDetails BankData={this.state.BankData} AccountTypedata={this.state.AccountTypedata} DetailsDTO={this.state.DetailsDTO} handleChange={this.handleChange} fields={this.state.fields} details={this.state.details} onInputParamChange={this.onInputParamChange}
                                     accountHolderNameState={this.state.accountHolderNameState} accountNumberState={this.state.accountNumberState} bankNameState={this.state.bankNameState} bankBranchAddState={this.state.bankBranchAddState} ifscCodeState={this.state.ifscCodeState}
-                                    validateUI={this.state.validateUI} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} errorifsccode={this.state.errorifsccode} erroraccno={this.state.erroraccno} classes={this.classes} bankDetails={this.state.bankDetails} handleChangebank={this.handleChangebank} />
+                                    validateUI={this.state.validateUI} ValidationUI={this.state.ValidationUI} errormessage={this.state.errormessage} errorifsccode={this.state.errorifsccode} errorbankName={this.state.errorbankName} erroraccName={this.state.erroraccName}  erroraccno={this.state.erroraccno} classes={this.classes} bankDetails={this.state.bankDetails} handleChangebank={this.handleChangebank} />
 
 
                                 <Document DocumentData={this.state.DocumentData} docidfunc={this.docidfunc} doc={this.state.doc} dmsdocId={this.state.dmsdocId} documentName={this.state.documentName} claimId={this.state.claimId} handleChange={this.handleChange} DetailsDTO={this.state.DetailsDTO} getUploadParams={this.state.getUploadParams} onChangeStatus={this.state.handleChangeStatus} onSubmit={this.state.handleSubmit} fields={this.state.fields} onInputParamChange={this.onInputParamChange} />

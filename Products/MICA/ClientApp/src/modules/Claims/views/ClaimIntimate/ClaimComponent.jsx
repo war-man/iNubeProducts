@@ -76,6 +76,8 @@ const ClaimComponent = (props) => {
 
                     {props.locationflag && (props.DetailsDTO.locationOfLoss == "") ? <p className="error"> </p> : null}
 
+                    {props.errorlossloc && (props.locationOfLossState == true) ? <p className="error"> Location of loss must contains only alphabets</p> : null}
+
                 </GridItem>
                 <GridItem xs={12} sm={12} md={3}>
                     <MasterDropdown
