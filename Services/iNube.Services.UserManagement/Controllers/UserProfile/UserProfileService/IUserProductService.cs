@@ -13,7 +13,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         IEnumerable<ddDTO> GetLocation(string locationType, int parentID, ApiContext apiContext);
         UserResponse CreateProfileUser(UserDTO user, ApiContext apiContext);
         EmployeeDTO CreateProfileemployee(EmployeeDTO emp, ApiContext apiContext);
-        TblUserDetails GetUserByUserId(string Id, ApiContext apiContext);
+        UserDetailsDTO GetUserByUserId(string Id, ApiContext apiContext);
         UserDTO ChangeEmailId(UserDTO _userDTO, ApiContext apiContext);
         UserDTO ChangeMobileNumber(UserDTO _userDTO, ApiContext apiContext);
         UserDTO ModifyUser(UserDTO usersDTOs, ApiContext apiContext);

@@ -28,11 +28,12 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             _emailService = emailService;
         }
 
-        public TblUserDetails GetUserByUserId(string Id, ApiContext apiContext)
+        public UserDetailsDTO GetUserByUserId(string Id, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var _userDetails = _context.TblUserDetails.SingleOrDefault(x => x.UserId == Id);
-            return _userDetails;
+            var result = _mapper.Map<UserDetailsDTO>(_userDetails);
+            return result;
         }
 
         public UserDTO SearchUserById(string userId, ApiContext apiContext)
