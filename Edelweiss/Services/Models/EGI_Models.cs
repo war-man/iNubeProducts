@@ -553,6 +553,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
     }
     public class PolicyCancelRequest
     {
+        public string ProposalNumber { get; set; }
         public string PolicyNumber { get; set; }
         public DateTime? EffectiveDate { get; set; }
         public DateTime? CancelRequestDate { get; set; }
@@ -668,6 +669,14 @@ namespace iNube.Services.MicaExtension_EGI.Models
     public class MonthlySIUploadDTO : ResponseStatus
     {
        
+    }
+    public class GlobalVariables
+    {
+        
+        public string CdaccountNumber { get; set; }
+        public string BillingFrequency { get; set; }
+        public DateTime PolicyEndDate { get; set; }
+        public dynamic PolicyData { get; set; }
     }
 }
 

@@ -4807,24 +4807,35 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
         {
-            var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apiContext);
-            // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();
-            var CdaccountNumber = (string)PolicyData["CDAccountNumber"];
-            var PolicyEndDate = (DateTime)PolicyData["Policy End Date"];
-            var BillingFrequency = (string)PolicyData["billingFrequency"];
+            GlobalVariables GlobalVariables = new GlobalVariables();
             PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
 
-            PolicyCancelReturnDto canceldetails = await PolicyCancellationCalculator(policyRequest.PolicyNumber, null);
-
-            policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
-
-            if (CdaccountNumber != null)
+            if (!string.IsNullOrEmpty(policyRequest.PolicyNumber))
             {
-                CDBalanceDTO FTaccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
-                CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
+                GlobalVariables.PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apiContext);
+
+                PolicyCancelReturnDto canceldetails = await PolicyCancellationCalculator(policyRequest.PolicyNumber, null);
+                policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
+            }
+            else if (!string.IsNullOrEmpty(policyRequest.ProposalNumber)) {
+                GlobalVariables.PolicyData = await _integrationService.InternalGetProposalDetailsByNumber(policyRequest.ProposalNumber, apiContext);
+                policyCancelResponse.FTPremium = 0;
+            }
+            // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();
+            GlobalVariables.CdaccountNumber = (string)GlobalVariables.PolicyData["CDAccountNumber"];
+            GlobalVariables.PolicyEndDate = (DateTime)GlobalVariables.PolicyData["Policy End Date"];
+            GlobalVariables.BillingFrequency = (string)GlobalVariables.PolicyData["billingFrequency"];
+           
+
+          
+
+            if (!string.IsNullOrEmpty(GlobalVariables.CdaccountNumber))
+            {
+                CDBalanceDTO FTaccountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "FT", apiContext);
+                CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "AD", apiContext);
                 policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance + FTaccountdetails.TotalAvailableBalance;
             }
-            policyCancelResponse.NoofDayRemaining = (PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
+            policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
             policyCancelResponse.TotalPremium = policyCancelResponse.FTPremium + policyCancelResponse.ADPremium;
 
             var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
@@ -4850,7 +4861,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     //Total Usage Shown
                     var usedays = Convert.ToInt32(Days);
                     // No. of days for AD
-                    if (BillingFrequency == "Monthly")
+                    if (GlobalVariables.BillingFrequency == "Monthly")
                         policyCancelResponse.NoofUnusedDays = 60 - usedays;
                     else
                         policyCancelResponse.NoofUnusedDays = 365 - usedays;
