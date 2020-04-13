@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using iNube.Services.UserManagement.Entities;
+using iNube.Services.UserManagement.Entities.AVO;
 using iNube.Services.UserManagement.Models;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using iNube.Utility.Framework.Model;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Entities.MICACP;
-using iNube.Services.UserManagement.Entities.AVO;
 
 namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileService.MicaProfile
 {
@@ -24,9 +23,8 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         private readonly IEmailService _emailService;
         public AvoProfileService(IMapper mapper, IEmailService emailService)
         {
-            _mapper = mapper;
             _emailService = emailService;
-
+            _mapper = mapper;
         }
 
         public UserDetailsDTO GetUserByUserId(string Id, ApiContext apiContext)
@@ -40,10 +38,10 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         public UserDTO SearchUserById(string userId, ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            Entities.AVO.AspNetUsers _userd = _context.AspNetUsers.Where(user => user.Id == userId)
-                       .Include(add => add.TblUserDetails)
-                       .Include(add => add.TblUserAddress)
-                       .FirstOrDefault();
+            AspNetUsers _userd = _context.AspNetUsers.Where(user => user.Id == userId)
+                        .Include(add => add.TblUserDetails)
+                        .Include(add => add.TblUserAddress)
+                        .FirstOrDefault();
             var _UsrDTO = _mapper.Map<UserDTO>(_userd);
             return _UsrDTO;
         }
@@ -85,7 +83,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         userDetails.OrganizationId = apiContext.OrgId;
                     }
                     //.OrganizationId = user.CustomerID > 0 ? user.CustomerID: apiContext.OrgId;
-                    Entities.AVO.AspNetUsers _users = _mapper.Map<Entities.AVO.AspNetUsers>(user);
+                    AspNetUsers _users = _mapper.Map<AspNetUsers>(user);
                     if (string.IsNullOrEmpty(_users.Id))
                     {
                         _users.Id = Guid.NewGuid().ToString();
@@ -137,7 +135,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             }
             else
             {
-                Entities.AVO.AspNetUsers _users = _mapper.Map<Entities.AVO.AspNetUsers>(user);
+                AspNetUsers _users = _mapper.Map<AspNetUsers>(user);
                 userDetails.ModifiedBy = apiContext.UserId;
                 userDetails.ModifiedDate = DateTimeNow;
 
@@ -147,10 +145,10 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     _context.TblUserAddress.Remove(item);
                 }
                 _context.SaveChanges();
-                var _usersDetail = _mapper.Map<Entities.AVO.TblUserDetails>(userDetails);
+                var _usersDetail = _mapper.Map<TblUserDetails>(userDetails);
                 _context.Update(_usersDetail);
 
-                var _useraddress1 = _mapper.Map<HashSet<Entities.AVO.TblUserAddress>>(user.UserAddress);
+                var _useraddress1 = _mapper.Map<HashSet<TblUserAddress>>(user.UserAddress);
 
                 foreach (var item in _useraddress1)
                 {
@@ -192,7 +190,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             //  var userDetail = user.TblUserDetails.First();
             emp.CreatedBy = apiContext.UserId;
-            var _empls = _mapper.Map<Entities.AVO.TblEmployees>(emp);
+            var _empls = _mapper.Map<TblEmployees>(emp);
             //_empls.Empid = Guid.NewGuid().ToString();
             //DateTime now = DateTime.Now;
             //_users.LockoutEnd = now;
@@ -205,7 +203,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         public UserDTO ChangeEmailId(UserDTO userDTO, ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            Entities.AVO.AspNetUsers _aspNet = _mapper.Map<Entities.AVO.AspNetUsers>(userDTO);
+            AspNetUsers _aspNet = _mapper.Map<AspNetUsers>(userDTO);
             var _aspUsers = _context.AspNetUsers.SingleOrDefault(x => x.Id == _aspNet.Id);
 
             var _users = _context.TblUserDetails.SingleOrDefault(x => x.UserId == _aspNet.Id);
@@ -222,7 +220,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         public UserDTO ChangeMobileNumber(UserDTO userDTO, ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            Entities.AVO.AspNetUsers _aspNet = _mapper.Map<Entities.AVO.AspNetUsers>(userDTO);
+            AspNetUsers _aspNet = _mapper.Map<AspNetUsers>(userDTO);
             var _aspUsers = _context.AspNetUsers.SingleOrDefault(x => x.Id == _aspNet.Id);
 
             var _users = _context.TblUserDetails.SingleOrDefault(x => x.UserId == _aspNet.Id);
@@ -295,7 +293,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             var _emp = _context.TblEmployees.SingleOrDefault(x => x.Empid == Empid);
             if (_emp != null)
             {
-                Entities.AVO.TblEmployees _tblUserDetails = _mapper.Map<Entities.AVO.TblEmployees>(_emp);
+                TblEmployees _tblUserDetails = _mapper.Map<TblEmployees>(_emp);
                 _context.TblEmployees.Find(_emp.Empid);
                 var emplDTOs = _mapper.Map<EmployeeDTO>(_emp);
                 return emplDTOs;
@@ -309,7 +307,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         public UserDTO ModifyUser(UserDTO usersDTOs, ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            Entities.AVO.AspNetUsers _aspNet = _mapper.Map<Entities.AVO.AspNetUsers>(usersDTOs);
+            AspNetUsers _aspNet = _mapper.Map<AspNetUsers>(usersDTOs);
             //We Use .Include Function  to add all Child Classes from a Parent Table 
             //In this Case Parent table is AspNet Users (Primary Key) Child Table is UserDetails (foreign Key)
             // var _aspUsers = _context.AspNetUsers.Include<>.SingleOrDefault(x => x.Id == usersDTOs.Id);
@@ -448,7 +446,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             {
                 if (pass.NewPassword == pass.ConfirmPassword)
                 {
-                    Entities.AVO.AspNetUsers _aspNet = _mapper.Map<Entities.AVO.AspNetUsers>(_aspUsers);
+                    AspNetUsers _aspNet = _mapper.Map<AspNetUsers>(_aspUsers);
 
                     if (string.IsNullOrWhiteSpace(pass.ConfirmPassword)) throw new ArgumentException("Please enter valid password", "password");
 
@@ -488,7 +486,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
                     if (pass.NewPassword == pass.ConfirmPassword)
                     {
-                        Entities.AVO.AspNetUsers _aspNet = _mapper.Map<Entities.AVO.AspNetUsers>(_aspUsers);
+                        AspNetUsers _aspNet = _mapper.Map<AspNetUsers>(_aspUsers);
                         if (string.IsNullOrWhiteSpace(pass.ConfirmPassword)) throw new ArgumentException("Please enter valid password", "password");
 
                         passwordSalt = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
@@ -546,7 +544,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     sendOtp.UserId = user.Id;
                     sendOtp.Email = user.Email;
                     sendOtp.Otp = otp.ToString();
-                    Entities.AVO.TblSendOtp _otp = _mapper.Map<Entities.AVO.TblSendOtp>(sendOtp);
+                    TblSendOtp _otp = _mapper.Map<TblSendOtp>(sendOtp);
                     _context.TblSendOtp.Add(_otp);
                     _context.SaveChanges();
                     emailTest.To = user.Email;
@@ -593,7 +591,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     sendOtp.UserId = user.Id;
                     sendOtp.UserName = user.UserName;
                     sendOtp.Otp = otp.ToString();
-                    Entities.AVO.TblSendOtp _otp = _mapper.Map<Entities.AVO.TblSendOtp>(sendOtp);
+                    TblSendOtp _otp = _mapper.Map<TblSendOtp>(sendOtp);
                     _context.TblSendOtp.Add(_otp);
                     _context.SaveChanges();
                     emailTest.To = sendOtp.Email;
@@ -701,7 +699,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             var users = _context.TblUserDetails.SingleOrDefault(a => a.UserId == image.UserId);
             users.ProfileImage = image.Document;
 
-            var result = _mapper.Map<Entities.AVO.TblUserDetails>(users);
+            var result = _mapper.Map<TblUserDetails>(users);
 
             _context.Update(result);
             _context.SaveChanges();

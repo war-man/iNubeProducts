@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using iNube.Services.UserManagement.Entities;
 using iNube.Services.UserManagement.Entities.AVO;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Models;
@@ -27,7 +26,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         public IEnumerable<RolesDTO> GetRoles(ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            IEnumerable<Entities.AVO.AspNetRoles> _roles = _context.AspNetRoles.Select(roles => roles);
+            IEnumerable<AspNetRoles> _roles = _context.AspNetRoles.Select(roles => roles);
 
             string custid = _config.GetSection("Inubeadmin").GetSection("Customerid").Value;
 
@@ -56,7 +55,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         public IEnumerable<RolesDTO> GetRolePermissionsById(string roleid, ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            IEnumerable<Entities.AVO.AspNetRoles> _roles = _context.AspNetRoles.Where(r => r.Id == roleid);
+            IEnumerable<AspNetRoles> _roles = _context.AspNetRoles.Where(r => r.Id == roleid);
             string custid = _config.GetSection("Inubeadmin").GetSection("Customerid").Value;
             if (apiContext.OrgId == Convert.ToDecimal(custid))
             {
@@ -97,7 +96,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
                     {
                         roleDTO.UserId = userRoles.UserId;
                         roleDTO.RoleId = userRoles.RoleId[i];
-                        Entities.AVO.AspNetUserRoles _usersRole = _mapper.Map<Entities.AVO.AspNetUserRoles>(roleDTO);
+                        AspNetUserRoles _usersRole = _mapper.Map<AspNetUserRoles>(roleDTO);
 
                         _context.AspNetUserRoles.Add(_usersRole);
                         // _context.SaveChanges();
@@ -114,7 +113,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
                     {
                         roleDTO.UserId = userRoles.UserId;
                         roleDTO.RoleId = userRoles.RoleId[i];
-                        Entities.AVO.AspNetUserRoles _usersRole = _mapper.Map<Entities.AVO.AspNetUserRoles>(roleDTO);
+                        AspNetUserRoles _usersRole = _mapper.Map<AspNetUserRoles>(roleDTO);
 
                         _context.AspNetUserRoles.Add(_usersRole);
                     }
@@ -156,7 +155,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         public IEnumerable<MasPermissionDTO> GetMasPermissions(string perType, ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            IEnumerable<Entities.AVO.TblMasPermission> _permissions = _context.TblMasPermission.Where(per => per.ItemType == perType);
+            IEnumerable<TblMasPermission> _permissions = _context.TblMasPermission.Where(per => per.ItemType == perType);
 
             var _masPermissionDTOs = GetMenuMasPermissions(_permissions, perType);
             //IEnumerable<MasPermissionDTO> _masPermissionDTOs = _permissions
@@ -180,7 +179,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             return _masPermissionDTOs;
         }
 
-        private IEnumerable<MasPermissionDTO> GetMenuMasPermissions(IEnumerable<Entities.AVO.TblMasPermission> _permissions, string perType)
+        private IEnumerable<MasPermissionDTO> GetMenuMasPermissions(IEnumerable<TblMasPermission> _permissions, string perType)
         {
 
             IEnumerable<MasPermissionDTO> _masPermissionDTOs = _permissions
@@ -205,7 +204,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             return _masPermissionDTOs;
         }
 
-        private IEnumerable<MasPermissionDTO> GetChildren(IEnumerable<Entities.AVO.TblMasPermission> permissions, int parentId)
+        private IEnumerable<MasPermissionDTO> GetChildren(IEnumerable<TblMasPermission> permissions, int parentId)
         {
             IEnumerable<MasPermissionDTO> masPermissionDTOs = permissions
                    .Where(c => c.ParentId == parentId)
@@ -232,7 +231,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var userRoles = _context.AspNetUserRoles.Where(u => u.UserId == userId).Select(r => r.RoleId).ToArray();
-            IEnumerable<Entities.AVO.AspNetRoles> _roles = _context.AspNetRoles.Where(r => userRoles.Contains(r.Id)).Select(roles => roles);
+            IEnumerable<AspNetRoles> _roles = _context.AspNetRoles.Where(r => userRoles.Contains(r.Id)).Select(roles => roles);
             IEnumerable<RolesDTO> _rolesDTOs = _mapper.Map<IEnumerable<RolesDTO>>(_roles);
             foreach (RolesDTO roles in _rolesDTOs)
             {
@@ -249,7 +248,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var userRoles = _context.AspNetUserRoles.Where(u => u.UserId == userId).Select(r => r.RoleId).ToArray();
-            IEnumerable<Entities.AVO.AspNetRoles> _roles = _context.AspNetRoles.Where(r => userRoles.Contains(r.Id)).Select(roles => roles);
+            IEnumerable<AspNetRoles> _roles = _context.AspNetRoles.Where(r => userRoles.Contains(r.Id)).Select(roles => roles);
             IEnumerable<RolesDTO> _rolesDTOs = _mapper.Map<IEnumerable<RolesDTO>>(_roles);
             foreach (RolesDTO roles in _rolesDTOs)
             {
@@ -270,7 +269,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             DbManager._TimeZone = UserDateTime.KeyValue;
             DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
 
-            var _roles = _mapper.Map<Entities.AVO.AspNetRoles>(role);
+            var _roles = _mapper.Map<AspNetRoles>(role);
             if (string.IsNullOrEmpty(_roles.Id))
             {
                 _roles.Id = Guid.NewGuid().ToString();
