@@ -40,7 +40,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
         {
             var dbConnection = GetEnvironmentConnection(loginDTO.ProductType, loginDTO.EnvId).Dbconnection;
             _context = (AVOUMContext)DbManager.GetContextByConnection(loginDTO.ProductType, dbConnection);
-            var user = _context.AspNetUsers.SingleOrDefault(x => x.UserName == loginDTO.Username);
+            var user = _context.AspNetUsers.FirstOrDefault(x => x.UserName == loginDTO.Username);
 
             // check if username exists
             if (user == null)
@@ -50,8 +50,17 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
 
             //// check if password is correct
             if (!Utilities.VerifyPasswordHash(loginDTO.Password, user.PasswordHash, passwordSalt))
-                return null;
-
+            {
+                if (user.AccessFailedCount < 5)
+                {
+                    user.AccessFailedCount = user.AccessFailedCount + 1;
+                    _context.SaveChanges();
+                    return null;
+                }
+                else
+                {
+                }
+            }
             // authentication successful
             AspNetUsersDTO userDTO = _mapper.Map<AspNetUsersDTO>(user);
             return userDTO;
@@ -114,7 +123,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             {
                 string username = _aspUsers.UserName;
                 emailTest.To = emailId;
-                emailTest.Subject = "MICA Username";
+                emailTest.Subject = "AVO Username";
                 emailTest.Message = "Dear User,\n" + "      " + "\n" + "      Your Username: " + username + "      " + "\n" + "\nThanks & Regards:\n" + "      " + "MICA Team";
                 await SendEmailAsync(emailTest);
                 return _aspUsers.UserName;
@@ -187,19 +196,22 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             LoginResponse loginResponse = new LoginResponse();
             var dbConnection = GetEnvironmentConnection(productType, envId).Dbconnection;
             _context = (AVOUMContext)DbManager.GetContextByConnection(productType, dbConnection);
-            var userDetails = _context.TblUserDetails.FirstOrDefault(u => u.UserName == user.UserName);
-            //var roleDetails = from ro in _context.AspNetRoles
-            //                  join ur in _context.AspNetUserRoles on ro.Id equals ur.RoleId
-            //                  where ur.UserId == user.Id
-            //                  select ur;
-            var roleName = _context.AspNetRoles.FirstOrDefault(u => u.Id == userDetails.RoleId).Name;
-            var issuer = _config["Jwt:Issuer"];
-            var audience = _config["Jwt:Audience"];
-            var expiry = isTokenExpire ? DateTime.Now.AddMinutes(120) : DateTime.Now.AddYears(3);
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            // Add standard claims
-            var claims = new List<Claim>
+            if (isTokenExpire == true)
+            {
+                loginResponse.PasswordExpire = false;
+                var userDetails = _context.TblUserDetails.FirstOrDefault(u => u.UserName == user.UserName);
+                //var roleDetails = from ro in _context.AspNetRoles
+                //                  join ur in _context.AspNetUserRoles on ro.Id equals ur.RoleId
+                //                  where ur.UserId == user.Id
+                //                  select ur;
+                var roleName = _context.AspNetRoles.FirstOrDefault(u => u.Id == userDetails.RoleId).Name;
+                var issuer = _config["Jwt:Issuer"];
+                var audience = _config["Jwt:Audience"];
+                var expiry = isTokenExpire ? DateTime.Now.AddMinutes(120) : DateTime.Now.AddYears(3);
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                // Add standard claims
+                var claims = new List<Claim>
             {
                 new Claim("UserId", user.Id),
                 new Claim("Email", user.Email),
@@ -211,20 +223,37 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 new Claim("ProductType",productType),
                 new Claim("ServerType",envId.ToString()),
             };
-            var token = new JwtSecurityToken(issuer: issuer, audience: audience, claims: claims,
-                expires: expiry, signingCredentials: credentials);
+                var token = new JwtSecurityToken(issuer: issuer, audience: audience, claims: claims,
+                    expires: expiry, signingCredentials: credentials);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var stringToken = tokenHandler.WriteToken(token);
-            loginResponse.Token = stringToken;
-            loginResponse.UserId = user.Id;
-            loginResponse.RoleId = userDetails.RoleId;
-            loginResponse.UserName = user.UserName;
-            loginResponse.FirstName = userDetails.FirstName;
-            loginResponse.LastName = userDetails.LastName;
-            loginResponse.IsMale = userDetails.GenderId == 1001 ? true : false;
-            loginResponse.DisplayName = loginResponse.FirstName + "  " + loginResponse.LastName;
-            loginResponse.Status = BusinessStatus.Ok;
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var stringToken = tokenHandler.WriteToken(token);
+                loginResponse.Token = stringToken;
+                loginResponse.UserId = user.Id;
+                loginResponse.RoleId = userDetails.RoleId;
+                loginResponse.PartnerId = userDetails.PartnerId;
+                loginResponse.OrganizationId = userDetails.OrganizationId;
+                loginResponse.UserName = user.UserName;
+                loginResponse.FirstName = userDetails.FirstName;
+                loginResponse.LastName = userDetails.LastName;
+                loginResponse.IsMale = userDetails.GenderId == 1001 ? true : false;
+                loginResponse.ProfileImage = userDetails.ProfileImage;
+                loginResponse.DisplayName = loginResponse.FirstName + "  " + loginResponse.LastName;
+                if ((DateTime.Now.Date - user.LastPasswordChanged.Value.Date).TotalDays > 60)
+                {
+                    loginResponse.PasswordExpire = true;
+                }
+                loginResponse.FirstTimeLogin = user.FirstTimeLogin;
+
+                loginResponse.ProfileImage = userDetails.ProfileImage;
+
+                loginResponse.Status = BusinessStatus.Ok;
+            }
+            else
+            {
+                loginResponse.Status = BusinessStatus.Error;
+                loginResponse.ResponseMessage = "Your accont has been Locked, please contact Admin.";
+            }
             return loginResponse;
         }
 

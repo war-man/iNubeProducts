@@ -16,8 +16,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.AvoProductServ
 
         Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote);
 
-        Task<List<object>> GetRiders(int ProductId, int PlanId);
+        Task<List<object>> GetRiders(int ProductId, int PlanId, ApiContext apiContext);
 
-        Task<bool> CheckSpouse(int ProductID, int PlanID);
+        Task<bool> CheckSpouse(int ProductID, int PlanID, ApiContext apiContext);
     }
 }

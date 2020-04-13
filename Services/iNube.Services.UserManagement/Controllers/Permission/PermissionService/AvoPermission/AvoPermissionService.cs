@@ -186,6 +186,10 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             UserPermissionsDTO userPermissions = null;
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             for (int i = 0; i < permissionIds.PermissionIds.Length; i++)
             {
                 userPermissions = new UserPermissionsDTO();
@@ -193,7 +197,8 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                 userPermissions.PermissionId = Convert.ToInt16(permissionIds.PermissionIds[i]);
                 userPermissions.UserorRole = "User";
                 // userPermissions.CreatedBy = CreatedBy;
-                userPermissions.CreatedDate = DateTime.Now;
+                userPermissions.CreatedBy = apiContext.UserId;
+                userPermissions.CreatedDate = DatetimeNow;
                 userPermissions.Status = true;
                 var _usersPer = _mapper.Map<TblUserPermissions>(userPermissions);
                 _context.TblUserPermissions.Add(_usersPer);
@@ -214,6 +219,10 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             TblUserPermissions userPermissions = null;
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             foreach (var item in permissionIds.RolePermissionIds)
             {
                 var newPermission = item.PermissionIds.ToList();
@@ -239,7 +248,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                     userPermissions.RoleId = item.RoleId;
                     userPermissions.UserorRole = "User";
                     // userPermissions.CreatedBy = CreatedBy;
-                    userPermissions.CreatedDate = DateTime.Now;
+                    userPermissions.CreatedDate = DatetimeNow;
                     userPermissions.Status = true;
                     _context.TblUserPermissions.Add(userPermissions);
                 }
@@ -248,44 +257,42 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
 
             _context.SaveChanges();
             return new UserPermissionResponse { Status = BusinessStatus.Created, Id = userPermissions?.UserPermissionsId.ToString(), ResponseMessage = $"Assigned Permissions successfully!!" };
-
         }
 
         public NewRolePermissionResponse AssignRolePermission(NewRolesPermissionDTO permissionIds, ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            TblUserPermissions userPermissions = null;
-            //foreach (var item in permissionIds.RolePermissionIds)
-            //{
-            //    var newPermission = item.PermissionIds.ToList();
-            //    var existingPerm = _context.TblUserPermissions.Where(t => t.RoleId == permissionIds.RoleId && t.UserorRole == "Role" && t.RoleId == item.RoleId).ToList();
-            //    //Delete which are not in current permissions--
-            //    var delPermission = existingPerm.Where(m => !item.PermissionIds.Contains((int)m.PermissionId)).ToList();
-            //    foreach (var perm in delPermission)
-            //    {
-            //        _context.Remove(perm);
-            //        existingPerm.Remove(perm);
-            //    }
-            //    var includedPermission = existingPerm.Where(m => item.PermissionIds.Contains((int)m.PermissionId)).ToList();
-            //    foreach (var incPerm in includedPermission)
-            //    {
-            //        newPermission.Remove((int)incPerm.PermissionId);
-            //    }
-            //Add new record
+            TblUserPermissions newRolePermissions = null;
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+            var permission = _context.TblUserPermissions.Where(p => p.RoleId == permissionIds.RoleId).Select(p => p);
+            if (permission != null)
+            {
+                var existingPerm = _context.TblUserPermissions.Where(r => r.RoleId == permissionIds.RoleId && r.UserorRole == "Role").ToList();
+                //Delete which are not in current permissions--
+                var delPermission = existingPerm.Where(m => m.RoleId == permissionIds.RoleId && m.UserorRole == "Role").ToList();
+                foreach (var perm in delPermission)
+                {
+                    _context.TblUserPermissions.Remove(perm);
+                }
+            }
+
             foreach (var permissionId in permissionIds.PermissionIds)
             {
-                userPermissions = new TblUserPermissions();
-                userPermissions.PermissionId = permissionId;
-                userPermissions.RoleId = permissionIds.RoleId;
-                userPermissions.UserorRole = "Role";
+                newRolePermissions = new TblUserPermissions();
+                newRolePermissions.PermissionId = permissionId;
+                newRolePermissions.RoleId = permissionIds.RoleId;
+                newRolePermissions.UserorRole = "Role";
                 // userPermissions.CreatedBy = CreatedBy;
-                userPermissions.CreatedDate = DateTime.Now;
-                userPermissions.Status = true;
-                _context.TblUserPermissions.Add(userPermissions);
+                newRolePermissions.CreatedDate = DatetimeNow;
+                newRolePermissions.Status = true;
+                _context.TblUserPermissions.Add(newRolePermissions);
             }
-            //}
             _context.SaveChanges();
-            return new NewRolePermissionResponse { Status = BusinessStatus.Created, Id = userPermissions?.UserPermissionsId.ToString(), ResponseMessage = $"Assigned Permissions successfully!!" };
+            return new NewRolePermissionResponse { Status = BusinessStatus.Created, Id = newRolePermissions?.UserPermissionsId.ToString(), ResponseMessage = $"Assigned Permissions successfully!!" };
         }
         /// <summary>
         /// Gets the role permissions.
@@ -445,7 +452,55 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
 
         public IEnumerable<MasPermissionDTO> GetDashboards(ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var menuPermission = _context.TblMasPermission.Where(r => r.ItemType == "Dashboard")
+                .Select(c => new MasPermissionDTO
+                {
+                    PermissionId = c.PermissionId,
+                    mID = c.PermissionId,
+                    ItemType = c.ItemType,
+                    ParentId = c.ParentId,
+                    MenuId = c.MenuId,
+                    mValue = c.ItemDescription,
+                    ItemDescription = c.ItemDescription,
+                    Label = c.ItemDescription,
+                    Url = c.Url,
+                    PathTo = c.PathTo,
+                    Collapse = c.Collapse,
+                    State = c.State,
+                    Mini = c.Mini,
+                    Icon = c.Icon,
+                    Redirect = c.Redirect,
+                    Component = c.Component,
+                    Status = false,
+                    //RoleId = permission.RoleId,
+                    //RoleName = ruleNames.First(r => r.Id == permission.RoleId).Name
+                }
+                ).ToList();
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menuPermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menuPermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
         }
 
         public IEnumerable<MasPermissionDTO> GetReports(ApiContext apiContext)
