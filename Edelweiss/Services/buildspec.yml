@@ -39,3 +39,11 @@ artifacts:
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json      
+
+    secondary-artifacts:
+    
+        EgiExtensionCI:
+            files:
+            - Edelweiss/Services/edprodappspec.yml
+            - Edelweiss/Services/edprodtaskdef.json
+            - imageDetail.json

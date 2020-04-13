@@ -38,7 +38,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
         List<ddDTO> GetVehicleMaster(string lMasterlist);
-        Task<BillingResponse> BillingDetails(string PolicyNo, string Month, int Year);
+        Task<BillingResponse> BillingDetails(string PolicyNo, int Month, int Year);
         Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata);
         TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
 
@@ -623,6 +623,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
         }
+
         public TaxTypeDTO TaxTypeForStateCode(string stateabbreviation)
         {
 
@@ -2461,12 +2462,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return obj;
         }
 
-        public async Task<BillingResponse> BillingDetails(string PolicyNo, string Month, int Year)
+        public async Task<BillingResponse> BillingDetails(string PolicyNo, int Month, int Year)
         {
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
             var CurrentMonth = IndianTime.Month;
+            var CurrentDate = IndianTime.Date;
 
 
             ApiContext apiContext = new ApiContext();
@@ -2483,129 +2485,81 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             BillingResponse response = new BillingResponse();
             ErrorInfo errorInfo = new ErrorInfo();
 
-            if (!String.IsNullOrEmpty(PolicyNo) && !String.IsNullOrEmpty(Month) && Year > 0)
+            if (!String.IsNullOrEmpty(PolicyNo) && Month > 0 && Month <= 12 && Year > 0)
             {
-                try
+                
+                getMonthNumber = Month;              
+
+                BillingDTO billingDTO = new BillingDTO();
+                CDAccountRequest accountRequest = new CDAccountRequest();
+                CDAccountDTO CdDailyDTO = new CDAccountDTO();
+                DateTime PolicyStartDate;
+
+                dynamic PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo,apiContext);
+
+                if (PolicyData != null)
                 {
-                    getMonthNumber = DateTime.ParseExact(Month, "MMMM", CultureInfo.CurrentCulture).Month;
+                    try
+                    {
+                        accountRequest.TxnEventType = "AD";
+                        accountRequest.accountnumber = PolicyData["CDAccountNumber"].ToString();
+                        PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
+
+
+                        if(PolicyStartDate.Month == Month && PolicyStartDate.Year == Year)
+                        {
+                            accountRequest.FromDate = PolicyStartDate.Date;
+                            accountRequest.ToDate = CurrentDate;
+                        }
+                        else
+                        {
+                            var PolicyDay = PolicyStartDate.Day;
+                            DateTime FromDate = new DateTime(Year, Month, PolicyDay, 0, 0, 0);
+                            var FinalFromDate = FromDate.AddMonths(-1);
+
+                            DateTime ToDate = new DateTime(Year, Month, PolicyDay, 0, 0, 0);
+                            var FinalToDate = ToDate.AddDays(-1);
+
+                            accountRequest.FromDate = FinalFromDate;
+                            accountRequest.ToDate = FinalToDate;
+                        }
+
+
+
+                    }
+                    catch (Exception Ex)
+                    {
+                        accountRequest.accountnumber = "";
+                        PolicyStartDate = DateTime.MinValue;
+                    }
                 }
-                catch
+                else
                 {
-                    response.ResponseMessage = "NO Such Month";
+                    response.ResponseMessage = "Policy Record Not Found";
                     response.Status = BusinessStatus.NotFound;
-                    errorInfo.ErrorMessage = "No Such Month Name: " + Month;
-                    errorInfo.ErrorCode = "GEN001";
-                    errorInfo.PropertyName = "NoRecords";
+                    errorInfo.ErrorMessage = "No Records for this Policy Number - " + PolicyNo;
+                    errorInfo.ErrorCode = "GEN003";
+                    errorInfo.PropertyName = "NotFound";
                     response.Errors.Add(errorInfo);
                     return response;
                 }
 
-                BillingDTO billingDTO = new BillingDTO();
-                CDDailyDTO CdDailyDTO = new CDDailyDTO();
-
-                //var checkPolicyNo = _context.TblMonthlyBalance.Any(x => x.PolicyNumber == PolicyNo);
-
-                var checkswitchLog = _context.TblSwitchLog.Any(x => x.PolicyNo == PolicyNo && x.CreatedDate.Value.Month == getMonthNumber && x.CreatedDate.Value.Year == Year);
-
-                var checkPremiumLog = _context.TblPremiumBookingLog.Any(x => x.PolicyNo == PolicyNo && x.TxnDateTime.Value.Month == getMonthNumber && x.TxnDateTime.Value.Year == Year);
-
-
                 //Integration Call for Balance 
-                CdDailyDTO = await _integrationService.GetDailyAccountDetails(PolicyNo, getMonthNumber, Year, apiContext);
+                CdDailyDTO = await _integrationService.GetAccountDetails(accountRequest, apiContext);
 
 
                 if (CdDailyDTO.Status == BusinessStatus.Ok)
                 {
-                    billingDTO.BalanceCarryForward = CdDailyDTO.AvailableAmount;
+                    billingDTO.OpeningBalance = CdDailyDTO.OpeningBalance;
+                    billingDTO.ClosingBalance = CdDailyDTO.ClosingBalance;
+                    billingDTO.BillingDetails = CdDailyDTO.AccountDetails;
                 }
                 else
                 {
-                    billingDTO.BalanceCarryForward = 0;
+                    billingDTO.OpeningBalance = 0;
+                    billingDTO.ClosingBalance = 0;
+                    billingDTO.BillingDetails = new List<AccountDetails>();
                 }
-
-
-                if (checkswitchLog)
-                {
-                    var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Month(CreatedDate) =" + getMonthNumber + "and Year(CreatedDate) =" + Year + "group by Month(CreatedDate) , PolicyNo";
-
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(connectionString))
-                        {
-                            connection.Open();
-
-                            //TBLSWITCHLOG
-                            SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
-                            DataSet Switchds = new DataSet();
-                            SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
-                            switchadapter.Fill(Switchds, "Query1");
-
-                            var Result = Switchds.Tables[0];
-                            var Days = Result.Rows[0].ItemArray[0];
-
-                            //Total Usage Shown
-                            billingDTO.TotalUsage = Convert.ToInt32(Days);
-
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        billingDTO.TotalUsage = 0;
-                    }
-
-                }
-                else
-                {
-                    billingDTO.TotalUsage = 0;
-                }
-
-                if (checkPremiumLog)
-                {
-                    var PremiumQuery = "select sum(BasePremium) 'Billing',Sum(FromTax + ToTax) 'GST',sum(TxnAmount) 'Total' from [QM].[TblPremiumBookingLog] where PolicyNo='" + PolicyNo + "' and Month(TxnDateTime) =" + getMonthNumber + " and Year(TxnDateTime) = " + Year;
-
-
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(connectionString))
-                        {
-                            connection.Open();
-
-                            //TBLPREMIUMBOOKING
-                            SqlCommand Premiumcommand = new SqlCommand(PremiumQuery, connection);
-                            DataSet Premiumds = new DataSet();
-                            SqlDataAdapter Premiumadapter = new SqlDataAdapter(Premiumcommand);
-                            Premiumadapter.Fill(Premiumds, "Query2");
-
-                            var PremiumResult = Premiumds.Tables[0];
-
-                            connection.Close();
-
-                            var Billing = PremiumResult.Rows[0].ItemArray[0];
-                            var GST = PremiumResult.Rows[0].ItemArray[1];
-                            var Total = PremiumResult.Rows[0].ItemArray[2];
-
-
-                            billingDTO.Billing = Convert.ToDecimal(Billing);
-                            billingDTO.Gst = Convert.ToDecimal(GST);
-                            billingDTO.Total = Convert.ToDecimal(Total);
-
-
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        billingDTO.Billing = 0;
-                        billingDTO.Gst = 0;
-                        billingDTO.Total = 0;
-                    }
-                }
-                else
-                {
-                    billingDTO.Billing = 0;
-                    billingDTO.Gst = 0;
-                    billingDTO.Total = 0;
-                }
-
 
                 response.BillingDTO = billingDTO;
                 response.Status = BusinessStatus.Ok;

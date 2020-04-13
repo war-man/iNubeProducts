@@ -38,3 +38,11 @@ artifacts:
     - Components/iNube.Components.RuleEngine/taskdef.json
     - imagedefinitions.json
     - imageDetail.json      
+
+    secondary-artifacts:
+    
+        iNubeRuleCI:
+            files:
+            - Components/iNube.Components.RuleEngine/edprodappspec.yml
+            - Components/iNube.Components.RuleEngine/edprodtaskdef.json
+            - imageDetail.json

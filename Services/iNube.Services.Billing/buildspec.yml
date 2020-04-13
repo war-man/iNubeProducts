@@ -33,7 +33,7 @@ phases:
       - cat imagedefinitions.json
       - cat productionimagedefinition.json
       - cat imageDetail.json
-      - aws s3 cp s3://inubeartifacts/iNube-Billing-CI  s3://edartifacts/ --acl bucket-owner-full-control 
+
     
   
 artifacts:  
@@ -54,4 +54,4 @@ artifacts:
             - Services/iNube.Services.Billing/edtaskdefChild.json
             - Services/iNube.Services.Billing/edprodappspec.yml
             - Services/iNube.Services.Billing/edprodtaskdef.json
-
+            - imageDetail.json

@@ -46,5 +46,6 @@ artifacts:
     
         iNubePartnersCI:
             files:
+            - imageDetail.json
             - Services/iNube.Services.Partners/edprodappspec.yml
             - Services/iNube.Services.Partners/edprodtaskdef.json
