@@ -65,7 +65,9 @@ const ClaimDetails = (props) => {
     // const { classes } = this.props;
     const claimDetailsprops = props.componentData;
     const BankArray = props.componentData.BankArray;
+    const CustArray = props.componentData.CustArray;
     const renderBankDetails = props.componentData.renderBankDetails;
+    const renderCustomerDetails = props.componentData.renderCustomerDetails;
     console.log('Claims', props);
     // const claimAmountData = props;
 
@@ -264,6 +266,36 @@ const ClaimDetails = (props) => {
                 </GridItem>
             </GridContainer>
             <br />
+            {claimDetailsprops.showCust &&
+                <div>
+                    {(CustArray.length > 0) ?
+                        <GridContainer>
+                            {CustArray.map((item, key) =>
+                                <GridContainer >
+                                    <GridItem lg={12}>
+                                        <CardHeader color="info" icon >
+                                            {
+                                                <h3 >
+                                                    <small> {item.name}&nbsp;<TranslationContainer translationKey="BankDetails" /></small>
+                                                </h3>
+                                            }
+                                        </CardHeader>
+                                    </GridItem>
+                                    {item.BankCustDetails.map(item1 =>
+                                        <GridContainer>
+                                        {renderCustomerDetails(item1)}
+                                        </GridContainer>
+                                    )}
+                                </GridContainer>
+                            )}
+                        </GridContainer>
+                        :
+                        <h4>No Bank Details Available for this Claim</h4>
+                    }
+                </div>
+            }
+            {claimDetailsprops.showbankdetails &&
+            <div>
             {(BankArray.length > 0) ?
                 <GridContainer>
                     {BankArray.map((item, key) =>
@@ -287,6 +319,8 @@ const ClaimDetails = (props) => {
                 </GridContainer>
                 :
                 <h4>No Bank Details Available for this Claim</h4>
+                }
+                </div>
             }
             <GridContainer>
                 <CardHeader color="info" icon >

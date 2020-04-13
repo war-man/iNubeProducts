@@ -121,6 +121,8 @@ class ClaimEnquiry extends React.Component {
             vehicleclaimstate: false,
             vehicleclaimdriver: false,
             vehicleclaimsurvey: false,
+            showCust: false,
+            showbankdetails: false,
             isimage: false,
             openpop: false,
             bytearr: [],
@@ -222,6 +224,7 @@ class ClaimEnquiry extends React.Component {
 
             email: "",
             BankArray: [],
+            CustArray: [],
             fields: {
                 claimStatusId: "",
                 approvedClaimAmount: "",
@@ -259,6 +262,7 @@ class ClaimEnquiry extends React.Component {
                 lossDateTime: "",
             },
             BankDetails: [],
+            BankCustDetails: [],
             claimDetailsData: {
                 "lossDate": "",
                 "locationOfEvent": "",
@@ -413,6 +417,7 @@ class ClaimEnquiry extends React.Component {
         this.setState({ fields });
         this.setState({ policyId: ClaimArr[0].policyId });
         console.log("Claimsendlist: ", this.state.Claimsendlist);
+        this.handleBankdetails(oid);
         this.policyDetailsfun(ClaimArr[0].policyNo);
         this.claimDetailsfun(ClaimArr[0].claimId);
         this.documentView(oid, false, true);
@@ -420,6 +425,27 @@ class ClaimEnquiry extends React.Component {
         this.state.ClaimNumber = ClaimArr[0].claimNumber;
         this.setState({ open: true });
         this.claimAmountTable();
+
+        if (ClaimArr[0].claimStatus == "Claim Intimation") {
+            this.setState({ showCust: true });
+        } else {
+            this.setState({ showCust: false });
+        }
+
+        if (ClaimArr[0].claimStatus == "Claim Settled") {
+            this.setState({ showbankdetails: true });
+        } else if (ClaimArr[0].claimStatus == "Claim Under Process") {
+            this.setState({ showbankdetails: true });
+        } else if (ClaimArr[0].claimStatus == "Vehicle Inspection") {
+            this.setState({ showbankdetails: true });
+        } else if (ClaimArr[0].claimStatus == "Under Repair") {
+            this.setState({ showbankdetails: true });
+        } else if (ClaimArr[0].claimStatus == "Documents Awaited") {
+            this.setState({ showbankdetails: true });
+        } else {
+            this.setState({ showbankdetails: false });
+        }
+
     }
 
     componentDidMount() {
@@ -738,10 +764,103 @@ class ClaimEnquiry extends React.Component {
         );
     }
 
+    renderCustomerDetails = (item) => {
+        return (
+            <GridContainer>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Account Holder Name"
+                        disabled={true}
+                        value={item.accountHolderName}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Account No."
+                        disabled={true}
+                        value={item.accountNumber}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <MasterDropdown
+                        labelText="Account Type"
+                        disabled={true}
+                        lstObject={this.state.AccountTypedata}
+                        filterName='Account Type'
+                        value={item.accountType}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Bank Name"
+                        disabled={true}
+                        value={item.bankName}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="IFSC Code"
+                        disabled={true}
+                        value={item.ifsccode}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+                <GridItem xs={8} sm={5} md={3}>
+                    <CustomInput
+                        labelText="Bank Branch Address"
+                        disabled={true}
+                        value={item.bankBranchAddress}
+                        formControlProps={{ fullWidth: true }}
+                    />
+                </GridItem>
+               
+            </GridContainer>
+        );
+    }
+
     Editopen = () => {
         //this.setState({ disabled: false });
         this.setState({ open: true });
         console.log("officesendlist: ", this.state.officesendlist);
+
+    }
+
+    handleBankdetails = (id) => {
+        let that = this;
+        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimBankDetails?claimid=` + id + ``, {
+            method: 'Get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log('Response data', data);
+
+            that.setState({ BankCustDetails: data });
+            console.log('Response bank data', that.state.BankCustDetails);
+            let custarray = that.state.CustArray;
+            console.log("Cust Array: ", that.state.BankCustDetails)
+            var BankCustelement = {};
+            console.log("Customer Array: ", that.state.BankCustDetails);
+            BankCustelement.name = that.state.BankCustDetails.payeeType;
+            that.state.BankCustDetails.dataOfPayment = null;
+            that.setState({});
+            let customerarray = [];
+            customerarray.push(that.state.BankCustDetails)
+            BankCustelement.BankCustDetails = customerarray;
+            custarray.push(BankCustelement);
+            that.setState({ custarray });
+            console.log("custarray", custarray);
+
+        });
+
 
     }
 
@@ -788,21 +907,35 @@ class ClaimEnquiry extends React.Component {
                 this.setState({ bankarray });
                 console.log("Bank Array: ", bankarray)
 
-                if (data[0][8][1].length > 0) {
-                    this.state.claimDetailsData.vehicleLocationState = data[0][8][1];
-                    this.setState({ vehicleclaimstate: true });
-                }
-                if (data[0][7][1].length > 0) {
+
+                if (data[0][7][1] != null && data[0][7][1].length > 0) {
                     this.state.claimDetailsData.vehicleLocation = data[0][7][1];
                     this.setState({ vehicleclaim: true });
                 }
-                if (data[0][10][1].length > 0) {
+                else {
+                    this.setState({ vehicleclaim: false });
+                }
+                if (data[0][8][1] != null && data[0][8][1].length > 0) {
+                    this.state.claimDetailsData.vehicleLocationState = data[0][8][1];
+                    this.setState({ vehicleclaimstate: true });
+                }
+                else {
+                    this.setState({ vehicleclaimstate: false });
+                }
+
+                if (data[0][9][1] != null && data[0][9][1].length > 0) {
+                    this.state.claimDetailsData.driverName = data[0][9][1];
+                    this.setState({ vehicleclaimdriver: true });
+                }
+                else {
+                    this.setState({ vehicleclaimdriver: false });
+                }
+                if (data[0][10][1] != null && data[0][10][1].length > 0) {
                     this.state.claimDetailsData.selfSurvey = data[0][10][1];
                     this.setState({ vehicleclaimsurvey: true });
                 }
-                if (data[0][9][1].length > 0) {
-                    this.state.claimDetailsData.driverName = data[0][9][1];
-                    this.setState({ vehicleclaimdriver: true });
+                else {
+                    this.setState({ vehicleclaimsurvey: false });
                 }
                 console.log("insurablegrid vaalue", this.state.claimTableData);
             });
@@ -1312,7 +1445,7 @@ class ClaimEnquiry extends React.Component {
                                             </Animated>
                                         </GridContainer>
 
-                                        <ClaimSearch TableData={this.state.TableData} BankArray={this.state.BankArray} renderBankDetails={this.renderBankDetails} handleDisappear={this.handleDisappear} refreshData={this.refreshData} ClaimAmountSum={this.ClaimAmountSum} ClaimDTO={this.state.ClaimDTO} fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount} disabled={this.state.disabled} claimId={this.state.claimId} SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} policyDetailsData={this.state.policyDetailsData} decision={this.state.decision} claimDetailsData={this.state.claimDetailsData}
+                                        <ClaimSearch TableData={this.state.TableData} CustArray={this.state.CustArray} showCust={this.state.showCust} showbankdetails={this.state.showbankdetails} BankArray={this.state.BankArray} renderBankDetails={this.renderBankDetails} renderCustomerDetails={this.renderCustomerDetails} handleDisappear={this.handleDisappear} refreshData={this.refreshData} ClaimAmountSum={this.ClaimAmountSum} ClaimDTO={this.state.ClaimDTO} fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount} disabled={this.state.disabled} claimId={this.state.claimId} SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} policyDetailsData={this.state.policyDetailsData} decision={this.state.decision} claimDetailsData={this.state.claimDetailsData}
                                             docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey} handleActivitylog={this.handleActivitylog} />
 
                                     </CardBody>
