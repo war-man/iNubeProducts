@@ -591,6 +591,13 @@ namespace iNube.Services.Policy.Controllers.Policy
             return Ok(response);
         }
 
+          [HttpGet]
+        public async Task<IActionResult> InternalGetProposalDetailsByNumber(string proposalNumber)
+        {
+            var response = await _policyService.InternalGetProposalDetailsByNumber(proposalNumber, Context);
+            return Ok(response);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType)

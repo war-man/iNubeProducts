@@ -309,5 +309,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
