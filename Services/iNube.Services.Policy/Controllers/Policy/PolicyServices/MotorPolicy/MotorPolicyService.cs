@@ -314,5 +314,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<object>> SearchProposalDetailsByNumber(string ProposalNumber, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

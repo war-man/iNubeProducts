@@ -618,6 +618,13 @@ namespace iNube.Services.Policy.Controllers.Policy
             var searchPolicyDetails = await _policyService.SearchPolicyDetailsByNumber(PolicyNumber, Context);
             return Ok(searchPolicyDetails);
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> SearchProposalDetailsByNumber(string ProposalNumber)
+        {
+            var searchProposalDetails = await _policyService.SearchProposalDetailsByNumber(ProposalNumber, Context);
+            return Ok(searchProposalDetails);
+        }
 
         [HttpPost]
         public async Task<IActionResult> RefundUpload(CancellationToken cancellationToken)
@@ -633,5 +640,36 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = await _policyService.GetEndoresementDetails(endorsementSearch, Context);
             return Ok(response);
         }
-    }
+
+
+        [HttpPut]
+        public async Task<IActionResult> ProposalCancellation(dynamic CancellationRequest)
+        {
+            var response = await _policyService.ProposalCancellation(CancellationRequest, Context);
+
+
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return BadRequest(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.Deleted:
+                    return Ok(response);
+                case BusinessStatus.Updated:
+                    return Ok(response);
+                case BusinessStatus.Error:
+                    return BadRequest(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized(response);
+                case BusinessStatus.None:
+                    return BadRequest(response);
+                case BusinessStatus.PreConditionFailed:
+                    return Ok(response);
+
+                default:
+                    return NotFound(response);
+            }
+        }
+        }
 }

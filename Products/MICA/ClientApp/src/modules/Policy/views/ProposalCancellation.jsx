@@ -50,17 +50,15 @@ const paddingCard =
 };
 // ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}
 
-class PolicyCancellation extends React.Component {
+class ProposalCancellation extends React.Component {
     constructor(props) {
         super(props);
         var date = new Date();
-
         var CurrentDateTime = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        //var CurrentDateTime = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes() }:${date.getSeconds()}`
-       // var CurrentDateTime1 = date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
         var CurrentDateTime1 = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
         this.state = {
+            DatePickerValue:null,
             RemarkState:false,
             ShowRefundDetails: false,
             disabled: false,
@@ -72,13 +70,13 @@ class PolicyCancellation extends React.Component {
             effectiveDate: CurrentDateTime,
             cancelRequestDate: CurrentDateTime,
             PolicysearchDTO: {
-                policynumber: "",
+                proposalnumber: "",
 
                 mobileNumber: "",
 
             },
             tabledata: [],
-            Policydetailsdata: [],
+            Proposaldetailsdata: [],
             Claimdetailsdata: [],
             policyDetailsData: {
                 "customerId": "",
@@ -92,14 +90,14 @@ class PolicyCancellation extends React.Component {
                 "totalSumInsured": "",
                 "balanceSumInsured": ""
             },
-            policyCancelDTO: {
+            ProposalCancelDTO: {
 
-                "policyNumber": "",
+                "proposalNumber": "",
                 "effectiveDate": CurrentDateTime1,
                 "cancelRequestDate": CurrentDateTime1
 
             },
-            policyCancelRequest: { "PolicyNumber": "", "EndorsementType": "Policy Cancellation","Remarks":""},
+            proposalCancelRequest: { "ProposalNumber": "", "Remarks": ""},
             PolicyCancelResponse: {
 
                 "noofDayRemaining": 0,
@@ -163,18 +161,19 @@ class PolicyCancellation extends React.Component {
     PolicyTable = () => {
         this.setState({ loader: true, showtable: true })
         this.setState({
-            Policydetailsdata: this.state.tabledata.map((prop, key) => {
+            Proposaldetailsdata: this.state.tabledata.map((prop, key) => {
                 const { classes } = this.props;
                 return {
                     id: key,
-                    PolicyNo: prop.policyNo,
+                    ProposalNo: prop.proposalNo,
                     IRN: prop.customerId,
                     IN: prop.coverNoteNo,
                     mobileNo: prop.mobileNumber,
-                    policyStartDate: new Date(prop.policyStartDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
-                    policyEndDate: new Date(prop.policyEndDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
+                    ProposalDate: new Date(prop.proposalDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
+                   // policyStartDate: new Date(prop.policyStartDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
+                    //policyEndDate: new Date(prop.policyEndDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', }),
 
-                    radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.policyNo)} />
+                    radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.proposalNo)} />
                 };
             })
         });
@@ -202,12 +201,12 @@ class PolicyCancellation extends React.Component {
     editFunction(id, pid) {
     
 
-        this.policyDetailsfun(pid);
+        this.proposalDetailsfun(pid);
         this.SearchClaimFun(pid);
-        let CancelDTO = this.state.policyCancelDTO;
-        CancelDTO.policyNumber = pid;
-        let cancelrequest = this.state.policyCancelRequest;
-        cancelrequest.PolicyNumber = pid;
+        let CancelDTO = this.state.ProposalCancelDTO;
+        CancelDTO.proposalNumber = pid;
+        let cancelrequest = this.state.proposalCancelRequest;
+        cancelrequest.ProposalNumber = pid;
         this.setState({ CancelDTO, cancelrequest });
 
 
@@ -256,8 +255,8 @@ class PolicyCancellation extends React.Component {
         console.log("Claimdetailsdata", this.state.Claimdetailsdata);
     }
 
-    policyDetailsfun = (policyNo) => {
-            fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/SearchPolicyDetailsByNumber?PolicyNumber=` + policyNo, {
+    proposalDetailsfun = (propsoalNo) => {
+        fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/SearchProposalDetailsByNumber?ProposalNumber=` + propsoalNo, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -293,10 +292,10 @@ class PolicyCancellation extends React.Component {
         return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
     }
     showRefundFun = () => {
-      //  this.state.policyCancelDTO.effectiveDate = Date.now.ToString('yyyy-MM-dd');
+      //  this.state.ProposalCancelDTO.effectiveDate = Date.now.ToString('yyyy-MM-dd');
       
 
-        //this.state.policyCancelDTO.cancelRequestDate = Date.now.ToString('yyyy-MM-dd');
+        //this.state.ProposalCancelDTO.cancelRequestDate = Date.now.ToString('yyyy-MM-dd');
         this.setState({ RemarkState: false});
         fetch(`${policyConfig.ExtensionUrl}/api/Mica_EGI/GetRefundDetails`, {
             method: 'post',
@@ -305,7 +304,7 @@ class PolicyCancellation extends React.Component {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
-            body: JSON.stringify(this.state.policyCancelDTO)
+            body: JSON.stringify(this.state.ProposalCancelDTO)
         }).then(response => response.json())
             .then(data => {
                 this.setState({ PolicyCancelResponse: data, ShowRefundDetails: true });
@@ -314,11 +313,11 @@ class PolicyCancellation extends React.Component {
      }
 
 
-    CancelPolicyFun = () => {
+    CancelProposalFun = () => {
        
             let that = this;
-            if (this.state.policyCancelRequest.PolicyNumber !== "") {
-                swal("Are you sure you want to cancel the policy?", {
+        if (this.state.proposalCancelRequest.ProposalNumber !== "") {
+                swal("Are you sure you want to cancel the Proposal?", {
                     buttons: {
                         cancel: {
                             text: "No",
@@ -338,19 +337,19 @@ class PolicyCancellation extends React.Component {
                     }
 
                 }).then((value) => {
-                    console.log("policyDTO", this.state.policyCancelRequest)
+                    console.log("policyDTO", this.state.proposalCancelRequest)
                     switch (value) {
 
                         case "confirm":
-                            if (this.state.policyCancelRequest.Remarks != "") {
-                                fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/PolicyEndoresemenet`, {
+                            if (this.state.proposalCancelRequest.Remarks != "") {
+                                fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/ProposalCancellation`, {
                                     method: 'PUT',
                                     headers: {
                                         'Accept': 'application/json',
                                         'Content-Type': 'application/json',
                                         'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                                     },
-                                    body: JSON.stringify(this.state.policyCancelRequest)
+                                    body: JSON.stringify(this.state.proposalCancelRequest)
                                 }).then(response => response.json())
                                     .then(data => {
                                         if (data.status == 3) {
@@ -363,7 +362,7 @@ class PolicyCancellation extends React.Component {
                                     });
                             } else {
                                 this.setState({ RemarkState:true});
-                                swal({ text: "Please fill Remarks for cancel the policy", icon: "error" });
+                                swal({ text: "Please fill Remarks for cancel the proposal", icon: "error" });
                             }
                                 break;
 
@@ -375,12 +374,12 @@ class PolicyCancellation extends React.Component {
 
        
     RemarksFun = (e) => {
-        let policyCancelRequest=this.state.policyCancelRequest;
-        policyCancelRequest[e.target.name] = e.target.value;
-        this.setState({ policyCancelRequest, RemarkState:false});
+        let proposalCancelRequest=this.state.proposalCancelRequest;
+        proposalCancelRequest[e.target.name] = e.target.value;
+        this.setState({ proposalCancelRequest, RemarkState:false});
     }
 
- 
+   
 
     render() {
         const { classes } = this.props;
@@ -388,6 +387,7 @@ class PolicyCancellation extends React.Component {
         return (
 
             <div>
+
                 {this.state.pageloader ?
                     <Card>
                         <CardHeader color="rose" icon>
@@ -395,7 +395,7 @@ class PolicyCancellation extends React.Component {
                                 <Icon><img id="icon" src={searchproduct} /></Icon>
                             </CardIcon>
                             <h4 className={this.props.cardIconTitle}>
-                                <small><TranslationContainer translationKey="SearchPolicy" /></small>
+                                <small><TranslationContainer translationKey="SearchProposal" /></small>
                             </h4>
                         </CardHeader>
 
@@ -404,12 +404,12 @@ class PolicyCancellation extends React.Component {
                                 <GridItem xs={4} sm={4} md={3}>
                                     <CustomInput
 
-                                        error={this.state.policynumberState}
-                                        labelText="PolicyNo"
-                                        name="policynumber"
+                                        error={this.state.proposalnumberState}
+                                        labelText="ProposalNumber"
+                                        name="proposalnumber"
                                         // required={true}
-                                        value={this.state.PolicysearchDTO.policynumber}
-                                        onChange={(e) => this.SetValue("policynumber", e)}
+                                        value={this.state.PolicysearchDTO.proposalnumber}
+                                        onChange={(e) => this.SetValue("proposalnumber", e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
@@ -427,7 +427,6 @@ class PolicyCancellation extends React.Component {
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
-
                                 <GridContainer justify="center">
                                     <GridItem xs={8} sm={3} md={3} lg={2}>
                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
@@ -448,8 +447,8 @@ class PolicyCancellation extends React.Component {
                             <GridItem xs={12}>
                                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                     <ReactTable
-                                        title={<h4 className={this.props.cardIconTitle}><small><TranslationContainer translationKey="Policy Details" /></small></h4>}
-                                        data={this.state.Policydetailsdata}
+                                        title={<h4 className={this.props.cardIconTitle}><small><TranslationContainer translationKey="Proposal Details" /></small></h4>}
+                                        data={this.state.Proposaldetailsdata}
                                         filterable
                                         columns={[
                                             {
@@ -463,8 +462,8 @@ class PolicyCancellation extends React.Component {
                                                 resizable: false,
                                             },
                                             {
-                                                Header: "PolicyNo",
-                                                accessor: "PolicyNo",
+                                                Header: "ProposalNumber",
+                                                accessor: "ProposalNo",
                                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                                 headerClassName: 'react-table-center',
                                                 minWidth: 70,
@@ -490,29 +489,36 @@ class PolicyCancellation extends React.Component {
                                                 resizable: false,
 
                                             },
-
-                                            {
-                                                Header: "PolicyStartDate",
-                                                accessor: "policyStartDate",
+                                                {
+                                                Header: "ProposalDate",
+                                                accessor: "ProposalDate",
                                                 minWidth: 80,
                                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                                 headerClassName: 'react-table-center',
                                                 resizable: false,
                                             },
-                                            {
-                                                Header: "PolicyEndDate",
-                                                accessor: "policyEndDate",
-                                                minWidth: 80,
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                headerClassName: 'react-table-center',
-                                                resizable: false,
-                                            },
+                                            //{
+                                            //    Header: "PolicyStartDate",
+                                            //    accessor: "policyStartDate",
+                                            //    minWidth: 80,
+                                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                            //    headerClassName: 'react-table-center',
+                                            //    resizable: false,
+                                            //},
+                                            //{
+                                            //    Header: "PolicyEndDate",
+                                            //    accessor: "policyEndDate",
+                                            //    minWidth: 80,
+                                            //    setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                            //    headerClassName: 'react-table-center',
+                                            //    resizable: false,
+                                            //},
 
 
                                         ]}
                                         defaultPageSize={5}
                                         showPaginationTop={false}
-                                        pageSize={([this.state.Policydetailsdata.length + 1] < 5) ? [this.state.Policydetailsdata.length + 1] : 5}
+                                        pageSize={([this.state.Proposaldetailsdata.length + 1] < 5) ? [this.state.Proposaldetailsdata.length + 1] : 5}
                                         //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
                                         showPaginationBottom={true}
                                         className="-striped -highlight"
@@ -555,15 +561,17 @@ class PolicyCancellation extends React.Component {
                                     <Icon><img id="icon" src={claim} /></Icon>
                                 </CardIcon>
                                 <h4 className={this.props.cardIconTitle}>
-                                    <small><TranslationContainer translationKey="PolicyDetails" /></small>
+                                    <small><TranslationContainer translationKey="ProposalDetails" /></small>
                                 </h4>
                             </CardHeader>
                             <CardBody>
                                 <GridContainer justify="center" lg={12}>
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                       
                                         <div className="banner">
-                                            <label><TranslationContainer translationKey="PolicyNumber" /></label>&nbsp;<h5>{this.state.policyCancelDTO.policyNumber}</h5>
-                                           
+                                            <label><TranslationContainer translationKey="ProposalNumber" /></label>&nbsp;<h5>{this.state.ProposalCancelDTO.proposalNumber}</h5>
+                   
+
                                         </div>
                                     </Animated>
 
@@ -808,7 +816,7 @@ class PolicyCancellation extends React.Component {
 
                                                 labelText="Cancel Request Date"
 
-                                                value={this.state.policyCancelDTO.cancelRequestDate}
+                                                value={this.state.ProposalCancelDTO.cancelRequestDate}
                                                 name='customerId'
 
                                                 disabled={this.state.disabled}
@@ -826,7 +834,7 @@ class PolicyCancellation extends React.Component {
 
                                                 labelText="Cancellation Effective Date"
 
-                                                value={this.state.policyCancelDTO.effectiveDate}
+                                                value={this.state.ProposalCancelDTO.effectiveDate}
                                                 name='customerId'
 
                                                 disabled={this.state.disabled}
@@ -855,7 +863,7 @@ class PolicyCancellation extends React.Component {
 
                                             <CustomInput
 
-                                                labelText="Number of Days till Policy End Date"
+                                                labelText="Number of Days till Proposal End Date"
                                                 inputType="number" type="numeric"
                                                 value={this.state.PolicyCancelResponse.noofDayRemaining}
                                                 name='customerId'
@@ -943,7 +951,7 @@ class PolicyCancellation extends React.Component {
                                                 labelText="Remarks"
                                                 error={this.state.RemarkState}
                                                 required={true}
-                                                value={this.state.policyCancelRequest.Remarks}
+                                                value={this.state.proposalCancelRequest.Remarks}
                                                 name='Remarks'
                                                 onChange={this.RemarksFun}
                                              
@@ -955,8 +963,8 @@ class PolicyCancellation extends React.Component {
                                         <GridContainer justify="center">
                                             <GridItem xs={8} sm={3} md={3} lg={2}>
                                                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                    <Button id="center-modify-user" color="info" round disabled={this.state.Claimdetailsdata.length > 0?true:false} className={classes.marginRight} onClick={this.CancelPolicyFun}>
-                                                        <TranslationContainer translationKey="Cancel Policy" />
+                                                    <Button id="center-modify-user" color="info" round disabled={this.state.Claimdetailsdata.length > 0?true:false} className={classes.marginRight} onClick={this.CancelProposalFun}>
+                                                        <TranslationContainer translationKey="Cancel Proposal" />
                                                     </Button>
                                                 </Animated>
                                             </GridItem>
@@ -966,10 +974,11 @@ class PolicyCancellation extends React.Component {
                             </Card>
                         </Animated>
                     </Animated> : null}
+
             </div>
 
 
         );
     }
 }
-export default withStyles(styles)(PolicyCancellation);
+export default withStyles(styles)(ProposalCancellation);

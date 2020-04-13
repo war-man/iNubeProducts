@@ -754,6 +754,14 @@ export const TRANSLATIONS = {
         ClaimDetails: 'Claim Details',
         PolicyCancellation: 'Policy Cancellation',
         RefundDetails: 'Refund Details',
+
+        //Proposal
+        /****************************************************************/
+
+        ProposalDetails: 'Proposal Details',
+        ProposalNumber: 'Proposal Number',
+        SearchProposal:'Search Proposal',
+
         //ClaimEnquiry
         IntimationDate: 'Intimation Date'
     },
