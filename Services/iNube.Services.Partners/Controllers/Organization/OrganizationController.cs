@@ -11,11 +11,13 @@ using iNube.Services.Partners.Helpers;
 using Microsoft.Extensions.Options;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework;
+using Microsoft.AspNetCore.Authorization;
 
 namespace iNube.Services.Partners.Controllers.Organization
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class OrganizationController : BaseApiController
     {
         public IOrganizationService _orgService;
