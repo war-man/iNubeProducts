@@ -2333,7 +2333,8 @@ h4 {
   font-size: 1.3em;
   line-height: 1.4em;
   margin-top: 10px;
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  margin-top: 10px !important; }
 
 h5 {
   font-size: 1.25em;
@@ -4737,7 +4738,7 @@ img {
   color: #231ffb; }
 
 .banner h5 {
-  margin: 17px 3px;
+  margin: 20px 3px;
   font-size: 1rem;
   font-weight: 500;
   color: #231ffb;
@@ -5057,6 +5058,12 @@ img {
 
 .payeetxttransform {
   text-transform: capitalize; }
+
+#DateTimePicker {
+  font-size: 14px !important; }
+
+.Mui-disabled {
+  color: #333c !important; }
 
 .btn-file {
   position: relative;
