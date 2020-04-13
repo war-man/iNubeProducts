@@ -758,22 +758,19 @@ class InboxClaimProcess extends React.Component {
         else if (Bankfieldsmodel.UIControl == "Datetime") {
 
             return (
-                
-
                 < CustomDateTimePicker
                     timeformate={true}
                     disabled={false}
                     width='13rem'
                     //required={true}
+                    disableFuture={true}
+                    //minDate={new Date(this.state.claimDetailsData.lossDate)}
+                    maxDate={new Date()}
                     labelText={Bankfieldsmodel.Name}
                     name={Bankfieldsmodel.Name}
                     value={Bankfieldsmodel.Value}
                     onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)} />
-
-
             );
-
-
         }
 
         else if (Bankfieldsmodel.UIControl == "Dropdown") {
@@ -797,7 +794,7 @@ class InboxClaimProcess extends React.Component {
         }
 
     }
-    
+
     renderPage1 = (Bankfieldsmodel, name) => {
         if (Bankfieldsmodel.UIControl == "TextField") {
             return (<CustomInput
@@ -814,26 +811,22 @@ class InboxClaimProcess extends React.Component {
 
         }
         else if (Bankfieldsmodel.UIControl == "Datetime") {
-
             return (
-               
                 < CustomDateTimePicker
                     timeformate={true}
                     disabled={false}
                     width='13rem'
-                   // required={true}
+                    //required={true}
+                    maxDate={new Date()}
+                    //minDate={new Date(this.state.claimDetailsData.lossDate)}
+                    disableFuture={true}
                     labelText={Bankfieldsmodel.Name}
-                    name = { Bankfieldsmodel.Name }
-                    value = { Bankfieldsmodel.Value }
+                    name={Bankfieldsmodel.Name}
+                    value={Bankfieldsmodel.Value}
                     onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)
-        } />
-
-
+                    } />
             );
-
-
         }
-
         else if (Bankfieldsmodel.UIControl == "Dropdown") {
 
             return (
@@ -854,7 +847,7 @@ class InboxClaimProcess extends React.Component {
 
         }
 
-}
+    }
 
 
 
@@ -888,7 +881,7 @@ class InboxClaimProcess extends React.Component {
 
     };
 
-   
+
 
     datechange = (date) => {
         const _date = date.split('/');

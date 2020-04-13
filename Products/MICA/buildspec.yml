@@ -37,7 +37,7 @@ phases:
         - echo clearing s3 bucket for egiswitch.edelweisscustomeruat.com
         - aws s3 rm s3://egiswitch.edelweisscustomeruat.com
         - echo $CODEBUILD_SRC_DIR
-        - aws s3 sync ./build/ s3://egiswitch.edelweisscustomeruat.com
+        - aws s3 sync ./build/ s3://egiswitch.edelweisscustomeruat.com 
 
 artifacts:
   files:

@@ -233,7 +233,7 @@ class ClaimInbox extends React.Component {
                         <GridItem /*xs={2}*/>
                             <Card id="card-bg5" onClick={(e) => this.handleSettled(e)}>
                                 <CardHeader>
-                                    <h5 id="white" className={classes.cardTitle}>Setteled Claims</h5>
+                                    <h5 id="white" className={classes.cardTitle}>Settled Claims</h5>
                                     <h4 className="h4center">
                                         <CountUp
                                             className="account-balance"

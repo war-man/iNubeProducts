@@ -23,4 +23,9 @@ phases:
         - echo $CODEBUILD_SRC_DIR
         - aws s3 sync ./build/ s3://mica.edelweissinsurance.com 
 
+        - echo clearing s3 bucket for Edelweiss Production UI
+        - aws s3 rm s3://egiswitch.edelweissinsurance.com
+        - echo $CODEBUILD_SRC_DIR
+        - aws s3 sync ./build/ s3://egiswitch.edelweissinsurance.com  
+
 

@@ -407,7 +407,7 @@ class ClaimProcess extends React.Component {
             displayfinancier: false,
             displaynominee: false,
             displaysurveyor: false,
-            
+
             vehicleActivity: {
                 "policyNumber": "",
                 "vehicleNumbers": [],
@@ -790,7 +790,7 @@ class ClaimProcess extends React.Component {
                     // id='dob'
                     name={Bankfieldsmodel.Name}
                     //value={Bankfieldsmodel.Value}
-                    // Futuredatevalidate={true}
+                    Futuredatevalidate={true}
                     //required={true}
                     onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)}
                     value={Bankfieldsmodel.Name}
@@ -833,7 +833,7 @@ class ClaimProcess extends React.Component {
                     // id='dob'
                     name={Bankfieldsmodel.Name}
                     value={Bankfieldsmodel.Value}
-                    // Futuredatevalidate={true}
+                    Futuredatevalidate={true}
                     //required={true}
                     onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)}
                     //value={Bankfieldsmodel.Name}
@@ -1094,7 +1094,7 @@ class ClaimProcess extends React.Component {
                 }
 
 
-                
+
             });
 
 
