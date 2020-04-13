@@ -30,6 +30,7 @@ import bindModel from 'components/ModelBinding/bindModel.js';
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 import MyUploader from "modules/FileUpload/views/DocumentUpload.jsx";
+import FileUploadConfig from "modules/FileUpload/FileUploadConfig.js";
 
 class Upload extends React.Component {
     constructor(props) {
@@ -43,7 +44,8 @@ class Upload extends React.Component {
             fields: {
                 FileName:"",
             },
-            showUpload:false,
+            showUpload: false,
+            monthly:[],
         };
     }
 
@@ -53,7 +55,78 @@ class Upload extends React.Component {
         fields[evt.target.name] = evt.target.value;
         this.setState({ fields });
         this.state.showUpload = true;
-    }
+        var data = evt.target.value;
+        if (evt.target.value == "Monthly SI Upload") {
+            fetch(`${FileUploadConfig.FileUploadConfigUrl}/api/Mica_EGI/MonthlySIUpload`, {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify("Monthly SI")
+            }).then(response => response.json())
+                .then(data => {
+                    swal({
+
+                        text: data.response,
+                        icon: "success"
+                    }); 
+                    if (data.status == 200) {
+                        swal({
+                            text: "Report Modified!",
+                            icon: "success"
+                        });
+                    } else if (data.status == 8) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    } else if (data.status == 4) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    }
+
+                    console.log("Search history data:", data);
+
+                });
+        }
+        else {
+            fetch(`${FileUploadConfig.FileUploadConfigUrl}/api/Policy/RefundUpload`, {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify("Refund Report")
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.status == 200) {
+                        swal({
+
+                            text: "Policy Modified!",
+                            icon: "success"
+                        });
+                    } else if (data.status == 8) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    } else if (data.status == 4) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    }
+
+                    console.log("Search history data:", data);
+
+                });
+        }
+ }
 
     render() {
         return (
