@@ -1793,24 +1793,27 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
                                 foreach (var Data in item.TblCdtransactionDetails)
                                 {
-                                    AccountDetailsObj = new AccountDetails();
-                                    AccountDetailsObj.Date = Data.TransactionDateTime;
-                                    AccountDetailsObj.TransactionType = item.TxnType;
-                                    AccountDetailsObj.Description = Data.Description;
-                                    AccountDetailsObj.Gst = Data.TaxAmount;
-                                    AccountDetailsObj.TotalAmount = Data.TotalAmount;
-
-                                    if (item.TxnType == "Credit")
+                                    if (Data.TxnIssuedFor == cDAccountRequest.TxnEventType)
                                     {
-                                        AccountDetailsObj.TransactionAmountCredit = Data.TxnAmount;
+                                        AccountDetailsObj = new AccountDetails();
+                                        AccountDetailsObj.Date = Data.TransactionDateTime;
+                                        AccountDetailsObj.TransactionType = item.TxnType;
+                                        AccountDetailsObj.Description = Data.Description;
+                                        AccountDetailsObj.Gst = Data.TaxAmount;
+                                        AccountDetailsObj.TotalAmount = Data.TotalAmount;
+
+                                        if (item.TxnType == "Credit")
+                                        {
+                                            AccountDetailsObj.TransactionAmountCredit = Data.TxnAmount;
 
 
+                                        }
+                                        else if (item.TxnType == "Debit")
+                                        {
+                                            AccountDetailsObj.TransactionAmountDebit = Data.TxnAmount;
+                                        }
+                                        AccountDetails.Add(AccountDetailsObj);
                                     }
-                                    else if (item.TxnType == "Debit")
-                                    {
-                                        AccountDetailsObj.TransactionAmountDebit = Data.TxnAmount;
-                                    }
-                                    AccountDetails.Add(AccountDetailsObj);
                                 }
                             }
 
