@@ -54,11 +54,11 @@ const ClaimComponent = (props) => {
                     */}
                     <CustomDateTimePicker timeformate={true} disabled={false} width='13rem' disableFuture={true} required={true} labelText="LossDateTime" name='lossDateTime' value={props.DetailsDTO.lossDateTime} onChange={(e) => props.handleDateChange(e, "lossDateTime")} />
 
-                    {props.errormessage && (props.DetailsDTO.lossDateTime == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                    {props.errormessage && (props.DetailsDTO.lossDateTime == null) ? <p className="error">*Required field cannot be left blank</p> : null}
 
                     {props.errordate && (props.DetailsDTO.lossDateTime > props.PolicyEndDate || props.DetailsDTO.lossDateTime < props.PolicyStartDate) ? <p className="error">*Loss Date must be within Policy Tenure </p> : null}
 
-                    {props.lossdateflag && (props.DetailsDTO.lossDateTime == "") ? <p className="error"> </p> : null}
+                    {props.lossdateflag && (props.DetailsDTO.lossDateTime == null) ? <p className="error"> </p> : null}
                 </GridItem>
                 <GridItem xs={8} sm={5} md={3}>
                     <CustomInput

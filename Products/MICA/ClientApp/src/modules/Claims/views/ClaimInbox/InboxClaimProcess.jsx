@@ -112,9 +112,9 @@ const searchBtn = {
 }
 
 const paddingCard =
-    {
-        padding: "10px",
-    };
+{
+    padding: "10px",
+};
 
 class InboxClaimProcess extends React.Component {
     constructor(props) {
@@ -140,6 +140,10 @@ class InboxClaimProcess extends React.Component {
             loader: true,
             errormessage: false,
             ValidationUI: true,
+            validateUI: false,
+            approveamtvalidation: false,
+            amtflag: false,
+            approvedAmtflag: false,
             ActivityData: [],
             errorstatus: false,
             approved: false,
@@ -398,108 +402,120 @@ class InboxClaimProcess extends React.Component {
 
     onFormSubmit = (evt) => {
         this.state.ValidationUI = true;
-
+        this.state.validateUI = false;
+        this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
-        if (this.state.ValidationUI === true) {
+        this.handleAmountValidation();
+        debugger;
+        if (this.state.approveamtvalidation === true) {
+            if (this.state.validateUI === true) {
+                if (this.state.ValidationUI === true) {
 
-            this.setState({ claimsdecisionshow: true });
+                    this.setState({ claimsdecisionshow: true });
 
-            console.log("submit", this.state.fields);
-            let field = this.state.fields;
-            field.emailId = this.state.email;
+                    console.log("submit", this.state.fields);
+                    let field = this.state.fields;
+                    field.emailId = this.state.email;
 
-            if (!$.isEmptyObject(this.state.BankDataModelDTO["Workshop"])) {
-                field.DataModelDTO.push(this.state.BankDataModelDTO["Workshop"]);
-            }
-            if (!$.isEmptyObject(this.state.BankDataModelDTO["Customer"])) {
-                field.DataModelDTO.push(this.state.BankDataModelDTO["Customer"]);
-            }
-            if (!$.isEmptyObject(this.state.BankDataModelDTO["Financier"])) {
-                field.DataModelDTO.push(this.state.BankDataModelDTO["Financier"]);
-            }
-            if (!$.isEmptyObject(this.state.BankDataModelDTO["Nominee"])) {
-                field.DataModelDTO.push(this.state.BankDataModelDTO["Nominee"]);
-            }
-            if (!$.isEmptyObject(this.state.BankDataModelDTO["Surveyor"])) {
-                field.DataModelDTO.push(this.state.BankDataModelDTO["Surveyor"]);
-            }
-            this.setState({ field });
-            console.log("fields: ", field);
-            console.log("submit JSON", JSON.stringify(this.state.fields));
+                    if (!$.isEmptyObject(this.state.BankDataModelDTO["Workshop"])) {
+                        field.DataModelDTO.push(this.state.BankDataModelDTO["Workshop"]);
+                    }
+                    if (!$.isEmptyObject(this.state.BankDataModelDTO["Customer"])) {
+                        field.DataModelDTO.push(this.state.BankDataModelDTO["Customer"]);
+                    }
+                    if (!$.isEmptyObject(this.state.BankDataModelDTO["Financier"])) {
+                        field.DataModelDTO.push(this.state.BankDataModelDTO["Financier"]);
+                    }
+                    if (!$.isEmptyObject(this.state.BankDataModelDTO["Nominee"])) {
+                        field.DataModelDTO.push(this.state.BankDataModelDTO["Nominee"]);
+                    }
+                    if (!$.isEmptyObject(this.state.BankDataModelDTO["Surveyor"])) {
+                        field.DataModelDTO.push(this.state.BankDataModelDTO["Surveyor"]);
+                    }
+                    this.setState({ field });
+                    console.log("fields: ", field);
+                    console.log("submit JSON", JSON.stringify(this.state.fields));
 
-            let detailsdto = this.state.fields;
+                    let detailsdto = this.state.fields;
 
-            console.log("ClaimData", this.state.claimTableData);
+                    console.log("ClaimData", this.state.claimTableData);
 
-            for (var i = 0; i < this.state.claimTableData.length; i++) {
-                if (this.state.claimTableData[i].approvedClaimAmounts != null) {
-                    this.state.DataAmount.push(this.state.claimTableData[i]);
-                }
-            }
-            detailsdto['ClaimInsurable'] = this.state.DataAmount;
-
-            this.setState({ detailsdto });
-
-            fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimProcess`, {
-                method: 'Post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-                body: JSON.stringify(field)
-            }).then(response => response.json())
-                .then(data => {
-                    console.log("response: ", data)
-                    //      if (data.status == 200) {
-                    //  this.state.claimId = data.claimId;
-                    //  this.setState({ claimnumber: data.claimNumber });
-                    if (data.status == 3) {
-                        swal({
-                            text: data.responseMessage,
-                            icon: "success",
-                            buttons: [false, "OK"],
-                        }).then((willDelete) => {
-                            if (willDelete) {
-                                this.handlepagereload();
-                            }
-                        });
-                    } else if (data.status == 7) {
-
-                        if (data.errors.length > 0) {
-                            swal({
-
-                                text: data.errors[0].errorMessage,
-                                icon: "error"
-                            });
-                        } else {
-                            swal({
-
-                                text: data.responseMessage,
-                                icon: "error"
-                            });
+                    for (var i = 0; i < this.state.claimTableData.length; i++) {
+                        if (this.state.claimTableData[i].approvedClaimAmounts != null) {
+                            this.state.DataAmount.push(this.state.claimTableData[i]);
                         }
+                    }
+                    detailsdto['ClaimInsurable'] = this.state.DataAmount;
 
+                    this.setState({ detailsdto });
+
+                    fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimProcess`, {
+                        method: 'Post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                        },
+                        body: JSON.stringify(field)
+                    }).then(response => response.json())
+                        .then(data => {
+                            console.log("response: ", data)
+                            //      if (data.status == 200) {
+                            //  this.state.claimId = data.claimId;
+                            //  this.setState({ claimnumber: data.claimNumber });
+                            if (data.status == 3) {
+                                swal({
+                                    text: data.responseMessage,
+                                    icon: "success",
+                                    buttons: [false, "OK"],
+                                }).then((willDelete) => {
+                                    if (willDelete) {
+                                        this.handlepagereload();
+                                    }
+                                });
+                            } else if (data.status == 7) {
+
+                                if (data.errors.length > 0) {
+                                    swal({
+
+                                        text: data.errors[0].errorMessage,
+                                        icon: "error"
+                                    });
+                                } else {
+                                    swal({
+
+                                        text: data.responseMessage,
+                                        icon: "error"
+                                    });
+                                }
+
+
+                            }
+                            //this.renderRedirect();
+                        });
+
+                } else {
+                    //this.setState({ errormessage: true });
+                    if (this.state.fields.claimStatusId == "") {
+                        this.setState({ errormessage: true });
+                        this.setState({ claimstatusflag: true });
+                        swal("", "Please select Claim status.", "error");
+                    }
+                    else if (this.state.fields.claimManagerRemarks == "") {
+                        this.setState({ errormessage: true });
+                        this.setState({ claimsremarksflag: true });
+                        swal("", "Please enter Claim manager remarks.", "error");
+                    }
+                    else {
 
                     }
-                    //this.renderRedirect();
-                });
+                }
 
+            } else {
+                swal("", "Amount paid to payee type's should not be greater than total approved amount.", "error");
+            }
         } else {
-            //this.setState({ errormessage: true });
-            if (this.state.fields.claimStatusId == "") {
-                this.setState({ errormessage: true });
-                this.setState({ claimstatusflag: true });
-                swal("", "Please select Claim status", "error");
-            }
-            else if (this.state.fields.claimManagerRemarks == "") {
-                this.setState({ errormessage: true });
-                this.setState({ claimsremarksflag: true });
-                swal("", "Please enter Claim manager remarks", "error");
-            }
-            else {
-
-            }
+            swal("", "Approved amount cannot be greater than balance sum insured.", "error");
         }
 
     };
@@ -512,6 +528,42 @@ class InboxClaimProcess extends React.Component {
         if (this.state.fields.claimStatusId !== "" && this.state.fields.claimManagerRemarks !== "") {
         } else {
             this.state.ValidationUI = false; this.state.errormessage = true;
+            this.setState({});
+        }
+    }
+    handleAmountValidation = () => {
+        debugger;
+        let amt = 0;
+
+        const workshopvalue = Number(this.state.BankDataModelDTO["Workshop"]["Amount Paid"]) || 0;
+        const custvalue = Number(this.state.BankDataModelDTO["Customer"]["Amount Paid"]) || 0;
+        const financevalue = Number(this.state.BankDataModelDTO["Financier"]["Amount Paid"]) || 0;
+        const nomineevalue = Number(this.state.BankDataModelDTO["Nominee"]["Amount Paid"]) || 0;
+        const surveyorvalue = Number(this.state.BankDataModelDTO["Surveyor"]["Amount Paid"]) || 0;
+
+        console.log("amount values:", workshopvalue, custvalue, financevalue, nomineevalue, surveyorvalue);
+        if (!isNaN(workshopvalue) || !isNaN(custvalue) || !isNaN(financevalue) || !isNaN(nomineevalue) || !isNaN(surveyorvalue)) {
+            amt = amt + workshopvalue + custvalue + financevalue + nomineevalue + surveyorvalue;
+        }
+        console.log("Amountdetails", amt, this.state.claimTableData.approvedClaimAmounts);
+
+        if (this.state.fields.approvedClaimAmount > this.state.policyDetailsData.balanceSumInsured) {
+            this.state.approveamtvalidation = false;
+           // this.state.approvedAmtflag = true;
+            this.setState({});
+        } else {
+            this.state.approveamtvalidation = true;
+            //this.state.approvedAmtflag = false;
+            this.setState({});
+        }
+
+        if (amt > this.state.fields.approvedClaimAmount) {
+            this.state.validateUI = false;
+            //this.state.amtflag = true;
+            this.setState({});
+        } else {
+            this.state.validateUI = true;
+           // this.state.amtflag = false;
             this.setState({});
         }
     }
@@ -860,9 +912,9 @@ class InboxClaimProcess extends React.Component {
         //var today = event.toDate();
         //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         var today = event.toDate();
-       // var date = today.toISOString();
+        // var date = today.toISOString();
         var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
-            
+
         const ClaimDataDTO = this.state.ClaimDTO;
         ClaimDataDTO[name] = date;
         this.setState({ ClaimDataDTO });

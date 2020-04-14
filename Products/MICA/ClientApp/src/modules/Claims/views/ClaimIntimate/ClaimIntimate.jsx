@@ -466,7 +466,7 @@ class ClaimIntimate extends React.Component {
             }
             else {
 
-                if (this.state.DetailsDTO.lossDateTime == "") {
+                if (this.state.DetailsDTO.lossDateTime == null) {
                     this.setState({ errormessage: true });
                     this.setState({ lossdateflag: true });
                     swal("", "Please enter Loss date time", "error");
@@ -529,7 +529,7 @@ class ClaimIntimate extends React.Component {
         
         console.log("ValidationAdditionalDetails", this.state.DetailsDTO.AdditionalDetails['Vehicle Location'])
 
-        if (this.state.DetailsDTO.lossDateTime !== "" && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== ""
+        if (this.state.DetailsDTO.lossDateTime !== null && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== ""
             && this.state.DetailsDTO.causeOfLoss !== "" && this.state.DetailsDTO.insurableItems !== "" && this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] != undefined && this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] != undefined) {
             this.state.ValidationUI = true;
         }
