@@ -1345,8 +1345,8 @@ class ClaimIntimate extends React.Component {
         //let _State = this.state;
 
         var today = e.toDate();
-
-        var date = today.toISOString();
+        var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
+       // var date = today.toISOString();
         //_State[name] = date;
         //this.setState({ _State });
 
