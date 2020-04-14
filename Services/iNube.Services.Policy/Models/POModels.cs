@@ -712,6 +712,7 @@ namespace iNube.Services.Policy.Models
     }
     public class PolicysearchDTO
     {
+        public bool Flag;
         public string Proposalnumber;
         public string Policynumber;
         public string EventId;

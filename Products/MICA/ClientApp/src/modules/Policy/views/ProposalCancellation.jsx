@@ -72,7 +72,7 @@ class ApplicationCancel extends React.Component {
             cancelRequestDate: CurrentDateTime,
             PolicysearchDTO: {
                 proposalnumber: "",
-
+                flag:true,
                 mobileNumber: "",
 
             },

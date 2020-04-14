@@ -878,8 +878,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true && (s.PolicyNo!= null||(s.ProposalNo != null && s.PolicyNo == null)))
+            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true )
                           select P;
+            if (policysearch.Flag == true)
+            {
+                _policy = _policy.Where(s=>s.ProposalNo != null && s.PolicyNo == null);
+            }
+            else {
+                _policy = _policy.Where(s=>s.PolicyNo != null);
+             
+            }
+
 
             if (!string.IsNullOrEmpty(policysearch.Proposalnumber))
             {
@@ -5098,7 +5107,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 var endObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
                                 AddProperty(endObj, "PolicyNumber", tbl_particiant.PolicyNo);
                                 AddProperty(endObj, "CDAccountNumber", tbl_particiant.CdaccountNumber);
-
+                                if (endoresementDto["Remarks"] != null)
+                                {
+                                    AddProperty(endObj, "Remarks", (string)endoresementDto["Remarks"]);
+                                }
+                              
                                 var exptempobj = JsonConvert.SerializeObject(endObj);
                                 json = JsonConvert.DeserializeObject<dynamic>(exptempobj.ToString());
 
@@ -6828,7 +6841,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
 
                         }
+                        var endObj = JsonConvert.DeserializeObject<ExpandoObject>(json.ToString());
+                        if (CancellationRequest["Remarks"] != null)
+                        {
+                            AddProperty(endObj, "Remarks", (string)CancellationRequest["Remarks"]);
+                        }
+                        var exptempobj = JsonConvert.SerializeObject(endObj);
+                        json = JsonConvert.DeserializeObject<dynamic>(exptempobj.ToString());
 
+
+                        tblPolicyDetailsdata.PolicyRequest = json.ToString();
+                        _context.TblPolicyDetails.Update(tblPolicyDetailsdata);
                         //Call GetRefund Details
                         //Refund Txn
                         PolicyCancelRequest policyCancelRequest = new PolicyCancelRequest();
