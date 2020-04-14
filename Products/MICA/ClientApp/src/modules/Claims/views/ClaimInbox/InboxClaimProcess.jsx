@@ -120,6 +120,7 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            ClaimIntemationDate: null,
             claimsremarksflag: false,
             claimstatusflag: false,
             prodId: "",
@@ -574,9 +575,10 @@ class InboxClaimProcess extends React.Component {
         // this.paymentDetailsfun(ClaimArr[0].claimId);
         this.state.PolicyNumber = ClaimArr[0].policyNo;
         this.state.ClaimNumber = ClaimArr[0].claimNumber;
+        this.state.ClaimIntemationDate = ClaimArr[0].createdDate;
         this.setState({ open: true });
 
-        console.log("approved", this.state.approved, this.state.decision);
+        console.log("approved", this.state.approved, this.state.decision, this.state.ClaimIntemationDate);
         if (ClaimArr[0].claimStatus == "Approved" || ClaimArr[0].claimStatus == "Rejected") {
             this.setState({ approved: false });
         }
@@ -764,7 +766,7 @@ class InboxClaimProcess extends React.Component {
                     width='13rem'
                     //required={true}
                     disableFuture={true}
-                    //minDate={new Date(this.state.claimDetailsData.lossDate)}
+                    minDate={this.state.ClaimIntemationDate}
                     maxDate={new Date()}
                     labelText={Bankfieldsmodel.Name}
                     name={Bankfieldsmodel.Name}
@@ -817,6 +819,7 @@ class InboxClaimProcess extends React.Component {
                     disabled={false}
                     width='13rem'
                     //required={true}
+                    minDate={this.state.ClaimIntemationDate}
                     maxDate={new Date()}
                     //minDate={new Date(this.state.claimDetailsData.lossDate)}
                     disableFuture={true}
