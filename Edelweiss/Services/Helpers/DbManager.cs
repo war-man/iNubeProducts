@@ -1,6 +1,4 @@
 ﻿
-//using iNube.Services.Accounting.Controllers.AccountConfig.IntegrationServices;
-//using iNube.Services.Accounting.Entities;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -9,8 +7,12 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using MicaExtension_EGI.Entities;
+using iNube.Services.Controllers.EGI.IntegrationServices;
+using iNube.Services.MicaExtension_EGI.Helpers;
 
-namespace iNube.Services.MicaExtension_EGI.Helpers
+namespace iNube.Services.Billing.Helpers
 {
     public class DbConnection
     {
@@ -72,33 +74,34 @@ namespace iNube.Services.MicaExtension_EGI.Helpers
             return dbConnectionString;
         }
 
-        public static async Task<DbContext> GetContextAsync(string product, string connectionKey)
+        public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
             DbContext context = null;
-            //DbHelper dbHelper = new DbHelper(new IntegrationService());
-            //string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
+            //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)
             {
                 case "Mica":
-                 //   var optionsBuilder = new DbContextOptionsBuilder<MICAACContext>();
-                   // optionsBuilder.UseSqlServer(dbConnectionString);
+                    var optionsBuilder = new DbContextOptionsBuilder<MICAQMContext>();
+                    optionsBuilder.UseSqlServer(dbConnectionString);
                     //DbContextOptions<MICAUMContext> dbContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                   // context = new MICAACContext(optionsBuilder.Options);
+                    context = new MICAQMContext(optionsBuilder.Options);
                     break;
                 //case "Avo":
-                //    DbContextOptions<> dbAvoContextOption = (DbContextOptions<AVOCMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                //    DbContextOptions<> dbAvoContextOption = (DbContextOptions<MICABIContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
                 //    context = new AVOUMContext(dbAvoContextOption);
                 //    break;
                 //case "Motor":
                 //    dbConnectionString = DbConnectionManager.GetConnectionString("Prod");
                 //    break;AVOCMContext
                 default:
-                   // var optionsBuilderDefault = new DbContextOptionsBuilder<MICAACContext>();
-                   // optionsBuilderDefault.UseSqlServer(dbConnectionString);
-                   // DbContextOptions<MICAUMContext> dbDefaultContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                   // context = new MICAACContext(optionsBuilderDefault.Options);
+                    var optionsBuilderDefault = new DbContextOptionsBuilder<MICAQMContext>();
+                    optionsBuilderDefault.UseSqlServer(dbConnectionString);
+                    // DbContextOptions<MICAUMContext> dbDefaultContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                    context = new MICAQMContext(optionsBuilderDefault.Options);
                     break;
             }
 

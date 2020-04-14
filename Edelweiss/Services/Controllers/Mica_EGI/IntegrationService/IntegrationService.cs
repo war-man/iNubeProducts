@@ -51,6 +51,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
       
         //NEW Internal Proposal Method for Account Number
         Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext);
+        Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
 
     }
     public class IntegrationService : IIntegrationService
@@ -75,8 +76,13 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
            
-        }        
+        }
 
+        public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
+        {
+            var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+        }
 
         public async Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext)
         {
