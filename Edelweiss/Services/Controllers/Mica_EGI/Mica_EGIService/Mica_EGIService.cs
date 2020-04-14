@@ -21,48 +21,49 @@ using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using iNube.Services.Billing.Helpers;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
     public interface IMicaEGIService
     {
-        GetScheduleResponse GetSchedule(string VehicleRegistrationNo, string PolicyNo);
-        ScheduleResponseDTO CreateSchedule(ScheduleDTO scheduleDTO);
-        Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata);
-        Task<bool> NightScheduler(DateTime? dateTime);
-        Task<bool> PremiumBookingScheduler(DateTime? dateTime);
-        Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff);
-        ActivityResponse ActivityReport(string PolicyNo, string Month);
+        Task<GetScheduleResponse> GetSchedule(string VehicleRegistrationNo, string PolicyNo, ApiContext context);
+        Task<ScheduleResponseDTO> CreateSchedule(ScheduleDTO scheduleDTO, ApiContext context);
+        Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata, ApiContext context);
+        Task<bool> NightScheduler(DateTime? dateTime, ApiContext context);
+        Task<bool> PremiumBookingScheduler(DateTime? dateTime, ApiContext context);
+        Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff, ApiContext context);
+        Task<ActivityResponse> ActivityReport(string PolicyNo, string Month, ApiContext context);
 
-        Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string CallType);
+        Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string CallType, ApiContext context);
 
-        AllScheduleResponse GetAllVehicleSchedule(string PolicyNo);
-        List<ddDTO> GetVehicleMaster(string lMasterlist);
-        Task<BillingResponse> BillingDetails(string PolicyNo, int Month, int Year);
-        Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata);
-        TaxTypeDTO TaxTypeForStateCode(string stateabbreviation);
+        Task<AllScheduleResponse> GetAllVehicleSchedule(string PolicyNo, ApiContext context);
+        Task<List<ddDTO>> GetVehicleMaster(string lMasterlist, ApiContext context);
+        Task<BillingResponse> BillingDetails(string PolicyNo, int Month, int Year, ApiContext context);
+        Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata, ApiContext context);
+        Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext context);
 
         //CD Method
-        Task<dynamic> CDMapper(string TxnType, dynamic SourceObject);
+        Task<dynamic> CDMapper(string TxnType, dynamic SourceObject, ApiContext context);
 
         //Rule Engine 
-        Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject);
+        Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject, ApiContext context);
 
         //Policy Cancellation Method
-        Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber, dynamic PolicyObject);
+        Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber, dynamic PolicyObject, ApiContext context);
 
         //Claims needs Activity of Vehicle
-        Task<ResponseVehicleActivity> GetVehicleActivity(VehicleActivityDTO vehicleActivity, ApiContext apiContext);
+        Task<ResponseVehicleActivity> GetVehicleActivity(VehicleActivityDTO vehicleActivity, ApiContext context);
         //refurnd Details
-        Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext);
+        Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext context);
 
         //Policy Cancellation Status Update
-        PolicyStatusResponseDTO PolicyStatusUpdate(PolicyStatusDTO policyStatus);
+        Task<PolicyStatusResponseDTO> PolicyStatusUpdate(PolicyStatusDTO policyStatus, ApiContext context);
 
         //MonthlySIScheduler
-        Task<bool> MonthlySIScheduler(DateTime? dateTime);
+        Task<bool> MonthlySIScheduler(DateTime? dateTime, ApiContext context);
 
-        Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken);
+        Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext context);
 
     }
 
@@ -87,8 +88,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public GetScheduleResponse GetSchedule(string VehicleRegistrationNo, string PolicyNo)
+        public async Task<GetScheduleResponse> GetSchedule(string VehicleRegistrationNo, string PolicyNo, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             GetScheduleResponse response = new GetScheduleResponse();
 
             var Check = CheckPolicyStatus(PolicyNo);
@@ -206,8 +209,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public ScheduleResponseDTO CreateSchedule(ScheduleDTO scheduleDTO)
+        public async Task<ScheduleResponseDTO> CreateSchedule(ScheduleDTO scheduleDTO, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             ScheduleResponseDTO response = new ScheduleResponseDTO();
 
             var Check = CheckPolicyStatus(scheduleDTO.PolicyNo);
@@ -321,9 +326,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
         }
 
-        public async Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata)
+        public async Task<PremiumReturnDto> CalCulatePremium(PremiumRequestDTO premiumdata, ApiContext context)
         {
-            // _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
             PremiumReturnDto response = new PremiumReturnDto();
             if (premiumdata.NoOfPC > 0)
             {
@@ -350,7 +355,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                             TaxTypeDTO taxType = new TaxTypeDTO();
-                            taxType = TaxTypeForStateCode(premiumdata.StateCode);
+                            taxType = await TaxTypeForStateCode(premiumdata.StateCode, context);
 
                             prem.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
                             prem.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
@@ -508,9 +513,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
         }
 
-        public async Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata)
+        public async Task<WrapperPremiumReturnDto> WrapperCalculatePremium(WrapperPremiumRequestDTO premiumdata, ApiContext context)
         {
-            // _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             WrapperPremiumReturnDto returnobj = new WrapperPremiumReturnDto();
             if (premiumdata.NoOfPC != 0)
             {
@@ -624,8 +630,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public TaxTypeDTO TaxTypeForStateCode(string stateabbreviation)
+        public async Task<TaxTypeDTO> TaxTypeForStateCode(string stateabbreviation, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
             var statedata = _context.TblMasState.SingleOrDefault(c => c.StateAbbreviation == stateabbreviation);
 
@@ -737,8 +744,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public async Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff)
+        public async Task<SwitchOnOffResponse> SwitchOnOff(SwitchOnOffDTO switchOnOff, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
             string VehicleRegistrationNo = switchOnOff.VehicleRegistrationNo;
             string PolicyNo = switchOnOff.PolicyNo;
@@ -1161,7 +1169,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFPC = ActivePCCount.ToString();
                     premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = ActiveTWCount.ToString();
 
-                    var taxType = TaxTypeForStateCode(detailsDTO.StateCode);
+                    var taxType = await TaxTypeForStateCode(detailsDTO.StateCode, context);
 
 
                     premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE; //Call TaxType //Verify
@@ -1671,8 +1679,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<bool> NightScheduler(DateTime? dateTime)
+        public async Task<bool> NightScheduler(DateTime? dateTime, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             DateTime? IndianTime = null;
 
             IndianTime = System.DateTime.UtcNow.AddMinutes(330);
@@ -1847,8 +1857,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public async Task<bool> PremiumBookingScheduler(DateTime? dateTime)
+        public async Task<bool> PremiumBookingScheduler(DateTime? dateTime, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             DateTime? IndianTime = null;
             IndianTime = System.DateTime.UtcNow.AddMinutes(330);
             var CurrentDay = IndianTime.Value.DayOfWeek.ToString();
@@ -1969,7 +1981,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = ActiveTWCount.ToString();
 
 
-                var taxType = TaxTypeForStateCode(detailsDTO.StateCode);
+                var taxType = await TaxTypeForStateCode(detailsDTO.StateCode, context);
 
                 premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE; //Call TaxType //Verify
                 premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE; //Call TaxType //Verify
@@ -2257,8 +2269,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return tblDailyActive;
         }
 
-        public ActivityResponse ActivityReport(string PolicyNo, string Month)
+        public async Task<ActivityResponse> ActivityReport(string PolicyNo, string Month, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             var getMonthNumber = 0;
             ActivityResponse response = new ActivityResponse();
             ErrorInfo errorInfo = new ErrorInfo();
@@ -2406,8 +2420,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return returnobj;
         }
 
-        public AllScheduleResponse GetAllVehicleSchedule(string PolicyNo)
+        public async Task<AllScheduleResponse> GetAllVehicleSchedule(string PolicyNo, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             AllScheduleResponse response = new AllScheduleResponse();
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
@@ -2452,8 +2468,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public List<ddDTO> GetVehicleMaster(string lMasterlist)
+        public async Task<List<ddDTO>> GetVehicleMaster(string lMasterlist, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
             List<ddDTO> obj;
 
@@ -2462,8 +2479,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return obj;
         }
 
-        public async Task<BillingResponse> BillingDetails(string PolicyNo, int Month, int Year)
+        public async Task<BillingResponse> BillingDetails(string PolicyNo, int Month, int Year, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
@@ -2582,8 +2600,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<dynamic> CDMapper(string TxnType, dynamic SourceObject)
+        public async Task<dynamic> CDMapper(string TxnType, dynamic SourceObject, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
             ApiContext apiContext = new ApiContext();
             apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
@@ -2671,7 +2690,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 endorsementDto.TypeOfEndorsement = "Addition";
                 endorsementDto.EndorsementEffectiveDate = IndianTime;
 
-                var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
+                var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate", context);
 
                 DeserilizedPremiumData = CallNewEndo;
 
@@ -2733,7 +2752,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 endorsementDto.TypeOfEndorsement = "Deletion";
                 endorsementDto.EndorsementEffectiveDate = IndianTime;
 
-                var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate");
+                var CallNewEndo = await EndorsementPremium(endorsementDto, PolicyData, "CDUpdate", context);
 
                 DeserilizedPremiumData = CallNewEndo;
 
@@ -2779,7 +2798,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 MicaCDDTO MICACDModel = new MicaCDDTO();
 
-                PolicyCancelReturnDto CallCancleCalculator = await PolicyCancellationCalculator(null, SourceObject);
+                PolicyCancelReturnDto CallCancleCalculator = await PolicyCancellationCalculator(null, SourceObject,context);
 
                 PolicyNumber = (string)SourceObject["PolicyNumber"];
 
@@ -2897,7 +2916,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             premiumDTO.dictionary_rate.AVFACTORTW_TW_NOOFTW = SourceObject["noOfTW"];
 
 
-            var taxType = TaxTypeForStateCode(SourceObject["stateCode"].ToString());
+            var taxType = await TaxTypeForStateCode(SourceObject["stateCode"].ToString(), context);
 
             premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE; //Call From State TaxType 
             premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE; //Call To State TaxType 
@@ -3460,8 +3479,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public async Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject)
+        public async Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             ApiContext apiContext = new ApiContext();
             apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
             apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
@@ -3782,7 +3803,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
                        for(int i=0; i < claiminsurable.Count; i++) { 
                        if(claiminsurable[i].coverName == "Accidental Damage") {
-                        ActivityResponse status = ActivityReport(policyno, month);
+                        ActivityResponse status = ActivityReport(policyno, month,context);
                                 if(status.ActivityDTO.Count > 0)
                                 {                
                                     var filter = status.ActivityDTO.Where(x => x.DateTime.Value.Date == lossdatetime.Date).LastOrDefault();
@@ -3857,8 +3878,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string callType)
+        public async Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string callType, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
             var CurrentDate = IndianTime.Date;
@@ -3969,7 +3992,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
                 TaxTypeDTO taxType = new TaxTypeDTO();
-                taxType = TaxTypeForStateCode(detailsDTO.StateCode);
+                taxType = await TaxTypeForStateCode(detailsDTO.StateCode, context);
 
                 string NoADDays = "";
                 string NoFTDays = RemainingDays.ToString();
@@ -4248,7 +4271,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 TaxTypeDTO taxType = new TaxTypeDTO();
-                taxType = TaxTypeForStateCode(detailsDTO.StateCode);
+                taxType = await TaxTypeForStateCode(detailsDTO.StateCode, context);
 
                 string NoADDays = "";
                 string NoFTDays = RemainingDays.ToString();
@@ -4611,8 +4634,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber, dynamic PolicyObject)
+        public async Task<PolicyCancelReturnDto> PolicyCancellationCalculator(string PolicyNumber, dynamic PolicyObject, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
             var CurrentDate = IndianTime.Date;
@@ -4665,7 +4690,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     StateCode = PolicyData["stateCode"];
 
                     TaxTypeDTO taxType = new TaxTypeDTO();
-                    taxType = TaxTypeForStateCode(StateCode);
+                    taxType = await TaxTypeForStateCode(StateCode, context);
 
                     premiumDTO.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
                     premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
@@ -4731,8 +4756,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<ResponseVehicleActivity> GetVehicleActivity(VehicleActivityDTO vehicleActivity, ApiContext apiContext)
+        public async Task<ResponseVehicleActivity> GetVehicleActivity(VehicleActivityDTO vehicleActivity, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
             ResponseVehicleActivity response = new ResponseVehicleActivity();
 
@@ -4744,7 +4770,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //check for claim--
                 if (!string.IsNullOrEmpty(vehicleActivity.ClaimNumber))
                 {
-                    var claim = await _integrationService.GetClaimByNumber(vehicleActivity.ClaimNumber, apiContext);
+                    var claim = await _integrationService.GetClaimByNumber(vehicleActivity.ClaimNumber, context);
                     if (claim != null)
                     {
                         clmDate = (DateTime)claim.CreatedDate;
@@ -4805,20 +4831,22 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apiContext)
+        public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             GlobalVariables GlobalVariables = new GlobalVariables();
             PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
 
             if (!string.IsNullOrEmpty(policyRequest.PolicyNumber))
             {
-                GlobalVariables.PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apiContext);
+                GlobalVariables.PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, context);
 
-                PolicyCancelReturnDto canceldetails = await PolicyCancellationCalculator(policyRequest.PolicyNumber, null);
+                PolicyCancelReturnDto canceldetails = await PolicyCancellationCalculator(policyRequest.PolicyNumber, null, context);
                 policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
             }
             else if (!string.IsNullOrEmpty(policyRequest.ProposalNumber)) {
-                GlobalVariables.PolicyData = await _integrationService.InternalGetProposalDetailsByNumber(policyRequest.ProposalNumber, apiContext);
+                GlobalVariables.PolicyData = await _integrationService.InternalGetProposalDetailsByNumber(policyRequest.ProposalNumber, context);
                 policyCancelResponse.FTPremium = 0;
             }
             // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();
@@ -4831,8 +4859,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             if (!string.IsNullOrEmpty(GlobalVariables.CdaccountNumber))
             {
-                CDBalanceDTO FTaccountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "FT", apiContext);
-                CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "AD", apiContext);
+                CDBalanceDTO FTaccountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "FT", context);
+                CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "AD", context);
                 policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance + FTaccountdetails.TotalAvailableBalance;
             }
             policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
@@ -4875,8 +4903,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return policyCancelResponse;
         }
 
-        public PolicyStatusResponseDTO PolicyStatusUpdate(PolicyStatusDTO policyStatus)
+        public async Task<PolicyStatusResponseDTO> PolicyStatusUpdate(PolicyStatusDTO policyStatus, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
             PolicyStatusResponseDTO responseDTO = new PolicyStatusResponseDTO();
             if (!String.IsNullOrEmpty(policyStatus.PolicyNumber) && policyStatus.PolicyStatus != null)
@@ -4910,8 +4939,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return false;
         }
 
-        public async Task<bool> MonthlySIScheduler(DateTime? dateTime)
+        public async Task<bool> MonthlySIScheduler(DateTime? dateTime, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             DateTime? CurrentIndianTime = null;
 
             CurrentIndianTime = System.DateTime.UtcNow.AddMinutes(330);
@@ -5011,7 +5042,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             dynamic PolicyData = JsonConvert.DeserializeObject(CDDetails.FirstOrDefault(x => x.Action == "Issue Policy").UpdatedResponse);
 
                             string StateCode = PolicyData["stateCode"];
-                            TaxTypeDTO TaxType = TaxTypeForStateCode(StateCode);
+                            TaxTypeDTO TaxType = await TaxTypeForStateCode(StateCode, context);
 
                             monthlySiDTO.PolicyNo = policy;
                             //PolicyData
@@ -5200,8 +5231,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public async Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken)
+        public async Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext context)
         {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
             string filePath = "";
             int step1 = 0;
             try

@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace iNube.Services.MicaExtension_EGI.Models
 {
+    public class EnvironmentResponse : ResponseStatus
+    {
+        public string Dbconnection { get; set; }
+    }
 
     public class ScheduleDTO
     {
