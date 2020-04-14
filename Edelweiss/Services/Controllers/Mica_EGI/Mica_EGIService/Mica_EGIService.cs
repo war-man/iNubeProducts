@@ -22,6 +22,7 @@ using System.Threading;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using iNube.Services.Billing.Helpers;
+using OfficeOpenXml;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -5299,6 +5300,230 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
                         var res = await ConvertCSVtoDataTable(filePath);
                         return res;
+                    }
+                    else
+                    {
+                        MonthlySIUploadDTO uploadDTO = new MonthlySIUploadDTO();
+
+                        if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
+                        {     
+
+                            //defining Global Variables
+                            var errorflag = false;
+                                                                                                                   
+                            var sheetNameValue = "";
+                            using (var stream = new MemoryStream())
+                            {
+                                await file.CopyToAsync(stream, cancellationToken);
+                                try
+                                {
+                                    using (var package = new ExcelPackage(stream))
+                                    {
+                                        foreach (var sheetName1 in package.Workbook.Worksheets)
+                                        {
+                                            sheetNameValue = sheetName1.Name;
+                                        }
+                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetNameValue];
+
+
+                                        // EPPlusHelper.GetColumnByName()
+                                        int TxnidIndex = worksheet.GetColumnByName("txn Id");
+                                        int payUidindex = worksheet.GetColumnByName("pay Uid");
+                                        int payAmountIndex = worksheet.GetColumnByName("pay Amount");
+                                        int payStatusIndex = worksheet.GetColumnByName("pay status");
+                                        int paymentDateIndex = worksheet.GetColumnByName("payment Date");
+
+                                        if (worksheet != null)
+                                        {
+                                            var rowCount = worksheet.Dimension.Rows;
+                                            for (int row = 2; row <= rowCount; row++)
+                                            {
+
+                                                var txnid = "";
+                                                var payUid = "";
+                                                var payAmount = "";
+                                                var payStatus = "";
+                                                DateTime paymentDate = new DateTime(2020, 1, 1, 01, 01, 01);
+
+
+                                                if (worksheet.Cells[row, TxnidIndex].Text.ToString().Trim() != null)
+                                                {
+                                                    txnid = worksheet.Cells[row, TxnidIndex].Text.ToString().Trim();
+                                                }
+                                                if (worksheet.Cells[row, payUidindex].Text.ToString().Trim() != null)
+                                                {
+                                                    payUid = worksheet.Cells[row, payUidindex].Text.ToString().Trim();
+                                                }
+
+                                                if (worksheet.Cells[row, payAmountIndex].Text.ToString().Trim() != null)
+                                                {
+                                                    payAmount = worksheet.Cells[row, payAmountIndex].Text.ToString().Trim();
+                                                }
+                                                if (worksheet.Cells[row, payStatusIndex].Text.ToString().Trim() != null)
+                                                {
+                                                    payStatus = worksheet.Cells[row, payStatusIndex].Text.ToString().Trim();
+                                                }
+                                                if (worksheet.Cells[row, paymentDateIndex].Text.ToString().Trim() != null)
+                                                {
+                                                    paymentDate = Convert.ToDateTime(worksheet.Cells[row, paymentDateIndex].Text.ToString());
+                                                }
+
+
+                                                if (String.IsNullOrEmpty(txnid))
+                                                {
+
+                                                    ErrorInfo errorInfo = new ErrorInfo();
+
+                                                    errorInfo.ErrorMessage = "Txn Id Missing";
+                                                    errorInfo.ErrorCode = "MSI001";
+                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    uploadDTO.Errors.Add(errorInfo);
+                                                    errorflag = true;
+
+
+                                                }
+
+                                                if (String.IsNullOrEmpty(payUid))
+                                                {
+                                                    ErrorInfo errorInfo = new ErrorInfo();
+
+                                                    errorInfo.ErrorMessage = "Pay Uid Missing";
+                                                    errorInfo.ErrorCode = "MSI002";
+                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    uploadDTO.Errors.Add(errorInfo);
+                                                    errorflag = true;
+                                                }
+
+
+
+                                                if (String.IsNullOrEmpty(payAmount))
+                                                {
+                                                    ErrorInfo errorInfo = new ErrorInfo();
+
+                                                    errorInfo.ErrorMessage = "Pay Amount Missing";
+                                                    errorInfo.ErrorCode = "MSI003";
+                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    uploadDTO.Errors.Add(errorInfo);
+                                                    errorflag = true;
+                                                }
+
+                                                if (String.IsNullOrEmpty(payStatus))
+                                                {
+                                                    ErrorInfo errorInfo = new ErrorInfo();
+
+                                                    errorInfo.ErrorMessage = "Pay Status Missing";
+                                                    errorInfo.ErrorCode = "MSI004";
+                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    uploadDTO.Errors.Add(errorInfo);
+                                                    errorflag = true;
+                                                }
+
+                                                if (payStatus != "Successful")
+                                                {
+                                                    ErrorInfo errorInfo = new ErrorInfo();
+
+                                                    errorInfo.ErrorMessage = "Pay Date Missing";
+                                                    errorInfo.ErrorCode = "MSI005";
+                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    uploadDTO.Errors.Add(errorInfo);
+                                                    errorflag = true;
+                                                }
+
+                                                var checkTxnid = _context.TblPolicyMonthlySi.Any(x => x.Txnid == txnid);
+
+                                                if (checkTxnid == false)
+                                                {
+                                                    ErrorInfo errorInfo = new ErrorInfo();
+
+                                                    errorInfo.ErrorMessage = "No Such TxnId";
+                                                    errorInfo.ErrorCode = "MSI004";
+                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    uploadDTO.Errors.Add(errorInfo);
+                                                    errorflag = true;
+                                                }
+
+                                                if (checkTxnid == true)
+                                                {
+                                                    //This Helps to Find out data is saved previously or not
+                                                    var checkData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
+
+                                                    if (!String.IsNullOrEmpty(checkData.PayUid))
+                                                    {
+                                                        ErrorInfo errorInfo = new ErrorInfo();
+                                                        errorInfo.ErrorMessage = "Data is Already Updated for this Txn Id Duplicate Record";
+                                                        errorInfo.ErrorCode = "MSI004";
+                                                        errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                        uploadDTO.Errors.Add(errorInfo);
+                                                        errorflag = true;
+                                                    }
+
+                                                    if (!String.IsNullOrEmpty(payAmount))
+                                                    {
+                                                        if (Convert.ToDecimal(payAmount) < checkData.TotalAmountChargeable)
+                                                        {
+
+                                                            ErrorInfo errorInfo = new ErrorInfo();
+
+                                                            errorInfo.ErrorMessage = "Pay Amount is Less Than the Billed Amount";
+                                                            errorInfo.ErrorCode = "MSI003";
+                                                            errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                            uploadDTO.Errors.Add(errorInfo);
+                                                            errorflag = true;
+                                                        }
+                                                    }
+
+                                                }
+
+
+
+                                                if (errorflag == false)
+                                                {
+                                                    var TblData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
+
+                                                    TblData.PayUid = payUid;
+                                                    TblData.PayAmount = payAmount;
+                                                    TblData.PayStatus = payStatus;
+                                                    TblData.PaymentDate = paymentDate;
+
+                                                    _context.TblPolicyMonthlySi.Update(TblData);
+                                                    _context.SaveChanges();
+
+                                                }
+                                                else
+                                                {
+                                                    errorflag = false;
+                                                    continue;
+                                                }
+
+                                            }
+
+                                            if (uploadDTO.Errors.Count > 0)
+                                            {
+                                                uploadDTO.ResponseMessage = "Document Uploaded for Sucess One & Failed Transactions Are in Errors";
+                                                uploadDTO.Status = BusinessStatus.Ok;
+                                                return uploadDTO;
+                                            }
+                                            else
+                                            {
+                                                uploadDTO.ResponseMessage = $"Document Uploaded Successfully";
+                                                uploadDTO.Status = BusinessStatus.Ok;
+                                                return uploadDTO;
+                                            }
+                                        }
+                                        
+                                        }
+                                    }                               
+                                catch (Exception ex)
+                                {
+                                    var error = ex.ToString();
+                                    return new MonthlySIUploadDTO { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter", MessageKey = step1.ToString() };
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return new MonthlySIUploadDTO { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx/csv file" };
+                        }
                     }
 
 
