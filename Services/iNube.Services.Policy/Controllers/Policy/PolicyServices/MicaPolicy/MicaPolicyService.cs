@@ -6838,19 +6838,19 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         PolicyCancelResponse RefundDetails = await _integrationService.GetRefundDetails(policyCancelRequest, apiContext);
 
 
-                        //string EndorsmentType = "Cancel Policy";
-                        //EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
-                        //endorsementDetailsDTO.Action = EndorsmentType;
-                        //endorsementDetailsDTO.EndorsementNo = EndorsementNo;
-                        //endorsementDetailsDTO.IsPremiumRegister = true;
-                        //endorsementDetailsDTO.UpdatedResponse = json.ToString();
-                        //endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
-                        //endorsementDetailsDTO.EnddorsementRequest = endoresementDto.ToString();
-                        //endorsementDetailsDTO.PolicyId = policyId;
+                        string EndorsmentType = "Cancel Proposal";
+                        EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
+                        endorsementDetailsDTO.Action = EndorsmentType;
+                      
+                        endorsementDetailsDTO.IsPremiumRegister = true;
+                        endorsementDetailsDTO.UpdatedResponse = json.ToString();
+                        endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
+                        endorsementDetailsDTO.EnddorsementRequest = CancellationRequest.ToString();
+                        endorsementDetailsDTO.PolicyId = policyId;
 
-                        //TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
+                        TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
 
-                        //_context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+                        _context.TblEndorsementDetails.Add(tblEndorsement_mapper);
 
 
 
@@ -6901,7 +6901,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             else 
             {
-                return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Proposal Number {tbl_particiant.ProposalNo} is in different Stage" };
+                return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is already issued for this Proposal Number {tbl_particiant.ProposalNo},Proposal cannot be cancelled" };
 
             }
           

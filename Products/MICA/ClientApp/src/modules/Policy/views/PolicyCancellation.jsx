@@ -420,7 +420,7 @@ class PolicyCancellation extends React.Component {
                                         error={this.state.mobileNumberState}
                                         labelText="InsuredMobileNo"
                                         name="mobileNumber"
-                                        inputType="number" type="numeric"
+                                      
                                         // required={true}
                                         value={this.state.PolicysearchDTO.mobileNumber}
                                         onChange={(e) => this.SetValue("mobileNumber", e)}
@@ -484,7 +484,7 @@ class PolicyCancellation extends React.Component {
                                             {
                                                 Header: "Mobile No",
                                                 accessor: "mobileNo",
-                                                setCellProps: (value) => ({ style: { textAlign: "right" } }),
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                                 headerClassName: 'react-table-center',
                                                 minWidth: 70,
                                                 resizable: false,

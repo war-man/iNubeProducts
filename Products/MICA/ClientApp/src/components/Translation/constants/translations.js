@@ -762,8 +762,12 @@ export const TRANSLATIONS = {
         ProposalNumber: 'Proposal Number',
         SearchProposal:'Search Proposal',
 
+        ApplicationCancel:'Application Cancellation',
+
         //ClaimEnquiry
         IntimationDate: 'Intimation Date'
+       
+
     },
     hi_IN: TRANSLATIONS_HN,
     kn_IN: TRANSLATIONS_KN,

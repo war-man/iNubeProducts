@@ -50,7 +50,7 @@ const paddingCard =
 };
 // ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}
 
-class ProposalCancellation extends React.Component {
+class ApplicationCancel extends React.Component {
     constructor(props) {
         super(props);
         var date = new Date();
@@ -420,7 +420,7 @@ class ProposalCancellation extends React.Component {
                                         error={this.state.mobileNumberState}
                                         labelText="InsuredMobileNo"
                                         name="mobileNumber"
-                                        inputType="number" type="numeric"
+                                       
                                         // required={true}
                                         value={this.state.PolicysearchDTO.mobileNumber}
                                         onChange={(e) => this.SetValue("mobileNumber", e)}
@@ -483,7 +483,7 @@ class ProposalCancellation extends React.Component {
                                             {
                                                 Header: "Mobile No",
                                                 accessor: "mobileNo",
-                                                setCellProps: (value) => ({ style: { textAlign: "right" } }),
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                                 headerClassName: 'react-table-center',
                                                 minWidth: 70,
                                                 resizable: false,
@@ -863,7 +863,7 @@ class ProposalCancellation extends React.Component {
 
                                             <CustomInput
 
-                                                labelText="Number of Days till Proposal End Date"
+                                                labelText="Number of Days till Policy End Date"
                                                 inputType="number" type="numeric"
                                                 value={this.state.PolicyCancelResponse.noofDayRemaining}
                                                 name='customerId'
@@ -981,4 +981,4 @@ class ProposalCancellation extends React.Component {
         );
     }
 }
-export default withStyles(styles)(ProposalCancellation);
+export default withStyles(styles)(ApplicationCancel);

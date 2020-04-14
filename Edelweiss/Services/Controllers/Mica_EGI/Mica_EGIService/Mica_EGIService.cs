@@ -4809,6 +4809,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
             GlobalVariables GlobalVariables = new GlobalVariables();
             PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
+            bool applicationcancel =true ;
+            if (!string.IsNullOrEmpty(policyRequest.PolicyNumber))
+            {
+                applicationcancel = false;
+            }
+            else {
+                applicationcancel = true;
+            }
 
             if (!string.IsNullOrEmpty(policyRequest.PolicyNumber))
             {
@@ -4824,6 +4832,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             // var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyRequest.PolicyNumber).FirstOrDefault();
             GlobalVariables.CdaccountNumber = (string)GlobalVariables.PolicyData["CDAccountNumber"];
             GlobalVariables.PolicyEndDate = (DateTime)GlobalVariables.PolicyData["Policy End Date"];
+            GlobalVariables.PolicyStartDate = (DateTime)GlobalVariables.PolicyData["Policy Start Date"];
             GlobalVariables.BillingFrequency = (string)GlobalVariables.PolicyData["billingFrequency"];
            
 
@@ -4833,9 +4842,23 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 CDBalanceDTO FTaccountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "FT", apiContext);
                 CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "AD", apiContext);
-                policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance + FTaccountdetails.TotalAvailableBalance;
+                if (applicationcancel) {
+                    policyCancelResponse.FTPremium = FTaccountdetails.TotalAvailableBalance;
+                    policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance;
+                }
+                else
+                {
+                    policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance + FTaccountdetails.TotalAvailableBalance;
+                }
             }
-            policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
+            if (applicationcancel)
+            {
+                policyCancelResponse.NoofDayRemaining = 365;
+            }
+            else
+            {
+                policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
+            }
             policyCancelResponse.TotalPremium = policyCancelResponse.FTPremium + policyCancelResponse.ADPremium;
 
             var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];

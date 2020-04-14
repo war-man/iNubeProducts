@@ -676,6 +676,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string CdaccountNumber { get; set; }
         public string BillingFrequency { get; set; }
         public DateTime PolicyEndDate { get; set; }
+        public DateTime PolicyStartDate { get; set; }
         public dynamic PolicyData { get; set; }
     }
 }
