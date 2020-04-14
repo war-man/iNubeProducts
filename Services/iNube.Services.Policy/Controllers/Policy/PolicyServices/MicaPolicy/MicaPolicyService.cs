@@ -4817,76 +4817,88 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var proposalNo = (string)modifydata["ProposalNumber"];
             var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
-            if (tbl_particiant != null)
-            {
+          
 
-
-
-                var policyId = tbl_particiant.PolicyId;
-                var type = "Update Proposal";
-                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata,DatetimeNow, Errors, apiContext);
-                if (tblPolicy1 == null && Errors.Count > 0)
+                if (tbl_particiant != null)
                 {
-                    return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                if (tbl_particiant.IsActive == true)
+                {
+
+
+                    var policyId = tbl_particiant.PolicyId;
+                    var type = "Update Proposal";
+                    var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+                    var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
+                    if (tblPolicy1 == null && Errors.Count > 0)
+                    {
+                        return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                    }
+                    //var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                    //dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                    //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+
+                    //foreach (var insurableName in json.InsurableItem)
+                    //{
+                    //    foreach (var insurableName1 in json1.InsurableItem)
+                    //    {
+                    //        foreach (var item in modifydata.InsurableItem)
+                    //        {
+
+                    //            if (item.InsurableName == insurableName1.InsurableName)
+                    //            {
+                    //                foreach (var fields in item.RiskItems)
+                    //                {
+                    //                    try
+                    //                    {
+                    //                        foreach (var jsoninsurableFields in insurableName.RiskItems)
+                    //                        {
+                    //                            var InputidentificationNumber = (string)fields["Identification Number"];
+                    //                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                    //                            if (InputidentificationNumber == TblIdentificationNo)
+                    //                            {
+                    //                                var Adddata = fields;
+                    //                                var removeitem = jsoninsurableFields;
+                    //                                insurableName.RiskItems.Remove(removeitem);
+                    //                                insurableName.RiskItems.Add(Adddata);
+
+                    //                            }
+                    //                        }
+                    //                    }
+                    //                    catch (Exception e)
+                    //                    {
+
+                    //                        insurableName1.RiskItems = insurableName.RiskItems;
+                    //                    }
+                    //                }
+                    //            }
+
+                    //        }
+
+                    //    }
+                    //}
+                    //tblPolicyDetailsdata.PolicyRequest = json1.ToString();
+                    //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
+                    //_context.SaveChanges();
                 }
-                //var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                //dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                else
+                    {
 
+                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProposalNumber", PropertyName = "ProposalNumber", ErrorMessage = $"Proposal Number {proposalNo} is already cancelled" };
+                        Errors.Add(errorInfo);
+                        return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+                    }
+                }
+                else
+                {
 
-                //foreach (var insurableName in json.InsurableItem)
-                //{
-                //    foreach (var insurableName1 in json1.InsurableItem)
-                //    {
-                //        foreach (var item in modifydata.InsurableItem)
-                //        {
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProposalNumber", PropertyName = "ProposalNumber", ErrorMessage = $"No Records found for this Proposal Number {proposalNo}" };
+                    Errors.Add(errorInfo);
+                    return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
 
-                //            if (item.InsurableName == insurableName1.InsurableName)
-                //            {
-                //                foreach (var fields in item.RiskItems)
-                //                {
-                //                    try
-                //                    {
-                //                        foreach (var jsoninsurableFields in insurableName.RiskItems)
-                //                        {
-                //                            var InputidentificationNumber = (string)fields["Identification Number"];
-                //                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                //                            if (InputidentificationNumber == TblIdentificationNo)
-                //                            {
-                //                                var Adddata = fields;
-                //                                var removeitem = jsoninsurableFields;
-                //                                insurableName.RiskItems.Remove(removeitem);
-                //                                insurableName.RiskItems.Add(Adddata);
-
-                //                            }
-                //                        }
-                //                    }
-                //                    catch (Exception e)
-                //                    {
-
-                //                        insurableName1.RiskItems = insurableName.RiskItems;
-                //                    }
-                //                }
-                //            }
-
-                //        }
-
-                //    }
-                //}
-                //tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                //_context.SaveChanges();
-            }
-            else
-            {
-
-                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProposalNumber", PropertyName = "ProposalNumber", ErrorMessage = $"No Records found for this Proposal Number {proposalNo}" };
-                Errors.Add(errorInfo);
-                return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
-
-            }
-
+                }
+          
+           
             return new ProposalResponse { Status = BusinessStatus.Updated, Id = proposalNo, ResponseMessage = $"RiskItem Updated for this Proposal Number { proposalNo }" };
 
         }
