@@ -6240,10 +6240,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<FileUploadResponse> ConvertCSVtoDataTable(string strFilePath,ApiContext apiContext)
         {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             List<ShowErrorInfoDetails> errorInfoDetails = new List<ShowErrorInfoDetails>();
             int logx = 0;
-            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+           
             StreamReader sr = null;
             try
             {
@@ -6578,7 +6582,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     //if value greter then 0 means first date is greater then second one
                                     //if value less then 0 it means first date is less then second date
                                     int value1 = DateTime.Compare(dateofpayment, Convert.ToDateTime(endeffectivedate));
-                                    int value2 = DateTime.Compare(dateofpayment, DateTime.Now);
+                                 
+                                    int value2 = DateTime.Compare(dateofpayment, DatetimeNow);
                                     if (value1 < 0)
                                     {
                                         ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment can not be less then endorsementeffectivedate for row {i + 1}" };
