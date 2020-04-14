@@ -52,18 +52,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
 
         [HttpGet]
-        public IActionResult GetSchedule(string VehicleRegistrationNo, string PolicyNo)
+        public async Task<IActionResult> GetSchedule(string VehicleRegistrationNo, string PolicyNo)
         {
 
-            var response = _quotationService.GetSchedule(VehicleRegistrationNo, PolicyNo, Context);
+            var response = await _quotationService.GetSchedule(VehicleRegistrationNo, PolicyNo, Context);
             return ServiceResponse(response);
 
         }
 
         [HttpPost]
-        public IActionResult CreateUpdateSchedule(ScheduleDTO scheduleDTO)
+        public async Task<IActionResult> CreateUpdateSchedule(ScheduleDTO scheduleDTO)
         {
-            var reponse = _quotationService.CreateSchedule(scheduleDTO, Context);
+            var reponse =await _quotationService.CreateSchedule(scheduleDTO, Context);
             return ServiceResponse(reponse);
         }
 
@@ -76,9 +76,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
      
         [HttpGet]
-        public IActionResult ActivityLog(string PolicyNo, string Month,string Year)
+        public async Task<IActionResult> ActivityLog(string PolicyNo, string Month,string Year)
         {
-            var response = _quotationService.ActivityReport(PolicyNo, Month, Context);
+            var response =await _quotationService.ActivityReport(PolicyNo, Month, Context);
             return ServiceResponse(response);
         }
 
@@ -99,16 +99,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpGet]
-        public IActionResult GetAllVehicleSchedule(string PolicyNo)
+        public async Task<IActionResult> GetAllVehicleSchedule(string PolicyNo)
         {
-            var response = _quotationService.GetAllVehicleSchedule(PolicyNo, Context);
+            var response =await _quotationService.GetAllVehicleSchedule(PolicyNo, Context);
             return Ok(response);
         }
 
         [HttpGet]
-        public IActionResult GetVehicleMaster(string lMasterlist, bool isFilter = true)
+        public async Task<IActionResult> GetVehicleMaster(string lMasterlist, bool isFilter = true)
         {
-            var objectval = _quotationService.GetVehicleMaster(lMasterlist, Context);
+            var objectval =await _quotationService.GetVehicleMaster(lMasterlist, Context);
 
             return Ok(objectval);
         }
@@ -121,9 +121,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpGet]
-        public IActionResult TaxTypeForStateCode(string stateabbreviation)
+        public async Task<IActionResult> TaxTypeForStateCode(string stateabbreviation)
         {
-            var response = _quotationService.TaxTypeForStateCode(stateabbreviation, Context);
+            var response =await _quotationService.TaxTypeForStateCode(stateabbreviation, Context);
             return Ok(response);
         }
 
@@ -172,9 +172,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpPost]
-        public IActionResult PolicyStatusUpdate(PolicyStatusDTO policyStatus)
+        public async Task<IActionResult> PolicyStatusUpdate(PolicyStatusDTO policyStatus)
         {
-            var response = _quotationService.PolicyStatusUpdate(policyStatus, Context);
+            var response =await _quotationService.PolicyStatusUpdate(policyStatus, Context);
             return ServiceResponse(response);
         }
 
