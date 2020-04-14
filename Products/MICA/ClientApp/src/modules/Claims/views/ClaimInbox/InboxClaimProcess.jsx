@@ -406,7 +406,6 @@ class InboxClaimProcess extends React.Component {
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
         this.handleAmountValidation();
-        debugger;
         if (this.state.approveamtvalidation === true) {
             if (this.state.validateUI === true) {
                 if (this.state.ValidationUI === true) {
@@ -499,12 +498,12 @@ class InboxClaimProcess extends React.Component {
                     if (this.state.fields.claimStatusId == "") {
                         this.setState({ errormessage: true });
                         this.setState({ claimstatusflag: true });
-                        swal("", "Please select Claim status.", "error");
+                        swal("", "Please select Claim status", "error");
                     }
                     else if (this.state.fields.claimManagerRemarks == "") {
                         this.setState({ errormessage: true });
                         this.setState({ claimsremarksflag: true });
-                        swal("", "Please enter Claim manager remarks.", "error");
+                        swal("", "Please enter Claim manager remarks", "error");
                     }
                     else {
 
@@ -512,10 +511,10 @@ class InboxClaimProcess extends React.Component {
                 }
 
             } else {
-                swal("", "Amount paid to payee type's should not be greater than total approved amount.", "error");
+                swal("", "Amount paid to payee type's should not be greater than total approved amount", "error");
             }
         } else {
-            swal("", "Approved amount cannot be greater than balance sum insured.", "error");
+            swal("", "Approved amount cannot be greater than balance sum insured", "error");
         }
 
     };
@@ -532,7 +531,7 @@ class InboxClaimProcess extends React.Component {
         }
     }
     handleAmountValidation = () => {
-        debugger;
+      
         let amt = 0;
 
         const workshopvalue = Number(this.state.BankDataModelDTO["Workshop"]["Amount Paid"]) || 0;
