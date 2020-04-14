@@ -297,6 +297,7 @@ export const ComponentsList = {
     RefundUpload: RefundUpload,
     Upload: Upload,
     ApplicationCancel: ApplicationCancel,
+
 }
 
 export default ComponentsList

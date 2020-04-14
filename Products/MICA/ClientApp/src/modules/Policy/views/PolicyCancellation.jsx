@@ -968,7 +968,6 @@ class PolicyCancellation extends React.Component {
                     </Animated> : null}
             </div>
 
-
         );
     }
 }

@@ -379,7 +379,6 @@ class ApplicationCancel extends React.Component {
         this.setState({ proposalCancelRequest, RemarkState:false});
     }
 
-   
 
     render() {
         const { classes } = this.props;

@@ -766,7 +766,6 @@ export const TRANSLATIONS = {
 
         //ClaimEnquiry
         IntimationDate: 'Intimation Date'
-       
 
     },
     hi_IN: TRANSLATIONS_HN,
