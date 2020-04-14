@@ -22,9 +22,11 @@ using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Models;
 using iNube.Services.UserManagement.Validations;
 using iNube.Utility.Framework.Extensions;
+using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,7 +84,19 @@ namespace iNube.Services.UserManagement
             services.AddHealthChecks().AddSqlServer(connectionstring);
             services.AddAutoMapper(typeof(Startup));
 
-
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                //options.HttpsPort = 5001;
+            });
+          //  services.
+          
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -102,6 +116,11 @@ namespace iNube.Services.UserManagement
             }
             app.UseAuthentication();
             app.UseHttpsRedirection();
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+              .AddFrameOptionsSameOrigin()
+              .AddXssProtectionEnabled()
+              .AddContentTypeOptionsNoSniff()
+            );
             app.UseMvc();
         }
 
