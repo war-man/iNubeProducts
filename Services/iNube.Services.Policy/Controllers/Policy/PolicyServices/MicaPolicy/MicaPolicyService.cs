@@ -3831,17 +3831,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             riskIndex++;
                         }
                         var Adddata = fields;
-                        if (oldInsItem["RiskItems"].Count > riskIndex)
+                        if (fields["IsPrimaryDriver"]!=null && fields["IsPrimaryDriver"].ToString().ToLower() == "yes")
                         {
-                            var jsoninsurableFields = oldInsItem["RiskItems"][riskIndex];//identification numbefr
-                            var InputidentificationNumber = (string)fields["Identification Number"];
-                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-
-                            if (InputidentificationNumber == TblIdentificationNo)
+                            //primary driver can not be update
+                        }
+                        else { 
+                            if (oldInsItem["RiskItems"].Count > riskIndex)
                             {
-                                var removeitem = jsoninsurableFields;
-                                oldInsItem.RiskItems.Remove(removeitem);
-                                oldInsItem.RiskItems.Add(Adddata);
+                                var jsoninsurableFields = oldInsItem["RiskItems"][riskIndex];//identification numbefr
+                                var InputidentificationNumber = (string)fields["Identification Number"];
+                                var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+
+                                if (InputidentificationNumber == TblIdentificationNo)
+                                {
+                                    var removeitem = jsoninsurableFields;
+                                    oldInsItem.RiskItems.Remove(removeitem);
+                                    oldInsItem.RiskItems.Add(Adddata);
+                                }
+                                else
+                                {
+                                    if (oldInsItem.RiskItems.Count < riskCount)
+                                    {
+                                        oldInsItem.RiskItems.Add(Adddata);
+                                    }
+                                    else
+                                    {
+                                        // Error needs to throw
+                                    }
+                                }
                             }
                             else
                             {
@@ -3851,22 +3868,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 }
                                 else
                                 {
-                                    // Error needs to throw
+                                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "RiskItems data is mismatch", ErrorCode = "RiskCount" };
+                                    Errors.Add(errorInfo);
                                 }
                             }
                         }
-                        else
-                        {
-                            if (oldInsItem.RiskItems.Count < riskCount)
-                            {
-                                oldInsItem.RiskItems.Add(Adddata);
-                            }
-                            else
-                            {
-                                ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "RiskItems data is mismatch", ErrorCode = "RiskCount" };
-                                Errors.Add(errorInfo);
-                            }
-                        }
+                       
                     }
                     catch (Exception ex)
                     {
@@ -4804,7 +4811,20 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
 
 
+        private bool ValidationUpdateProposal(dynamic modifydata, List<ErrorInfo> Errors , ApiContext apiContext)
+        {
 
+          
+
+            foreach (var item in modifydata.InsurableItem) {
+                if (item.InsurableName == "Vehicle") {
+                    if (item.RiskItems.Count > 0) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
         public async Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext)
         {
@@ -4823,68 +4843,45 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                 if (tbl_particiant.IsActive == true)
                 {
-
-
                     var policyId = tbl_particiant.PolicyId;
                     var type = "Update Proposal";
                     var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
-                    var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
-                    if (tblPolicy1 == null && Errors.Count > 0)
+
+                    if (!string.IsNullOrEmpty(tbl_particiant.PolicyNo))
                     {
-                        return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                           bool ValidData = ValidationUpdateProposal(modifydata, Errors, apiContext);
+                        if (ValidData == false)
+                        {
+
+                            ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PO003", PropertyName = "ProposalNumber", ErrorMessage = $"Vehicle cannot be update when policy is already issued" };
+                            Errors.Add(errorInfo);
+                            return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, Errors = Errors };
+                        }
+                        else {
+                            var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
+                        if (tblPolicy1 == null && Errors.Count > 0)
+                        {
+                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                        }
+                        }
                     }
-                    //var insurableItem = tblPolicyDetailsdata.PolicyRequest;
-                    //dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
-                    //dynamic json1 = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+                    else
+                    {
 
 
-                    //foreach (var insurableName in json.InsurableItem)
-                    //{
-                    //    foreach (var insurableName1 in json1.InsurableItem)
-                    //    {
-                    //        foreach (var item in modifydata.InsurableItem)
-                    //        {
+                       
+                        var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
+                        if (tblPolicy1 == null && Errors.Count > 0)
+                        {
+                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                        }
+                    }
 
-                    //            if (item.InsurableName == insurableName1.InsurableName)
-                    //            {
-                    //                foreach (var fields in item.RiskItems)
-                    //                {
-                    //                    try
-                    //                    {
-                    //                        foreach (var jsoninsurableFields in insurableName.RiskItems)
-                    //                        {
-                    //                            var InputidentificationNumber = (string)fields["Identification Number"];
-                    //                            var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
-                    //                            if (InputidentificationNumber == TblIdentificationNo)
-                    //                            {
-                    //                                var Adddata = fields;
-                    //                                var removeitem = jsoninsurableFields;
-                    //                                insurableName.RiskItems.Remove(removeitem);
-                    //                                insurableName.RiskItems.Add(Adddata);
-
-                    //                            }
-                    //                        }
-                    //                    }
-                    //                    catch (Exception e)
-                    //                    {
-
-                    //                        insurableName1.RiskItems = insurableName.RiskItems;
-                    //                    }
-                    //                }
-                    //            }
-
-                    //        }
-
-                    //    }
-                    //}
-                    //tblPolicyDetailsdata.PolicyRequest = json1.ToString();
-                    //_context.TblPolicyDetails.Update(tblPolicyDetailsdata);
-                    //_context.SaveChanges();
                 }
                 else
                     {
 
-                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProposalNumber", PropertyName = "ProposalNumber", ErrorMessage = $"Proposal Number {proposalNo} is already cancelled" };
+                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PO002", PropertyName = "ProposalNumber", ErrorMessage = $"Proposal Number {proposalNo} is already cancelled" };
                         Errors.Add(errorInfo);
                         return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
                     }
@@ -4892,7 +4889,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 else
                 {
 
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProposalNumber", PropertyName = "ProposalNumber", ErrorMessage = $"No Records found for this Proposal Number {proposalNo}" };
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PO001", PropertyName = "ProposalNumber", ErrorMessage = $"No Records found for this Proposal Number {proposalNo}" };
                     Errors.Add(errorInfo);
                     return new ProposalResponse { Status = BusinessStatus.NotFound, Errors = Errors };
 
