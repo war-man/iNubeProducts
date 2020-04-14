@@ -6898,7 +6898,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 }
             }
-
             else 
             {
                 return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is already issued for this Proposal Number {tbl_particiant.ProposalNo},Proposal cannot be cancelled" };
