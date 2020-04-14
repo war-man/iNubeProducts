@@ -40,7 +40,7 @@ namespace iNube.Services.UserManagement.Entities.AVO
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=AVOLifeP2;User ID=AVOLifeUserP2;Password=AVOLife*User123;");
+                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
             }
         }
 
@@ -52,9 +52,9 @@ namespace iNube.Services.UserManagement.Entities.AVO
             {
                 entity.ToTable("AspNetRoleClaims", "UM");
 
-                entity.Property(e => e.RoleId)
-                    .IsRequired()
-                    .HasMaxLength(450);
+                entity.HasIndex(e => e.RoleId);
+
+                entity.Property(e => e.RoleId).IsRequired();
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.AspNetRoleClaims)
@@ -65,20 +65,31 @@ namespace iNube.Services.UserManagement.Entities.AVO
             {
                 entity.ToTable("AspNetRoles", "UM");
 
+                entity.HasIndex(e => e.NormalizedName)
+                    .HasName("RoleNameIndex")
+                    .IsUnique()
+                    .HasFilter("([NormalizedName] IS NOT NULL)");
+
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Name).HasMaxLength(256);
 
                 entity.Property(e => e.NormalizedName).HasMaxLength(256);
+
+                entity.Property(e => e.OrganizationId)
+                    .HasColumnName("OrganizationID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.PartnerId).HasColumnType("numeric(18, 0)");
             });
 
             modelBuilder.Entity<AspNetUserClaims>(entity =>
             {
                 entity.ToTable("AspNetUserClaims", "UM");
 
-                entity.Property(e => e.UserId)
-                    .IsRequired()
-                    .HasMaxLength(450);
+                entity.HasIndex(e => e.UserId);
+
+                entity.Property(e => e.UserId).IsRequired();
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AspNetUserClaims)
@@ -91,13 +102,13 @@ namespace iNube.Services.UserManagement.Entities.AVO
 
                 entity.ToTable("AspNetUserLogins", "UM");
 
+                entity.HasIndex(e => e.UserId);
+
                 entity.Property(e => e.LoginProvider).HasMaxLength(128);
 
                 entity.Property(e => e.ProviderKey).HasMaxLength(128);
 
-                entity.Property(e => e.UserId)
-                    .IsRequired()
-                    .HasMaxLength(450);
+                entity.Property(e => e.UserId).IsRequired();
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AspNetUserLogins)
@@ -109,6 +120,8 @@ namespace iNube.Services.UserManagement.Entities.AVO
                 entity.HasKey(e => new { e.UserId, e.RoleId });
 
                 entity.ToTable("AspNetUserRoles", "UM");
+
+                entity.HasIndex(e => e.RoleId);
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.AspNetUserRoles)
@@ -138,9 +151,19 @@ namespace iNube.Services.UserManagement.Entities.AVO
             {
                 entity.ToTable("AspNetUsers", "UM");
 
+                entity.HasIndex(e => e.NormalizedEmail)
+                    .HasName("EmailIndex");
+
+                entity.HasIndex(e => e.NormalizedUserName)
+                    .HasName("UserNameIndex")
+                    .IsUnique()
+                    .HasFilter("([NormalizedUserName] IS NOT NULL)");
+
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Email).HasMaxLength(256);
+
+                entity.Property(e => e.LastPasswordChanged).HasColumnType("datetime");
 
                 entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
 
@@ -690,6 +713,10 @@ namespace iNube.Services.UserManagement.Entities.AVO
                 entity.Property(e => e.MiddleName)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedBy).HasMaxLength(450);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")

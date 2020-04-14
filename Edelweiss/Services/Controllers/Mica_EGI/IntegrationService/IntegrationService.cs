@@ -48,6 +48,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         //Billing Details - Partner New CR
         Task<CDAccountDTO> GetAccountDetails(CDAccountRequest accountRequest, ApiContext apiContext);
+      
+        //NEW Internal Proposal Method for Account Number
+        Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext);
 
     }
     public class IntegrationService : IIntegrationService
@@ -159,6 +162,11 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         public async Task<dynamic> InternalGetPolicyDetailsByNumber(string PolicyNo, ApiContext apiContext)
         {
             var uri = PolicyUrl + "/api/Policy/InternalGetPolicyDetailsByNumber?policyNumber=" + PolicyNo;
+            return await GetApiInvoke<dynamic>(uri, apiContext);
+        }
+         public async Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/InternalGetProposalDetailsByNumber?proposalNumber=" + proposalNumber;
             return await GetApiInvoke<dynamic>(uri, apiContext);
         }
 

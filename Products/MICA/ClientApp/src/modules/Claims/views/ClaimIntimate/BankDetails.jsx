@@ -48,20 +48,22 @@ const BankDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                             //success={props.accHolderNameState === "success"}
-                            //error={props.accountHolderNameState}
+                            error={props.accountHolderNameState}
                             labelText="AccountHolderName"
                             value={props.bankDetails.accountHolderName}
                             name="accountHolderName"
                             onChange={(e) => props.handleChangebank("accountHolderName",e)}
 
-                        formControlProps={{ fullWidth: true }} />
+                            formControlProps={{ fullWidth: true }} />
+
+                        {props.erroraccName && (props.accountHolderNameState === true) ? <p className="error"> Account holder name must contains only alphabets</p> : null}
                        
                     </GridItem>
 
                     <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                        // success={props.accNumberState === "success"}
-                        //error={props.accountNumberState}
+                          //  error={props.accountNumberState}
                             labelText="AccountNo"
                             inputType="number"
                             value={props.bankDetails.accountNumber}
@@ -89,14 +91,15 @@ const BankDetails = (props) => {
                     <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                         //success={props.bankNameState === "success"}
-                       // error={props.bankNameState }
+                            error={props.bankNameState}
                             labelText="BankName"
                             value={props.bankDetails.bankName}
                             name="bankName"
                             onChange={(e) => props.handleChangebank("bankName",e)}
 
                         formControlProps={{ fullWidth: true }} />
-                       
+                        {props.errorbankName && (props.bankNameState === true) ? <p className="error"> Bank name must contains only alphabets</p> : null}
+
                     </GridItem>
 
                     <GridItem xs={12} sm={12} md={3}>

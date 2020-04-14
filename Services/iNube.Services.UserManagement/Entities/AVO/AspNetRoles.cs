@@ -17,6 +17,8 @@ namespace iNube.Services.UserManagement.Entities.AVO
         public string Name { get; set; }
         public string NormalizedName { get; set; }
         public string ConcurrencyStamp { get; set; }
+        public decimal? PartnerId { get; set; }
+        public decimal? OrganizationId { get; set; }
 
         public virtual ICollection<AspNetRoleClaims> AspNetRoleClaims { get; set; }
         public virtual ICollection<AspNetUserRoles> AspNetUserRoles { get; set; }

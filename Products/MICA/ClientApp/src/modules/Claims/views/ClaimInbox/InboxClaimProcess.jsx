@@ -857,8 +857,9 @@ class InboxClaimProcess extends React.Component {
         //var today = event.toDate();
         //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         var today = event.toDate();
-        var date = today.toISOString();
-
+       // var date = today.toISOString();
+        var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+            
         const ClaimDataDTO = this.state.ClaimDTO;
         ClaimDataDTO[name] = date;
         this.setState({ ClaimDataDTO });
@@ -1102,22 +1103,35 @@ class InboxClaimProcess extends React.Component {
                 //    this.setState({ vehicleclaim: true });
                 //}
 
-                if (data[0][4][1].length != 0) {
+                if (data[0][4][1] != null && data[0][4][1].length > 0) {
                     this.state.claimDetailsData.vehicleLocation = data[0][4][1];
                     this.setState({ vehicleclaim: true });
                 }
-                if (data[0][5][1].length != 0) {
+                else {
+                    this.setState({ vehicleclaim: false });
+                }
+                if (data[0][5][1] != null && data[0][5][1].length > 0) {
                     this.state.claimDetailsData.vehicleLocationState = data[0][5][1];
                     this.setState({ vehicleclaimstate: true });
                 }
-                if (data[0][6][1].length != 0) {
+                else {
+                    this.setState({ vehicleclaimstate: false });
+                }
+                if (data[0][6][1] != null && data[0][6][1].length > 0) {
                     this.state.claimDetailsData.driverName = data[0][6][1];
                     this.setState({ vehicleclaimdriver: true });
                 }
-                if (data[0][7][1].length != 0) {
+                else {
+                    this.setState({ vehicleclaimdriver: false });
+                }
+                if (data[0][7][1] != null && data[0][7][1].length > 0) {
                     this.state.claimDetailsData.selfSurvey = data[0][7][1];
                     this.setState({ vehicleclaimsurvey: true });
                 }
+                else {
+                    this.setState({ vehicleclaimsurvey: false });
+                }
+
 
 
             });

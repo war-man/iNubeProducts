@@ -24,33 +24,29 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 {
     public class AvoProductService : IProductConfigService, IAvoProductConfigService
     {
-        private  AVOPRContext _context;
+        private AVOPRContext _context;
         private IMapper _mapper;
         private readonly IServiceProvider _serviceProvider;
         private ILoggerManager _logger;
         private readonly IEmailService _emailService;
-       // public IProductConfigurationIntegrationService _integrationService;
+        // public IProductConfigurationIntegrationService _integrationService;
         private readonly IConfiguration _configuration;
 
         public AvoProductService(AVOPRContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IConfiguration configuration)
         {
-
             _mapper = mapper;
             _serviceProvider = serviceProvider;
             _logger = logger;
             _emailService = emailService;
-           // _integrationService = integrationService;
+            // _integrationService = integrationService;
             _configuration = configuration;
 
         }
 
         public async Task<List<ddDTOs>> GetProductMasterAvo(string masterType, int parentID, ApiContext apiContext)
         {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            apiContext.ProductType = "Avo";
-            apiContext.ServerType = "AvoDev";
-               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
-            
             var ProductData = _context.TblProducts.Where(x => x.IsActive == true)
                                                   .Select(x => new ddDTOs
                                                   {
@@ -61,10 +57,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                                   }).ToList();
 
 
-            if(masterType == "Plan")
+            if (masterType == "Plan")
             {
-                var PlanData = _context.TblProductPlan.Where(x=>x.ProductId == parentID)
-                                                      .Select(x=>new ddDTOs
+                var PlanData = _context.TblProductPlan.Where(x => x.ProductId == parentID)
+                                                      .Select(x => new ddDTOs
                                                       {
                                                           mID = x.PlanId,
                                                           mValue = x.PlanDescriprion,
@@ -73,11 +69,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                                       }).ToList();
                 return PlanData;
             }
-         
-            if(masterType == "Policy Term")
+
+            if (masterType == "Policy Term")
             {
                 var PolicyData = _context.TblProductPolicyTerm.Where(x => x.PlanId == parentID)
-                                                               .Select(x=>new ddDTOs
+                                                               .Select(x => new ddDTOs
                                                                {
                                                                    mID = x.PolicyTermId,
                                                                    mValue = x.Term.ToString(),
@@ -85,18 +81,18 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 return PolicyData;
             }
 
-            if(masterType == "Preffered Mode")
+            if (masterType == "Preffered Mode")
             {
                 var PrefferedData = _context.TblMasCommonTypes.Where(x => x.IsDeleted == 0 && x.MasterType == "PaymentFrequency")
-                                                               .Select(x=>new ddDTOs
+                                                               .Select(x => new ddDTOs
                                                                {
-                                                                   mID = x.CommonTypesId ,
+                                                                   mID = x.CommonTypesId,
                                                                    mValue = x.Description
                                                                }).ToList();
 
                 return PrefferedData;
             }
-         
+
 
             return ProductData;
         }
@@ -184,7 +180,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public string MapQuotePremiumObject( MapQuoteDTO objLifeQuote, bool forRiders = false)
+        public string MapQuotePremiumObject(MapQuoteDTO objLifeQuote, bool forRiders = false)
         {
             ProposalDetails proposalDetails = new ProposalDetails();
             proposalDetails.Product = new Product();
@@ -193,9 +189,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //    proposalDetails.Product.BasicSumAssured = "";
             //if (objLifeQuote.objProductDetials.Plan == "1")
             //{
-                proposalDetails.Product.TotalLifeBenefit = proposalDetails.Product.BasicSumAssured;
-                //proposalDetails.Product.BasicSumAssured = "200000";
-                proposalDetails.Product.BasicSumAssured = proposalDetails.Product.BasicSumAssured;
+            proposalDetails.Product.TotalLifeBenefit = proposalDetails.Product.BasicSumAssured;
+            //proposalDetails.Product.BasicSumAssured = "200000";
+            proposalDetails.Product.BasicSumAssured = proposalDetails.Product.BasicSumAssured;
             //}
             proposalDetails.Product.ProductId = objLifeQuote.objProductDetials.Plan;
             proposalDetails.Product.PlanId = objLifeQuote.objProductDetials.Variant;
@@ -257,7 +253,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     }
 
                     member.OccupationId = "268";
-                  //  var QuoteData = _integrationService.GetMasLifeOccupations(EngOccupation);
+                    //  var QuoteData = _integrationService.GetMasLifeOccupations(EngOccupation);
 
                     // member.OccupationId = entity.tblMasLifeOccupations.Where(a => a.OccupationCode == EngOccupation).Select(a => a.ID).FirstOrDefault().ToString();
 
@@ -319,12 +315,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<MapQuoteDTO> CalculateQuotePremium(MapQuoteDTO objLifeQuote, ApiContext apiContext, bool AnnualMode = false)
         {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            apiContext.ProductType = "Avo";
-            apiContext.ServerType = "AvoDev";
-               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
-            
             //using (AVOAIALifeEntities entity = new AVOAIALifeEntities())
             //{
 
@@ -343,104 +336,104 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             var connectionString = _configuration.GetConnectionString("PRConnection");
 
             System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
-                con.Open();
-                System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand();
-                cmd.Connection = con;
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "[PR].[usp_GetPremiumForAllProducts]";
-                cmd.Parameters.Add("@s", SqlDbType.VarChar);
-                cmd.Parameters.Add("@withDecimal", SqlDbType.Bit);
-                cmd.Parameters[0].Value = xmlStr;
-                cmd.Parameters[1].Value = 0;
-                DataSet ds = new DataSet();
-          //  DataTable dtTest = new DataTable();
-                System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cmd);
-                da.Fill(ds);
-           // ds.Tables.Add(dtTest);
-                List<BenifitDetailsDTO> lstPremium = new List<BenifitDetailsDTO>();
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                {
-                    BenifitDetailsDTO benifit = new BenifitDetailsDTO();
-                    benifit.BenefitID = Convert.ToInt32(ds.Tables[0].Rows[i]["ProductRiderId"]);
-                    benifit.BenifitName = Convert.ToString(ds.Tables[0].Rows[i]["RiderName"]);
-                    benifit.RiderSuminsured = Convert.ToString(ds.Tables[0].Rows[i]["SumAssured"]);
-                    benifit.RiderPremium = Convert.ToString(ds.Tables[0].Rows[i]["RiderPremium"] == DBNull.Value ? "0" : ds.Tables[0].Rows[i].ItemArray[3]);
-                    benifit.AssuredMember = Convert.ToString(ds.Tables[0].Rows[i]["RelationID"]);
-                    benifit.TotalPremium = Convert.ToString(ds.Tables[0].Rows[i]["PayablePremium"]);
-                    benifit.MemberID = Convert.ToString(ds.Tables[0].Rows[i]["MemberId"]);
-                    benifit.LoadingAmount = Convert.ToString(ds.Tables[0].Rows[i]["LoadingAmount"]);
-                    benifit.DiscountAmount = Convert.ToString(ds.Tables[0].Rows[i]["DiscountAmount"]);
-                    benifit.AnnualRiderPremium = Convert.ToString(ds.Tables[0].Rows[i]["AnnualRiderPremium"]);
-                    benifit.LoadingPercentage = Convert.ToString(ds.Tables[0].Rows[i]["LoadingPer"]);
-                    benifit.LoadinPerMille = Convert.ToString(ds.Tables[0].Rows[i]["LoadingPerMille"]);
-                    lstPremium.Add(benifit);
-                }
-                if (AnnualMode == false)
-                {
-                    objLifeQuote.AnnualPremium = lstPremium.Select(a => a.TotalPremium).FirstOrDefault();
-                }
+            con.Open();
+            System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand();
+            cmd.Connection = con;
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "[PR].[usp_GetPremiumForAllProducts]";
+            cmd.Parameters.Add("@s", SqlDbType.VarChar);
+            cmd.Parameters.Add("@withDecimal", SqlDbType.Bit);
+            cmd.Parameters[0].Value = xmlStr;
+            cmd.Parameters[1].Value = 0;
+            DataSet ds = new DataSet();
+            //  DataTable dtTest = new DataTable();
+            System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cmd);
+            da.Fill(ds);
+            // ds.Tables.Add(dtTest);
+            List<BenifitDetailsDTO> lstPremium = new List<BenifitDetailsDTO>();
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                BenifitDetailsDTO benifit = new BenifitDetailsDTO();
+                benifit.BenefitID = Convert.ToInt32(ds.Tables[0].Rows[i]["ProductRiderId"]);
+                benifit.BenifitName = Convert.ToString(ds.Tables[0].Rows[i]["RiderName"]);
+                benifit.RiderSuminsured = Convert.ToString(ds.Tables[0].Rows[i]["SumAssured"]);
+                benifit.RiderPremium = Convert.ToString(ds.Tables[0].Rows[i]["RiderPremium"] == DBNull.Value ? "0" : ds.Tables[0].Rows[i].ItemArray[3]);
+                benifit.AssuredMember = Convert.ToString(ds.Tables[0].Rows[i]["RelationID"]);
+                benifit.TotalPremium = Convert.ToString(ds.Tables[0].Rows[i]["PayablePremium"]);
+                benifit.MemberID = Convert.ToString(ds.Tables[0].Rows[i]["MemberId"]);
+                benifit.LoadingAmount = Convert.ToString(ds.Tables[0].Rows[i]["LoadingAmount"]);
+                benifit.DiscountAmount = Convert.ToString(ds.Tables[0].Rows[i]["DiscountAmount"]);
+                benifit.AnnualRiderPremium = Convert.ToString(ds.Tables[0].Rows[i]["AnnualRiderPremium"]);
+                benifit.LoadingPercentage = Convert.ToString(ds.Tables[0].Rows[i]["LoadingPer"]);
+                benifit.LoadinPerMille = Convert.ToString(ds.Tables[0].Rows[i]["LoadingPerMille"]);
+                lstPremium.Add(benifit);
+            }
+            if (AnnualMode == false)
+            {
+                objLifeQuote.AnnualPremium = lstPremium.Select(a => a.TotalPremium).FirstOrDefault();
+            }
 
 
-                for (int i = 0; i < objLifeQuote.objQuoteMemberDetails.Count; i++)
+            for (int i = 0; i < objLifeQuote.objQuoteMemberDetails.Count; i++)
+            {
+                var Id = objLifeQuote.objQuoteMemberDetails[i].TabIndex;
+                for (int j = 0; j < objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails.Count; j++)
                 {
-                    var Id = objLifeQuote.objQuoteMemberDetails[i].TabIndex;
-                    for (int j = 0; j < objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails.Count; j++)
+                    var riderId = objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].BenefitID;
+
+                    var prem = lstPremium.Where(a => a.BenefitID == riderId && a.MemberID == Id).FirstOrDefault();
+                    if (prem != null)
                     {
-                        var riderId = objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].BenefitID;
-
-                        var prem = lstPremium.Where(a => a.BenefitID == riderId && a.MemberID == Id).FirstOrDefault();
-                        if (prem != null)
+                        if (AnnualMode == true)
                         {
-                            if (AnnualMode == true)
-                            {
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeLoadingAmount = prem.LoadingAmount;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeDiscountAmount = prem.DiscountAmount;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeAnnualpremium = prem.AnnualRiderPremium;
-                            }
-                            else
-                            {
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AssuredMember = prem.AssuredMember;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].ActualRiderPremium = (Convert.ToInt64(prem.RiderPremium) - Convert.ToInt64(prem.LoadingAmount)).ToString();
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderSuminsured = prem.RiderSuminsured;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingAmount = prem.LoadingAmount;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderPremium = prem.RiderPremium;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].DiscountAmount = prem.DiscountAmount;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualRiderPremium = prem.AnnualRiderPremium;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingPercentage = prem.LoadingPercentage;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadinPerMille = prem.LoadinPerMille;
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].TotalPremium = prem.TotalPremium;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeLoadingAmount = prem.LoadingAmount;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeDiscountAmount = prem.DiscountAmount;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeAnnualpremium = prem.AnnualRiderPremium;
+                        }
+                        else
+                        {
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AssuredMember = prem.AssuredMember;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].ActualRiderPremium = (Convert.ToInt64(prem.RiderPremium) - Convert.ToInt64(prem.LoadingAmount)).ToString();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderSuminsured = prem.RiderSuminsured;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingAmount = prem.LoadingAmount;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderPremium = prem.RiderPremium;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].DiscountAmount = prem.DiscountAmount;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualRiderPremium = prem.AnnualRiderPremium;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingPercentage = prem.LoadingPercentage;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadinPerMille = prem.LoadinPerMille;
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].TotalPremium = prem.TotalPremium;
 
                         }
 
                     }
+                    else
+                    {
+                        if (AnnualMode == true)
+                        {
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeLoadingAmount = "0";
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeDiscountAmount = "0";
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeAnnualpremium = "0";
+                        }
                         else
                         {
-                            if (AnnualMode == true)
-                            {
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeLoadingAmount = "0";
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeDiscountAmount = "0";
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualModeAnnualpremium = "0";
-                            }
-                            else
-                            {
                             objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].BenifitName = lstPremium.Select(x => x.BenifitName).FirstOrDefault();
-                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderPremium = lstPremium.Select(x=>x.RiderPremium).FirstOrDefault();
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingAmount = lstPremium.Select(x=>x.LoadingAmount).FirstOrDefault();
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].ActualRiderPremium = lstPremium.Select(x => x.AnnualRiderPremium).FirstOrDefault();
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderSuminsured = lstPremium.Select(x => x.RiderSuminsured).FirstOrDefault();
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].DiscountAmount = lstPremium.Select(x => x.DiscountAmount).FirstOrDefault();
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualRiderPremium = lstPremium.Select(x => x.AnnualRiderPremium).FirstOrDefault();
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingPercentage = lstPremium.Select(x => x.LoadingPercentage).FirstOrDefault();
-                                objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadinPerMille = lstPremium.Select(x => x.LoadinPerMille).FirstOrDefault();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderPremium = lstPremium.Select(x => x.RiderPremium).FirstOrDefault();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingAmount = lstPremium.Select(x => x.LoadingAmount).FirstOrDefault();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].ActualRiderPremium = lstPremium.Select(x => x.AnnualRiderPremium).FirstOrDefault();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderSuminsured = lstPremium.Select(x => x.RiderSuminsured).FirstOrDefault();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].DiscountAmount = lstPremium.Select(x => x.DiscountAmount).FirstOrDefault();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualRiderPremium = lstPremium.Select(x => x.AnnualRiderPremium).FirstOrDefault();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingPercentage = lstPremium.Select(x => x.LoadingPercentage).FirstOrDefault();
+                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadinPerMille = lstPremium.Select(x => x.LoadinPerMille).FirstOrDefault();
                             objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].TotalPremium = lstPremium.Select(x => x.TotalPremium).FirstOrDefault();
 
 
 
                         }
                     }
-                        // objLifeQuote.AnnualModePremium.Add(prem);
+                    // objLifeQuote.AnnualModePremium.Add(prem);
 
-                   // }
+                    // }
 
                 }
 
@@ -451,7 +444,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             return objLifeQuote;
         }
-        
+
         public async Task<MapQuoteDTO> GetIllustration(MapQuoteDTO objLifeQuote)
         {
             string xmlStr = MapQuotePremiumObject(objLifeQuote);
@@ -522,9 +515,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<List<MasterListItemDTO>> ListProducts(ApiContext apiContext)
         {
-            apiContext.ProductType = "Avo";
-            apiContext.ServerType = "AvoDev";
-               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             List<MasterListItemDTO> lstProducts = new List<MasterListItemDTO>();
             lstProducts = (from Product in _context.TblProducts.Where(a => a.IsActive == true)
@@ -538,13 +529,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return lstProducts;
 
         }
-        
-        public async Task<ProductMastersDTO> LoadProductMasters(ProductMastersDTO obj,ApiContext apiContext)
-        {
 
-            apiContext.ProductType = "Avo";
-            apiContext.ServerType = "AvoDev";
-               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+        public async Task<ProductMastersDTO> LoadProductMasters(ProductMastersDTO obj, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             Entities.AvoEntities.TblProducts Product = new Entities.AvoEntities.TblProducts();
 
@@ -622,92 +610,89 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //using (AVOAIALifeEntities entity = new AVOAIALifeEntities())
             //{
 
-                string xmlStr = MapQuotePremiumObject(objLifeQuote, true);
-               
-               // string xmlStr = MapQuotePremiumObject(entity, objLifeQuote, true);
-                //#region  Log Input 
-                //tbllogxml objlogxml = new tbllogxml();
-                //objlogxml.Description = "premium xml";
-                //objlogxml.PolicyID = Convert.ToString(objLifeQuote.objProspect.ContactID);
-                //objlogxml.UserID = objLifeQuote.UserName;
-                //objlogxml.XMlData = xmlStr;
-                //objlogxml.CreatedDate = DateTime.Now;
-                //entity.tbllogxmls.Add(objlogxml);
-                //entity.SaveChanges();
-                //#endregion
-                var connectionString = _configuration.GetConnectionString("PRConnection");
+            string xmlStr = MapQuotePremiumObject(objLifeQuote, true);
 
-                System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
-                con.Open();
-                System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand();
-                cmd.Connection = con;
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "[PR].[usp_GetPremiumForAllProducts]";
-                cmd.Parameters.Add("@s", SqlDbType.VarChar);
-                cmd.Parameters.Add("@withDecimal", SqlDbType.Bit);
-                cmd.Parameters[0].Value = xmlStr;
-                cmd.Parameters[1].Value = 0;
-                DataSet ds = new DataSet();
-                System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cmd);
-                da.Fill(ds);
+            // string xmlStr = MapQuotePremiumObject(entity, objLifeQuote, true);
+            //#region  Log Input 
+            //tbllogxml objlogxml = new tbllogxml();
+            //objlogxml.Description = "premium xml";
+            //objlogxml.PolicyID = Convert.ToString(objLifeQuote.objProspect.ContactID);
+            //objlogxml.UserID = objLifeQuote.UserName;
+            //objlogxml.XMlData = xmlStr;
+            //objlogxml.CreatedDate = DateTime.Now;
+            //entity.tbllogxmls.Add(objlogxml);
+            //entity.SaveChanges();
+            //#endregion
+            var connectionString = _configuration.GetConnectionString("PRConnection");
 
-                List<BenifitDetailsDTO> lstPremium = new List<BenifitDetailsDTO>();
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            System.Data.SqlClient.SqlConnection con = new System.Data.SqlClient.SqlConnection(connectionString);
+            con.Open();
+            System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand();
+            cmd.Connection = con;
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "[PR].[usp_GetPremiumForAllProducts]";
+            cmd.Parameters.Add("@s", SqlDbType.VarChar);
+            cmd.Parameters.Add("@withDecimal", SqlDbType.Bit);
+            cmd.Parameters[0].Value = xmlStr;
+            cmd.Parameters[1].Value = 0;
+            DataSet ds = new DataSet();
+            System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cmd);
+            da.Fill(ds);
+
+            List<BenifitDetailsDTO> lstPremium = new List<BenifitDetailsDTO>();
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                BenifitDetailsDTO benifit = new BenifitDetailsDTO();
+                benifit.BenefitID = Convert.ToInt32(ds.Tables[0].Rows[i]["ProductRiderId"]);
+                benifit.BenifitName = Convert.ToString(ds.Tables[0].Rows[i]["RiderName"]);
+                benifit.RiderSuminsured = Convert.ToString(ds.Tables[0].Rows[i]["SumAssured"]);
+                benifit.RiderPremium = Convert.ToString(ds.Tables[0].Rows[i]["RiderPremium"] == DBNull.Value ? "0" : ds.Tables[0].Rows[i].ItemArray[3]);
+                benifit.AssuredMember = Convert.ToString(ds.Tables[0].Rows[i]["RelationID"]);
+                benifit.MemberID = Convert.ToString(ds.Tables[0].Rows[i]["MemberId"]);
+                benifit.LoadingAmount = Convert.ToString(ds.Tables[0].Rows[i]["LoadingAmount"]);
+                benifit.DiscountAmount = Convert.ToString(ds.Tables[0].Rows[i]["DiscountAmount"]);
+                benifit.AnnualRiderPremium = Convert.ToString(ds.Tables[0].Rows[i]["AnnualRiderPremium"]);
+                lstPremium.Add(benifit);
+            }
+
+
+            for (int i = 0; i < objLifeQuote.objQuoteMemberDetails.Count; i++)
+            {
+                var Id = objLifeQuote.objQuoteMemberDetails[i].TabIndex;
+                for (int j = 0; j < objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails.Count; j++)
                 {
-                    BenifitDetailsDTO benifit = new BenifitDetailsDTO();
-                    benifit.BenefitID = Convert.ToInt32(ds.Tables[0].Rows[i]["ProductRiderId"]);
-                    benifit.BenifitName = Convert.ToString(ds.Tables[0].Rows[i]["RiderName"]);
-                    benifit.RiderSuminsured = Convert.ToString(ds.Tables[0].Rows[i]["SumAssured"]);
-                    benifit.RiderPremium = Convert.ToString(ds.Tables[0].Rows[i]["RiderPremium"] == DBNull.Value ? "0" : ds.Tables[0].Rows[i].ItemArray[3]);
-                    benifit.AssuredMember = Convert.ToString(ds.Tables[0].Rows[i]["RelationID"]);
-                    benifit.MemberID = Convert.ToString(ds.Tables[0].Rows[i]["MemberId"]);
-                    benifit.LoadingAmount = Convert.ToString(ds.Tables[0].Rows[i]["LoadingAmount"]);
-                    benifit.DiscountAmount = Convert.ToString(ds.Tables[0].Rows[i]["DiscountAmount"]);
-                    benifit.AnnualRiderPremium = Convert.ToString(ds.Tables[0].Rows[i]["AnnualRiderPremium"]);
-                    lstPremium.Add(benifit);
-                }
-
-
-                for (int i = 0; i < objLifeQuote.objQuoteMemberDetails.Count; i++)
-                {
-                    var Id = objLifeQuote.objQuoteMemberDetails[i].TabIndex;
-                    for (int j = 0; j < objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails.Count; j++)
+                    var riderId = objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].BenefitID;
+                    var prem = lstPremium.Where(a => a.BenefitID == riderId && a.MemberID == Id).FirstOrDefault();
+                    if (prem != null)
                     {
-                        var riderId = objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].BenefitID;
-                        var prem = lstPremium.Where(a => a.BenefitID == riderId && a.MemberID == Id).FirstOrDefault();
-                        if (prem != null)
-                        {
-                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AssuredMember = prem.AssuredMember;
-                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].ActualRiderPremium = (Convert.ToInt64(prem.RiderPremium) - Convert.ToInt64(prem.LoadingAmount)).ToString();
-                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderSuminsured = prem.RiderSuminsured;
-                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingAmount = prem.LoadingAmount;
-                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderPremium = prem.RiderPremium;
-                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].DiscountAmount = prem.DiscountAmount;
-                            objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualRiderPremium = prem.AnnualRiderPremium;
+                        objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AssuredMember = prem.AssuredMember;
+                        objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].ActualRiderPremium = (Convert.ToInt64(prem.RiderPremium) - Convert.ToInt64(prem.LoadingAmount)).ToString();
+                        objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderSuminsured = prem.RiderSuminsured;
+                        objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].LoadingAmount = prem.LoadingAmount;
+                        objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].RiderPremium = prem.RiderPremium;
+                        objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].DiscountAmount = prem.DiscountAmount;
+                        objLifeQuote.objQuoteMemberDetails[i].ObjBenefitDetails[j].AnnualRiderPremium = prem.AnnualRiderPremium;
 
 
-                        }
                     }
-
                 }
 
-        //    }
+            }
+
+            //    }
 
             return objLifeQuote;
         }
-        
-        public async Task<List<object>> GetRiders(int ProductId , int PlanId)
+
+        public async Task<List<object>> GetRiders(int ProductId, int PlanId, ApiContext apiContext)
         {
-            ApiContext apiContext = new ApiContext();
-            apiContext.ProductType = "Avo";
-            apiContext.ServerType = "AvoDev";
-               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
 
             var RiderData = _context.TblProductPlanRiders
-                                    .Where(x=>x.ProductId == ProductId && x.PlanId == PlanId && x.IsActive == true).ToList();
+                                    .Where(x => x.ProductId == ProductId && x.PlanId == PlanId && x.IsActive == true).ToList();
 
-             RiderData.OrderBy(x => x.DisplayOrder);
+            RiderData.OrderBy(x => x.DisplayOrder);
 
             List<Object> objBenefitDetails = new List<object>();
 
@@ -733,14 +718,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             return objBenefitDetails;
         }
-        
-        public async Task<bool> CheckSpouse(int ProductID, int PlanID)
-        {
-            ApiContext apiContext = new ApiContext();
 
-            apiContext.ProductType = "Avo";
-            apiContext.ServerType = "AvoDev";
-               _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
+        public async Task<bool> CheckSpouse(int ProductID, int PlanID, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //RelationID = 2 , Bcz Spouse RelaationID is 2 in DB 
 
@@ -795,7 +776,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type,string FieldType, ApiContext apiContext)
+        public async Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, string FieldType, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -844,7 +825,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             throw new NotImplementedException();
         }
-        
+
         public async Task<IEnumerable<Models.BillingEventDataDTO>> BillingEventData(Models.BillingEventRequest pDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
@@ -885,11 +866,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public Task<DocumentResponse> Docupload(string productcode,string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        public Task<DocumentResponse> Docupload(string productcode, string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
-        public Task<DocumentResponse> PromoDocupload(string productcode, string productId,HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        public Task<DocumentResponse> PromoDocupload(string productcode, string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -931,17 +912,17 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             throw new NotImplementedException();
         }
-        
-        public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext)
+
+        public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
-        
+
         public async Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
-        
+
         public async Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext)
         {
             throw new NotImplementedException();

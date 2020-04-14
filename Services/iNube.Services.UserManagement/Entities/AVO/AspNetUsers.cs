@@ -32,6 +32,8 @@ namespace iNube.Services.UserManagement.Entities.AVO
         public bool LockoutEnabled { get; set; }
         public int AccessFailedCount { get; set; }
         public int? FirstTimeLogin { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime? LastPasswordChanged { get; set; }
 
         public virtual ICollection<AspNetUserClaims> AspNetUserClaims { get; set; }
         public virtual ICollection<AspNetUserLogins> AspNetUserLogins { get; set; }

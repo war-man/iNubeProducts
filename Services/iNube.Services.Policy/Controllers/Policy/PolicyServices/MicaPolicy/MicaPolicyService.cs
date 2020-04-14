@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Spreadsheet;
+//using DocumentFormat.OpenXml.Spreadsheet;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.Policy.Entities;
 using iNube.Services.Policy.Helpers;
@@ -878,8 +878,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true && s.PolicyNo!= null)
+            var _policy = from P in _context.TblPolicy.OrderByDescending(p => p.CreatedDate).Where(s=>s.IsActive==true && (s.PolicyNo!= null||(s.ProposalNo != null && s.PolicyNo == null)))
                           select P;
+
+            if (!string.IsNullOrEmpty(policysearch.Proposalnumber))
+            {
+               
+                _policy = _policy.Where(P => P.ProposalNo.Contains(policysearch.Proposalnumber));
+            }
             if (apiContext.PartnerId > 0 && apiContext.OrgId > 0)
             {
                 _policy = _policy.Where(pr => pr.AgentId == apiContext.PartnerId && pr.CustomerId == apiContext.OrgId.ToString());
@@ -927,6 +933,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 _policy = _policy.Where(P => P.CreatedDate.Date == policysearch.EventDate);
             }
+          
             var _policySearchDTOs = _mapper.Map<IEnumerable<PolicyDTO>>(_policy);
 
             return _policySearchDTOs;
@@ -1581,6 +1588,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var DATA = _context.TblPolicy.SingleOrDefault(x => x.PolicyNo == PolicyNumber);
+
+            Dictionary<object, object> finaldata = new Dictionary<object, object>();
+            List<object> FullfinalData = new List<object>();
+
+            finaldata.Add("Insured Ref No", DATA.CustomerId);
+            finaldata.Add("Insured Name", DATA.CoverNoteNo);
+            finaldata.Add("Insured Mobile No", DATA.MobileNumber);
+            finaldata.Add("Insured Email", DATA.Email);
+            finaldata.Add("Event Date", DATA.CreatedDate);
+            finaldata.Add("Cover Event", DATA.CoverEvent);
+            finaldata.Add("Policy Start Date", DATA.PolicyStartDate);
+            finaldata.Add("Policy End Date", DATA.PolicyEndDate);
+            finaldata.Add("Total Sum Insured", DATA.SumInsured);
+            finaldata.Add("Balance Sum Insured", DATA.BalanceSumInsued);
+            foreach (var item in finaldata)
+            {
+                List<object> data = new List<object>();
+                data.Add(item.Key);
+                data.Add(item.Value);
+                FullfinalData.Add(data);
+            }
+            return FullfinalData;
+        }
+        public async Task<List<object>> SearchProposalDetailsByNumber(string ProposalNumber, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var DATA = _context.TblPolicy.SingleOrDefault(x => x.ProposalNo == ProposalNumber);
 
             Dictionary<object, object> finaldata = new Dictionary<object, object>();
             List<object> FullfinalData = new List<object>();
@@ -5135,7 +5170,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     tbl_particiant.PolicyStatus = ModuleConstants.PolicyCancelStatus;
                                     tbl_particiant.PolicyStatusId = ModuleConstants.PolicyStatusCancelled;
                                     tbl_particiant.PolicyStageId = ModuleConstants.PolicyStagePolicy;
-                                    tbl_particiant.PolicyStageStatusId = ModuleConstants.EndorsementStageCancelled;
+                                    tbl_particiant.PolicyStageStatusId = ModuleConstants.PolicyStageStatusCancelled;
                                     tbl_particiant.PolicyCancelDate = DatetimeNow;
                                     _context.TblPolicy.Update(tbl_particiant);
 
@@ -5168,7 +5203,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         //Success
                                     }
 
-                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow.ToString()} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
+                                    return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Policy Number {tbl_particiant.PolicyNo} is cancelled with effect from {DatetimeNow.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account"};
 
                                 }
                                 else
@@ -5550,6 +5585,27 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tblPolicy = _context.TblPolicy.Where(p => p.PolicyNo == policyNumber).FirstOrDefault();
+            if (tblPolicy != null)
+            {
+                var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == tblPolicy.PolicyId);
+                var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                var json1 = JsonConvert.DeserializeObject<ExpandoObject>(insurableItem);
+                AddProperty(json1, "CDAccountNumber", tblPolicy.CdaccountNumber);
+                var json = JsonConvert.SerializeObject(json1);
+
+                var json2 = JsonConvert.DeserializeObject<object>(json);
+
+                return json2;
+            }
+            return null;
+
+        }
+
+        public async Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var tblPolicy = _context.TblPolicy.Where(p => p.ProposalNo == proposalNumber).FirstOrDefault();
             if (tblPolicy != null)
             {
                 var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == tblPolicy.PolicyId);
@@ -6720,13 +6776,144 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             return colIdx;
         }
+
+
+        public async Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+            var proposalNo = (string)CancellationRequest["ProposalNumber"];
+            var tbl_particiant = _context.TblPolicy.FirstOrDefault(x => x.ProposalNo == proposalNo);
+            var policyId = tbl_particiant.PolicyId;
+            var tblPolicyDetailsdata = _context.TblPolicyDetails.FirstOrDefault(x => x.PolicyId == policyId);
+            if (tbl_particiant.PolicyStageId == ModuleConstants.PolicyStageProposal && tbl_particiant.PolicyStatusId == ModuleConstants.PolicyStatusInActive)
+            {
+                if (tbl_particiant.PolicyStageStatusId == ModuleConstants.PolicyStageProposalCreated && tbl_particiant.IsActive == true)
+                {
+                    if (tblPolicyDetailsdata != null)
+                    {
+
+                        var insurableItem = tblPolicyDetailsdata.PolicyRequest;
+                        dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
+
+
+                        //Call Rulemapper
+
+                        var res = await _integrationService.RuleMapper(json, "Cancel Proposal", apiContext);
+                        var seriaizeListofres = JsonConvert.SerializeObject(res);
+                        List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
+                        var checkerrorlog = Listofres.FirstOrDefault(p => p.ValidatorName == "Final Result" && p.Outcome == "Fail");
+                        if (Listofres != null)
+                        {
+                            foreach (var item in Listofres)
+                            {
+
+                                if (item.Outcome == "Fail" && item.ValidatorName != "Final Result")
+                                {
+
+                                    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = item.Code, ErrorMessage = item.Message, PropertyName = item.ValidatorName };
+                                    Errors.Add(errorInfo);
+
+                                }
+
+                            }
+                            if (Errors.Count > 0)
+                            {
+                                return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors };
+                            }
+
+                        }
+
+                        //Call GetRefund Details
+                        //Refund Txn
+                        PolicyCancelRequest policyCancelRequest = new PolicyCancelRequest();
+                        policyCancelRequest.EffectiveDate = DatetimeNow;
+                        policyCancelRequest.CancelRequestDate = DatetimeNow;
+                        policyCancelRequest.ProposalNumber = tbl_particiant.ProposalNo;
+                        PolicyCancelResponse RefundDetails = await _integrationService.GetRefundDetails(policyCancelRequest, apiContext);
+
+
+                        //string EndorsmentType = "Cancel Policy";
+                        //EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
+                        //endorsementDetailsDTO.Action = EndorsmentType;
+                        //endorsementDetailsDTO.EndorsementNo = EndorsementNo;
+                        //endorsementDetailsDTO.IsPremiumRegister = true;
+                        //endorsementDetailsDTO.UpdatedResponse = json.ToString();
+                        //endorsementDetailsDTO.EndorsementEffectivedate = DatetimeNow;
+                        //endorsementDetailsDTO.EnddorsementRequest = endoresementDto.ToString();
+                        //endorsementDetailsDTO.PolicyId = policyId;
+
+                        //TblEndorsementDetails tblEndorsement_mapper = _mapper.Map<TblEndorsementDetails>(endorsementDetailsDTO);
+
+                        //_context.TblEndorsementDetails.Add(tblEndorsement_mapper);
+
+
+
+                        tbl_particiant.IsActive = false;
+                        tbl_particiant.PolicyStatus = ModuleConstants.ProposalCancelStatus;
+                        tbl_particiant.PolicyStatusId = ModuleConstants.PolicyStatusCancelled;
+                        tbl_particiant.PolicyStageId = ModuleConstants.PolicyStageProposal;
+                        tbl_particiant.PolicyStageStatusId = ModuleConstants.PolicyStageStatusCancelled;
+                        tbl_particiant.PolicyCancelDate = DatetimeNow;
+                        _context.TblPolicy.Update(tbl_particiant);
+
+
+
+
+
+                        PolicyRefund policyRefund = new PolicyRefund();
+                        policyRefund.EndorsementEffectivedate = DatetimeNow;
+                        policyRefund.TxnDate = DatetimeNow;
+                        policyRefund.TotalRefundAmount = RefundDetails.TotalPremium;
+                        // policyRefund.EndorsementNumber = EndorsementNo;
+                        policyRefund.UpdatedResponse = json.ToString();
+                        policyRefund.PolicyId = policyId;
+
+                        TblPolicyRefund tblpolicyRefund_mapper = _mapper.Map<TblPolicyRefund>(policyRefund);
+
+                        _context.TblPolicyRefund.Add(tblpolicyRefund_mapper);
+
+
+
+
+                        _context.SaveChanges();
+
+                        return new ProposalResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Proposal Number {tbl_particiant.ProposalNo} is cancelled with effect from {DatetimeNow.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)} Refund Amount Rs.{RefundDetails.TotalPremium}(inclusive of GST on Refund Premium) will be credited to Customer's Account" };
+
+
+                    }
+                    else {
+                        return new ProposalResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"No record Found for this ProposalNumber {tbl_particiant.ProposalNo}" };
+
+                    }
+                }
+                else {
+                    //proposal is already cancel
+                    return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Proposal Number {tbl_particiant.ProposalNo} is already Cancelled" };
+
+                }
+            }
+
+            else 
+            {
+                return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Proposal Number {tbl_particiant.ProposalNo} is in different Stage" };
+
+            }
+          
+           
+        }
+        }
+
+
+
+
+
     }
- 
-
-
-
-
-}
 
 
 

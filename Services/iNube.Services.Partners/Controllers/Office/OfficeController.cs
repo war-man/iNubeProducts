@@ -13,11 +13,13 @@ using Microsoft.Extensions.Options;
 using iNube.Services.Partners.Models;
 using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace iNube.Services.Partners.Controllers.Office
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class OfficeController : BaseApiController
     {
         public IOfficeService _officeService;

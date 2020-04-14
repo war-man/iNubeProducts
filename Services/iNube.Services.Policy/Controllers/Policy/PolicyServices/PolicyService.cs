@@ -70,6 +70,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<object> GetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
 
         Task<List<object>> SearchPolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext);
+        Task<List<object>> SearchProposalDetailsByNumber(string ProposalNumber, ApiContext apiContext);
 
 
         Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext);
@@ -82,6 +83,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext);
+        Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext);
+        Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext);
     }
     public class PolicyService : IPolicyService
     {
@@ -740,6 +743,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).InternalGetPolicyDetailsByNumber(policyNumber, apiContext);
         }
+        public async Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).InternalGetProposalDetailsByNumber(proposalNumber, apiContext);
+        }
         public async Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).GetDailyAccountDetails(policyNumber, month, year, TxnEventType, apiContext);
@@ -754,6 +761,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).SearchPolicyDetailsByNumber(PolicyNumber, apiContext);
         }
+        
+        public async Task<List<object>> SearchProposalDetailsByNumber(string ProposalNumber, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).SearchProposalDetailsByNumber(ProposalNumber, apiContext);
+        }
 
         public async Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
@@ -763,6 +775,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).GetEndoresementDetails(endorsementSearch, apiContext);
+        }
+
+        public async Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).ProposalCancellation(CancellationRequest, apiContext);
+         
         }
     }
 }

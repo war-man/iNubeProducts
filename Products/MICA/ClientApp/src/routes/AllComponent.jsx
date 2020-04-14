@@ -77,6 +77,8 @@ const ViewCDAccount = AsyncComponent(() => { return import("modules/Partners/Acc
 /*Policy Module*/
 const PolicyCancellation = AsyncComponent(() => { return import("modules/Policy/views/PolicyCancellation.jsx"); });
 const RefundUpload = AsyncComponent(() => { return import("modules/Policy/views/RefundUpload.jsx"); });
+const ProposalCancellation = AsyncComponent(() => { return import("modules/Policy/views/ProposalCancellation.jsx"); });
+
 
 /*Billing Module*/
 const CreateBilling = AsyncComponent(() => { return import("modules/Billing/BillingConfiguration/CreateBilling.jsx"); });
@@ -294,6 +296,7 @@ export const ComponentsList = {
     AllocationExecution: AllocationExecution,
     RefundUpload: RefundUpload,
     Upload: Upload,
+    ProposalCancellation: ProposalCancellation,
 }
 
 export default ComponentsList

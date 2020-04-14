@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using iNube.Services.UserManagement.Entities.AVO;
+using iNube.Services.UserManagement.Entities.MICACP;
 using iNube.Services.UserManagement.Models;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,12 @@ namespace iNube.Services.UserManagement.Helpers
         {
             CreateMap<LoginDTO, AspNetUsers>();
             CreateMap<AspNetUsers, LoginDTO>();
-            CreateMap<UserDTO, AspNetUsers>();
-            CreateMap<AspNetUsers, UserDTO>();
+
+            CreateMap<UserDTO, AspNetUsers>()
+            .ForMember(dest => dest.TblUserDetails, opt => opt.MapFrom(src => src.UserDetails))
+            .ForMember(dest => dest.TblUserAddress, opt => opt.MapFrom(src => src.UserAddress)).ReverseMap();
+
+
             CreateMap<RolesDTO, AspNetRoles>();
             CreateMap<AspNetRoles, RolesDTO>();
             CreateMap<MasPermissionDTO, TblMasPermission>();
@@ -34,8 +39,16 @@ namespace iNube.Services.UserManagement.Helpers
             CreateMap<TblUserAddress, UserAddressDTO>();
             CreateMap<TblSendOtp, SendOtp>();
             CreateMap<SendOtp, TblSendOtp>();
+
             CreateMap<AspNetUsers, AspNetUsersDTO>();
             CreateMap<AspNetUsersDTO, AspNetUsers>();
+
+            CreateMap<AspNetUsersDTO, AspNetUsers>()
+            .ForMember(dest => dest.TblUserAddress, opt => opt.MapFrom(src => src.UserAddress))
+            .ForMember(dest => dest.TblUserDetails, opt => opt.MapFrom(src => src.UserDetails))
+            .ForMember(dest => dest.TblUserPermissions, opt => opt.MapFrom(src => src.UserPermissions)).ReverseMap();
+
+
             CreateMap<AspNetUserClaims, AspNetUserClaimsDTO>();
             CreateMap<AspNetUserClaimsDTO, AspNetUserClaims>();
 
@@ -45,6 +58,10 @@ namespace iNube.Services.UserManagement.Helpers
             CreateMap<AspNetUserRolesDTO, AspNetUserRoles>();
             CreateMap<AspNetUserTokens, AspNetUserTokensDTO>();
             CreateMap<AspNetUserTokensDTO, AspNetUserTokens>();
+
+            CreateMap<TblCustomerSettings, CustomerSettingsDTO>();
+            CreateMap<CustomerSettingsDTO, TblCustomerSettings>();
+            CreateMap<TblCustomerEnvironment, CustomerEnvironmentDTO>().ReverseMap();
         }
 
     }

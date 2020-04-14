@@ -42,7 +42,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile
         [HttpGet]
         public IActionResult GetUserByUserId(string Id)
         {
-            TblUserDetails _user = _userService.GetUserByUserId(Id, Context);
+            var _user = _userService.GetUserByUserId(Id, Context);
             return Ok(_user);
 
         }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using iNube.Services.UserManagement.Entities;
+using iNube.Services.UserManagement.Entities.AVO;
 using iNube.Services.UserManagement.Models;
 using System;
 using System.Collections.Generic;
@@ -15,54 +15,74 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 {
     public class AvoProfileService : IUserProductService
     {
-        private MICAUMContext _context;
+        private AVOUMContext _context;
         private MICACPContext _cpcontext;
         private IMapper _mapper;
         private bool Result;
         public static int otpvalue { get; set; }
         private readonly IEmailService _emailService;
-        public AvoProfileService(MICAUMContext context, IMapper mapper, IEmailService emailService)
+        public AvoProfileService(IMapper mapper, IEmailService emailService)
         {
-            _context = context;
-            _mapper = mapper;
             _emailService = emailService;
-
+            _mapper = mapper;
         }
 
-        public TblUserDetails GetUserByUserId(string Id, ApiContext apiContext)
+        public UserDetailsDTO GetUserByUserId(string Id, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var _userDetails = _context.TblUserDetails.SingleOrDefault(x => x.UserId == Id);
-            return _userDetails;
-
+            var result = _mapper.Map<UserDetailsDTO>(_userDetails);
+            return result;
         }
 
         public UserDTO SearchUserById(string userId, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var _userd = _context.AspNetUsers.Where(user => user.Id == userId)
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            AspNetUsers _userd = _context.AspNetUsers.Where(user => user.Id == userId)
                         .Include(add => add.TblUserDetails)
                         .Include(add => add.TblUserAddress)
-                        .ToList();
+                        .FirstOrDefault();
             var _UsrDTO = _mapper.Map<UserDTO>(_userd);
             return _UsrDTO;
         }
 
         public UserResponse CreateProfileUser(UserDTO user, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+            if (user.EnvId > 0)
+            {
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, user.EnvId.ToString());
+            }
+            else
+            {
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+
+
             var userDetails = user.UserDetails.First();
-            var userAddress = user.UserAddress.First();
+            //var userAddress = user.UserAddress.FirstOrDefault();
             EmailTest emailTest = new EmailTest();
             if (string.IsNullOrEmpty(userDetails.UserId))
             {
                 var aspNet = _context.AspNetUsers.SingleOrDefault(x => x.UserName == userDetails.Email);
                 if (aspNet == null)
                 {
-                    userDetails.RoleId = null;
                     userDetails.UserName = userDetails.Email;
-                    userDetails.CreatedDate = DateTime.Now;
-                    //userDetails.ProfileImage = userDetails.ProfileImage;
+                    userDetails.CreatedBy = apiContext.UserId;
+                    userDetails.CreatedDate = DateTimeNow;
+                    userDetails.IsActive = true;
+                    if (userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
+                    {
+                        userDetails.OrganizationId = userDetails.OrganizationId;
+                    }
+                    else
+                    {
+                        userDetails.OrganizationId = apiContext.OrgId;
+                    }
+                    //.OrganizationId = user.CustomerID > 0 ? user.CustomerID: apiContext.OrgId;
                     AspNetUsers _users = _mapper.Map<AspNetUsers>(user);
                     if (string.IsNullOrEmpty(_users.Id))
                     {
@@ -70,16 +90,43 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _users.UserName = userDetails.Email;
                         _users.Email = userDetails.Email;
                         _users.FirstTimeLogin = 0;
+                        _users.LastPasswordChanged = DateTimeNow;
                         _users.PasswordHash = Utilities.GenerateDefaultPassword();
                         emailTest.To = userDetails.Email;
                         emailTest.Subject = "User profile creation";
-                        emailTest.Message = "Your account has been created with Username:" + _users.UserName + "\n" + "Please use this for login.";
+                        emailTest.Message = "Your account has been created with Username:" + _users.UserName + " and password: Mica@123 \n" + "This is a system generated password. Kindly reset the same after log in.";
                         _context.AspNetUsers.Add(_users);
                     }
                     _context.SaveChanges();
                     var _usersDTOs = _mapper.Map<UserDTO>(_users);
+
+                    _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
+
+                    var cpdata = _cpcontext.TblCustomerUsers.SingleOrDefault(a => a.UserName == userDetails.Email);
+                    TblCustomerUsers customerUsers = new TblCustomerUsers();
+
+                    if (userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
+                    {
+                        customerUsers.CustomerId = userDetails.OrganizationId;
+                    }
+                    else
+                    {
+                        customerUsers.CustomerId = apiContext.OrgId;
+                    }
+                    customerUsers.UserName = userDetails.Email;
+                    customerUsers.Email = userDetails.Email;
+                    customerUsers.CreatedDate = DateTimeNow;
+                    customerUsers.ContactNumber = userDetails.ContactNumber;
+                    customerUsers.UserId = _users.Id;
+                    customerUsers.IsActive = true;
+                    customerUsers.LoginProvider = "Form";
+                    customerUsers.IsFirstTimeLogin = 1;
+
+                    _cpcontext.TblCustomerUsers.Add(customerUsers);
+                    _cpcontext.SaveChanges();
+
                     SendEmailAsync(emailTest);
-                    return new UserResponse { Status = BusinessStatus.Created, users = _usersDTOs, Id = _usersDTOs.Id, ResponseMessage = $"User created successfully! \n Login with: {_usersDTOs.Email}" };
+                    return new UserResponse { Status = BusinessStatus.Created, users = _usersDTOs, Id = _usersDTOs.Id, ResponseMessage = $"User created successfully! \n for user: {_usersDTOs.Email}" };
                 }
                 else
                 {
@@ -89,13 +136,39 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             else
             {
                 AspNetUsers _users = _mapper.Map<AspNetUsers>(user);
-                var _useraddress = _mapper.Map<TblUserAddress>(userAddress);
-                var _usersDetail = _mapper.Map<TblUserDetails>(userDetails);
-                //_context.AspNetUsers.Update(_users);
-                //_context.TblUserDetails.Update(_usersDetail);
-                _context.Update(_usersDetail);
-                _context.Update(_useraddress);
+                userDetails.ModifiedBy = apiContext.UserId;
+                userDetails.ModifiedDate = DateTimeNow;
+
+                var useraddr = _context.TblUserAddress.Where(p => p.Id == userDetails.UserId);
+                foreach (var item in useraddr)
+                {
+                    _context.TblUserAddress.Remove(item);
+                }
                 _context.SaveChanges();
+                var _usersDetail = _mapper.Map<TblUserDetails>(userDetails);
+                _context.Update(_usersDetail);
+
+                var _useraddress1 = _mapper.Map<HashSet<TblUserAddress>>(user.UserAddress);
+
+                foreach (var item in _useraddress1)
+                {
+                    item.Id = userDetails.UserId;
+                    _context.TblUserAddress.Add(item);
+                }
+                _context.SaveChanges();
+
+                _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
+
+                var cpdata = _cpcontext.TblCustomerUsers.SingleOrDefault(a => a.UserName == userDetails.Email);
+                TblCustomerUsers customerUsers = new TblCustomerUsers();
+
+                customerUsers.ModifiedDate = DateTimeNow;
+                customerUsers.Email = userDetails.Email;
+                customerUsers.ContactNumber = userDetails.ContactNumber;
+
+                _cpcontext.TblCustomerUsers.Update(customerUsers);
+                _cpcontext.SaveChanges();
+
                 return new UserResponse { Status = BusinessStatus.Created, users = user, Id = _usersDetail.UserId, ResponseMessage = $"User modified successfully!" };
             }
         }
@@ -114,8 +187,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public EmployeeDTO CreateProfileemployee(EmployeeDTO emp, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             //  var userDetail = user.TblUserDetails.First();
+            emp.CreatedBy = apiContext.UserId;
             var _empls = _mapper.Map<TblEmployees>(emp);
             //_empls.Empid = Guid.NewGuid().ToString();
             //DateTime now = DateTime.Now;
@@ -128,7 +202,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public UserDTO ChangeEmailId(UserDTO userDTO, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             AspNetUsers _aspNet = _mapper.Map<AspNetUsers>(userDTO);
             var _aspUsers = _context.AspNetUsers.SingleOrDefault(x => x.Id == _aspNet.Id);
 
@@ -145,7 +219,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public UserDTO ChangeMobileNumber(UserDTO userDTO, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             AspNetUsers _aspNet = _mapper.Map<AspNetUsers>(userDTO);
             var _aspUsers = _context.AspNetUsers.SingleOrDefault(x => x.Id == _aspNet.Id);
 
@@ -162,8 +236,33 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public IEnumerable<UserDetailsDTO> SearchUser(UserSearchDTO searchRequest, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var _users = _context.TblUserDetails.OrderByDescending(u => u.CreatedDate).Select(x => x);
+            if (apiContext.OrgId > 0 && apiContext.PartnerId > 0)
+            {
+                _users = _users.Where(u => (u.OrganizationId == apiContext.OrgId && u.PartnerId == apiContext.PartnerId));
+            }
+            //else
+            //{
+            //    _users = _users.Where(pr => (pr.OrganizationId == apiContext.OrgId && pr.PartnerId == apiContext.PartnerId));
+            //}
+            else if (apiContext.OrgId > 0)
+            {
+                _users = _users.Where(u => u.OrganizationId == apiContext.OrgId);
+            }
+
+            if (searchRequest.Status == 1009)
+            {
+                _users = _users.Where(u => u.IsActive == true);
+            }
+            if (searchRequest.Status == 1010)
+            {
+                _users = _users.Where(u => u.IsActive == false);
+            }
+            if (searchRequest.Status == 1011)
+            {
+                _users = _context.TblUserDetails.OrderByDescending(u => u.CreatedDate).Select(x => x);
+            }
             if (!string.IsNullOrEmpty(searchRequest.FirstName))
             {
                 _users = _users.Where(u => u.FirstName.Contains(searchRequest.FirstName));
@@ -171,10 +270,6 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             if (!string.IsNullOrEmpty(searchRequest.PanNo))
             {
                 _users = _users.Where(u => u.PanNo.Contains(searchRequest.PanNo));
-            }
-            if (!string.IsNullOrEmpty(searchRequest.EmployeeNumber))
-            {
-                _users = _users.Where(u => u.EmployeeNumber == searchRequest.EmployeeNumber);
             }
             if (!string.IsNullOrEmpty(searchRequest.EmailId))
             {
@@ -184,13 +279,17 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             {
                 _users = _users.Where(u => u.PartnerId == searchRequest.PartnerId);
             }
+            if (!string.IsNullOrEmpty(searchRequest.ContactNumber))
+            {
+                _users = _users.Where(u => u.ContactNumber == searchRequest.ContactNumber);
+            }
             var _usersDTOs = _mapper.Map<List<UserDetailsDTO>>(_users);
             return _usersDTOs;
         }
 
         public EmployeeDTO SearchEmployee(int Empid, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var _emp = _context.TblEmployees.SingleOrDefault(x => x.Empid == Empid);
             if (_emp != null)
             {
@@ -207,7 +306,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public UserDTO ModifyUser(UserDTO usersDTOs, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             AspNetUsers _aspNet = _mapper.Map<AspNetUsers>(usersDTOs);
             //We Use .Include Function  to add all Child Classes from a Parent Table 
             //In this Case Parent table is AspNet Users (Primary Key) Child Table is UserDetails (foreign Key)
@@ -230,7 +329,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         //get for master
         public IEnumerable<ddDTO> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             IEnumerable<ddDTO> ddDTOs;
             ddDTOs = _context.TblmasUmcommonTypes
              .Select(c => new ddDTO
@@ -245,7 +344,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         // get Location
         public IEnumerable<ddDTO> GetLocation(string locationType, int parentID, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             IEnumerable<ddDTO> ddDTOs;
 
             switch (locationType)
@@ -314,9 +413,32 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             return true;
         }
 
+        public decimal GetCustomerId(decimal envid, string product)
+        {
+            _cpcontext = (MICACPContext)DbManager.GetCPContext(product);
+            var data = _cpcontext.TblCustomerEnvironment.FirstOrDefault(a => a.Id == envid);
+            return Convert.ToDecimal(data.CustomerId);
+        }
+
         public PasswordResponse ChangePassword(Password pass, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (pass.EnvId > 0)
+            {
+                _context = (AVOUMContext)DbManager.GetContext(pass.ProductType, pass.EnvId.ToString());
+                apiContext.ProductType = pass.ProductType;
+                apiContext.ServerType = pass.EnvId.ToString();
+                apiContext.OrgId = GetCustomerId(pass.EnvId, pass.ProductType);
+            }
+            else
+            {
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             byte[] passwordHash;
             byte[] passwordSalt;
             var _aspUsers = _context.AspNetUsers.FirstOrDefault(x => x.Id == pass.Id);
@@ -334,6 +456,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(pass.ConfirmPassword));
                     }
                     _aspNet.PasswordHash = passwordHash;
+                    _aspNet.FirstTimeLogin = 1;
+                    _aspNet.AccessFailedCount = 0;
+                    _aspNet.LastPasswordChanged = DateTimeNow;
                     _context.AspNetUsers.Update(_aspNet);
                     _context.SaveChanges();
                     var _usersDTOs = _mapper.Map<UserDTO>(_aspUsers);
@@ -370,6 +495,8 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(pass.ConfirmPassword));
                         }
                         _aspNet.PasswordHash = passwordHash;
+                        _aspNet.LastPasswordChanged = DateTimeNow;
+                        _aspNet.AccessFailedCount = 0;
                         _context.AspNetUsers.Update(_aspNet);
                         _context.SaveChanges();
                         var _usersDTOs = _mapper.Map<UserDTO>(_aspUsers);
@@ -389,7 +516,15 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public async Task<SendOtpResponse> SendOTP(SendOtp sendOtp, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (sendOtp.EnvId > 0)
+            {
+                _context = (AVOUMContext)DbManager.GetContext(sendOtp.ProductType, sendOtp.EnvId.ToString());
+            }
+            else
+            {
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var user = _context.AspNetUsers.SingleOrDefault(x => x.UserName == sendOtp.UserName);
             try
             {
@@ -427,7 +562,15 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public async Task<SendOtpResponse> ResetOTP(SendOtp sendOtp, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (sendOtp.EnvId > 0)
+            {
+                _context = (AVOUMContext)DbManager.GetContext(sendOtp.ProductType, sendOtp.EnvId.ToString());
+            }
+            else
+            {
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var user = _context.AspNetUsers.SingleOrDefault(x => x.Email == sendOtp.Email);
             try
             {
@@ -471,7 +614,15 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public VerifyOTPResponse VerifyingOTP(VerifyOTP onetp, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            if (onetp.EnvId > 0)
+            {
+                _context = (AVOUMContext)DbManager.GetContext(onetp.ProductType, onetp.EnvId.ToString());
+            }
+            else
+            {
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var sentotp = _context.TblSendOtp.SingleOrDefault(x => x.UserId == onetp.UserId);
 
             if (sentotp.Otp == onetp.Otp)
@@ -495,7 +646,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public UserEmailResponse UserEmailValidations(string emailid, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var email = _context.AspNetUsers.Any(item => item.Email == emailid);
             if (email == true)
             {
@@ -509,35 +660,72 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         public UserDTO DeleteUserById(string Id, ApiContext apiContext)
         {
-            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var tbl_userdata = _context.AspNetUsers.Where(item => item.Id == Id)
-                                               .Include(add => add.TblUserAddress)
-                                               .Include(add => add.TblUserAddress)
-                                               .FirstOrDefault();
-            tbl_userdata.IsActive = false;
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
 
-            var user = _cpcontext.TblCustomerUsers.Where(p => p.UserName == tbl_userdata.UserName).FirstOrDefault();
-            user.IsActive = false;
+            var user = _context.TblUserDetails.Where(item => item.UserId == Id).FirstOrDefault();
+            user.IsActive = (user.IsActive == false ? user.IsActive = true : user.IsActive = false);
+            _context.TblUserDetails.Update(user);
+
+            var tbl_userdata = _context.AspNetUsers.Where(item => item.Id == Id).FirstOrDefault();
+            tbl_userdata.IsActive = (tbl_userdata.IsActive == false ? tbl_userdata.IsActive = true : tbl_userdata.IsActive = false);
+            //tbl_userdata.IsActive = !tbl_userdata.IsActive;
+
+            _context.AspNetUsers.Update(tbl_userdata);
+            _context.SaveChanges();
+
+            _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
+
+            var cpdata = _cpcontext.TblCustomerUsers.SingleOrDefault(a => a.UserId == Id);
+            cpdata.IsActive = (cpdata.IsActive == false ? cpdata.IsActive = true : cpdata.IsActive = false);
+
+            //cpdata.IsActive = !cpdata.IsActive;
+
+            _cpcontext.TblCustomerUsers.Update(cpdata);
+            _cpcontext.SaveChanges();
 
             EmailTest emailTest = new EmailTest();
             emailTest.To = tbl_userdata.Email;
             emailTest.Subject = "Deletion of User";
-            emailTest.Message = "Dear User,\n" + "      " + "\n" + "      Your account has been deleted: " + "\n" + "\nThanks & Regards:\n" + "      " + "MICA Team";
+            emailTest.Message = "Dear User,\n" + "      " + "\n" + "      Your account has been Deactivated to Activate please contact Admin." + "\n" + "\nThanks & Regards:\n" + "      " + "MICA Team";
 
-            _context.SaveChanges();
-
-            var data = _mapper.Map<UserDTO>(tbl_userdata);
-            return data;
+            return null;
         }
 
         public UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            //var claimdetails = _context.TblClaimdoc.SingleOrDefault(x => x.ClaimId == ClaimId);
+
+            var users = _context.TblUserDetails.SingleOrDefault(a => a.UserId == image.UserId);
+            users.ProfileImage = image.Document;
+
+            var result = _mapper.Map<TblUserDetails>(users);
+
+            _context.Update(result);
+            _context.SaveChanges();
+
+            var user = _mapper.Map<UserDetailsDTO>(result);
+
+            return new UserUploadImageResponse { Status = BusinessStatus.Created, details = user, Id = user.UserId, ResponseMessage = $"Image uploaded successfully!" };
         }
 
         public UserNameById GetUserNameById(string Id, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            try
+            {
+                UserNameById userNameById = new UserNameById();
+                //UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+                var UserName = _context.TblUserDetails.Where(u => u.UserId == Id).FirstOrDefault();
+                var name = UserName.UserName;
+                var data = _mapper.Map<UserNameById>(UserName);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
     }
 }

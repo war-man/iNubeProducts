@@ -49,7 +49,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             throw new NotImplementedException();
         }
 
-        public TblUserDetails GetUserByUserId(string Id, ApiContext apiContext)
+        public UserDetailsDTO GetUserByUserId(string Id, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

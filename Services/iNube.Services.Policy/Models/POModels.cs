@@ -504,6 +504,7 @@ namespace iNube.Services.Policy.Models
     {
         public Dictionary<string, string> policy { get; set; }
     }
+   
     public class PolicyProposalResponse : ResponseStatus
     {
         public dynamic ProposalPolicyDetail { get; set; }
@@ -711,6 +712,7 @@ namespace iNube.Services.Policy.Models
     }
     public class PolicysearchDTO
     {
+        public string Proposalnumber;
         public string Policynumber;
         public string EventId;
         public string ProductId;
@@ -1585,6 +1587,7 @@ namespace iNube.Services.Policy.Models
     }
     public class PolicyCancelRequest
     {
+        public string ProposalNumber { get; set; }
         public string PolicyNumber { get; set; }
         public DateTime? EffectiveDate { get; set; }
         public DateTime? CancelRequestDate { get; set; }
