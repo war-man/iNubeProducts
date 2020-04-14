@@ -58,6 +58,7 @@ class ApplicationCancel extends React.Component {
         var CurrentDateTime1 = `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
         this.state = {
+            redirect: false,
             DatePickerValue:null,
             RemarkState:false,
             ShowRefundDetails: false,
@@ -354,6 +355,8 @@ class ApplicationCancel extends React.Component {
                                     .then(data => {
                                         if (data.status == 3) {
                                             swal({ text: data.responseMessage, icon: "success" });
+                                            this.setState({ redirect: true });
+                                            this.renderRedirect();
                                         } else {
 
                                             swal({ text: data.responseMessage, icon: "error" });
@@ -369,7 +372,8 @@ class ApplicationCancel extends React.Component {
                     }
                 }
                 );
-            }
+        }
+       
         }
 
        
@@ -378,6 +382,15 @@ class ApplicationCancel extends React.Component {
         proposalCancelRequest[e.target.name] = e.target.value;
         this.setState({ proposalCancelRequest, RemarkState:false});
     }
+    renderRedirect = () => {
+        if (this.state.redirect === true) {
+            return <Redirect to={{
+                pathname: '/dashboard/home',
+
+            }} />
+        }
+    }
+
 
 
     render() {
@@ -386,7 +399,7 @@ class ApplicationCancel extends React.Component {
         return (
 
             <div>
-
+                {this.renderRedirect()}
                 {this.state.pageloader ?
                     <Card>
                         <CardHeader color="rose" icon>
@@ -614,7 +627,7 @@ class ApplicationCancel extends React.Component {
                                         <CustomInput
                                             disabled={this.state.disabled}
                                             labelText="InsuredMobileNo"
-                                            inputType="number" type="numeric"
+                                           
                                             value={this.state.policyDetailsData.mobileNumber}
                                             name='mobileNumber'
 

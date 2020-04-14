@@ -226,23 +226,13 @@ const sidebarStyle = theme => ({
         paddingLeft: "10px",
         paddingRight: "10px",
         transition: "all 300ms linear",
-        margin: "5px 15px 0",
-        borderRadius: "3px",
+        margin: "5px 15px 0", borderRadius: "3px",
         position: "relative",
         display: "block",
         padding: "5px 15px",
-        backgroundColor: "transparent",
-        ...defaultFont,
-        width: "auto",
-        "&:hover": {
-            outline: "none",
-            backgroundColor: "rgba(200, 200, 200, 0.2)",
-            boxShadow: "none"
-        },
-        "&,&:hover,&:focus": {
-            color: "inherit"
-        }
+        backgroundColor: "transparent", ...defaultFont, width: "auto", "&:hover": { outline: "none", backgroundColor: "rgba(200, 200, 200, 0.2)", boxShadow: "none" }, "&,&:hover,&:focus": { color: "inherit" }
     },
+
     itemIcon: {
         color: "inherit",
         width: "30px",
@@ -250,7 +240,7 @@ const sidebarStyle = theme => ({
         float: "left",
         position: "inherit",
         top: "3px",
-        marginRight: "15px",
+        marginRight: "-10px",
         textAlign: "center",
         verticalAlign: "middle",
         opacity: "0.8"
@@ -356,7 +346,7 @@ const sidebarStyle = theme => ({
         display: "block",
         transition: "transform 300ms ease 0s, opacity 300ms ease 0s",
         fontSize: "14px",
-        left: "1.7rem",
+        //left: "1.7rem",
     },
     collapseItemTextRTL: {
         textAlign: "right"
@@ -371,7 +361,7 @@ const sidebarStyle = theme => ({
     caret: {
         marginTop: "13px",
         position: "absolute",
-        right: "18px",
+        right: "8px",
         transition: "all 150ms ease-in",
         display: "inline-block",
         width: "0",

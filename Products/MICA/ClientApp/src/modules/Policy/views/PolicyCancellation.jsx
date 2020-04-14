@@ -61,6 +61,7 @@ class PolicyCancellation extends React.Component {
         var CurrentDateTime1 = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 
         this.state = {
+            redirect:false,
             RemarkState:false,
             ShowRefundDetails: false,
             disabled: false,
@@ -355,6 +356,8 @@ class PolicyCancellation extends React.Component {
                                     .then(data => {
                                         if (data.status == 3) {
                                             swal({ text: data.responseMessage, icon: "success" });
+                                            this.setState({ redirect: true });
+                                            this.renderRedirect();
                                         } else {
 
                                             swal({ text: data.responseMessage, icon: "error" });
@@ -379,7 +382,14 @@ class PolicyCancellation extends React.Component {
         policyCancelRequest[e.target.name] = e.target.value;
         this.setState({ policyCancelRequest, RemarkState:false});
     }
+    renderRedirect = () => {
+        if (this.state.redirect === true) {
+            return <Redirect to={{
+                pathname: '/dashboard/home',
 
+            }} />
+        }
+    }
  
 
     render() {
@@ -388,6 +398,7 @@ class PolicyCancellation extends React.Component {
         return (
 
             <div>
+                {this.renderRedirect()}
                 {this.state.pageloader ?
                     <Card>
                         <CardHeader color="rose" icon>
