@@ -104,28 +104,27 @@ namespace iNube.Services.UserManagement
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.InitializedCommonConfiguration(env, Configuration);
+            //app.InitializedCommonConfiguration(env, Configuration);
             // global cors policy
-           // app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowCredentials());
-            //app.UseCors(builder => builder.WithOrigins("http://localhost:55294"));
-            //app.UseHealthChecks("/hc", new HealthCheckOptions()
-            //{
-            //    Predicate = _ => true,
-            //    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            //});
+            // app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors(builder => builder.WithOrigins("http://localhost:55294"));
+            app.UseHealthChecks("/hc", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
 
 
-            //app.UseSwagger(c =>
-            //{
-            //    c.RouteTemplate = Configuration["Swagger:Url"].ToString() + "/{documentName}/swagger.json";
-            //});
-            //app.UseSwaggerUI(c =>
-            //{
-            //    c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
-            //    c.RoutePrefix = Configuration["Swagger:Url"].ToString();
-            //});
-            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
-            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = Configuration["Swagger:Url"].ToString() + "/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
+                c.RoutePrefix = Configuration["Swagger:Url"].ToString();
+            });
+            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

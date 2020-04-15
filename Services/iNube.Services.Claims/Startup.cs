@@ -13,6 +13,10 @@ using iNube.Services.Claims.Controllers.ClaimManagement.ClaimService;
 using System;
 using iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaProduct;
 using iNube.Utility.Framework.LogPrivider.LogService;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Http;
 
 namespace iNube.Services.Claims
 {
@@ -50,14 +54,43 @@ namespace iNube.Services.Claims
             var connectionstring = Configuration.GetConnectionString("PCConnection");
             services.AddHealthChecks().AddSqlServer(connectionstring);
             services.AddAutoMapper(typeof(Startup));
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                //options.HttpsPort = 5001;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
-            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            //app.InitializedCommonConfiguration(env, Configuration);
+            // global cors policy
+            // app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors(builder => builder.WithOrigins("http://localhost:55294"));
+            app.UseHealthChecks("/hc", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+
+
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = Configuration["Swagger:Url"].ToString() + "/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
+                c.RoutePrefix = Configuration["Swagger:Url"].ToString();
+            });
+            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -69,6 +102,11 @@ namespace iNube.Services.Claims
             }
             app.UseAuthentication();
             app.UseHttpsRedirection();
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+              .AddFrameOptionsSameOrigin()
+              .AddXssProtectionEnabled()
+              .AddContentTypeOptionsNoSniff()
+            );
             app.UseMvc();
         }
         private void ConfigureModuleService(IServiceCollection services)
