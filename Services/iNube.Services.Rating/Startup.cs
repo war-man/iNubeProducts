@@ -91,7 +91,11 @@ namespace iNube.Services.Rating
         {
             //app.InitializedCommonConfiguration(env, Configuration);
             // global cors policy
-            app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors(x => x
+              .AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials());
             app.UseHealthChecks("/hc", new HealthCheckOptions()
             {
                 Predicate = _ => true,

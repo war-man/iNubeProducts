@@ -86,19 +86,17 @@ namespace iNube.Services.UserManagement
             services.AddHealthChecks().AddSqlServer(connectionstring);
             services.AddAutoMapper(typeof(Startup));
 
-            //services.AddHsts(options =>
-            //{
-            //    options.Preload = true;
-            //    options.IncludeSubDomains = true;
-            //    options.MaxAge = TimeSpan.FromDays(365);
-            //});
-            //services.AddHttpsRedirection(options =>
-            //{
-            //    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-            //    //options.HttpsPort = 5001;
-            //});
-          //  services.
-          
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                //options.HttpsPort = 5001;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,9 +105,10 @@ namespace iNube.Services.UserManagement
             //app.InitializedCommonConfiguration(env, Configuration);
             // global cors policy
             app.UseCors(x => x
+              .AllowAnyOrigin()
               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials());
+              .AllowAnyHeader()
+              .AllowCredentials());
 
             app.UseHealthChecks("/hc", new HealthCheckOptions()
             {
@@ -138,12 +137,12 @@ namespace iNube.Services.UserManagement
                 app.UseHsts();
             }
             app.UseAuthentication();
-           // app.UseHttpsRedirection();
-            //app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
-            //  .AddFrameOptionsSameOrigin()
-            //  .AddXssProtectionEnabled()
-            //  .AddContentTypeOptionsNoSniff()
-            //);
+            app.UseHttpsRedirection();
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+              .AddFrameOptionsSameOrigin()
+              .AddXssProtectionEnabled()
+              .AddContentTypeOptionsNoSniff()
+            );
             app.UseMvc();
         }
 
