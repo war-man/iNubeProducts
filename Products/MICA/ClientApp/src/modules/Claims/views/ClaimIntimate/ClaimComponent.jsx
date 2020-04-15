@@ -52,13 +52,25 @@ const ClaimComponent = (props) => {
                         formControlProps={{ fullWidth: true }}
                     />
                     */}
-                    <CustomDateTimePicker timeformate={true} disabled={false} width='13rem' disableFuture={true} required={true} labelText="LossDateTime" name='lossDateTime' value={props.DetailsDTO.lossDateTime} onChange={(e) => props.handleDateChange(e, "lossDateTime")} />
+                    <CustomDateTimePicker
+                        error={props.lossDateTimeState}
+                        timeformate={true}
+                        disabled={false}
+                        width='15rem'
+                        disableFuture={true}
+                        required={true}
+                        labelText="Loss Date Time"
+                        name='lossDateTime'
+                        value={props.DetailsDTO.lossDateTime}
+                        //onChange={(e) => props.handleDateChange(e, "lossDateTime")}
+                        onChange={(evt) => props.onDateChange('datetime', 'DetailsDTO', 'lossDateTime', evt)}
+                    />
 
-                    {props.errormessage && (props.DetailsDTO.lossDateTime == null) ? <p className="error">*Required field cannot be left blank</p> : null}
+                    {props.errormessage && (props.DetailsDTO.lossDateTime == null) ? <p className="errorDatepicker">*Required field cannot be left blank</p> : null}
 
-                    {props.errordate && (props.DetailsDTO.lossDateTime > props.PolicyEndDate || props.DetailsDTO.lossDateTime < props.PolicyStartDate) ? <p className="error">*Loss Date must be within Policy Tenure </p> : null}
+                    {props.errordate && (props.DetailsDTO.lossDateTime > props.PolicyEndDate || props.DetailsDTO.lossDateTime < props.PolicyStartDate) ? <p className="errorDatepicker">*Loss Date must be within Policy Tenure </p> : null}
 
-                    {props.lossdateflag && (props.DetailsDTO.lossDateTime == null) ? <p className="error"> </p> : null}
+                    {props.lossdateflag && (props.DetailsDTO.lossDateTime == null) ? <p className="errorDatepicker"> </p> : null}
                 </GridItem>
                 <GridItem xs={8} sm={5} md={3}>
                     <CustomInput
