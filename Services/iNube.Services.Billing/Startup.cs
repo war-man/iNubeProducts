@@ -16,6 +16,10 @@ using iNube.Services.Billing.Controllers.Billing.MotorBillingService;
 using iNube.Services.Billing.Controllers.Billing;
 using System;
 using iNube.Utility.Framework.LogPrivider.LogService;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Http;
+using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
 
 namespace iNube.Services.Billing
 {
@@ -54,12 +58,38 @@ namespace iNube.Services.Billing
            
             services.AddHealthChecks().AddSqlServer(connectionstring);
             services.AddAutoMapper(typeof(Startup));
-
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                //options.HttpsPort = 5001;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.InitializedCommonConfiguration(env, Configuration);
+           // app.UseCors(builder => builder.WithOrigins("http://localhost:55294"));
+            app.UseHealthChecks("/hc", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+
+
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = Configuration["Swagger:Url"].ToString() + "/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
+                c.RoutePrefix = Configuration["Swagger:Url"].ToString();
+            });
             // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
             if (env.IsDevelopment())
@@ -73,6 +103,11 @@ namespace iNube.Services.Billing
             }
             app.UseAuthentication();
             app.UseHttpsRedirection();
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+            .AddFrameOptionsSameOrigin()
+            .AddXssProtectionEnabled()
+            .AddContentTypeOptionsNoSniff()
+          );
             app.UseMvc();
         }
 
