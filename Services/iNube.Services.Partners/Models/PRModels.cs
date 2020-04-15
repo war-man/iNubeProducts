@@ -20,7 +20,7 @@ namespace iNube.Services.Partners.Models
         public int? cobid { get; set; }
         public string productCode { get; set; }
     }
-   
+
     public partial class LocationDTO
     {
         public string locationType { get; set; }
@@ -182,6 +182,192 @@ namespace iNube.Services.Partners.Models
 
         public virtual ICollection<OrgAddressDTO> OrgAddress { get; set; }
         public virtual ICollection<OrgSpocDetailsDTO> OrgSpocDetails { get; set; }
+    }
+
+    public class AVOOrganizationResponse : ResponseStatus
+    {
+        public AVOOrganizationDTO Organization { get; set; }
+    }
+
+    public partial class AVOOrganizationDTO
+    {
+        public AVOOrganizationDTO()
+        {
+            AVOOrgAddress = new HashSet<AVOOrgAddress>();
+            AVOOrgOffice = new HashSet<AVOOrgOffice>();
+            AVOOrgSpocDetails = new HashSet<AVOOrgSpocDetails>();
+            OrgStructure = new HashSet<OrgStructure>();
+        }
+
+        public decimal OrganizationId { get; set; }
+        public int OrgCategoryId { get; set; }
+        public int ConfigurationTypeId { get; set; }
+        public int OrgTypeId { get; set; }
+        public string OrgName { get; set; }
+        public string CorpAddressSameAs { get; set; }
+        public string MailingAddressSameAs { get; set; }
+        public byte[] OrgLogo { get; set; }
+        public string OrgWebsite { get; set; }
+        public string OrgPhoneNo { get; set; }
+        public string OrgFaxNo { get; set; }
+        public int? OrgLevels { get; set; }
+        public string OrgRegistrationNo { get; set; }
+        public string OrgRegisteringAuthority { get; set; }
+        public DateTime? OrgRegistrationDate { get; set; }
+        public string OrgServiceTaxRegistrationNumber { get; set; }
+        public string OrgPanno { get; set; }
+        public string OrgTanno { get; set; }
+        public string OrganizationCode { get; set; }
+        public bool? IsActive { get; set; }
+        public decimal? CustomerId { get; set; }
+        public decimal? ParentId { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+
+        public virtual ICollection<AVOOrgAddress> AVOOrgAddress { get; set; }
+        public virtual ICollection<AVOOrgOffice> AVOOrgOffice { get; set; }
+        public virtual ICollection<AVOOrgSpocDetails> AVOOrgSpocDetails { get; set; }
+        public virtual ICollection<OrgStructure> OrgStructure { get; set; }
+    }
+
+    public partial class AVOOrgAddress
+    {
+        public decimal OrgAddressId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public string OrgAddressType { get; set; }
+        public int? OrgCountryId { get; set; }
+        public int? OrgStateId { get; set; }
+        public int? OrgDistrictId { get; set; }
+        public int? OrgCityId { get; set; }
+        public string OrgAddressLine1 { get; set; }
+        public string OrgAddressLine2 { get; set; }
+        public string OrgAddressLine3 { get; set; }
+        public int? OrgPincodeId { get; set; }
+    }
+
+    public partial class AVOOrgOffice
+    {
+        public AVOOrgOffice()
+        {
+            //InverseOfficeReportingOffice = new HashSet<AVOOrgOffice>();
+            AVOOfficeSpocDetails = new HashSet<AVOOfficeSpocDetails>();
+            //AVOOrgOfficeMapping = new HashSet<AVOOrgOfficeMapping>();
+        }
+
+        public decimal OrgOfficeId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public string OfficeName { get; set; }
+        public string OfficeCode { get; set; }
+        public string OfficePhoneNo { get; set; }
+        public string OfficeFaxNo { get; set; }
+        public int? OfficeLevelId { get; set; }
+        public decimal? OfficeReportingOfficeId { get; set; }
+        public int? OfficeCountryId { get; set; }
+        public int? OfficeStateId { get; set; }
+        public int? OfficeDistrictId { get; set; }
+        public int? OfficeCityId { get; set; }
+        public string OfficeAddressLine1 { get; set; }
+        public string OfficeAddressLine2 { get; set; }
+        public string OfficeAddressLine3 { get; set; }
+        public int? OfficePincodeId { get; set; }
+        public bool? IsActive { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+
+        //public virtual ICollection<AVOOrgOffice> InverseOfficeReportingOffice { get; set; }
+        public virtual ICollection<AVOOfficeSpocDetails> AVOOfficeSpocDetails { get; set; }
+        //public virtual ICollection<AVOOrgOfficeMapping> AVOOrgOfficeMapping { get; set; }
+        //public virtual ICollection<AVOOrgOfficeMapping> TblOrgOfficeMappingPrimaryOffice { get; set; }
+        //public virtual ICollection<AVOOrgOfficeMapping> TblOrgOfficeMappingReportingOffice { get; set; }
+    }
+
+    public partial class AVOOrgOfficeMapping
+    {
+        public decimal OrgOfficeMappingId { get; set; }
+        public decimal PrimaryOfficeId { get; set; }
+        public decimal ReportingOfficeId { get; set; }
+        public DateTime? EffectiveFrom { get; set; }
+        public DateTime? EffectiveTo { get; set; }
+        public string UserName { get; set; }
+        public DateTime? CreatedDateTime { get; set; }
+        public bool? IsValid { get; set; }
+
+        //public virtual TblOrgOffice PrimaryOffice { get; set; }
+        //public virtual TblOrgOffice ReportingOffice { get; set; }
+    }
+
+    public partial class AVOOrgSpocDetails
+    {
+        public decimal OrgSpocId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public string SpocfirstName { get; set; }
+        public string Spocmobileno { get; set; }
+        public string SpocemailId { get; set; }
+        public string Spocdesignation { get; set; }
+        public int? SpoccountryId { get; set; }
+        public int? SpocstateId { get; set; }
+        public int? SpocdistrictId { get; set; }
+        public int? SpoccityId { get; set; }
+        public string SpocaddressLine1 { get; set; }
+        public string SpocaddressLine2 { get; set; }
+        public string SpocaddressLine3 { get; set; }
+        public int? SpocpincodeId { get; set; }
+        public string SpocMiddleName { get; set; }
+        public string SpocLastName { get; set; }
+        public DateTime? Spocdob { get; set; }
+        public DateTime? Spocdoj { get; set; }
+        public string SpocpanNo { get; set; }
+        public string LandLineOffice { get; set; }
+        public string LandLineResidence { get; set; }
+        public string SpocUserName { get; set; }
+        public int? SpocMaritalStatusId { get; set; }
+        public int? SpocGenderId { get; set; }
+        public string SpocBranchName { get; set; }
+        public int? SpocBrachCode { get; set; }
+    }
+
+    public partial class OrgStructure
+    {
+        public string levelname { get; set; }
+        public string reportto { get; set; }
+        public int levelId { get; set; }
+        public string StructureType { get; set; }
+    }
+
+    public partial class AVOOrgStructure
+    {
+        public decimal OrgStructureId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public int? LevelId { get; set; }
+        public string LevelDefinition { get; set; }
+        public int? RepotrsToId { get; set; }
+        public decimal? ParentId { get; set; }
+        public string UserName { get; set; }
+        public DateTime? CreatedDateTime { get; set; }
+        public bool? IsValid { get; set; }
+        public int? StructureTypeId { get; set; }
+    }
+
+    public partial class AVOOfficeSpocDetails
+    {
+        public decimal OfficeSpocid { get; set; }
+        public decimal? OfficeId { get; set; }
+        public string Spocname { get; set; }
+        public string Spocmobileno { get; set; }
+        public string SpocemailId { get; set; }
+        public string Spocdesignation { get; set; }
+        public int? SpoccountryId { get; set; }
+        public int? SpocstateId { get; set; }
+        public int? SpocdistrictId { get; set; }
+        public int? SpoccityId { get; set; }
+        public string SpocaddressLine1 { get; set; }
+        public string SpocaddressLine2 { get; set; }
+        public string SpocaddressLine3 { get; set; }
+        public int? SpocpincodeId { get; set; }
     }
 
     public partial class OrgOfficeDTO
@@ -885,7 +1071,7 @@ namespace iNube.Services.Partners.Models
         //  public virtual CoverRcbdetailsDTO CoverRcbdetails { get; set; }
 
     }
-    
+
 
     #region ProductKit
     public class PolicycancelDTO
@@ -1091,7 +1277,7 @@ namespace iNube.Services.Partners.Models
 
     }
     #endregion
-  
+
     public class PartnerUploadlogoResponse : ResponseStatus
     {
         public PartnersDTO details { get; set; }
@@ -1103,7 +1289,7 @@ namespace iNube.Services.Partners.Models
         public string DocumentName { get; set; }
         public string DocumentType { get; set; }
     }
-  
+
 
     public class AssignedProducts
     {
@@ -1142,13 +1328,13 @@ namespace iNube.Services.Partners.Models
         public string PartnerName { get; set; }
     }
 
-    public class MasterCDDTO 
+    public class MasterCDDTO
     {
 
         public MasterCDDTO()
         {
             CdTransactionsDTO = new List<MasterCdTransactionsDTO>();
-           
+
         }
         public string AccountNo { get; set; }
         public List<MasterCdTransactionsDTO> CdTransactionsDTO { get; set; }
@@ -1162,7 +1348,7 @@ namespace iNube.Services.Partners.Models
         public string TxnType { get; set; }
         public decimal Amount { get; set; }
         public string PaymentReferenceNo { get; set; }
-            
+
     }
     public class EditAssignProductDTO
     {
@@ -1190,8 +1376,8 @@ namespace iNube.Services.Partners.Models
 
 
     }
-  
-        public class TxnParameterDTO
+
+    public class TxnParameterDTO
     {
         public string Type { get; set; }
         public decimal Amount { get; set; }
@@ -1269,12 +1455,12 @@ namespace iNube.Services.Partners.Models
 
         public List<MicaCDDTO> micaCDDTO { get; set; }
     }
-    public class DailyDTO: ResponseStatus
+    public class DailyDTO : ResponseStatus
     {
         public string AccountNo { get; set; }
         public decimal? AvailableAmount { get; set; }
         public string TxnEventType { get; set; }
-       
+
 
     }
 
@@ -1286,7 +1472,7 @@ namespace iNube.Services.Partners.Models
         public decimal? TxnAmountBalance { get; set; }
         public decimal? TaxAmountBalance { get; set; }
         public decimal? TotalAvailableBalance { get; set; }
-   
+
 
 
     }
@@ -1311,15 +1497,15 @@ namespace iNube.Services.Partners.Models
         public decimal? TransactionAmountCredit { get; set; }
         public decimal? Gst { get; set; }
         public decimal? TotalAmount { get; set; }
-     
+
     }
-    public partial class CDAccountDTO:ResponseStatus
+    public partial class CDAccountDTO : ResponseStatus
     {
-        
+
         public decimal? OpeningBalance { get; set; }
         public decimal? ClosingBalance { get; set; }
         public List<AccountDetails> AccountDetails { get; set; }
-      
+
     }
     public partial class CDAccountRequest
     {
@@ -1327,8 +1513,8 @@ namespace iNube.Services.Partners.Models
         public string TxnEventType { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
-     
+
     }
-    }
+}
 
 

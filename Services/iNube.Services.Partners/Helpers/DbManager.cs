@@ -1,4 +1,5 @@
 ﻿using iNube.Services.Partners.Entities;
+using iNube.Services.Partners.Entities.AVO;
 using iNube.Services.Partners.Helpers;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using Microsoft.EntityFrameworkCore;
@@ -89,10 +90,10 @@ namespace iNube.Services.UserManagement.Helpers
                     context = new MICAPRContext(optionsBuilder.Options);
                     break;
                 case "Avo":
-                    var optionBuilder = new DbContextOptionsBuilder<MICAPRContext>();
+                    var optionBuilder = new DbContextOptionsBuilder<AVOPRContext>();
                     optionBuilder.UseSqlServer(dbConnectionString);
                     //DbContextOptions<MICAUMContext> dbContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                    context = new MICAPRContext(optionBuilder.Options);
+                    context = new AVOPRContext(optionBuilder.Options);
                     break;
                 case "Motor":
                     dbConnectionString = DbConnectionManager.GetConnectionString("Prod");

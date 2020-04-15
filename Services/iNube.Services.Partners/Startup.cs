@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Http;
+using iNube.Services.Partners.Entities.AVO;
 
 namespace iNube.Services.Partners
 {
@@ -39,6 +40,7 @@ namespace iNube.Services.Partners
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<MICAPRContext>();
+            services.AddDbContext<AVOPRContext>();
 
 
             //services.AddCors();
@@ -120,7 +122,7 @@ namespace iNube.Services.Partners
         }
 
         public void ConfigureModuleService(IServiceCollection services)
-        { 
+        {
             services.AddTransient<IValidator<CdAccountsDTO>, CreateCDAccountRequestValidator>();
             services.AddTransient<IValidator<PartnersDTO>, CreatePartnerRequestValidator>();
             services.AddTransient<IValidator<PartnerAddressDTO>, PartnerAddressValidator>();
@@ -157,8 +159,8 @@ namespace iNube.Services.Partners
                         return serviceProvider.GetService<MicaOrganizationService>();
                     case "Motor":
                         return serviceProvider.GetService<MotorOrganizationService>();
-                    case "Avo":
-                        return serviceProvider.GetService<AvoOrganizationService>();
+                    //case "Avo":
+                    //    return serviceProvider.GetService<AvoOrganizationService>();
                     default:
                         return serviceProvider.GetService<MicaOrganizationService>();
 
@@ -213,6 +215,7 @@ namespace iNube.Services.Partners
             services.AddScoped<IAccountService, AccountsService>();
             services.AddScoped<IIntegrationService, IntegrationService>();
             services.AddScoped<IOrganizationService, OrganizationService>();
+            services.AddScoped<IAvoOrganizationProductService, AvoOrganizationService>();
             services.AddScoped<IPartnerService, PartnerService>();
             services.AddScoped<ILoggerManager, LoggerManager>();
             services.AddTransient<IEmailService, EmailService>();

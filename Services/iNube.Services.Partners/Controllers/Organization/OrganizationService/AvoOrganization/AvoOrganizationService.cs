@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using iNube.Services.Partners.Controllers.Partner.PartnerService;
-using iNube.Services.Partners.Entities;
-using iNube.Services.Partners.Helpers;
+using iNube.Services.Partners.Entities.AVO;
 using iNube.Services.Partners.Models;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
@@ -16,14 +14,14 @@ using Microsoft.Extensions.Configuration;
 namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 {
 
-    public class AvoOrganizationService : IOrganizationProductService
+    public class AvoOrganizationService : IAvoOrganizationProductService
     {
-        private MICAPRContext _context;
+        private AVOPRContext _context;
         private IMapper _mapper;
         private readonly IConfiguration _configuration;
 
         private IIntegrationService _integrationService;
-        public AvoOrganizationService(MICAPRContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
+        public AvoOrganizationService(AVOPRContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
@@ -34,24 +32,24 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         //get for master
         public async Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             IEnumerable<ddDTO> ddDTOs;
             ddDTOs = _context.TblmasPrcommonTypes
              .Select(c => new ddDTO
-              {
-                  mID = c.CommonTypeId,
-                  mValue = c.Value,
-                  mType = c.MasterType
-              });
-             return ddDTOs;
+             {
+                 mID = c.CommonTypeId,
+                 mValue = c.Value,
+                 mType = c.MasterType
+             });
+            return ddDTOs;
         }
 
         // get Location
         public async Task<IEnumerable<ddDTO>> GetLocation(string locationType, int parentID, ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             IEnumerable<ddDTO> ddDTOs;
 
@@ -106,15 +104,82 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return ddDTOs;
         }
 
-        public async Task<OrganizationResponse> CreateOrganizationAsync(OrganizationDTO orgDTO, ApiContext apiContext)
+        public async Task<AVOOrganizationResponse> CreateOrganizationAsync(AVOOrganizationDTO orgDTO, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             TblOrganization organization = _mapper.Map<TblOrganization>(orgDTO);
             //_context.Entry(organization).State = organization.OrganizationId == 0 ? EntityState.Added : EntityState.Modified;
             if (organization.OrganizationId == 0)
             {
-                _context.TblOrganization.Add(organization);
+                var _organization = _mapper.Map<TblOrganization>(orgDTO);
+
+                var orgoffspoc = orgDTO.AVOOrgSpocDetails.FirstOrDefault();
+                TblOrgOffice orgOffice = new TblOrgOffice();
+                orgOffice.OfficeName = orgDTO.OrgName;
+                //orgOffice.OfficeCode = orgoffspoc.SpocBrachCode;
+                orgOffice.OfficePhoneNo = orgDTO.OrgPhoneNo;
+                orgOffice.OfficeFaxNo = orgDTO.OrgFaxNo;
+                //orgOffice.OfficeLevelId = 1;
+                //orgOffice.OfficeReportingOfficeId = 0;
+                orgOffice.OfficeCountryId = orgoffspoc.SpoccountryId;
+                orgOffice.OfficeStateId = orgoffspoc.SpocstateId;
+                orgOffice.OfficeDistrictId = orgoffspoc.SpocdistrictId;
+                orgOffice.OfficeCityId = orgoffspoc.SpoccityId;
+                orgOffice.OfficeAddressLine1 = orgoffspoc.SpocaddressLine1;
+                orgOffice.OfficeAddressLine2 = orgoffspoc.SpocaddressLine2;
+                orgOffice.OfficeAddressLine3 = orgoffspoc.SpocaddressLine3;
+                orgOffice.OfficePincodeId = orgoffspoc.SpoccityId;
+                orgOffice.IsActive = true;
+                orgOffice.CreatedBy = apiContext.UserId;
+                orgOffice.CreatedDate = DateTime.Now;
+
+                TblOfficeSpocDetails OrgOfficeSpoc = new TblOfficeSpocDetails();
+                OrgOfficeSpoc.Spocname = orgoffspoc.SpocfirstName;
+                OrgOfficeSpoc.Spocmobileno = orgoffspoc.Spocmobileno;
+                OrgOfficeSpoc.SpocemailId = orgoffspoc.SpocemailId;
+                OrgOfficeSpoc.Spocdesignation = orgoffspoc.Spocdesignation;
+                OrgOfficeSpoc.SpoccountryId = orgoffspoc.SpoccountryId;
+                OrgOfficeSpoc.SpocstateId = orgoffspoc.SpocstateId;
+                OrgOfficeSpoc.SpocdistrictId = orgoffspoc.SpocdistrictId;
+                OrgOfficeSpoc.SpoccityId = orgoffspoc.SpoccityId;
+                OrgOfficeSpoc.SpocaddressLine1 = orgoffspoc.SpocaddressLine1;
+                OrgOfficeSpoc.SpocaddressLine2 = orgoffspoc.SpocaddressLine2;
+                OrgOfficeSpoc.SpocaddressLine3 = orgoffspoc.SpocaddressLine3;
+                OrgOfficeSpoc.SpocpincodeId = orgoffspoc.SpoccityId;
+
+                orgOffice.TblOfficeSpocDetails.Add(OrgOfficeSpoc);
+
+                _organization.TblOrgOffice.Add(orgOffice);
+
+                var structuretype = _context.TblmasPrcommonTypes.Where(a => a.MasterType == "StructureType").Select(b => b);
+
+                var orgstucture = orgDTO.OrgStructure;
+                foreach (var item in orgstucture)
+                {
+                    TblOrgStructure tblOrg = new TblOrgStructure();
+                    tblOrg.LevelId = item.levelId;
+                    tblOrg.LevelDefinition = item.levelname;
+                    if (!string.IsNullOrEmpty(item.levelname))
+                    {
+                        if (item.levelname == "self")
+                        {
+                            tblOrg.RepotrsToId = null;
+                            tblOrg.ParentId = null;
+                        }
+                        else
+                        {
+                            tblOrg.RepotrsToId = _context.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.levelname).LevelId;
+                            tblOrg.ParentId = _context.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.levelname).LevelId;
+                        }
+                    }
+                    tblOrg.UserName = apiContext.UserName;
+                    tblOrg.CreatedDateTime = DateTime.Now;
+                    tblOrg.StructureTypeId = structuretype.FirstOrDefault(a => a.Value == item.StructureType).CommonTypeId;
+                    _organization.TblOrgStructure.Add(tblOrg);
+                }
+
+                _context.TblOrganization.Add(_organization);
             }
             else
             {
@@ -122,72 +187,79 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 _context.Update(organization);
             }
             _context.SaveChanges();
-            var organizationDTOs = _mapper.Map<OrganizationDTO>(organization);
+            var organizationDTOs = _mapper.Map<AVOOrganizationDTO>(organization);
+
             if (orgDTO.OrganizationId == 0)
             {
                 var userCount = await CreateUserAsync(organizationDTOs, apiContext);
             }
-            return new OrganizationResponse() { Status = BusinessStatus.Created, Id = organizationDTOs.OrganizationId.ToString(), ResponseMessage = $"Organizations ID {organizationDTOs.OrganizationId} successfully {(orgDTO.OrganizationId == 0 ? "created " : "modified")} for {organizationDTOs.OrgName}" };
+
+            return new AVOOrganizationResponse() { Status = BusinessStatus.Created, Id = organizationDTOs.OrganizationId.ToString(), ResponseMessage = $"Organizations ID {organizationDTOs.OrganizationId} successfully {(orgDTO.OrganizationId == 0 ? "created " : "modified")} for {organizationDTOs.OrgName}" };
             //return organizationDTOs;
         }
 
-        public async Task<OrganizationDTO> GetOrganization(int orgId, ApiContext apiContext)
+        public async Task<AVOOrganizationDTO> GetOrganization(int orgId, ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            OrganizationDTO _organizationDTO = new OrganizationDTO();
+            AVOOrganizationDTO _organizationDTO = new AVOOrganizationDTO();
             TblOrganization _tblOrg = _context.TblOrganization.Where(org => org.OrganizationId == orgId)
                                         .Include(add => add.TblOrgAddress)
                                         .Include(spoc => spoc.TblOrgSpocDetails)
                                         .FirstOrDefault();
-            _organizationDTO = _mapper.Map<OrganizationDTO>(_tblOrg);
+            _organizationDTO = _mapper.Map<AVOOrganizationDTO>(_tblOrg);
             return _organizationDTO;
         }
 
-        public async Task<IEnumerable<OrganizationDTO>> SearchOrganizationById(int orgId, ApiContext apiContext)
+        public async Task<IEnumerable<AVOOrganizationDTO>> SearchOrganizationById(int orgId, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration)); ;
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration)); ;
             var _org = _context.TblOrganization.Where(org => org.OrganizationId == orgId)
                         .Include(add => add.TblOrgAddress)
+                        .Include(add => add.TblOrgOffice)
+                        .Include(add => add.TblOrgStructure)
                         .Include(spoc => spoc.TblOrgSpocDetails)
                         .ToList();
-            var _OrgDTO = _mapper.Map<List<OrganizationDTO>>(_org);
+            var _OrgDTO = _mapper.Map<List<AVOOrganizationDTO>>(_org);
             return _OrgDTO;
         }
 
-        public async Task<IEnumerable<OrganizationDTO>> SearchOrganization(OrgSearchDTO searchorg, ApiContext apiContext)
+        public async Task<IEnumerable<AVOOrganizationDTO>> SearchOrganization(OrgSearchDTO searchorg, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _org = _context.TblOrganization
                  .Include(add => add.TblOrgAddress)
+                 .Include(add => add.TblOrgOffice)
+                 .Include(add => add.TblOrgStructure)
                  .Include(spoc => spoc.TblOrgSpocDetails)
                  .ToList();
-            var _OrgDTO = _mapper.Map<List<OrganizationDTO>>(_org);
+            var _OrgDTO = _mapper.Map<List<AVOOrganizationDTO>>(_org);
             return _OrgDTO;
         }
 
         public int TestMethod(ApiContext apiContext)
         {
-            //_context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            //_context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             return 0;
         }
 
-        public async Task<int> CreateUserAsync(OrganizationDTO orgDTO, ApiContext apiContext)
+        public async Task<int> CreateUserAsync(AVOOrganizationDTO orgDTO, ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             if (orgDTO.ConfigurationTypeId == 3)
             {
-                var user = GetUserData(orgDTO.OrgSpocDetails.FirstOrDefault());
+                var user = GetUserData(orgDTO.AVOOrgSpocDetails.FirstOrDefault());
                 await _integrationService.CreateUserAsync(user, apiContext);
             }
             return 1;
 
         }
-        private UserDTO GetUserData(OrgSpocDetailsDTO orgSpocDetailsDTO)
+
+        private UserDTO GetUserData(AVOOrgSpocDetails orgSpocDetailsDTO)
         {
-             UserDTO userDTO = new UserDTO();
+            UserDTO userDTO = new UserDTO();
 
             UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
             UserAddressDTO userAddressDTO = new UserAddressDTO();
@@ -218,9 +290,13 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return userDTO;
         }
 
-        public async Task<IEnumerable<OrganizationDTO>> GetOrgByParentId(int orgid, ApiContext apiContext)
+        public async Task<IEnumerable<AVOOrganizationDTO>> GetOrgByParentId(int orgid, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var orgdata = _context.TblOrganization.Select(o => o.ParentId == orgid);
+            var _result = _mapper.Map<List<AVOOrganizationDTO>>(orgdata);
+            return _result.ToList();
         }
     }
 }
