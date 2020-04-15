@@ -4,5 +4,19 @@
         <name>iNube.Services.Lead</name>
     </assembly>
     <members>
+        <member name="M:iNube.Services.Lead.Controllers.Lead.LeadService.LeadService.GetProperties(System.Object)">
+            <summary>
+            RuleEngine
+            </summary>
+            <param name="lMasterlist"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iNube.Services.Lead.Controllers.Lead.LeadService.LeadService.GetMaster(System.String)">
+            <summary>
+            RUleEngine End
+            </summary>
+            <param name="lMasterlist"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

@@ -13,6 +13,10 @@
     <UserSecretsId>dd7ed7c6-dbb7-496f-aac7-49337f6d8956</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>E:\GITRepo\AWS\iNubeProducts\Services\iNube.Services.Lead\iNube.Services.Lead.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.UI" Version="2.2.12" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
