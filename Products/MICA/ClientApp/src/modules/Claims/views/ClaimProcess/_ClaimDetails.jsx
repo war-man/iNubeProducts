@@ -204,6 +204,23 @@ const ClaimDetails = (props) => {
                         />
                     </GridItem>
                 }
+
+                {
+                    claimDetailsprops.PerformerFlag &&
+
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
+                            //disabled={claimDetailsprops.disabled}
+                            labelText="Performer"
+                            value={claimDetailsprops.fields.AdditionalDetails.Performer}
+                            onChange={claimDetailsprops.handlePerformerFun}
+                            name='Performer'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
                 <GridContainer justify="center">
                     <GridItem xs={3} sm={3} md={3}>
 

@@ -120,6 +120,7 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            PerformerFlag:true,
             ClaimIntemationDate: null,
             claimsremarksflag: false,
             claimstatusflag: false,
@@ -241,6 +242,7 @@ class InboxClaimProcess extends React.Component {
                 ClaimInsurable: [],
                 payeeTypeId: "",
                 DataModelDTO: [],
+                AdditionalDetails: {"Performer":""}
             },
             emptyobject: {},
             Workshop: {},
@@ -317,7 +319,8 @@ class InboxClaimProcess extends React.Component {
                 "accountType": "",
                 "bankName": "",
                 "ifscCode": "",
-                "bankAddress": ""
+                "bankAddress": "",
+               
             },
             policyDetailsData: {
                 "customerId": "",
@@ -401,6 +404,7 @@ class InboxClaimProcess extends React.Component {
     };
 
     onFormSubmit = (evt) => {
+        console.log("this.state.fields",this.state.fields);
         this.state.ValidationUI = true;
         this.state.validateUI = false;
         this.state.approveamtvalidation = false;
@@ -1588,6 +1592,13 @@ class InboxClaimProcess extends React.Component {
         console.log("table data", this.state.TableDataList);
     }
 
+    handlePerformerFun = (e) => {
+        let AdditionalDetails = this.state.fields.AdditionalDetails;
+        AdditionalDetails[e.target.name] = e.target.value;
+        this.setState({ AdditionalDetails });
+        
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -1729,6 +1740,7 @@ class InboxClaimProcess extends React.Component {
                                     displaywork={this.state.displaywork} displaycust={this.state.displaycust} displayfinancier={this.state.displayfinancier} displaynominee={this.state.displaynominee} displaysurveyor={this.state.displaysurveyor}
                                     handleActivitylog={this.handleActivitylog} claimstatusflag={this.state.claimstatusflag} claimsremarksflag={this.state.claimsremarksflag}
                                     Bankarray={this.state.Bankarray} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}
+                                    PerformerFlag={this.state.PerformerFlag} handlePerformerFun={this.handlePerformerFun}
                                 />
                             </CardBody>
                         </Card>
