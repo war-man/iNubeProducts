@@ -47,7 +47,6 @@ namespace iNube.Services.Rating
             var micaconnectionstring = Configuration.GetConnectionString("DefaultConnection");
             //services.AddDbContext<MICAACContext>(x => x.UseSqlServer(micaconnectionstring));
 
-
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 

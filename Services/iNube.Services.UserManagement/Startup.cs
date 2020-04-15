@@ -109,13 +109,11 @@ namespace iNube.Services.UserManagement
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials());
-
             app.UseHealthChecks("/hc", new HealthCheckOptions()
             {
                 Predicate = _ => true,
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
-
 
             app.UseSwagger(c =>
             {

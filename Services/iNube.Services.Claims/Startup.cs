@@ -83,7 +83,6 @@ namespace iNube.Services.Claims
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 
-
             app.UseSwagger(c =>
             {
                 c.RouteTemplate = Configuration["Swagger:Url"].ToString() + "/{documentName}/swagger.json";
