@@ -106,7 +106,11 @@ namespace iNube.Services.UserManagement
         {
             //app.InitializedCommonConfiguration(env, Configuration);
             // global cors policy
-            app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors(x => x
+              .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials());
+
             app.UseHealthChecks("/hc", new HealthCheckOptions()
             {
                 Predicate = _ => true,
@@ -135,11 +139,11 @@ namespace iNube.Services.UserManagement
             }
             app.UseAuthentication();
             app.UseHttpsRedirection();
-            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
-              .AddFrameOptionsSameOrigin()
-              .AddXssProtectionEnabled()
-              .AddContentTypeOptionsNoSniff()
-            );
+            //app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+            //  .AddFrameOptionsSameOrigin()
+            //  .AddXssProtectionEnabled()
+            //  .AddContentTypeOptionsNoSniff()
+            //);
             app.UseMvc();
         }
 
