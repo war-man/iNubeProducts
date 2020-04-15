@@ -79,8 +79,7 @@ namespace iNube.Services.Partners
         {
             //app.InitializedCommonConfiguration(env, Configuration);
             // global cors policy
-            // app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowCredentials());
-            app.UseCors(builder => builder.WithOrigins("http://localhost:55294"));
+            app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().AllowCredentials());
             app.UseHealthChecks("/hc", new HealthCheckOptions()
             {
                 Predicate = _ => true,
