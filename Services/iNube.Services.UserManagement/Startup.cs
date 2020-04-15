@@ -86,17 +86,17 @@ namespace iNube.Services.UserManagement
             services.AddHealthChecks().AddSqlServer(connectionstring);
             services.AddAutoMapper(typeof(Startup));
 
-            services.AddHsts(options =>
-            {
-                options.Preload = true;
-                options.IncludeSubDomains = true;
-                options.MaxAge = TimeSpan.FromDays(365);
-            });
-            services.AddHttpsRedirection(options =>
-            {
-                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                //options.HttpsPort = 5001;
-            });
+            //services.AddHsts(options =>
+            //{
+            //    options.Preload = true;
+            //    options.IncludeSubDomains = true;
+            //    options.MaxAge = TimeSpan.FromDays(365);
+            //});
+            //services.AddHttpsRedirection(options =>
+            //{
+            //    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+            //    //options.HttpsPort = 5001;
+            //});
           //  services.
           
         }
@@ -138,7 +138,7 @@ namespace iNube.Services.UserManagement
                 app.UseHsts();
             }
             app.UseAuthentication();
-            app.UseHttpsRedirection();
+           // app.UseHttpsRedirection();
             //app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
             //  .AddFrameOptionsSameOrigin()
             //  .AddXssProtectionEnabled()
