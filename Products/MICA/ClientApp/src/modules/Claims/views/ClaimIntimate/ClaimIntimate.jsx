@@ -391,7 +391,7 @@ class ClaimIntimate extends React.Component {
         evt.preventDefault();
         this.UIValidation();
         this.IsValidProductDetails();
-        debugger;
+       
         if (this.state.validateUI === true) {
 
             if (this.state.ValidationUI === true) {
@@ -542,7 +542,8 @@ class ClaimIntimate extends React.Component {
     }
 
     UIValidation = () => {
-
+       
+        console.log("lossDateTimeState", this.state.lossDateTimeState);
         if (this.state.locationOfLossState === false && this.state.lossDescriptionState === false && this.state.ifscCodeState === false && this.state.accountHolderNameState === false
             && this.state.bankNameState === false) {
 
@@ -569,34 +570,19 @@ class ClaimIntimate extends React.Component {
     }
 
     onDateChange = (formate, type, name, event) => {
-
-        console.log("event", event);
-        console.log("name", name);
+        
+        //var today = event.toDate();
+        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
         var today = event.toDate();
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+        var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
 
-
-        //var dd = today.getDate();
-        //var mm = today.getMonth() + 1;
-        //if (mm < 10) {
-        //    mm = '0' + mm;
-
-        //}
-        //if (dd < 10) {
-        //    dd = '0' + dd;
-        //}
-
-        //var date1 = dd + '/' + mm + '/' + today.getFullYear();
         console.log("date", date);
-        // if (formate == 'datetime') {
         let DetailsDataDTO = this.state.DetailsDTO;
         DetailsDataDTO[name] = date;
         this.setState({ DetailsDataDTO });
         let PolicyDataDTO = this.state.PolicysearchDTO;
         PolicyDataDTO[name] = date;
         this.setState({ PolicyDataDTO });
-        //  }
-
         console.log("datetime", this.state.DetailsDTO);
 
         console.log("PolicyStartDate", this.state.PolicyStartDate);
