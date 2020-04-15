@@ -1698,6 +1698,8 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
         public async Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)
         {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var Errors = new List<ErrorInfo>();
             CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
             dbHelper._TimeZone = UserDateTime.KeyValue;
@@ -1716,24 +1718,30 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
             if (cdaccount == null)
             {
-                /* CD Account Table*/
-                TblCdaccounts tblCdaccounts = new TblCdaccounts();
+                try
+                {
+                    /* CD Account Table*/
+                    TblCdaccounts tblCdaccounts = new TblCdaccounts();
 
-                tblCdaccounts.AccountNo = accountnumber;
-                tblCdaccounts.OrganizationId = apiContext.OrgId;
-                tblCdaccounts.InitialAmount = 0;
+                    tblCdaccounts.AccountNo = accountnumber;
+                    tblCdaccounts.OrganizationId = apiContext.OrgId;
+                    tblCdaccounts.InitialAmount = 0;
 
-                tblCdaccounts.AvailableBalance = 0;
-                tblCdaccounts.LedgerBalance = 0;
-                tblCdaccounts.CreatedBy = apiContext.UserId;
-                tblCdaccounts.CreatedDate = DateTimeNow;
-                tblCdaccounts.ThresholdValue = 0;
-                tblCdaccounts.DropLimit = 0;
-                tblCdaccounts.Remark = $"Intial Setup  {0}";
-                tblCdaccounts.Active = true;
+                    tblCdaccounts.AvailableBalance = 0;
+                    tblCdaccounts.LedgerBalance = 0;
+                    tblCdaccounts.CreatedBy = apiContext.UserId;
+                    tblCdaccounts.CreatedDate = DateTimeNow;
+                    tblCdaccounts.ThresholdValue = 0;
+                    tblCdaccounts.DropLimit = 0;
+                    tblCdaccounts.Remark = $"Intial Setup  {0}";
+                    tblCdaccounts.Active = true;
 
-                _context.TblCdaccounts.Add(tblCdaccounts);
-                _context.SaveChanges();
+                    _context.TblCdaccounts.Add(tblCdaccounts);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex) {
+                    return new MasterCDDTO { Status = BusinessStatus.Error, ResponseMessage = ex.InnerException.ToString() };
+                }
 
             }
             return new MasterCDDTO { Status = BusinessStatus.Created, ResponseMessage = $"CD Account created successfully for this AccountNumber {accountnumber}" };

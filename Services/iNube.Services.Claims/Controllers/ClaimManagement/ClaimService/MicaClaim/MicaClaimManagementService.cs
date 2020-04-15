@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -1699,145 +1700,181 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                 DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
                 var ClaimApproval = _context.TblClaims.SingleOrDefault(x => x.ClaimNumber == claimsDTO.ClaimNumber);
-                var Insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == claimsDTO.ClaimId).ToList();
-                EmailTest emailTest = new EmailTest();
-                TblClaimHistory claimsHistory = new TblClaimHistory();
-                List<ClaimdocDTO> _claimdoc = new List<ClaimdocDTO>();
-
-                var oldstatusId = ClaimApproval.ClaimStatusId;
-                // Get Clone 
-                //  var hisClaimApproval= Clone.ClaimApproval.
-
-                TblClaims claimsprocess = _mapper.Map<TblClaims>(ClaimApproval);
-
-                claimsprocess.ModifiedBy = apiContext.UserId;
-                claimsprocess.ModifiedDate = DateTimeNow;
-                claimsprocess.ClaimStatusId = claimsDTO.ClaimStatusId;
-                claimsprocess.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
-                claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
-
-                foreach (var item in claimsDTO.DataModelDTO)
+                if (ClaimApproval != null)
                 {
-                    //if (item.type.ToString() == "Customer")
-                    //{
-                    //    var custBankdetail = _context.TblBankAccounts.FirstOrDefault(x => x.ClaimId == claimsDTO.ClaimId && x.PayeeType == "Customer");
-                    //    custBankdetail.AccountHolderName = item["Account Holder Name"];
-                    //    custBankdetail.AccountNumber = item["Account No."];
-                    //    custBankdetail.ClaimId = ClaimApproval.ClaimId;
-                    //    custBankdetail.BankBranchAddress = item["Bank Branch Address"];
-                    //    custBankdetail.BankName = item["Bank Name"];
-                    //    custBankdetail.Ifsccode = item["IFSC Code"];
-                    //    custBankdetail.AccountType = item["Account Type"];
-                    //    custBankdetail.AmountPaid = item["Amount Paid"];
-                    //    custBankdetail.DataOfPayment = item["Date Of Payment"];
-                    //    _context.TblBankAccounts.Update(custBankdetail);
-                    //}
-                    //else
-                    //{
-                    TblClaimPayments claimPayments = new TblClaimPayments();
-                    claimPayments.AccountHolderName = item["Account Holder Name"];
-                    claimPayments.AccountNumber = item["Account No."];
-                    claimPayments.ClaimId = ClaimApproval.ClaimId;
-                    claimPayments.BankBranchAddress = item["Bank Branch Address"];
-                    claimPayments.BankName = item["Bank Name"];
-                    claimPayments.Ifsccode = item["IFSC Code"];
-                    claimPayments.AccountType = item["Account Type"];
-                    claimPayments.AmountPaid = item["Amount Paid"];
-                    claimPayments.DataOfPayment = item["Date Of Payment"];
-                    claimPayments.PayeeType = item.type;
-                    _context.TblClaimPayments.Add(claimPayments);
-                    //}
-                }
+                    var Insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == claimsDTO.ClaimId).ToList();
+                    EmailTest emailTest = new EmailTest();
+                    TblClaimHistory claimsHistory = new TblClaimHistory();
+                    List<ClaimdocDTO> _claimdoc = new List<ClaimdocDTO>();
 
+                    var oldstatusId = ClaimApproval.ClaimStatusId;
+                    // Get Clone 
+                    //  var hisClaimApproval= Clone.ClaimApproval.
 
-                _context.TblClaims.Update(claimsprocess);
-                //_context.SaveChanges();
-                if (!string.IsNullOrEmpty(claimsDTO.EmailId))
-                {
-                    if (claimsprocess.ClaimStatusId == 9)
+                    TblClaims claimsprocess = _mapper.Map<TblClaims>(ClaimApproval);
+                    var OldClaimFields = JsonConvert.DeserializeObject<ExpandoObject>(ClaimApproval.ClaimFields.ToString());
+                    if (claimsDTO.AdditionalDetails != null)
                     {
-                        emailTest.To = claimsDTO.EmailId;
-                        emailTest.Subject = "Claim successfully approved";
-                        emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " successfully approved. \n Your Claim has been approved, by the Claims Manager. \n The Approved Claims will be settled as per the policy terms and conditions.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
-                        await SendEmailAsync(emailTest);
+                        var keyValuePair = JsonConvert.DeserializeObject<IDictionary<string, string>>(claimsDTO.AdditionalDetails.ToString());
+                        foreach (var item in keyValuePair)
+                        {
+                            AddProperty(OldClaimFields, item.Key, item.Value);
+                        }
+                        dynamic json = JsonConvert.SerializeObject(OldClaimFields);
+                        claimsprocess.ClaimFields = json;
+
                     }
-                    else if (claimsprocess.ClaimStatusId == 11)
+                    claimsprocess.ModifiedBy = apiContext.UserId;
+                    claimsprocess.ModifiedDate = DateTimeNow;
+                    claimsprocess.ClaimStatusId = claimsDTO.ClaimStatusId;
+                    claimsprocess.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
+                    claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
+
+                    foreach (var item in claimsDTO.DataModelDTO)
                     {
-                        emailTest.To = claimsDTO.EmailId;
-                        emailTest.Subject = "Claim Rejected";
-                        emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " has been rejected. \n Your Claim has been rejected, by the Claims Manager. \n We regret to inform you that your claim has been Rejected by the claims manager.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
-                        await SendEmailAsync(emailTest);
+                        //if (item.type.ToString() == "Customer")
+                        //{
+                        //    var custBankdetail = _context.TblBankAccounts.FirstOrDefault(x => x.ClaimId == claimsDTO.ClaimId && x.PayeeType == "Customer");
+                        //    custBankdetail.AccountHolderName = item["Account Holder Name"];
+                        //    custBankdetail.AccountNumber = item["Account No."];
+                        //    custBankdetail.ClaimId = ClaimApproval.ClaimId;
+                        //    custBankdetail.BankBranchAddress = item["Bank Branch Address"];
+                        //    custBankdetail.BankName = item["Bank Name"];
+                        //    custBankdetail.Ifsccode = item["IFSC Code"];
+                        //    custBankdetail.AccountType = item["Account Type"];
+                        //    custBankdetail.AmountPaid = item["Amount Paid"];
+                        //    custBankdetail.DataOfPayment = item["Date Of Payment"];
+                        //    _context.TblBankAccounts.Update(custBankdetail);
+                        //}
+                        //else
+                        //{
+                        TblClaimPayments claimPayments = new TblClaimPayments();
+                        claimPayments.AccountHolderName = item["Account Holder Name"];
+                        claimPayments.AccountNumber = item["Account No."];
+                        claimPayments.ClaimId = ClaimApproval.ClaimId;
+                        claimPayments.BankBranchAddress = item["Bank Branch Address"];
+                        claimPayments.BankName = item["Bank Name"];
+                        claimPayments.Ifsccode = item["IFSC Code"];
+                        claimPayments.AccountType = item["Account Type"];
+                        claimPayments.AmountPaid = item["Amount Paid"];
+                        claimPayments.DataOfPayment = item["Date Of Payment"];
+                        claimPayments.PayeeType = item.type;
+                        _context.TblClaimPayments.Add(claimPayments);
+                        //}
                     }
+
+
+                    _context.TblClaims.Update(claimsprocess);
+                    //_context.SaveChanges();
+                    if (!string.IsNullOrEmpty(claimsDTO.EmailId))
+                    {
+                        if (claimsprocess.ClaimStatusId == 9)
+                        {
+                            emailTest.To = claimsDTO.EmailId;
+                            emailTest.Subject = "Claim successfully approved";
+                            emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " successfully approved. \n Your Claim has been approved, by the Claims Manager. \n The Approved Claims will be settled as per the policy terms and conditions.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
+                            await SendEmailAsync(emailTest);
+                        }
+                        else if (claimsprocess.ClaimStatusId == 11)
+                        {
+                            emailTest.To = claimsDTO.EmailId;
+                            emailTest.Subject = "Claim Rejected";
+                            emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " has been rejected. \n Your Claim has been rejected, by the Claims Manager. \n We regret to inform you that your claim has been Rejected by the claims manager.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
+                            await SendEmailAsync(emailTest);
+                        }
+                    }
+                    foreach (var item in Insurable)
+                    {
+                        // item.ApprovedClaimAmounts = claimsDTO.ApprovedClaimAmounts ;
+                        item.ApprovedClaimAmounts = claimsDTO.ClaimInsurable.FirstOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId).ApprovedClaimAmounts;
+                        _context.TblClaimInsurable.Update(item);
+                    }
+
+                    foreach (var item in claimsDTO.Alldoc)
+                    {
+                        TblClaimdoc Claimdoc = new TblClaimdoc();
+
+                        Claimdoc.DmsdocId = item.DocumentID;
+                        Claimdoc.DocumentName = item.FileName;
+                        Claimdoc.DocumentType = item.DocumentType;
+                        Claimdoc.ClaimId = claimsDTO.ClaimId;
+                        _context.TblClaimdoc.Add(Claimdoc);
+                        // _context.SaveChanges();
+
+                    }
+
+                    //adding new record to tblhistory on updating claimstatus of existing claim from tblclaims
+                    claimsHistory.ClaimId = ClaimApproval.ClaimId;
+                    //claimsHistory.ClaimStatusId = claimsDTO.ClaimStatusId;
+                    claimsHistory.ClaimStatusId = oldstatusId;
+                    claimsHistory.ClaimAmount = ClaimApproval.ClaimAmount;
+                    claimsHistory.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
+                    claimsHistory.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
+                    claimsHistory.CreatedBy = ClaimApproval.CreatedBy;
+                    claimsHistory.CreatedDate = ClaimApproval.CreatedDate;
+                    claimsHistory.LossId = ClaimApproval.LossId;
+                    claimsHistory.LossDateTime = ClaimApproval.LossDateTime;
+                    claimsHistory.LocationOfEvent = ClaimApproval.LocationOfEvent;
+                    claimsHistory.LossOfDescription = ClaimApproval.LossOfDescription;
+                    claimsHistory.PolicyId = ClaimApproval.PolicyId;
+                    claimsHistory.OrgId = apiContext.OrgId;
+                    claimsHistory.PartnerId = apiContext.PartnerId;
+                    claimsHistory.PolicyNo = ClaimApproval.PolicyNo;
+                    claimsHistory.ClaimNumber = ClaimApproval.ClaimNumber;
+                    claimsHistory.ModifiedBy = ClaimApproval.ModifiedBy;
+                    claimsHistory.ModifiedDate = ClaimApproval.ModifiedDate;
+
+                    claimsHistory.Active = true;
+
+
+                    _context.TblClaimHistory.Add(claimsHistory);
+
+                    _context.SaveChanges();
+
+                    var amount = (decimal)claimsprocess.ApprovedClaimAmount;
+
+                    var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
+
+                    //Balance Sum Insured
+                    if (claimsprocess.ClaimStatusId == 38)
+                    {
+                        var balanceSumInsured = await _integrationService.UpdatePolicyBalanceSumInsuredAsync(claimsprocess.PolicyNo, amount, apiContext);
+                    }
+
+                    //Accouting Transaction 
+                    var account = AccountMapApproval(apiContext, claimsDTO);
+                    ClaimProcessResponseDTO claimProcess = new ClaimProcessResponseDTO() { Status = BusinessStatus.Updated, ResponseMessage = "Claim Processed successfully! \n Your Claim Number: " + claimsDTO.ClaimNumber };
+                    claimProcess.ClaimProcess = _claimprocess;
+                    return claimProcess;
                 }
-                foreach (var item in Insurable)
-                {
-                    // item.ApprovedClaimAmounts = claimsDTO.ApprovedClaimAmounts ;
-                    item.ApprovedClaimAmounts = claimsDTO.ClaimInsurable.FirstOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId).ApprovedClaimAmounts;
-                    _context.TblClaimInsurable.Update(item);
+                else {
+                    return new ClaimProcessResponseDTO() { Status = BusinessStatus.NotFound, ResponseMessage = $"No record Found for this Claim Number:{claimsDTO.ClaimNumber}" };
                 }
-
-                foreach (var item in claimsDTO.Alldoc)
-                {
-                    TblClaimdoc Claimdoc = new TblClaimdoc();
-
-                    Claimdoc.DmsdocId = item.DocumentID;
-                    Claimdoc.DocumentName = item.FileName;
-                    Claimdoc.DocumentType = item.DocumentType;
-                    Claimdoc.ClaimId = claimsDTO.ClaimId;
-                    _context.TblClaimdoc.Add(Claimdoc);
-                    // _context.SaveChanges();
-
-                }
-
-                //adding new record to tblhistory on updating claimstatus of existing claim from tblclaims
-                claimsHistory.ClaimId = ClaimApproval.ClaimId;
-                //claimsHistory.ClaimStatusId = claimsDTO.ClaimStatusId;
-                claimsHistory.ClaimStatusId = oldstatusId;
-                claimsHistory.ClaimAmount = ClaimApproval.ClaimAmount;
-                claimsHistory.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
-                claimsHistory.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
-                claimsHistory.CreatedBy = ClaimApproval.CreatedBy;
-                claimsHistory.CreatedDate = ClaimApproval.CreatedDate;
-                claimsHistory.LossId = ClaimApproval.LossId;
-                claimsHistory.LossDateTime = ClaimApproval.LossDateTime;
-                claimsHistory.LocationOfEvent = ClaimApproval.LocationOfEvent;
-                claimsHistory.LossOfDescription = ClaimApproval.LossOfDescription;
-                claimsHistory.PolicyId = ClaimApproval.PolicyId;
-                claimsHistory.OrgId = apiContext.OrgId;
-                claimsHistory.PartnerId = apiContext.PartnerId;
-                claimsHistory.PolicyNo = ClaimApproval.PolicyNo;
-                claimsHistory.ClaimNumber = ClaimApproval.ClaimNumber;
-                claimsHistory.ModifiedBy = ClaimApproval.ModifiedBy;
-                claimsHistory.ModifiedDate = ClaimApproval.ModifiedDate;
-
-                claimsHistory.Active = true;
-
-
-                _context.TblClaimHistory.Add(claimsHistory);
-
-                _context.SaveChanges();
-
-                var amount = (decimal)claimsprocess.ApprovedClaimAmount;
-
-                var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
-
-                //Balance Sum Insured
-                if (claimsprocess.ClaimStatusId == 38)
-                {
-                    var balanceSumInsured = await _integrationService.UpdatePolicyBalanceSumInsuredAsync(claimsprocess.PolicyNo, amount, apiContext);
-                }
-
-                //Accouting Transaction 
-                var account = AccountMapApproval(apiContext, claimsDTO);
-                ClaimProcessResponseDTO claimProcess = new ClaimProcessResponseDTO() { Status = BusinessStatus.Updated, ResponseMessage = "Claim Processed successfully! \n Your Claim Number: " + claimsDTO.ClaimNumber };
-                claimProcess.ClaimProcess = _claimprocess;
-                return claimProcess;
             }
             catch (Exception ex)
             {
                 return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, ResponseMessage = "Error Details" + ex.ToString() };
             }
         }
+
+        public void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
+
+        {
+
+            // ExpandoObject supports IDictionary so we can extend it like this
+
+            var expandoDict = expando as IDictionary<string, object>;
+
+            if (expandoDict.ContainsKey(propertyName))
+
+                expandoDict[propertyName] = propertyValue;
+
+            else
+
+                expandoDict.Add(propertyName, propertyValue);
+
+        }
+
 
         public async Task<ClaimDocUpload> UploadFiles(ClaimdocDTO claimdoc, ApiContext apiContext)
         {

@@ -105,6 +105,7 @@ namespace iNube.Services.Claims.Models
         public string PolicyNumber { get; set; }
         public int? PayeeTypeId { get; set; }
         public dynamic DataModelDTO { get; set; }
+        public dynamic AdditionalDetails { get; set; }
         // public string InsuredName { get; set; }
         // public decimal? ApprovedClaimAmounts { get; set; }
         // public string DmsdocId { get; set; }
