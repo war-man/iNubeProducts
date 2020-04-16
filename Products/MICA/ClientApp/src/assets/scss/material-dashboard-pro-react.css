@@ -3897,6 +3897,13 @@ img {
   font-weight: 400;
   font-size: 12px; }
 
+.errorDatepicker {
+  color: #cc0000;
+  position: relative;
+  bottom: -20px;
+  font-weight: 400;
+  font-size: 12px; }
+
 .error1 {
   color: #cc0000;
   position: relative;
