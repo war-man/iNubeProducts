@@ -87,6 +87,9 @@ namespace iNube.Services.Billing.Helpers
             DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
+            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", dbConnectionString, "5 -- dbConnection String", new ApiContext() { ProductType = product, ServerType = connectionKey });
+
+
             switch (product)
             {
                 case "Mica":

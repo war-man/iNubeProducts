@@ -85,9 +85,10 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             
             var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", uri, "3", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
-            return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
-
-
+           // return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+           var result = await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", result.Dbconnection, "Final Return in integration Call", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
+            return result;
         }
 
         public async Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext)
