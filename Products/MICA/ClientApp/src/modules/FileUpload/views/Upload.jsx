@@ -160,104 +160,56 @@ class Upload extends React.Component {
                 }
             });
         }
-
-        else if (this.state.fields.FileName == 2) {
-
-            fetch(`${FileUploadConfig.FileUploadConfigUrl}/api/Mica_EGI/MonthlySIUpload`, {
-                method: 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-                body: JSON.stringify(mdata)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    this.setState({ monthlyData: data });
-                    console.log(this.state.monthlyData, data, 'Result');
-
-                    if (data.status == 1) {
-
-                        this.setState({ mflag: false });
-
-                        swal({
-                            text: data.responseMessage,
-                            icon: "success"
-                        });
-                    }
-
-                    else   {
-                       // if (data.errors.length > 0) {
-                            this.setState({ monthlyData: data.errors });
-                            this.setState({ mflag: true });
-                            this.tabledata();
-                        //}
-                        swal({
-                            text: data.responseMessage,
-                            icon: "success"
-                        });
-                    }
-
-
-                });
-        }
-
-        else { }
         
-        //else {
-        //    $.ajax({
-        //        type: "POST",
-        //        url: `${FileUploadConfig.FileUploadConfigUrl}/api/Mica_EGI/MonthlySIUpload`,
-        //        //https://localhost:44351/api/Policy/RefundUpload
-        //        //url: `https://localhost:44351/api/Policy/RefundUpload`,
-        //        contentType: false,
-        //        processData: false,
+        else {
+            $.ajax({
+                type: "POST",
+                url: `${FileUploadConfig.FileUploadConfigUrl}/api/Mica_EGI/MonthlySIUpload`,
+                //https://localhost:44351/api/Policy/RefundUpload
+                //url: `https://localhost:44351/api/Policy/RefundUpload`,
+                contentType: false,
+                processData: false,
 
-        //        data: data,
-        //        beforeSend: function (xhr) {
-        //            /* Authorization header */
-        //            xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
-        //        },
-        //        success: function (response) {
-        //            console.log("response ", response,response.errors,response.status);
+                data: data,
+                beforeSend: function (xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+                },
+                success: function (response) {
+                    console.log("response ", response,response.errors,response.status);
 
-        //            if (response.status == 1) {
-        //                if (response.errors.length > 0) {
-        //                    this.state.mflag = false;
-        //                    //this.state.monthlyData = response.errors;
-        //                    //this.tabledata();
-        //                }
-        //                    swal({
-        //                        text: response.responseMessage,
-        //                        icon: "success"
-        //                });
+                   
+                    if (response.status == 1) {
+                        this.setState({
+                            mflag: true,
+                            monthlyData: response.errors,
 
-        //            } else if (response.status == 7) {
-                       
-        //                if (response.errors.length > 0) {
-        //                    this.state.monthlyData = response.errors;
-        //                    this.state.mflag = true;
-        //                    this.tabledata();
-        //                }
-        //                swal({
-        //                    text: response.responseMessage,
-        //                    icon: "success"
-        //                });
-        //                console.log("check", response.responseMessage);
-        //            }
-        //            else {
-        //            }
-        //        },
-        //        error: function () {
-        //            this.state.mflag = false;
-        //            swal({
-        //                text: "File uploading unsuccessful",
-        //                icon: "error"
-        //            });
-        //        }
-        //    });
-        //}
+                         });
+                        this.tabledata(response.errors);
+                            swal({
+                                text: response.responseMessage,
+                                icon: "success"
+                        });
+
+                    } else  {
+                            this.setState({
+                                mflag: true,
+                            monthlyData: response.errors,
+
+                        });
+
+                        this.tabledata(response.errors);
+                        swal({
+                            text: response.responseMessage,
+                            icon: "error"
+                        });
+                        console.log("check", response.responseMessage);
+                    }
+                    
+                }.bind(this),
+              
+            });
+        }
 }
 
     RefundTableHeader = (activityDTOs) => {
@@ -273,12 +225,13 @@ class Upload extends React.Component {
         console.log("table data", this.state.TableDataList);
     }
 
-    tabledata = () => {
+    tabledata = (errors) => {
         debugger
+        var responseErrors = errors;
         this.setState({ mflag: true });
         console.log("Monthly", this.state.monthlyData);
         this.setState({
-            monthlyDetailsData: this.state.monthlyData.map((prop, key) => {
+            monthlyDetailsData: responseErrors.map((prop, key) => {
                 return {
                     SNo: key + 1,
                     ErrorCode: prop.errorCode,
