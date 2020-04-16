@@ -53,7 +53,8 @@ class Upload extends React.Component {
             errorList: [],
             TableDataList: [],
             TableDataCopy: [],
-            RefundTableHeaderFun:[],
+            RefundTableHeaderFun: [],
+            result:[],
         };
         //let [TableDataCopy, RefundTableHeaderFun] = React.useState([]);
         //let [ShowGrid, GridFun] = React.useState(false);
@@ -94,8 +95,6 @@ class Upload extends React.Component {
             $.ajax({
                 type: "POST",
                 url: `${FileUploadConfig.FileUploadConfigUrl}/api/Policy/RefundUpload`,
-                //https://localhost:44351/api/Policy/RefundUpload
-                //url: `https://localhost:44351/api/Policy/RefundUpload`,
                 contentType: false,
                 processData: false,
 
@@ -104,9 +103,14 @@ class Upload extends React.Component {
                     /* Authorization header */
                     xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
                 },
+                //success: () => {
+                //    this.setState({
+                //        result: data
+                //    })
+                //},
                 success: function (response) {
                     console.log("response ", response);
-
+                    
                     if (response.status == 1) {
 
                         this.state.GridFun = false;
@@ -119,7 +123,7 @@ class Upload extends React.Component {
                         if (response.errorDetails.length > 0) {
                             this.state.GridFun = true;
                             this.state.errorListFun(response.errorDetails);
-                            this.state.RefundTableHeader(response.errorDetails);
+                            this.state.RefundTableHeader(response.responseMessage);
                         }
                         swal({
                             text: response.responseMessage,
@@ -166,11 +170,11 @@ class Upload extends React.Component {
                             icon: "success"
                         });
                     } else if (response.status == 7) {
-                        if (response.errorDetails.length > 0) {
-                            this.state.GridFun = true;
-                            this.state.errorListFun(response.errorDetails);
-                            this.state.RefundTableHeader(response.errorDetails);
-                        }
+                        //if (response.responseMessage.length > 0) {
+                            //this.state.GridFun = true;
+                            //this.state.errorListFun(response.responseMessage);
+                            //this.state.RefundTableHeader(response.responseMessage);
+                        //}
                         swal({
                             text: response.responseMessage,
                             icon: "success"
@@ -191,18 +195,19 @@ class Upload extends React.Component {
         }
 }
 
-     RefundTableHeader = (activityDTOs) => {
-
-        this.state.TableDataList = Object.keys(activityDTOs[0]).map((prop, key) => {
-            return {
-                Header: prop.charAt(0).toUpperCase() + prop.slice(1),
-                accessor: prop,
-            };
-
-        })
-        this.state.RefundTableHeaderFun(this.state.TableDataList);
-
-        console.log("table data", this.state.TableDataList, this.state.errorList);
+    RefundTableHeader = () => {
+        console.log("prop data", this.state.result);
+        console.log("prop1 data", this.state.errorListFun);
+        this.setState({
+            TableDataList= Object.keys(activityDTOs[0]).map((prop, key) => {
+                return {
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                    accessor: prop,
+                };
+                this.setState({});
+            })
+        });
+        console.log("table data", this.state.TableDataList);
     }
 
     render() {
@@ -279,9 +284,9 @@ class Upload extends React.Component {
                                         <ReactTable
                                             title={<h5><TranslationContainer translationKey={"Refund Upload Errors"} /></h5>}
 
-                                            data={this.state.errorList}
+                                            data={errorList}
                                             filterable
-                                            columns={this.state.TableDataCopy}
+                                            columns={TableDataCopy}
                                             defaultPageSize={4}
                                             pageSize={([this.state.errorList.length + 1] < 4) ? [this.state.errorList.length + 1] : 4}
                                             showPaginationTop={false}
