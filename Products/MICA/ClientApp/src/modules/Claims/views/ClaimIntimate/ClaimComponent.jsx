@@ -68,7 +68,7 @@ const ClaimComponent = (props) => {
 
                     {props.errormessage && (props.DetailsDTO.lossDateTime == null) ? <p className="errorDatepicker">*Required field cannot be left blank</p> : null}
 
-                    {props.errordate && (props.DetailsDTO.lossDateTime > props.PolicyEndDate || props.DetailsDTO.lossDateTime < props.PolicyStartDate) ? <p className="errorDatepicker">*Loss Date must be within Policy Tenure </p> : null}
+                    {props.errordate && (props.DetailsDTO.lossDateTime > props.PolicyEndDate || props.DetailsDTO.lossDateTime < props.PolicyStartDate) ? <p className="errorDatepicker">*Loss date time must be within Policy Tenure </p> : null}
 
                     {props.lossdateflag && (props.DetailsDTO.lossDateTime == null) ? <p className="errorDatepicker"> </p> : null}
                 </GridItem>
