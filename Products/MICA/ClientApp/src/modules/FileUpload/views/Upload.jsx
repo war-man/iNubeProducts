@@ -54,7 +54,10 @@ class Upload extends React.Component {
             TableDataList: [],
             TableDataCopy: [],
             RefundTableHeaderFun: [],
-            result:[],
+            result: [],
+            monthlyDetailsData: [],
+            monthlyData: [],
+            mflag:false,
         };
         //let [TableDataCopy, RefundTableHeaderFun] = React.useState([]);
         //let [ShowGrid, GridFun] = React.useState(false);
@@ -90,6 +93,13 @@ class Upload extends React.Component {
             }
         }
 
+        var mdata = new FormData();
+        if (files.length > 0) {
+            for (var j = 0; j < files.length; j++) {
+                mdata.append(files[j].file.name, files[j].file);
+
+            }
+        }
      
         if (this.state.fields.FileName == 1) {
             $.ajax({
@@ -103,14 +113,9 @@ class Upload extends React.Component {
                     /* Authorization header */
                     xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
                 },
-                //success: () => {
-                //    this.setState({
-                //        result: data
-                //    })
-                //},
                 success: function (response) {
                     console.log("response ", response);
-                    
+
                     if (response.status == 1) {
 
                         this.state.GridFun = false;
@@ -120,6 +125,18 @@ class Upload extends React.Component {
                             icon: "success"
                         });
                     } else if (response.status == 7) {
+                        if (response.errorDetails.length > 0) {
+                            this.state.GridFun = true;
+                            this.state.errorListFun(response.errorDetails);
+                            this.state.RefundTableHeader(response.responseMessage);
+                        }
+                        swal({
+                            text: response.responseMessage,
+                            icon: "success"
+                        });
+                        console.log("check", response.responseMessage);
+                    }
+                    else if (response.status == 0) {
                         if (response.errorDetails.length > 0) {
                             this.state.GridFun = true;
                             this.state.errorListFun(response.errorDetails);
@@ -144,55 +161,103 @@ class Upload extends React.Component {
             });
         }
 
-        else {
-            $.ajax({
-                type: "POST",
-                url: `${FileUploadConfig.FileUploadConfigUrl}/api/Mica_EGI/MonthlySIUpload`,
-                //https://localhost:44351/api/Policy/RefundUpload
-                //url: `https://localhost:44351/api/Policy/RefundUpload`,
-                contentType: false,
-                processData: false,
+        else if (this.state.fields.FileName == 2) {
 
-                data: data,
-                beforeSend: function (xhr) {
-                    /* Authorization header */
-                    xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+            fetch(`${FileUploadConfig.FileUploadConfigUrl}/api/Mica_EGI/MonthlySIUpload`, {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                 },
-                success: function (response) {
-                    console.log("response ", response);
+                body: JSON.stringify(mdata)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({ monthlyData: data });
+                    console.log(this.state.monthlyData, data, 'Result');
 
-                    if (response.status == 1) {
+                    if (data.status == 1) {
 
-                        this.state.GridFun = false;
+                        this.setState({ mflag: false });
+
                         swal({
-
-                            text: response.responseMessage,
+                            text: data.responseMessage,
                             icon: "success"
                         });
-                    } else if (response.status == 7) {
-                        //if (response.responseMessage.length > 0) {
-                            //this.state.GridFun = true;
-                            //this.state.errorListFun(response.responseMessage);
-                            //this.state.RefundTableHeader(response.responseMessage);
+                    }
+
+                    else   {
+                       // if (data.errors.length > 0) {
+                            this.setState({ monthlyData: data.errors });
+                            this.setState({ mflag: true });
+                            this.tabledata();
                         //}
                         swal({
-                            text: response.responseMessage,
+                            text: data.responseMessage,
                             icon: "success"
                         });
+                    }
 
-                    }
-                    else {
-                    }
-                },
-                error: function () {
-                    this.state.GridFun = false;
-                    swal({
-                        text: "File uploading unsuccessful",
-                        icon: "error"
-                    });
-                }
-            });
+
+                });
         }
+
+        else { }
+        
+        //else {
+        //    $.ajax({
+        //        type: "POST",
+        //        url: `${FileUploadConfig.FileUploadConfigUrl}/api/Mica_EGI/MonthlySIUpload`,
+        //        //https://localhost:44351/api/Policy/RefundUpload
+        //        //url: `https://localhost:44351/api/Policy/RefundUpload`,
+        //        contentType: false,
+        //        processData: false,
+
+        //        data: data,
+        //        beforeSend: function (xhr) {
+        //            /* Authorization header */
+        //            xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+        //        },
+        //        success: function (response) {
+        //            console.log("response ", response,response.errors,response.status);
+
+        //            if (response.status == 1) {
+        //                if (response.errors.length > 0) {
+        //                    this.state.mflag = false;
+        //                    //this.state.monthlyData = response.errors;
+        //                    //this.tabledata();
+        //                }
+        //                    swal({
+        //                        text: response.responseMessage,
+        //                        icon: "success"
+        //                });
+
+        //            } else if (response.status == 7) {
+                       
+        //                if (response.errors.length > 0) {
+        //                    this.state.monthlyData = response.errors;
+        //                    this.state.mflag = true;
+        //                    this.tabledata();
+        //                }
+        //                swal({
+        //                    text: response.responseMessage,
+        //                    icon: "success"
+        //                });
+        //                console.log("check", response.responseMessage);
+        //            }
+        //            else {
+        //            }
+        //        },
+        //        error: function () {
+        //            this.state.mflag = false;
+        //            swal({
+        //                text: "File uploading unsuccessful",
+        //                icon: "error"
+        //            });
+        //        }
+        //    });
+        //}
 }
 
     RefundTableHeader = (activityDTOs) => {
@@ -206,6 +271,22 @@ class Upload extends React.Component {
             })
         });
         console.log("table data", this.state.TableDataList);
+    }
+
+    tabledata = () => {
+        debugger
+        this.setState({ mflag: true });
+        console.log("Monthly", this.state.monthlyData);
+        this.setState({
+            monthlyDetailsData: this.state.monthlyData.map((prop, key) => {
+                return {
+                    SNo: key + 1,
+                    ErrorCode: prop.errorCode,
+                    ErrorMessage: prop.errorMessage,
+                    PropertyName: prop.propertyName
+                };
+            })
+        });
     }
 
     render() {
@@ -275,7 +356,7 @@ class Upload extends React.Component {
                             </GridContainer>
 
 
-                            {this.state.ShowGrid &&
+                        {this.state.GridFun &&
                                 <GridContainer justify="center" >
                                     <GridItem xs={12}>
 
@@ -300,6 +381,51 @@ class Upload extends React.Component {
                         </CardBody>
                     </Card>
                 }
+
+                {this.state.mflag &&
+                <GridContainer>
+                 <GridItem lg={12}>
+                                                        <ReactTable
+                                    title=<TranslationContainer translationKey={"Monthly SI Error Details"} />
+                                                            data={this.state.monthlyDetailsData}
+                                                            filterable
+
+                                                            columns={[
+
+                                                                {
+
+                                                                    Header: "Error Code",
+                                                                    accessor: "ErrorCode",
+                                                                    headerClassName: 'react-table-center',
+                                                                    //minWidth: 40,
+                                                                    resizable: false,
+                                                                },
+                                                                {
+                                                                    Header: "Error Message",
+                                                                    accessor: "ErrorMessage",
+                                                                    style: { textAlign: "center" },
+                                                                    headerClassName: 'react-table-center',
+                                                                    //minWidth: 40,
+                                                                    resizable: false,
+                                                                },
+                                                                {
+                                                                    Header: "Property Name",
+                                                                    accessor: "PropertyName",
+                                                                    headerClassName: 'react-table-center',
+                                                                    //minWidth: 40,
+                                                                    resizable: false,
+                                                                },
+                                                            ]}
+
+                                                            defaultPageSize={5}
+                                                            showPaginationTop={false}
+                                                            //pageSize={([this.state.Policydetailsdata.length + 1] < 5) ? [this.state.Policydetailsdata.length + 1] : 5}
+                                                            showPaginationBottom
+                    className="-striped -highlight discription-tab"
+                />
+                                                    </GridItem>
+                </GridContainer>
+                    }
                         </div>
         );
     }
