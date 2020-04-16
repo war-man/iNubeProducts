@@ -5343,6 +5343,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                 var payUid = "";
                                                 var payAmount = "";
                                                 var payStatus = "";
+                                                var PropertyName = "";
                                                 DateTime paymentDate = new DateTime(2020, 1, 1, 01, 01, 01);
 
 
@@ -5379,8 +5380,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                     errorInfo.PropertyName = Convert.ToString(row); //Row Number
                                                     uploadDTO.Errors.Add(errorInfo);
                                                     errorflag = true;
+                                                    PropertyName = Convert.ToString(row);
 
-
+                                                }
+                                                else
+                                                {
+                                                    PropertyName = txnid;
                                                 }
 
                                                 if (String.IsNullOrEmpty(payUid))
@@ -5389,7 +5394,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                                     errorInfo.ErrorMessage = "Pay Uid Missing";
                                                     errorInfo.ErrorCode = "MSI002";
-                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    errorInfo.PropertyName = PropertyName;
                                                     uploadDTO.Errors.Add(errorInfo);
                                                     errorflag = true;
                                                 }
@@ -5402,7 +5407,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                                     errorInfo.ErrorMessage = "Pay Amount Missing";
                                                     errorInfo.ErrorCode = "MSI003";
-                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    errorInfo.PropertyName = PropertyName;
                                                     uploadDTO.Errors.Add(errorInfo);
                                                     errorflag = true;
                                                 }
@@ -5413,7 +5418,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                                     errorInfo.ErrorMessage = "Pay Status Missing";
                                                     errorInfo.ErrorCode = "MSI004";
-                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    errorInfo.PropertyName = PropertyName;
                                                     uploadDTO.Errors.Add(errorInfo);
                                                     errorflag = true;
                                                 }
@@ -5424,7 +5429,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                                     errorInfo.ErrorMessage = "Pay Date Missing";
                                                     errorInfo.ErrorCode = "MSI005";
-                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    errorInfo.PropertyName = PropertyName;
                                                     uploadDTO.Errors.Add(errorInfo);
                                                     errorflag = true;
                                                 }
@@ -5437,7 +5442,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                                     errorInfo.ErrorMessage = "No Such TxnId";
                                                     errorInfo.ErrorCode = "MSI004";
-                                                    errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                    errorInfo.PropertyName = PropertyName;
                                                     uploadDTO.Errors.Add(errorInfo);
                                                     errorflag = true;
                                                 }
@@ -5452,7 +5457,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                         ErrorInfo errorInfo = new ErrorInfo();
                                                         errorInfo.ErrorMessage = "Data is Already Updated for this Txn Id Duplicate Record";
                                                         errorInfo.ErrorCode = "MSI004";
-                                                        errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                        errorInfo.PropertyName = PropertyName;
                                                         uploadDTO.Errors.Add(errorInfo);
                                                         errorflag = true;
                                                     }
@@ -5466,7 +5471,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                                             errorInfo.ErrorMessage = "Pay Amount is Less Than the Billed Amount";
                                                             errorInfo.ErrorCode = "MSI003";
-                                                            errorInfo.PropertyName = Convert.ToString(row); //Row Number
+                                                            errorInfo.PropertyName = PropertyName;
                                                             uploadDTO.Errors.Add(errorInfo);
                                                             errorflag = true;
                                                         }
@@ -5596,6 +5601,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var payStatus = dt.Rows[i][payStatusIndex].ToString();
                     var paymentDate = Convert.ToDateTime(dt.Rows[i][paymentDateIndex]);
 
+                    var PropertyName = "";
+
                     if(String.IsNullOrEmpty(txnid))
                     {
                         
@@ -5606,8 +5613,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         errorInfo.PropertyName = Convert.ToString(i+1); //Row Number
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;
-
-                       
+                        PropertyName = Convert.ToString(i + 1);
+                    }
+                    else
+                    {
+                        PropertyName = txnid;
                     }
 
                     if (String.IsNullOrEmpty(payUid))
@@ -5616,7 +5626,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         errorInfo.ErrorMessage = "Pay Uid Missing";
                         errorInfo.ErrorCode = "MSI002";
-                        errorInfo.PropertyName = Convert.ToString(i + 1); //Row Number
+                        errorInfo.PropertyName = PropertyName; 
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;                        
                     }
@@ -5629,7 +5639,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         errorInfo.ErrorMessage = "Pay Amount Missing";
                         errorInfo.ErrorCode = "MSI003";
-                        errorInfo.PropertyName = Convert.ToString(i + 1); //Row Number
+                        errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;                       
                     }
@@ -5640,7 +5650,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         errorInfo.ErrorMessage = "Pay Status Missing";
                         errorInfo.ErrorCode = "MSI004";
-                        errorInfo.PropertyName = Convert.ToString(i + 1); //Row Number
+                        errorInfo.PropertyName = PropertyName; 
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;                  
                     }
@@ -5651,7 +5661,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         errorInfo.ErrorMessage = "Pay Date Missing";
                         errorInfo.ErrorCode = "MSI005";
-                        errorInfo.PropertyName = Convert.ToString(i + 1); //Row Number
+                        errorInfo.PropertyName = PropertyName; 
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;                       
                     }
@@ -5664,7 +5674,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         errorInfo.ErrorMessage = "No Such TxnId";
                         errorInfo.ErrorCode = "MSI004";
-                        errorInfo.PropertyName = Convert.ToString(i + 1); //Row Number
+                        errorInfo.PropertyName = PropertyName; 
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;                       
                     }
@@ -5679,7 +5689,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             ErrorInfo errorInfo = new ErrorInfo();
                             errorInfo.ErrorMessage = "Data is Already Updated for this Txn Id Duplicate Record";
                             errorInfo.ErrorCode = "MSI004";
-                            errorInfo.PropertyName = Convert.ToString(i + 1); //Row Number
+                            errorInfo.PropertyName = PropertyName;
                             uploadDTO.Errors.Add(errorInfo);
                             errorflag = true;
                         }
@@ -5693,7 +5703,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                 errorInfo.ErrorMessage = "Pay Amount is Less Than the Billed Amount";
                                 errorInfo.ErrorCode = "MSI003";
-                                errorInfo.PropertyName = Convert.ToString(i + 1); //Row Number
+                                errorInfo.PropertyName = PropertyName;
                                 uploadDTO.Errors.Add(errorInfo);
                                 errorflag = true;
                             }
@@ -5731,6 +5741,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if (uploadDTO.Errors.Count > 0)
                 {
                     uploadDTO.ResponseMessage = "Document Uploaded for Sucess One & Failed Transactions Are in Errors";
+                    uploadDTO.Status = BusinessStatus.Ok;
                     return uploadDTO;
                 }
                 else
