@@ -1,23 +1,46 @@
+let env = "EdelweissProd";
 //let env = "Production";
 //let env = "Dev";
 //let env = "Local";
-let env = "UAT";
+//let env = "UAT";
 
-let partnerconfigUrl = 'https://localhost:44315';
-let productConfigUrl = 'https://localhost:44347';
-let UserConfigUrl = 'https://localhost:44367';
-let ruleEngineUrl = 'http://localhost:59676';
-let accountConfigUrl = 'http://localhost:52166';
-let BillingConfigUrl = 'https://localhost:44362';
-let policyconfigUrl = 'https://localhost:44351';
-let claimConfigUrl = 'https://localhost:44344';
-let dynamicPagesConfigUrl = 'http://localhost:52166';
-let rateConfigUrl = 'http://localhost:58593';
-let RDLCConfigUrl = 'https://localhost:49776';
-let ReinsuranceConfigUrl = 'http://localhost:5000';
-let Baseurl = 'https://egiswitchapi.edelweisscustomeruat.com';
-let ReportConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-let ExtensionUrl= "https://egiswitchapi.edelweisscustomeruat.com";
+let Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
+let partnerconfigUrl = Baseurl;
+let productConfigUrl = Baseurl;
+let UserConfigUrl = Baseurl;
+let ruleEngineUrl = Baseurl;
+let accountConfigUrl = Baseurl;
+let BillingConfigUrl = Baseurl;
+let policyconfigUrl = Baseurl;
+let claimConfigUrl = Baseurl;
+let rateConfigUrl = Baseurl;
+let ReportConfigUrl = Baseurl;
+let dynamicPagesConfigUrl = Baseurl;
+let RDLCConfigUrl = Baseurl;
+let ReinsuranceConfigUrl = Baseurl;
+let ExtensionUrl = Baseurl;
+
+
+if (env === "EdelweissProd") {
+    Baseurl = 'https://egiswitchapi.edelweissinsurance.com';
+    partnerconfigUrl = Baseurl;
+    productConfigUrl = Baseurl;
+    UserConfigUrl = Baseurl;
+    ruleEngineUrl = Baseurl;
+    accountConfigUrl = Baseurl;
+    BillingConfigUrl = Baseurl;
+    policyconfigUrl = Baseurl;
+    claimConfigUrl = Baseurl;
+    rateConfigUrl = Baseurl;
+    ReportConfigUrl = Baseurl;
+    dynamicPagesConfigUrl = Baseurl;
+    RDLCConfigUrl = Baseurl;
+    ReinsuranceConfigUrl = Baseurl;
+    ExtensionUrl = Baseurl;
+}
+
+
+
 
 if (env === "Local") {
     partnerconfigUrl = 'https://localhost:44315';
@@ -36,62 +59,62 @@ if (env === "Local") {
 }
 if (env === "Dev") {
     Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
-    partnerconfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9005';
-    productConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9007';
-    UserConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9009';
-    ruleEngineUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9052';
-    accountConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9011';
-    BillingConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9001';
-    policyconfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9006';
-    claimConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9002';
-    rateConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com:9012';
-
-    dynamicPagesConfigUrl = 'https://inubeservicesaccounting.azurewebsites.net';
-    RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
-    ReinsuranceConfigUrl = 'https://inubeservicesreinsurance.azurewebsites.net';
-    ExtensionUrl = 'http://localhost:63630';
+    partnerconfigUrl = Baseurl;
+    productConfigUrl = Baseurl;
+    UserConfigUrl = Baseurl;
+    ruleEngineUrl = Baseurl;
+    accountConfigUrl = Baseurl;
+    BillingConfigUrl = Baseurl;
+    policyconfigUrl = Baseurl;
+    claimConfigUrl = Baseurl;
+    rateConfigUrl = Baseurl;
+    ReportConfigUrl = Baseurl;
+    dynamicPagesConfigUrl = Baseurl;
+    RDLCConfigUrl = Baseurl;
+    ReinsuranceConfigUrl = Baseurl;
+    ExtensionUrl = Baseurl;
 }
 if (env === "Production") {
-    partnerconfigUrl = 'https://localhost:44315';
-    productConfigUrl = 'https://localhost:44347';
-    UserConfigUrl = 'https://localhost:44367';
-    ruleEngineUrl = 'http://localhost:59676';
-    accountConfigUrl = 'http://localhost:52166';
-    ReinsuranceConfigUrl = 'http://localhost:5000';
-    BillingConfigUrl = 'https://localhost:44362';
-    policyconfigUrl = 'https://localhost:44351';
-    claimConfigUrl = 'https://localhost:44344';
-    dynamicPagesConfigUrl = 'http://localhost:52166';
-    rateConfigUrl = 'http://localhost:58593';
-    ExtensionUrl = 'http://localhost:63630';
-
-    RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
-    ReinsuranceConfigUrl = 'https://inubeservicesreinsurance.azurewebsites.net';
+    Baseurl = 'https://localhost:44315';
+    partnerconfigUrl = Baseurl;
+    productConfigUrl = Baseurl;
+    UserConfigUrl = Baseurl;
+    ruleEngineUrl = Baseurl;
+    accountConfigUrl = Baseurl;
+    BillingConfigUrl = Baseurl;
+    policyconfigUrl = Baseurl;
+    claimConfigUrl = Baseurl;
+    rateConfigUrl = Baseurl;
+    ReportConfigUrl = Baseurl;
+    dynamicPagesConfigUrl = Baseurl;
+    RDLCConfigUrl = Baseurl;
+    ReinsuranceConfigUrl = Baseurl;
+    ExtensionUrl = Baseurl;
 }
 if (env === "UAT") {
     Baseurl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    partnerconfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    productConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    UserConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    ruleEngineUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    accountConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    BillingConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    policyconfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    claimConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    rateConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    ReportConfigUrl = 'https://egiswitchapi.edelweisscustomeruat.com';
-    dynamicPagesConfigUrl = 'https://inubeservicesaccounting.azurewebsites.net';
-    RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
-    ReinsuranceConfigUrl = 'https://inubeservicesreinsurance.azurewebsites.net';
-    ExtensionUrl = "https://egiswitchapi.edelweisscustomeruat.com";
+    partnerconfigUrl = Baseurl;
+    productConfigUrl = Baseurl;
+    UserConfigUrl = Baseurl;
+    ruleEngineUrl = Baseurl;
+    accountConfigUrl = Baseurl;
+    BillingConfigUrl = Baseurl;
+    policyconfigUrl = Baseurl;
+    claimConfigUrl = Baseurl;
+    rateConfigUrl = Baseurl;
+    ReportConfigUrl = Baseurl;
+    dynamicPagesConfigUrl = Baseurl;
+    RDLCConfigUrl = Baseurl;
+    ReinsuranceConfigUrl = Baseurl;
+    ExtensionUrl = Baseurl;
 }
 
 
 export const config = {
-    env: 'production',
+    env: env,
     product: 'Mica',
     isTest: false,
-    Baseurl: 'https://egiswitchapi.edelweisscustomeruat.com',
+    Baseurl: Baseurl,
 
     partnerconfigUrl: partnerconfigUrl,
     productConfigUrl: productConfigUrl,
@@ -108,11 +131,11 @@ export const config = {
     ReportConfigUrl: ReportConfigUrl,
     ExtensionUrl: ExtensionUrl,
 
-    apiUrl: 'https://inubeservicesusermanagement.azurewebsites.net/api',
-    localUrl: 'http://localhost:63034/api',
-    ruleEngineUrl: 'https://inubecomponentsruleengine.azurewebsites.net/',
-    rulelocalUrl: 'https://inubecomponentsruleengine.azurewebsites.net/',
-    localRuleUrl: 'https://inubecomponentsruleengine.azurewebsites.net/',
+    apiUrl: '',
+    localUrl: '',
+    ruleEngineUrl: '',
+    rulelocalUrl: '',
+    localRuleUrl: '',
 
     facebook: "", //Facebook App Id
     linkedin: "", //Linkedin app id
