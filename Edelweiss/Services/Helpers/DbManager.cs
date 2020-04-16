@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using MicaExtension_EGI.Entities;
 using iNube.Services.Controllers.EGI.IntegrationServices;
 using iNube.Services.MicaExtension_EGI.Helpers;
+using iNube.Utility.Framework.LogPrivider.LogService;
+using iNube.Utility.Framework.Model;
 
 namespace iNube.Services.Billing.Helpers
 {
@@ -76,6 +78,9 @@ namespace iNube.Services.Billing.Helpers
 
         public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
+            LoggerManager logger = new LoggerManager(configuration);
+            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", "Testing", "2",new ApiContext() { ProductType=product,ServerType=connectionKey});
+
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 

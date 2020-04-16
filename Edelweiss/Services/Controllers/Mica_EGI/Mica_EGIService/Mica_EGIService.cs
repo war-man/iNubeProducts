@@ -23,6 +23,7 @@ using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using iNube.Services.Billing.Helpers;
 using OfficeOpenXml;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -2471,6 +2472,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<List<ddDTO>> GetVehicleMaster(string lMasterlist, ApiContext context)
         {
+            LoggerManager logger = new LoggerManager(_configuration);
+            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", "Testing", "1", context);
+
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
             List<ddDTO> obj;

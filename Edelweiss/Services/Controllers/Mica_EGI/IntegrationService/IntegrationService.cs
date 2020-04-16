@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using iNube.Services.MicaExtension_EGI.Models;
 using Microsoft.Extensions.Configuration;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.Controllers.EGI.IntegrationServices
 {
@@ -80,8 +81,13 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
+            LoggerManager logger = new LoggerManager(_configuration);
+            
             var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", uri, "3", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
             return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+
+
         }
 
         public async Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext)
