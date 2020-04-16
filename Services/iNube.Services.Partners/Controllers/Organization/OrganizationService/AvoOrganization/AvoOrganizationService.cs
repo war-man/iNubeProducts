@@ -157,26 +157,33 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 var orgstucture = orgDTO.OrgStructure;
                 foreach (var item in orgstucture)
                 {
-                    TblOrgStructure tblOrg = new TblOrgStructure();
-                    tblOrg.LevelId = item.levelId;
-                    tblOrg.LevelDefinition = item.levelname;
-                    if (!string.IsNullOrEmpty(item.levelname))
+                    try
                     {
-                        if (item.levelname == "self")
+                        TblOrgStructure tblOrg = new TblOrgStructure();
+                        tblOrg.LevelId = item.levelId;
+                        tblOrg.LevelDefinition = item.levelname;
+                        if (!string.IsNullOrEmpty(item.levelname))
                         {
-                            tblOrg.RepotrsToId = null;
-                            tblOrg.ParentId = null;
+                            if (item.reportto == "self")
+                            {
+                                tblOrg.RepotrsToId = 0;
+                                tblOrg.ParentId = 0;
+                            }
+                            else
+                            {
+                                tblOrg.RepotrsToId = _organization.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.reportto).LevelId;
+                                tblOrg.ParentId = _organization.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.reportto).LevelId;
+                            }
                         }
-                        else
-                        {
-                            tblOrg.RepotrsToId = _context.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.levelname).LevelId;
-                            tblOrg.ParentId = _context.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.levelname).LevelId;
-                        }
+                        tblOrg.UserName = apiContext.UserName;
+                        tblOrg.CreatedDateTime = DateTime.Now;
+                        tblOrg.StructureTypeId = structuretype.FirstOrDefault(a => a.Value == item.StructureType).CommonTypeId;
+                        _organization.TblOrgStructure.Add(tblOrg);
                     }
-                    tblOrg.UserName = apiContext.UserName;
-                    tblOrg.CreatedDateTime = DateTime.Now;
-                    tblOrg.StructureTypeId = structuretype.FirstOrDefault(a => a.Value == item.StructureType).CommonTypeId;
-                    _organization.TblOrgStructure.Add(tblOrg);
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
 
                 _context.TblOrganization.Add(_organization);
