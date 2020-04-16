@@ -195,14 +195,12 @@ class Upload extends React.Component {
         }
 }
 
-    RefundTableHeader = () => {
-        console.log("prop data", this.state.result);
-        console.log("prop1 data", this.state.errorListFun);
+    RefundTableHeader = (activityDTOs) => {
         this.setState({
-            TableDataList= Object.keys(activityDTOs[0]).map((prop, key) => {
-                return {
-                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
-                    accessor: prop,
+        TableDataList : Object.keys(activityDTOs[0]).map((prop, key) => {
+            return {
+                Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                accessor: prop,
                 };
                 this.setState({});
             })
@@ -284,9 +282,9 @@ class Upload extends React.Component {
                                         <ReactTable
                                             title={<h5><TranslationContainer translationKey={"Refund Upload Errors"} /></h5>}
 
-                                            data={errorList}
+                                            data={this.state.errorList}
                                             filterable
-                                            columns={TableDataCopy}
+                                            columns={this.state.TableDataCopy}
                                             defaultPageSize={4}
                                             pageSize={([this.state.errorList.length + 1] < 4) ? [this.state.errorList.length + 1] : 4}
                                             showPaginationTop={false}
