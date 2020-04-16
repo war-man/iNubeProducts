@@ -218,17 +218,27 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();
+            LoggerManager logger = new LoggerManager(_configuration);          
+
            if (!string.IsNullOrEmpty(apiContext.Token))
             {
+                logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", apiContext.Token, "--CHeck empty GETAPIInvoke--", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+
+
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
             }
 
             using (var response = await client.GetAsync(url))
             using (var content = response.Content)
             {
+                logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", response.ToString(), "GETAPIInvoke---Before", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+
                 if (response.IsSuccessStatusCode)
                 {
                     var serviceResponse = await content.ReadAsAsync<TResponse>();
+                    logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", serviceResponse.ToString(), "GETAPIInvoke---After", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+
+
                     if (serviceResponse != null)
                     {
                         return serviceResponse;
