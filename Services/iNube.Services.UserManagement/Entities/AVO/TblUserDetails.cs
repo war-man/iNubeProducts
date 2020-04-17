@@ -53,9 +53,9 @@ namespace iNube.Services.UserManagement.Entities.AVO
         public int? MaritalStatusId { get; set; }
         public byte[] ProfileImage { get; set; }
         public string PartnerName { get; set; }
+        public bool? IsActive { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
-        public bool? IsActive { get; set; }
 
         public virtual TblmasUmcommonTypes Gender { get; set; }
         public virtual AspNetRoles Role { get; set; }

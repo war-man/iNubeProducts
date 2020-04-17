@@ -22,6 +22,8 @@ namespace iNube.Services.UserManagement.Entities.AVO
         public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual DbSet<AspNetUserTokens> AspNetUserTokens { get; set; }
         public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
+        public virtual DbSet<TblDynamicConfig> TblDynamicConfig { get; set; }
+        public virtual DbSet<TblDynamicPermissions> TblDynamicPermissions { get; set; }
         public virtual DbSet<TblEmployees> TblEmployees { get; set; }
         public virtual DbSet<TblMasCity> TblMasCity { get; set; }
         public virtual DbSet<TblMasCountry> TblMasCountry { get; set; }
@@ -40,7 +42,7 @@ namespace iNube.Services.UserManagement.Entities.AVO
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=AVOLifeP2;User ID=AVOLifeUserP2;Password=AVOLife*User123;");
             }
         }
 
@@ -52,9 +54,9 @@ namespace iNube.Services.UserManagement.Entities.AVO
             {
                 entity.ToTable("AspNetRoleClaims", "UM");
 
-                entity.HasIndex(e => e.RoleId);
-
-                entity.Property(e => e.RoleId).IsRequired();
+                entity.Property(e => e.RoleId)
+                    .IsRequired()
+                    .HasMaxLength(450);
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.AspNetRoleClaims)
@@ -64,11 +66,6 @@ namespace iNube.Services.UserManagement.Entities.AVO
             modelBuilder.Entity<AspNetRoles>(entity =>
             {
                 entity.ToTable("AspNetRoles", "UM");
-
-                entity.HasIndex(e => e.NormalizedName)
-                    .HasName("RoleNameIndex")
-                    .IsUnique()
-                    .HasFilter("([NormalizedName] IS NOT NULL)");
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -87,9 +84,9 @@ namespace iNube.Services.UserManagement.Entities.AVO
             {
                 entity.ToTable("AspNetUserClaims", "UM");
 
-                entity.HasIndex(e => e.UserId);
-
-                entity.Property(e => e.UserId).IsRequired();
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasMaxLength(450);
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AspNetUserClaims)
@@ -102,13 +99,13 @@ namespace iNube.Services.UserManagement.Entities.AVO
 
                 entity.ToTable("AspNetUserLogins", "UM");
 
-                entity.HasIndex(e => e.UserId);
-
                 entity.Property(e => e.LoginProvider).HasMaxLength(128);
 
                 entity.Property(e => e.ProviderKey).HasMaxLength(128);
 
-                entity.Property(e => e.UserId).IsRequired();
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasMaxLength(450);
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AspNetUserLogins)
@@ -120,8 +117,6 @@ namespace iNube.Services.UserManagement.Entities.AVO
                 entity.HasKey(e => new { e.UserId, e.RoleId });
 
                 entity.ToTable("AspNetUserRoles", "UM");
-
-                entity.HasIndex(e => e.RoleId);
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.AspNetUserRoles)
@@ -151,14 +146,6 @@ namespace iNube.Services.UserManagement.Entities.AVO
             {
                 entity.ToTable("AspNetUsers", "UM");
 
-                entity.HasIndex(e => e.NormalizedEmail)
-                    .HasName("EmailIndex");
-
-                entity.HasIndex(e => e.NormalizedUserName)
-                    .HasName("UserNameIndex")
-                    .IsUnique()
-                    .HasFilter("([NormalizedUserName] IS NOT NULL)");
-
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Email).HasMaxLength(256);
@@ -170,6 +157,59 @@ namespace iNube.Services.UserManagement.Entities.AVO
                 entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
 
                 entity.Property(e => e.UserName).HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<TblDynamicConfig>(entity =>
+            {
+                entity.HasKey(e => e.ConfigId)
+                    .HasName("PK__tblDynam__C3BC335CB2C2D497");
+
+                entity.ToTable("tblDynamicConfig", "UM");
+
+                entity.Property(e => e.ConfigId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ItemDescription).HasMaxLength(50);
+
+                entity.Property(e => e.ItemType).HasMaxLength(50);
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TblDynamicPermissions>(entity =>
+            {
+                entity.HasKey(e => e.DynamicPermissionId)
+                    .HasName("PK__tblDynam__9E6E40FAB1A10DD8");
+
+                entity.ToTable("tblDynamicPermissions", "UM");
+
+                entity.Property(e => e.DynamicPermissionId)
+                    .HasColumnName("DynamicPermissionID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DynamicId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.DynamicName).HasMaxLength(50);
+
+                entity.Property(e => e.DynamicType).HasMaxLength(50);
+
+                entity.Property(e => e.Roleid).HasMaxLength(450);
+
+                entity.Property(e => e.Userid).HasMaxLength(450);
+
+                entity.Property(e => e.UserorRole)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<TblEmployees>(entity =>

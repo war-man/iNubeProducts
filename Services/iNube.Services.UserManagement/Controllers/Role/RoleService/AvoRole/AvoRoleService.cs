@@ -28,20 +28,20 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             IEnumerable<AspNetRoles> _roles = _context.AspNetRoles.Select(roles => roles);
 
-            string custid = _config.GetSection("Inubeadmin").GetSection("Customerid").Value;
+            //string custid = _config.GetSection("Inubeadmin").GetSection("Customerid").Value;
 
-            if (apiContext.OrgId == Convert.ToDecimal(custid))
-            {
-                _roles = _roles.Where(r => r.OrganizationId == apiContext.OrgId);
-            }
+            //if (apiContext.OrgId == Convert.ToDecimal(custid))
+            //{
+            //    _roles = _roles.Where(r => r.OrganizationId == apiContext.OrgId);
+            //}
             //else if (apiContext.OrgId > 0 && apiContext.PartnerId > 0)
             //{
             //    _roles = _roles.Where(r => (r.OrganizationId == apiContext.OrgId && r.PartnerId == apiContext.PartnerId));
             //}
-            else if (apiContext.OrgId != Convert.ToDecimal(custid) && apiContext.OrgId > 0)
-            {
-                _roles = _roles.Where(r => (r.OrganizationId != Convert.ToDecimal(custid)));
-            }
+            //else if (apiContext.OrgId != Convert.ToDecimal(custid) && apiContext.OrgId > 0)
+            //{
+            //    _roles = _roles.Where(r => (r.OrganizationId != Convert.ToDecimal(custid)));
+            //}
 
             IEnumerable<RolesDTO> _rolesDTOs = _mapper.Map<IEnumerable<RolesDTO>>(_roles);
             foreach (RolesDTO roles in _rolesDTOs)

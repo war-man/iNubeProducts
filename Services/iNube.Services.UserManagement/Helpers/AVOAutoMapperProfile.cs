@@ -62,6 +62,9 @@ namespace iNube.Services.UserManagement.Helpers
             CreateMap<TblCustomerSettings, CustomerSettingsDTO>();
             CreateMap<CustomerSettingsDTO, TblCustomerSettings>();
             CreateMap<TblCustomerEnvironment, CustomerEnvironmentDTO>().ReverseMap();
+
+            CreateMap<DynamicConfigDTO, TblDynamicConfig>().ReverseMap();
+            CreateMap<DynamicPermissionsDTO, TblDynamicPermissions>().ReverseMap();
         }
 
     }
