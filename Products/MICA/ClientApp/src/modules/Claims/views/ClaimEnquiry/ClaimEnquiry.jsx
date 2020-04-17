@@ -1281,7 +1281,7 @@ class ClaimEnquiry extends React.Component {
                                         formControlProps={{ fullWidth: true }} />
                                         */}
 
-                                    <CustomDateTimePicker timeformate={false} disabled={false} width='13rem' required={true} labelText="LossDate" name='lossDateTime' value={this.state.ClaimDTO.lossDateTime} onChange={(e) => this.handleDateChange(e, "lossDateTime")} />
+                                    <CustomDateTimePicker timeformate={false} disabled={false} width='13rem' required={true} labelText="Loss Date" name='lossDateTime' value={this.state.ClaimDTO.lossDateTime} onChange={(e) => this.handleDateChange(e, "lossDateTime")} />
 
                                 </GridItem>
 
