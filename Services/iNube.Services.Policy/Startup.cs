@@ -13,6 +13,7 @@ using iNube.Services.Policy.Controllers.Policy.PolicyServices;
 using iNube.Services.Policy.Controllers.Proposal.IntegrationService.iNube.Services.Proposal.Controllers.ProposalConfig.IntegrationService;
 using iNube.Services.Policy.Controllers.Proposal.ProposalService;
 using iNube.Services.Policy.Entities;
+using iNube.Services.Policy.Entities.AVO.DynamicReportEntities;
 using iNube.Services.Policy.Entities.AvoEntities;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
 using iNube.Services.Policy.Helpers;
@@ -51,6 +52,8 @@ namespace iNube.Services.Policy
             services.AddDbContext<ProposalContext>();
 
             services.AddDbContext<MICARPContext>();
+            services.AddDbContext<AVORPContext>();
+
             //var connectionstring = Configuration.GetConnectionString("PCConnection");
 
             // configure strongly typed settings objects
