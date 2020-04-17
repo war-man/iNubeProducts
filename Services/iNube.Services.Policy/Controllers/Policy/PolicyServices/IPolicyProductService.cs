@@ -74,5 +74,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext);
         Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext);
         Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext);
+        Task<bool> ProposalCancellationScheduler(ApiContext apiContext);
     }
 }
