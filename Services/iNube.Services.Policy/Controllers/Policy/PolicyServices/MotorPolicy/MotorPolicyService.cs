@@ -324,5 +324,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> ProposalCancellationScheduler(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

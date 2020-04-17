@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
+using iNube.Services.Policy.Entities.AVO.DynamicReportEntities;
 
 namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
 {
@@ -91,12 +92,12 @@ namespace iNube.Services.Policy.Helpers.DynamicReportHelpers
                     //DbContextOptions<MICAPCContext> dbContextOption = (DbContextOptions<MICAPCContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
                     context = new MICARPContext(optionsBuilder.Options);
                     break;
-                //case "Avo":
-                //    var optionBuilder = new DbContextOptionsBuilder<AVORPContext>();
-                //    //DbContextOptions<AVOPRContext> dbAvoContextOption = (DbContextOptions<AVOPRContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                //    optionBuilder.UseSqlServer(dbConnectionString);
-                //    context = new AVORPContext(optionBuilder.Options);
-                //    break;
+                case "Avo":
+                    var optionBuilder = new DbContextOptionsBuilder<AVORPContext>();
+                    //DbContextOptions<AVORPContext> dbAvoContextOption = (DbContextOptions<AVOPRContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                    optionBuilder.UseSqlServer(dbConnectionString);
+                    context = new AVORPContext(optionBuilder.Options);
+                    break;
                 case "Motor":
                     dbConnectionString = DbConnectionManager.GetConnectionString("Prod");
                     break;

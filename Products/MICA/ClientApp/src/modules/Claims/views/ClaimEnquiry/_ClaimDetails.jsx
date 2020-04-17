@@ -167,6 +167,19 @@ const ClaimDetails = (props) => {
                         />
                     </GridItem>
                 }
+                {claimDetailsprops.performerflag &&
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
+                            disabled={claimDetailsprops.disabled}
+                            labelText="Performer"
+                            value={claimDetailsprops.claimDetailsData.performer}
+                            name='performer'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
 
                 <GridContainer justify="center">
                     <GridItem xs={3} sm={3} md={3}>
@@ -283,7 +296,7 @@ const ClaimDetails = (props) => {
                                     </GridItem>
                                     {item.BankCustDetails.map(item1 =>
                                         <GridContainer>
-                                        {renderCustomerDetails(item1)}
+                                            {renderCustomerDetails(item1)}
                                         </GridContainer>
                                     )}
                                 </GridContainer>
@@ -295,31 +308,31 @@ const ClaimDetails = (props) => {
                 </div>
             }
             {claimDetailsprops.showbankdetails &&
-            <div>
-            {(BankArray.length > 0) ?
-                <GridContainer>
-                    {BankArray.map((item, key) =>
-                        <GridContainer >
-                            <GridItem lg={12}>
-                                <CardHeader color="info" icon >
-                                    {
-                                        <h3 >
-                                            <small> {item.name}&nbsp;<TranslationContainer translationKey="BankDetails" /></small>
-                                        </h3>
-                                    }
-                                </CardHeader>
-                            </GridItem>
-                            {item.BankDetails.map(item1 =>
-                                <GridContainer>
-                                    {renderBankDetails(item1)}
+                <div>
+                    {(BankArray.length > 0) ?
+                        <GridContainer>
+                            {BankArray.map((item, key) =>
+                                <GridContainer >
+                                    <GridItem lg={12}>
+                                        <CardHeader color="info" icon >
+                                            {
+                                                <h3 >
+                                                    <small> {item.name}&nbsp;<TranslationContainer translationKey="BankDetails" /></small>
+                                                </h3>
+                                            }
+                                        </CardHeader>
+                                    </GridItem>
+                                    {item.BankDetails.map(item1 =>
+                                        <GridContainer>
+                                            {renderBankDetails(item1)}
+                                        </GridContainer>
+                                    )}
                                 </GridContainer>
                             )}
                         </GridContainer>
-                    )}
-                </GridContainer>
-                :
-                <h4>No Bank Details Available for this Claim</h4>
-                }
+                        :
+                        <h4>No Bank Details Available for this Claim</h4>
+                    }
                 </div>
             }
             <GridContainer>

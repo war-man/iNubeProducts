@@ -1644,6 +1644,18 @@ namespace iNube.Services.Policy.Models
         public PolicyStatusDTO PolicyStatus { get; set; }
     }
 
+    public class CancelScheduleDTO
+    {
+        public string ProposalNumber { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string MobileNumber { get; set; }
+    }
+
+    public class ProposalCancelDTO
+    {
+        public string ProposalNumber { get; set; }
+        public string Remarks { get; set; }
+    }
 }
 
 

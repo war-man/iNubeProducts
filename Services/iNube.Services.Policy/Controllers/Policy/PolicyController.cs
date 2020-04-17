@@ -671,5 +671,15 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return NotFound(response);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ProposalCancellationScheduler()
+        {
+            var response = await _policyService.ProposalCancellationScheduler(Context);
+            return Ok(response);
         }
+
+
+
+    }
 }

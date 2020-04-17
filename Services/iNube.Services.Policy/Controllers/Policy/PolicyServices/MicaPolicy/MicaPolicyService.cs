@@ -6952,11 +6952,54 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
           
            
         }
+            
+
+        public async Task<bool> ProposalCancellationScheduler(ApiContext apiContext)
+        {
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);         
+            var CurrentDate = IndianTime.Date;
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var ProposalList = _context.TblPolicy.Where(x=>x.PolicyStageId == 6 && x.PolicyStatusId != 4)
+                                                 .Select(x=> new CancelScheduleDTO
+                                                 {
+                                                     ProposalNumber = x.ProposalNo,
+                                                     CreatedDate = x.CreatedDate,
+                                                     MobileNumber = x.MobileNumber
+                                                 }).ToList();
+
+            foreach(var item in ProposalList)
+            {
+                if(item.CreatedDate.Date >= CurrentDate )
+                {
+                    continue;
+                }
+
+                var DateDifference = (CurrentDate - item.CreatedDate.Date).TotalDays + 1;
+
+                switch (DateDifference)
+                {
+                    case 2: case 7: case 14: break;
+
+                    case 15:
+                        ProposalCancelDTO proposalCancel = new ProposalCancelDTO();
+                        proposalCancel.ProposalNumber = item.ProposalNumber;
+                        proposalCancel.Remarks = "Auto - Proposal Cancellation";
+                        var callProosalCancel = await ProposalCancellation(proposalCancel,apiContext);
+                        break;
+
+                    default: continue;
+                }
+
+            }
+
+            return true;
+
         }
 
 
-
-
+    }
 
     }
 
