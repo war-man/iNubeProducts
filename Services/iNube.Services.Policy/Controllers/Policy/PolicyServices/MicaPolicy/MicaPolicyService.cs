@@ -6369,15 +6369,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 var errorflag = false;
                 var endrsNum = "";
                 var updatedResponse = "";
-                DateTime endorsementeffectivedate = Convert.ToDateTime("1/1/1754 12:00:00");
-                DateTime txndate = Convert.ToDateTime("1/1/1754 12:00:00");
+                DateTime endorsementeffectivedate = DatetimeNow;
+                DateTime txndate = DatetimeNow;
                 var paymentstatus = "";
                 var paymentstatus1 = "";
-                DateTime dateofpayment = Convert.ToDateTime("1/1/1754 12:00:00");
+                DateTime dateofpayment = DatetimeNow;
                 decimal totalRefundAmount = 0;
                 decimal ammountpaid = 0;
                 var paymentrefId = "";
-                DateTime dateofpayment1 = Convert.ToDateTime("1/1/1754 12:00:00");
+                DateTime dateofpayment1 = DatetimeNow;
                 ShowErrorInfoDetails errorInfoDetailsInfo = new ShowErrorInfoDetails();
 
                 var erromsg = "";
@@ -6635,9 +6635,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 {
                                     var endeffectivedate = PolicyRefundDetails.EndorsementEffectivedate;//22/03/2020
 
+                                    DateTime validadate = Convert.ToDateTime(s5);
+                                    var dtFrom = validadate.ToString("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                                     //Checking format of dd/mm/yy
+                                    // DateTime dateconvert = Convert.ToDateTime(s5.Replace("\"", ""));//23/03/2020
+                                    dateofpayment = DateTime.ParseExact(dtFrom, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
-                                    dateofpayment = Convert.ToDateTime(s5.Replace("\"", ""));//23/03/2020
                                     var strdayofpayment = dateofpayment.ToString();
 
                                     string inputString = strdayofpayment;
@@ -6662,6 +6665,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     int value1 = DateTime.Compare(dateofpayment, Convert.ToDateTime(endeffectivedate));
                                  
                                     int value2 = DateTime.Compare(dateofpayment, DatetimeNow);
+
+                                   
+                                   
+
                                     if (value1 < 0)
                                     {
                                         ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment can not be less then endorsementeffectivedate for row {i + 1}" };

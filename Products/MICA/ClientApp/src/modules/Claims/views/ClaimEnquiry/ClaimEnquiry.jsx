@@ -121,6 +121,7 @@ class ClaimEnquiry extends React.Component {
             vehicleclaimstate: false,
             vehicleclaimdriver: false,
             vehicleclaimsurvey: false,
+            performerflag: false,
             showCust: false,
             showbankdetails: false,
             isimage: false,
@@ -271,6 +272,7 @@ class ClaimEnquiry extends React.Component {
                 "vehicleLocationState": "",
                 "driverName": "",
                 "selfSurvey": "",
+                "performer": "",
                 "claimManagerRemarks": "",
                 "totalClaimedAmount": "",
                 "claimStatus": "",
@@ -937,6 +939,13 @@ class ClaimEnquiry extends React.Component {
                 else {
                     this.setState({ vehicleclaimsurvey: false });
                 }
+                if (data[0][11][1] != null && data[0][11][1].length > 0) {
+                    this.state.claimDetailsData.performer = data[0][11][1];
+                    this.setState({ performerflag: true });
+                }
+                else {
+                    this.setState({ performerflag: false });
+                }
                 console.log("insurablegrid vaalue", this.state.claimTableData);
             });
     }
@@ -1272,7 +1281,7 @@ class ClaimEnquiry extends React.Component {
                                         formControlProps={{ fullWidth: true }} />
                                         */}
 
-                                    <CustomDateTimePicker timeformate={false} disabled={false} width='13rem' required={true} labelText="LossDate" name='lossDateTime' value={this.state.ClaimDTO.lossDateTime} onChange={(e) => this.handleDateChange(e, "lossDateTime")} />
+                                    <CustomDateTimePicker timeformate={false} disabled={false} width='13rem' required={true} labelText="Loss Date" name='lossDateTime' value={this.state.ClaimDTO.lossDateTime} onChange={(e) => this.handleDateChange(e, "lossDateTime")} />
 
                                 </GridItem>
 
@@ -1446,7 +1455,7 @@ class ClaimEnquiry extends React.Component {
                                         </GridContainer>
 
                                         <ClaimSearch TableData={this.state.TableData} CustArray={this.state.CustArray} showCust={this.state.showCust} showbankdetails={this.state.showbankdetails} BankArray={this.state.BankArray} renderBankDetails={this.renderBankDetails} renderCustomerDetails={this.renderCustomerDetails} handleDisappear={this.handleDisappear} refreshData={this.refreshData} ClaimAmountSum={this.ClaimAmountSum} ClaimDTO={this.state.ClaimDTO} fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount} disabled={this.state.disabled} claimId={this.state.claimId} SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} policyDetailsData={this.state.policyDetailsData} decision={this.state.decision} claimDetailsData={this.state.claimDetailsData}
-                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey} handleActivitylog={this.handleActivitylog} />
+                                            docDetailsData={this.state.docDetailsData} docdata={this.state.docdata} Datapic={this.state.Datapic} handleChange={this.handleChange} onInputParamChange={this.onInputParamChange} claimStatusIdState={this.state.claimStatusIdState} approvedClaimAmountState={this.state.approvedClaimAmountState} claimManagerRemarksState={this.state.claimManagerRemarksState} classes={this.classes} ClaimIntimationDetails={this.state.ClaimIntimationDetails} vehicleclaim={this.state.vehicleclaim} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey} performerflag={this.state.performerflag} handleActivitylog={this.handleActivitylog} />
 
                                     </CardBody>
                                 </Card>
