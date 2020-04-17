@@ -2192,6 +2192,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 finaldata.Add("Vehicle Location State", statevalue);
                 finaldata.Add("Driver Name", json["Driver Name"]);
                 finaldata.Add("Self-Survey Required", json["Self-Survey Required"]);
+                finaldata.Add("Performer", json["Performer"]);
             }
 
             foreach (var item in finaldata)
