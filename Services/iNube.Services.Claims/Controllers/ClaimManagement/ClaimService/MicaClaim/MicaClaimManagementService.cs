@@ -1700,6 +1700,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                 DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
                 var ClaimApproval = _context.TblClaims.SingleOrDefault(x => x.ClaimNumber == claimsDTO.ClaimNumber);
+               // var oldClaimApproval= _context.TblClaims.SingleOrDefault(x => x.ClaimNumber == claimsDTO.ClaimNumber);
                 if (ClaimApproval != null)
                 {
                     var Insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == claimsDTO.ClaimId).ToList();
@@ -1708,6 +1709,32 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     List<ClaimdocDTO> _claimdoc = new List<ClaimdocDTO>();
 
                     var oldstatusId = ClaimApproval.ClaimStatusId;
+
+                    //adding new record to tblhistory on updating claimstatus of existing claim from tblclaims
+                  claimsHistory.ClaimId = ClaimApproval.ClaimId;
+                    //claimsHistory.ClaimStatusId = claimsDTO.ClaimStatusId;
+                    claimsHistory.ClaimStatusId = oldstatusId;
+                    claimsHistory.ClaimAmount = ClaimApproval.ClaimAmount;
+                    claimsHistory.ClaimManagerRemarks = ClaimApproval.ClaimManagerRemarks;
+                    claimsHistory.ApprovedClaimAmount = ClaimApproval.ApprovedClaimAmount;
+                    claimsHistory.CreatedBy = ClaimApproval.CreatedBy;
+                    claimsHistory.CreatedDate = ClaimApproval.CreatedDate;
+                    claimsHistory.LossId = ClaimApproval.LossId;
+                    claimsHistory.LossDateTime = ClaimApproval.LossDateTime;
+                    claimsHistory.LocationOfEvent = ClaimApproval.LocationOfEvent;
+                    claimsHistory.LossOfDescription = ClaimApproval.LossOfDescription;
+                    claimsHistory.PolicyId = ClaimApproval.PolicyId;
+                    claimsHistory.OrgId = apiContext.OrgId;
+                    claimsHistory.PartnerId = apiContext.PartnerId;
+                    claimsHistory.PolicyNo = ClaimApproval.PolicyNo;
+                    claimsHistory.ClaimNumber = ClaimApproval.ClaimNumber;
+                    claimsHistory.ModifiedBy = ClaimApproval.ModifiedBy;
+                    claimsHistory.ModifiedDate = ClaimApproval.ModifiedDate;
+
+                    claimsHistory.Active = true;
+
+
+                    _context.TblClaimHistory.Add(claimsHistory);
                     // Get Clone 
                     //  var hisClaimApproval= Clone.ClaimApproval.
 
@@ -1803,31 +1830,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                     }
 
-                    //adding new record to tblhistory on updating claimstatus of existing claim from tblclaims
-                    claimsHistory.ClaimId = ClaimApproval.ClaimId;
-                    //claimsHistory.ClaimStatusId = claimsDTO.ClaimStatusId;
-                    claimsHistory.ClaimStatusId = oldstatusId;
-                    claimsHistory.ClaimAmount = ClaimApproval.ClaimAmount;
-                    claimsHistory.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
-                    claimsHistory.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
-                    claimsHistory.CreatedBy = ClaimApproval.CreatedBy;
-                    claimsHistory.CreatedDate = ClaimApproval.CreatedDate;
-                    claimsHistory.LossId = ClaimApproval.LossId;
-                    claimsHistory.LossDateTime = ClaimApproval.LossDateTime;
-                    claimsHistory.LocationOfEvent = ClaimApproval.LocationOfEvent;
-                    claimsHistory.LossOfDescription = ClaimApproval.LossOfDescription;
-                    claimsHistory.PolicyId = ClaimApproval.PolicyId;
-                    claimsHistory.OrgId = apiContext.OrgId;
-                    claimsHistory.PartnerId = apiContext.PartnerId;
-                    claimsHistory.PolicyNo = ClaimApproval.PolicyNo;
-                    claimsHistory.ClaimNumber = ClaimApproval.ClaimNumber;
-                    claimsHistory.ModifiedBy = ClaimApproval.ModifiedBy;
-                    claimsHistory.ModifiedDate = ClaimApproval.ModifiedDate;
-
-                    claimsHistory.Active = true;
-
-
-                    _context.TblClaimHistory.Add(claimsHistory);
+            
 
                     _context.SaveChanges();
 
@@ -3138,11 +3141,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             counts.Intimated = _ClaimSearchData.Where(g => g.ClaimStatusId == 33).Count();
             counts.Approved = _ClaimSearchData.Where(g => g.ClaimStatusId == 9).Count();
             counts.Document = _ClaimSearchData.Where(g => g.ClaimStatusId == 17).Count();
-            counts.Rejected = _ClaimSearchData.Where(g => g.ClaimStatusId == 34).Count();
-            counts.Rejected = counts.Rejected + _ClaimSearchData.Where(g => g.ClaimStatusId == 35).Count();
-            counts.Rejected = counts.Rejected + _ClaimSearchData.Where(g => g.ClaimStatusId == 36).Count();
-            counts.Rejected = counts.Rejected + _ClaimSearchData.Where(g => g.ClaimStatusId == 37).Count();
+            counts.Others = _ClaimSearchData.Where(g => g.ClaimStatusId == 34).Count();
+            counts.Others = counts.Others + _ClaimSearchData.Where(g => g.ClaimStatusId == 35).Count();
+            counts.Others = counts.Others + _ClaimSearchData.Where(g => g.ClaimStatusId == 36).Count();
+            counts.Others = counts.Others + _ClaimSearchData.Where(g => g.ClaimStatusId == 37).Count();
             counts.Setteled = _ClaimSearchData.Where(g => g.ClaimStatusId == 38).Count();
+            counts.Rejected = _ClaimSearchData.Where(g => g.ClaimStatusId == 39).Count();
 
             return counts;
         }

@@ -2966,7 +2966,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                     json1["Balance SumInsured"] = Convert.ToInt64(json1["Balance SumInsured"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
 
-                                    tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
+                                    policy.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
 
                                 }
 
@@ -3053,6 +3053,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                                     if (insurableItemRequest["si"] != null && Convert.ToInt64(insurableItemRequest["si"]) > 0)
                                                                     {
                                                                         json1.si = insurableItemRequest.si;
+                                                                        policy.SumInsured= insurableItemRequest.si;
                                                                     }
                                                                     foreach (var fields in item.RiskItems)
                                                                     {
@@ -3267,11 +3268,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                             json1["Balance SumInsured"] = Convert.ToInt64(json1["Balance SumInsured"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
 
+                                            policy.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
 
                                         }
 
 
-                                        tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
 
 
 
@@ -3301,6 +3302,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                                 if (insurableItemRequest["si"] != null && Convert.ToInt64(insurableItemRequest["si"]) > 0)
                                                                 {
                                                                     json1.si = insurableItemRequest.si;
+                                                                    policy.SumInsured = insurableItemRequest.si;
                                                                 }
                                                                 foreach (var fields in item.RiskItems)
                                                                 {
@@ -3506,10 +3508,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
 
                         json1["Balance SumInsured"] = Convert.ToInt64(json1["Balance SumInsured"]) + Convert.ToInt64(insurableItemRequest["si"]) - Convert.ToInt64(json1["si"]);
-
+                        policy.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
 
                     }
-                    tbl_particiant.BalanceSumInsued = Convert.ToInt32(json1["Balance SumInsured"]);
+                   
 
                     //Step2:Validate of Request Object
                     List<CDMapper> cDMappers = new List<CDMapper>();
@@ -3565,10 +3567,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
 
 
-                       // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                    // var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
+                    if (insurableItemRequest["si"] != null && Convert.ToInt64(insurableItemRequest["si"]) > 0)
+                    {
+                        json1.si = insurableItemRequest.si;
+                        policy.SumInsured = insurableItemRequest.si;
+                    }
 
-
-                        foreach (var item in insurableItemRequest.InsurableItem)
+                    foreach (var item in insurableItemRequest.InsurableItem)
                         {
 
                             foreach (var insurableName in json.InsurableItem)
@@ -3577,7 +3583,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 {
                                     if (item.InsurableName == "Vehicle" && insurableName.InsurableName == "Vehicle" && insurableName1.InsurableName == "Vehicle")
                                     {
-                                        foreach (var fields in item.RiskItems)
+                                   
+                                    foreach (var fields in item.RiskItems)
                                         {
                                             if (insurableName.RiskItems.Count > 0)
                                             {
@@ -6635,11 +6642,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 {
                                     var endeffectivedate = PolicyRefundDetails.EndorsementEffectivedate;//22/03/2020
 
-                                    DateTime validadate = Convert.ToDateTime(s5);
-                                    var dtFrom = validadate.ToString("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                                    string validadate = Convert.ToDateTime(s5).ToString();
+                                    //var dtFrom = validadate.ToString("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                                     //Checking format of dd/mm/yy
                                     // DateTime dateconvert = Convert.ToDateTime(s5.Replace("\"", ""));//23/03/2020
-                                    dateofpayment = DateTime.ParseExact(dtFrom, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                                    dateofpayment = DateTime.ParseExact(validadate, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
                                     var strdayofpayment = dateofpayment.ToString();
 

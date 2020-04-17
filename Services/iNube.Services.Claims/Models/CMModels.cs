@@ -384,6 +384,7 @@ namespace iNube.Services.Claims.Models
         public int Document { get; set; }
         public int Rejected { get; set; }
         public int Setteled { get; set; }
+        public int Others { get; set; }
     }
 
 
