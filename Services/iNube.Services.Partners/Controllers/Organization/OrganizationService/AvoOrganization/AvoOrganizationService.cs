@@ -305,5 +305,29 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             var _result = _mapper.Map<List<AVOOrganizationDTO>>(orgdata);
             return _result.ToList();
         }
+
+        public async Task<IEnumerable<ddDTO>> GetOrgDropdown(ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            IEnumerable<ddDTO> ddDTOs;
+            ddDTOs = _context.TblOrganization.Select(a => new ddDTO
+            {
+                mID = Convert.ToInt32(a.OrganizationId),
+                mValue = a.OrgName,
+            });
+            return ddDTOs;
+        }
+
+        public async Task<IEnumerable<ddDTO>> GetOffbyOrgid(int orgid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            IEnumerable<ddDTO> ddDTOs;
+            ddDTOs = _context.TblOrgOffice.Where(a => a.OrganizationId == orgid).Select(a => new ddDTO
+            {
+                mID = Convert.ToInt32(a.OrgOfficeId),
+                mValue = a.OfficeName,
+            });
+            return ddDTOs;
+        }
     }
 }

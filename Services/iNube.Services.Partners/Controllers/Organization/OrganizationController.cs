@@ -209,5 +209,21 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetOrgByParentId(orgid, Context);
             return Ok(response);
         }
+
+        //  || AVO
+        [HttpGet]
+        public async Task<IActionResult> GetOrgDropdown()
+        {
+            var response = await _avoorgService.GetOrgDropdown(Context);
+            return Ok(response);
+        }
+
+        //  || AVO
+        [HttpGet]
+        public async Task<IActionResult> GetOffbyOrgid(int orgid)
+        {
+            var response = await _avoorgService.GetOffbyOrgid(orgid, Context);
+            return Ok(response);
+        }
     }
 }
