@@ -54,15 +54,12 @@ class Upload extends React.Component {
             TableDataList: [],
             TableDataCopy: [],
             RefundTableHeaderFun: [],
-            result: [],
             monthlyDetailsData: [],
             monthlyData: [],
-            mflag:false,
+            mflag: false,
+            responseErrors:[],
+            resErrors:[],
         };
-        //let [TableDataCopy, RefundTableHeaderFun] = React.useState([]);
-        //let [ShowGrid, GridFun] = React.useState(false);
-        //let [errorList, errorListFun] = React.useState([]);
-        //let TableDataList = [];
     }
 
 
@@ -117,47 +114,43 @@ class Upload extends React.Component {
                     console.log("response ", response);
 
                     if (response.status == 1) {
-
-                        this.state.GridFun = false;
+                        this.setState({
+                            GridFun: true,
+                            errorListFun: response.errorDetails
+                        });
+                        this.RefundTableHeader(response.errors);
                         swal({
 
                             text: response.responseMessage,
                             icon: "success"
                         });
-                    } else if (response.status == 7) {
-                        if (response.errorDetails.length > 0) {
-                            this.state.GridFun = true;
-                            this.state.errorListFun(response.errorDetails);
-                            this.state.RefundTableHeader(response.responseMessage);
-                        }
+
+                    } else {
+                       // if (response.errorDetails.length > 0) {
+                        this.setState({
+                            GridFun : true,
+                            errorListFun:response.errorDetails
+                        });
+                        this.RefundTableHeader(response.errors);
+                        //}
                         swal({
                             text: response.responseMessage,
                             icon: "success"
                         });
                         console.log("check", response.responseMessage);
                     }
-                    else if (response.status == 0) {
-                        if (response.errorDetails.length > 0) {
-                            this.state.GridFun = true;
-                            this.state.errorListFun(response.errorDetails);
-                            this.state.RefundTableHeader(response.responseMessage);
-                        }
-                        swal({
-                            text: response.responseMessage,
-                            icon: "success"
-                        });
-                        console.log("check", response.responseMessage);
-                    }
-                    else {
-                    }
-                },
+
+                }.bind(this),
                 error: function () {
-                    this.state.GridFun = false;
+
+                    this.setState({
+                        GridFun : false
+                    });
                     swal({
                         text: "File uploading unsuccessful",
                         icon: "error"
                     });
-                }
+                }.bind(this)
             });
         }
         
@@ -212,9 +205,12 @@ class Upload extends React.Component {
         }
 }
 
-    RefundTableHeader = (activityDTOs) => {
+    RefundTableHeader = (errors) => {
+        console.log("errors", errors);
+        this.state.resErrors = errors;
+        this.setState({GridFun:true});
         this.setState({
-        TableDataList : Object.keys(activityDTOs[0]).map((prop, key) => {
+            TableDataList: Object.keys(this.state.resErrors[0]).map((prop, key) => {
             return {
                 Header: prop.charAt(0).toUpperCase() + prop.slice(1),
                 accessor: prop,
@@ -222,16 +218,15 @@ class Upload extends React.Component {
                 this.setState({});
             })
         });
-        console.log("table data", this.state.TableDataList);
     }
 
     tabledata = (errors) => {
         debugger
-        var responseErrors = errors;
+        this.state.responseErrors = errors;
         this.setState({ mflag: true });
         console.log("Monthly", this.state.monthlyData);
         this.setState({
-            monthlyDetailsData: responseErrors.map((prop, key) => {
+            monthlyDetailsData: this.state.responseErrors.map((prop, key) => {
                 return {
                     SNo: key + 1,
                     ErrorCode: prop.errorCode,
@@ -316,9 +311,9 @@ class Upload extends React.Component {
                                         <ReactTable
                                             title={<h5><TranslationContainer translationKey={"Refund Upload Errors"} /></h5>}
 
-                                            data={this.state.errorList}
+                                            data={this.state.resErrors}
                                             filterable
-                                            columns={this.state.TableDataCopy}
+                                            columns={this.state.TableDataList}
                                             defaultPageSize={4}
                                             pageSize={([this.state.errorList.length + 1] < 4) ? [this.state.errorList.length + 1] : 4}
                                             showPaginationTop={false}
