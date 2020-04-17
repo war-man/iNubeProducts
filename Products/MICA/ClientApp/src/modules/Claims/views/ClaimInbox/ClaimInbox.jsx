@@ -54,12 +54,14 @@ class ClaimInbox extends React.Component {
             document: false,
             rejected: false,
             setteled: false,
+            others: false,
             ClaimCount: {
                 "intimated": "",
                 "approved": "",
                 "document": "",
                 "rejected": "",
                 "setteled": "",
+                "others":""
             },
             ClaimDTO: {
                 claimStatusId: "",
@@ -76,7 +78,8 @@ class ClaimInbox extends React.Component {
             approved: false,
             document: false,
             rejected: false,
-            setteled: false
+            setteled: false,
+            others: false
         });
         //swal({
         //    text: "this is Claim intimation",
@@ -96,6 +99,7 @@ class ClaimInbox extends React.Component {
             .then(data => {
                 console.log("response data", data);
                 this.setState({ ClaimCount: data })
+
             });
     }
 
@@ -108,7 +112,8 @@ class ClaimInbox extends React.Component {
             approved: true,
             document: false,
             rejected: false,
-            setteled: false
+            setteled: false,
+            others: false
         });
         //swal({
         //    text: "this is Claims Approved",
@@ -125,7 +130,8 @@ class ClaimInbox extends React.Component {
             approved: false,
             document: true,
             rejected: false,
-            setteled: false
+            setteled: false,
+            others: false
         });
         //swal({
         //    text: "this is Document pending",
@@ -135,21 +141,38 @@ class ClaimInbox extends React.Component {
 
     handleRejected = () => {
         let status = this.state.ClaimDTO;
-        status.claimStatusId = 0;
+        status.claimStatusId = 39;
         this.setState({
             status,
             intimate: false,
             approved: false,
             document: false,
             rejected: true,
-            setteled: false
+            setteled: false,
+             others: false
         });
         //swal({
         //    text: "this is Claims Rejected",
         //    icon: "info"
         //});
     }
-
+    handleOther = () => {
+        let status = this.state.ClaimDTO;
+        status.claimStatusId = 0;
+        this.setState({
+            status,
+            intimate: false,
+            approved: false,
+            document: false,
+            rejected: false,
+            setteled: false,
+            others:true
+        });
+        //swal({
+        //    text: "this is Claims Rejected",
+        //    icon: "info"
+        //});
+    }
     handleSettled = () => {
         let status = this.state.ClaimDTO;
         status.claimStatusId = 38;
@@ -159,7 +182,8 @@ class ClaimInbox extends React.Component {
             approved: false,
             document: false,
             rejected: false,
-            setteled: true
+            setteled: true,
+            others: false
         });
         //swal({
         //    text: "this is Claims Settled",
@@ -251,12 +275,30 @@ class ClaimInbox extends React.Component {
                         <GridItem /*xs={2}*/>
                             <Card id="card-bg4" onClick={(e) => this.handleRejected(e)}>
                                 <CardHeader>
-                                    <h5 id="white" className={classes.cardTitle}>Other Claims</h5>
+                                    <h5 id="white" className={classes.cardTitle}>Rejected Claims</h5>
                                     <h4 className="h4center">
                                         <CountUp
                                             className="account-balance"
                                             start={0}
                                             end={this.state.ClaimCount.rejected}
+                                            duration={3.50}
+                                            useEasing={true}
+                                            useGrouping={true}
+                                            separator=" "
+                                        />
+                                    </h4>
+                                </CardHeader>
+                            </Card>
+                        </GridItem>
+                        <GridItem /*xs={2}*/>
+                            <Card id="card-bg3" onClick={(e) => this.handleOther(e)}>
+                                <CardHeader>
+                                    <h5 id="white" className={classes.cardTitle}>Other Claims</h5>
+                                    <h4 className="h4center">
+                                        <CountUp
+                                            className="account-balance"
+                                            start={0}
+                                            end={this.state.ClaimCount.others}
                                             duration={3.50}
                                             useEasing={true}
                                             useGrouping={true}
@@ -281,9 +323,11 @@ class ClaimInbox extends React.Component {
                     : null}
 
                 {this.state.rejected ?
+                    <ClaimPage ClaimDTO={this.state.ClaimDTO} />
+                    : null}
+                {this.state.others ?
                     <InboxClaimProcess ClaimDTO={this.state.ClaimDTO} />
                     : null}
-
                 {this.state.setteled ?
                     <ClaimPage ClaimDTO={this.state.ClaimDTO} />
                     : null}
