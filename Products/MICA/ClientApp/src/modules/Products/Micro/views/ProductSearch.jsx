@@ -361,7 +361,7 @@ class ProductSearch extends React.Component {
             //this.setState({ animatedType: "fadeInUp" });
         }
         console.log("Type", this.state.animatedType)
-        fetch(`https://inubeservicesproductconfiguration.azurewebsites.net/api/Product/GetMasterData?sMasterlist=das`, {
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetMasterData?sMasterlist=das`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -383,7 +383,7 @@ class ProductSearch extends React.Component {
 
     GetMasterService = (type, pID) => {
         // fetch(`https://localhost:44347/api/Product/GetProductMaster?masterType=` + type + `&parentID=` + pID,{
-        fetch(`https://inubeservicesproductconfiguration.azurewebsites.net/api/Product/GetProductMaster?masterType=` + type + `&parentID=` + pID, {
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetProductMaster?masterType=` + type + `&parentID=` + pID, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
