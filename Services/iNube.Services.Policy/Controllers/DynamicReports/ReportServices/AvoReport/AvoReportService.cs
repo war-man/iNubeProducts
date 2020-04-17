@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using AutoMapper.Configuration;
 using iNube.Services.DynamicReports.model;
 using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
 using iNube.Services.Policy.Entities.AVO.DynamicReportEntities;
 using iNube.Services.Policy.Helpers.DynamicReportHelpers;
 using iNube.Services.Policy.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
