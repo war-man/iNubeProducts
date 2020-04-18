@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using inube.Services.Notification.Controllers.DMS.DMSService;
+using inube.Services.Notification.Helpers;
 using inube.Services.Notification.Models;
 using inube.Services.Notification.Template;
 using iNube.Utility.Framework;
@@ -22,6 +23,7 @@ namespace inube.Services.Notification.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class NotificationsController : BaseApiController
     {
         private readonly IHostingEnvironment _host;
@@ -29,13 +31,17 @@ namespace inube.Services.Notification.Controllers
         private readonly IConfiguration _configuration;
         private ICompositeViewEngine _viewEngine;
         private readonly IDMSService _iDMSService;
-        public NotificationsController(IDMSService iDMSService, IHostingEnvironment host, IEmailService emailService, IConfiguration configuration, ICompositeViewEngine viewEngine)
+        private readonly INEmailService _emailNService;
+        private readonly ISMSService _smsService;
+        public NotificationsController(IDMSService iDMSService, IHostingEnvironment host, IEmailService emailService, IConfiguration configuration, ICompositeViewEngine viewEngine, INEmailService emailNService, ISMSService smsService)
         {
             _host = host;
             _emailService = emailService;
             _configuration = configuration;
             _viewEngine = viewEngine;
             _iDMSService = iDMSService;
+            _emailNService = emailNService;
+            _smsService = smsService;
         }
 		
 		 [HttpGet]
@@ -236,8 +242,18 @@ namespace inube.Services.Notification.Controllers
             return ServiceResponse(response);
         }
 
-
-
+        [HttpPost]
+        public async Task<IActionResult> SendSMSAsync([FromBody]Models.SMSRequest request)
+        {
+            var response = await _smsService.SendSMS(request,Context);
+            return ServiceResponse(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SendEmailAsync([FromBody]Models.EmailRequest request)
+        {
+            var response = await _emailNService.SendEmail(request, Context);
+            return ServiceResponse(response);
+        }
 
 
         [HttpPost]
@@ -920,5 +936,7 @@ namespace inube.Services.Notification.Controllers
             EmailRequest emailTest = new EmailRequest() { Message = $"Dear Customer,\n\n Your Insurance Policy transaction has been successful.\n\n , find the Policy \n schedule document attached.\n Assuring you the best of services always.\n\n Regards,\n Team MICA ", Subject = $"Test Email from MICA", To = "ashish.sinha@inubesolutions.com", IsAttachment = true };
             return emailTest;
         }
+
+
     }
 }

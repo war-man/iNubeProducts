@@ -3,7 +3,9 @@ using FluentValidation.AspNetCore;
 using HealthChecks.UI.Client;
 using inube.Services.Notification.Controllers.DMS.DMSService;
 using inube.Services.Notification.Controllers.RDLC.RdlcService;
+using inube.Services.Notification.Helpers;
 using inube.Services.Notification.Models;
+using iNube.Services.Notification.Controllers.IntegrationServices;
 using iNube.Services.Notification.Helpers;
 using iNube.Utility.Framework.Extensions;
 using iNube.Utility.Framework.Filters.Attribute;
@@ -86,6 +88,9 @@ namespace inube.Services.Notification
         {
             services.AddScoped<IReportsService, ReportsService>();
             services.AddTransient<IDMSService, DMSService1>();
+            services.AddScoped<INEmailService, EmailNService>();
+            services.AddTransient<ISMSService, SMSService>();
+            services.AddTransient<IIntegrationService, IntegrationService>();
         }
         }
 }
