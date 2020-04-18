@@ -57,6 +57,8 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         Task<PolicyStatusResponseDTO> PolicyStatusUpdate(PolicyStatusDTO policyStatusDTO, ApiContext apiContext);
         //GetMappingParams(string mappingname, ApiContext apiContext)
+
+        Task<ResponseStatus> SendSMSAsync(Models.SMSRequest SmsRequest, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -81,6 +83,12 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
 
+        }
+
+        public async Task<ResponseStatus> SendSMSAsync(Models.SMSRequest SmsRequest, ApiContext apiContext)
+        {
+            var uri = NotificationUrl + "/api/Notifications/SendSMSAsync";
+            return await PostApiInvoke<Models.SMSRequest, ResponseStatus>(uri, apiContext, SmsRequest);
         }
 
 

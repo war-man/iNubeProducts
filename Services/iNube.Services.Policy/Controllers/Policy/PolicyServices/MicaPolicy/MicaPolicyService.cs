@@ -6956,8 +6956,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<bool> ProposalCancellationScheduler(ApiContext apiContext)
         {
-            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);         
-            var CurrentDate = IndianTime.Date;
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+            var CurrentDate = DatetimeNow.Date;
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -6978,16 +6981,61 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 var DateDifference = (CurrentDate - item.CreatedDate.Date).TotalDays + 1;
 
+                if(DateDifference == 15)
+                {
+
+                    ProposalCancelDTO proposalCancel = new ProposalCancelDTO();
+                    proposalCancel.ProposalNumber = item.ProposalNumber;
+                    proposalCancel.Remarks = "Auto - Proposal Cancellation";
+                    var callProposalCancel = await ProposalCancellation(proposalCancel,apiContext);
+                    continue;
+                }
+
+            }
+
+            return true;
+
+        }
+
+
+        public async Task<bool> SmsScheduler(ApiContext apiContext)
+        {
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+            var CurrentDate = DatetimeNow.Date;
+
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var ProposalList = _context.TblPolicy.Where(x => x.PolicyStageId == 6 && x.PolicyStatusId != 4)
+                                                 .Select(x => new CancelScheduleDTO
+                                                 {
+                                                     ProposalNumber = x.ProposalNo,
+                                                     CreatedDate = x.CreatedDate,
+                                                     MobileNumber = x.MobileNumber
+                                                 }).ToList();
+
+            foreach (var item in ProposalList)
+            {
+                if (item.CreatedDate.Date >= CurrentDate)
+                {
+                    continue;
+                }
+
+                var DateDifference = (CurrentDate - item.CreatedDate.Date).TotalDays + 1;
+
+                var ProposalExpiryDate = item.CreatedDate.AddDays(15).ToString("MM/dd/yyyy hh:mm tt");
+
                 switch (DateDifference)
                 {
-                    case 2: case 7: case 14: break;
+                    case 2: case 7: case 14:
+                        Models.SMSRequest request = new Models.SMSRequest();
+                        request.SMSMessage = "A gentle reminder, you haven't added your vehicle(s) on the Edelweiss Switch app! Please download and activate the app before " + ProposalExpiryDate + " or your application will have to be cancelled, and your premium will be refunded to your original payment mode. Already downloaded and activated the app? Ignore this message! For Help, call 1800 12000";
+                        request.RecipientNumber = item.MobileNumber;
 
-                    case 15:
-                        ProposalCancelDTO proposalCancel = new ProposalCancelDTO();
-                        proposalCancel.ProposalNumber = item.ProposalNumber;
-                        proposalCancel.Remarks = "Auto - Proposal Cancellation";
-                        var callProosalCancel = await ProposalCancellation(proposalCancel,apiContext);
-                        break;
+                        var callNotification = await _integrationService.SendSMSAsync(request, apiContext);
+                        continue;
 
                     default: continue;
                 }
@@ -6997,7 +7045,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return true;
 
         }
-
 
     }
 

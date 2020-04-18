@@ -532,14 +532,7 @@ namespace iNube.Services.Policy.Models
         public string PaymentRefernceId { get; set; }
 
     }
-    public class EmailRequest
-    {
-        public string To { get; set; }
-        public string Subject { get; set; }
-        public string Message { get; set; }
-        public string PartnerEmail { get; set; }
-        public bool IsAttachment { get; set; }
-    }
+
     public class SingleCover
     {
         public string IdentificationNumber { get; set; }
@@ -561,15 +554,6 @@ namespace iNube.Services.Policy.Models
         public bool SendEmail { get; set; }
         public bool AttachPDF { get; set; }
         public SMSRequest smsRequest { get; set; }
-    }
-    public class SMSRequest
-    {
-        public string APIKey { get; set; }
-        public string SenderId { get; set; }
-        public string Channel { get; set; }
-        public string RecipientNumber { get; set; }
-        public string PolicyNumber { get; set; }
-        public string SMSMessage { get; set; }
     }
 
     public class PolicyModel
@@ -1656,6 +1640,51 @@ namespace iNube.Services.Policy.Models
         public string ProposalNumber { get; set; }
         public string Remarks { get; set; }
     }
+
+    public class SMSRequest
+    {
+        public string APIKey { get; set; }
+        public string SenderId { get; set; }
+        public string Channel { get; set; }
+        public string RecipientNumber { get; set; }
+        public string PolicyNumber { get; set; }
+        public string SMSMessage { get; set; }
+        public string DCS { get; set; }
+        public bool FlashSMS { get; set; }
+        public string CountryCode { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public bool Short { get; set; }
+        public string[] RecipientList { get; set; }
+    }
+
+
+    public class EmailRequest
+    {
+        public EmailRequest()
+        {
+            Attachments = new List<EmailAttachment>();
+            mailTo = new List<string>();
+            mailCc = new List<string>();
+            mailBcc = new List<string>();
+        }
+        public string To { get; set; }
+        public List<string> mailTo { get; set; }
+        public List<string> mailCc { get; set; }
+        public List<string> mailBcc { get; set; }
+        public string Subject { get; set; }
+        public string Message { get; set; }
+        public string PartnerEmail { get; set; }
+        public bool IsAttachment { get; set; }
+        public List<EmailAttachment> Attachments { get; set; }
+    }
+    public class EmailAttachment
+    {
+        public string FileName { get; set; }
+        public byte[] FileData { get; set; }
+    }
+
+
 }
 
 

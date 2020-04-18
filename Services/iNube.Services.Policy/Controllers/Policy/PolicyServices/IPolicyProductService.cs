@@ -75,5 +75,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext);
         Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext);
         Task<bool> ProposalCancellationScheduler(ApiContext apiContext);
+        Task<bool> SmsScheduler(ApiContext apiContext);
     }
 }

@@ -349,5 +349,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> SmsScheduler(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

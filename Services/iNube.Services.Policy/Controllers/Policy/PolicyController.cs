@@ -679,7 +679,12 @@ namespace iNube.Services.Policy.Controllers.Policy
             return Ok(response);
         }
 
-
+        [HttpGet]
+        public async Task<IActionResult> SmsScheduler()
+        {
+            var response = await _policyService.SmsScheduler(Context);
+            return Ok(response);
+        }
 
     }
 }
