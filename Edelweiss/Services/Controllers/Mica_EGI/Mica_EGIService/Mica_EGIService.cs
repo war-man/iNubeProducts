@@ -362,7 +362,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             prem.dictionary_rate.FSTTAX_TAXTYPE = taxType.FSTTAX_TAXTYPE;
                             prem.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
 
-                            var Data = await _integrationService.CalCulateRatingPremium(prem);
+                            var Data = await _integrationService.CalCulateRatingPremium(prem,context);
                             List<CalculationResult> val = null;
                             if (Data != null)
                             {
@@ -544,7 +544,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         prem.dictionary_rate.FSTTAX_TAXTYPE = "";
                         prem.dictionary_rate.TSTTAX_TAXTYPE = "";
 
-                        var Data = await _integrationService.WrapperCalculateRatingPremium(prem);
+                        var Data = await _integrationService.WrapperCalculateRatingPremium(prem,context);
 
                         List<CalculationResult> val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
                         if (val != null)
@@ -757,14 +757,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
             var CurrentDay = IndianTime.DayOfWeek.ToString();
             var CurrentTimeHour = IndianTime.Hour;
-
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
+                     
 
             TblSwitchLog checkLog = new TblSwitchLog();
             TblSchedule ScheduleData = new TblSchedule();
@@ -1132,7 +1125,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     //Call the Policy Service to Get Policy Details.
                     //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
 
-                    var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, apiContext);
+                    var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
 
                     PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
                     var BillingFrequency = "";
@@ -1179,7 +1172,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                     //Call CalculatePremium Policy Module MICA
-                    var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, apiContext);
+                    var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, context);
 
                     List<CalculationResult> DeserilizedPremiumData = new List<CalculationResult>();
 
@@ -1249,7 +1242,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         endorsementCal.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
 
                         //TO GET AD PERDAY - FROM TAX AND TO TAX Because its not coming from rating Module
-                        var callEndoCalculator = await EndorsementCalculator(endorsementCal);
+                        var callEndoCalculator = await EndorsementCalculator(endorsementCal,context);
 
                         if (callEndoCalculator.Count > 0)
                         {
@@ -1348,7 +1341,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         //var CallMicaCd = await _integrationService.GenerateCDTransaction(CdModel, apiContext);
 
-                        var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, apiContext);
+                        var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, context);
 
 
 
@@ -1707,14 +1700,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             var ActiveTW = 0;
 
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+           
 
-            var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, apiContext);
+            var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
 
 
             if (PolicyDetails == null || PolicyDetails.Count == 0)
@@ -2063,7 +2051,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     endorsementCal.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
 
                     //TO GET AD PERDAY - FROM TAX AND TO TAX Because its not coming from rating Module
-                    var callEndoCalculator = await EndorsementCalculator(endorsementCal);
+                    var callEndoCalculator = await EndorsementCalculator(endorsementCal,context);
 
                     if (callEndoCalculator.Count > 0)
                     {
@@ -2354,74 +2342,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
         }
-
-        private async Task<PremiumReturnDto> InternalCalculatePremium(SchedulerPremiumDTO premiumDTO)
-        {
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
-
-            PremiumReturnDto returnobj = new PremiumReturnDto();
-
-            //Call CalculatePremium Policy Module MICA
-            var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, apiContext);
-
-            List<CalculationResult> val = new List<CalculationResult>();
-            CDDTO CdModel = new CDDTO();
-
-            if (CalPremiumResponse != null)
-            {
-                val = JsonConvert.DeserializeObject<List<CalculationResult>>(CalPremiumResponse.ToString());
-            }
-
-
-            if (val.Count() > 0)
-            {
-
-
-                var Ftperday = 0.00;
-                var fire = val.FirstOrDefault(x => x.Entity == "FTPM").EValue;
-                var theft = val.FirstOrDefault(x => x.Entity == "ADPMPD").EValue;
-                Ftperday = Ftperday + Convert.ToDouble(fire) + Convert.ToDouble(theft);
-
-                var Ft30days = Ftperday * 30;
-                var Ft60days = Ftperday * 60;
-
-                var Ft365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FT365").EValue);
-                var Ad60days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60DAYS").EValue);
-                var Ad365days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365DAYS").EValue);
-                var ad60fttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60FTAXAMT").EValue);
-                var ad60ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD60TTAXAMT").EValue);
-
-                var ad365ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365FTAXAMT").EValue);
-                var ad365ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD365TTAXAMT").EValue);
-                var ad30days = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30DAYS").EValue);
-                var ad30ftax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30FTAXAMT").EValue);
-                var ad30ttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "AD30TTAXAMT").EValue);
-
-                var ftfttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTFTAXAMT").EValue);
-                var ftttax = Convert.ToDecimal(val.FirstOrDefault(x => x.Entity == "FTTTAXAMT").EValue);
-
-                var monthlyGST = ad60fttax + ad60ttax + ftfttax + ftttax;
-                var yearlyGST = ad365ftax + ad365ttax + ftfttax + ftttax;
-
-                returnobj.PerDayPremium = Convert.ToDecimal(Ftperday);
-                returnobj.FireTheft = Convert.ToDecimal(Ft365days);
-                returnobj.ADPremium = Convert.ToDecimal(Ad60days);
-                returnobj.GST = Convert.ToDecimal(monthlyGST);
-                returnobj.MonthlyPremium = ad30days + Convert.ToDecimal(ad30ftax) + Convert.ToDecimal(ad30ttax);
-                returnobj.Total = returnobj.FireTheft + returnobj.ADPremium + returnobj.GST;
-                returnobj.FinalAmount = Math.Round(returnobj.FireTheft + returnobj.ADPremium + returnobj.GST);
-
-            }
-
-            return returnobj;
-        }
-
+         
         public async Task<AllScheduleResponse> GetAllVehicleSchedule(string PolicyNo, ApiContext context)
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
@@ -2496,14 +2417,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             var CurrentMonth = IndianTime.Month;
             var CurrentDate = IndianTime.Date;
 
-
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
             var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
 
 
@@ -2521,7 +2434,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CDAccountDTO CdDailyDTO = new CDAccountDTO();
                 DateTime PolicyStartDate;
 
-                dynamic PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo,apiContext);
+                dynamic PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
 
                 if (PolicyData != null)
                 {
@@ -2571,7 +2484,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
                 //Integration Call for Balance 
-                CdDailyDTO = await _integrationService.GetAccountDetails(accountRequest, apiContext);
+                CdDailyDTO = await _integrationService.GetAccountDetails(accountRequest, context);
 
 
                 if (CdDailyDTO.Status == BusinessStatus.Ok)
@@ -2610,14 +2523,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<dynamic> CDMapper(string TxnType, dynamic SourceObject, ApiContext context)
         {
-            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
-
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));         
 
             List<CalculationResult> DeserilizedPremiumData = new List<CalculationResult>();
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
@@ -2817,8 +2723,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (CdaccountNumber != null)
                 {
-                    CDBalanceDTO FtAccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", apiContext);
-                    CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", apiContext);
+                    CDBalanceDTO FtAccountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "FT", context);
+                    CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(CdaccountNumber, "AD", context);
                     var ADPremium = Convert.ToDecimal(accountdetails.TxnAmountBalance + FtAccountdetails.TxnAmountBalance);
                     var GST = Convert.ToDecimal(accountdetails.TaxAmountBalance + FtAccountdetails.TaxAmountBalance);
                     var Total = ADPremium + GST;
@@ -2931,7 +2837,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             //Call CalculatePremium Rating Module MICA
-            var CalPremiumResponse = await _integrationService.RatingPremium(premiumDTO, apiContext);
+            var CalPremiumResponse = await _integrationService.RatingPremium(premiumDTO, context);
 
 
 
@@ -3490,15 +3396,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         public async Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject, ApiContext context)
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
-
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
-
+                       
             var Currentdate = System.DateTime.UtcNow.AddMinutes(330);
 
             int successcount = 0;
@@ -3520,7 +3418,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     List<RuleEngineResponse> engineResponses;
                     try
                     {
-                        RuleEngine = await _integrationService.RuleEngine(ruleOneDTO, apiContext);
+                        RuleEngine = await _integrationService.RuleEngine(ruleOneDTO, context);
                         engineResponses = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(RuleEngine.ToString());
 
                         // bool res = IntegrationValidation(engineResponses, "List", "ValidatorName");
@@ -3606,7 +3504,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     List<RuleEngineResponse> engineResponse = new List<RuleEngineResponse>();
                     try
                     {
-                        // RuleEngine = await _integrationService.RuleEngine(ruleTwoDTO, apiContext);
+                        // RuleEngine = await _integrationService.RuleEngine(ruleTwoDTO, context);
                         // engineResponses = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(RuleEngine.ToString());
 
 
@@ -3892,14 +3790,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
-            var CurrentDate = IndianTime.Date;
-
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+            var CurrentDate = IndianTime.Date;           
 
             PremiumReturnDto DifferentialPremium = new PremiumReturnDto();
 
@@ -3952,7 +3843,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
                     //Get the Policy Details by PolicyNumber
                     //In response from Policy
-                    PolicyData = await _integrationService.GetPolicyDetails(endorsementPremium.PolicyNo, apiContext);
+                    PolicyData = await _integrationService.GetPolicyDetails(endorsementPremium.PolicyNo, context);
                 }
                 else
                 {
@@ -4087,7 +3978,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 //Call CalculatePremium for with Endorsment Data MICA
-                var NewPremiumData = await NewInternalCalculatePremium(premiumDTO, BillingFrequency);
+                var NewPremiumData = await NewInternalCalculatePremium(premiumDTO, BillingFrequency,context);
 
 
                 if (NewPremiumData == null)
@@ -4129,7 +4020,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 //Call CalculatePremium for with Endorsment Data MICA
-                var OldPremiumData = await NewInternalCalculatePremium(oldPremiumDTO, BillingFrequency);
+                var OldPremiumData = await NewInternalCalculatePremium(oldPremiumDTO, BillingFrequency,context);
 
 
 
@@ -4152,7 +4043,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     endorsementCal.dictionary_rule = endoRule;
                     endorsementCal.dictionary_rate = endoRate;
 
-                    var CallEndorsmentCalculator = await EndorsementCalculator(endorsementCal);
+                    var CallEndorsmentCalculator = await EndorsementCalculator(endorsementCal,context);
 
                     if (callType == "CDUpdate")
                     {
@@ -4229,7 +4120,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
                     //Get the Policy Details by PolicyNumber
                     //In response from Policy
-                    PolicyData = await _integrationService.GetPolicyDetails(endorsementPremium.PolicyNo, apiContext);
+                    PolicyData = await _integrationService.GetPolicyDetails(endorsementPremium.PolicyNo, context);
                 }
                 else
                 {
@@ -4364,7 +4255,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 premiumDTO.dictionary_rate.TSTTAX_TAXTYPE = taxType.TSTTAX_TAXTYPE;
 
                 //Call CalculatePremium for with Endorsment Data MICA
-                var NewPremiumData = await NewInternalCalculatePremium(premiumDTO, BillingFrequency);
+                var NewPremiumData = await NewInternalCalculatePremium(premiumDTO, BillingFrequency,context);
 
 
                 if (NewPremiumData == null)
@@ -4406,7 +4297,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 //Call CalculatePremium for with Endorsment Data MICA
-                var OldPremiumData = await NewInternalCalculatePremium(oldPremiumDTO, BillingFrequency);
+                var OldPremiumData = await NewInternalCalculatePremium(oldPremiumDTO, BillingFrequency,context);
 
 
 
@@ -4434,7 +4325,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     endorsementCal.dictionary_rule = endoRule;
                     endorsementCal.dictionary_rate = endoRate;
 
-                    var CallEndorsmentCalculator = await EndorsementCalculator(endorsementCal);
+                    var CallEndorsmentCalculator = await EndorsementCalculator(endorsementCal,context);
 
                     if (callType == "CDUpdate")
                     {
@@ -4524,20 +4415,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        private async Task<EndoPremiumReturnDto> NewInternalCalculatePremium(SchedulerPremiumDTO premiumDTO, string BillingFrequency)
+        private async Task<EndoPremiumReturnDto> NewInternalCalculatePremium(SchedulerPremiumDTO premiumDTO, string BillingFrequency,ApiContext context)
         {
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
-
             EndoPremiumReturnDto returnobj = new EndoPremiumReturnDto();
 
             //Call CalculatePremium Policy Module MICA
-            var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, apiContext);
+            var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, context);
 
             List<CalculationResult> val = new List<CalculationResult>();
             CDDTO CdModel = new CDDTO();
@@ -4610,17 +4493,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-        private async Task<List<CalculationResult>> EndorsementCalculator(EndorsementCalDTO endorsementCal)
-        {
-
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
-            var CallEndrosmentRating = await _integrationService.EndorsementCalculator(endorsementCal, apiContext);
+        private async Task<List<CalculationResult>> EndorsementCalculator(EndorsementCalDTO endorsementCal,ApiContext context)
+        {         
+            var CallEndrosmentRating = await _integrationService.EndorsementCalculator(endorsementCal, context);
 
             List<CalculationResult> RatingResponnse = new List<CalculationResult>();
 
@@ -4651,14 +4526,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             var CurrentDate = IndianTime.Date;
 
             PolicyCancelReturnDto cancelReturnDto = new PolicyCancelReturnDto();
-
-
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+                               
 
             dynamic PolicyData = null;
 
@@ -4666,7 +4534,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 //Get the Policy Details by PolicyNumber
                 //In response from Policy
-                PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
+                PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, context);
             }
             else
             {
@@ -4729,7 +4597,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             EndorsementCalDTO endorsementCalDTO = new EndorsementCalDTO();
 
-            var CallRatingCalculator = await NewInternalCalculatePremium(premiumDTO, BillingFrequency);
+            var CallRatingCalculator = await NewInternalCalculatePremium(premiumDTO, BillingFrequency,context);
 
 
             endorsementCalDTO.dictionary_rate.FSTTAX_TAXTYPE = premiumDTO.dictionary_rate.FSTTAX_TAXTYPE;
@@ -4745,7 +4613,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             cancelReturnDto.AdPerDay = CallRatingCalculator.AdPerDay;
 
 
-            var CallEndoCalculator = await EndorsementCalculator(endorsementCalDTO);
+            var CallEndoCalculator = await EndorsementCalculator(endorsementCalDTO,context);
 
             cancelReturnDto.FromTaxType = premiumDTO.dictionary_rate.FSTTAX_TAXTYPE;
             cancelReturnDto.ToTaxType = premiumDTO.dictionary_rate.TSTTAX_TAXTYPE;
@@ -4986,19 +4854,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CurrentDate = dateTime.Value.Date;
             }
 
-            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();           
 
             TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
             DateTime PolicyStartDate, NextMonth, CDFromDate;
 
             //Step-1:Get All Active Policy's 
-            var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, apiContext);
+            var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
 
 
             if (PolicyDetails == null || PolicyDetails.Count == 0)
@@ -5057,7 +4919,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         };
 
                         //Step-3 Get Entire Policy Details
-                        var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, apiContext);
+                        var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, context);
 
                         int DaysChargeable = TotalUsage(policy, CDFromDate, CurrentIndianTime.Value);
 
@@ -5118,7 +4980,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
 
-                            var CalculatePremium = await EndorsementCalculator(endorsementCalDTO);
+                            var CalculatePremium = await EndorsementCalculator(endorsementCalDTO,context);
 
                             if (CalculatePremium.Count > 0)
                             {

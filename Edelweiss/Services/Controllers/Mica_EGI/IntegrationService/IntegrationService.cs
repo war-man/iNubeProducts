@@ -15,7 +15,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
     public interface IIntegrationService
     {
 
-        Task<dynamic> CalCulateRatingPremium(SchedulerPremiumDTO dynamicData);
+        Task<dynamic> CalCulateRatingPremium(SchedulerPremiumDTO dynamicData,ApiContext context);
         Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext);
 
         //Scheduler Module AR
@@ -23,7 +23,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         Task<List<PolicyDetailsDTO>> GetPolicyList(string productCode, ApiContext apiContext);
         Task<dynamic> CalculatePremium(SchedulerPremiumDTO premiumDTO, ApiContext apiContext);
         Task<dynamic> GetPolicyDetails(string PolicyNo, ApiContext apiContext);
-        Task<dynamic> WrapperCalculateRatingPremium(SchedulerPremiumDTO dynamicData);
+        Task<dynamic> WrapperCalculateRatingPremium(SchedulerPremiumDTO dynamicData,ApiContext context);
 
         //MICA Rating for CD Mapping
         Task<dynamic> RatingPremium(SchedulerPremiumDTO dynamicData, ApiContext apiContext);
@@ -129,27 +129,15 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         }
 
         //Calculation Premium for Rating
-        public async Task<dynamic> CalCulateRatingPremium(SchedulerPremiumDTO dynamicData)
+        public async Task<dynamic> CalCulateRatingPremium(SchedulerPremiumDTO dynamicData,ApiContext context)
         {
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
             var uri = PolicyUrl + "/api/Policy/CalCulatePremium";
-            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
+            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, context, dynamicData);
         }
-        public async Task<dynamic> WrapperCalculateRatingPremium(SchedulerPremiumDTO dynamicData)
-        {
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
+        public async Task<dynamic> WrapperCalculateRatingPremium(SchedulerPremiumDTO dynamicData,ApiContext context)
+        {          
             var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/41";
-            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, apiContext, dynamicData);
+            return await PostApiInvoke<SchedulerPremiumDTO, dynamic>(uri, context, dynamicData);
         }
 
         public async Task<dynamic> RatingPremium(SchedulerPremiumDTO dynamicData,ApiContext apiContext)
