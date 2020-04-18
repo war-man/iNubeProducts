@@ -22,6 +22,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
         IEnumerable<ddDTOs> GetMaster(string lMasterlist);
         Task<CustomerResponse> createProvision(CustomerProvisioningDTO customerProvisioningDTO, ApiContext apiContext);
         CustomerSettingsDTO GetCustomerSettings(int customerid, string type, int envid, ApiContext apiContext);
+        List<CustomerSettingsDTO> GetCustomerTypeSettings(int customerid, string type, int envid, ApiContext apiContext);
 
     }
     public class CustomerProvisioningService : ICustomerProvisioningService
@@ -200,6 +201,19 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             customer.EnvId = data.EnvId;
 
             return customer;
+        }
+
+        public List<CustomerSettingsDTO> GetCustomerTypeSettings(int customerid, string type, int envid, ApiContext apiContext)
+        {
+            _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
+            var data = _cpcontext.TblCustomerSettings.Where(a => a.CustomerId == customerid && a.Type == type);
+
+            if (envid != 0)
+            {
+                data = data.Where(a => a.EnvId == envid);
+            }
+            var responsedata = _mapper.Map<List<CustomerSettingsDTO>>(data);
+            return responsedata;
         }
     }
 }

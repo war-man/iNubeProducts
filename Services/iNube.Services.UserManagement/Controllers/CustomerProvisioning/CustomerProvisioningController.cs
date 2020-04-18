@@ -55,6 +55,12 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning
             var response = _customerProvisioningService.GetCustomerSettings(customerid, type, envid, Context);
             return Ok(response);
         }
+        [HttpGet]
+        public IActionResult GetCustomerTypeSettings(int customerid, string type, int envid)
+        {
+            var response = _customerProvisioningService.GetCustomerTypeSettings(customerid, type, envid, Context);
+            return Ok(response);
+        }
 
     }
 }
