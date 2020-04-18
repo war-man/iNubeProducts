@@ -5038,7 +5038,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             if (checkswitchLog)
             {
-                var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("dd/MM/yyyy") + "' and '" + ToDate.Date.ToString("dd/MM/yyyy") + "' group by Month(CreatedDate) , PolicyNo";
+                var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("MM/dd/yyyy") + "' and '" + ToDate.Date.ToString("MM/dd/yyyy") + "' group by Month(CreatedDate) , PolicyNo";
 
                 try
                 {
