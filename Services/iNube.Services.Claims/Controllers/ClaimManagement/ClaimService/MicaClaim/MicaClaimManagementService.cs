@@ -1812,12 +1812,27 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     }
                     foreach (var item in Insurable)
                     {
+                        
                         // item.ApprovedClaimAmounts = claimsDTO.ApprovedClaimAmounts ;
-                        item.ApprovedClaimAmounts = claimsDTO.ClaimInsurable.FirstOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId).ApprovedClaimAmounts;
-                        _context.TblClaimInsurable.Update(item);
-                    }
+                        var approveclaim = claimsDTO.ClaimInsurable.FirstOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId);
 
-                    foreach (var item in claimsDTO.Alldoc)
+                        if (approveclaim != null)
+                        {
+                            if (approveclaim.ApprovedClaimAmounts != null)
+                            {
+                                item.ApprovedClaimAmounts = approveclaim.ApprovedClaimAmounts;
+                                _context.TblClaimInsurable.Update(item);
+                            }
+                            else if (claimsprocess.ClaimStatusId == 38)
+                            {
+                                return new ClaimProcessResponseDTO() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Please Provide Approved Amount" };
+
+                            }
+
+                        }
+
+                    }
+                        foreach (var item in claimsDTO.Alldoc)
                     {
                         TblClaimdoc Claimdoc = new TblClaimdoc();
 
