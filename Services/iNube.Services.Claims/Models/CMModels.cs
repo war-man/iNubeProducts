@@ -132,6 +132,7 @@ namespace iNube.Services.Claims.Models
         public string InsuredMobileNo { get; set; }
         public DateTime? EventDate { get; set; }
         public DateTime? lossDateTime { get; set; }
+      
     }
 
     public partial class ClaimSearchResponseDTO : ResponseStatus
@@ -167,6 +168,10 @@ namespace iNube.Services.Claims.Models
         public int? ProductIdPk { get; set; }
         public string LocationOfEvent { get; set; }
         public int? ClaimAmount { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public string ClaimManagerRemarks { get; set; }
+        public DateTime? ClaimStatusDate { get; set; }
+
     }
 
     public partial class ClaimResponseDTO
