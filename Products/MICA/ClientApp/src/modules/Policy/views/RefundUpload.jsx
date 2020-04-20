@@ -16,6 +16,9 @@ const RefundUpload = (props) => {
     let [TableDataCopy, RefundTableHeaderFun] = React.useState([]);
     let [ShowGrid, GridFun] = React.useState(false);
     let [errorList, errorListFun] = React.useState([]);
+
+
+
     let TableDataList = [];
     console.log("doc props ", props)
     // specify upload params and url for your files
@@ -31,15 +34,15 @@ const RefundUpload = (props) => {
         if (files.length > 0) {
             for (var i = 0; i < files.length; i++) {
                 data.append(files[i].file.name, files[i].file);
-              
+
             }
         }
+
 
         $.ajax({
             type: "POST",
             url: `${policyConfig.PolicyconfigUrl}/api/Policy/RefundUpload`,
-            //https://localhost:44351/api/Policy/RefundUpload
-            //url: `https://localhost:44351/api/Policy/RefundUpload`,
+
             contentType: false,
             processData: false,
 
@@ -50,7 +53,7 @@ const RefundUpload = (props) => {
             },
             success: function (response) {
                 console.log("response ", response);
-             
+
                 if (response.status == 1) {
                     GridFun(false);
                     swal({
@@ -61,6 +64,19 @@ const RefundUpload = (props) => {
                 } else if (response.status == 7) {
                     if (response.errorDetails.length > 0) {
                         GridFun(true);
+                        response.errorDetails.map((prop, index) => {
+
+                            if (prop.errorDescription != undefined) {
+                                if (prop.errorDescription.length > 0) {
+                                    prop.errorDescription = prop.errorDescription.map(c => {
+                                        return (<p className="gridparagraph">{c.Details} </p>)
+                                    })
+                                }
+                            } else {
+                                return response.errorDetails[index];
+                            }
+                        }
+                        );
                         errorListFun(response.errorDetails);
                         RefundTableHeader(response.errorDetails);
                     }
@@ -68,7 +84,7 @@ const RefundUpload = (props) => {
                         text: response.responseMessage,
                         icon: "success"
                     });
-                  
+
                 }
                 else {
                 }
@@ -85,18 +101,18 @@ const RefundUpload = (props) => {
 
     }
 
-   const RefundTableHeader = (activityDTOs) => {
-      
-            TableDataList= Object.keys(activityDTOs[0]).map((prop, key) => {
-                return {
-                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
-                    accessor: prop,
-                };
-             
-       })
-       RefundTableHeaderFun(TableDataList);
-      
-       console.log("table data", TableDataList, errorList);
+    const RefundTableHeader = (activityDTOs) => {
+
+        TableDataList = Object.keys(activityDTOs[0]).map((prop, key) => {
+            return {
+                Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                accessor: prop,
+            };
+
+        })
+        RefundTableHeaderFun(TableDataList);
+
+        console.log("table data", TableDataList, errorList);
     }
 
 
@@ -105,33 +121,33 @@ const RefundUpload = (props) => {
 
         <GridContainer lg={12}>
             <Card>
-            <CardHeader color="info" icon >
-              
-             
-            
-                <h3 >
-                    <small>  Refund Upload Document:</small>
+                <CardHeader color="info" icon >
 
-                    <span id="red" style={{ color: 'red' }}>*</span>
-                </h3>
-            
-            </CardHeader>
 
-        <CardBody>
-            <GridContainer justify="center">
-               
-            <GridItem xs={12}>
-                <Dropzone
-                    maxFiles={1}
-                    getUploadParams={getUploadParams}
-                    onChangeStatus={handleChangeStatus}
-                    onSubmit={handleSubmit}
-                //accept="image/*,audio/*,video/*,application/pdf/*,word/*"
-                />
-                </GridItem>
+
+                    <h3 >
+                        <small>  Refund Upload Document:</small>
+
+                        <span id="red" style={{ color: 'red' }}>*</span>
+                    </h3>
+
+                </CardHeader>
+
+                <CardBody>
+                    <GridContainer justify="center">
+
+                        <GridItem xs={12}>
+                            <Dropzone
+                                maxFiles={1}
+                                getUploadParams={getUploadParams}
+                                onChangeStatus={handleChangeStatus}
+                                onSubmit={handleSubmit}
+                            //accept="image/*,audio/*,video/*,application/pdf/*,word/*"
+                            />
+                        </GridItem>
                     </GridContainer>
 
-                  
+
                     {ShowGrid && <GridContainer justify="center" >
                         <GridItem xs={12}>
 
@@ -154,7 +170,7 @@ const RefundUpload = (props) => {
 
                     </GridContainer>}
                 </CardBody>
-                </Card>
+            </Card>
         </GridContainer>
     );
 }
