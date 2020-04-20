@@ -3868,7 +3868,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 var InputidentificationNumber = (string)fields["Identification Number"];
                                 var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
                                 //Check for age
-                                var dob = (string)fields["DOB"];
+                                var dob = Convert.ToString(fields["DOB"]);
                                 var dobDateTime = EPPlusHelper.ValidateDate(dob);
                                 if (dobDateTime != null)
                                 {

@@ -35,35 +35,43 @@ namespace iNube.Services.Policy.Helpers
         {
             try
             {
-                // for US, alter to suit if splitting on hyphen, comma, etc.
-                string[] dateParts = date.Split('/');
-                if (dateParts.Length == 1)
+                DateTime fromDateValue;
+                if (DateTime.TryParse(date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out fromDateValue))
                 {
-                    dateParts = date.Split('-');
-                }
-                // create new date from the parts; if this does not fail
-                // the method will return true and the date is valid
-                if (dateParts[0].Length > 2)
-                {
-                    string[] timeParts = dateParts[2].Split('T');
-                    if (timeParts.Length == 1)
-                    {
-                        timeParts = timeParts[0].Split(' ');
-                    }
-                    return new DateTime(Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(timeParts[0]));
-                }
-                else if (dateParts[2].Length > 4)
-                {
-                    string[] timeParts = dateParts[2].Split('T');
-                    if (timeParts.Length == 1)
-                    {
-                        timeParts = timeParts[0].Split(' ');
-                    }
-                    return new DateTime(Convert.ToInt32(timeParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[0]));
+                    return fromDateValue;
                 }
                 else
                 {
-                    return new DateTime(Convert.ToInt32(dateParts[2]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[0]));
+                    // for US, alter to suit if splitting on hyphen, comma, etc.
+                    string[] dateParts = date.Split('/');
+                    if (dateParts.Length == 1)
+                    {
+                        dateParts = date.Split('-');
+                    }
+                    // create new date from the parts; if this does not fail
+                    // the method will return true and the date is valid
+                    if (dateParts[0].Length > 2)
+                    {
+                        string[] timeParts = dateParts[2].Split('T');
+                        if (timeParts.Length == 1)
+                        {
+                            timeParts = timeParts[0].Split(' ');
+                        }
+                        return new DateTime(Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(timeParts[0]));
+                    }
+                    else if (dateParts[2].Length > 4)
+                    {
+                        string[] timeParts = dateParts[2].Split('T');
+                        if (timeParts.Length == 1)
+                        {
+                            timeParts = timeParts[0].Split(' ');
+                        }
+                        return new DateTime(Convert.ToInt32(timeParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[0]));
+                    }
+                    else
+                    {
+                        return new DateTime(Convert.ToInt32(dateParts[2]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[0]));
+                    }
                 }
             }
             catch
