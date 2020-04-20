@@ -4872,9 +4872,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CurrentDate = dateTime.Value.Date;
             }
 
-            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();           
-
-            TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();     
             DateTime PolicyStartDate, NextMonth, CDFromDate;
 
             //Step-1:Get All Active Policy's 
@@ -4893,6 +4891,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             //Step-2:Start the Loop Based On Policy Number
             foreach (var policy in PolicyNumberList)
             {
+                TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
+
                 try
                 {
 
