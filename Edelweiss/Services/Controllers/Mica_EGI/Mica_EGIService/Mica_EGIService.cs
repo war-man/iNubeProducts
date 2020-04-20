@@ -1868,20 +1868,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
-
+          
             TblSwitchLog switchLog = new TblSwitchLog();
             TblSchedule ScheduleData = new TblSchedule();
             TblSchedulerLog schedulerLog = new TblSchedulerLog();
             TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
             TblDailyActiveVehicles dailyActiveVehicles = new TblDailyActiveVehicles();
             TblScheduleReport scheduleReport = new TblScheduleReport();
+
+
+            var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
+
+            if(PolicyNumberList.Count < 0)
+            {
+                return false;
+            }
 
             scheduleReport.ScheduleStartDate = IndianTime;
             scheduleReport.SuccessCount = 0;
@@ -1894,8 +1895,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var ReportID = scheduleReport.ReportId;
 
-            var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
-
+           
             foreach (var policy in PolicyNumberList)
             {
 
@@ -1919,7 +1919,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //Call the Policy Service to Get Policy Details.
                 //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
-                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policy, apiContext);
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policy, context);
 
 
                 PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
@@ -1978,7 +1978,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 //Call CalculatePremium Policy Module MICA
-                var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, apiContext);
+                var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, context);
 
                 List<CalculationResult> DeserilizedPremiumData = new List<CalculationResult>();
                 CDDTO CdModel = new CDDTO();
@@ -2125,7 +2125,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     ExtCdModel.Description = "Auto Schedule Premium for Policy - " + policy;
                     ExtCdModel.Frequency = BillingFrequency;
 
-                    var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, apiContext);
+                    var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, context);
 
 
                     if (CallMicaCd != null)
