@@ -794,12 +794,45 @@ namespace iNube.Services.Claims.Models
     {
         public string APIKey { get; set; }
         public string SenderId { get; set; }
+        public string URL { get; set; }
         public string Channel { get; set; }
         public string RecipientNumber { get; set; }
         public string PolicyNumber { get; set; }
         public string SMSMessage { get; set; }
+        public string DCS { get; set; }
+        public string FlashSMS { get; set; }
+        public string CountryCode { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public string Short { get; set; }
     }
+    public class EmailRequest
+    {
+        public EmailRequest()
+        {
+            Attachments = new List<EmailAttachment>();
+            mailTo = new List<string>();
+            mailCc = new List<string>();
+            mailBcc = new List<string>();
+        }
+        public string To { get; set; }
 
+        public List<string> mailTo { get; set; }
+        public List<string> mailCc { get; set; }
+        public List<string> mailBcc { get; set; }
+        public string Subject { get; set; }
+        public string Message { get; set; }
+        public string PartnerEmail { get; set; }
+        public bool IsAttachment { get; set; }
+        public List<EmailAttachment> Attachments { get; set; }
+    }
+    public class EmailAttachment
+    {
+        public string FileName { get; set; }
+        public string FileExtension { get; set; }
+        public byte[] FileData { get; set; }
+        public string ContentType { get; set; }
+    }
     public partial class ClaimAllocationDetailsDTO
     {
         public int AllocationId { get; set; }

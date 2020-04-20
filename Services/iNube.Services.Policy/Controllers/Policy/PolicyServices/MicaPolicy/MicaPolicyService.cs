@@ -396,6 +396,22 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             return true;
         }
+        public async Task<bool> SendEmailAsync(EmailRequest emailTest, ApiContext apiContext)
+        {
+            try
+            {
+                EmailRequest email = new EmailRequest();
+                email.mailTo.Add(emailTest.To);
+                email.Subject = emailTest.Subject;
+                email.Message = emailTest.Message;
+                var res = await _integrationService.SendEmailAsync(email, apiContext);
+            }
+            catch (Exception ex)
+            {
+                
+            }
+            return true;
+        }
         public async Task<PolicyDTO> ModifyPolicy(string policyNumber, PolicyDTO policyDetail, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -603,7 +619,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             return policNumber;
         }
-        private async Task SendNotificationAsync(string policyNumber, string partnerEmail, string customerEmail, string customerNumber, string cover, string coverEvent, string productName)
+        private async Task SendNotificationAsync(ApiContext apiContext, string policyNumber, string partnerEmail, string customerEmail, string customerNumber, string cover, string coverEvent, string productName)
         {
             //partner email
             //EmailTest emailTest = new EmailTest() { Message = $"Dear Partner,\n One Insurance Policy transaction has been successful.\nYour Policy No {policyNumber} is generated for - {productName} \n  Regards,\n Team MICA ", Subject = $"Insured coverage of Cover {cover} for Cover event {coverEvent} under Policy No.{policyNumber}", To = partnerEmail };
@@ -612,7 +628,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             if (!string.IsNullOrEmpty(customerEmail))
             {
                 EmailRequest emailTest = new EmailRequest() { Message = $"Dear Customer,\n\n Your Insurance Policy transaction has been successful.\n\n Your Policy No {policyNumber} is generated for - {productName} , find the Policy \n schedule document attached.\n Assuring you the best of services always.\n\n Regards,\n Team MICA ", Subject = $"Insured coverage of Cover {cover} for Cover event {coverEvent} under Policy No.{policyNumber}", To = partnerEmail };
-                await SendEmailAsync(emailTest);
+                await SendEmailAsync(emailTest,apiContext);
             }
         }
         private List<ErrorInfo> GetPolicyRequestValidation(dynamic policyDetail)

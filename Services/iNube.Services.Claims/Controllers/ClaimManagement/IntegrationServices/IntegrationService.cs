@@ -42,6 +42,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         Task<PolicyResponse> UpdatePolicyBalanceSumInsuredAsync(string PolicyNumber, decimal amount, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         Task<List<RuleEngineResponse>> RuleMapperAsync(string TxnType, dynamic SourceObject, ApiContext apiContext);
+
+        Task<ResponseStatus> SendSMSAsync(Models.SMSRequest SmsRequest, ApiContext apiContext);
+        Task<ResponseStatus> SendEmailAsync(Models.EmailRequest SmsRequest, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -404,6 +407,18 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         {
             var uri = PolicyUrl + "/api/Policy/GetPolicyForClaimsInvoice";
             return await PostListApiInvoke<Models.BillingEventRequest, PolicyDataForClaims>(uri, apiContext, EventRequet);
+        }
+
+       public async Task<ResponseStatus> SendSMSAsync(Models.SMSRequest SmsRequest, ApiContext apiContext)
+        {
+            var uri = NotificationUrl + "/api/Notifications/SendSMSAsync";
+            return await PostApiInvoke<Models.SMSRequest, ResponseStatus>(uri, SmsRequest, apiContext );
+        }
+
+        public async Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext)
+        {
+            var uri = NotificationUrl + "/api/Notifications/SendEmailAsync";
+            return await PostApiInvoke<Models.EmailRequest, ResponseStatus>(uri, EmailRequest, apiContext);
         }
     }
 }
