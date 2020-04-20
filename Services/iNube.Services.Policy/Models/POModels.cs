@@ -8,16 +8,16 @@ namespace iNube.Services.Policy.Models
     public class ShowErrorInfoDetails
     {
         public string paymentGatewayRefrenceid { get; set; }
-        public string ErrorDescription { get; set; }
+        //public string ErrorDescription { get; set; }
         public int ErroRowNo { get; set; }
         public string EndorsementNo { get; set; }
         public string PaymentStatus { get; set; }
         public decimal Ammountpaid { get; set; }
         public decimal TotalRefundAmount { get; set; }
-        public DateTime DateofPayment { get; set; }
-        public DateTime EndorsementEffectiveDate{get;set;}
+        public DateTime? DateofPayment { get; set; }
+        public DateTime? EndorsementEffectiveDate{get;set;}
+        public List<Dictionary<string, string>> ErrorDescription { get; set; }
 
-        
     }
     public partial class ddDTOs
     {

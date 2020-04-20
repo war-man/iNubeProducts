@@ -396,6 +396,22 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             return true;
         }
+        public async Task<bool> SendEmailAsync(EmailRequest emailTest, ApiContext apiContext)
+        {
+            try
+            {
+                EmailRequest email = new EmailRequest();
+                email.mailTo.Add(emailTest.To);
+                email.Subject = emailTest.Subject;
+                email.Message = emailTest.Message;
+                var res = await _integrationService.SendEmailAsync(email, apiContext);
+            }
+            catch (Exception ex)
+            {
+                
+            }
+            return true;
+        }
         public async Task<PolicyDTO> ModifyPolicy(string policyNumber, PolicyDTO policyDetail, ApiContext apiContext)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -603,7 +619,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             return policNumber;
         }
-        private async Task SendNotificationAsync(string policyNumber, string partnerEmail, string customerEmail, string customerNumber, string cover, string coverEvent, string productName)
+        private async Task SendNotificationAsync(ApiContext apiContext, string policyNumber, string partnerEmail, string customerEmail, string customerNumber, string cover, string coverEvent, string productName)
         {
             //partner email
             //EmailTest emailTest = new EmailTest() { Message = $"Dear Partner,\n One Insurance Policy transaction has been successful.\nYour Policy No {policyNumber} is generated for - {productName} \n  Regards,\n Team MICA ", Subject = $"Insured coverage of Cover {cover} for Cover event {coverEvent} under Policy No.{policyNumber}", To = partnerEmail };
@@ -612,7 +628,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             if (!string.IsNullOrEmpty(customerEmail))
             {
                 EmailRequest emailTest = new EmailRequest() { Message = $"Dear Customer,\n\n Your Insurance Policy transaction has been successful.\n\n Your Policy No {policyNumber} is generated for - {productName} , find the Policy \n schedule document attached.\n Assuring you the best of services always.\n\n Regards,\n Team MICA ", Subject = $"Insured coverage of Cover {cover} for Cover event {coverEvent} under Policy No.{policyNumber}", To = partnerEmail };
-                await SendEmailAsync(emailTest);
+                await SendEmailAsync(emailTest,apiContext);
             }
         }
         private List<ErrorInfo> GetPolicyRequestValidation(dynamic policyDetail)
@@ -3793,7 +3809,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var type = "Update Proposal";
 
-            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata,DatetimeNow, Errors, apiContext);
+            var tblPolicy =await ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata,DatetimeNow, Errors, apiContext);
+            if(tblPolicy == null)
+            {
+                return null;
+            } 
             return _mapper.Map<PolicyDTO>(tblPolicy);
         }
 
@@ -3801,7 +3821,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var policyNo = (string)modifydata["PolicyNumber"];
+            var policyNo = tblPolicy.PolicyNo;
             var policyId = tblPolicy.PolicyId;
             var insurableItem = tblPolicyDetails.PolicyRequest;
             dynamic json = JsonConvert.DeserializeObject<dynamic>(insurableItem);
@@ -3841,6 +3861,36 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         if (fields["IsPrimaryDriver"]!=null && fields["IsPrimaryDriver"].ToString().ToLower() == "yes")
                         {
                             //primary driver can not be update
+                            //primary driver can not be update if Policy is generated
+                            if (string.IsNullOrEmpty(policyNo))
+                            {
+                                var jsoninsurableFields = oldInsItem["RiskItems"][riskIndex];
+                                var InputidentificationNumber = (string)fields["Identification Number"];
+                                var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
+                                //Check for age
+                                var dob = (string)fields["DOB"];
+                                var dobDateTime = EPPlusHelper.ValidateDate(dob);
+                                if (dobDateTime != null)
+                                {
+                                    var prmDrvAge = Convert.ToInt32(json1["driverAge"]);
+                                    var CalAge = EPPlusHelper.CalculateAge(Convert.ToDateTime(dobDateTime));
+                                    if (prmDrvAge == CalAge)
+                                    {
+                                        if (InputidentificationNumber == TblIdentificationNo)
+                                        {
+                                            var removeitem = jsoninsurableFields;
+                                            oldInsItem.RiskItems.Remove(removeitem);
+                                            oldInsItem.RiskItems.Add(Adddata);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = $"Primary driver-age {json1["driverAge"]} data is mismatch with DOB {dob}", ErrorCode = "PrimaryDriver" };
+                                        Errors.Add(errorInfo);
+                                    }
+                                }
+
+                            }
                         }
                         else { 
                             if (oldInsItem["RiskItems"].Count > riskIndex)
@@ -4865,22 +4915,19 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, Errors = Errors };
                         }
                         else {
-                            var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
+                            var tblPolicy1 =await ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
                         if (tblPolicy1 == null && Errors.Count > 0)
                         {
-                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"Insurable Item is not proper" };
                         }
                         }
                     }
                     else
                     {
-
-
-                       
-                        var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
+                        var tblPolicy1 =await  ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
                         if (tblPolicy1 == null && Errors.Count > 0)
                         {
-                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"Insurable Item is not proper" };
                         }
                     }
 
@@ -5773,14 +5820,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         }
         public async Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
-           string filePath = "";
-           int step1 = 0;
+            string filePath = "";
+            int step1 = 0;
             List<ShowErrorInfoDetails> errorInfoDetails = new List<ShowErrorInfoDetails>();
             try
             {
                 CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
                 dbHelper._TimeZone = UserDateTime.KeyValue;
-                
+                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
                 var files = httpRequest.Form.Files;
                 //var docId = GetActiveResult(file.Name); HttpRequest
                 DataTable dt = new DataTable();
@@ -5789,36 +5836,26 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 foreach (var file in files)
                 {
                     step1++;
-                    var filename = ContentDispositionHeaderValue
-                                        .Parse(file.ContentDisposition)
-                                        .FileName
-                                        .Trim('"');
-                    // filename = "\\UploadFiles\\" + filename;
-                    // var  size += file.Length;
-                    // var fileBasepath = System.IO.Directory.GetCurrentDirectory() + "";
-                    //string filePath = fileBasepath + "" + filename;
+
                     if (file == null || file.Length <= 0)
                     {
                         return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
                     }
+                    var filename = ContentDispositionHeaderValue
+                                       .Parse(file.ContentDisposition)
+                                       .FileName
+                                       .Trim('"');
                     var path = Path.Combine("", filename);
                     filePath = Path.GetFullPath(path);
                     using (FileStream fs = System.IO.File.Create(filePath))
                     {
                         file.CopyTo(fs);
-                        //BinaryReader reader = new BinaryReader(fs);
-                        //stringVal = reader.ReadString();
-                        //sb.Append(stringVal);
                         fs.Flush();
                     }
 
                     step1++;
 
-
-                     
-
-                   var  sheetName=System.IO.Path.GetFileNameWithoutExtension(path).ToString();
-
+                    var sheetName = System.IO.Path.GetFileNameWithoutExtension(path).ToString();
 
                     var fileExt = Path.GetExtension(file.FileName);
 
@@ -5826,13 +5863,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         step1++;
                         // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
-                        var res = await ConvertCSVtoDataTable(filePath, apiContext);
+                        var res = await ConvertCSVtoDataTable(filePath, apiContext, DatetimeNow);
                         return res;
                     }
                     else
                     {
                         //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
-                       
+
                         if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
                         {
                             bool sms = true;
@@ -5852,41 +5889,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
                             //defining Global Variables
-                            var errorflag = false;
-                            var endrsNum = "";
-                            var updatedResponse = "";
-                            DateTime endorsementeffectivedate = Convert.ToDateTime("1/1/1754 12:00:00");
-                            DateTime txndate = Convert.ToDateTime("1/1/1754 12:00:00");
-                            var paymentstatus = "";
-                            var paymentstatus1 = "";
-                            DateTime dateofpayment = Convert.ToDateTime("1/1/1754 12:00:00");
-                            decimal totalRefundAmount = 0;
-                            decimal ammountpaid = 0;
-                            var paymentrefId = "";
-                            DateTime dateofpayment1 = Convert.ToDateTime("1/1/1754 12:00:00");
                             ShowErrorInfoDetails errorInfoDetailsInfo = new ShowErrorInfoDetails();
 
-                          
-
-
-
-                            //defining variables for the columns
-
-                            var s0 = "";
-                            var s = "";
-                            var s1 = "";
-                            var s2 = "";
-                            var s3 = "";
-                            var s4 = "";
-                            var s5 = "";
-
-                            var s6 = "";
-
-
-
-
-
-
+                            var endorsementNo = "";
+                            var endrsEffDate = "";
+                            var totRefundAmt = "";
+                            var pmtGtRefId = "";
+                            var amtPaid = "";
+                            var pmtStatus = "";
+                            var dtOfPmt = "";
 
                             var sheetNameValue = "";
                             using (var stream = new MemoryStream())
@@ -5901,8 +5912,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             sheetNameValue = sheetName1.Name;
                                         }
                                         ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetNameValue];
-                                      
-                                        
+
+
                                         // EPPlusHelper.GetColumnByName()
                                         int endrsId = worksheet.GetColumnByName("endorsement Number");
                                         int refundId = worksheet.GetColumnByName("total Refund Amount");
@@ -5917,370 +5928,41 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             for (int row = 2; row <= rowCount; row++)
                                             {
                                                 errorInfoDetailsInfo = new ShowErrorInfoDetails();
-                                                //declaring Error msgs
-
-                                                var erromsg = "";
-                                                var erromsg1 = "";
-                                                var erromsg2 = "";
-                                                var erromsg3 = "";
-                                                var erromsg4 = "";
-                                                var erromsg5 = "";
-                                                var erromsg6 = "";
-                                                var erromsg7 = "";
-                                                var erromsg8 = "";
-                                                var erromsg9 = "";
-                                                var erromsg10 = "";
-                                                var erromsg11 = "";
-
-
-
-                                                endrsNum = "";
-
                                                 if (worksheet.Cells[row, endrsId].Text.ToString().Trim() != null)
                                                 {
-
-                                                    s0 = worksheet.Cells[row, endrsId].Text.ToString().Trim();
+                                                    endorsementNo = worksheet.Cells[row, endrsId].Text.ToString().Trim();
                                                 }
                                                 if (worksheet.Cells[row, endrEffDtId].Text.ToString().Trim() != null)
                                                 {
-                                                    s = worksheet.Cells[row, endrEffDtId].Text.ToString().Trim();
+                                                    endrsEffDate = worksheet.Cells[row, endrEffDtId].Text.ToString().Trim();
                                                 }
-
                                                 if (worksheet.Cells[row, refundId].Text.ToString().Trim() != null)
                                                 {
-                                                    s1 = worksheet.Cells[row, refundId].Text.ToString().Trim();
+                                                    totRefundAmt = worksheet.Cells[row, refundId].Text.ToString().Trim();
                                                 }
                                                 if (worksheet.Cells[row, pmtRefId].Text.ToString().Trim() != null)
                                                 {
-                                                    s2 = worksheet.Cells[row, pmtRefId].Text.ToString().Trim();
+                                                    pmtGtRefId = worksheet.Cells[row, pmtRefId].Text.ToString().Trim();
                                                 }
                                                 if (worksheet.Cells[row, amtId].Text.ToString().Trim() != null)
                                                 {
-                                                    s3 = worksheet.Cells[row, amtId].Text.ToString().Trim();
+                                                    amtPaid = worksheet.Cells[row, amtId].Text.ToString().Trim();
                                                 }
                                                 //endrsNum = s0;
                                                 if (worksheet.Cells[row, pmtStatId].Text.ToString().Trim() != null)
                                                 {
-                                                    s4 = worksheet.Cells[row, pmtStatId].Text.ToString().Trim();
+                                                    pmtStatus = worksheet.Cells[row, pmtStatId].Text.ToString().Trim();
                                                 }
                                                 if (worksheet.Cells[row, dtPmtId].Text.ToString().Trim() != null)
                                                 {
-                                                    s5 = worksheet.Cells[row, dtPmtId].Text.ToString().Trim();
-                                                }
-                                                //endrsNum = s0;
-
-                                                if (string.IsNullOrEmpty(s0))
-                                                {
-                                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber can not be empty for row {row}" };
-                                                    Errors.Add(errorInfo);
-                                                    erromsg = $"EndorsementNumber can not be empty for row {row}";
-                                                    errorInfoDetailsInfo.EndorsementNo = s0;
-
-                                                    if (string.IsNullOrEmpty(s))
-                                                    {
-
-                                                        erromsg1 = $"Endorsement Effective date can not be empty";
-                                                        errorInfoDetailsInfo.EndorsementEffectiveDate = Convert.ToDateTime(s);
-                                                        errorflag = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        errorInfoDetailsInfo.EndorsementEffectiveDate = Convert.ToDateTime(s);
-                                                    }
-
-
-                                                    if (string.IsNullOrEmpty(s1))
-                                                    {
-
-                                                        erromsg2 = $"Total Refund Amount can not be empty";
-                                                        errorInfoDetailsInfo.TotalRefundAmount = Convert.ToDecimal(s1);
-                                                        errorflag = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        errorInfoDetailsInfo.TotalRefundAmount = Convert.ToDecimal(s1);
-                                                    }
-
-                                                    if (string.IsNullOrEmpty(s2))
-                                                    {
-
-                                                        erromsg3 = $"Payment Gateway RefrenceId can not be null";
-                                                        errorInfoDetailsInfo.paymentGatewayRefrenceid = s2;
-                                                        errorflag = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        errorInfoDetailsInfo.paymentGatewayRefrenceid = s2;
-                                                    }
-                                                    if (string.IsNullOrEmpty(s3))
-                                                    {
-
-                                                        erromsg4 = $"Ammount paid can not be null";
-                                                        s3 = "0.0";
-                                                        errorInfoDetailsInfo.Ammountpaid = Convert.ToDecimal(s3);
-                                                        errorflag = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        errorInfoDetailsInfo.Ammountpaid = Convert.ToDecimal(s3);
-                                                    }
-                                                    if (string.IsNullOrEmpty(s4))
-                                                    {
-
-                                                        erromsg4 = $"Payment status can not be null";
-                                                        errorInfoDetailsInfo.PaymentStatus = s4;
-                                                        errorflag = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        errorInfoDetailsInfo.PaymentStatus = s4;
-                                                    }
-                                                    if (string.IsNullOrEmpty(s5))
-                                                    {
-
-                                                        erromsg5 = $"Date of Payment can not be null";
-                                                        errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                                        errorflag = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                                    }
-                                                   // errorInfoDetailsInfo.ErrorDescription =  erromsg + erromsg1 + erromsg2 + erromsg3 + erromsg4 + erromsg5;
-
-                                                    errorflag = true;
-                                                   // errorInfoDetails.Add(errorInfoDetailsInfo);
+                                                    dtOfPmt = worksheet.Cells[row, dtPmtId].Text.ToString().Trim();
                                                 }
 
-                                                else
-                                                {
-                                                    endrsNum = s0;
-                                                    errorInfoDetailsInfo.EndorsementNo = endrsNum;
-                                                    if (string.IsNullOrEmpty(s))
-                                                    {
-                                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Endorsement Effective date can not be empty for row {row}" };
-                                                        Errors.Add(errorInfo);
-                                                        erromsg1 = $"Endorsement Effective date can not be empty";
-                                                        errorInfoDetailsInfo.EndorsementEffectiveDate = Convert.ToDateTime(s);
-                                                        errorflag = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        endorsementeffectivedate = Convert.ToDateTime(s.Replace("\"", ""));
-                                                        errorInfoDetailsInfo.EndorsementEffectiveDate = endorsementeffectivedate;
-                                                    }
-                                                    txndate = DateTime.Now;
-                                                        if (string.IsNullOrEmpty(s1))
-                                                        {
-                                                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"TotalRefundAmount can not be empty for row {row}" };
-                                                            Errors.Add(errorInfo);
-                                                            erromsg2 = $"Total Refund Amount can not be empty";
-                                                            errorInfoDetailsInfo.TotalRefundAmount = Convert.ToDecimal(s1);
-                                                            errorflag = true;
-                                                        }
-                                                        else
-                                                        {
-
-                                                            totalRefundAmount = Convert.ToDecimal(s1.Replace("\"", ""));
-                                                            errorInfoDetailsInfo.TotalRefundAmount = totalRefundAmount;
-                                                        }
-                                                        if (string.IsNullOrEmpty(s2))
-                                                        {
-                                                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PaymentReferenceGatwayId  can not be empty for row {row}" };
-                                                            Errors.Add(errorInfo);
-                                                            erromsg3 = $"Payment Gateway RefrenceId can not be null";
-                                                            errorInfoDetailsInfo.paymentGatewayRefrenceid = s2;
-                                                            errorflag = true;
-                                                        }
-                                                        else
-                                                        {
-                                                            paymentrefId = s2.Replace("\"", "");
-                                                            errorInfoDetailsInfo.paymentGatewayRefrenceid = paymentrefId;
-                                                        }
-                                                        if (string.IsNullOrEmpty(s3))
-                                                        {
-                                                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Total Amount can not be empty for row {row}" };
-                                                            Errors.Add(errorInfo);
-                                                            erromsg4 = $"Ammount paid can not be null";
-                                                            s3 = "0.0";
-                                                            errorInfoDetailsInfo.Ammountpaid = Convert.ToDecimal(s3);
-                                                            errorflag = true;
-                                                        }
-                                                        else
-                                                        {
-                                                            ammountpaid = Convert.ToDecimal(s3.Replace("\"", ""));
-                                                            errorInfoDetailsInfo.Ammountpaid = ammountpaid;
-                                                        }
-                                                        if (string.IsNullOrEmpty(s4))
-                                                        {
-                                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Payment status  can not be empty for row {row}" };
-                                                        Errors.Add(errorInfo);
-                                                        erromsg4 = $"Payment status can not be null";
-                                                        errorInfoDetailsInfo.PaymentStatus = s4;
-                                                        errorflag = true;
-                                                        }
-                                                        else
-                                                        {
-                                                            paymentstatus = s4.Replace("\"", "");
-                                                            var succ = "successful";
-                                                            var fail = "failure";
-                                                            var value1 = string.Equals(paymentstatus, succ, StringComparison.CurrentCultureIgnoreCase);
-                                                            var value2 = string.Equals(paymentstatus, fail, StringComparison.CurrentCultureIgnoreCase);
-                                                            if (value1 == true)
-                                                            {
-                                                            paymentstatus1 = paymentstatus;
-                                                            errorInfoDetailsInfo.PaymentStatus = paymentstatus1;
-                                                            }
-                                                           else if (value2 == true)
-                                                            {
-                                                            paymentstatus1 = paymentstatus;
-                                                            errorInfoDetailsInfo.PaymentStatus = paymentstatus1;
-                                                             }
-                                                         else
-                                                            {
-                                                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Payment status can be only successful or failure can not be other for row {row}" };
-                                                            Errors.Add(errorInfo);
-                                                            erromsg6 = $"Payment status can be only successful or failure can not be other for row";
-                                                            errorInfoDetailsInfo.PaymentStatus = s4;
-                                                            errorflag = true;
-                                                            }
-
-                                                    }
-
-                                                    var PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == endrsNum);
-                                                    if (string.IsNullOrEmpty(s5))
-                                                    {
-                                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Date of Payment can not be empty for row {row}" };
-                                                        Errors.Add(errorInfo);
-                                                        erromsg5 = $"Date of Payment can not be null";
-                                                        errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                                        errorflag = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        var endeffectivedate = PolicyRefundDetails.EndorsementEffectivedate;//22/03/2020
-
-                                                        //Checking format of dd/mm/yy
-
-                                                        dateofpayment = Convert.ToDateTime(s5.Replace("\"", ""));//23/03/2020
-                                                        var strdayofpayment = dateofpayment.ToString();
-
-                                                        string inputString = strdayofpayment;
-                                                        DateTime dDate;
-
-                                                        if (DateTime.TryParse(inputString, out dDate))
-                                                        {
-                                                            String.Format("{0:d/MM/yyyy}", dDate);
-                                                        }
-                                                        else
-                                                        {
-                                                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment is not dd/mm/yyyy format  for row {row}" };
-                                                            Errors.Add(errorInfo); // <-- Control flow goes here
-                                                            erromsg5 = $"Date of Payment is not dd//mm/yyyy format";
-                                                            errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                                            errorflag = true;
-                                                        }
-
-
-                                                        //if value greter then 0 means first date is greater then second one
-                                                        //if value less then 0 it means first date is less then second date
-                                                        int value1 = DateTime.Compare(dateofpayment, Convert.ToDateTime(endeffectivedate));
-                                                        int value2 = DateTime.Compare(dateofpayment, DateTime.Now);
-                                                        if (value1 < 0)
-                                                        {
-                                                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment can not be less then endorsementeffectivedate for row {row}" };
-                                                            Errors.Add(errorInfo);
-                                                            erromsg8 = $"DateofPayment can not be less then endorsementeffectivedate";
-                                                            errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                                            // ShowErrorInfo errordetails = new ShowErrorInfo() { ErrorDescription = $"DateofPayment can not be less then endorsementeffectivedate for row {i + 1}", RowNo = i + 1, propertyName = "DateOfpayment", endorsementid = endrsNum };
-                                                            // errordetails1.Add(errordetails);
-                                                            errorflag = true;
-                                                        }
-                                                        else if (value2 > 0)
-                                                        {
-                                                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment can not be the future date for row {row}" };
-                                                            Errors.Add(errorInfo);
-                                                            erromsg9 = $"DateofPayment can not be the future date";
-                                                            errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                                            errorflag = true;
-                                                        }
-                                                        else
-                                                        {
-                                                            dateofpayment1 = dateofpayment;
-                                                            errorInfoDetailsInfo.DateofPayment = dateofpayment1;
-                                                        }
-                                                    }
-
-                                                    if (PolicyRefundDetails == null)
-                                                    {
-                                                       // ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber does not exist for row {row} in database", ErrorCode = logx.ToString() };
-                                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber does not exist for row {row} in database" };
-                                                        Errors.Add(errorInfo);
-                                                        erromsg10 = $"EndorsementNumber does not exist";
-                                                        errorflag = true;
-
-                                                    }
-                                                    if (errorflag == false)
-                                                    {
-
-                                                        //updating the details from csv to table
-                                                        // PolicyRefundDetails.EndorsementEffectivedate = endorsementeffectivedate;
-                                                        // PolicyRefundDetails.TotalRefundAmount = totalRefundAmount;
-
-                                                        PolicyRefundDetails.TxnDate = txndate;
-                                                        PolicyRefundDetails.PaymentGatewayReferenceId = paymentrefId;
-                                                        PolicyRefundDetails.PaymentStatus = paymentstatus1;
-                                                        PolicyRefundDetails.AmountPaid = ammountpaid;
-                                                        PolicyRefundDetails.DateOfPayment = dateofpayment1;
-
-
-                                                        _context.TblPolicyRefund.Update(PolicyRefundDetails);
-                                                        _context.SaveChanges();
-
-                                                    }
-                                                    else
-                                                    {
-                                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $" Can not be updated for row {row}" };
-                                                        Errors.Add(errorInfo);
-                                                        erromsg11 = $"Can not be updated";
-                                                        errorflag = true;
-                                                    }
-
-
-                                                   
-                                                }
-
-                                                var errorRowNo = row;
-                                                errorInfoDetailsInfo.ErroRowNo = errorRowNo;
-                                                errorInfoDetailsInfo.ErrorDescription = erromsg + erromsg1 + erromsg2 + erromsg3 + erromsg4 + erromsg5 + erromsg6 + erromsg7 + erromsg8 + erromsg9 + erromsg10 + erromsg11;
-                                                if (string.IsNullOrEmpty(errorInfoDetailsInfo.ErrorDescription))
-                                                {
-                                                    continue;
-                                                }
-                                                else
-                                                {
-                                                    errorInfoDetails.Add(errorInfoDetailsInfo);
-                                                }
-                                                errorflag = false;
-                                                //Resetting errors messages
-
-                                                erromsg = "";
-                                                erromsg1 = "";
-                                                erromsg2 = "";
-                                                erromsg3 = "";
-                                                erromsg4 = "";
-                                                erromsg5 = "";
-                                                erromsg6 = "";
-                                                erromsg7 = "";
-                                                erromsg8 = "";
-                                                erromsg9 = "";
-                                                erromsg10 = "";
-                                                erromsg11 = "";
-
-
+                                                UpdateRefundDetails(errorInfoDetails, row, errorInfoDetailsInfo, endorsementNo, endrsEffDate, totRefundAmt,
+                                                    pmtGtRefId, amtPaid, pmtStatus, dtOfPmt, DatetimeNow);
 
                                             }
-                                            if (Errors.Count > 0)
+                                            if (errorInfoDetails.Count > 0)
                                             {
                                                 return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded with following Erros", Errors = Errors, ErrorDetails = errorInfoDetails };
                                             }
@@ -6304,11 +5986,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         }
                     }
 
-
-                  
-                   
                 }
-                if (Errors.Count > 0)
+                if (errorInfoDetails.Count > 0)
                 {
                     return new FileUploadResponse { Status = BusinessStatus.Ok, Errors = Errors, ResponseMessage = $" {dt.Rows.Count }Document uploaded succefully with {Errors.Count} records having issues" };
                 }
@@ -6319,20 +5998,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             catch (Exception ex)
             {
-                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document upload error!"+ex.ToString() , MessageKey = step1.ToString()+" "+ filePath };
+                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document upload error!" + ex.ToString(), MessageKey = step1.ToString() + " " + filePath };
             }
         }
-
-        public async Task<FileUploadResponse> ConvertCSVtoDataTable(string strFilePath,ApiContext apiContext)
+        public async Task<FileUploadResponse> ConvertCSVtoDataTable(string strFilePath, ApiContext apiContext, DateTime DatetimeNow)
         {
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
-            dbHelper._TimeZone = UserDateTime.KeyValue;
-            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             List<ShowErrorInfoDetails> errorInfoDetails = new List<ShowErrorInfoDetails>();
             int logx = 0;
-           
+
             StreamReader sr = null;
             try
             {
@@ -6373,33 +6049,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 // var c = dt.Rows[0][2];
                 var count = dt.Rows.Count;
 
-                var errorflag = false;
-                var endrsNum = "";
-                var updatedResponse = "";
-                DateTime endorsementeffectivedate = DatetimeNow;
-                DateTime txndate = DatetimeNow;
-                var paymentstatus = "";
-                var paymentstatus1 = "";
-                DateTime dateofpayment = DatetimeNow;
-                decimal totalRefundAmount = 0;
-                decimal ammountpaid = 0;
-                var paymentrefId = "";
-                DateTime dateofpayment1 = DatetimeNow;
                 ShowErrorInfoDetails errorInfoDetailsInfo = new ShowErrorInfoDetails();
-
-                var erromsg = "";
-                var erromsg1 = "";
-                var erromsg2 = "";
-                var erromsg3 = "";
-                var erromsg4 = "";
-                var erromsg5 = "";
-                var erromsg6 = "";
-                var erromsg7 = "";
-                var erromsg8 = "";
-                var erromsg9 = "";
-                var erromsg10 = "";
-                var erromsg11 = "";
-
 
 
 
@@ -6407,372 +6057,19 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                     // var s = dt.Rows[i][10].ToString().Trim();
                     errorInfoDetailsInfo = new ShowErrorInfoDetails();
-                    endrsNum = "";
-                    var s0 = dt.Rows[i][endorsementindex].ToString().Replace("\"", "").Trim();
-                    var s = dt.Rows[i][EndorsementEffectivedateIndex].ToString().Replace("\"", "").Trim();
-                    var s1 = dt.Rows[i][TotalRefundAmountIndex].ToString().Replace("\"", "").Trim();
-                    var s2 = dt.Rows[i][PaymentGatewayReferenceIdIndex].ToString().Replace("\"", "").Trim();
-                    var s3 = dt.Rows[i][AmountPaidIndex].ToString().Replace("\"", "").Trim();
-                    var s4 = dt.Rows[i][PaymentStatusIndex].ToString().Replace("\"", "").Trim();
-                    var s5 = dt.Rows[i][DateOfPaymentIndex].ToString().Replace("\"", "").Trim();
 
-                    if (string.IsNullOrEmpty(s0))
-                    {
-                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber can not be empty for row {i + 1}" };
-                            Errors.Add(errorInfo);
-                            erromsg = $"EndorsementNumber can not be empty";
-                            errorInfoDetailsInfo.EndorsementNo = s0;
-
-                        if (string.IsNullOrEmpty(s))
-                        {
-
-                            erromsg1 = $"Endorsement Effective date can not be empty";
-                            errorInfoDetailsInfo.EndorsementEffectiveDate = Convert.ToDateTime(s);
-                            errorflag = true;
-                        }
-                        else
-                        {
-                            errorInfoDetailsInfo.EndorsementEffectiveDate = Convert.ToDateTime(s);
-                        }
-                        
-
-                        if (string.IsNullOrEmpty(s1))
-                        {
-
-                          erromsg2 = $"Total Refund Amount can not be empty";
-                            errorInfoDetailsInfo.TotalRefundAmount = Convert.ToDecimal(s1);
-                            errorflag = true;
-                        }
-                        else
-                        {
-                            errorInfoDetailsInfo.TotalRefundAmount = Convert.ToDecimal(s1);
-                        }
-
-                        if (string.IsNullOrEmpty(s2))
-                        {
-
-                            erromsg3 = $"Payment Gateway RefrenceId can not be null";
-                            errorInfoDetailsInfo.paymentGatewayRefrenceid = s2;
-                            errorflag = true;
-                        }
-                        else
-                        {
-                            errorInfoDetailsInfo.paymentGatewayRefrenceid = s2;
-                        }
-                        if (string.IsNullOrEmpty(s3))
-                        {
-
-                             erromsg4 = $"Ammount paid can not be null";
-                            s3 = "0.0";
-                            errorInfoDetailsInfo.Ammountpaid = Convert.ToDecimal(s3);
-                            errorflag = true;
-                        }
-                        else
-                        {
-                            errorInfoDetailsInfo.Ammountpaid = Convert.ToDecimal(s3);
-                        }
-                        if (string.IsNullOrEmpty(s4))
-                        {
-
-                           erromsg4 = $"Payment status can not be null";
-                           errorInfoDetailsInfo.PaymentStatus = s4;
-                            errorflag = true;
-                        }
-                        else
-                        {
-                            errorInfoDetailsInfo.PaymentStatus = s4;
-                        }
-                        if (string.IsNullOrEmpty(s5))
-                        {
-
-                            erromsg5 = $"Date of Payment can not be null";
-                            errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                            errorflag = true;
-                        }
-                        else
-                        {
-                            errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                        }
-                       // errorInfoDetailsInfo.ErrorDescription = erromsg + erromsg1 + erromsg2 + erromsg3 + erromsg4 + erromsg5;
-
-                          errorflag = true;
-                       // errorInfoDetails.Add(errorInfoDetailsInfo);
-                    }
-                    else
-                    {
-                        endrsNum = s0;
-                        errorInfoDetailsInfo.EndorsementNo = endrsNum;
-
-
-
-                            if (string.IsNullOrEmpty(s))
-                            {
-                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Endorsement Effective date can not be empty for row {i + 1}" };
-                                Errors.Add(errorInfo);
-                               erromsg1 = $"Endorsement Effective date can not be empty";
-                               errorInfoDetailsInfo.EndorsementEffectiveDate = Convert.ToDateTime(s);
-
-                            errorflag = true;
-                            }
-                            else
-                            {
-                                endorsementeffectivedate = Convert.ToDateTime(s.Replace("\"", ""));
-                                errorInfoDetailsInfo.EndorsementEffectiveDate = endorsementeffectivedate;
-                            }
-
-                        
-                        txndate = DateTime.Now;
-
-                        
-                        if (s1 != null || s1 != "")
-                        {
-                            if (string.IsNullOrEmpty(s1))
-                            {
-                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"TotalRefundAmount can not be empty for row {i + 1}" };
-                                Errors.Add(errorInfo);
-                                erromsg2 = $"Total Refund Amount can not be empty";
-                                errorInfoDetailsInfo.TotalRefundAmount = Convert.ToDecimal(s1);
-                                errorflag = true;
-                            }
-                            else
-                            {
-
-                                totalRefundAmount = Convert.ToDecimal(s1.Replace("\"", ""));
-                                errorInfoDetailsInfo.TotalRefundAmount = totalRefundAmount;
-                            }
-                        }
-                        
-                        if (s2 != null || s2 != "")
-                        {
-                            if (string.IsNullOrEmpty(s2))
-                            {
-                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"PaymentReferenceGatwayId  can not be empty for row {i + 1}" };
-                                Errors.Add(errorInfo);
-                                erromsg3 = $"Payment Gateway RefrenceId can not be null";
-                                errorInfoDetailsInfo.paymentGatewayRefrenceid = s2;
-                                errorflag = true;
-                            }
-                            else
-                            {
-                                paymentrefId = s2.Replace("\"", "");
-                                errorInfoDetailsInfo.paymentGatewayRefrenceid = paymentrefId;
-                            }
-                        }
-                       
-                        if (s3 != null || s3 != "")
-                        {
-                            if (string.IsNullOrEmpty(s3))
-                            {
-                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Total Amount can not be empty for row {i + 1}" };
-                                Errors.Add(errorInfo);
-                                erromsg4 = $"Ammount paid can not be null";
-                                s3 = "0.0";
-                                errorInfoDetailsInfo.Ammountpaid = Convert.ToDecimal(s3);
-                                errorflag = true;
-                            }
-                            else
-                            {
-                                ammountpaid = Convert.ToDecimal(s3.Replace("\"", ""));
-                                errorInfoDetailsInfo.Ammountpaid = ammountpaid;
-                            }
-                        }
-                       
-                        if (s4 != null || s4 != "")
-                        {
-                            if (string.IsNullOrEmpty(s4))
-                            {
-                                ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Payment status  can not be empty for row {i + 1}" };
-                                Errors.Add(errorInfo);
-                                erromsg4 = $"Payment status can not be null";
-                                errorInfoDetailsInfo.PaymentStatus = s4;
-                                errorflag = true;
-                            }
-                            else
-                            {
-                                paymentstatus = s4.Replace("\"", "");
-                                var succ = "successful";
-                                var fail = "failure";
-                                var value1= string.Equals(paymentstatus, succ, StringComparison.CurrentCultureIgnoreCase);
-                                var value2 = string.Equals(paymentstatus, fail, StringComparison.CurrentCultureIgnoreCase);
-                                if (value1==true)
-                                {
-                                    paymentstatus1 = paymentstatus;
-                                    errorInfoDetailsInfo.PaymentStatus = paymentstatus1;
-                                }
-                                else if(value2==true)
-                                {
-                                    paymentstatus1 = paymentstatus;
-                                    errorInfoDetailsInfo.PaymentStatus = paymentstatus1;
-                                }
-                                else
-                                {
-                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Payment status can be only successful or failure can not be other for row {i + 1}" };
-                                    Errors.Add(errorInfo);
-                                    erromsg6 = $"Payment status can be only successful or failure can not be other for row";
-                                    errorInfoDetailsInfo.PaymentStatus = s4;
-                                    errorflag = true;
-                                }
-                               
-                            }
-                        }
-                        var PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == endrsNum);
-
-                        if (PolicyRefundDetails == null)
-                        {
-                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"EndorsementNumber does not exist for row {i + 1} in database", ErrorCode = logx.ToString() };
-                            Errors.Add(errorInfo);
-                            erromsg10 = $"EndorsementNumber does not exist";
-                            errorflag = true;
-
-                        }
-                        else
-                        {
-
-                            if (s5 != null || s5 != "")
-                            {
-                                if (string.IsNullOrEmpty(s5))
-                                {
-                                    ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"Date of Payment can not be empty for row {i + 1}" };
-                                    Errors.Add(errorInfo);
-                                    erromsg5 = $"Date of Payment can not be null";
-                                    errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                    errorflag = true;
-                                }
-                                else
-                                {
-                                    var endeffectivedate = PolicyRefundDetails.EndorsementEffectivedate;//22/03/2020
-
-                                    string validadate = Convert.ToDateTime(s5).ToString();
-                                    //var dtFrom = validadate.ToString("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-                                    //Checking format of dd/mm/yy
-                                    // DateTime dateconvert = Convert.ToDateTime(s5.Replace("\"", ""));//23/03/2020
-                                    dateofpayment = DateTime.ParseExact(validadate, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-
-                                    var strdayofpayment = dateofpayment.ToString();
-
-                                    string inputString = strdayofpayment;
-                                    DateTime dDate;
-
-                                    if (DateTime.TryParse(inputString, out dDate))
-                                    {
-                                        String.Format("{0:d/MM/yyyy}", dDate);
-                                    }
-                                    else
-                                    {
-                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment is not dd/mm/yyyy format  for row {i + 1}" };
-                                        Errors.Add(errorInfo); // <-- Control flow goes here
-                                        erromsg5 = $"Date of Payment is not dd//mm/yyyy format";
-                                        errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                        errorflag = true;
-                                    }
-
-
-                                    //if value greter then 0 means first date is greater then second one
-                                    //if value less then 0 it means first date is less then second date
-                                    int value1 = DateTime.Compare(dateofpayment, Convert.ToDateTime(endeffectivedate));
-                                 
-                                    int value2 = DateTime.Compare(dateofpayment, DatetimeNow);
-
-                                   
-                                   
-
-                                    if (value1 < 0)
-                                    {
-                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment can not be less then endorsementeffectivedate for row {i + 1}" };
-                                        Errors.Add(errorInfo);
-                                        erromsg8 = $"DateofPayment can not be less then endorsementeffectivedate";
-                                        errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                        // ShowErrorInfo errordetails = new ShowErrorInfo() { ErrorDescription = $"DateofPayment can not be less then endorsementeffectivedate for row {i + 1}", RowNo = i + 1, propertyName = "DateOfpayment", endorsementid = endrsNum };
-                                        // errordetails1.Add(errordetails);
-                                        errorflag = true;
-                                    }
-                                    else if (value2 > 0)
-                                    {
-                                        ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $"DateofPayment can not be the future date for row {i + 1}" };
-                                        Errors.Add(errorInfo);
-                                        erromsg9 = $"DateofPayment can not be the future date";
-                                        errorInfoDetailsInfo.DateofPayment = Convert.ToDateTime(s5);
-                                        errorflag = true;
-                                    }
-                                    else
-                                    {
-                                        dateofpayment1 = dateofpayment;
-                                        errorInfoDetailsInfo.DateofPayment = dateofpayment1;
-                                    }
-                                }
-
-                            }
-
-                        }
-                        logx++;
-                        
-                       
-
-                        if (errorflag == false)
-                        {
-
-                            //updating the details from csv to table
-                            // PolicyRefundDetails.EndorsementEffectivedate = endorsementeffectivedate;
-                            // PolicyRefundDetails.TotalRefundAmount = totalRefundAmount;
-                            
-                            PolicyRefundDetails.TxnDate = txndate;
-                            PolicyRefundDetails.PaymentGatewayReferenceId = paymentrefId;
-                            PolicyRefundDetails.PaymentStatus = paymentstatus1;
-                            PolicyRefundDetails.AmountPaid = ammountpaid;
-                            PolicyRefundDetails.DateOfPayment = dateofpayment1;
-
-
-                            _context.TblPolicyRefund.Update(PolicyRefundDetails);
-                            _context.SaveChanges();
-                            
-                        }
-                        else
-                        {
-                            ErrorInfo errorInfo = new ErrorInfo() { ErrorMessage = $" Can not be updated for row {i + 1}" };
-                            Errors.Add(errorInfo);
-                            erromsg11 = $"Can not be updated";
-                            errorflag = true;
-                        }
-                    }
-                    
-                    errorflag = false;
-                    var errorRowNo = i + 1;
-                    errorInfoDetailsInfo.ErroRowNo = errorRowNo;
-                    errorInfoDetailsInfo.ErrorDescription = erromsg+erromsg1 + erromsg2 + erromsg3 + erromsg4 + erromsg5 + erromsg6 + erromsg7 + erromsg8 + erromsg9 + erromsg10 + erromsg11;
-
-
-                    if (string.IsNullOrEmpty(errorInfoDetailsInfo.ErrorDescription))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        errorInfoDetails.Add(errorInfoDetailsInfo);
-                    }
-
-                    //Resetting errors messages
-
-                     erromsg = "";
-                     erromsg1 = "";
-                     erromsg2 = "";
-                     erromsg3 = "";
-                     erromsg4 = "";
-                     erromsg5 = "";
-                     erromsg6 = "";
-                     erromsg7 = "";
-                     erromsg8 = "";
-                     erromsg9 = "";
-                     erromsg10 = "";
-                     erromsg11 = "";
-
-
-
-
-
+                    var endorsementNo = dt.Rows[i][endorsementindex].ToString().Replace("\"", "").Trim();
+                    var endrsEffDate = dt.Rows[i][EndorsementEffectivedateIndex].ToString().Replace("\"", "").Trim();
+                    var totRefundAmt = dt.Rows[i][TotalRefundAmountIndex].ToString().Replace("\"", "").Trim();
+                    var pmtGtRefId = dt.Rows[i][PaymentGatewayReferenceIdIndex].ToString().Replace("\"", "").Trim();
+                    var amtPaid = dt.Rows[i][AmountPaidIndex].ToString().Replace("\"", "").Trim();
+                    var pmtStatus = dt.Rows[i][PaymentStatusIndex].ToString().Replace("\"", "").Trim();
+                    var dtOfPmt = dt.Rows[i][DateOfPaymentIndex].ToString().Replace("\"", "").Trim();
+                    UpdateRefundDetails(errorInfoDetails, i, errorInfoDetailsInfo, endorsementNo, endrsEffDate, totRefundAmt, pmtGtRefId, amtPaid, pmtStatus, dtOfPmt, DatetimeNow);
                 }
-                if (Errors.Count > 0)
+                if (errorInfoDetails.Count > 0)
                 {
-                    return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded with following Erros", Errors = Errors, ErrorDetails=errorInfoDetails };
+                    return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded with following Erros", Errors = Errors, ErrorDetails = errorInfoDetails };
                 }
                 else
                 {
@@ -6784,12 +6081,210 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 logx++;
                 return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document uploaded with following Erros " + ex.ToString(), MessageKey = logx.ToString() };
             }
-            finally {
+            finally
+            {
                 sr.Dispose();
             }
         }
-    
-    public int FindIndex(string filepath,string columnName)
+
+        private void UpdateRefundDetails(List<ShowErrorInfoDetails> errorInfoDetails, int i, ShowErrorInfoDetails errorInfoDetailsInfo, string endorsementNo, string endrsEffDate, string totRefundAmt
+            , string pmtGtRefId, string amtPaid, string pmtStatus, string dtOfPmt, DateTime DatetimeNow)
+        {
+            TblPolicyRefund PolicyRefundDetails = null;
+            List<Dictionary<string, string>> dict1 = new List<Dictionary<string, string>>();
+            var errorflag = false;
+            string endrsNumber = "", paymentstatus = "";
+            DateTime dateofpayment;
+            if (string.IsNullOrEmpty(endorsementNo))
+            {
+                errorInfoDetailsInfo.EndorsementNo = endorsementNo;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "EndorsementNumber");
+                dict.Add("Details", "EndorsementNumber can not be empty");
+                dict1.Add(dict);
+                errorflag = true;
+                endrsNumber = i.ToString();
+            }
+            else
+            {
+                errorInfoDetailsInfo.EndorsementNo = endorsementNo;
+                endrsNumber = endorsementNo;
+
+            }
+            if (string.IsNullOrEmpty(endrsEffDate))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "EndorsementEffectiveDate");
+                dict.Add("Details", $"Endorsement Effective date can not be empty for EndorsementNumber {endrsNumber}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.EndorsementEffectiveDate = EPPlusHelper.ValidateDate(endrsEffDate);
+            }
+
+
+            if (string.IsNullOrEmpty(totRefundAmt))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "TotalRefundAmount");
+                dict.Add("Details", $"Total Refund Amount can not be empty for EndorsementNumber {endrsNumber}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.TotalRefundAmount = Convert.ToDecimal(totRefundAmt);
+            }
+
+            if (string.IsNullOrEmpty(pmtGtRefId))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "PaymentGatewayRefrenceid");
+                dict.Add("Details", $"Payment Gateway RefrenceId can not be null for EndorsementNumber {endrsNumber}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.paymentGatewayRefrenceid = pmtGtRefId;
+            }
+            if (string.IsNullOrEmpty(amtPaid))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "Ammountpaid");
+                dict.Add("Details", $"Ammount paid can not be null for EndorsementNumber {endrsNumber}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.Ammountpaid = Convert.ToDecimal(amtPaid);
+            }
+            if (string.IsNullOrEmpty(pmtStatus))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "PaymentStatus");
+                dict.Add("Details", $"Payment status can not be null for EndorsementNumber {endrsNumber}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.PaymentStatus = pmtStatus;
+                paymentstatus = pmtStatus.Replace("\"", "");
+                var succ = "successful";
+                var fail = "failure";
+                var value1 = string.Equals(paymentstatus, succ, StringComparison.CurrentCultureIgnoreCase);
+                var value2 = string.Equals(paymentstatus, fail, StringComparison.CurrentCultureIgnoreCase);
+                if (value1 == true)
+                {
+                    errorInfoDetailsInfo.PaymentStatus = paymentstatus;
+                }
+                else if (value2 == true)
+                {
+                    errorInfoDetailsInfo.PaymentStatus = paymentstatus;
+                }
+                else
+                {
+                    var dict = new Dictionary<string, string>();
+                    dict.Add("Header", "PaymentStatus");
+                    dict.Add("Details", $"Payment status can be only successful or failure can not be other for EndorsementNumber {endrsNumber}");
+                    dict1.Add(dict);
+                    errorInfoDetailsInfo.PaymentStatus = pmtStatus;
+                    errorflag = true;
+                }
+            }
+            if (string.IsNullOrEmpty(dtOfPmt))
+            {
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "DateofPayment");
+                dict.Add("Details", $"Date of Payment can not be null for EndorsementNumber {endrsNumber}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.DateofPayment = EPPlusHelper.ValidateDate(dtOfPmt);
+            }
+            if (errorflag == false)
+            {
+                PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == errorInfoDetailsInfo.EndorsementNo);
+
+                if (PolicyRefundDetails == null)
+                {
+                    var dict = new Dictionary<string, string>();
+                    dict.Add("Header", "EndorsementNumber");
+                    dict.Add("Details", $"EndorsementNumber  {endorsementNo} does not exist in database");
+                    dict1.Add(dict);
+                    errorflag = true;
+
+                }
+                else
+                {
+                    var endeffectivedate = PolicyRefundDetails.EndorsementEffectivedate;//22/03/2020
+
+                    dateofpayment = (DateTime)EPPlusHelper.ValidateDate(dtOfPmt);
+
+                    //if value greter then 0 means first date is greater then second one
+                    //if value less then 0 it means first date is less then second date
+                    int value1 = DateTime.Compare(dateofpayment, Convert.ToDateTime(endeffectivedate));
+
+                    int value2 = DateTime.Compare(dateofpayment, DatetimeNow);
+
+                    if (value1 < 0)
+                    {
+                        var dict = new Dictionary<string, string>();
+                        dict.Add("Header", "EndorsementNumber");
+                        dict.Add("Details", $"DateofPayment can not be less then endorsementeffectivedate for EndorsementNumber  {endorsementNo} ");
+                        dict1.Add(dict);
+                        errorflag = true;
+                    }
+                    else if (value2 > 0)
+                    {
+                        var dict = new Dictionary<string, string>();
+                        dict.Add("Header", "EndorsementNumber");
+                        dict.Add("Details", $"DateofPayment can not be the future date for EndorsementNumber  {endorsementNo} ");
+                        dict1.Add(dict);
+                        errorflag = true;
+                    }
+                    else
+                    {
+                        errorInfoDetailsInfo.DateofPayment = dateofpayment;
+                    }
+                }
+
+                if (errorflag == false)
+                {
+                    PolicyRefundDetails.TxnDate = DatetimeNow;
+                    PolicyRefundDetails.PaymentGatewayReferenceId = errorInfoDetailsInfo.paymentGatewayRefrenceid;
+                    PolicyRefundDetails.PaymentStatus = errorInfoDetailsInfo.PaymentStatus;
+                    PolicyRefundDetails.AmountPaid = errorInfoDetailsInfo.Ammountpaid;
+                    PolicyRefundDetails.DateOfPayment = errorInfoDetailsInfo.DateofPayment;
+                    _context.TblPolicyRefund.Update(PolicyRefundDetails);
+                    _context.SaveChanges();
+
+                }
+                else
+                {
+                    errorInfoDetailsInfo.ErrorDescription = dict1;
+                    errorInfoDetails.Add(errorInfoDetailsInfo);
+                }
+            }
+            else
+            {
+                errorInfoDetailsInfo.ErrorDescription = dict1;
+                errorInfoDetails.Add(errorInfoDetailsInfo);
+            }
+            errorflag = false;
+        }
+        public int FindIndex(string filepath,string columnName)
         {
            // string filepath = @"C:\Users\brajesh.kumar\Desktop\test11.csv";
             var lines = File.ReadLines(filepath);
@@ -7025,7 +6520,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 var DateDifference = (CurrentDate - item.CreatedDate.Date).TotalDays + 1;
 
-                var ProposalExpiryDate = item.CreatedDate.AddDays(15).ToString("MM/dd/yyyy hh:mm tt");
+                var ProposalExpiryDate = item.CreatedDate.AddDays(14).ToString("dd/MM/yyyy hh:mm tt");
 
                 switch (DateDifference)
                 {

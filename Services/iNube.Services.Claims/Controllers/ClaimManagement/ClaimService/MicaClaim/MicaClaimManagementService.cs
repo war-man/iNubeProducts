@@ -4,6 +4,7 @@ using iNube.Services.Claims.Entities;
 using iNube.Services.Claims.Entities.CNEntities;
 using iNube.Services.Claims.Helpers;
 using iNube.Services.Claims.Models;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
 using Microsoft.AspNetCore.Http;
@@ -36,13 +37,15 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
         public DbHelper dbHelper;
-        public MicaClaimManagementService(MICACMContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration, IEmailService emailService)
+        private ILoggerManager _logger;
+        public MicaClaimManagementService(MICACMContext context, IMapper mapper, IIntegrationService integrationService, ILoggerManager logger, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _configuration = configuration;
             _emailService = emailService;
+            _logger = logger;
             dbHelper = new DbHelper(new IntegrationService(configuration)); ;
         }
 
@@ -872,8 +875,24 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             catch (Exception ex)
             {
+               
 
-
+            }
+            return true;
+        }
+        public async Task<bool> SendEmailAsync(EmailTest emailTest, ApiContext apiContext)
+        {
+            try
+            {
+                EmailRequest email = new EmailRequest();
+                email.mailTo.Add(emailTest.To);
+                email.Subject = emailTest.Subject;
+                email.Message = emailTest.Message;
+                var res =await  _integrationService.SendEmailAsync(email, apiContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Claims_SendEmailAsync", apiContext);
             }
             return true;
         }
@@ -1050,9 +1069,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 EmailTest emailTest = new EmailTest();
                 emailTest.To = policyDetails.Email;
                 emailTest.Subject = "Claim successfully registered";
-                emailTest.Message = "Claim Number: " + claims.ClaimNumber + " successfully registered against policy No: " + claims.PolicyNumber + " \n Your Claim will be processed in accordance with the Policy terms and Conditions. \n \n Assuring the best of services always. \n \nRegards, \nTeam MICA";
+                emailTest.Message = "Claim Number: " + claims.ClaimNumber + " successfully registered against policy No: " + claims.PolicyNumber + " \n Your Claim will be processed in accordance with the Policy terms and Conditions. \n \n Assuring the best of services always. \n \nThanks ";
                 // New changes 
-                await SendEmailAsync(emailTest);
+                await SendEmailAsync(emailTest, apiContext);
             }
 
 
@@ -1060,9 +1079,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 EmailTest manangerEmail = new EmailTest();
                 manangerEmail.To = _claimAllocationDetailsDTO.EmailId;
-                // manangerEmail.Subject = "";
+                manangerEmail.Subject = "Claim Number " + claims.ClaimNumber + "  is allocated to you on " + claims.CreatedDate.Value.ToShortDateString();
                 manangerEmail.Message = " Dear Sir/Madam " + " \n\n Vehicle Number " + vehiclenumber + " is damaged on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n\n Thanks ";
-                await SendEmailAsync(manangerEmail);
+                await SendEmailAsync(manangerEmail,apiContext);
             }
             //Models.SMSRequest request = new Models.SMSRequest();
             //request.RecipientNumber = "8197521528";

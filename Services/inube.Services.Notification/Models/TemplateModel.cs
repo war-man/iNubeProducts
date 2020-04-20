@@ -109,7 +109,7 @@ namespace inube.Services.Notification.Models
             Attachments = new List<EmailAttachment>();
             mailTo = new List<string>();
             mailCc = new List<string>();
-            mailTo = new List<string>();
+            mailBcc = new List<string>();
         }
         public string To { get; set; }
 

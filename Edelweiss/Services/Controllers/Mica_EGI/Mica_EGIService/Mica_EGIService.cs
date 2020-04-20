@@ -67,6 +67,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext context);
 
+        Task<List<CityMasDTO>> SmartCityMaster(string searchString,ApiContext context);
+        Task<decimal> GetSIFromMakeModel(decimal VehicleId, ApiContext context);
+        Task<CityMasDTO> GetStateCode(string CityName,ApiContext context);
+
+
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -546,7 +551,25 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         var Data = await _integrationService.WrapperCalculateRatingPremium(prem,context);
 
-                        List<CalculationResult> val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
+                        List<CalculationResult> val = new List<CalculationResult>();
+
+                        try
+                        {
+                            val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
+                        }
+                        catch(Exception Ex)
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            returnobj.ResponseMessage = "Deserialization Failed";
+                            returnobj.Status = BusinessStatus.PreConditionFailed;
+                            errorInfo.ErrorMessage = "Mica Calculate Premium Failed";
+                            errorInfo.ErrorCode = "ExtWrapperCP";
+                            errorInfo.PropertyName = "MicaRating";
+                            returnobj.Errors.Add(errorInfo);
+                            return returnobj;
+                        }
+
                         if (val != null)
                         {
 
@@ -1868,20 +1891,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
-            ApiContext apiContext = new ApiContext();
-            apiContext.OrgId = Convert.ToDecimal(_configuration["Mica_ApiContext:OrgId"]);
-            apiContext.UserId = _configuration["Mica_ApiContext:UserId"];
-            apiContext.Token = _configuration["Mica_ApiContext:Token"];
-            apiContext.ServerType = _configuration["Mica_ApiContext:ServerType"];
-            apiContext.IsAuthenticated = Convert.ToBoolean(_configuration["Mica_ApiContext:IsAuthenticated"]);
-
-
+          
             TblSwitchLog switchLog = new TblSwitchLog();
             TblSchedule ScheduleData = new TblSchedule();
             TblSchedulerLog schedulerLog = new TblSchedulerLog();
             TblPremiumBookingLog bookingLog = new TblPremiumBookingLog();
             TblDailyActiveVehicles dailyActiveVehicles = new TblDailyActiveVehicles();
             TblScheduleReport scheduleReport = new TblScheduleReport();
+
+
+            var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
+
+            if(PolicyNumberList.Count < 0)
+            {
+                return false;
+            }
 
             scheduleReport.ScheduleStartDate = IndianTime;
             scheduleReport.SuccessCount = 0;
@@ -1894,10 +1918,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var ReportID = scheduleReport.ReportId;
 
-            var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
-
+           
             foreach (var policy in PolicyNumberList)
             {
+
+                var checkPolicyCancel = CheckPolicyStatus(policy);
+
+                if(checkPolicyCancel == true)
+                {
+                    continue;
+                }
+
 
                 schedulerLog = new TblSchedulerLog();
 
@@ -1919,26 +1950,29 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //Call the Policy Service to Get Policy Details.
                 //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
-                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policy, apiContext);
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policy, context);
 
 
                 PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
-
-                if (PolicyData != null)
+                try
                 {
+                    if (PolicyData != null)
+                    {
 
-                    detailsDTO.SumInsured = PolicyData["si"];
-                    detailsDTO.NoOfPC = PolicyData["noOfPC"];
-                    detailsDTO.NoOfTW = PolicyData["noOfTW"];
-                    detailsDTO.PD_Age = PolicyData["driverAge"];
-                    detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
-                    detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
-                    detailsDTO.StateCode = PolicyData["stateCode"];
-                    BillingFrequency = PolicyData["billingFrequency"];
-                    AccountNumber = PolicyData["CDAccountNumber"];
+                        detailsDTO.SumInsured = PolicyData["si"];
+                        detailsDTO.NoOfPC = PolicyData["noOfPC"];
+                        detailsDTO.NoOfTW = PolicyData["noOfTW"];
+                        detailsDTO.PD_Age = PolicyData["driverAge"];
+                        detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
+                        detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
+                        detailsDTO.StateCode = PolicyData["stateCode"];
+                        BillingFrequency = PolicyData["billingFrequency"];
+                        AccountNumber = PolicyData["CDAccountNumber"];
+
+                    }
 
                 }
-                else
+                catch (Exception ex)
                 {
                     schedulerLog.SchedulerStatus = policy + " - No Record Found for this Policy Number";
                     _context.TblSchedulerLog.Update(schedulerLog);
@@ -1950,6 +1984,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     _context.SaveChanges();
                     continue;
                 }
+               
 
 
                 //CalculatePremiumObject
@@ -1978,7 +2013,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 //Call CalculatePremium Policy Module MICA
-                var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, apiContext);
+                var CalPremiumResponse = await _integrationService.CalculatePremium(premiumDTO, context);
 
                 List<CalculationResult> DeserilizedPremiumData = new List<CalculationResult>();
                 CDDTO CdModel = new CDDTO();
@@ -2125,7 +2160,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     ExtCdModel.Description = "Auto Schedule Premium for Policy - " + policy;
                     ExtCdModel.Frequency = BillingFrequency;
 
-                    var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, apiContext);
+                    var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, context);
 
 
                     if (CallMicaCd != null)
@@ -4854,9 +4889,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CurrentDate = dateTime.Value.Date;
             }
 
-            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();           
-
-            TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();     
             DateTime PolicyStartDate, NextMonth, CDFromDate;
 
             //Step-1:Get All Active Policy's 
@@ -4875,6 +4908,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             //Step-2:Start the Loop Based On Policy Number
             foreach (var policy in PolicyNumberList)
             {
+                var checkPolicyCancel = CheckPolicyStatus(policy);
+
+                if (checkPolicyCancel == true)
+                {
+                    continue;
+                }
+
+
+                TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
+
                 try
                 {
 
@@ -5655,7 +5698,60 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return colIdx;
         }
 
+        public async Task<List<CityMasDTO>> SmartCityMaster(string searchString,ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
+
+            var CityData = _context.TblMasCity.Where(x => x.CityName.StartsWith(searchString))
+                                                  .Select(x => new CityMasDTO
+                                                  {
+                                                      StateCode = "",
+                                                      CityName = x.CityName,
+                                                      CityId = x.CityId
+
+                                                  }).ToList();
+            return CityData;
+
+        }
+
+        public async Task<CityMasDTO> GetStateCode(string CityName,ApiContext context)
+        {
+
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+            var StateID = _context.TblMasCity.FirstOrDefault(x => x.CityName == CityName).StateId;
+
+            CityMasDTO masDTO = new CityMasDTO();
+            masDTO.CityName = CityName;
+            if (StateID > 0)
+            {
+                var StateCode = _context.TblMasState.SingleOrDefault(x => x.StateId == StateID).StateAbbreviation;
+                masDTO.StateCode = StateCode;
+
+                return masDTO;
+            }
+
+            return masDTO;
+
+        }
+
+
+        public async Task<decimal> GetSIFromMakeModel(decimal VehicleId, ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+
+            try
+            {
+                var SI = Convert.ToDecimal(_context.TblVehicleDetailsData.SingleOrDefault(x => x.VehicleId == VehicleId).SumInsured);
+                return SI;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
 

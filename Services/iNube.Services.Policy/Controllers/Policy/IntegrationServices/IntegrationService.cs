@@ -59,6 +59,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         //GetMappingParams(string mappingname, ApiContext apiContext)
 
         Task<ResponseStatus> SendSMSAsync(Models.SMSRequest SmsRequest, ApiContext apiContext);
+        Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -91,7 +92,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await PostApiInvoke<Models.SMSRequest, ResponseStatus>(uri, apiContext, SmsRequest);
         }
 
-
+        public async Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext)
+        {
+            var uri = NotificationUrl + "/api/Notifications/SendEmailAsync";
+            return await PostApiInvoke<Models.EmailRequest, ResponseStatus>(uri, apiContext, EmailRequest );
+        }
         //      //Acccounting Module
         //      //public async Task<IEnumerable<AccountMapDetailsDto>> GetAccountMapAsync(ApiContext apiContext)
         //      //{
