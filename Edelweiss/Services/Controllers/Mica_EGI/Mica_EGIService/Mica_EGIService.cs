@@ -1917,6 +1917,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             foreach (var policy in PolicyNumberList)
             {
 
+                var checkPolicyCancel = CheckPolicyStatus(policy);
+
+                if(checkPolicyCancel == true)
+                {
+                    continue;
+                }
+
+
                 schedulerLog = new TblSchedulerLog();
 
                 var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
@@ -1941,22 +1949,25 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
-
-                if (PolicyData != null)
+                try
                 {
+                    if (PolicyData != null)
+                    {
 
-                    detailsDTO.SumInsured = PolicyData["si"];
-                    detailsDTO.NoOfPC = PolicyData["noOfPC"];
-                    detailsDTO.NoOfTW = PolicyData["noOfTW"];
-                    detailsDTO.PD_Age = PolicyData["driverAge"];
-                    detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
-                    detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
-                    detailsDTO.StateCode = PolicyData["stateCode"];
-                    BillingFrequency = PolicyData["billingFrequency"];
-                    AccountNumber = PolicyData["CDAccountNumber"];
+                        detailsDTO.SumInsured = PolicyData["si"];
+                        detailsDTO.NoOfPC = PolicyData["noOfPC"];
+                        detailsDTO.NoOfTW = PolicyData["noOfTW"];
+                        detailsDTO.PD_Age = PolicyData["driverAge"];
+                        detailsDTO.PD_DriveExperince = PolicyData["driverExp"];
+                        detailsDTO.AdditionalDriver = PolicyData["additionalDriver"];
+                        detailsDTO.StateCode = PolicyData["stateCode"];
+                        BillingFrequency = PolicyData["billingFrequency"];
+                        AccountNumber = PolicyData["CDAccountNumber"];
+
+                    }
 
                 }
-                else
+                catch (Exception ex)
                 {
                     schedulerLog.SchedulerStatus = policy + " - No Record Found for this Policy Number";
                     _context.TblSchedulerLog.Update(schedulerLog);
@@ -1968,6 +1979,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     _context.SaveChanges();
                     continue;
                 }
+               
 
 
                 //CalculatePremiumObject
@@ -4891,6 +4903,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             //Step-2:Start the Loop Based On Policy Number
             foreach (var policy in PolicyNumberList)
             {
+                var checkPolicyCancel = CheckPolicyStatus(policy);
+
+                if (checkPolicyCancel == true)
+                {
+                    continue;
+                }
+
+
                 TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
 
                 try
