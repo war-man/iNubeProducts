@@ -546,7 +546,25 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         var Data = await _integrationService.WrapperCalculateRatingPremium(prem,context);
 
-                        List<CalculationResult> val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
+                        List<CalculationResult> val = new List<CalculationResult>();
+
+                        try
+                        {
+                            val = JsonConvert.DeserializeObject<List<CalculationResult>>(Data.ToString());
+                        }
+                        catch(Exception Ex)
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            returnobj.ResponseMessage = "Deserialization Failed";
+                            returnobj.Status = BusinessStatus.PreConditionFailed;
+                            errorInfo.ErrorMessage = "Mica Calculate Premium Failed";
+                            errorInfo.ErrorCode = "ExtWrapperCP";
+                            errorInfo.PropertyName = "MicaRating";
+                            returnobj.Errors.Add(errorInfo);
+                            return returnobj;
+                        }
+
                         if (val != null)
                         {
 
