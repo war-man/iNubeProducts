@@ -683,5 +683,13 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public DateTime PolicyStartDate { get; set; }
         public dynamic PolicyData { get; set; }
     }
+
+    public partial class CityMasDTO
+    {
+        public int? CityId { get; set; }
+        public string CityName { get; set; }
+        public string StateCode { get; set; }
+    }
+
 }
 

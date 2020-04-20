@@ -67,6 +67,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext context);
 
+        Task<List<CityMasDTO>> SmartCityMaster(string searchString,ApiContext context);
+        Task<decimal> GetSIFromMakeModel(decimal VehicleId, ApiContext context);
+        Task<CityMasDTO> GetStateCode(string CityName,ApiContext context);
+
+
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -5693,7 +5698,60 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return colIdx;
         }
 
+        public async Task<List<CityMasDTO>> SmartCityMaster(string searchString,ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
+
+            var CityData = _context.TblMasCity.Where(x => x.CityName.StartsWith(searchString))
+                                                  .Select(x => new CityMasDTO
+                                                  {
+                                                      StateCode = "",
+                                                      CityName = x.CityName,
+                                                      CityId = x.CityId
+
+                                                  }).ToList();
+            return CityData;
+
+        }
+
+        public async Task<CityMasDTO> GetStateCode(string CityName,ApiContext context)
+        {
+
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+            var StateID = _context.TblMasCity.FirstOrDefault(x => x.CityName == CityName).StateId;
+
+            CityMasDTO masDTO = new CityMasDTO();
+            masDTO.CityName = CityName;
+            if (StateID > 0)
+            {
+                var StateCode = _context.TblMasState.SingleOrDefault(x => x.StateId == StateID).StateAbbreviation;
+                masDTO.StateCode = StateCode;
+
+                return masDTO;
+            }
+
+            return masDTO;
+
+        }
+
+
+        public async Task<decimal> GetSIFromMakeModel(decimal VehicleId, ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+
+            try
+            {
+                var SI = Convert.ToDecimal(_context.TblVehicleDetailsData.SingleOrDefault(x => x.VehicleId == VehicleId).SumInsured);
+                return SI;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
 

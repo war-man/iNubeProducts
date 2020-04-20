@@ -192,5 +192,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return Ok(response);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> SmartCityMaster(string searchString)
+        {
+            var cityDTOs = await _quotationService.SmartCityMaster(searchString,Context);
+
+            return Ok(cityDTOs);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetSIFromMakeModel(decimal VehicleId)
+        {
+            var data = await _quotationService.GetSIFromMakeModel(VehicleId, Context);
+            return Ok(data);
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetStateCode(string CityName)
+        {
+            var response = await _quotationService.GetStateCode(CityName,Context);
+            return Ok(response);
+        }
+
+
     }
 }
