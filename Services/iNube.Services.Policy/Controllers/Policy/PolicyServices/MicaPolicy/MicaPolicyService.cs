@@ -7041,7 +7041,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 var DateDifference = (CurrentDate - item.CreatedDate.Date).TotalDays + 1;
 
-                var ProposalExpiryDate = item.CreatedDate.AddDays(15).ToString("MM/dd/yyyy hh:mm tt");
+                var ProposalExpiryDate = item.CreatedDate.AddDays(15).ToString("dd/MM/yyyy hh:mm tt");
 
                 switch (DateDifference)
                 {
