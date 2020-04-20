@@ -3809,7 +3809,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             var type = "Update Proposal";
 
-            var tblPolicy = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata,DatetimeNow, Errors, apiContext);
+            var tblPolicy =await ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata,DatetimeNow, Errors, apiContext);
+            if(tblPolicy == null)
+            {
+                return null;
+            } 
             return _mapper.Map<PolicyDTO>(tblPolicy);
         }
 
@@ -4911,22 +4915,19 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             return new ProposalResponse { Status = BusinessStatus.PreConditionFailed, Errors = Errors };
                         }
                         else {
-                            var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
+                            var tblPolicy1 =await ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
                         if (tblPolicy1 == null && Errors.Count > 0)
                         {
-                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"Insurable Item is not proper" };
                         }
                         }
                     }
                     else
                     {
-
-
-                       
-                        var tblPolicy1 = ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
+                        var tblPolicy1 =await  ModifyUpdateInsurabableItem(modifydata, type, tbl_particiant, tblPolicyDetailsdata, DatetimeNow, Errors, apiContext);
                         if (tblPolicy1 == null && Errors.Count > 0)
                         {
-                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"RiskItem Count is mismatch" };
+                            return new ProposalResponse { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = $"Insurable Item is not proper" };
                         }
                     }
 
