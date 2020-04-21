@@ -1,33 +1,50 @@
 {
-    "family": "ed-mica-rating",
-    "taskRoleArn": "",
-    "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
-    "networkMode": "awsvpc",
-    "containerDefinitions": [
-        {
-            "name": "ed-mica-rating",
-            "image": "<edrating>",
-            
-            "cpu": 512,
-            "memory": 512,
-                     
-            "portMappings": [
-                {
-                    "containerPort": 9012,
-                    "hostPort": 9012,
-                    "protocol": "tcp"
-                }
-            ],
-            "essential": true
-            
+  "family": "ed-mica-rating",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "ed-mica-rating",
+      "image": "<edrating>",
+
+      "cpu": 800,
+      "memory": 1024,
+
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/ed-mica-rating",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
         }
-    ],
-    
-    
-    "requiresCompatibilities": [
-        "EC2"
-    ],
-    "cpu": "512",
-    "memory": "512"
-    
+      },
+
+      "portMappings": [
+        {
+          "containerPort": 9012,
+          "hostPort": 9012,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+
+    }
+  ],
+
+
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "800",
+  "memory": "1024",
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/ed-mica-rating",
+      "awslogs-region": "ap-south-1",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
+
 }
