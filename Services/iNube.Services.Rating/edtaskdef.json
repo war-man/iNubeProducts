@@ -8,8 +8,8 @@
       "name": "ed-mica-rating",
       "image": "<edrating>",
 
-      "cpu": 800,
-      "memory": 1024,
+      "cpu": 1024,
+      "memory": 3048,
 
       "logConfiguration": {
         "logDriver": "awslogs",
@@ -36,8 +36,8 @@
   "requiresCompatibilities": [
     "EC2"
   ],
-  "cpu": "800",
-  "memory": "1024",
+  "cpu": "1024",
+  "memory": "3048",
   "logConfiguration": {
     "logDriver": "awslogs",
     "options": {
