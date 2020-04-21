@@ -20,5 +20,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<IEnumerable<ddDTO>> GetOrgDropdown(ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetOffbyOrgid(int orgid,ApiContext apiContext);
         Task<IEnumerable<AvoOrgEmployee>> GetEmployeeDetails(ApiContext apiContext);
+        Task<CreateOfficeResponse> CreateOffice(AVOOrgOffice aVOOrgOffice, ApiContext apiContext);
     }
 }

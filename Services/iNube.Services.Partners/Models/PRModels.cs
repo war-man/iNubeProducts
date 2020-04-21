@@ -247,6 +247,11 @@ namespace iNube.Services.Partners.Models
         public int? OrgPincodeId { get; set; }
     }
 
+    public class CreateOfficeResponse : ResponseStatus
+    {
+        
+    }
+
     public partial class AVOOrgOffice
     {
         public AVOOrgOffice()
