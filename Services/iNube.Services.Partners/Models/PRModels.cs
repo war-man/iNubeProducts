@@ -430,6 +430,48 @@ namespace iNube.Services.Partners.Models
         public int? SpocGenderId { get; set; }
     }
 
+    public partial class AvoOrgEmployee
+    {
+        public decimal OrgEmpId { get; set; }
+        public string StaffCode { get; set; }
+        public string StaffName { get; set; }
+        public decimal? PositionId { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public decimal? StaffTypeId { get; set; }
+        public string Function { get; set; }
+        public DateTime? AppointmentDate { get; set; }
+        public string Smcode { get; set; }
+        public string Imdcode { get; set; }
+        public string StaffStatus { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+
+        public virtual AvoOrgPositions Position { get; set; }
+    }
+
+    public partial class AvoOrgPositions
+    {
+        public decimal PositionId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public decimal OfficeId { get; set; }
+        public decimal? DesignationId { get; set; }
+        public string PositionName { get; set; }
+        public decimal? RepOrgId { get; set; }
+        public decimal? RepOfficeId { get; set; }
+        public decimal? ParentId { get; set; }
+        public decimal? ParentLineId { get; set; }
+        public decimal? ReportingId { get; set; }
+        public decimal? ReportingLineId { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public bool? IsVacant { get; set; }
+        public bool? IsActive { get; set; } 
+    }
     #endregion
 
     #region Partner

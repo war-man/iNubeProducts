@@ -225,5 +225,12 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetOffbyOrgid(orgid, Context);
             return Ok(response);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeDetails()
+        {
+            var response = await _avoorgService.GetEmployeeDetails(Context);
+            return Ok(response);
+        }
+       
     }
 }

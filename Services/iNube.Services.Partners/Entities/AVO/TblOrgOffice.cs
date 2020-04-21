@@ -11,6 +11,8 @@ namespace iNube.Services.Partners.Entities.AVO
             TblOfficeSpocDetails = new HashSet<TblOfficeSpocDetails>();
             TblOrgOfficeMappingPrimaryOffice = new HashSet<TblOrgOfficeMapping>();
             TblOrgOfficeMappingReportingOffice = new HashSet<TblOrgOfficeMapping>();
+            TblOrgPositionsOffice = new HashSet<TblOrgPositions>();
+            TblOrgPositionsRepOffice = new HashSet<TblOrgPositions>();
         }
 
         public decimal OrgOfficeId { get; set; }
@@ -46,5 +48,7 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual ICollection<TblOfficeSpocDetails> TblOfficeSpocDetails { get; set; }
         public virtual ICollection<TblOrgOfficeMapping> TblOrgOfficeMappingPrimaryOffice { get; set; }
         public virtual ICollection<TblOrgOfficeMapping> TblOrgOfficeMappingReportingOffice { get; set; }
+        public virtual ICollection<TblOrgPositions> TblOrgPositionsOffice { get; set; }
+        public virtual ICollection<TblOrgPositions> TblOrgPositionsRepOffice { get; set; }
     }
 }

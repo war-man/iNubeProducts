@@ -26,8 +26,10 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual DbSet<TblMasPinCode> TblMasPinCode { get; set; }
         public virtual DbSet<TblMasPlan> TblMasPlan { get; set; }
         public virtual DbSet<TblMasState> TblMasState { get; set; }
+        public virtual DbSet<TblMovements> TblMovements { get; set; }
         public virtual DbSet<TblOfficeSpocDetails> TblOfficeSpocDetails { get; set; }
         public virtual DbSet<TblOrgAddress> TblOrgAddress { get; set; }
+        public virtual DbSet<TblOrgEmployee> TblOrgEmployee { get; set; }
         public virtual DbSet<TblOrgOffice> TblOrgOffice { get; set; }
         public virtual DbSet<TblOrgOfficeHistory> TblOrgOfficeHistory { get; set; }
         public virtual DbSet<TblOrgOfficeMapping> TblOrgOfficeMapping { get; set; }
@@ -374,6 +376,52 @@ namespace iNube.Services.Partners.Entities.AVO
                     .HasConstraintName("FK_tblMasState_tblMasCountry");
             });
 
+            modelBuilder.Entity<TblMovements>(entity =>
+            {
+                entity.HasKey(e => e.MovementId);
+
+                entity.ToTable("tblMovements", "PR");
+
+                entity.Property(e => e.MovementId)
+                    .HasColumnName("MovementID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.CurrentPositionId)
+                    .HasColumnName("CurrentPositionID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ModifiedBy)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.MovementStatusId)
+                    .HasColumnName("MovementStatusID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.MovementTypeId).HasColumnName("MovementTypeID");
+
+                entity.Property(e => e.NewPositionId)
+                    .HasColumnName("NewPositionID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.OrgEmpId)
+                    .HasColumnName("OrgEmpID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.RecommendedByid)
+                    .HasColumnName("RecommendedBYID")
+                    .HasColumnType("numeric(18, 0)");
+            });
+
             modelBuilder.Entity<TblOfficeSpocDetails>(entity =>
             {
                 entity.HasKey(e => e.OfficeSpocid);
@@ -525,6 +573,85 @@ namespace iNube.Services.Partners.Entities.AVO
                     .WithMany(p => p.TblOrgAddress)
                     .HasForeignKey(d => d.OrganizationId)
                     .HasConstraintName("FK_tblOrgAddress_tblOrganization");
+            });
+
+            modelBuilder.Entity<TblOrgEmployee>(entity =>
+            {
+                entity.HasKey(e => e.OrgEmpId);
+
+                entity.ToTable("tblOrgEmployee", "PR");
+
+                entity.HasIndex(e => e.StaffCode)
+                    .HasName("IX_tblOrgEmployee")
+                    .IsUnique();
+
+                entity.Property(e => e.OrgEmpId)
+                    .HasColumnName("OrgEmpID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AppointmentDate).HasColumnType("datetime");
+
+                entity.Property(e => e.CreatedBy)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .HasColumnName("EMail")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Function)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Imdcode)
+                    .HasColumnName("IMDCode")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedBy)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PhoneNumber)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PositionId)
+                    .HasColumnName("PositionID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Smcode)
+                    .HasColumnName("SMCode")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StaffCode)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StaffName)
+                    .IsRequired()
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StaffStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StaffTypeId)
+                    .HasColumnName("StaffTypeID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.HasOne(d => d.Position)
+                    .WithMany(p => p.TblOrgEmployee)
+                    .HasForeignKey(d => d.PositionId)
+                    .HasConstraintName("FK_tblOrgEmployee_tblOrgPositions");
             });
 
             modelBuilder.Entity<TblOrgOffice>(entity =>
@@ -730,21 +857,106 @@ namespace iNube.Services.Partners.Entities.AVO
 
                 entity.Property(e => e.PositionId)
                     .HasColumnName("PositionID")
-                    .ValueGeneratedNever();
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
 
-                entity.Property(e => e.CreatedDateTime).HasColumnType("datetime");
-
-                entity.Property(e => e.OfiiceId).HasColumnName("OfiiceID");
-
-                entity.Property(e => e.PositionName)
+                entity.Property(e => e.CreatedBy)
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.PositionTypeId).HasColumnName("PositionTypeID");
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ReportsToId).HasColumnName("ReportsToID");
+                entity.Property(e => e.DesignationId)
+                    .HasColumnName("DesignationID")
+                    .HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.UserId).HasColumnName("UserID");
+                entity.Property(e => e.ModifiedBy)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.OfficeId)
+                    .HasColumnName("OfficeID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.OrganizationId)
+                    .HasColumnName("OrganizationID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ParentId)
+                    .HasColumnName("ParentID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ParentLineId)
+                    .HasColumnName("ParentLineID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.PositionName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RepOfficeId)
+                    .HasColumnName("RepOfficeID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.RepOrgId)
+                    .HasColumnName("RepOrgID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ReportingId)
+                    .HasColumnName("ReportingID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ReportingLineId)
+                    .HasColumnName("ReportingLineID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.HasOne(d => d.Designation)
+                    .WithMany(p => p.TblOrgPositions)
+                    .HasForeignKey(d => d.DesignationId)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrgStructure");
+
+                entity.HasOne(d => d.Office)
+                    .WithMany(p => p.TblOrgPositionsOffice)
+                    .HasForeignKey(d => d.OfficeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrgOffice");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.TblOrgPositionsOrganization)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrganization");
+
+                entity.HasOne(d => d.Parent)
+                    .WithMany(p => p.InverseParent)
+                    .HasForeignKey(d => d.ParentId)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrgPositions1");
+
+                entity.HasOne(d => d.ParentLine)
+                    .WithMany(p => p.InverseParentLine)
+                    .HasForeignKey(d => d.ParentLineId)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrgPositions");
+
+                entity.HasOne(d => d.RepOffice)
+                    .WithMany(p => p.TblOrgPositionsRepOffice)
+                    .HasForeignKey(d => d.RepOfficeId)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrgOffice1");
+
+                entity.HasOne(d => d.RepOrg)
+                    .WithMany(p => p.TblOrgPositionsRepOrg)
+                    .HasForeignKey(d => d.RepOrgId)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrganization1");
+
+                entity.HasOne(d => d.Reporting)
+                    .WithMany(p => p.InverseReporting)
+                    .HasForeignKey(d => d.ReportingId)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrgPositions2");
+
+                entity.HasOne(d => d.ReportingLine)
+                    .WithMany(p => p.InverseReportingLine)
+                    .HasForeignKey(d => d.ReportingLineId)
+                    .HasConstraintName("FK_tblOrgPositions_tblOrgPositions3");
             });
 
             modelBuilder.Entity<TblOrgSpocDetails>(entity =>

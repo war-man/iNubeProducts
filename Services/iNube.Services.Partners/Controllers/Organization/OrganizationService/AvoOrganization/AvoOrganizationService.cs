@@ -329,5 +329,15 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             });
             return ddDTOs;
         }
+
+        public async Task<IEnumerable<AvoOrgEmployee>> GetEmployeeDetails(ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
+            var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployee>>(Emp);
+
+            return employeeList;
+        }
     }
 }
