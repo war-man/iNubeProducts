@@ -1179,8 +1179,7 @@ class ClaimProcess extends React.Component {
 
     documentLinkView = (dmsdocId) => {
         let that = this;
-
-        fetch("https://inubeservicesnotification.azurewebsites.net/api/DMS/DownloadView?id=" + dmsdocId, {
+        fetch(`${ClaimConfig.NotificationUrl}/api/DMS/DownloadView?id=` + dmsdocId, {
 
             method: 'get',
 

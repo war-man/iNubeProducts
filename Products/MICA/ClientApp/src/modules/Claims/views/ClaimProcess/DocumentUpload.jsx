@@ -34,10 +34,7 @@ const MyUploader = (props) => {
 
         $.ajax({
             type: "POST",
-           // url: `${ClaimConfig.claimConfigUrl}/api/ClaimManagement/UploadFiles?claimId=` + props.claimId,
-           // url: "http://localhost:53000/api/DMS/Documentupload/Documentupload",
-
-            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload`,
+            url: `${ClaimConfig.NotificationUrl}/api/DMS/Documentupload/Documentupload`,
 
             contentType: false,
             processData: false,
@@ -47,6 +44,8 @@ const MyUploader = (props) => {
                 /* Authorization header */
                 xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
             },
+
+
             success: function (data) {
                 console.log("datamongo", data);
                 props.docidfunc(data);
