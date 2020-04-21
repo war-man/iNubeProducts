@@ -5255,8 +5255,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                 var payUid = "";
                                                 var payAmount = "";
                                                 var payStatus = "";
-                                                var PropertyName = "";
-                                                DateTime paymentDate = new DateTime(2020, 1, 1, 01, 01, 01);
+                                                var PropertyName = "";                                               
+                                                DateTime? paymentDate = new DateTime(2020, 1, 1, 01, 01, 01);
 
 
                                                 if (worksheet.Cells[row, TxnidIndex].Text.ToString().Trim() != null)
@@ -5278,7 +5278,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                 }
                                                 if (worksheet.Cells[row, paymentDateIndex].Text.ToString().Trim() != null)
                                                 {
-                                                    paymentDate = Convert.ToDateTime(worksheet.Cells[row, paymentDateIndex].Text.ToString());
+                                                    paymentDate = EPPlusHelper.ValidateDate(worksheet.Cells[row, paymentDateIndex].Text.ToString());
                                                 }
 
 
@@ -5339,12 +5339,24 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                 {
                                                     ErrorInfo errorInfo = new ErrorInfo();
 
-                                                    errorInfo.ErrorMessage = "Pay Date Missing";
+                                                    errorInfo.ErrorMessage = "Pay Status Not Sucessful";
                                                     errorInfo.ErrorCode = "MSI005";
                                                     errorInfo.PropertyName = PropertyName;
                                                     uploadDTO.Errors.Add(errorInfo);
                                                     errorflag = true;
                                                 }
+
+                                                if (paymentDate == null)
+                                                {
+                                                    ErrorInfo errorInfo = new ErrorInfo();
+
+                                                    errorInfo.ErrorMessage = "Payment Date Missing / Not Proper";
+                                                    errorInfo.ErrorCode = "MSI006";
+                                                    errorInfo.PropertyName = PropertyName;
+                                                    uploadDTO.Errors.Add(errorInfo);
+                                                    errorflag = true;
+                                                }
+
 
                                                 var checkTxnid = _context.TblPolicyMonthlySi.Any(x => x.Txnid == txnid);
 
@@ -5353,7 +5365,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                     ErrorInfo errorInfo = new ErrorInfo();
 
                                                     errorInfo.ErrorMessage = "No Such TxnId";
-                                                    errorInfo.ErrorCode = "MSI004";
+                                                    errorInfo.ErrorCode = "MSI007";
                                                     errorInfo.PropertyName = PropertyName;
                                                     uploadDTO.Errors.Add(errorInfo);
                                                     errorflag = true;
@@ -5368,7 +5380,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                     {
                                                         ErrorInfo errorInfo = new ErrorInfo();
                                                         errorInfo.ErrorMessage = "Data is Already Updated for this Txn Id Duplicate Record";
-                                                        errorInfo.ErrorCode = "MSI004";
+                                                        errorInfo.ErrorCode = "MSI008";
                                                         errorInfo.PropertyName = PropertyName;
                                                         uploadDTO.Errors.Add(errorInfo);
                                                         errorflag = true;
@@ -5382,7 +5394,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                             ErrorInfo errorInfo = new ErrorInfo();
 
                                                             errorInfo.ErrorMessage = "Pay Amount is Less Than the Billed Amount";
-                                                            errorInfo.ErrorCode = "MSI003";
+                                                            errorInfo.ErrorCode = "MSI009";
                                                             errorInfo.PropertyName = PropertyName;
                                                             uploadDTO.Errors.Add(errorInfo);
                                                             errorflag = true;
@@ -5507,11 +5519,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 for (var i = 0; i < count; i++)
                 {
-                    var txnid = dt.Rows[i][TxnidIndex].ToString();
-                    var payUid = dt.Rows[i][payUidindex].ToString();
-                    var payAmount = dt.Rows[i][payAmountIndex].ToString();
-                    var payStatus = dt.Rows[i][payStatusIndex].ToString();
-                    var paymentDate = Convert.ToDateTime(dt.Rows[i][paymentDateIndex]);
+                    var txnid = dt.Rows[i][TxnidIndex].ToString().Replace("\"", "").Trim();
+                    var payUid = dt.Rows[i][payUidindex].ToString().Replace("\"", "").Trim();
+                    var payAmount = dt.Rows[i][payAmountIndex].ToString().Replace("\"", "").Trim();
+                    var payStatus = dt.Rows[i][payStatusIndex].ToString().Replace("\"", "").Trim();
+
+                    //EPPlusHelper - For Validation Of Date in Excel
+                    var paymentDate = EPPlusHelper.ValidateDate(dt.Rows[i][paymentDateIndex].ToString().Replace("\"", "").Trim());
 
                     var PropertyName = "";
 
@@ -5571,12 +5585,26 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Date Missing";
+                        errorInfo.ErrorMessage = "Pay Status is Not Sucessful";
                         errorInfo.ErrorCode = "MSI005";
                         errorInfo.PropertyName = PropertyName; 
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;                       
                     }
+
+
+                    if (paymentDate == null)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        errorInfo.ErrorMessage = "Payment Date Missing / Not Proper";
+                        errorInfo.ErrorCode = "MSI006";
+                        errorInfo.PropertyName = PropertyName;
+                        uploadDTO.Errors.Add(errorInfo);
+                        errorflag = true;
+                    }
+
+
 
                     var checkTxnid = _context.TblPolicyMonthlySi.Any(x=>x.Txnid == txnid);
 
@@ -5585,7 +5613,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         ErrorInfo errorInfo = new ErrorInfo();
 
                         errorInfo.ErrorMessage = "No Such TxnId";
-                        errorInfo.ErrorCode = "MSI004";
+                        errorInfo.ErrorCode = "MSI007";
                         errorInfo.PropertyName = PropertyName; 
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;                       
@@ -5600,7 +5628,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         {
                             ErrorInfo errorInfo = new ErrorInfo();
                             errorInfo.ErrorMessage = "Data is Already Updated for this Txn Id Duplicate Record";
-                            errorInfo.ErrorCode = "MSI004";
+                            errorInfo.ErrorCode = "MSI008";
                             errorInfo.PropertyName = PropertyName;
                             uploadDTO.Errors.Add(errorInfo);
                             errorflag = true;
@@ -5614,7 +5642,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 ErrorInfo errorInfo = new ErrorInfo();
 
                                 errorInfo.ErrorMessage = "Pay Amount is Less Than the Billed Amount";
-                                errorInfo.ErrorCode = "MSI003";
+                                errorInfo.ErrorCode = "MSI009";
                                 errorInfo.PropertyName = PropertyName;
                                 uploadDTO.Errors.Add(errorInfo);
                                 errorflag = true;
