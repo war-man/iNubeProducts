@@ -5591,8 +5591,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;                       
                     }
-
-
                     if (paymentDate == null)
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
@@ -5603,9 +5601,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         uploadDTO.Errors.Add(errorInfo);
                         errorflag = true;
                     }
-
-
-
+                                       
                     var checkTxnid = _context.TblPolicyMonthlySi.Any(x=>x.Txnid == txnid);
 
                     if (checkTxnid == false)
