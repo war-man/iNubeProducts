@@ -472,6 +472,7 @@ namespace iNube.Services.Partners.Models
         public DateTime? ModifiedDate { get; set; }
 
         public decimal MovementId { get; set; }
+        public decimal? MovementStatusId { get; set; }
     }
 
     public partial class AvoOrgPositions

@@ -356,7 +356,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           CreatedDate = emp.CreatedDate,
                           ModifiedBy = emp.ModifiedBy,
                           ModifiedDate = emp.ModifiedDate,
-                          MovementId = mov.MovementId
+                          MovementId = mov.MovementId,
+                          MovementStatusId = mov.MovementStatusId
 
                       };
           //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
