@@ -32,9 +32,9 @@ const MyUploader = (props) => {
        
         $.ajax({
             type: "POST",
-           // url: "http://localhost:53000/api/DMS/Documentupload/Documentupload",
-            url: `https://inubeservicesnotification.azurewebsites.net/api/DMS/Documentupload/Documentupload`,
-       
+          
+            url: `${ClaimConfig.NotificationUrl}/api/DMS/Documentupload/Documentupload`,
+
             contentType: false,
             processData: false,
 

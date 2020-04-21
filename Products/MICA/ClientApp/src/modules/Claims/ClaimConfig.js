@@ -12,12 +12,14 @@ let claimConfigUrl = config.claimConfigUrl;
 let productConfigUrl = config.productConfigUrl;
 let partnerconfigUrl = config.partnerconfigUrl;
 let policyconfigUrl = config.policyconfigUrl;
+let NotificationUrl = config.NotificationUrl;
 
 export const ClaimConfig = {
     claimConfigUrl,
     productConfigUrl,
     partnerconfigUrl,
-    policyconfigUrl
+    policyconfigUrl,
+    NotificationUrl
 }
 
 export default ClaimConfig

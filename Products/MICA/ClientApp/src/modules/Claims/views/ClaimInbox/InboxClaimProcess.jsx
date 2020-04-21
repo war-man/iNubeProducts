@@ -410,6 +410,7 @@ class InboxClaimProcess extends React.Component {
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
         this.handleAmountValidation();
+ 
         if (this.state.approveamtvalidation === true) {
             if (this.state.validateUI === true) {
                 if (this.state.ValidationUI === true) {
@@ -444,9 +445,9 @@ class InboxClaimProcess extends React.Component {
                     console.log("ClaimData", this.state.claimTableData);
 
                     for (var i = 0; i < this.state.claimTableData.length; i++) {
-                        if (this.state.claimTableData[i].approvedClaimAmounts != null) {
+                        //if (this.state.claimTableData[i].approvedClaimAmounts != null) {
                             this.state.DataAmount.push(this.state.claimTableData[i]);
-                        }
+                        //}
                     }
                     detailsdto['ClaimInsurable'] = this.state.DataAmount;
 
@@ -754,6 +755,7 @@ class InboxClaimProcess extends React.Component {
     }
 
     onModelChange = (evt, name) => {
+
         let BankDataModelDTO = this.state.BankDataModelDTO;
         let data = BankDataModelDTO[name];
         data.type = name;
@@ -769,6 +771,7 @@ class InboxClaimProcess extends React.Component {
     };
 
     oncustomerselect = () => {
+ 
         let bank = this.state.BankDataModelDTO;
         let bankdata = this.state.Bankdata.Customer;
         let cbank = this.state.BankDetails;
@@ -1495,6 +1498,7 @@ class InboxClaimProcess extends React.Component {
     }
 
     handleCheckbox = (event, name, i) => {
+ 
         let element = this.state.Bankarray;
         if (event.target.checked == true) {
             if (name != "Customer") {
