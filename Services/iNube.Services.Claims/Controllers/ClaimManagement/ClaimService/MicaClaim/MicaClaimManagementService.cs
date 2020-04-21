@@ -2429,7 +2429,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.InsuredEmail = pk[0].Email;
                     item.InsuredMobileNo = pk[0].MobileNumber;
                     item.ProductIdPk = pk[0].ProductIdPk;
-                    item.ClaimStatusDate = item.ModifiedDate;
+                   
                 }
                 catch (Exception ex)
                 {

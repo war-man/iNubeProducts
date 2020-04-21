@@ -168,8 +168,7 @@ namespace iNube.Services.Claims.Models
         public int? ProductIdPk { get; set; }
         public string LocationOfEvent { get; set; }
         public int? ClaimAmount { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public string ClaimManagerRemarks { get; set; }
+        public string ClaimRemarks { get; set; }
         public DateTime? ClaimStatusDate { get; set; }
 
     }
