@@ -44,6 +44,8 @@ const MyUploader = (props) => {
                 /* Authorization header */
                 xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
             },
+
+
             success: function (data) {
                 console.log("datamongo", data);
                 props.docidfunc(data);
