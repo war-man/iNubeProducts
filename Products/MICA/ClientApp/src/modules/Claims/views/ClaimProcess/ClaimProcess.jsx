@@ -1179,7 +1179,6 @@ class ClaimProcess extends React.Component {
 
     documentLinkView = (dmsdocId) => {
         let that = this;
-
         fetch(`${ClaimConfig.NotificationUrl}/api/DMS/DownloadView?id=` + dmsdocId, {
 
             method: 'get',

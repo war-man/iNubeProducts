@@ -75,8 +75,7 @@ const ClaimDetails = (props) => {
     const claimDetailsprops = props.componentData;
     //console.log('claimDetailsprops.typeList', claimDetailsprops.typeList);
     console.log("claimDetailsprops.ClaimStatusData", claimDetailsprops.ClaimStatusData);
-    // const claimAmountData = props;
-
+    
     return (
         <div>
 

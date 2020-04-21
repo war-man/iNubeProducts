@@ -1013,8 +1013,7 @@ class ClaimEnquiry extends React.Component {
 
     documentLinkView = (dmsdocId) => {
         console.log("1234567", dmsdocId);
-        //fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid + `&isDoc=` + isDoc, {
-
+       
         fetch(`${ClaimConfig.NotificationUrl}/api/DMS/DownloadView?id=` + dmsdocId, {
 
             method: 'get',

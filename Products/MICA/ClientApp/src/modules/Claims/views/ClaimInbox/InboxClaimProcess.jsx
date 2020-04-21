@@ -1268,7 +1268,7 @@ class InboxClaimProcess extends React.Component {
     }
 
     documentLinkView = (dmsdocId) => {
-        //this.setState({ openpop: true });
+       
         console.log("1234567", dmsdocId);
        
         fetch(`${ClaimConfig.NotificationUrl}/api/DMS/DownloadView?id=` + dmsdocId, {
