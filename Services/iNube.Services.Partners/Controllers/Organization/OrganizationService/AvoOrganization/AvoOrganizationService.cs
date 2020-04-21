@@ -330,14 +330,38 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return ddDTOs;
         }
 
-        public async Task<IEnumerable<AvoOrgEmployee>> GetEmployeeDetails(ApiContext apiContext)
+        public async Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
-            var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployee>>(Emp);
+          //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
 
-            return employeeList;
+            var Emp = from emp in _context.TblOrgEmployee
+                      join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
+                      select new AvoOrgEmployeeSearch
+                      {
+                          OrgEmpId = emp.OrgEmpId,
+                          StaffCode = emp.StaffCode,
+                          StaffName = emp.StaffName,
+                          PositionId = emp.PositionId,
+                          Email = emp.Email,
+                          PhoneNumber = emp.PhoneNumber,
+                          StaffTypeId = emp.StaffTypeId,
+                          Function = emp.Function,
+                          AppointmentDate = emp.AppointmentDate,
+                          Smcode = emp.Smcode,
+                          Imdcode = emp.Imdcode,
+                          StaffStatus = emp.StaffStatus,
+                          CreatedBy = emp.CreatedBy,
+                          CreatedDate = emp.CreatedDate,
+                          ModifiedBy = emp.ModifiedBy,
+                          ModifiedDate = emp.ModifiedDate,
+                          MovementId = mov.MovementId
+
+                      };
+          //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
+
+            return Emp;
         }
     }
 }

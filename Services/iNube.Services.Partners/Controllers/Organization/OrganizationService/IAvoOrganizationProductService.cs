@@ -19,6 +19,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<IEnumerable<AVOOrganizationDTO>> GetOrgByParentId(int orgid, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetOrgDropdown(ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetOffbyOrgid(int orgid,ApiContext apiContext);
-        Task<IEnumerable<AvoOrgEmployee>> GetEmployeeDetails(ApiContext apiContext);
+        Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(ApiContext apiContext);
     }
 }
