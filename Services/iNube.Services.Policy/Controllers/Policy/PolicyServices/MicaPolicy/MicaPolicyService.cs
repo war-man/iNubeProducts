@@ -3765,16 +3765,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
         public async Task<List<PolicyDetails>> GetAllPolicy(string productCode, ApiContext apiContext)
         {
-
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
             if (productDetails != null)
             {
                 var policydata = _context.TblPolicy.Where(x => (x.IsActive == true && x.ProductIdPk == productDetails.ProductId && x.PolicyNo != null)).
-                    Select(s => new PolicyDetails
+                    Select(s => new
                     {
-
+                        policyid = s.PolicyId,
                         PolicyNumber = s.PolicyNo,
                         SumInsured = s.SumInsured,
                         PolicyStartDate = s.PolicyStartDate.ToString(),
@@ -3784,8 +3783,38 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
                     )
                     .ToList();
+                List<PolicyDetails> PolicyDataList = new List<PolicyDetails>();
+                PolicyDetails PolicyDetailsobj = new PolicyDetails();
+                if (policydata.Count > 0)
+                {
 
-                return policydata;
+                    foreach (var item in policydata)
+                    {
+
+                        PolicyDetailsobj = new PolicyDetails();
+                        PolicyDetailsobj.PolicyNumber = item.PolicyNumber;
+                        PolicyDetailsobj.SumInsured = item.SumInsured;
+                        PolicyDetailsobj.PolicyStartDate = item.PolicyStartDate.ToString();
+                        PolicyDetailsobj.PolicyEndDate = item.PolicyEndDate.ToString();
+                        PolicyDetailsobj.PremiumAmount = item.PremiumAmount;
+
+                        var policydetails = _context.TblPolicyDetails.FirstOrDefault(p => p.PolicyId == item.policyid);
+                        if (policydetails != null)
+                        {
+                            var json = JsonConvert.DeserializeObject<dynamic>(policydetails.PolicyRequest);
+                            if (json["billingFrequency"] != null)
+                            {
+                                PolicyDetailsobj.BillingFrequency = json["billingFrequency"];
+                            }
+
+
+                        }
+                        PolicyDataList.Add(PolicyDetailsobj);
+                    }
+
+                }
+
+                return PolicyDataList;
 
 
 

@@ -589,6 +589,7 @@ namespace iNube.Services.Policy.Models
         public string ProductName { get; set; }
         public decimal? PremiumAmount { get; set; }
         public decimal? SumInsured { get; set; }
+        public string BillingFrequency { get; set; }
     }
     public class ProductsModel
     {
