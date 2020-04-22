@@ -875,7 +875,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             catch (Exception ex)
             {
-               
+
 
             }
             return true;
@@ -888,7 +888,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 email.mailTo.Add(emailTest.To);
                 email.Subject = emailTest.Subject;
                 email.Message = emailTest.Message;
-                var res =await  _integrationService.SendEmailAsync(email, apiContext);
+                var res = await _integrationService.SendEmailAsync(email, apiContext);
             }
             catch (Exception ex)
             {
@@ -1081,7 +1081,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 manangerEmail.To = _claimAllocationDetailsDTO.EmailId;
                 manangerEmail.Subject = "Claim Number " + claims.ClaimNumber + "  is allocated to you on " + claims.CreatedDate.Value.ToShortDateString();
                 manangerEmail.Message = " Dear Sir/Madam " + " \n\n Vehicle Number " + vehiclenumber + " is damaged on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n\n Thanks ";
-                await SendEmailAsync(manangerEmail,apiContext);
+                await SendEmailAsync(manangerEmail, apiContext);
             }
             //Models.SMSRequest request = new Models.SMSRequest();
             //request.RecipientNumber = "8197521528";
@@ -1719,7 +1719,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                 DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
                 var ClaimApproval = _context.TblClaims.SingleOrDefault(x => x.ClaimNumber == claimsDTO.ClaimNumber);
-               // var oldClaimApproval= _context.TblClaims.SingleOrDefault(x => x.ClaimNumber == claimsDTO.ClaimNumber);
+                // var oldClaimApproval= _context.TblClaims.SingleOrDefault(x => x.ClaimNumber == claimsDTO.ClaimNumber);
                 if (ClaimApproval != null)
                 {
                     var Insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == claimsDTO.ClaimId).ToList();
@@ -1730,7 +1730,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     var oldstatusId = ClaimApproval.ClaimStatusId;
 
                     //adding new record to tblhistory on updating claimstatus of existing claim from tblclaims
-                  claimsHistory.ClaimId = ClaimApproval.ClaimId;
+                    claimsHistory.ClaimId = ClaimApproval.ClaimId;
                     //claimsHistory.ClaimStatusId = claimsDTO.ClaimStatusId;
                     claimsHistory.ClaimStatusId = oldstatusId;
                     claimsHistory.ClaimAmount = ClaimApproval.ClaimAmount;
@@ -1831,7 +1831,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     }
                     foreach (var item in Insurable)
                     {
-                        
+
                         // item.ApprovedClaimAmounts = claimsDTO.ApprovedClaimAmounts ;
                         var approveclaim = claimsDTO.ClaimInsurable.FirstOrDefault(x => x.ClaimInsurableId == item.ClaimInsurableId);
 
@@ -1851,7 +1851,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         }
 
                     }
-                        foreach (var item in claimsDTO.Alldoc)
+                    foreach (var item in claimsDTO.Alldoc)
                     {
                         TblClaimdoc Claimdoc = new TblClaimdoc();
 
@@ -1864,7 +1864,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                     }
 
-            
+
 
                     _context.SaveChanges();
 
@@ -1880,11 +1880,22 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                     //Accouting Transaction 
                     var account = AccountMapApproval(apiContext, claimsDTO);
-                    ClaimProcessResponseDTO claimProcess = new ClaimProcessResponseDTO() { Status = BusinessStatus.Updated, ResponseMessage = "Claim Processed successfully! \n Your Claim Number: " + claimsDTO.ClaimNumber };
-                    claimProcess.ClaimProcess = _claimprocess;
-                    return claimProcess;
+                    if (claimsprocess.ClaimStatusId == 39)
+                    {
+                        ClaimProcessResponseDTO claimProcess = new ClaimProcessResponseDTO() { Status = BusinessStatus.Updated, ResponseMessage = "Claim Rejected! \n Your Claim Number: " + claimsDTO.ClaimNumber };
+                        claimProcess.ClaimProcess = _claimprocess;
+                        return claimProcess;
+                    }
+                    else
+                    {
+                        ClaimProcessResponseDTO claimProcess = new ClaimProcessResponseDTO() { Status = BusinessStatus.Updated, ResponseMessage = "Claim Processed successfully! \n Your Claim Number: " + claimsDTO.ClaimNumber };
+                        claimProcess.ClaimProcess = _claimprocess;
+                        return claimProcess;
+                    }
+                    
                 }
-                else {
+                else
+                {
                     return new ClaimProcessResponseDTO() { Status = BusinessStatus.NotFound, ResponseMessage = $"No record Found for this Claim Number:{claimsDTO.ClaimNumber}" };
                 }
             }
@@ -2429,7 +2440,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.InsuredEmail = pk[0].Email;
                     item.InsuredMobileNo = pk[0].MobileNumber;
                     item.ProductIdPk = pk[0].ProductIdPk;
-                   
+
                 }
                 catch (Exception ex)
                 {
