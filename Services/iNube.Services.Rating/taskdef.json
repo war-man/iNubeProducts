@@ -9,7 +9,6 @@
       "image": "<IMAGE1_NAME>",
 
       "cpu": 512,
-      "memory": 1024,
       "memoryReservation": 128,
       "logConfiguration": {
         "logDriver": "awslogs",
