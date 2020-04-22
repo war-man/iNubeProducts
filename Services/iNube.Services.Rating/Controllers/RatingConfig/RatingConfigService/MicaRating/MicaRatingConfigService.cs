@@ -558,13 +558,18 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             List<CalculationResult> calcultion = new List<CalculationResult>();
             try
             {
+                _logger.LogRequest("Rating", "Rating", response.ToString(), "_context---Before", new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
-            
+
             if (_context == null)
             {
                 _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             }
-            var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId)).OrderBy(it =>it.Steps);
+
+                _logger.LogRequest("Rating", "Rating", _context.ToString(), "_context---After", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+
+
+                var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId)).OrderBy(it =>it.Steps);
             //For ODSI RUles
             var CalculationConigParam = _context.TblCalculationConfigParam.Where(item => item.Type == "Rate" && item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId));
 
@@ -729,7 +734,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             }
             catch (Exception ex)
             {
-               // _logger.LogError(ex, "RatingConfig", MethodBase.GetCurrentMethod().Name, null, null, apiContext);
+                // _logger.LogError(ex, "RatingConfig", MethodBase.GetCurrentMethod().Name, null, null, apiContext);
+                _logger.LogRequest("Rating", "Rating", ex.ToString(), "CatchBlock-Rating-Final", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+
                 errorResponse.ResponseMessage = "Incorrect Input Parameter";
                 return errorResponse;
             }

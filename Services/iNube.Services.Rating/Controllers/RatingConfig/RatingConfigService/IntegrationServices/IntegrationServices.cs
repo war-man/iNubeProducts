@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.IntegrationServices
 {
@@ -34,13 +35,23 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
         }
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
+            LoggerManager logger = new LoggerManager(_configuration);
+
             var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
-            return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+            var result = await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+            logger.LogRequest("Rating", "Rating", result.Dbconnection, "Final Return in integration Call--DB Return", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
+            return result;
+
         }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-           // HttpClient client = new HttpClient();
+            LoggerManager logger = new LoggerManager(_configuration);
+
+            logger.LogRequest("Rating", "Rating", url , "GetApiInvoke---First--Url", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+
+
+            // HttpClient client = new HttpClient();
             if (!string.IsNullOrEmpty(apiContext.Token))
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
