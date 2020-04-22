@@ -398,6 +398,25 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
            
         }
 
-       
+        public async Task<IEnumerable<ddDTO>> GetNewBranchDropdown(int posid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
+
+            var Emp = from emp in _context.TblOrgEmployee
+                      join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
+                      join off in _context.TblOrgOffice on pos.OrganizationId equals off.OrganizationId
+                      select new ddDTO
+                      {
+                          mID = Convert.ToInt32(off.OrgOfficeId),
+                          mValue = off.OfficeName,
+
+                      };
+            //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
+
+            return Emp;
+        }
+
     }
 }

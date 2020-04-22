@@ -254,5 +254,13 @@ namespace iNube.Services.Partners.Controllers.Organization
 
         }
 
+        //  || AVO
+        [HttpGet]
+        public async Task<IActionResult> GetNewBranchDropdown(int posid)
+        {
+            var response = await _avoorgService.GetNewBranchDropdown(posid, Context);
+            return Ok(response);
+        }
+
     }
 }
