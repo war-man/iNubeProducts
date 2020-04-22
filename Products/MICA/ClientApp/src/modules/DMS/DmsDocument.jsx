@@ -359,7 +359,7 @@ class DmsDocument extends React.Component {
                             {this.state.showDropZone ?
                                 <GridItem xs={12}>
                                     <Dropzone
-                                        getUploadParams={this.getUploadParams}
+                                       // getUploadParams={this.getUploadParams}
                                         onChangeStatus={this.handleChangeStatus}
                                         onSubmit={this.uploadfile}
                                         accept="image/*,audio/*,video/*,application/pdf/*,word/*"

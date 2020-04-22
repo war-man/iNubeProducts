@@ -83,7 +83,7 @@ const MyUploader = (props) => {
             <GridItem xs={12}>
                 <Dropzone
                     maxFiles={1}
-                    getUploadParams={getUploadParams}
+                    //getUploadParams={getUploadParams}
                     onChangeStatus={handleChangeStatus}
                     onSubmit={handleSubmit}
                 //accept="image/*,audio/*,video/*,application/pdf/*,word/*"
