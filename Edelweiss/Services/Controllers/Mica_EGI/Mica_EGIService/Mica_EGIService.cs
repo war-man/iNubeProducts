@@ -4903,6 +4903,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
 
+           
             PolicyNumberList.Distinct();
 
             //Step-2:Start the Loop Based On Policy Number
@@ -4915,6 +4916,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     continue;
                 }
 
+                var BillingFrequency = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).BillingFrequency;
+
+
+                if (BillingFrequency != "Monthly")
+                {
+                    continue;
+                }
 
                 TblPolicyMonthlySi monthlySiDTO = new TblPolicyMonthlySi();
 
