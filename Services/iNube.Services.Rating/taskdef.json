@@ -10,6 +10,12 @@
 
       "cpu": 1024,
       "memory": 3048,
+      "environment": [
+        {
+          "name": "ASPNETCORE_ENVIRONMENT",
+          "value": "EdUat"
+        }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
