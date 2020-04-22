@@ -25,7 +25,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
-        public AccountConfigController(IAccountConfigService accountService,IMapper mapper, IOptions<AppSettings> appSettings
+        public AccountConfigController(IAccountConfigService accountService, IMapper mapper, IOptions<AppSettings> appSettings
             )
         {
             _accountService = accountService;
@@ -34,27 +34,27 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
         }
 
         [HttpDelete]
-        public IActionResult  DeleteCoaMapping(decimal AccountMapppingId)
+        public IActionResult DeleteCoaMapping(decimal AccountMapppingId)
         {
-            _accountService.DeleteCoaMapping(AccountMapppingId,Context);
+            _accountService.DeleteCoaMapping(AccountMapppingId, Context);
             return Ok();
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAccounts([FromBody]CoaaccountsDto tblCoaaccountDto)
         {
-                var response =await _accountService.CreateAccounts(tblCoaaccountDto, Context);
-                switch (response.Status)
-                {
-                    case BusinessStatus.InputValidationFailed:
-                        return Ok(response);
-                    case BusinessStatus.Created:
-                        return Ok(response);
-                    case BusinessStatus.UnAuthorized:
-                        return Unauthorized();
-                    default:
-                        return Forbid();
-                }
+            var response = await _accountService.CreateAccounts(tblCoaaccountDto, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                default:
+                    return Forbid();
+            }
         }
 
         [HttpPost]
@@ -129,13 +129,13 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
         public async Task<IActionResult> SearchAccount(AccountSearchDetailsDto searchdto)
         {
             var response = await _accountService.SearchAccount(searchdto, Context);
-            if(response != null)
+            if (response != null)
             {
                 return Ok(response);
             }
             return NotFound();
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> SearchCOAMapping(CoaMappingSearchDto searchdto)
         {
@@ -150,7 +150,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
         [HttpPost]
         public async Task<IActionResult> SearchTransactionAccount(TransactionSearchAccountDto searchdto, DateTime fromDate, DateTime toDate)
         {
-            var response = await _accountService.SearchTransactionAccount(searchdto,fromDate,toDate, Context);
+            var response = await _accountService.SearchTransactionAccount(searchdto, fromDate, toDate, Context);
             if (response != null)
             {
                 return Ok(response);
@@ -190,7 +190,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
             }
             return NotFound();
         }
-        
+
         [HttpPut]
         public async Task<IActionResult> ModifyCoaAccount(int AccountId, CoaaccountsDto accountDto)
         {
@@ -226,7 +226,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
             }
             return NotFound();
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetCOAMappingById(decimal accountMappingId)
         {
@@ -253,7 +253,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
         [HttpGet]
         public async Task<IActionResult> GetTransactionDetails()
         {
-            var transactionDtos =await _accountService.GetTransactionDetails(Context);
+            var transactionDtos = await _accountService.GetTransactionDetails(Context);
             return Ok(transactionDtos);
         }
         [HttpGet]
@@ -266,52 +266,61 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig
         [HttpGet]
         public async Task<IActionResult> GetTransactionMappingDetails()
         {
-            var accountTransactionMapDtos =await _accountService.GetTransactionRuleMappingCondition(Context);
+            var accountTransactionMapDtos = await _accountService.GetTransactionRuleMappingCondition(Context);
             return Ok(accountTransactionMapDtos);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetJournalEntryDetailsGrid()
         {
-            var accountJournalEntryDtos =await _accountService.GetJournalEnntryDetails(Context);
+            var accountJournalEntryDtos = await _accountService.GetJournalEnntryDetails(Context);
             return Ok(accountJournalEntryDtos);
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetCoaMappingDetails()
         {
-            var accountCoaMappingDtos =await _accountService.GetCoaMappingDetails(Context);
+            var accountCoaMappingDtos = await _accountService.GetCoaMappingDetails(Context);
             return Ok(accountCoaMappingDtos);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllAccountWithType()
         {
-            var accountListData =await _accountService.GetAccountDetails(Context);
+            var accountListData = await _accountService.GetAccountDetails(Context);
             return Ok(accountListData);
         }
 
 
-        
+
         ////Excel Upload For COAMapping
         [HttpPost]
         public async Task<IActionResult> ImportExcelCOAMapping(IFormFile formFile, CancellationToken cancellationToken)
         {
-            await _accountService.Import(formFile, cancellationToken,Context);
+            await _accountService.Import(formFile, cancellationToken, Context);
             return Ok();
 
         }
-		
-		 [HttpGet]
+
+        [HttpGet]
         [AllowAnonymous]
-        public IActionResult HC() 
+        public IActionResult HC()
         {
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
 
-        
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HCTest()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+
+
+        }
     }
-}
+
+    }
 
  
