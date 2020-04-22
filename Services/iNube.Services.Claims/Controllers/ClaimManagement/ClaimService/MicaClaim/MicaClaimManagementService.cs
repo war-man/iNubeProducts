@@ -1710,6 +1710,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
         {
 
             _context = (MICACMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
             try
             {
 
@@ -1775,42 +1776,48 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     claimsprocess.ClaimStatusId = claimsDTO.ClaimStatusId;
                     claimsprocess.ClaimManagerRemarks = claimsDTO.ClaimManagerRemarks;
                     claimsprocess.ApprovedClaimAmount = claimsDTO.ApprovedClaimAmount;
-
-                    foreach (var item in claimsDTO.DataModelDTO)
+                    ErrorInfo errorInfo = null;
+                    if (claimsprocess.ClaimStatusId == 38 && (claimsDTO.DataModelDTO == null || claimsDTO.DataModelDTO.Count == 0))
                     {
-                        //if (item.type.ToString() == "Customer")
-                        //{
-                        //    var custBankdetail = _context.TblBankAccounts.FirstOrDefault(x => x.ClaimId == claimsDTO.ClaimId && x.PayeeType == "Customer");
-                        //    custBankdetail.AccountHolderName = item["Account Holder Name"];
-                        //    custBankdetail.AccountNumber = item["Account No."];
-                        //    custBankdetail.ClaimId = ClaimApproval.ClaimId;
-                        //    custBankdetail.BankBranchAddress = item["Bank Branch Address"];
-                        //    custBankdetail.BankName = item["Bank Name"];
-                        //    custBankdetail.Ifsccode = item["IFSC Code"];
-                        //    custBankdetail.AccountType = item["Account Type"];
-                        //    custBankdetail.AmountPaid = item["Amount Paid"];
-                        //    custBankdetail.DataOfPayment = item["Date Of Payment"];
-                        //    _context.TblBankAccounts.Update(custBankdetail);
-                        //}
-                        //else
-                        //{
-                        TblClaimPayments claimPayments = new TblClaimPayments();
-                        claimPayments.AccountHolderName = item["Account Holder Name"];
-                        claimPayments.AccountNumber = item["Account No."];
-                        claimPayments.ClaimId = ClaimApproval.ClaimId;
-                        claimPayments.BankBranchAddress = item["Bank Branch Address"];
-                        claimPayments.BankName = item["Bank Name"];
-                        claimPayments.Ifsccode = item["IFSC Code"];
-                        claimPayments.AccountType = item["Account Type"];
-                        claimPayments.AmountPaid = item["Amount Paid"];
-                        claimPayments.DataOfPayment = item["Date Of Payment"];
-                        claimPayments.PayeeType = item.type;
-                        _context.TblClaimPayments.Add(claimPayments);
-                        //}
+                        return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Claims Process Fails-Payee Details is not provided" };
+                    }
+                    if (claimsDTO.DataModelDTO != null)
+                    {
+                        foreach (var item in claimsDTO.DataModelDTO)
+                        {
+                            TblClaimPayments claimPayments = new TblClaimPayments();
+                            claimPayments.AccountHolderName = item["Account Holder Name"];
+                            claimPayments.AccountNumber = item["Account No."];
+                            claimPayments.ClaimId = ClaimApproval.ClaimId;
+                            claimPayments.BankBranchAddress = item["Bank Branch Address"];
+                            claimPayments.BankName = item["Bank Name"];
+                            claimPayments.Ifsccode = item["IFSC Code"];
+                            claimPayments.AccountType = item["Account Type"];
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Amount Paid"])))
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "Amount", ErrorMessage = "Amount Paid Cannot be null" };
+                                Errors.Add(errorInfo);
+                            }
+                            else
+                            {
+                                claimPayments.AmountPaid = item["Amount Paid"];
+                            }
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Date Of Payment"])))
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "Date", ErrorMessage = "Date Of Payment Cannot be null" };
+                                Errors.Add(errorInfo);
+                            }
+                            else
+                            {
+                                claimPayments.DataOfPayment = item["Date Of Payment"];
+                            }
+
+                            claimPayments.PayeeType = item.type;
+                            _context.TblClaimPayments.Add(claimPayments);
+                        }
+
                     }
 
-
-                    _context.TblClaims.Update(claimsprocess);
                     //_context.SaveChanges();
                     if (!string.IsNullOrEmpty(claimsDTO.EmailId))
                     {
@@ -1819,14 +1826,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                             emailTest.To = claimsDTO.EmailId;
                             emailTest.Subject = "Claim successfully approved";
                             emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " successfully approved. \n Your Claim has been approved, by the Claims Manager. \n The Approved Claims will be settled as per the policy terms and conditions.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
-                            await SendEmailAsync(emailTest);
+                            await SendEmailAsync(emailTest, apiContext);
                         }
                         else if (claimsprocess.ClaimStatusId == 11)
                         {
                             emailTest.To = claimsDTO.EmailId;
                             emailTest.Subject = "Claim Rejected";
                             emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " has been rejected. \n Your Claim has been rejected, by the Claims Manager. \n We regret to inform you that your claim has been Rejected by the claims manager.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
-                            await SendEmailAsync(emailTest);
+                            await SendEmailAsync(emailTest, apiContext);
                         }
                     }
                     foreach (var item in Insurable)
@@ -1863,9 +1870,12 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         // _context.SaveChanges();
 
                     }
+                    if (Errors.Count > 0)
+                    {
+                        return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Claims Process Fails" };
+                    }
 
-
-
+                    _context.TblClaims.Update(claimsprocess);
                     _context.SaveChanges();
 
                     var amount = (decimal)claimsprocess.ApprovedClaimAmount;
@@ -1879,7 +1889,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     }
 
                     //Accouting Transaction 
-                    var account = AccountMapApproval(apiContext, claimsDTO);
+                    try
+                    {
+                        var account = AccountMapApproval(apiContext, claimsDTO);
+                    }
+                    catch (Exception ex)
+                    {
+                        //Accounting Log Fail...
+
+                    }
+
                     if (claimsprocess.ClaimStatusId == 39)
                     {
                         ClaimProcessResponseDTO claimProcess = new ClaimProcessResponseDTO() { Status = BusinessStatus.Updated, ResponseMessage = "Claim Rejected! \n Your Claim Number: " + claimsDTO.ClaimNumber };
@@ -1892,7 +1911,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         claimProcess.ClaimProcess = _claimprocess;
                         return claimProcess;
                     }
-                    
+
                 }
                 else
                 {
@@ -1901,7 +1920,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
             catch (Exception ex)
             {
-                return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, ResponseMessage = "Error Details" + ex.ToString() };
+                return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, ResponseMessage = "Claims Process Fails" };
             }
         }
 
