@@ -6,7 +6,7 @@ const MyUpload = () => {
 
     // specify upload params and url for your files
 
-    const getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
+   // const getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
 
 
 
@@ -28,7 +28,7 @@ const MyUpload = () => {
 
         <Dropzone
 
-            getUploadParams={getUploadParams}
+          //  getUploadParams={getUploadParams}
 
             onChangeStatus={handleChangeStatus}
 

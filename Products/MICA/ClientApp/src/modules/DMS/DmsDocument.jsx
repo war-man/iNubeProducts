@@ -80,7 +80,7 @@ class DmsDocument extends React.Component {
         console.log("name", evt.target.name);
     };
 
-    getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
+    //getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
 
     handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
 

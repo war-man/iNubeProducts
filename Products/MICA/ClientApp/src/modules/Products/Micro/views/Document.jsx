@@ -11,7 +11,7 @@ const MyUploader = (props) => {
 
     console.log("doc props ", props)
     // specify upload params and url for your files
-    const getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
+   // const getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
 
     // called every time a file's `status` changes
     const handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
