@@ -249,7 +249,7 @@ namespace iNube.Services.Partners.Models
 
     public class CreateOfficeResponse : ResponseStatus
     {
-        
+
     }
 
     public partial class AVOOrgOffice
@@ -498,7 +498,7 @@ namespace iNube.Services.Partners.Models
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? IsVacant { get; set; }
-        public bool? IsActive { get; set; } 
+        public bool? IsActive { get; set; }
     }
     #endregion
 
@@ -1585,6 +1585,82 @@ namespace iNube.Services.Partners.Models
         public DateTime? ToDate { get; set; }
 
     }
+
+    public partial class AVOOrgEmployee
+    {
+        public AVOOrgEmployee()
+        {
+            AVOOrgEmpAddress = new HashSet<AVOOrgEmpAddress>();
+            AVOOrgEmpEducation = new HashSet<AVOOrgEmpEducation>();
+        }
+
+        public decimal OrgEmpId { get; set; }
+        public string StaffCode { get; set; }
+        public string StaffName { get; set; }
+        public decimal? PositionId { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public decimal? StaffTypeId { get; set; }
+        public string Function { get; set; }
+        public DateTime? AppointmentDate { get; set; }
+        public string Smcode { get; set; }
+        public string Imdcode { get; set; }
+        public string StaffStatus { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public int? SalutationId { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public DateTime? Dob { get; set; }
+        public DateTime? DateOfJoining { get; set; }
+        public int? MaritalStatusId { get; set; }
+        public int? GenderId { get; set; }
+        public string PhoneNumber1 { get; set; }
+        public string BankName { get; set; }
+        public string BranchName { get; set; }
+        public string AccountNumber { get; set; }
+
+        // public virtual AVOOrgPositions Position { get; set; }
+        public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
+        public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
+    }
+
+    public partial class AVOOrgEmpAddress
+    {
+        public decimal EmpAddressId { get; set; }
+        public decimal? OrgEmpId { get; set; }
+        public string EmpAddressType { get; set; }
+        public int? EmpCountryId { get; set; }
+        public int? EmpStateId { get; set; }
+        public int? EmpDistrictId { get; set; }
+        public int? EmpCityId { get; set; }
+        public string EmpAddressLine1 { get; set; }
+        public string EmpAddressLine2 { get; set; }
+        public string EmpAddressLine3 { get; set; }
+        public int? EmpPincodeId { get; set; }
+
+        //public virtual AVOMasCity EmpCity { get; set; }
+        //public virtual AVOMasCountry EmpCountry { get; set; }
+        //public virtual AVOMasDistrict EmpDistrict { get; set; }
+        //public virtual AVOMasPinCode EmpPincode { get; set; }
+        //public virtual AVOMasState EmpState { get; set; }
+        //public virtual AVOOrgEmployee OrgEmp { get; set; }
+    }
+
+    public partial class AVOOrgEmpEducation
+    {
+        public decimal EmpEducationId { get; set; }
+        public decimal? OrgEmpId { get; set; }
+        public string Certification { get; set; }
+        public string Year { get; set; }
+        public string GradeOrPercentage { get; set; }
+
+        //public virtual AVOOrgEmployee OrgEmp { get; set; }
+    }
+
 }
 
 

@@ -10,6 +10,7 @@ namespace iNube.Services.Partners.Entities.AVO
             TblMasPinCode = new HashSet<TblMasPinCode>();
             TblOfficeSpocDetails = new HashSet<TblOfficeSpocDetails>();
             TblOrgAddress = new HashSet<TblOrgAddress>();
+            TblOrgEmpAddress = new HashSet<TblOrgEmpAddress>();
             TblOrgOffice = new HashSet<TblOrgOffice>();
             TblOrgSpocDetails = new HashSet<TblOrgSpocDetails>();
         }
@@ -28,6 +29,7 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual ICollection<TblMasPinCode> TblMasPinCode { get; set; }
         public virtual ICollection<TblOfficeSpocDetails> TblOfficeSpocDetails { get; set; }
         public virtual ICollection<TblOrgAddress> TblOrgAddress { get; set; }
+        public virtual ICollection<TblOrgEmpAddress> TblOrgEmpAddress { get; set; }
         public virtual ICollection<TblOrgOffice> TblOrgOffice { get; set; }
         public virtual ICollection<TblOrgSpocDetails> TblOrgSpocDetails { get; set; }
     }

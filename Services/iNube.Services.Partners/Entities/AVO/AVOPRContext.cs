@@ -29,6 +29,8 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual DbSet<TblMovements> TblMovements { get; set; }
         public virtual DbSet<TblOfficeSpocDetails> TblOfficeSpocDetails { get; set; }
         public virtual DbSet<TblOrgAddress> TblOrgAddress { get; set; }
+        public virtual DbSet<TblOrgEmpAddress> TblOrgEmpAddress { get; set; }
+        public virtual DbSet<TblOrgEmpEducation> TblOrgEmpEducation { get; set; }
         public virtual DbSet<TblOrgEmployee> TblOrgEmployee { get; set; }
         public virtual DbSet<TblOrgOffice> TblOrgOffice { get; set; }
         public virtual DbSet<TblOrgOfficeHistory> TblOrgOfficeHistory { get; set; }
@@ -67,7 +69,7 @@ namespace iNube.Services.Partners.Entities.AVO
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<TblAllocationRate>(entity =>
             {
@@ -575,6 +577,101 @@ namespace iNube.Services.Partners.Entities.AVO
                     .HasConstraintName("FK_tblOrgAddress_tblOrganization");
             });
 
+            modelBuilder.Entity<TblOrgEmpAddress>(entity =>
+            {
+                entity.HasKey(e => e.EmpAddressId);
+
+                entity.ToTable("tblOrgEmpAddress", "PR");
+
+                entity.Property(e => e.EmpAddressId)
+                    .HasColumnName("EmpAddressID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.EmpAddressLine1)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmpAddressLine2)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmpAddressLine3)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EmpAddressType)
+                    .HasMaxLength(1)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OrgEmpId)
+                    .HasColumnName("OrgEmpID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.HasOne(d => d.EmpCity)
+                    .WithMany(p => p.TblOrgEmpAddress)
+                    .HasForeignKey(d => d.EmpCityId)
+                    .HasConstraintName("FK_tblOrgEmpAddress_tblMasCity");
+
+                entity.HasOne(d => d.EmpCountry)
+                    .WithMany(p => p.TblOrgEmpAddress)
+                    .HasForeignKey(d => d.EmpCountryId)
+                    .HasConstraintName("FK_tblOrgEmpAddress_tblMasCountry");
+
+                entity.HasOne(d => d.EmpDistrict)
+                    .WithMany(p => p.TblOrgEmpAddress)
+                    .HasForeignKey(d => d.EmpDistrictId)
+                    .HasConstraintName("FK_tblOrgEmpAddress_tblMasDistrict");
+
+                entity.HasOne(d => d.EmpPincode)
+                    .WithMany(p => p.TblOrgEmpAddress)
+                    .HasForeignKey(d => d.EmpPincodeId)
+                    .HasConstraintName("FK_tblOrgEmpAddress_tblMasPinCode");
+
+                entity.HasOne(d => d.EmpState)
+                    .WithMany(p => p.TblOrgEmpAddress)
+                    .HasForeignKey(d => d.EmpStateId)
+                    .HasConstraintName("FK_tblOrgEmpAddress_tblMasState");
+
+                entity.HasOne(d => d.OrgEmp)
+                    .WithMany(p => p.TblOrgEmpAddress)
+                    .HasForeignKey(d => d.OrgEmpId)
+                    .HasConstraintName("FK_tblOrgEmpAddress_tblOrgEmployee");
+            });
+
+            modelBuilder.Entity<TblOrgEmpEducation>(entity =>
+            {
+                entity.HasKey(e => e.EmpEducationId);
+
+                entity.ToTable("tblOrgEmpEducation", "PR");
+
+                entity.Property(e => e.EmpEducationId)
+                    .HasColumnName("EmpEducationID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Certification)
+                    .HasMaxLength(450)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.GradeOrPercentage)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OrgEmpId)
+                    .HasColumnName("OrgEmpID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.OrgEmp)
+                    .WithMany(p => p.TblOrgEmpEducation)
+                    .HasForeignKey(d => d.OrgEmpId)
+                    .HasConstraintName("FK_tblOrgEmpEducation_tblOrgEmployee");
+            });
+
             modelBuilder.Entity<TblOrgEmployee>(entity =>
             {
                 entity.HasKey(e => e.OrgEmpId);
@@ -590,7 +687,13 @@ namespace iNube.Services.Partners.Entities.AVO
                     .HasColumnType("numeric(18, 0)")
                     .ValueGeneratedOnAdd();
 
+                entity.Property(e => e.AccountNumber).HasMaxLength(50);
+
                 entity.Property(e => e.AppointmentDate).HasColumnType("datetime");
+
+                entity.Property(e => e.BankName).HasMaxLength(50);
+
+                entity.Property(e => e.BranchName).HasMaxLength(50);
 
                 entity.Property(e => e.CreatedBy)
                     .HasMaxLength(100)
@@ -598,10 +701,18 @@ namespace iNube.Services.Partners.Entities.AVO
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.DateOfJoining).HasColumnType("datetime");
+
+                entity.Property(e => e.Dob)
+                    .HasColumnName("DOB")
+                    .HasColumnType("datetime");
+
                 entity.Property(e => e.Email)
                     .HasColumnName("EMail")
                     .HasMaxLength(100)
                     .IsUnicode(false);
+
+                entity.Property(e => e.FirstName).HasMaxLength(50);
 
                 entity.Property(e => e.Function)
                     .HasMaxLength(100)
@@ -612,6 +723,10 @@ namespace iNube.Services.Partners.Entities.AVO
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LastName).HasMaxLength(50);
+
+                entity.Property(e => e.MiddleName).HasMaxLength(50);
+
                 entity.Property(e => e.ModifiedBy)
                     .HasMaxLength(100)
                     .IsUnicode(false);
@@ -621,6 +736,8 @@ namespace iNube.Services.Partners.Entities.AVO
                 entity.Property(e => e.PhoneNumber)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PhoneNumber1).HasMaxLength(20);
 
                 entity.Property(e => e.PositionId)
                     .HasColumnName("PositionID")

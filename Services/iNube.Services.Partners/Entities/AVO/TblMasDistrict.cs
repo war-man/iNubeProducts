@@ -10,6 +10,7 @@ namespace iNube.Services.Partners.Entities.AVO
             TblMasCity = new HashSet<TblMasCity>();
             TblOfficeSpocDetails = new HashSet<TblOfficeSpocDetails>();
             TblOrgAddress = new HashSet<TblOrgAddress>();
+            TblOrgEmpAddress = new HashSet<TblOrgEmpAddress>();
             TblOrgOffice = new HashSet<TblOrgOffice>();
             TblOrgSpocDetails = new HashSet<TblOrgSpocDetails>();
         }
@@ -27,6 +28,7 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual ICollection<TblMasCity> TblMasCity { get; set; }
         public virtual ICollection<TblOfficeSpocDetails> TblOfficeSpocDetails { get; set; }
         public virtual ICollection<TblOrgAddress> TblOrgAddress { get; set; }
+        public virtual ICollection<TblOrgEmpAddress> TblOrgEmpAddress { get; set; }
         public virtual ICollection<TblOrgOffice> TblOrgOffice { get; set; }
         public virtual ICollection<TblOrgSpocDetails> TblOrgSpocDetails { get; set; }
     }

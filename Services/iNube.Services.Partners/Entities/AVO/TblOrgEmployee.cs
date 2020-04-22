@@ -5,6 +5,12 @@ namespace iNube.Services.Partners.Entities.AVO
 {
     public partial class TblOrgEmployee
     {
+        public TblOrgEmployee()
+        {
+            TblOrgEmpAddress = new HashSet<TblOrgEmpAddress>();
+            TblOrgEmpEducation = new HashSet<TblOrgEmpEducation>();
+        }
+
         public decimal OrgEmpId { get; set; }
         public string StaffCode { get; set; }
         public string StaffName { get; set; }
@@ -21,7 +27,21 @@ namespace iNube.Services.Partners.Entities.AVO
         public DateTime? CreatedDate { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public int? SalutationId { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public DateTime? Dob { get; set; }
+        public DateTime? DateOfJoining { get; set; }
+        public int? MaritalStatusId { get; set; }
+        public int? GenderId { get; set; }
+        public string PhoneNumber1 { get; set; }
+        public string BankName { get; set; }
+        public string BranchName { get; set; }
+        public string AccountNumber { get; set; }
 
         public virtual TblOrgPositions Position { get; set; }
+        public virtual ICollection<TblOrgEmpAddress> TblOrgEmpAddress { get; set; }
+        public virtual ICollection<TblOrgEmpEducation> TblOrgEmpEducation { get; set; }
     }
 }
