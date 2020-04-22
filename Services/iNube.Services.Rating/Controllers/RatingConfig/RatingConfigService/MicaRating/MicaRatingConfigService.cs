@@ -19,6 +19,8 @@ using System.Data;
 using Newtonsoft.Json.Linq;
 using System.Dynamic;
 using Microsoft.Extensions.Configuration;
+using iNube.Utility.Framework.LogPrivider.LogService;
+using System.Reflection;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.MicaRating
 {
@@ -29,8 +31,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         private readonly AppSettings _appSettings;
         private readonly Func<string, IRatingConfigService> _ratingService;
         private IConfiguration _configuration;
-
-        public MicaRatingConfigService(Func<string, IRatingConfigService> ratingService, IMapper mapper, MICARTContext context, IConfiguration configuration,
+        private ILoggerManager _logger;
+        public MicaRatingConfigService(Func<string, IRatingConfigService> ratingService, ILoggerManager logger, IMapper mapper, MICARTContext context, IConfiguration configuration,
             IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
@@ -38,6 +40,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             _appSettings = appSettings.Value;
            /// _context = context;
             _ratingService = ratingService;
+            _logger = logger;
         }
 
         //Service COde 
@@ -552,6 +555,11 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             ResponseStatus errorResponse = new ResponseStatus();
             ResponseStatus response = new ResponseStatus();
             ResponseStatus rateresponse = new ResponseStatus();
+            List<CalculationResult> calcultion = new List<CalculationResult>();
+            try
+            {
+
+            
             if (_context == null)
             {
                 _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -594,8 +602,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 {
                     
                     //Add into dictionary here only 
-                    try
-                    {
+                    //try
+                    //{
                         dynamic sendRate = new ExpandoObject();
                         foreach (var sendDicItem in ruleParameters)
                         {
@@ -617,17 +625,17 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                         {
                             rate.Add(ConfigParamName, rateresponse.ResponseMessage);
                         }
-                    }
-                    catch(Exception ex)
-                    {
-                        errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
-                        return errorResponse;
-                    }
+                    //}
+                    //catch(Exception ex)
+                    //{
+                    //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+                    //    return errorResponse;
+                    //}
                 }
                 else
                 {
-                    try
-                    {
+                    //try
+                    //{
                         dynamic sendRate = new ExpandoObject();
                         var rating = _context.TblRating.FirstOrDefault(item => item.RateName == ConfigParamName);
                         ratingId = rating.RatingId.ToString();
@@ -638,12 +646,12 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                         {
                             rate.Add(ConfigParamName, rateresponse.ResponseMessage);
                         }
-                    }
-                    catch(Exception ex)
-                    {
-                        errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
-                        return errorResponse;
-                    }
+                    //}
+                    //catch(Exception ex)
+                    //{
+                    //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+                    //    return errorResponse;
+                    //}
                 }
             }
 
@@ -654,31 +662,31 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             string json_rate = Convert.ToString(dynamic.dictionary_rate);
             Dictionary<string, object> jsonRate_Dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json_rate);
 
-            List<CalculationResult> calcultion = new List<CalculationResult>();
+           
             foreach (var dict in jsonRate_Dictionary)
             {
                 json_Dictionary.Add(dict.Key, dict.Value);
                 calcultion.Add(new CalculationResult { Entity = dict.Key, EValue = dict.Value.ToString() });
             }
-            try
-            {
+            //try
+            //{
                 foreach (var dictrate in rate)
                 {
                     json_Dictionary.Add(dictrate.Key, dictrate.Value);
                     calcultion.Add(new CalculationResult { Entity = dictrate.Key, EValue = dictrate.Value.ToString() });
                 }
-            }
-            catch(Exception ex)
-            {
-                errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
-                return errorResponse;
-            }
+            //}
+            //catch(Exception ex)
+            //{
+            //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+            //    return errorResponse;
+            //}
 
             var expression = "";
             var resultExpression = "";
             
-            try
-            {
+            //try
+            //{
                 foreach (var rateitem in Expression)
                 {
                     
@@ -696,29 +704,35 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     //    calcultion.Add(new CalculationResult { Entity = returnVal.Key, EValue = returnVal.Value.ToString() });
                     //}
                 }
+            //}
+            //catch(Exception ex)
+            //{
+            //    //calcultion.Add(new CalculationResult { Entity = "Error", EValue = "Incorrect Input Parameter" });
+            //    //return calcultion.ToList();
+            //    errorResponse.ResponseMessage = "Incorrect Input Parameter";
+            //    return errorResponse;
+            //}
+
+                //Dictionary<string, string> myResult = new Dictionary<string, string>();
+                //foreach (var dicItem in calcultion)
+                //{
+                //    if (!myResult.ContainsKey(dicItem.Entity))
+                //    {
+                //        myResult.Add(dicItem.Entity, dicItem.EValue);
+                //    }
+                //}
+                //calcultion.Clear();
+                //foreach (var dicIyemData in myResult)
+                //{
+                //    calcultion.Add(new CalculationResult { Entity = dicIyemData.Key, EValue = dicIyemData.Value.ToString() });
+                //}
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                //calcultion.Add(new CalculationResult { Entity = "Error", EValue = "Incorrect Input Parameter" });
-                //return calcultion.ToList();
+                _logger.LogError(ex, "RatingConfig", MethodBase.GetCurrentMethod().Name, null, null, apiContext);
                 errorResponse.ResponseMessage = "Incorrect Input Parameter";
                 return errorResponse;
             }
-
-            //Dictionary<string, string> myResult = new Dictionary<string, string>();
-            //foreach (var dicItem in calcultion)
-            //{
-            //    if (!myResult.ContainsKey(dicItem.Entity))
-            //    {
-            //        myResult.Add(dicItem.Entity, dicItem.EValue);
-            //    }
-            //}
-            //calcultion.Clear();
-            //foreach (var dicIyemData in myResult)
-            //{
-            //    calcultion.Add(new CalculationResult { Entity = dicIyemData.Key, EValue = dicIyemData.Value.ToString() });
-            //}
-            
             return calcultion.ToList();
             //return reslt.ToList();
         }
