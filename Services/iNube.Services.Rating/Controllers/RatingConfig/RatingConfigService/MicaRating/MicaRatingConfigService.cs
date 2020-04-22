@@ -729,7 +729,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "RatingConfig", MethodBase.GetCurrentMethod().Name, null, null, apiContext);
+               // _logger.LogError(ex, "RatingConfig", MethodBase.GetCurrentMethod().Name, null, null, apiContext);
                 errorResponse.ResponseMessage = "Incorrect Input Parameter";
                 return errorResponse;
             }
