@@ -76,7 +76,7 @@ const MyUploader = (props) => {
             </CardHeader>
             <GridItem xs={4}>
                 <Dropzone
-                    getUploadParams={getUploadParams}
+                   // getUploadParams={getUploadParams}
                     onChangeStatus={handleChangeStatus}
                     onSubmit={handleSubmit}
                      accept="image/*"
