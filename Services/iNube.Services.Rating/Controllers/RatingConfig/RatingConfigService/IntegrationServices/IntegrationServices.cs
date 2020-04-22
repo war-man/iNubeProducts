@@ -49,8 +49,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
             LoggerManager logger = new LoggerManager(_configuration);
 
             logger.LogRequest("Rating", "Rating", url , "GetApiInvoke---First--Url", new ApiContext() { ProductType = "Mica", ServerType = "297" });
-
-
+            
             // HttpClient client = new HttpClient();
             if (!string.IsNullOrEmpty(apiContext.Token))
             {
