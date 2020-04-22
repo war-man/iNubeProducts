@@ -117,10 +117,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 var orgoffspoc = orgDTO.AVOOrgSpocDetails.FirstOrDefault();
                 TblOrgOffice orgOffice = new TblOrgOffice();
                 orgOffice.OfficeName = orgDTO.OrgName;
-                //orgOffice.OfficeCode = orgoffspoc.SpocBrachCode;
+                orgOffice.OfficeCode = orgDTO.OrganizationCode;
                 orgOffice.OfficePhoneNo = orgDTO.OrgPhoneNo;
                 orgOffice.OfficeFaxNo = orgDTO.OrgFaxNo;
-                //orgOffice.OfficeLevelId = 1;
+                orgOffice.OfficeLevelId = 0;
                 //orgOffice.OfficeReportingOfficeId = 0;
                 orgOffice.OfficeCountryId = orgoffspoc.SpoccountryId;
                 orgOffice.OfficeStateId = orgoffspoc.SpocstateId;
@@ -329,5 +329,75 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             });
             return ddDTOs;
         }
+
+        public async Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+          //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
+
+            var Emp = from emp in _context.TblOrgEmployee
+                      join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
+                      select new AvoOrgEmployeeSearch
+                      {
+                          OrgEmpId = emp.OrgEmpId,
+                          StaffCode = emp.StaffCode,
+                          StaffName = emp.StaffName,
+                          PositionId = emp.PositionId,
+                          Email = emp.Email,
+                          PhoneNumber = emp.PhoneNumber,
+                          StaffTypeId = emp.StaffTypeId,
+                          Function = emp.Function,
+                          AppointmentDate = emp.AppointmentDate,
+                          Smcode = emp.Smcode,
+                          Imdcode = emp.Imdcode,
+                          StaffStatus = emp.StaffStatus,
+                          CreatedBy = emp.CreatedBy,
+                          CreatedDate = emp.CreatedDate,
+                          ModifiedBy = emp.ModifiedBy,
+                          ModifiedDate = emp.ModifiedDate,
+                          MovementId = mov.MovementId,
+                          MovementStatusId = mov.MovementStatusId
+
+                      };
+          //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
+
+            return Emp;
+        }
+
+        public async Task<CreateOfficeResponse> CreateOffice(AVOOrgOffice aVOOrgOffice, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+
+             var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
+             var officeReportingId = data.OfficeReportingOfficeId;
+
+             var officelevelid= _context.TblOrgOffice.FirstOrDefault(a=>a.OrgOfficeId== officeReportingId).OfficeLevelId;
+            if(officelevelid==0)
+            {
+                data.OfficeLevelId = 1;
+
+            }
+            else
+            {
+
+                data.OfficeLevelId = officelevelid + 1;
+            }
+
+                _context.TblOrgOffice.Add(data);
+                _context.SaveChanges();
+                return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Office Created sucessfully " };
+            }
+            catch (Exception ex)
+            {
+
+                return new CreateOfficeResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
+            }
+           
+        }
+
+       
     }
 }

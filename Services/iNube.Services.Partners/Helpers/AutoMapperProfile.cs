@@ -85,8 +85,8 @@ namespace iNube.Services.Partners.Helpers
             .ForMember(dest => dest.TblOfficeSpocDetails, opt => opt.MapFrom(src => src.AVOOfficeSpocDetails)).ReverseMap();
             //.ForMember(dest => dest.TblOrgOfficeMappingPrimaryOffice, opt => opt.MapFrom(src => src.AVOOrgOfficeMapping)).ReverseMap();
 
-            CreateMap<OfficeSpocDetailsDTO, Entities.AVO.TblOfficeSpocDetails>();
-            CreateMap<Entities.AVO.TblOfficeSpocDetails, OfficeSpocDetailsDTO>();
+            CreateMap<AVOOfficeSpocDetails, Entities.AVO.TblOfficeSpocDetails>();
+            CreateMap<Entities.AVO.TblOfficeSpocDetails, AVOOfficeSpocDetails>();
 
             CreateMap<AVOOrgOfficeMapping, TblOrgOfficeMapping>();
             CreateMap<TblOrgOfficeMapping, AVOOrgOfficeMapping>();

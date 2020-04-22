@@ -7,4 +7,4 @@ export const AccountConfig = {
     accountConfigUrl
 }
 
-export default AccountConfig
+export default AccountConfig 

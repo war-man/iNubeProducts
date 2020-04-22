@@ -225,5 +225,34 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetOffbyOrgid(orgid, Context);
             return Ok(response);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeDetails()
+        {
+            var response = await _avoorgService.GetEmployeeDetails(Context);
+            return Ok(response);
+        }
+        //  || AVO
+
+      
+        [HttpPost]
+        public async Task<IActionResult> CreateOffice([FromBody] AVOOrgOffice aVOOrgOffice)
+        {
+            // save 
+            var response = await _avoorgService.CreateOffice(aVOOrgOffice, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                default:
+                    return Forbid();
+            }
+
+
+        }
+
     }
 }

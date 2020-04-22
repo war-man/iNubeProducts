@@ -419,6 +419,7 @@ class InboxClaimProcess extends React.Component {
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
         this.handleAmountValidation();
+ 
         if (this.state.approveamtvalidation === true) {
             if (this.state.validateUI === true) {
                 if (this.state.ValidationUI === true) {
@@ -453,9 +454,9 @@ class InboxClaimProcess extends React.Component {
                     console.log("ClaimData", this.state.claimTableData);
 
                     for (var i = 0; i < this.state.claimTableData.length; i++) {
-                        if (this.state.claimTableData[i].approvedClaimAmounts != null) {
+                        //if (this.state.claimTableData[i].approvedClaimAmounts != null) {
                             this.state.DataAmount.push(this.state.claimTableData[i]);
-                        }
+                        //}
                     }
                     detailsdto['ClaimInsurable'] = this.state.DataAmount;
 
@@ -1073,11 +1074,8 @@ class InboxClaimProcess extends React.Component {
     }
 
     documentLinkView = (dmsdocId) => {
-        //this.setState({ openpop: true });
         console.log("1234567", dmsdocId);
-        //fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/DocumentView?ClaimId=` + oid + `&isDoc=` + isDoc, {
-
-        fetch("https://inubeservicesnotification.azurewebsites.net/api/DMS/DownloadView?id=" + dmsdocId, {
+        fetch(`${ClaimConfig.NotificationUrl}/api/DMS/DownloadView?id=` + dmsdocId, {
 
             method: 'get',
 

@@ -65,7 +65,7 @@ class Upload extends React.Component {
 
  
 // specify upload params and url for your files
- getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
+// getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
 
 // called every time a file's `status` changes
  handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
@@ -295,7 +295,7 @@ class Upload extends React.Component {
                                 <GridItem xs={12}>
                                     <Dropzone
                                         maxFiles={1}
-                                        getUploadParams={this.getUploadParams}
+                                       // getUploadParams={this.getUploadParams}
                                         onChangeStatus={this.handleChangeStatus}
                                         onSubmit={this.handleSubmit}
                                     //accept="image/*,audio/*,video/*,application/pdf/*,word/*"

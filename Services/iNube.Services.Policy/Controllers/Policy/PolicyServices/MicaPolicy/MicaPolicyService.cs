@@ -4436,6 +4436,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                         _context.SaveChanges();
 
+                                        Models.SMSRequest request = new Models.SMSRequest();
+                                        request.SMSMessage = "Welcome to your Edelweiss Switch (Driver Based Insurance) policy! To get it started, all you have to do is download the Edelweiss Switch app at : https://switch.edelweissinsurance.com/welcome and add your vehicle(s) on it. Please do this within 15 days, or your application will have to be cancelled, and your premium will be refunded to your original payment mode. Already downloaded and activated the app? Ignore this message! For Help, call 1800 12000";
+                                        request.RecipientNumber = mappedPolicy.MobileNumber;
+
+                                        var callNotification = await _integrationService.SendSMSAsync(request, apiContext);
+
+
+
                                         //  var paytmtransactionResponce = await _integrationService.DoTransactionByPayment(PolicyId, Amount, mappedPolicy.MobileNumber, apiContext);
 
 

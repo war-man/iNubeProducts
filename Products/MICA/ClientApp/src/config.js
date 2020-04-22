@@ -2,7 +2,9 @@
 //let env = "Production";
 //let env = "Dev";
 //let env = "Local";
-let env = "UAT";
+let env = "UAT"; 
+
+
 
 let Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
 let partnerconfigUrl = Baseurl;
@@ -19,7 +21,8 @@ let dynamicPagesConfigUrl = Baseurl;
 let RDLCConfigUrl = Baseurl;
 let ReinsuranceConfigUrl = Baseurl;
 let ExtensionUrl = Baseurl;
-
+let NotificationUrl = Baseurl;
+ 
 
 if (env === "EdelweissProd") {
     Baseurl = 'https://egiswitchapi.edelweissinsurance.com';
@@ -37,6 +40,7 @@ if (env === "EdelweissProd") {
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
+    NotificationUrl = Baseurl;
 }
 
 
@@ -56,6 +60,7 @@ if (env === "Local") {
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
     ReinsuranceConfigUrl = 'http://localhost:5000';
     ExtensionUrl = "http://localhost:63630";
+    NotificationUrl ="http://localhost:53000";
 }
 if (env === "Dev") {
     Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
@@ -73,6 +78,7 @@ if (env === "Dev") {
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
+    NotificationUrl = Baseurl;
 }
 if (env === "Production") {
     Baseurl = 'https://localhost:44315';
@@ -90,6 +96,7 @@ if (env === "Production") {
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
+    NotificationUrl = Baseurl;
 }
 if (env === "UAT") {
     Baseurl = 'https://egiswitchapi.edelweisscustomeruat.com';
@@ -107,6 +114,7 @@ if (env === "UAT") {
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
+    NotificationUrl = Baseurl;
 }
 
 
@@ -130,6 +138,7 @@ export const config = {
     ReinsuranceConfigUrl: ReinsuranceConfigUrl,
     ReportConfigUrl: ReportConfigUrl,
     ExtensionUrl: ExtensionUrl,
+    NotificationUrl: NotificationUrl,
 
     apiUrl: '',
     localUrl: '',

@@ -100,8 +100,6 @@ namespace iNube.Services.Rating
                 Predicate = _ => true,
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
-
-
             app.UseSwagger(c =>
             {
                 c.RouteTemplate = Configuration["Swagger:Url"].ToString() + "/{documentName}/swagger.json";
@@ -111,7 +109,7 @@ namespace iNube.Services.Rating
                 c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
                 c.RoutePrefix = Configuration["Swagger:Url"].ToString();
             });
-            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+           
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -121,6 +119,7 @@ namespace iNube.Services.Rating
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()

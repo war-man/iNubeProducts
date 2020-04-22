@@ -5,6 +5,11 @@ namespace iNube.Services.Partners.Entities.AVO
 {
     public partial class TblOrgStructure
     {
+        public TblOrgStructure()
+        {
+            TblOrgPositions = new HashSet<TblOrgPositions>();
+        }
+
         public decimal OrgStructureId { get; set; }
         public decimal? OrganizationId { get; set; }
         public int? LevelId { get; set; }
@@ -17,5 +22,6 @@ namespace iNube.Services.Partners.Entities.AVO
         public int? StructureTypeId { get; set; }
 
         public virtual TblOrganization Organization { get; set; }
+        public virtual ICollection<TblOrgPositions> TblOrgPositions { get; set; }
     }
 }

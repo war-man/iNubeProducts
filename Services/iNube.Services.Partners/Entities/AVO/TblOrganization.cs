@@ -9,6 +9,8 @@ namespace iNube.Services.Partners.Entities.AVO
         {
             TblOrgAddress = new HashSet<TblOrgAddress>();
             TblOrgOffice = new HashSet<TblOrgOffice>();
+            TblOrgPositionsOrganization = new HashSet<TblOrgPositions>();
+            TblOrgPositionsRepOrg = new HashSet<TblOrgPositions>();
             TblOrgSpocDetails = new HashSet<TblOrgSpocDetails>();
             TblOrgStructure = new HashSet<TblOrgStructure>();
         }
@@ -45,6 +47,8 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual TblmasPrcommonTypes OrgType { get; set; }
         public virtual ICollection<TblOrgAddress> TblOrgAddress { get; set; }
         public virtual ICollection<TblOrgOffice> TblOrgOffice { get; set; }
+        public virtual ICollection<TblOrgPositions> TblOrgPositionsOrganization { get; set; }
+        public virtual ICollection<TblOrgPositions> TblOrgPositionsRepOrg { get; set; }
         public virtual ICollection<TblOrgSpocDetails> TblOrgSpocDetails { get; set; }
         public virtual ICollection<TblOrgStructure> TblOrgStructure { get; set; }
     }
