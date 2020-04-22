@@ -70,7 +70,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<List<CityMasDTO>> SmartCityMaster(string searchString,ApiContext context);
         Task<decimal> GetSIFromMakeModel(decimal VehicleId, ApiContext context);
         Task<CityMasDTO> GetStateCode(string CityName,ApiContext context);
-
+        Task<ResponseStatus> VehicleStatusUpdate(VehicleStatusDTO vehicleStatus, ApiContext context);
 
     }
 
@@ -1930,13 +1930,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
 
-                schedulerLog = new TblSchedulerLog();
-
-                var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
-
-                var ActivePCCount = getDailyStat.ActivePc;
-                var ActiveTWCount = getDailyStat.ActiveTw;
-
+                schedulerLog = new TblSchedulerLog();              
 
                 schedulerLog.SchedulerDateTime = IndianTime;
                 schedulerLog.SchedulerStatus = "Running";
@@ -1946,7 +1940,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var BillingFrequency = "";
                 var AccountNumber = "";
-
+                
+                List<DeletionHandleDTO> VehicleListPolicy = new List<DeletionHandleDTO>();
 
                 //Call the Policy Service to Get Policy Details.
                 //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
@@ -1969,6 +1964,28 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         BillingFrequency = PolicyData["billingFrequency"];
                         AccountNumber = PolicyData["CDAccountNumber"];
 
+                        var VehicleRiskItem = PolicyData["InsurableItem"][1]["RiskItems"];
+
+                        foreach (var item in VehicleRiskItem)
+                        {
+                            DeletionHandleDTO deletionHandle = new DeletionHandleDTO();
+
+                                deletionHandle.VehicleNumber = item["Vehicle Number"];                         
+                                deletionHandle.VehicleType = item["Vehicle Type"];
+                         
+                            if(!String.IsNullOrEmpty(deletionHandle.VehicleNumber) && !String.IsNullOrEmpty(deletionHandle.VehicleType))
+                            {
+                                VehicleListPolicy.Add(deletionHandle);
+                            }
+                        }
+
+                        var scheduledata = _context.TblSchedule.Where(x=>x.PolicyNo == policy).ToList();
+                                               
+                        if (VehicleListPolicy.Count != scheduledata.Count())
+                        {
+                            var makeVehicleInactive = VehicleInactive(VehicleListPolicy, scheduledata);
+                        }
+
                     }
 
                 }
@@ -1984,7 +2001,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     _context.SaveChanges();
                     continue;
                 }
-               
+
+
+                var getDailyStat = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
+
+                if(getDailyStat == null)
+                {
+                    continue;
+                }
+
+                var ActivePCCount = getDailyStat.ActivePc;
+                var ActiveTWCount = getDailyStat.ActiveTw;
+
 
 
                 //CalculatePremiumObject
@@ -5784,6 +5812,79 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 throw ex;
             }
         }
+
+        private bool VehicleInactive(List<DeletionHandleDTO> PolicyVehicleLst , List<TblSchedule> ScheduleData)
+        {
+           
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentDate = IndianTime.Date;
+
+
+            foreach (var item in ScheduleData)
+            {
+
+                var verifyVehicle = PolicyVehicleLst.Any(x=>x.VehicleNumber == item.VehicleRegistrationNo);
+
+                if(verifyVehicle == false)
+                {
+                    var getdata = _context.TblSchedule.FirstOrDefault(x => x.VehicleRegistrationNo == item.VehicleRegistrationNo);
+
+                    if (getdata != null)
+                    {
+                        getdata.IsActive = false;
+                        _context.TblSchedule.Update(getdata);
+                    }
+
+                    var checkSwitchlog = _context.TblSwitchLog.LastOrDefault(x=>x.VehicleNumber == item.VehicleRegistrationNo && x.CreatedDate.Value.Date == CurrentDate && x.SwitchStatus == true);
+                    
+                    if (checkSwitchlog != null)
+                    {
+                       var getdailydata = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == item.PolicyNo && x.TxnDate.Value.Date == CurrentDate);
+                        if (getdailydata != null)
+                        {
+                            if (item.VehicleType == "PC")
+                            {
+                                getdailydata.ActivePc = getdailydata.ActivePc - 1;
+                            }
+                            else if (item.VehicleType == "TW")
+                            {
+                                getdailydata.ActiveTw = getdailydata.ActiveTw - 1;
+                            }
+                            _context.TblDailyActiveVehicles.Update(getdailydata);
+
+                        }
+                    }
+                    _context.SaveChanges();
+
+                }
+                
+            }
+
+            return true;
+        }
+
+        public async Task<ResponseStatus> VehicleStatusUpdate(VehicleStatusDTO vehicleStatus, ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+
+            var getdata = _context.TblSchedule.FirstOrDefault(x=>x.PolicyNo == vehicleStatus.PolicyNumber && x.VehicleRegistrationNo == vehicleStatus.VehicleNumber);
+
+            if(getdata != null)
+            {
+                getdata.IsActive = vehicleStatus.Status;
+                _context.TblSchedule.Update(getdata);
+                _context.SaveChanges();               
+                return new ResponseStatus { Status = BusinessStatus.Ok, MessageKey = "Vehicle Status is Updated" };
+            }
+            else
+            {
+                return new ResponseStatus { Status = BusinessStatus.NotFound, MessageKey = "No Such Record Found for sent inputs" };
+            }
+
+
+        }
+
     }
 }
 

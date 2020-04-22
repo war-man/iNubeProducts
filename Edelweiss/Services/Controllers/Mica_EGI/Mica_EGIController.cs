@@ -216,6 +216,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return Ok(response);
         }
 
-
+        [HttpPut]
+        public async Task<IActionResult> VehicleStatusUpdate(VehicleStatusDTO vehicleStatus)
+        {
+            var response = await _quotationService.VehicleStatusUpdate(vehicleStatus, Context);
+            return Ok(response);
+        }
     }
 }

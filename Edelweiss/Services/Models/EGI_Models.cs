@@ -693,5 +693,18 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string StateCode { get; set; }
     }
 
+    public partial class DeletionHandleDTO
+    {
+        public string VehicleNumber { get; set; }
+        public string VehicleType { get; set; }
+    }
+
+    public partial class VehicleStatusDTO
+    {
+        public string PolicyNumber { get; set; }
+        public string VehicleNumber { get; set; }
+        public bool Status { get; set; }
+    }
+
 }
 
