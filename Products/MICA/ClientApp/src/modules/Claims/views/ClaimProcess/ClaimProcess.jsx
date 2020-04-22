@@ -1939,8 +1939,6 @@ class ClaimProcess extends React.Component {
                                         this.state.docbyte = "data:image;base64," + this.state.bytearr
                                     }
                                 />
-
-                                
                             }
                         </div>
 

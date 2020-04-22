@@ -84,7 +84,8 @@ const MyUploader = (props) => {
             <Dropzone 
                 //getUploadParams={getUploadParams}
                 onChangeStatus={handleChangeStatus}
-                onSubmit={handleSubmit}
+                    onSubmit={handleSubmit}
+
                   //accept="image/*,audio/*,video/*,application/pdf/*,word/*,application/msword/*,application/vnd.ms-excel/*,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet/*"
                 />
             </GridItem>
