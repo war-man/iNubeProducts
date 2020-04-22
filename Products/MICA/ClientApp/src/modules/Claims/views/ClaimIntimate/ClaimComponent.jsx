@@ -56,7 +56,7 @@ const ClaimComponent = (props) => {
                         error={props.lossDateTimeState}
                         timeformate={true}
                         disabled={false}
-                        width='15rem'
+                        width='13rem'
                         disableFuture={true}
                         required={true}
                         labelText="Loss Date Time"

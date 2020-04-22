@@ -26,6 +26,7 @@ import CustomDropDownTree from "components/CustomDropdownTree/CustomDropDownTree
 import CustomCheckbox from "components/Checkbox/CustomCheckbox";
 import Button from "components/CustomButtons/Button.jsx";
 import ClaimBankDetails from "./ClaimBankDetails.jsx";
+import ClaimPayeeDetails from "./ClaimPayeeDetails.jsx";
 
 
 const style = {
@@ -70,9 +71,10 @@ const CustomTableCell = withStyles(theme => ({
 }))(TableCell);
 
 const ClaimDetails = (props) => {
-    console.log("claimDetailsData123", props);
+    console.log("claimDetailsData1231", props);
     // const { classes } = this.props;
-    const claimDetailsprops = props.componentData;
+    const claimDetailsprops = props.componentData.state;
+    const claimDetailsFun = props.componentData;
     //console.log('claimDetailsprops.typeList', claimDetailsprops.typeList);
     console.log("claimDetailsprops.ClaimStatusData", claimDetailsprops.ClaimStatusData);
     // const claimAmountData = props;
@@ -213,7 +215,7 @@ const ClaimDetails = (props) => {
                             //disabled={claimDetailsprops.disabled}
                             labelText="Performer"
                             value={claimDetailsprops.fields.AdditionalDetails.Performer}
-                            onChange={claimDetailsprops.handlePerformerFun}
+                            onChange={claimDetailsFun.handlePerformerFun}
                             name='Performer'
                             formControlProps={{
                                 fullWidth: true
@@ -224,7 +226,7 @@ const ClaimDetails = (props) => {
                 <GridContainer justify="center">
                     <GridItem xs={3} sm={3} md={3}>
 
-                        <Button color="warning" onClick={claimDetailsprops.handleActivitylog} id="claims" round>
+                        <Button color="warning" onClick={claimDetailsFun.handleActivitylog} id="claims" round>
                             Activity Log
                             </Button>
 
@@ -328,7 +330,7 @@ const ClaimDetails = (props) => {
                 </GridItem>
             </GridContainer>
 
-
+           
 
             <GridContainer lg={12} justify="flex-end">
 
@@ -353,47 +355,18 @@ const ClaimDetails = (props) => {
                         inputType="number"
                         // required={true}
                         value={claimDetailsprops.fields.approvedClaimAmount}
-                        onChange={(e) => claimDetailsprops.handleClaimAmount(e)}
+                        onChange={(e) => claimDetailsFun.handleClaimAmount(e)}
                         formControlProps={{ fullWidth: true }}
                     />
                 </GridItem>
 
 
             </GridContainer>
-            <GridContainer>
-                <h4>Payment Details</h4>
-            </GridContainer>
-            <GridContainer>
-                <GridContainer>
-                    <h6 className="payeetxttransform">Select Payee</h6>
-                </GridContainer>
-                <GridContainer>
-                    {claimDetailsprops.ProductClaimData.map((item, i) =>
-                        <GridItem xs={12} sm={4} md={3} className="downlevel">
-                            <CustomCheckbox key={i}
-                                name={item.inputType}
-                                labelText={item.inputType}
-                                value={item.inputType}
-                                // checked={false}
-                                // onChange={(e) => claimDetailsprops.SetRiskClaimsDetailsValue('Claim Process', e)}
-                                onChange={(e) => claimDetailsprops.handleCheckbox(e, item.inputType, i)}
-                                disabled={(item.disable == true) ? true : null}
-                                formControlProps={{
-                                    fullWidth: true
-                                }} />
-                        </GridItem>
-                    )}
-                </GridContainer>
-            </GridContainer>
-            <GridContainer /*key={i}*/>
-                <GridItem>
-                    <ClaimBankDetails claimDetailsprops={claimDetailsprops} />
-                </GridItem>
-            </GridContainer>
-
+          
+            <ClaimPayeeDetails claimDetailsprops={claimDetailsprops} claimDetailsFun={claimDetailsFun}/>
             <ClaimsDecision claimStatusIdState={claimDetailsprops.claimStatusIdState} claimManagerRemarksState={claimDetailsprops.claimManagerRemarksState}
-                fields={claimDetailsprops.fields} ClaimsDecisionData={claimDetailsprops.ClaimsDecisionData} handleChange={claimDetailsprops.handleChange} onFormSubmit={claimDetailsprops.onFormSubmit}
-                approved={claimDetailsprops.approved} onInputParamChange={claimDetailsprops.onInputParamChange} fields={claimDetailsprops.fields} errormessage={claimDetailsprops.errormessage}
+                fields={claimDetailsprops.fields} ClaimsDecisionData={claimDetailsprops.ClaimsDecisionData} handleChange={claimDetailsFun.handleChange} onFormSubmit={claimDetailsFun.onFormSubmit}
+                approved={claimDetailsprops.approved} onInputParamChange={claimDetailsFun.onInputParamChange} fields={claimDetailsprops.fields} errormessage={claimDetailsprops.errormessage}
                 ValidationUI={claimDetailsprops.ValidationUI} classes={claimDetailsprops.classes} errorstatus={claimDetailsprops.errorstatus} DecisionType={claimDetailsprops.DecisionType} ClaimStatusData={claimDetailsprops.ClaimStatusData} />
 
 

@@ -41,7 +41,7 @@ const style = {
 
 const PolicyDetails = (props) => {
 
-    const policyDetailsprops = props.componentData;
+    const policyDetailsprops = props.componentData.state;
 
     return (
         <div>

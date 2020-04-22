@@ -36,7 +36,8 @@ const style = {
 
 const DocDetails = (props) => {
     // const { classes } = this.props;
-    const docDetailsprops = props.componentData;
+    const docDetailsprops = props.componentData.state;
+    const docDetailsFun = props.componentData;
     var ClaimId = docDetailsprops.claimId;
     console.log("docDetailsprops.docdata", docDetailsprops.docdata);
     return (
@@ -128,7 +129,7 @@ const DocDetails = (props) => {
                 </GridItem>
             </GridContainer>  
 
-            <MyUploader claimId={docDetailsprops.claimId} dmsdocId={docDetailsprops.dmsdocId} docidfunc={docDetailsprops.docidfunc} documentName={docDetailsprops.documentName} />
+            <MyUploader claimId={docDetailsprops.claimId} dmsdocId={docDetailsprops.dmsdocId} docidfunc={docDetailsFun.docidfunc} documentName={docDetailsprops.documentName} />
 
         </div>
     );

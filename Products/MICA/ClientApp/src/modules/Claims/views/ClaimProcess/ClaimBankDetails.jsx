@@ -29,12 +29,70 @@ import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import $ from 'jquery';
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import CustomDateTimePicker from "components/CustomDateTimePicker/DateTimePicker.jsx";
 
 const ClaimBankDetails = (props) => {
     const claimDetailsprops = props.claimDetailsprops;
+    const claimDetailsFun = props.claimDetailsFun;
     const Bankarray = props.claimDetailsprops.Bankarray;
     console.log("props.ClaimStatusData", props);
     console.log("props.ClaimStatusData", props.key);
+  
+   const renderPage1 = (Bankfieldsmodel, name) => {
+        if (Bankfieldsmodel.UIControl == "TextField") {
+            return (<CustomInput
+                labelText={Bankfieldsmodel.Name}
+                //  required={true}
+                name={Bankfieldsmodel.Name}
+                value={Bankfieldsmodel.Value}
+                onChange={(e) => claimDetailsFun.onModelChange(e, name)}
+                formControlProps={{ fullWidth: true }}
+            />
+
+            );
+
+
+        }
+        else if (Bankfieldsmodel.UIControl == "Datetime") {
+            return (
+                < CustomDateTimePicker
+                    timeformate={true}
+                    disabled={false}
+                    width='13rem'
+                    //required={true}
+                    minDate={claimDetailsprops.ClaimIntemationDate}
+                    maxDate={new Date()}
+                    //minDate={new Date(this.state.claimDetailsData.lossDate)}
+                    disableFuture={true}
+                    labelText={Bankfieldsmodel.Name}
+                    name={Bankfieldsmodel.Name}
+                    value={Bankfieldsmodel.Value}
+                    onChange={(event) => claimDetailsFun.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)         }
+       />
+            );
+        }
+        else if (Bankfieldsmodel.UIControl == "Dropdown") {
+
+            return (
+                <MasterDropdown
+                    // required={true}
+                    labelText={Bankfieldsmodel.Name}
+                    // id="Type"
+                    lstObject={claimDetailsprops.AccountTypedata}
+                    filterName='Account Type'
+                    value={Bankfieldsmodel.Value}
+                    name={Bankfieldsmodel.Name}
+                    onChange={(e) => claimDetailsFun.onModelChange(e, name)}
+                    formControlProps={{ fullWidth: true }}
+                />
+
+            );
+
+
+        }
+
+    }
+
     return (
         <div>
             {Bankarray.length > 0 ?
@@ -58,7 +116,7 @@ const ClaimBankDetails = (props) => {
                                     {
                                         item.BankDetails.map(m =>
                                             <GridItem xs={8} sm={5} md={3}>
-                                                {claimDetailsprops.renderPage1(m, item.name)}
+                                                {renderPage1(m, item.name)}
 
                                             </GridItem>
                                         )
@@ -81,7 +139,7 @@ const ClaimBankDetails = (props) => {
                                     {
                                         item.BankDetails.map(m =>
                                             <GridItem xs={8} sm={5} md={3}>
-                                                {claimDetailsprops.renderPage(m, item.name)}
+                                                {renderPage1(m, item.name)}
 
                                             </GridItem>
                                         )
@@ -93,6 +151,8 @@ const ClaimBankDetails = (props) => {
                     )}
                 </GridContainer>
                 : null}
+           
+
         </div >
     );
 }

@@ -589,8 +589,6 @@ class ClaimIntimate extends React.Component {
 
     onDateChange = (formate, type, name, event) => {
 
-        //var today = event.toDate();
-        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
         var today = event.toDate();
         var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
 
@@ -1347,14 +1345,10 @@ class ClaimIntimate extends React.Component {
             });
     }
     handleDateChange = (e, name) => {
-
-        //let _State = this.state;
-
+        
         var today = e.toDate();
         var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
-        // var date = today.toISOString();
-        //_State[name] = date;
-        //this.setState({ _State });
+        
 
         let DetailsDataDTO = this.state.DetailsDTO;
         DetailsDataDTO[name] = date;
