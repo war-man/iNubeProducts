@@ -82,7 +82,7 @@ const MyUploader = (props) => {
                    // getUploadParams={getUploadParams}
                     onChangeStatus={handleChangeStatus}
                     onSubmit={handleSubmit}
-                    accept="image/*,audio/*,video/*,application/pdf/*,word/*"
+                    //accept="image/*,audio/*,video/*,application/pdf/*,word/*"
                 />
             </GridItem>
         </GridContainer>
