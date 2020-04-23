@@ -296,5 +296,13 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeDetailsById(int empid)
+        {
+            var response = await _avoorgService.GetEmployeeDetailsById(empid, Context);
+            return Ok(response);
+        }
+
+
     }
 }

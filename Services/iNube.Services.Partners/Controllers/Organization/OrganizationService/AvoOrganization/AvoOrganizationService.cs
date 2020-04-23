@@ -473,6 +473,28 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         }
 
+        public async Task<AVOOrgEmployee> GetEmployeeDetailsById(int empid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var Emp = _context.TblOrgEmployee.Where(item => item.OrgEmpId == empid)
+                  .Include(add => add.TblOrgEmpAddress)
+                  .Include(a => a.TblOrgEmpEducation)
+                  .SingleOrDefault();
+
+            //var Emp = from emp in _context.TblOrgEmployee
+            //          join ed in _context.TblOrgEmpEducation on emp.OrgEmpId equals ed.OrgEmpId
+            //          join add in _context.TblOrgEmpAddress on emp.OrgEmpId equals add.OrgEmpId
+            //          select new ddDTO
+            //          {
+            //              mID = Convert.ToInt32(off.OrgOfficeId),
+            //              mValue = off.OfficeName,
+
+            //          };
+            var contractdata = _mapper.Map<AVOOrgEmployee>(Emp);
+
+            return contractdata;
+        }
 
     }
 }
