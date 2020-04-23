@@ -22,5 +22,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(ApiContext apiContext);
         Task<CreateOfficeResponse> CreateOffice(AVOOrgOffice aVOOrgOffice, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetNewBranchDropdown(int posid, ApiContext apiContext);
+        Task<List<MasterDto>> GetDesignation(int orgid, ApiContext apiContext);
+        Task<List<MasterDto>> GetEmployee(int orgid, int offid, int desgiId, ApiContext apiContext);
+        Task<int> GetCount(int empid, ApiContext Context);
     }
 }

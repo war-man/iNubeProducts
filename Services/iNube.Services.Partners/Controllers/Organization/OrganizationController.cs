@@ -261,6 +261,40 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetNewBranchDropdown(posid, Context);
             return Ok(response);
         }
+        [HttpGet]
+        public  async Task<IActionResult> GetDesignation(int orgid)
+        {
+            var isFilter = true;
+            var response =await _avoorgService.GetDesignation(orgid, Context);
+            if (isFilter)
+            {
+                var masterdata = response.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
+                return Ok(masterdata);
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployee(int orgid,int offid, int desgiId)
+        {
+            var isFilter = true;
+            var response = await _avoorgService.GetEmployee(orgid, offid, desgiId, Context);
+            if (isFilter)
+            {
+                var masterdata = response.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
+                return Ok(masterdata);
+            }
+
+            return Ok(response);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCount(int empid)
+        {
+           
+            var response = await _avoorgService.GetCount(empid, Context);
+            return Ok(response);
+        }
 
     }
 }

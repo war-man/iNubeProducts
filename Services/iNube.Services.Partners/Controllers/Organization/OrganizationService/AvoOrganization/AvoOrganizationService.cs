@@ -417,6 +417,62 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             return Emp;
         }
+        public async Task<List<MasterDto>> GetDesignation(int orgid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var masterdata = _context.TblOrgStructure.Where(s => s.OrganizationId == orgid && s.StructureTypeId == 28)
+                                                    .Select(x => new MasterDto
+                                                    {
+                                                        mID = Convert.ToInt32(x.OrgStructureId),
+                                                        mType = "Designation",
+                                                        mValue = x.LevelDefinition
+                                                    }).ToList();
+            return masterdata;
+
+
+        }
+        public async Task<List<MasterDto>> GetEmployee(int orgid, int offid, int desgiId, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var positionid = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == orgid && x.OfficeId == offid && x.DesignationId == desgiId).PositionId;
+
+            var masterdata = _context.TblOrgEmployee.Where(s => s.PositionId == positionid)
+                                                    .Select(x => new MasterDto
+                                                    {
+                                                        mID = Convert.ToInt32(x.OrgEmpId),
+                                                        mType = "Employee",
+                                                        mValue = x.StaffName
+                                                    }).ToList();
+            return masterdata;
+
+
+        }
+
+        public async Task<int> GetCount(int empid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var count = 0;
+            var positionid = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == empid).PositionId;
+
+            var masterdata = _context.TblOrgPositions.Where(s => s.PositionId == positionid)
+                                                    .Select(x => new CountDto
+                                                    {
+                                                        ParentId = Convert.ToInt32(x.ParentId),
+                                                        Positionid = Convert.ToInt32(x.PositionId)
+
+                                                    }).ToList();
+            foreach(var item in masterdata)
+            {
+                if(item.ParentId==item.Positionid)
+                {
+                    count++;
+                }
+            }
+            return count ;
+
+
+        }
+
 
     }
 }

@@ -1661,6 +1661,18 @@ namespace iNube.Services.Partners.Models
         //public virtual AVOOrgEmployee OrgEmp { get; set; }
     }
 
+    public partial class MasterDto
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+
+    }
+    public partial class CountDto
+    {
+        public int ParentId { get; set; }
+        public int Positionid { get; set; }
+    }
 }
 
 
