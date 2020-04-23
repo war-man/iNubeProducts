@@ -1828,7 +1828,16 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
                         }
                         cDAccountDTO.AccountDetails = AccountDetails;
-                        cDAccountDTO.OpeningBalance = _context.TblCdtransaction.LastOrDefault(s => s.AccountNo == cDAccountRequest.accountnumber && s.TxnDateTime.Value.Date <= cDAccountRequest.FromDate).FinalBalance;
+                        
+                        var openingbalance = _context.TblCdtransaction.LastOrDefault(s => s.AccountNo == cDAccountRequest.accountnumber && s.TxnDateTime.Value.Date < cDAccountRequest.FromDate);
+                        if (openingbalance != null)
+                        {
+                            cDAccountDTO.OpeningBalance = openingbalance.FinalBalance;
+
+                        }
+                        else {
+                            cDAccountDTO.OpeningBalance = 0;
+                        }
                         cDAccountDTO.ClosingBalance = _context.TblCdtransaction.LastOrDefault(s => s.AccountNo == cDAccountRequest.accountnumber && s.TxnDateTime.Value.Date <= cDAccountRequest.ToDate).FinalBalance;
                         cDAccountDTO.Status = BusinessStatus.Ok;
                         cDAccountDTO.ResponseMessage = $"CDTransactionDetails in between {cDAccountRequest.FromDate}-{cDAccountRequest.ToDate} ";
