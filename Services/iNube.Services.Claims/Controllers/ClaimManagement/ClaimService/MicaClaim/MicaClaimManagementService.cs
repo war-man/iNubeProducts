@@ -2071,8 +2071,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 var insurable = _context.TblClaimInsurable.Where(x => x.ClaimId == ClaimId).ToList();
 
                 var tblClaim = _context.TblClaims.Where(item => item.ClaimId == ClaimId)
-                      .Include(add => add.TblClaimInsurable).FirstOrDefault();
+                      .Include(add => add.TblClaimInsurable)
+                      .Include(add1 => add1.TblClaimPayments).FirstOrDefault();
                 var _claimInsurableDTOs = _mapper.Map<IEnumerable<ClaimInsurableDTO>>(tblClaim.TblClaimInsurable);
+                var _bankDTOs = _mapper.Map<IEnumerable<ClaimPaymentDTO>>(tblClaim.TblClaimPayments);
 
                 var doc = _context.TblClaimdoc.Where(x => x.ClaimId == ClaimId);
                 var status = (from a in _context.TblClaims.Where(x => x.ClaimId == ClaimId)
@@ -2117,6 +2119,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     finaldata.Add("Vehicle Location State", statevalue);
                     finaldata.Add("Driver Name", json["Driver Name"]);
                     finaldata.Add("Self-Survey Required", json["Self-Survey Required"]);
+                    finaldata.Add("Performer", json["Performer"]);
                 }
 
 
@@ -2164,11 +2167,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 }
 
                 //insurableResponse.policyInsurableDetails.AddRange(data);
-
+                var bandata = _bankDTOs.ToList();
 
                 FullfinalData.Add(finalData);
                 FullfinalData.Add(insurabledata.ToList());
-                //return FullfinalData;
+                if (bandata.Count > 0)
+                {
+                    FullfinalData.Add(bandata);
+                }
             }
             catch (Exception ex)
             {
@@ -2544,6 +2550,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     var data1 = _context.TblClaimInsurable.FirstOrDefault(x => x.ClaimId == item.ClaimId);
 
                     item.ClaimStatus = claimstatus.FirstOrDefault(a => a.CommonTypeId == item.ClaimStatusId).Value;
+                    item.InsurableApprovedAmount = data1.ApprovedClaimAmounts;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
                     item.InsuredName = pk[0].CoverNoteNo;
@@ -3241,5 +3248,6 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var response = _mapper.Map<BankAccountsDTO>(data);
             return response;
         }
+
     }
 }

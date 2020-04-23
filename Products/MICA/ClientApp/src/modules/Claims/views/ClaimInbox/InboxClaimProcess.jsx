@@ -123,7 +123,7 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          
+            
             PerformerFlag:true,
             ClaimIntemationDate: null,
             claimsremarksflag: false,
@@ -290,7 +290,7 @@ class InboxClaimProcess extends React.Component {
                 makeModel: ""
             },
             Bankfieldsmodel: [],
-            
+            OtherClaimBankDetails: [],
             Datapic: [
 
                 { data: "" }
@@ -624,7 +624,10 @@ class InboxClaimProcess extends React.Component {
         const fields = this.state.fields;
         fields.claimNumber = ClaimArr[0].claimNumber;
         fields.claimId = ClaimArr[0].claimId;
-        // fields.claimStatusId = ClaimArr[0].claimStatusId;
+        fields.claimStatusId = ClaimArr[0].claimStatusId;
+        fields.claimManagerRemarks = ClaimArr[0].claimRemarks;
+        fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
+        //this.state.claimamt.approvedClaimAmounts = ClaimArr[0].insurableApprovedAmount;
 
         this.state.prodId = ClaimArr[0].productIdPk;
         console.log("prodId", this.state.prodId);
@@ -676,6 +679,7 @@ class InboxClaimProcess extends React.Component {
        // this.handleBankdetails(oid);
         this.setState({ showtable: false });
         //this.claimAmountTable();
+
     }
 
     componentDidMount() {
@@ -951,16 +955,23 @@ class InboxClaimProcess extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-
+               // debugger;
+                console.log("Claimdetailsforother", data);
                 this.setState({ claimTableData: data[1] });
 
+               // this.state.claimamt.approvedClaimAmounts = this.state.claimTableData[0].approvedClaimAmounts;
+
+               // console.log("claimapprovedamount", this.state.claimTableData[0], this.state.claimTableData[0].approvedClaimAmounts);
+
                 this.claimAmountTable(this.state.claimTableData);
+
+                
 
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
                 this.state.claimDetailsData.totalClaimedAmount = data[0][3][1];
-
+                this.state.fields.AdditionalDetails.Performer = data[0][8][1];
                 //if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
 
                 //    this.state.claimDetailsData.vehicleLocation = data[0][4][1];
@@ -999,8 +1010,12 @@ class InboxClaimProcess extends React.Component {
                     this.setState({ vehicleclaimsurvey: false });
                 }
 
+                if (data[2].length > 0) {
+                    this.setState({ OtherClaimBankDetails: data[2] });
+                }
 
-
+                console.log("this.state.OtherClaimBankDetails", this.state.OtherClaimBankDetails);
+               
             });
 
         // this.setState({ disabled: true });
