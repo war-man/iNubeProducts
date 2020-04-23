@@ -114,12 +114,12 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<Entities.AVO.TblMasPinCode, PinCodeDTO>();
 
             CreateMap<AVOOrgEmployee, TblOrgEmployee>()
-            .ForMember(dest => dest.AVOOrgEmpAddress, opt => opt.MapFrom(src => src.AVOOrgEmpAddress))
-            .ForMember(dest => dest.AVOOrgEmpEducation, opt => opt.MapFrom(src => src.AVOOrgEmpEducation)).ReverseMap();
+            .ForMember(dest => dest.TblOrgEmpAddress, opt => opt.MapFrom(src => src.AVOOrgEmpAddress))
+            .ForMember(dest => dest.TblOrgEmpEducation, opt => opt.MapFrom(src => src.AVOOrgEmpEducation)).ReverseMap();
 
-            CreateMap<Entites.AVO.TblOrgEmployee, AVOOrgEmployee>.ReverseMap();
-            CreateMap<Entites.AVO.TblOrgEmpAddress, AVOOrgEmpAddress>.ReverseMap();
-            CreateMap<Entites.AVO.TblOrgEmpEducation, AVOOrgEmpEducation>.ReverseMap();
+            CreateMap<TblOrgEmployee, AVOOrgEmployee>();
+            CreateMap<TblOrgEmpAddress, AVOOrgEmpAddress>();
+            CreateMap<TblOrgEmpEducation, AVOOrgEmpEducation>();
             
         }
 
