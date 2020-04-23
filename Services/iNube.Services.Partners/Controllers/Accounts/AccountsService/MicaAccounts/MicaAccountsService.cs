@@ -1822,6 +1822,26 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                         }
                                         AccountDetails.Add(AccountDetailsObj);
                                     }
+                                    else if(cDAccountRequest.TxnEventType =="AD" && Data.Description.Contains("Endorsement-Deletion"))
+                                    {
+                                        AccountDetailsObj = new AccountDetails();
+                                        AccountDetailsObj.Date = Data.TransactionDateTime;
+                                        AccountDetailsObj.TransactionType = item.TxnType;
+                                        AccountDetailsObj.Description = Data.Description;
+                                        AccountDetailsObj.Gst = Data.TaxAmount;
+                                        AccountDetailsObj.TotalAmount = Data.TotalAmount;
+
+                                        if (item.TxnType == "Credit")
+                                        {
+                                            AccountDetailsObj.TransactionAmountCredit = Data.TxnAmount;
+
+                                        }
+                                        else if (item.TxnType == "Debit")
+                                        {
+                                            AccountDetailsObj.TransactionAmountDebit = Data.TxnAmount;
+                                        }
+                                        AccountDetails.Add(AccountDetailsObj);
+                                    }
                                 }
                             }
 
