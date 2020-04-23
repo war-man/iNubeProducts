@@ -5827,7 +5827,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if(verifyVehicle == false)
                 {
-                    var getdata = _context.TblSchedule.FirstOrDefault(x => x.VehicleRegistrationNo == item.VehicleRegistrationNo);
+                    var getdata = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == item.PolicyNo && x.VehicleRegistrationNo == item.VehicleRegistrationNo);
 
                     if (getdata != null)
                     {
@@ -5835,7 +5835,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblSchedule.Update(getdata);
                     }
 
-                    var checkSwitchlog = _context.TblSwitchLog.LastOrDefault(x=>x.VehicleNumber == item.VehicleRegistrationNo && x.CreatedDate.Value.Date == CurrentDate && x.SwitchStatus == true);
+                    var checkSwitchlog = _context.TblSwitchLog.LastOrDefault(x=>x.PolicyNo == item.PolicyNo && x.VehicleNumber == item.VehicleRegistrationNo && x.CreatedDate.Value.Date == CurrentDate && x.SwitchStatus == true);
                     
                     if (checkSwitchlog != null)
                     {
