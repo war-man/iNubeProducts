@@ -43,8 +43,6 @@ if (env === "EdelweissProd") {
 }
 
 
-
-
 if (env === "Local") {
     partnerconfigUrl = 'https://localhost:44315';
     productConfigUrl = 'https://localhost:44347';

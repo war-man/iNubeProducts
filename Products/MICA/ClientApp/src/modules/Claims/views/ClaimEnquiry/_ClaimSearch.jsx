@@ -11,7 +11,8 @@ import Wizard from "components/Wizard/Wizard.jsx";
 
 
 
-import PolicyDetails from "modules/Claims/views/ClaimProcess/_PolicyDetails.jsx";
+//import PolicyDetails from "modules/Claims/views/ClaimProcess/_PolicyDetails.jsx";
+import PolicyDetails from "./_PolicyDetails.jsx";
 import ClaimDetails from "./_ClaimDetails.jsx";
 import DocDetails from "./_DocDetails.jsx";
 //import PaymentDetails from "modules/Claims/views/ClaimProcess/_PaymentDetails.jsx";
