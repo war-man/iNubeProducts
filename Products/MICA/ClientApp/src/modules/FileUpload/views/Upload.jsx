@@ -114,11 +114,13 @@ class Upload extends React.Component {
                     console.log("response ", response);
 
                     if (response.status == 1) {
-                        this.setState({
-                            GridFun: true,
-                            errorListFun: response.errorDetails
-                        });
-                        this.RefundTableHeader(response.errors);
+                      
+                        console.log("errorDetails", response.errorDetails);
+                        //this.setState({
+                        //    GridFun: true,
+                        //    errorListFun: response.errorDetails
+                        //});
+                        //this.RefundTableHeader(response.errors);
                         swal({
 
                             text: response.responseMessage,
@@ -127,11 +129,29 @@ class Upload extends React.Component {
 
                     } else {
                        // if (response.errorDetails.length > 0) {
+                        response.errorDetails.map((prop, index) => {
+
+                            if (prop.errorDescription != undefined) {
+                                if (prop.errorDescription.length > 0) {
+                                    prop.errorDescription = prop.errorDescription.map(c => {
+                                        return (<p className="gridparagraph">{c.Details} </p>)
+                                    })
+                                }
+                            }
+                            else {
+                                return response.errorDetails[index];
+                            }
+                        }
+                        );
+
+
+
                         this.setState({
                             GridFun : true,
                             errorListFun:response.errorDetails
                         });
-                        this.RefundTableHeader(response.errors);
+
+                        this.RefundTableHeader(response.errorDetails);
                         //}
                         swal({
                             text: response.responseMessage,
@@ -210,7 +230,7 @@ class Upload extends React.Component {
         this.state.resErrors = errors;
         this.setState({GridFun:true});
         this.setState({
-            TableDataList: Object.keys(this.state.resErrors[0]).map((prop, key) => {
+            TableDataList: Object.keys(errors[0]).map((prop, key) => {
             return {
                 Header: prop.charAt(0).toUpperCase() + prop.slice(1),
                 accessor: prop,

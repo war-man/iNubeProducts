@@ -62,6 +62,19 @@ const MyUploader = (props) => {
                 } else if (response.status == 7) {
                     if (response.errorDetails.length > 0) {
                         GridFun(true);
+                        response.errorDetails.map((prop, index) => {
+
+                            if (prop.errorDescription != undefined) {
+                                if (prop.errorDescription.length > 0) {
+                                    prop.errorDescription = prop.errorDescription.map(c => {
+                                        return (<p className="gridparagraph">{c.Details} </p>)
+                                    })
+                                }
+                            } else {
+                                return response.errorDetails[index];
+                            }
+                        }
+                        );
                         errorListFun(response.errorDetails);
                         RefundTableHeader(response.errorDetails);
                     }
