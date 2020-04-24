@@ -1783,39 +1783,82 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     }
                     if (claimsDTO.DataModelDTO != null)
                     {
+                        decimal PayeeAppAmt = 0;
+                        var payeeDetails = _context.TblClaimPayments.Where(c => c.ClaimId == ClaimApproval.ClaimId).ToList();
                         foreach (var item in claimsDTO.DataModelDTO)
                         {
-                            TblClaimPayments claimPayments = new TblClaimPayments();
-                            claimPayments.AccountHolderName = item["Account Holder Name"];
-                            claimPayments.AccountNumber = item["Account No."];
-                            claimPayments.ClaimId = ClaimApproval.ClaimId;
-                            claimPayments.BankBranchAddress = item["Bank Branch Address"];
-                            claimPayments.BankName = item["Bank Name"];
-                            claimPayments.Ifsccode = item["IFSC Code"];
-                            claimPayments.AccountType = item["Account Type"];
-                            if (string.IsNullOrEmpty(Convert.ToString(item["Amount Paid"])))
+                            var PayeExist = payeeDetails.FirstOrDefault(p => p.PayeeType == Convert.ToString(item.type));
+                            if (PayeExist != null)
                             {
-                                errorInfo = new ErrorInfo() { ErrorCode = "Amount", ErrorMessage = "Amount Paid Cannot be null" };
-                                Errors.Add(errorInfo);
+                                PayeExist.AccountHolderName = item["Account Holder Name"];
+                                PayeExist.AccountNumber = item["Account No."];
+                                PayeExist.ClaimId = ClaimApproval.ClaimId;
+                                PayeExist.BankBranchAddress = item["Bank Branch Address"];
+                                PayeExist.BankName = item["Bank Name"];
+                                PayeExist.Ifsccode = item["IFSC Code"];
+                                PayeExist.AccountType = item["Account Type"];
+                                if (string.IsNullOrEmpty(Convert.ToString(item["Amount Paid"])))
+                                {
+                                    errorInfo = new ErrorInfo() { ErrorCode = "Amount", ErrorMessage = "Amount Paid Cannot be null" };
+                                    Errors.Add(errorInfo);
+                                }
+                                else
+                                {
+                                    PayeExist.AmountPaid = item["Amount Paid"];
+                                    PayeeAppAmt = PayeeAppAmt + (decimal)PayeExist.AmountPaid;
+                                }
+                                if (string.IsNullOrEmpty(Convert.ToString(item["Date Of Payment"])))
+                                {
+                                    errorInfo = new ErrorInfo() { ErrorCode = "Date", ErrorMessage = "Date Of Payment Cannot be null" };
+                                    Errors.Add(errorInfo);
+                                }
+                                else
+                                {
+                                    PayeExist.DataOfPayment = item["Date Of Payment"];
+                                }
+                                _context.TblClaimPayments.Update(PayeExist);
                             }
                             else
                             {
-                                claimPayments.AmountPaid = item["Amount Paid"];
-                            }
-                            if (string.IsNullOrEmpty(Convert.ToString(item["Date Of Payment"])))
-                            {
-                                errorInfo = new ErrorInfo() { ErrorCode = "Date", ErrorMessage = "Date Of Payment Cannot be null" };
-                                Errors.Add(errorInfo);
-                            }
-                            else
-                            {
-                                claimPayments.DataOfPayment = item["Date Of Payment"];
+                                TblClaimPayments claimPayments = new TblClaimPayments();
+                                claimPayments.AccountHolderName = item["Account Holder Name"];
+                                claimPayments.AccountNumber = item["Account No."];
+                                claimPayments.ClaimId = ClaimApproval.ClaimId;
+                                claimPayments.BankBranchAddress = item["Bank Branch Address"];
+                                claimPayments.BankName = item["Bank Name"];
+                                claimPayments.Ifsccode = item["IFSC Code"];
+                                claimPayments.AccountType = item["Account Type"];
+                                if (string.IsNullOrEmpty(Convert.ToString(item["Amount Paid"])))
+                                {
+                                    errorInfo = new ErrorInfo() { ErrorCode = "Amount", ErrorMessage = "Amount Paid Cannot be null" };
+                                    Errors.Add(errorInfo);
+                                }
+                                else
+                                {
+                                    claimPayments.AmountPaid = item["Amount Paid"];
+                                    PayeeAppAmt = PayeeAppAmt + (decimal)PayeExist.AmountPaid;
+                                }
+                                if (string.IsNullOrEmpty(Convert.ToString(item["Date Of Payment"])))
+                                {
+                                    errorInfo = new ErrorInfo() { ErrorCode = "Date", ErrorMessage = "Date Of Payment Cannot be null" };
+                                    Errors.Add(errorInfo);
+                                }
+                                else
+                                {
+                                    claimPayments.DataOfPayment = item["Date Of Payment"];
+                                }
+
+                                claimPayments.PayeeType = item.type;
+                                _context.TblClaimPayments.Add(claimPayments);
                             }
 
-                            claimPayments.PayeeType = item.type;
-                            _context.TblClaimPayments.Add(claimPayments);
+
                         }
-
+                        if (claimsprocess.ClaimStatusId == 38 && Convert.ToDecimal(claimsprocess.ApprovedClaimAmount) != PayeeAppAmt)
+                        {
+                            errorInfo = new ErrorInfo() { ErrorCode = "ApprovalAmount", ErrorMessage = $"Total Payee Amount {PayeeAppAmt}  is not equal to Approval Amount {claimsprocess.ApprovedClaimAmount}" };
+                            Errors.Add(errorInfo);
+                        }
                     }
 
                     //_context.SaveChanges();
@@ -1858,25 +1901,40 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         }
 
                     }
-                    foreach (var item in claimsDTO.Alldoc)
+                    var docDetails = _context.TblClaimdoc.Where(c => c.ClaimId == ClaimApproval.ClaimId).ToList();
+                    try
                     {
-                        TblClaimdoc Claimdoc = new TblClaimdoc();
 
-                        Claimdoc.DmsdocId = item.DocumentID;
-                        Claimdoc.DocumentName = item.FileName;
-                        Claimdoc.DocumentType = item.DocumentType;
-                        Claimdoc.ClaimId = claimsDTO.ClaimId;
-                        _context.TblClaimdoc.Add(Claimdoc);
-                        // _context.SaveChanges();
+                        foreach (var item in claimsDTO.Alldoc)
+                        {
+                            var DocExist = docDetails.FirstOrDefault(p => p.DmsdocId == Convert.ToString(item.DocumentID));
+                            if (DocExist != null)
+                            {
+                                DocExist.DmsdocId = item.DocumentID;
+                                DocExist.DocumentName = item.FileName;
+                                DocExist.DocumentType = item.DocumentType;
+                                DocExist.ClaimId = claimsDTO.ClaimId;
+                                _context.TblClaimdoc.Update(DocExist);
+                            }
+                            else
+                            {
+                                TblClaimdoc Claimdoc = new TblClaimdoc();
+
+                                Claimdoc.DmsdocId = item.DocumentID;
+                                Claimdoc.DocumentName = item.FileName;
+                                Claimdoc.DocumentType = item.DocumentType;
+                                Claimdoc.ClaimId = claimsDTO.ClaimId;
+                                _context.TblClaimdoc.Add(Claimdoc);
+                            }
+
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
 
                     }
-                    if (Errors.Count > 0)
-                    {
-                        return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Claims Process Fails" };
-                    }
-
-                    _context.TblClaims.Update(claimsprocess);
-                    _context.SaveChanges();
 
                     var amount = (decimal)claimsprocess.ApprovedClaimAmount;
 
@@ -1898,6 +1956,13 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         //Accounting Log Fail...
 
                     }
+                    if (Errors.Count > 0)
+                    {
+                        return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Claims Process Fails" };
+                    }
+
+                    _context.TblClaims.Update(claimsprocess);
+                    _context.SaveChanges();
 
                     if (claimsprocess.ClaimStatusId == 39)
                     {
