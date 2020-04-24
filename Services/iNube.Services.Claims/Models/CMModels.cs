@@ -170,7 +170,7 @@ namespace iNube.Services.Claims.Models
         public int? ClaimAmount { get; set; }
         public int? ApprovedClaimAmount { get; set; }
         public decimal? InsurableApprovedAmount { get; set; }
-        public string ClaimRemarks { get; set; }
+        public string claimManagerRemarks{ get; set; }
         public DateTime? ClaimStatusDate { get; set; }
 
     }

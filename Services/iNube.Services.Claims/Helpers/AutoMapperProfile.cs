@@ -33,8 +33,7 @@ namespace iNube.Services.Claims.Helpers
             CreateMap<SearchDTO, TblClaims>();
 
             CreateMap<SearchDTO, TblClaims>()
-            .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => src.ClaimStatusDate))
-            .ForMember(dest => dest.ClaimManagerRemarks, opt => opt.MapFrom(src => src.ClaimRemarks)).ReverseMap();
+            .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => src.ClaimStatusDate)).ReverseMap();
 
 
 
