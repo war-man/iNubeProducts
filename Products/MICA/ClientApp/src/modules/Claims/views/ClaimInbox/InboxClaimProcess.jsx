@@ -123,7 +123,7 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            
+            renderpage:false,
             PerformerFlag:true,
             ClaimIntemationDate: null,
             claimsremarksflag: false,
@@ -409,11 +409,17 @@ class InboxClaimProcess extends React.Component {
     handleClose = () => {
         this.setState({ openpop: false });
     };
-
+    internalCallFormSubmit = (data) => {
+        let field = this.state.fields;
+        field.claimManagerRemarks = data.claimManagerRemarks;
+        field.claimStatusId = data.claimStatusId;
+        this.setState({ field });
+        this.onFormSubmit();
+    }
    
 
-    onFormSubmit = (evt) => {
-        console.log("this.state.fields", this.state.fields, this.state.BankDataCopyModelDTO);
+    onFormSubmit = () => {
+        console.log("this.state.fields", this.state.fields, this.state.Bankarray, this.state.BankDataCopyModelDTO);
         this.state.ValidationUI = true;
         this.state.validateUI = false;
         this.state.approveamtvalidation = false;
@@ -428,6 +434,7 @@ class InboxClaimProcess extends React.Component {
 
                     console.log("submit", this.state.fields);
                     let field = this.state.fields;
+                    field.DataModelDTO = [];
                     field.emailId = this.state.email;
 
                     if (!$.isEmptyObject(this.state.BankDataCopyModelDTO["Workshop"])) {
@@ -514,7 +521,7 @@ class InboxClaimProcess extends React.Component {
                         this.setState({ claimstatusflag: true });
                         swal("", "Please select Claim status", "error");
                     }
-                    else if (this.state.fields.claimManagerRemarks == "") {
+                    else if (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks ==null) {
                         this.setState({ errormessage: true });
                         this.setState({ claimsremarksflag: true });
                         swal("", "Please enter Claim manager remarks", "error");
@@ -538,7 +545,7 @@ class InboxClaimProcess extends React.Component {
     }
 
     IsValidProductDetails = () => {
-        if (this.state.fields.claimStatusId !== "" && this.state.fields.claimManagerRemarks !== "") {
+        if (this.state.fields.claimStatusId !== "" && this.state.fields.claimManagerRemarks !== "" && this.state.fields.claimManagerRemarks !==null) {
         } else {
             this.state.ValidationUI = false; this.state.errormessage = true;
             this.setState({});
@@ -582,12 +589,12 @@ class InboxClaimProcess extends React.Component {
     }
 
     onInputParamChange = (type, evt) => {
-        console.log('Event', evt);
+        
         let fields = this.state.fields;
         let name = evt.target.name;
         let value = evt.target.value;
         fields[name] = value;
-        console.log("fields", fields);
+       
         this.setState({ fields });
 
         this.change(evt, name, type);
@@ -625,20 +632,21 @@ class InboxClaimProcess extends React.Component {
         fields.claimNumber = ClaimArr[0].claimNumber;
         fields.claimId = ClaimArr[0].claimId;
         fields.claimStatusId = ClaimArr[0].claimStatusId;
-        fields.claimManagerRemarks = ClaimArr[0].claimRemarks;
-        fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
+        fields.claimManagerRemarks = ClaimArr[0].claimManagerRemarks;
+        //fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
         //this.state.claimamt.approvedClaimAmounts = ClaimArr[0].insurableApprovedAmount;
 
         this.state.prodId = ClaimArr[0].productIdPk;
         console.log("prodId", this.state.prodId);
-
+       
         this.setState({ fields });
+        this.onGet();
         this.setState({ policyId: ClaimArr[0].policyId });
         console.log("Claimsendlist: ", this.state.Claimsendlist);
 
         this.policyDetailsfun(ClaimArr[0].policyNo);
         this.claimAmountTable();
-        this.claimDetailsfun(ClaimArr[0].claimId);
+      
         this.documentView(oid, false, true);
 
         // this.paymentDetailsfun(ClaimArr[0].claimId);
@@ -675,7 +683,7 @@ class InboxClaimProcess extends React.Component {
             this.setState({ approved: true });
         }
 
-        this.onGet();
+    
        // this.handleBankdetails(oid);
         this.setState({ showtable: false });
         //this.claimAmountTable();
@@ -959,7 +967,7 @@ class InboxClaimProcess extends React.Component {
                 console.log("Claimdetailsforother", data);
                 this.setState({ claimTableData: data[1] });
 
-               // this.state.claimamt.approvedClaimAmounts = this.state.claimTableData[0].approvedClaimAmounts;
+                this.state.claimamt.approvedClaimAmounts = data[1][0].approvedClaimAmounts;
 
                // console.log("claimapprovedamount", this.state.claimTableData[0], this.state.claimTableData[0].approvedClaimAmounts);
 
@@ -1010,16 +1018,55 @@ class InboxClaimProcess extends React.Component {
                     this.setState({ vehicleclaimsurvey: false });
                 }
 
-                if (data[2].length > 0) {
-                    this.setState({ OtherClaimBankDetails: data[2] });
-                }
+                if (data.length>2 && data[2].length > 0) {
+                    let arr = [];
+                    for (var i = 0; i < data[2].length; i++) {
+                        let obj = {};
+                        obj.name = data[2][i].payeeType;
+                        obj.BankDetails = JSON.parse(JSON.stringify(BankdetailsFields));
+                        arr.push(obj);
+                     
+                        if (this.state.ProductClaimData.length > 0) {
+                            let checkboxindex = this.state.ProductClaimData.findIndex(s => s.mValue == data[2][i].payeeType);
+                            if (checkboxindex != -1) {
+                                this.state.ProductClaimData[checkboxindex].mIsRequired = true;
+                            }
+                        }
+                        console.log("checkboxindex", this.state.ProductClaimData, data[2][i].payeeType);
+                        let bank = arr;
+                    let index = bank.findIndex(e => e.name == data[2][i].payeeType);
+                    let bankvalue = bank[index].BankDetails.filter(a => a.Name == "Account Holder Name")
+                    bankvalue[0].Value = data[2][i].accountHolderName;
+                    bankvalue = bank[index].BankDetails.filter(a => a.Name == "Account No.")
+                    bankvalue[0].Value = data[2][i].accountNumber;
+                    bankvalue = bank[index].BankDetails.filter(a => a.Name == "Account Type")
+                    bankvalue[0].Value = data[2][i].accountType;
+                    bankvalue = bank[index].BankDetails.filter(a => a.Name == "Bank Name")
+                    bankvalue[0].Value = data[2][i].bankName;
+                    bankvalue = bank[index].BankDetails.filter(a => a.Name == "IFSC Code")
+                    bankvalue[0].Value = data[2][i].ifsccode;
+                    bankvalue = bank[index].BankDetails.filter(a => a.Name == "Bank Branch Address")
+                    bankvalue[0].Value = data[2][i].bankBranchAddress;
+                    bankvalue = bank[index].BankDetails.filter(a => a.Name == "Amount Paid")
+                    bankvalue[0].Value = data[2][i].amountPaid;
+                    bankvalue = bank[index].BankDetails.filter(a => a.Name == "Date Of Payment")
+                    bankvalue[0].Value = data[2][i].dataOfPayment ;
+                    //let tempObj = object.assign({}, this.state.Bankdata1);
+                    //tempObj.
+                   // this.state.BankDataModelDTO[data[2][i].payeeType] = Object.assign(this.state.BankDataModelDTO[data[2][i].payeeType], tempObj);
 
+                    //this.setState({ bank });
+                   }
+                    this.setState({ OtherClaimBankDetails: arr });
+                 
+                }
+                this.setState({ renderpage: true });
                 console.log("this.state.OtherClaimBankDetails", this.state.OtherClaimBankDetails);
                
             });
 
         // this.setState({ disabled: true });
-
+        console.log("this.state.OtherClaimBankDetails", this.state.OtherClaimBankDetails);
 
     }
 
@@ -1175,6 +1222,7 @@ class InboxClaimProcess extends React.Component {
             console.log("ClaimIntimationDetails ", this.state.claimTableData[i].approvedClaimAmounts);
         }
         this.state.fields.approvedClaimAmount = amt;
+        this.state.claimamt.approvedClaimAmounts = amt;
         this.setState({});
         console.log("ClaimIntimationDetails claimAmount ", this.state.fields.approvedClaimAmount);
         this.claimAmountTable();
@@ -1310,7 +1358,7 @@ class InboxClaimProcess extends React.Component {
                 // this.setState({});
 
                 console.log("ProductClaimData", this.state.ProductClaimData);
-
+                this.claimDetailsfun(this.state.claimId);
 
             });
     }
@@ -1383,7 +1431,13 @@ class InboxClaimProcess extends React.Component {
         this.setState({ AdditionalDetails });
         
     }
-  
+    handleCheckboxUpdate = (event, name, i) => {
+        if (event.target.checked == true) {
+            this.state.ProductClaimData[i].mIsRequired = true;
+        } else if (event.target.checked == false) {
+            this.state.ProductClaimData[i].mIsRequired = false;
+        }
+    }
   
 
     render() {
@@ -1532,7 +1586,7 @@ class InboxClaimProcess extends React.Component {
                                 />
                                 */}
 
-                                <div>
+                                {this.state.renderpage && <div>
                                     <Card className="claimSearch">
                                         <CardBody>
 
@@ -1542,7 +1596,7 @@ class InboxClaimProcess extends React.Component {
                                                 steps={[
                                                     { stepName: <TranslationContainer translationKey="PolicyDetails" />, stepComponent: PolicyDetails, stepId: "PolicyDetails", stepData: this },
 
-                                                   { stepName: <TranslationContainer translationKey="DocumentDetails" />, stepComponent: DocDetails, stepId: "DocDetails", stepData: this },
+                                                    { stepName: <TranslationContainer translationKey="DocumentDetails" />, stepComponent: DocDetails, stepId: "DocDetails", stepData: this },
 
                                                     { stepName: <TranslationContainer translationKey="ClaimDetails" />, stepComponent: ClaimDetails, stepId: "ClaimDetails", stepData: this },
 
@@ -1556,7 +1610,7 @@ class InboxClaimProcess extends React.Component {
 
                                         </CardBody>
                                     </Card>
-                                </div>
+                                </div>}
                             </CardBody>
                         </Card>
                     </Animated>

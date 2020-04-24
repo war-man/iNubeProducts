@@ -339,7 +339,7 @@ const ClaimDetails = (props) => {
                         inputType="number"
                         // required={true}
                         value={claimDetailsprops.fields.approvedClaimAmount}
-                        onChange={(e) => claimDetailsFun.handleClaimAmount(e)}
+                        //onChange={(e) => claimDetailsFun.handleClaimAmount(e)}
                         formControlProps={{ fullWidth: true }}
                     />
                 </GridItem>
@@ -348,12 +348,12 @@ const ClaimDetails = (props) => {
             </GridContainer>
           
             <ClaimPayeeDetails claimDetailsprops={claimDetailsprops} claimDetailsFun={claimDetailsFun}/>
-            <ClaimsDecision claimStatusIdState={claimDetailsprops.claimStatusIdState} claimManagerRemarksState={claimDetailsprops.claimManagerRemarksState}
+            {/*  <ClaimsDecision claimStatusIdState={claimDetailsprops.claimStatusIdState} claimManagerRemarksState={claimDetailsprops.claimManagerRemarksState}
                 fields={claimDetailsprops.fields} ClaimsDecisionData={claimDetailsprops.ClaimsDecisionData} handleChange={claimDetailsFun.handleChange} onFormSubmit={claimDetailsFun.onFormSubmit}
                 approved={claimDetailsprops.approved} onInputParamChange={claimDetailsFun.onInputParamChange} fields={claimDetailsprops.fields} errormessage={claimDetailsprops.errormessage}
                 ValidationUI={claimDetailsprops.ValidationUI} classes={claimDetailsprops.classes} errorstatus={claimDetailsprops.errorstatus} DecisionType={claimDetailsprops.DecisionType} ClaimStatusData={claimDetailsprops.ClaimStatusData} />
 
-
+*/}
 
         </div>
 

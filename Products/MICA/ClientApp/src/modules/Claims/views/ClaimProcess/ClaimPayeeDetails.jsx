@@ -17,13 +17,14 @@ class ClaimPayeeDetails extends React.Component {
         super(props);
         console.log("BankDetails coming",this.props);
         this.state = {
-
+            claimManagerRemarksState:"",
+            fields: this.props.claimDetailsprops.fields,
           
             claimid: this.props.claimDetailsprops.claimid,
             AccountTypedata:[],
             displaycust: false,
             BankDataModelDTO: [],
-            Bankarray: [],
+            Bankarray:this.props.claimDetailsprops.OtherClaimBankDetails,
             BankDetails: {},
             Bankdata: {
                 "Customer": {
@@ -80,13 +81,14 @@ class ClaimPayeeDetails extends React.Component {
         datamodel["Surveyor"] = {};
         this.setState({ datamodel });
 
-        console.log("datamodel ", datamodel);
+        console.log("datamodel ", datamodel, this.state.claimid);
         this.handleBankdetails(this.state.claimid);
-
+        console.log("Bankarray", this.state.Bankarray, this.props.claimDetailsprops.OtherClaimBankDetails);
     }
 
   
     handleCheckbox = (event, name, i) => {
+        this.props.claimDetailsFun.handleCheckboxUpdate(event, name, i);
         let element = this.state.Bankarray;
         if (event.target.checked == true) {
             if (name != "Customer") {
@@ -96,7 +98,7 @@ class ClaimPayeeDetails extends React.Component {
                 let array = [];
                 Bankelement.name = name;
                 //Bankelement.BankDetails = [...array, ...BankdetailsFields];
-                Bankelement.BankDetails = JSON.parse(JSON.stringify(BankdetailsFields));;
+                Bankelement.BankDetails = JSON.parse(JSON.stringify(BankdetailsFields));
                 element.push(Bankelement);
             }
             else {
@@ -325,24 +327,39 @@ class ClaimPayeeDetails extends React.Component {
        // this.change(event, name, formate, date, type);
 
     };
-    handleBankdetails = (id) => {
-        let that = this;
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimBankDetails?claimid=` + id + ``, {
-            method: 'Get',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-        }).then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            console.log('Response data', data);
-            that.setState({ BankDetails: data });
-            console.log('Response bank data', that.state.BankDetails);
-        });
-    }
+    //handleBankdetails = (id) => {
+    //    let that = this;
+    //    fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimBankDetails?claimid=` + id + ``, {
+    //        method: 'Get',
+    //        headers: {
+    //            'Accept': 'application/json',
+    //            'Content-Type': 'application/json',
+    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+    //        },
+    //    }).then(function (response) {
+    //        return response.json();
+    //    }).then(function (data) {
+    //        console.log('Response data', data);
+    //        that.setState({ BankDetails: data });
+    //        console.log('Response bank data', that.state.BankDetails);
+    //    });
+    //}
 
+    onInputParamChange = (type, evt) => {
+
+        let fields = this.state.fields;
+        let name = evt.target.name;
+        let value = evt.target.value;
+        fields[name] = value;
+
+        this.setState({ fields });
+
+       // this.change(evt, name, type);
+    };
+    onInternalFormSubmit = () => {
+      
+        this.props.claimDetailsFun.internalCallFormSubmit(this.state.fields);
+    }
 
     render() {
        
@@ -365,8 +382,8 @@ class ClaimPayeeDetails extends React.Component {
                             <CustomCheckbox key={i}
                                 name={item.inputType}
                                 labelText={item.inputType}
-                                value={item.inputType}
-                                // checked={false}
+                                value={item.mIsRequired}
+                                checked={item.mIsRequired}
                                 // onChange={(e) => claimDetailsprops.SetRiskClaimsDetailsValue('Claim Process', e)}
                                 onChange={(e) => this.handleCheckbox(e, item.inputType, i)}
                                 disabled={(item.disable == true) ? true : null}
@@ -437,6 +454,86 @@ class ClaimPayeeDetails extends React.Component {
 
 
                 </div >
+                <div>
+                    {this.props.claimDetailsprops.approved &&
+                        <GridContainer>
+                            <CardHeader color="info" icon >
+                                {
+                                    <h3 >
+                                        <small><TranslationContainer translationKey="ApproversRemark" /></small>
+                                    </h3>
+                                }
+                            </CardHeader>
+                            <GridContainer lg={12}>
+                                <GridItem xs={12} sm={4} md={3}>
+
+                                    <MasterDropdown
+                                        // success={props.claimStatusIdState === "success"}
+                                        error={this.state.claimStatusIdState}
+                                        labelText="ClaimStatus"
+                                        id="ddlstatus"
+                                        lstObject={this.props.claimDetailsprops.ClaimStatusData}
+                                        filterName='Claim Status'
+                                        required={true}
+                                        value={this.state.fields.claimStatusId}
+                                        name='claimStatusId'
+                                        onChange={(evt) => this.onInputParamChange("claimStatusId", evt)}
+                                        formControlProps={{ fullWidth: true }}
+                                    />
+                                {this.props.claimDetailsprops.errormessage && (this.state.fields.claimStatusId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                                {this.props.claimDetailsprops.claimstatusflag && (this.state.fields.claimStatusId == "") ? <p className="error"> </p> : null}
+
+                                </GridItem>
+
+                                {/* <GridItem xs={12} sm={12} md={4}>
+                        <CustomInput
+                            success={props.approvedClaimAmountState === "success"}
+                            error={props.approvedClaimAmountState === "error"}
+                            labelText="Approved Claim Amount"
+                            required={true}
+                            value={props.fields.approvedClaimAmount}
+                            name="approvedClaimAmount"
+                            onChange={(evt) => props.onInputParamChange("approvedClaimAmount", evt)}
+                            inputProps={{
+                                //type: "number"
+                            }}
+                            formControlProps={{ fullWidth: true }} />
+                    </GridItem>
+                    */}
+
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <CustomInput
+                                        // success={props.claimManagerRemarksState === "success"}
+                                        error={this.state.claimManagerRemarksState}
+                                        labelText="ManagerRemarks"
+                                        required={true}
+                                        multiline={true}
+                                        value={this.state.fields.claimManagerRemarks}
+                                        name="claimManagerRemarks"
+                                        onChange={(evt) => this.onInputParamChange("claimManagerRemarks", evt)}
+                                        inputProps={{
+                                            //type: "number"
+                                        }}
+                                        formControlProps={{ fullWidth: true }} />
+                                {this.props.claimDetailsprops.errormessage && (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks ==null) ? <p className="error">*Required field cannot be left blank</p> : null}
+
+                                {this.props.claimDetailsprops.claimsremarksflag && (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks == null) ? <p className="error"> </p> : null}
+                                </GridItem>
+
+                                <GridContainer lg={12} justify="center">
+                                    <GridItem xs={5} sm={3} md={3} lg={1}>
+                                        <Button color="info" round onClick={() => this.onInternalFormSubmit()}>
+                                            <TranslationContainer translationKey="Submit" />
+                                        </Button>
+                                    </GridItem>
+                                </GridContainer>
+
+                            </GridContainer>
+                        </GridContainer>
+                    }
+
+                </div>
                 </div>
                               );
 }
