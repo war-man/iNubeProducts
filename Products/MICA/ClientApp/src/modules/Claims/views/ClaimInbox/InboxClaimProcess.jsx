@@ -428,6 +428,7 @@ class InboxClaimProcess extends React.Component {
 
                     console.log("submit", this.state.fields);
                     let field = this.state.fields;
+                    field.DataModelDTO = [];
                     field.emailId = this.state.email;
 
                     if (!$.isEmptyObject(this.state.BankDataCopyModelDTO["Workshop"])) {
