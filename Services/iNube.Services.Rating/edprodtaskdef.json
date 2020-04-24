@@ -8,9 +8,16 @@
       "name": "ed-prod-mica-rating",
       "image": "<edrating>",
 
-      "cpu": 512,
-      "memory": 512,
-
+      "cpu": 1024,
+      "memory": 3048,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/ed-prod-mica-rating",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
       "portMappings": [
         {
           "containerPort": 9012,
@@ -27,7 +34,15 @@
   "requiresCompatibilities": [
     "EC2"
   ],
-  "cpu": "512",
-  "memory": "512"
+  "cpu": "1024",
+  "memory": "3048",
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/ed-prod-mica-rating",
+      "awslogs-region": "ap-south-1",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
 
 }

@@ -8,8 +8,16 @@
       "name": "ed-prod-mica-ruleengine",
       "image": "<edrule>",
 
-      "cpu": 300,
-      "memory": 300,
+      "cpu": 512,
+      "memory": 1024,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/ed-prod-mica-ruleengine",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
 
       "portMappings": [
         {
@@ -27,7 +35,15 @@
   "requiresCompatibilities": [
     "EC2"
   ],
-  "cpu": "300",
-  "memory": "300"
+  "cpu": "512",
+  "memory": "1024",
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/ed-prod-mica-ruleengine",
+      "awslogs-region": "ap-south-1",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
 
 }

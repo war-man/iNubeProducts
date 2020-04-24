@@ -195,7 +195,7 @@ class ClaimPayeeDetails extends React.Component {
                     width='13rem'
                     //required={true}
                     disableFuture={true}
-                    minDate={this.state.ClaimIntemationDate}
+                    minDate={this.props.claimDetailsprops.ClaimIntemationDate}
                     maxDate={new Date()}
                     labelText={Bankfieldsmodel.Name}
                     name={Bankfieldsmodel.Name}
@@ -248,7 +248,7 @@ class ClaimPayeeDetails extends React.Component {
                     disabled={false}
                     width='13rem'
                     //required={true}
-                    minDate={this.state.ClaimIntemationDate}
+                    minDate={this.props.claimDetailsprops.ClaimIntemationDate}
                     maxDate={new Date()}
                     //minDate={new Date(this.state.claimDetailsData.lossDate)}
                     disableFuture={true}
