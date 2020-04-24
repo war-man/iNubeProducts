@@ -16,8 +16,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
     {
 
         Task<dynamic> CalCulateRatingPremium(SchedulerPremiumDTO dynamicData,ApiContext context);
-        Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext);
-
+        
         //Scheduler Module AR
         Task<dynamic> GenerateCDTransaction(CDDTO cdModel, ApiContext apiContext);
         Task<List<PolicyDetailsDTO>> GetPolicyList(string productCode, ApiContext apiContext);
@@ -90,13 +89,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", result.Dbconnection, "Final Return in integration Call", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
             return result;
         }
-
-        public async Task<PolicyResponse> CreateMultiCoverPolicy(dynamic policyDetail, ApiContext apiContext)
-        {
-            var uri = PolicyUrl + "/api/Policy/CreatePolicy";
-            return await PostApiInvoke<dynamic, PolicyResponse>(uri, apiContext, policyDetail);
-        }
-
+        
         public async Task<List<PolicyDetailsDTO>> GetPolicyList(string productCode, ApiContext apiContext)
         {
             var uri = PolicyUrl + "/api/Policy/GetAllPolicy?ProductCode=" + productCode;

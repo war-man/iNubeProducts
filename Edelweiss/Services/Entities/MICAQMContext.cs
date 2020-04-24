@@ -15,6 +15,8 @@ namespace MicaExtension_EGI.Entities
         {
         }
 
+        public virtual DbSet<TblBatchJobDetailsLog> TblBatchJobDetailsLog { get; set; }
+        public virtual DbSet<TblBatchJobLog> TblBatchJobLog { get; set; }
         public virtual DbSet<TblDailyActiveVehicles> TblDailyActiveVehicles { get; set; }
         public virtual DbSet<TblMasCity> TblMasCity { get; set; }
         public virtual DbSet<TblMasState> TblMasState { get; set; }
@@ -45,6 +47,43 @@ namespace MicaExtension_EGI.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+
+            modelBuilder.Entity<TblBatchJobDetailsLog>(entity =>
+            {
+                entity.HasKey(e => e.BatchDetailLogId)
+                    .HasName("PK__TblBatch__BF81F62FC572E278");
+
+                entity.ToTable("TblBatchJobDetailsLog", "QM");
+
+                entity.Property(e => e.TxnEndDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.TxnStartDateTime).HasColumnType("datetime");
+
+                entity.HasOne(d => d.BatchLog)
+                    .WithMany(p => p.TblBatchJobDetailsLog)
+                    .HasForeignKey(d => d.BatchLogId)
+                    .HasConstraintName("FK__TblBatchJ__Batch__3943762B");
+            });
+
+            modelBuilder.Entity<TblBatchJobLog>(entity =>
+            {
+                entity.HasKey(e => e.BatchLogId)
+                    .HasName("PK__TblBatch__5927836E3B59DB2E");
+
+                entity.ToTable("TblBatchJobLog", "QM");
+
+                entity.Property(e => e.BatchMode)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BatchName)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.EndDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.StartDateTime).HasColumnType("datetime");
+            });
 
             modelBuilder.Entity<TblDailyActiveVehicles>(entity =>
             {

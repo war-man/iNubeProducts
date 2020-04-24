@@ -4918,7 +4918,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();     
-            DateTime PolicyStartDate, NextMonth, CDFromDate;
+            DateTime PolicyStartDate, NextMonth, CDFromDate, CDToDate;
 
             //Step-1:Get All Active Policy's 
             var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
@@ -4931,7 +4931,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
 
-           
             PolicyNumberList.Distinct();
 
             //Step-2:Start the Loop Based On Policy Number
@@ -4966,17 +4965,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         CDFromDate = PolicyStartDate;
                         NextMonth = PolicyStartDate.AddMonths(1);
-                        monthlySiDTO.DueDate = NextMonth.AddDays(-1);
+                        monthlySiDTO.DueDate = NextMonth;
                         monthlySiDTO.ReportCreatedDate = monthlySiDTO.DueDate.Value.AddDays(-2);
+                        CDToDate = monthlySiDTO.ReportCreatedDate.Value.AddDays(-1);
                     }
                     else
                     {
-                        //Last Policy Transaction Exsists
-                        DateTime LastMonthDueDate = checkLastBilling.DueDate.Value;
-                        CDFromDate = LastMonthDueDate; //Verify Should it be +1 or not..?!
-                        NextMonth = LastMonthDueDate.AddMonths(1);
-                        monthlySiDTO.DueDate = NextMonth.AddDays(-1);
-                        monthlySiDTO.ReportCreatedDate = monthlySiDTO.DueDate.Value.AddDays(-2);
+                        //Billing Details Exsists for this Policy Transaction 
+                        DateTime LastMonthDueDate = checkLastBilling.DueDate.Value.Date;
+                        CDFromDate = monthlySiDTO.ReportCreatedDate.Value.Date;
+                        monthlySiDTO.DueDate = LastMonthDueDate.AddMonths(1);
+                        monthlySiDTO.ReportCreatedDate = monthlySiDTO.ReportCreatedDate.Value.AddMonths(1);
+                        CDToDate = monthlySiDTO.ReportCreatedDate.Value.Date.AddDays(-1);
                     }
 
                     if (monthlySiDTO.ReportCreatedDate.Value.Date != CurrentDate.Date)

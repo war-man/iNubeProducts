@@ -129,7 +129,6 @@ namespace iNube.Services.MicaExtension_EGI.Models
     public class PolicyResponse : ResponseStatus
     {
         public Dictionary<string, string> policy { get; set; }
-        public BusinessStatus Status { get; internal set; }
         public int QuotationNumber { get; set; }
     }
 
