@@ -1836,7 +1836,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                                 else
                                 {
                                     claimPayments.AmountPaid = item["Amount Paid"];
-                                    PayeeAppAmt = PayeeAppAmt + (decimal)PayeExist.AmountPaid;
+                                    PayeeAppAmt = PayeeAppAmt + (decimal)claimPayments.AmountPaid;
                                 }
                                 if (string.IsNullOrEmpty(Convert.ToString(item["Date Of Payment"])))
                                 {
