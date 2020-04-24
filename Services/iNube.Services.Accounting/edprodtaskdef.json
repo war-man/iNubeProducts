@@ -9,7 +9,7 @@
       "image": "<edaccounting>",
 
       "cpu": 512,
-      "memory": 512,
+      "memory": 1024,
 
       "logConfiguration": {
         "logDriver": "awslogs",
@@ -34,7 +34,7 @@
 
   "requiresCompatibilities": [ "EC2" ],
   "cpu": "512",
-  "memory": "512",
+  "memory": "1024",
   "logConfiguration": {
     "logDriver": "awslogs",
     "options": {
