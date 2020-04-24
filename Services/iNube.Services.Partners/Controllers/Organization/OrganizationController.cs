@@ -296,11 +296,27 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetEmployeeDetailsById(int empid)
+        //  || AVO
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreatePosition([FromBody] AvoOfficeDto Officedto)
         {
-            var response = await _avoorgService.GetEmployeeDetailsById(empid, Context);
-            return Ok(response);
+            // save 
+            var response = await _avoorgService.Saveoffice(Officedto, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                default:
+                    return Forbid();
+            }
+
+
         }
 
 

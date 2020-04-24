@@ -1673,6 +1673,29 @@ namespace iNube.Services.Partners.Models
         public int ParentId { get; set; }
         public int Positionid { get; set; }
     }
+
+    public partial class AvoOfficeDto
+    {
+        public decimal EmpId { get; set; }
+        public int newpositioncount { get; set; }
+        public decimal PositionId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public decimal OfficeId { get; set; }
+        public decimal? DesignationId { get; set; }
+        public string PositionName { get; set; }
+        public decimal? RepOrgId { get; set; }
+        public decimal? RepOfficeId { get; set; }
+        public decimal? ParentId { get; set; }
+        public decimal? ParentLineId { get; set; }
+        public decimal? ReportingId { get; set; }
+        public decimal? ReportingLineId { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public bool? IsVacant { get; set; }
+        public bool? IsActive { get; set; }
+    }
 }
 
 

@@ -26,5 +26,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<List<MasterDto>> GetEmployee(int orgid, int offid, int desgiId, ApiContext apiContext);
         Task<int> GetCount(int empid, ApiContext Context);
         Task<AVOOrgEmployee> GetEmployeeDetailsById(int empid, ApiContext apiContext);
+        Task<CreateOfficeResponse> Saveoffice(AvoOfficeDto Officedto, ApiContext apiContext);
     }
 }

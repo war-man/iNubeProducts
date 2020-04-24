@@ -496,5 +496,41 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return contractdata;
         }
 
+
+        public async Task<CreateOfficeResponse> Saveoffice(AvoOfficeDto Officedto, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+
+                //  var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
+                var positioncount = Officedto.newpositioncount;
+                for(var i=0;i<positioncount;i++)
+                {
+                    var positionName = _context.TblOrgStructure.FirstOrDefault(a => a.OrganizationId == Officedto.DesignationId).LevelDefinition;
+                    var parentId = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == Officedto.EmpId).PositionId;
+                    TblOrgPositions tblOrgPositions = new TblOrgPositions();
+                    tblOrgPositions.OrganizationId = Officedto.OrganizationId;
+                    tblOrgPositions.OfficeId = Officedto.OfficeId;
+                    tblOrgPositions.DesignationId = Officedto.DesignationId;
+                    tblOrgPositions.PositionName = positionName;
+                    tblOrgPositions.RepOrgId = Officedto.OrganizationId;
+                    tblOrgPositions.RepOfficeId = Officedto.OfficeId;
+                    tblOrgPositions.ParentId = parentId;
+                    tblOrgPositions.IsActive = true;
+                    tblOrgPositions.IsVacant = true;
+                   _context.TblOrgPositions.Add(tblOrgPositions);
+                }
+                _context.SaveChanges();
+                return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Data saved sucessfully " };
+            }
+            catch (Exception ex)
+            {
+
+                return new CreateOfficeResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
+            }
+
+        }
+
     }
 }
