@@ -5246,7 +5246,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         step1++;
                         // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
-                        var res = await ConvertCSVtoDataTable(filePath);
+                        var res = ConvertCSVtoDataTable(filePath);
                         return res;
                     }
                     else
@@ -5508,7 +5508,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
         }
 
-        public async Task<MonthlySIUploadDTO> ConvertCSVtoDataTable(string strFilePath)
+        private MonthlySIUploadDTO ConvertCSVtoDataTable(string strFilePath)
         {
 
             MonthlySIUploadDTO uploadDTO = new MonthlySIUploadDTO();

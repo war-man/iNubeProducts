@@ -58,7 +58,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
     {
 
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, RatingUrl, ExtensionUrl;
         
         public IntegrationService(IConfiguration configuration)
         {
