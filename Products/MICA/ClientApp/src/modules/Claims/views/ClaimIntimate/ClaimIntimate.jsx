@@ -996,7 +996,9 @@ class ClaimIntimate extends React.Component {
                 PolicyArr.push(pArr[id]);
             }
         })
+       
         console.log("radioarr", this.state.radioarr);
+        //this.setState({ InsurableItemData: [], ClaimsAmountData: [] });
         let that = this;
         fetch(`${ClaimConfig.policyconfigUrl}/api/Policy/PolicyInsurableDetails?PolicyNumber=` + pid, {
             method: 'get',
@@ -1010,10 +1012,10 @@ class ClaimIntimate extends React.Component {
                 console.log("cdata", cdata);
 
                 if (cdata.status === 0) {
-                    this.setState({ policyflag: true });
-                    that.setState({ ClaimsAmountData: cdata.policyInsurableDetails, InsurableItemData: cdata.insurableItems });
+                    
+                    that.setState({ policyflag: true , ClaimsAmountData: cdata.policyInsurableDetails, InsurableItemData: cdata.insurableItems, showInsGrid: false});
                     console.log("PolicyInsurableDetails: ", that.state.ClaimsAmountData);
-
+                    //this.setState({ showInsGrid: true });
 
                 } else {
                     this.setState({ policyflag: false });
@@ -1021,6 +1023,7 @@ class ClaimIntimate extends React.Component {
                 }
 
             });
+       
         console.log("PolicytArr", PolicyArr);
         this.state.prodId = PolicyArr[0].productIdPk;
         console.log("prodId", this.state.prodId);
@@ -1083,7 +1086,23 @@ class ClaimIntimate extends React.Component {
         claim.policyNumber = PolicyArr[0].policyNo;
         claim.emailId = PolicyArr[0].email;
         claim.benefitAmount = PolicyArr[0].sumInsured;
+        claim['insurableItems'] = '';
+        //Reseting values
+        claim['lossDescription'] = '';
+        claim['causeOfLoss'] = '';
+        claim['lossIntimatedBy'] = '';
+        claim['locationOfLoss'] = '';
+        //claim['lossDateTime'] = '';
         this.setState({ claim });
+        //Reseting Bank detils
+        let bnk = this.state.bankDetails;
+        bnk['accountHolderName'] = '';
+        bnk['accountNumber'] = '';
+        bnk['accountType'] = '';
+        bnk['bankName'] = '';
+        bnk['ifscCode'] = '';
+        bnk['bankBranchAddress'] = '';
+        this.setState({ bnk });
 
         console.log("Productdataid: ", Productdataid);
         this.setState({ sendproductid: Productdataid });
