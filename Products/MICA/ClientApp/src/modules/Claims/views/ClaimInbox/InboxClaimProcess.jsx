@@ -419,13 +419,11 @@ class InboxClaimProcess extends React.Component {
 
     onFormSubmit = () => {
         this.state.ValidationUI = true;
-        this.state.validateUI = false;
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
         this.handleAmountValidation();
 
         if (this.state.approveamtvalidation === true) {
-            if (this.state.validateUI === true) {
                 if (this.state.ValidationUI === true) {
 
                     this.setState({ claimsdecisionshow: true });
@@ -529,9 +527,6 @@ class InboxClaimProcess extends React.Component {
                     }
                 }
 
-            } else {
-                swal("", "Amount paid to payee type's should not be greater than total approved amount", "error");
-            }
         } else {
             swal("", "Approved amount cannot be greater than balance sum insured", "error");
         }
@@ -575,15 +570,15 @@ class InboxClaimProcess extends React.Component {
             this.setState({});
         }
 
-        if (amt > Number(this.state.fields.approvedClaimAmount)) {
-            this.state.validateUI = false;
-            //this.state.amtflag = true;
-            this.setState({});
-        } else {
-            this.state.validateUI = true;
-            // this.state.amtflag = false;
-            this.setState({});
-        }
+        //if (amt > Number(this.state.fields.approvedClaimAmount)) {
+        //    this.state.validateUI = false;
+        //    //this.state.amtflag = true;
+        //    this.setState({});
+        //} else {
+        //    this.state.validateUI = true;
+        //    // this.state.amtflag = false;
+        //    this.setState({});
+        //}
     }
 
     onInputParamChange = (type, evt) => {
@@ -631,7 +626,7 @@ class InboxClaimProcess extends React.Component {
         fields.claimId = ClaimArr[0].claimId;
         fields.claimStatusId = ClaimArr[0].claimStatusId;
         fields.claimManagerRemarks = ClaimArr[0].claimManagerRemarks;
-        //fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
+        fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
         //this.state.claimamt.approvedClaimAmounts = ClaimArr[0].insurableApprovedAmount;
 
         this.state.prodId = ClaimArr[0].productIdPk;
