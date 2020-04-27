@@ -462,7 +462,7 @@ class ClaimIntimate extends React.Component {
                                         icon: "error"
                                     })
                                 }
-                                this.onBankdataReset();
+                               //this.onBankdataReset();
                             }
                         });
 
@@ -1092,7 +1092,8 @@ class ClaimIntimate extends React.Component {
         claim['causeOfLoss'] = '';
         claim['lossIntimatedBy'] = '';
         claim['locationOfLoss'] = '';
-        //claim['lossDateTime'] = '';
+        claim['lossDateTime'] = null;
+        claim['claimAmount'] = '';
         this.setState({ claim });
         //Reseting Bank detils
         let bnk = this.state.bankDetails;

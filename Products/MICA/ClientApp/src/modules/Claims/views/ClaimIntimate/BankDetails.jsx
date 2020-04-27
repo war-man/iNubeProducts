@@ -113,7 +113,7 @@ const BankDetails = (props) => {
 
                         formControlProps={{ fullWidth: true }} />
 
-                        {props.errorifsccode && (props.ifscCodeState == true) ? <p className="error"> IFSC Code should be in correct formate (eg: CNBK1234567)</p> : null}
+                        {props.errorifsccode && (props.ifscCodeState == true) ? <p className="error"> IFSC Code should be in correct format (eg: CNBK1234567)</p> : null}
 
                     </GridItem>
 
