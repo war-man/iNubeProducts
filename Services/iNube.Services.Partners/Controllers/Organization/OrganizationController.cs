@@ -329,5 +329,15 @@ namespace iNube.Services.Partners.Controllers.Organization
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> GetMappingDetails(int orgid, int offid)
+        {
+            var isFilter = true;
+            var response = await _avoorgService.GetMappingDetails(orgid,offid, Context);
+         
+            return Ok(response);
+        }
+
+
     }
 }
