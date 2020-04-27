@@ -4994,13 +4994,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         {
                             PolicyNumber = policy,
                             FromDate = CDFromDate,
-                            ToDate = CurrentIndianTime,
+                            ToDate = CDToDate,
                         };
 
                         //Step-3 Get Entire Policy Details
                         var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, context);
 
-                        int DaysChargeable = TotalUsage(policy, CDFromDate, CurrentIndianTime.Value);
+                        int DaysChargeable = TotalUsage(policy, CDFromDate, CDToDate);
 
                         if (CDDetails.Count() > 0 && DaysChargeable > 0)
                         {
