@@ -23,7 +23,7 @@ class ClaimPayeeDetails extends React.Component {
             claimid: this.props.claimDetailsprops.claimid,
             AccountTypedata:[],
             displaycust: false,
-            BankDataModelDTO: [],
+            BankDataModelDTO: this.props.claimDetailsprops.BankDataModelDTO,
             Bankarray:this.props.claimDetailsprops.OtherClaimBankDetails,
             BankDetails: {},
             Bankdata: {
@@ -73,15 +73,15 @@ class ClaimPayeeDetails extends React.Component {
 
         this.setState({ Bankfieldsmodel: BankdetailsFields });
 
-        let datamodel = this.state.BankDataModelDTO;
-        datamodel["Workshop"] = {};
-        datamodel["Customer"] = {};
-        datamodel["Financier"] = {};
-        datamodel["Nominee"] = {};
-        datamodel["Surveyor"] = {};
-        this.setState({ datamodel });
+        //let datamodel = this.state.BankDataModelDTO;
+        //datamodel["Workshop"] = {};
+        //datamodel["Customer"] = {};
+        //datamodel["Financier"] = {};
+        //datamodel["Nominee"] = {};
+        //datamodel["Surveyor"] = {};
+        //this.setState({ datamodel });
 
-        console.log("datamodel ", datamodel, this.state.claimid);
+        console.log("datamodel ", this.state.claimid);
         this.handleBankdetails(this.state.claimid);
         console.log("Bankarray", this.state.Bankarray, this.props.claimDetailsprops.OtherClaimBankDetails);
     }
@@ -294,7 +294,7 @@ class ClaimPayeeDetails extends React.Component {
         this.setState({ bank });
         //}
         this.setState({ /*bank,*/ data, BankDataModelDTO });
-        this.props.claimDetailsprops.BankDataCopyModelDTO = this.state.BankDataModelDTO;
+       
     };
     onDateChange = (formate, type, name, objname, event) => {
         const { validdate } = this.state;
