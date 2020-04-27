@@ -466,7 +466,6 @@ class ClaimIntimate extends React.Component {
                             }
                         });
 
-
                 }
                 else {
 

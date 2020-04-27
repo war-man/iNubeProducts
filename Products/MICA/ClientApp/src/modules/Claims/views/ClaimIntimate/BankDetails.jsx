@@ -115,6 +115,7 @@ const BankDetails = (props) => {
 
                         {props.errorifsccode && (props.ifscCodeState == true) ? <p className="error"> IFSC Code should be in correct format (eg: CNBK1234567)</p> : null}
 
+
                     </GridItem>
 
                     <GridItem xs={12} sm={8} md={9}>
