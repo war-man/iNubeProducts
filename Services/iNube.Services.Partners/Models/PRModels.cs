@@ -437,6 +437,12 @@ namespace iNube.Services.Partners.Models
 
     public partial class AvoOrgEmployee
     {
+        public AvoOrgEmployee()
+        {
+            AVOOrgEmpAddress = new HashSet<AVOOrgEmpAddress>();
+            AVOOrgEmpEducation = new HashSet<AVOOrgEmpEducation>();
+        }
+
         public decimal OrgEmpId { get; set; }
         public string StaffCode { get; set; }
         public string StaffName { get; set; }
@@ -453,8 +459,22 @@ namespace iNube.Services.Partners.Models
         public DateTime? CreatedDate { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public int? SalutationId { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public DateTime? Dob { get; set; }
+        public DateTime? DateOfJoining { get; set; }
+        public int? MaritalStatusId { get; set; }
+        public int? GenderId { get; set; }
+        public string PhoneNumber1 { get; set; }
+        public string BankName { get; set; }
+        public string BranchName { get; set; }
+        public string AccountNumber { get; set; }
 
         public virtual AvoOrgPositions Position { get; set; }
+        public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
+        public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
     }
 
     public partial class AvoOrgEmployeeSearch
@@ -1586,7 +1606,7 @@ namespace iNube.Services.Partners.Models
 
     }
 
-    public partial class AVOOrgEmployee
+    public class AVOOrgEmployee
     {
         public AVOOrgEmployee()
         {
@@ -1623,7 +1643,7 @@ namespace iNube.Services.Partners.Models
         public string BranchName { get; set; }
         public string AccountNumber { get; set; }
 
-        // public virtual AVOOrgPositions Position { get; set; }
+        //public virtual TblOrgPositions Position { get; set; }
         public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
         public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
     }
@@ -1641,13 +1661,6 @@ namespace iNube.Services.Partners.Models
         public string EmpAddressLine2 { get; set; }
         public string EmpAddressLine3 { get; set; }
         public int? EmpPincodeId { get; set; }
-
-        //public virtual AVOMasCity EmpCity { get; set; }
-        //public virtual AVOMasCountry EmpCountry { get; set; }
-        //public virtual AVOMasDistrict EmpDistrict { get; set; }
-        //public virtual AVOMasPinCode EmpPincode { get; set; }
-        //public virtual AVOMasState EmpState { get; set; }
-        //public virtual AVOOrgEmployee OrgEmp { get; set; }
     }
 
     public partial class AVOOrgEmpEducation
@@ -1657,8 +1670,6 @@ namespace iNube.Services.Partners.Models
         public string Certification { get; set; }
         public string Year { get; set; }
         public string GradeOrPercentage { get; set; }
-
-        //public virtual AVOOrgEmployee OrgEmp { get; set; }
     }
 
     public partial class MasterDto

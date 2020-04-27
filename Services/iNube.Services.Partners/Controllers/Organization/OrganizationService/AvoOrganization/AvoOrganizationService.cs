@@ -334,7 +334,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-          //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
+            //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
 
             var Emp = from emp in _context.TblOrgEmployee
                       join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
@@ -360,7 +360,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           MovementStatusId = mov.MovementStatusId
 
                       };
-          //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
+            //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
 
             return Emp;
         }
@@ -371,20 +371,20 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             try
             {
 
-             var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
-             var officeReportingId = data.OfficeReportingOfficeId;
+                var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
+                var officeReportingId = data.OfficeReportingOfficeId;
 
-             var officelevelid= _context.TblOrgOffice.FirstOrDefault(a=>a.OrgOfficeId== officeReportingId).OfficeLevelId;
-            if(officelevelid==0)
-            {
-                data.OfficeLevelId = 1;
+                var officelevelid = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == officeReportingId).OfficeLevelId;
+                if (officelevelid == 0)
+                {
+                    data.OfficeLevelId = 1;
 
-            }
-            else
-            {
+                }
+                else
+                {
 
-                data.OfficeLevelId = officelevelid + 1;
-            }
+                    data.OfficeLevelId = officelevelid + 1;
+                }
 
                 _context.TblOrgOffice.Add(data);
                 _context.SaveChanges();
@@ -395,7 +395,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
                 return new CreateOfficeResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
             }
-           
+
         }
 
         public async Task<IEnumerable<ddDTO>> GetNewBranchDropdown(int posid, ApiContext apiContext)
@@ -461,14 +461,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                                                         Positionid = Convert.ToInt32(x.PositionId)
 
                                                     }).ToList();
-            foreach(var item in masterdata)
+            foreach (var item in masterdata)
             {
-                if(item.ParentId==item.Positionid)
+                if (item.ParentId == item.Positionid)
                 {
                     count++;
                 }
             }
-            return count ;
+            return count;
 
 
         }
@@ -505,7 +505,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
                 //  var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
                 var positioncount = Officedto.newpositioncount;
-                for(var i=0;i<positioncount;i++)
+                for (var i = 0; i < positioncount; i++)
                 {
                     var positionName = _context.TblOrgStructure.FirstOrDefault(a => a.OrganizationId == Officedto.DesignationId).LevelDefinition;
                     var parentId = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == Officedto.EmpId).PositionId;
@@ -519,7 +519,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     tblOrgPositions.ParentId = parentId;
                     tblOrgPositions.IsActive = true;
                     tblOrgPositions.IsVacant = true;
-                   _context.TblOrgPositions.Add(tblOrgPositions);
+                    _context.TblOrgPositions.Add(tblOrgPositions);
                 }
                 _context.SaveChanges();
                 return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Data saved sucessfully " };
@@ -530,6 +530,24 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 return new CreateOfficeResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
             }
 
+        }
+
+        public async Task<IEnumerable<AVOOrgEmployee>> SearchPeople(string EmpCode, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var SearchData = _context.TblOrgEmployee/*.OrderByDescending(b=>b.CreatedDate)*/.Select(a => a)
+                 .Include(add => add.TblOrgEmpAddress)
+                 .Include(add => add.TblOrgEmpEducation)
+                 .ToList();
+
+            if (!string.IsNullOrEmpty(EmpCode))
+            {
+                SearchData = SearchData.Where(a => a.StaffCode == EmpCode).Select(a => a).ToList();
+            }
+
+            var _SearchData = _mapper.Map<List<AVOOrgEmployee>>(SearchData);
+            return _SearchData;
         }
 
     }

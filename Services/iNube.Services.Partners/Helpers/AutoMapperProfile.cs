@@ -91,6 +91,13 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<AVOOrgOfficeMapping, TblOrgOfficeMapping>();
             CreateMap<TblOrgOfficeMapping, AVOOrgOfficeMapping>();
 
+            CreateMap<AVOOrgEmployee, Entities.AVO.TblOrgEmployee>()
+             .ForMember(dest => dest.TblOrgEmpAddress, opt => opt.MapFrom(src => src.AVOOrgEmpAddress))
+             .ForMember(dest => dest.TblOrgEmpEducation, opt => opt.MapFrom(src => src.AVOOrgEmpEducation)).ReverseMap();
+
+            CreateMap<Entities.AVO.TblOrgEmployee, AVOOrgEmployee>().ReverseMap();
+            CreateMap<Entities.AVO.TblOrgEmpAddress, AVOOrgEmpAddress>().ReverseMap();
+            CreateMap<Entities.AVO.TblOrgEmpEducation, AVOOrgEmpEducation>().ReverseMap();
 
             //CreateMap<PartnersDTO, TblPartners>()
             //.ForMember(dest => dest.TblPartnerAddress, opt => opt.MapFrom(src => src.PartnerAddress)).ReverseMap();
@@ -113,13 +120,7 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<PinCodeDTO, Entities.AVO.TblMasPinCode>();
             CreateMap<Entities.AVO.TblMasPinCode, PinCodeDTO>();
 
-            CreateMap<AVOOrgEmployee, Entities.AVO.TblOrgEmployee>()
-             .ForMember(dest => dest.TblOrgEmpAddress, opt => opt.MapFrom(src => src.AVOOrgEmpAddress))
-             .ForMember(dest => dest.TblOrgEmpEducation, opt => opt.MapFrom(src => src.AVOOrgEmpEducation)).ReverseMap();
 
-            // CreateMap<TblOrgEmployee, AVOOrgEmployee>();
-            CreateMap<Entities.AVO.TblOrgEmpAddress, AVOOrgEmpAddress>();
-            CreateMap<Entities.AVO.TblOrgEmpEducation, AVOOrgEmpEducation>();
 
         }
 

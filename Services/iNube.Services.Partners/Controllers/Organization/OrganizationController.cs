@@ -320,5 +320,14 @@ namespace iNube.Services.Partners.Controllers.Organization
         }
 
 
+        // Search People ||AVO
+        [HttpGet]
+        public async Task<IActionResult> SearchPeople (string EmpCode)
+        {
+            var searchData = await _avoorgService.SearchPeople(EmpCode, Context);
+            return Ok(searchData);
+        }
+
+
     }
 }
