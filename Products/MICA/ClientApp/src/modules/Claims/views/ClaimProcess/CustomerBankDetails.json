@@ -13,7 +13,7 @@
     "Validation": "",
     "Value": "",
     "ValidationType": "",
-    "UIControl": "TextField"
+    "UIControl": "AccountNumber"
   },
   {
     "Name": "Account Type",

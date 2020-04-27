@@ -587,7 +587,6 @@ class ClaimIntimate extends React.Component {
     }
 
     onDateChange = (formate, type, name, event) => {
-
         var today = event.toDate();
         var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`
 
@@ -1091,8 +1090,8 @@ class ClaimIntimate extends React.Component {
         claim['causeOfLoss'] = '';
         claim['lossIntimatedBy'] = '';
         claim['locationOfLoss'] = '';
-        claim['lossDateTime'] = null;
-        claim['claimAmount'] = '';
+        //claim['lossDateTime'] = null;
+        //claim['claimAmount'] = '';
         this.setState({ claim });
         //Reseting Bank detils
         let bnk = this.state.bankDetails;
