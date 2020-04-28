@@ -34,9 +34,9 @@
   {
     "Name": "IFSC Code",
     "DataType": "string",
-    "Validation": "",
+    "Validation": false,
     "Value": "",
-    "ValidationType": "",
+    "ValidationType": "IFSC Code",
     "UIControl": "TextField"
   },
   {

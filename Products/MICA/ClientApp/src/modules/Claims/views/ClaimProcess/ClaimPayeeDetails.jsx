@@ -11,6 +11,7 @@ import CardHeader from "components/Card/CardHeader.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import CustomDateTimePicker from "components/CustomDateTimePicker/DateTimePicker.jsx";
 import ClaimConfig from "modules/Claims/ClaimConfig.js";
+import validationPage from "modules/Claims/views/ValidationPage.jsx";
 
 class ClaimPayeeDetails extends React.Component {
     constructor(props) {
@@ -189,6 +190,7 @@ class ClaimPayeeDetails extends React.Component {
             return (<CustomInput
                 labelText={Bankfieldsmodel.Name}
                 //  required={true}
+                error={Bankfieldsmodel.Validation}
                 inputType="number"
                 name={Bankfieldsmodel.Name}
                 value={Bankfieldsmodel.Value}
@@ -244,6 +246,7 @@ class ClaimPayeeDetails extends React.Component {
         if (Bankfieldsmodel.UIControl == "TextField") {
             return (<CustomInput
                 labelText={Bankfieldsmodel.Name}
+                error={Bankfieldsmodel.Validation}
                 //  required={true}
                 name={Bankfieldsmodel.Name}
                 value={Bankfieldsmodel.Value}
@@ -314,14 +317,15 @@ class ClaimPayeeDetails extends React.Component {
         let data = BankDataModelDTO[name];
         data.type = name;
         data[evt.target.name] = evt.target.value;
-        //if (name == "Customer") {
+     
         let bank = this.state.Bankarray;
         let index = bank.findIndex(e => e.name == name);
         let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
         bankvalue[0].Value = evt.target.value;
+        bankvalue[0].Validation=this.Validation(evt,bankvalue[0].ValidationType);
         this.setState({ bank });
-        //}
-        this.setState({ /*bank,*/ data, BankDataModelDTO });
+      
+        this.setState({  data, BankDataModelDTO });
        
     };
     onDateChange = (formate, type, name, objname, event) => {
@@ -352,7 +356,7 @@ class ClaimPayeeDetails extends React.Component {
 
         this.setState({ data });
 
-       // this.change(event, name, formate, date, type);
+       // this.Validation(event, name, formate, date, type);
 
     };
     //handleBankdetails = (id) => {
@@ -372,6 +376,35 @@ class ClaimPayeeDetails extends React.Component {
     //        console.log('Response bank data', that.state.BankDetails);
     //    });
     //}
+
+    Validation(event,type) {
+
+        switch (type) {
+         
+
+           
+            case "IFSC Code":
+                if (validationPage.verifyBankifsc(event.target.value)) {
+
+                    return false;
+                } else {
+                    return true;
+                }
+                break;
+
+            case "lossDateTime":
+                if (validationPage.verifydatetime(event.toDate())) {
+                    return false;
+                } else {
+                    return true;
+                }
+                break;
+            
+            default:
+                break;
+        }
+    }
+
 
     onInputParamChange = (type, evt) => {
 
