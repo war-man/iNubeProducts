@@ -21,6 +21,13 @@ namespace iNube.Services.Partners.Models
         public string productCode { get; set; }
     }
 
+    public partial class vacantPositiondto
+    {
+        public string mID { get; set; }
+        public string mValue { get; set; }
+      
+    }
+
     public partial class LocationDTO
     {
         public string locationType { get; set; }
@@ -435,47 +442,7 @@ namespace iNube.Services.Partners.Models
         public int? SpocGenderId { get; set; }
     }
 
-    public partial class AvoOrgEmployee
-    {
-        public AvoOrgEmployee()
-        {
-            AVOOrgEmpAddress = new HashSet<AVOOrgEmpAddress>();
-            AVOOrgEmpEducation = new HashSet<AVOOrgEmpEducation>();
-        }
-
-        public decimal OrgEmpId { get; set; }
-        public string StaffCode { get; set; }
-        public string StaffName { get; set; }
-        public decimal? PositionId { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
-        public decimal? StaffTypeId { get; set; }
-        public string Function { get; set; }
-        public DateTime? AppointmentDate { get; set; }
-        public string Smcode { get; set; }
-        public string Imdcode { get; set; }
-        public string StaffStatus { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public string ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public int? SalutationId { get; set; }
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
-        public DateTime? Dob { get; set; }
-        public DateTime? DateOfJoining { get; set; }
-        public int? MaritalStatusId { get; set; }
-        public int? GenderId { get; set; }
-        public string PhoneNumber1 { get; set; }
-        public string BankName { get; set; }
-        public string BranchName { get; set; }
-        public string AccountNumber { get; set; }
-
-        public virtual AvoOrgPositions Position { get; set; }
-        public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
-        public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
-    }
+  
 
     public partial class AvoOrgEmployeeSearch
     {
@@ -1612,6 +1579,7 @@ namespace iNube.Services.Partners.Models
         {
             AVOOrgEmpAddress = new HashSet<AVOOrgEmpAddress>();
             AVOOrgEmpEducation = new HashSet<AVOOrgEmpEducation>();
+            Position = new AvoOrgPositions();
         }
 
         public decimal OrgEmpId { get; set; }
@@ -1643,7 +1611,7 @@ namespace iNube.Services.Partners.Models
         public string BranchName { get; set; }
         public string AccountNumber { get; set; }
 
-        //public virtual TblOrgPositions Position { get; set; }
+       public virtual AvoOrgPositions Position { get; set; }
         public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
         public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
     }

@@ -552,36 +552,58 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
 
 
-        public async Task<List<Dictionary<string ,int>>> GetMappingDetails(int orgid,int offid, ApiContext apiContext)
+        public async Task<List<vacantPositiondto>> GetVecPositions(decimal orgid, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            List<Dictionary<string, int>> keyValuePairs = new List<Dictionary<string, int>>(); 
-            var totalList = _context.TblOrgPositions.Where(a => a.OrganizationId == orgid && a.OfficeId == offid && a.IsVacant == true).ToList();
             var totalPosition = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid && a.StructureTypeId==28).ToList();
-            var positioncount = 0;
-            Dictionary<string, int> dic = new Dictionary<string, int>();
-
-            foreach (var position in totalPosition)
+            List<vacantPositiondto> ddDTOs = new List<vacantPositiondto>();
+            vacantPositiondto ddDTO = new vacantPositiondto();
+            var positname = "";
+            foreach (var positions in totalPosition)
             {
-                foreach (var item in totalList)
+                var count = _context.TblOrgPositions.Where(a=>a.DesignationId== positions.OrgStructureId && a.IsVacant==true).Count();
+                if(count>0)
                 {
-                    if(position.LevelDefinition==item.PositionName)
-                    {
-                        positioncount++;
-                        
-                    }
+                    ddDTO = new vacantPositiondto();
+                    ddDTO.mID = positions.LevelDefinition;
+                    ddDTO.mValue = positions.LevelDefinition;
+                    ddDTOs.Add(ddDTO);
+                }
 
-                }
-                var checkkey=dic.ContainsKey(position.LevelDefinition);
-                if (checkkey == false && positioncount > 0)
-                {
-                    dic.Add(position.LevelDefinition, positioncount);
-                    keyValuePairs.Add(dic);
-                }
-                positioncount = 0;
             }
-            return keyValuePairs;
+            return ddDTOs;
 
+
+        }
+
+        public async Task<int> GetVacantPositonCount(string designame, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+           
+            var count = _context.TblOrgPositions.Where(a => a.PositionName == designame && a.IsVacant == true).Count();
+            return count;
+        }
+
+
+
+
+        public async Task<CreateOfficeResponse> SaveEmplMappingDetails(AVOOrgEmployee avOOrgEmployee, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+
+                var data = _mapper.Map<TblOrgEmployee>(avOOrgEmployee);
+                _context.TblOrgEmployee.Add(data);
+                //data.
+                _context.SaveChanges();
+                return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Data saved sucessfully " };
+            }
+            catch (Exception ex)
+            {
+
+                return new CreateOfficeResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
+            }
 
         }
     }
