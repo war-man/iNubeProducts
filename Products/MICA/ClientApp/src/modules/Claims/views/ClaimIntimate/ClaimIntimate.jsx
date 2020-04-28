@@ -974,7 +974,7 @@ class ClaimIntimate extends React.Component {
         console.log("selected: ", this.state.selected);
     }
     CommontotalAmountUpdate = () => {
-
+        debugger;
         let claimdetails = this.state.selected.map((item, i) => { if (eval(item.claimAmounts > 0)) { return eval(item.claimAmounts) } else { return 0; } });
 
         console.log("claimdetails", claimdetails, this.state.selected, this.state.ClaimsAmountData)
@@ -1092,6 +1092,7 @@ class ClaimIntimate extends React.Component {
         claim['locationOfLoss'] = '';
         claim['lossDateTime'] = null;
         claim['claimAmount'] = '';
+        this.state.selected = [];
         this.setState({ claim });
         //Reseting Bank detils
         let bnk = this.state.bankDetails;
