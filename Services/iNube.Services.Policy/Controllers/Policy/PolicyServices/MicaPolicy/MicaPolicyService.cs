@@ -3778,8 +3778,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         SumInsured = s.SumInsured,
                         PolicyStartDate = s.PolicyStartDate.ToString(),
                         PolicyEndDate = s.PolicyEndDate.ToString(),
-                        PremiumAmount = s.PremiumAmount
-
+                        PremiumAmount = s.PremiumAmount,
+                        CDAccountNumber=s.CdaccountNumber
                     }
                     )
                     .ToList();
@@ -3797,6 +3797,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         PolicyDetailsobj.PolicyStartDate = item.PolicyStartDate.ToString();
                         PolicyDetailsobj.PolicyEndDate = item.PolicyEndDate.ToString();
                         PolicyDetailsobj.PremiumAmount = item.PremiumAmount;
+                        PolicyDetailsobj.CDAccountNumber = item.CDAccountNumber;
 
                         var policydetails = _context.TblPolicyDetails.FirstOrDefault(p => p.PolicyId == item.policyid);
                         if (policydetails != null)
