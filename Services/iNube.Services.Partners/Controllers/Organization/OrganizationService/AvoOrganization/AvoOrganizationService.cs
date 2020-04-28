@@ -532,7 +532,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         }
 
-        public async Task<IEnumerable<AVOOrgEmployee>> SearchPeople(string EmpCode, ApiContext apiContext)
+        public async Task<IEnumerable<AVOOrgEmployee>> SearchPeople(SearchPeople searchPeople, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -541,12 +541,27 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                  .Include(add => add.TblOrgEmpEducation)
                  .ToList();
 
-            if (!string.IsNullOrEmpty(EmpCode))
+            if (!string.IsNullOrEmpty(searchPeople.EmpCode))
             {
-                SearchData = SearchData.Where(a => a.StaffCode == EmpCode).Select(a => a).ToList();
+                SearchData = SearchData.Where(a => a.StaffCode == searchPeople.EmpCode).Select(a => a).ToList();
             }
 
             var _SearchData = _mapper.Map<List<AVOOrgEmployee>>(SearchData);
+
+            foreach (var item in _SearchData)
+            {
+                var designation = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == item.PositionId);
+                if (designation != null)
+                {
+                    item.Designation = designation.PositionName;
+                }
+                var offname = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == designation.OfficeId);
+                if (offname != null)
+                {
+                    item.OfficeName = offname.OfficeName;
+                }
+            }
+
             return _SearchData;
         }
 
