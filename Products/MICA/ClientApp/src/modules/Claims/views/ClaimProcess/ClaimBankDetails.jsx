@@ -52,7 +52,21 @@ const ClaimBankDetails = (props) => {
             );
 
 
-        }
+        } else if (Bankfieldsmodel.UIControl == "AccountNumber") {
+           return (<CustomInput
+               labelText={Bankfieldsmodel.Name}
+               //  required={true}
+               inputType="number"
+               name={Bankfieldsmodel.Name}
+               value={Bankfieldsmodel.Value}
+               onChange={(e) => claimDetailsFun.onModelChange(e, name)}
+               formControlProps={{ fullWidth: true }}
+           />
+
+           );
+
+
+       }
         else if (Bankfieldsmodel.UIControl == "Datetime") {
             return (
                 < CustomDateTimePicker

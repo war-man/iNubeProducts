@@ -565,5 +565,39 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return _SearchData;
         }
 
+
+
+        public async Task<List<Dictionary<string ,int>>> GetMappingDetails(int orgid,int offid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<Dictionary<string, int>> keyValuePairs = new List<Dictionary<string, int>>(); 
+            var totalList = _context.TblOrgPositions.Where(a => a.OrganizationId == orgid && a.OfficeId == offid && a.IsVacant == true).ToList();
+            var totalPosition = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid && a.StructureTypeId==28).ToList();
+            var positioncount = 0;
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+
+            foreach (var position in totalPosition)
+            {
+                foreach (var item in totalList)
+                {
+                    if(position.LevelDefinition==item.PositionName)
+                    {
+                        positioncount++;
+                        
+                    }
+
+                }
+                var checkkey=dic.ContainsKey(position.LevelDefinition);
+                if (checkkey == false && positioncount > 0)
+                {
+                    dic.Add(position.LevelDefinition, positioncount);
+                    keyValuePairs.Add(dic);
+                }
+                positioncount = 0;
+            }
+            return keyValuePairs;
+
+
+        }
     }
 }

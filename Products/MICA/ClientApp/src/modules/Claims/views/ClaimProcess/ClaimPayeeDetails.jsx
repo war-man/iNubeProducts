@@ -185,6 +185,20 @@ class ClaimPayeeDetails extends React.Component {
             );
 
 
+        } else if (Bankfieldsmodel.UIControl == "AccountNumber") {
+            return (<CustomInput
+                labelText={Bankfieldsmodel.Name}
+                //  required={true}
+                inputType="number"
+                name={Bankfieldsmodel.Name}
+                value={Bankfieldsmodel.Value}
+                onChange={(e) => this.onModelChange(e, name)}
+                formControlProps={{ fullWidth: true }}
+            />
+
+            );
+
+
         }
         else if (Bankfieldsmodel.UIControl == "Datetime") {
 
@@ -231,6 +245,20 @@ class ClaimPayeeDetails extends React.Component {
             return (<CustomInput
                 labelText={Bankfieldsmodel.Name}
                 //  required={true}
+                name={Bankfieldsmodel.Name}
+                value={Bankfieldsmodel.Value}
+                onChange={(e) => this.onModelChange(e, name)}
+                formControlProps={{ fullWidth: true }}
+            />
+
+            );
+
+
+        } else if (Bankfieldsmodel.UIControl == "AccountNumber") {
+            return (<CustomInput
+                labelText={Bankfieldsmodel.Name}
+                //  required={true}
+                inputType="number"
                 name={Bankfieldsmodel.Name}
                 value={Bankfieldsmodel.Value}
                 onChange={(e) => this.onModelChange(e, name)}

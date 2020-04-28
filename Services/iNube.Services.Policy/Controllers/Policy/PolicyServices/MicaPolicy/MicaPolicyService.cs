@@ -3778,8 +3778,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         SumInsured = s.SumInsured,
                         PolicyStartDate = s.PolicyStartDate.ToString(),
                         PolicyEndDate = s.PolicyEndDate.ToString(),
-                        PremiumAmount = s.PremiumAmount
-
+                        PremiumAmount = s.PremiumAmount,
+                        CDAccountNumber=s.CdaccountNumber
                     }
                     )
                     .ToList();
@@ -3797,6 +3797,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         PolicyDetailsobj.PolicyStartDate = item.PolicyStartDate.ToString();
                         PolicyDetailsobj.PolicyEndDate = item.PolicyEndDate.ToString();
                         PolicyDetailsobj.PremiumAmount = item.PremiumAmount;
+                        PolicyDetailsobj.CDAccountNumber = item.CDAccountNumber;
 
                         var policydetails = _context.TblPolicyDetails.FirstOrDefault(p => p.PolicyId == item.policyid);
                         if (policydetails != null)
@@ -6263,6 +6264,15 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     errorflag = true;
 
                 }
+                else if (!string.IsNullOrEmpty(PolicyRefundDetails.PaymentGatewayReferenceId))
+                {
+                    var dict = new Dictionary<string, string>();
+                    dict.Add("Header", "RecordsUpdated");
+                    dict.Add("Details", $"For EndorsementNumber  {endorsementNo} record is already updated in the database.");
+                    dict1.Add(dict);
+                    errorflag = true;
+
+                }
                 else
                 {
                     var endeffectivedate = PolicyRefundDetails.EndorsementEffectivedate;//22/03/2020
@@ -6448,7 +6458,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         policyRefund.EndorsementEffectivedate = DatetimeNow;
                         policyRefund.TxnDate = DatetimeNow;
                         policyRefund.TotalRefundAmount = RefundDetails.TotalPremium;
-                        // policyRefund.EndorsementNumber = EndorsementNo;
+                        policyRefund.EndorsementNumber = tbl_particiant.ProposalNo+"_"+ (2);
                         policyRefund.UpdatedResponse = json.ToString();
                         policyRefund.PolicyId = policyId;
 
