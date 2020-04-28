@@ -147,6 +147,10 @@ namespace iNube.Services.Partners.Models
         public OrganizationDTO Organization { get; set; }
     }
 
+    public class SearchPeople
+    {
+        public string EmpCode { get; set;}
+    }
     public partial class OrganizationDTO
     {
         public OrganizationDTO()
@@ -1642,6 +1646,8 @@ namespace iNube.Services.Partners.Models
         public string BankName { get; set; }
         public string BranchName { get; set; }
         public string AccountNumber { get; set; }
+        public string OfficeName { get; set; }
+        public string Designation { get; set; }
 
         //public virtual TblOrgPositions Position { get; set; }
         public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }

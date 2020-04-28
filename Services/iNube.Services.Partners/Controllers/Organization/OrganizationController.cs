@@ -321,10 +321,10 @@ namespace iNube.Services.Partners.Controllers.Organization
 
 
         // Search People ||AVO
-        [HttpGet]
-        public async Task<IActionResult> SearchPeople (string EmpCode)
+        [HttpPost]
+        public async Task<IActionResult> SearchPeople (SearchPeople searchPeople)
         {
-            var searchData = await _avoorgService.SearchPeople(EmpCode, Context);
+            var searchData = await _avoorgService.SearchPeople(searchPeople, Context);
             return Ok(searchData);
         }
 
