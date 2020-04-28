@@ -1785,74 +1785,139 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     {
                         decimal PayeeAppAmt = 0;
                         var payeeDetails = _context.TblClaimPayments.Where(c => c.ClaimId == ClaimApproval.ClaimId).ToList();
+                        string accHoldName="", accNumber="", bnkName="", bnkAddr="", bnkIfsc="", bnkpayee="";
+                        decimal amtPaid = 0;DateTime payeeDate= DateTime.Now;int accType = 0;bool isBnkValid = true;
+                        //var claimPayee = claimsDTO.DataModelDTO.GroupBy(o => o.).Select(o => o.FirstOrDefault());
                         foreach (var item in claimsDTO.DataModelDTO)
                         {
-                            var PayeExist = payeeDetails.FirstOrDefault(p => p.PayeeType == Convert.ToString(item.type));
-                            if (PayeExist != null)
+                            isBnkValid = true;
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Account Holder Name"])))
                             {
-                                PayeExist.AccountHolderName = item["Account Holder Name"];
-                                PayeExist.AccountNumber = item["Account No."];
-                                PayeExist.ClaimId = ClaimApproval.ClaimId;
-                                PayeExist.BankBranchAddress = item["Bank Branch Address"];
-                                PayeExist.BankName = item["Bank Name"];
-                                PayeExist.Ifsccode = item["IFSC Code"];
-                                PayeExist.AccountType = item["Account Type"];
-                                if (string.IsNullOrEmpty(Convert.ToString(item["Amount Paid"])))
-                                {
-                                    errorInfo = new ErrorInfo() { ErrorCode = "Amount", ErrorMessage = "Amount Paid Cannot be null" };
-                                    Errors.Add(errorInfo);
-                                }
-                                else
-                                {
-                                    PayeExist.AmountPaid = item["Amount Paid"];
-                                    PayeeAppAmt = PayeeAppAmt + (decimal)PayeExist.AmountPaid;
-                                }
-                                if (string.IsNullOrEmpty(Convert.ToString(item["Date Of Payment"])))
-                                {
-                                    errorInfo = new ErrorInfo() { ErrorCode = "Date", ErrorMessage = "Date Of Payment Cannot be null" };
-                                    Errors.Add(errorInfo);
-                                }
-                                else
-                                {
-                                    PayeExist.DataOfPayment = item["Date Of Payment"];
-                                }
-                                _context.TblClaimPayments.Update(PayeExist);
+                                errorInfo = new ErrorInfo() { ErrorCode = "AccountHolderName", ErrorMessage = "Account Holder Name Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
                             }
                             else
                             {
-                                TblClaimPayments claimPayments = new TblClaimPayments();
-                                claimPayments.AccountHolderName = item["Account Holder Name"];
-                                claimPayments.AccountNumber = item["Account No."];
-                                claimPayments.ClaimId = ClaimApproval.ClaimId;
-                                claimPayments.BankBranchAddress = item["Bank Branch Address"];
-                                claimPayments.BankName = item["Bank Name"];
-                                claimPayments.Ifsccode = item["IFSC Code"];
-                                claimPayments.AccountType = item["Account Type"];
-                                if (string.IsNullOrEmpty(Convert.ToString(item["Amount Paid"])))
-                                {
-                                    errorInfo = new ErrorInfo() { ErrorCode = "Amount", ErrorMessage = "Amount Paid Cannot be null" };
-                                    Errors.Add(errorInfo);
-                                }
-                                else
-                                {
-                                    claimPayments.AmountPaid = item["Amount Paid"];
-                                    PayeeAppAmt = PayeeAppAmt + (decimal)claimPayments.AmountPaid;
-                                }
-                                if (string.IsNullOrEmpty(Convert.ToString(item["Date Of Payment"])))
-                                {
-                                    errorInfo = new ErrorInfo() { ErrorCode = "Date", ErrorMessage = "Date Of Payment Cannot be null" };
-                                    Errors.Add(errorInfo);
-                                }
-                                else
-                                {
-                                    claimPayments.DataOfPayment = item["Date Of Payment"];
-                                }
-
-                                claimPayments.PayeeType = item.type;
-                                _context.TblClaimPayments.Add(claimPayments);
+                                accHoldName = item["Account Holder Name"];
                             }
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Account No."])))
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "AccountNo", ErrorMessage = "Account No Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
+                            }
+                            else
+                            {
+                                accNumber = item["Account No."];
+                            }
+                            
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Bank Branch Address"])))
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "BranchAddress", ErrorMessage = "Bank Branch Address Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
+                            }
+                            else
+                            {
+                                bnkAddr = item["Bank Branch Address"];
+                            }
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Bank Name"])))
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "BankName", ErrorMessage = "Bank Name Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
+                            }
+                            else
+                            {
+                                bnkName = item["Bank Name"];
+                            }
+                            if (string.IsNullOrEmpty(Convert.ToString(item["IFSC Code"])))
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "IFSCCode", ErrorMessage = "IFSC Code Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
+                            }
+                            else
+                            {
+                                bnkIfsc = item["IFSC Code"];
+                            }
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Account Type"])))
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "AccountType", ErrorMessage = "Account Type Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
+                            }
+                            else
+                            {
+                                accType = item["Account Type"];
+                            }
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Amount Paid"]))  && claimsprocess.ClaimStatusId == 38)
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "Amount", ErrorMessage = "Amount Paid Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
+                            }
+                            else
+                            {
+                                amtPaid = item["Amount Paid"];
+                                PayeeAppAmt = PayeeAppAmt + amtPaid;
+                            }
+                            if (string.IsNullOrEmpty(Convert.ToString(item["Date Of Payment"])) && claimsprocess.ClaimStatusId == 38)
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "Date", ErrorMessage = "Date Of Payment Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
+                            }
+                            else
+                            {
+                                payeeDate = item["Date Of Payment"];
+                            }
+                            if (string.IsNullOrEmpty(Convert.ToString(item["type"])))
+                            {
+                                errorInfo = new ErrorInfo() { ErrorCode = "PaymentType", ErrorMessage = "Payment Type Cannot be null" };
+                                Errors.Add(errorInfo);
+                                isBnkValid = false;
+                            }
+                            else
+                            {
+                                bnkpayee = item["type"];
+                            }
+                            if (isBnkValid)
+                            {
+                                var PayeExist = payeeDetails.FirstOrDefault(p => p.PayeeType == Convert.ToString(item.type));
+                                if (PayeExist != null)
+                                {
+                                    PayeExist.AccountHolderName = accHoldName;
+                                    PayeExist.AccountNumber = accNumber;
+                                    PayeExist.ClaimId = ClaimApproval.ClaimId;
+                                    PayeExist.BankBranchAddress = bnkAddr;
+                                    PayeExist.BankName = bnkName;
+                                    PayeExist.Ifsccode = bnkIfsc;
+                                    PayeExist.AccountType = accType;
+                                    PayeExist.AmountPaid = amtPaid;
+                                    PayeExist.DataOfPayment = payeeDate;
+                                    PayeExist.PayeeType = bnkpayee;
+                                    _context.TblClaimPayments.Update(PayeExist);
+                                }
+                                else
+                                {
+                                    TblClaimPayments claimPayments = new TblClaimPayments();
+                                    claimPayments.AccountHolderName = accHoldName;
+                                    claimPayments.AccountNumber = accNumber;
+                                    claimPayments.ClaimId = ClaimApproval.ClaimId;
+                                    claimPayments.BankBranchAddress = bnkAddr;
+                                    claimPayments.BankName = bnkName;
+                                    claimPayments.Ifsccode = bnkIfsc;
+                                    claimPayments.AccountType = accType;
+                                    claimPayments.AmountPaid = amtPaid;
+                                    claimPayments.DataOfPayment = payeeDate;
 
+                                    claimPayments.PayeeType = bnkpayee;
+                                    _context.TblClaimPayments.Add(claimPayments);
+                                }
 
+                            }
                         }
                         if (claimsprocess.ClaimStatusId == 38 && Convert.ToDecimal(claimsprocess.ApprovedClaimAmount) != PayeeAppAmt)
                         {
@@ -1862,23 +1927,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     }
 
                     //_context.SaveChanges();
-                    if (!string.IsNullOrEmpty(claimsDTO.EmailId))
-                    {
-                        if (claimsprocess.ClaimStatusId == 9)
-                        {
-                            emailTest.To = claimsDTO.EmailId;
-                            emailTest.Subject = "Claim successfully approved";
-                            emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " successfully approved. \n Your Claim has been approved, by the Claims Manager. \n The Approved Claims will be settled as per the policy terms and conditions.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
-                            await SendEmailAsync(emailTest, apiContext);
-                        }
-                        else if (claimsprocess.ClaimStatusId == 11)
-                        {
-                            emailTest.To = claimsDTO.EmailId;
-                            emailTest.Subject = "Claim Rejected";
-                            emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " has been rejected. \n Your Claim has been rejected, by the Claims Manager. \n We regret to inform you that your claim has been Rejected by the claims manager.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
-                            await SendEmailAsync(emailTest, apiContext);
-                        }
-                    }
+                    
                     foreach (var item in Insurable)
                     {
 
@@ -1935,7 +1984,10 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
 
                     }
-
+                    if (Errors.Count > 0)
+                    {
+                        return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Claims Process Fails" };
+                    }
                     var amount = (decimal)claimsprocess.ApprovedClaimAmount;
 
                     var _claimprocess = _mapper.Map<ClaimProcessDTO>(claimsprocess);
@@ -1956,11 +2008,24 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         //Accounting Log Fail...
 
                     }
-                    if (Errors.Count > 0)
+                    
+                    if (!string.IsNullOrEmpty(claimsDTO.EmailId))
                     {
-                        return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, Errors = Errors, ResponseMessage = "Claims Process Fails" };
+                        if (claimsprocess.ClaimStatusId == 9)
+                        {
+                            emailTest.To = claimsDTO.EmailId;
+                            emailTest.Subject = "Claim successfully approved";
+                            emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " successfully approved. \n Your Claim has been approved, by the Claims Manager. \n The Approved Claims will be settled as per the policy terms and conditions.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
+                            await SendEmailAsync(emailTest, apiContext);
+                        }
+                        else if (claimsprocess.ClaimStatusId == 11)
+                        {
+                            emailTest.To = claimsDTO.EmailId;
+                            emailTest.Subject = "Claim Rejected";
+                            emailTest.Message = "Claim Number: " + claimsprocess.ClaimNumber + " has been rejected. \n Your Claim has been rejected, by the Claims Manager. \n We regret to inform you that your claim has been Rejected by the claims manager.\n Assuring the best of services always. \n \nRegards, \nTeam MICA";
+                            await SendEmailAsync(emailTest, apiContext);
+                        }
                     }
-
                     _context.TblClaims.Update(claimsprocess);
                     _context.SaveChanges();
 

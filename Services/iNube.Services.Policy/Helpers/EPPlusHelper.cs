@@ -21,7 +21,7 @@ namespace iNube.Services.Policy.Helpers
         public static DateTime? IsDate(string tempDate)
         {
             DateTime fromDateValue;
-            var formats = new[] { "dd/MM/yyyy", "yyyy-MM-dd" ,"dd-mm-yyyy"};
+            var formats = new[] { "dd/MM/yyyy", "yyyy-MM-dd" ,"dd-MM-yyyy"};
             if (DateTime.TryParseExact(tempDate, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out fromDateValue))
             {
                 return fromDateValue;
