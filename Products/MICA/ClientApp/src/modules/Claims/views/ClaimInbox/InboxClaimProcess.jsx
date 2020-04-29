@@ -491,7 +491,8 @@ class InboxClaimProcess extends React.Component {
                     detailsdto['ClaimInsurable'] = this.state.DataAmount;
 
                     this.setState({ detailsdto });
-                   
+
+
                         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimProcess`, {
                             method: 'Post',
                             headers: {
