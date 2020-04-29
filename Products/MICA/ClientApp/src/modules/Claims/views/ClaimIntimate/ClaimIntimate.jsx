@@ -1085,6 +1085,7 @@ class ClaimIntimate extends React.Component {
         claim.emailId = PolicyArr[0].email;
         claim.benefitAmount = PolicyArr[0].sumInsured;
         claim['insurableItems'] = '';
+        claim['alldoc'] = [];
         //Reseting values
         claim['lossDescription'] = '';
         claim['causeOfLoss'] = '';
