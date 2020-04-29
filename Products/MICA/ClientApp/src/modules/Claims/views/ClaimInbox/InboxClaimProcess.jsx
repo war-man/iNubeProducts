@@ -410,15 +410,18 @@ class InboxClaimProcess extends React.Component {
         this.setState({ openpop: false });
     };
     BankPayeeValidation = () => {
-        this.setState({ ValidIFSCCode: false });
+      
         console.log("Bankarray in model", this.state.OtherClaimBankDetails);
 
         for (var I = 0; I < this.state.OtherClaimBankDetails.length; I++) {
             let validList = this.state.OtherClaimBankDetails[I].BankDetails.filter(S => S.Validation == true && S.Name =="IFSC Code");
-            if (validList != null) {
+            if (validList != null && validList.length > 0) {
+                this.state.ValidIFSCCode = true;
                 this.setState({ ValidIFSCCode: true });
+               
             } 
             console.log("validateLists", validList);
+          
         }
 
         let otherClaimBankDetails = this.state.OtherClaimBankDetails;
@@ -443,7 +446,9 @@ class InboxClaimProcess extends React.Component {
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
         this.handleAmountValidation();
+        this.state.ValidIFSCCode=false;
         this.BankPayeeValidation();
+       
         if (this.state.approveamtvalidation === true) {
             if (this.state.ValidIFSCCode == false) {
                 if (this.state.ValidationUI === true) {
