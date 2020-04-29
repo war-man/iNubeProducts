@@ -35,7 +35,10 @@ import Modal from '@material-ui/core/Modal';
 import PDFViewer from 'pdf-viewer-reactjs';
 import BankdetailsFields from "modules/Claims/views/ClaimProcess/BankdetailsFields.json";
 import CustomerBankDetails from "modules/Claims/views/ClaimProcess/CustomerBankDetails.json";
-
+import PolicyDetails from "modules/Claims/views/ClaimProcess/_PolicyDetails.jsx";
+import ClaimDetails from "../ClaimProcess/_ClaimDetails.jsx";
+import DocDetails from "../ClaimProcess/_DocDetails.jsx";
+import Wizard from "components/Wizard/Wizard.jsx";
 import CustomDateTimePicker from "components/CustomDateTimePicker/DateTimePicker.jsx";
 //import Data from "./Data.json";
 
@@ -120,6 +123,8 @@ class ClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            ValidIFSCCode: false,
+            renderpage: false,
             PerformerFlag: true,
             ClaimIntemationDate: null,
             claimsremarksflag: false,
@@ -247,6 +252,7 @@ class ClaimProcess extends React.Component {
                 ClaimInsurable: [],
 
             },
+
             email: "",
             fields: {
                 claimStatusId: "",
@@ -275,6 +281,7 @@ class ClaimProcess extends React.Component {
                 documentType: "",
             },
             BankDetails: {},
+            OtherClaimBankDetails: [],
             index: 0,
             claimamt: [{
                 approvedClaimAmounts: 0
@@ -415,15 +422,41 @@ class ClaimProcess extends React.Component {
             },
             popopen: false,
             vehicleActivitydata: [],
-            TableDataList: []
+            TableDataList: [],
+            BankDataModelData: {}
         };
-        this.dataTable = this.dataTable.bind(this);
-        this.SetValue = this.SetValue.bind(this);
+       
     }
 
     handleClose = () => {
         this.setState({ openpop: false });
     };
+    BankPayeeValidation = () => {
+        this.setState({ ValidIFSCCode: false });
+        console.log("Bankarray in model", this.state.OtherClaimBankDetails);
+
+        for (var I = 0; I < this.state.OtherClaimBankDetails.length; I++) {
+            let validList = this.state.OtherClaimBankDetails[I].BankDetails.filter(S => S.Validation == true && S.Name == "IFSC Code");
+            if (validList != null) {
+                this.setState({ ValidIFSCCode: true });
+            }
+            console.log("validateLists", validList);
+        }
+
+        let otherClaimBankDetails = this.state.OtherClaimBankDetails;
+        //let index = bank.findIndex(e => e.name == name);
+        //let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
+        //bankvalue[0].Value = evt.target.value;
+        //bankvalue[0].Validation = this.Validation(evt, bankvalue[0].ValidationType);
+        //this.setState({ bank });
+    }
+    internalCallFormSubmit = (data) => {
+        let field = this.state.fields;
+        field.claimManagerRemarks = data.claimManagerRemarks;
+        field.claimStatusId = data.claimStatusId;
+        this.setState({ field });
+        this.onFormSubmit();
+    }
     SetValue = (type, event) => {
 
         let name = event.target.name;
@@ -434,22 +467,22 @@ class ClaimProcess extends React.Component {
         this.change(event, name, type);
     };
 
-    onFormSubmit = (evt) => {
-        console.log("this.state.fields", this.state.fields);
+    onFormSubmit = () => {
         this.state.ValidationUI = true;
         this.state.validateUI = false;
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
         this.handleAmountValidation();
-        debugger;
+        this.BankPayeeValidation();
         if (this.state.approveamtvalidation === true) {
-            if (this.state.validateUI === true) {
+            if (this.state.ValidIFSCCode == false) {
                 if (this.state.ValidationUI === true) {
 
                     this.setState({ claimsdecisionshow: true });
 
                     console.log("submit", this.state.fields);
                     let field = this.state.fields;
+                    field.DataModelDTO = [];    
                     field.emailId = this.state.email;
 
                     if (!$.isEmptyObject(this.state.BankDataModelDTO["Workshop"])) {
@@ -525,6 +558,18 @@ class ClaimProcess extends React.Component {
                                 }
 
 
+                            } else if (data.status == 9) {
+                                if (data.errors.length > 0) {
+                                    swal({
+                                        text: data.errors[0].errorMessage,
+                                        icon: "error"
+                                    });
+                                } else {
+                                    swal({
+                                        text: data.responseMessage,
+                                        icon: "error"
+                                    });
+                                }
                             }
                             //this.renderRedirect();
                         });
@@ -536,7 +581,7 @@ class ClaimProcess extends React.Component {
                         this.setState({ claimstatusflag: true });
                         swal("", "Please select Claim status", "error");
                     }
-                    else if (this.state.fields.claimManagerRemarks == "") {
+                    else if (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks == null) {
                         this.setState({ errormessage: true });
                         this.setState({ claimsremarksflag: true });
                         swal("", "Please enter Claim manager remarks", "error");
@@ -546,8 +591,9 @@ class ClaimProcess extends React.Component {
                     }
                 }
 
-            } else {
-                swal("", "Amount paid to payee type's should not be greater than total approved amount", "error");
+            }
+            else {
+                swal("", "IFSC Code should be in correct format (eg: CNBK1234567)", "error");
             }
         } else {
             swal("", "Approved amount cannot be greater than balance sum insured", "error");
@@ -560,7 +606,7 @@ class ClaimProcess extends React.Component {
     }
 
     IsValidProductDetails = () => {
-        if (this.state.fields.claimStatusId !== "" && this.state.fields.claimManagerRemarks !== "") {
+        if (this.state.fields.claimStatusId !== "" && this.state.fields.claimManagerRemarks !== "" && this.state.fields.claimManagerRemarks !== null) {
         } else {
             this.state.ValidationUI = false; this.state.errormessage = true;
             this.setState({});
@@ -582,7 +628,7 @@ class ClaimProcess extends React.Component {
         }
         console.log("Amountdetails", amt, this.state.claimTableData.approvedClaimAmounts);
 
-        if (this.state.fields.approvedClaimAmount > this.state.policyDetailsData.balanceSumInsured) {
+        if (Number(this.state.fields.approvedClaimAmount) > Number(this.state.policyDetailsData.balanceSumInsured)) {
             this.state.approveamtvalidation = false;
             // this.state.approvedAmtflag = true;
             this.setState({});
@@ -592,24 +638,22 @@ class ClaimProcess extends React.Component {
             this.setState({});
         }
 
-        if (amt > this.state.fields.approvedClaimAmount) {
-            this.state.validateUI = false;
-            //this.state.amtflag = true;
-            this.setState({});
-        } else {
-            this.state.validateUI = true;
-            // this.state.amtflag = false;
-            this.setState({});
-        }
+        //if (amt > this.state.fields.approvedClaimAmount) {
+        //    this.state.validateUI = false;
+        //    //this.state.amtflag = true;
+        //    this.setState({});
+        //} else {
+        //    this.state.validateUI = true;
+        //    // this.state.amtflag = false;
+        //    this.setState({});
+        //}
     }
 
     onInputParamChange = (type, evt) => {
-        console.log('Event', evt);
         let fields = this.state.fields;
         let name = evt.target.name;
         let value = evt.target.value;
         fields[name] = value;
-        console.log("fields", fields);
         this.setState({ fields });
 
         this.change(evt, name, type);
@@ -626,8 +670,7 @@ class ClaimProcess extends React.Component {
     }
 
     editFunction(id, oid) {
-        console.log("pid", oid);
-        console.log("officelist data", this.state.Claimlist);
+        
         var CArr = this.state.Claimlist;
         var ClaimArr = [];
         $.each(CArr, function (k, v) {
@@ -645,18 +688,22 @@ class ClaimProcess extends React.Component {
         const fields = this.state.fields;
         fields.claimNumber = ClaimArr[0].claimNumber;
         fields.claimId = ClaimArr[0].claimId;
-        // fields.claimStatusId = ClaimArr[0].claimStatusId;
+        fields.claimStatusId = ClaimArr[0].claimStatusId;
+        fields.claimManagerRemarks = ClaimArr[0].claimManagerRemarks;
+        fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
+        //this.state.claimamt.approvedClaimAmounts = ClaimArr[0].insurableApprovedAmount;
 
         this.state.prodId = ClaimArr[0].productIdPk;
         console.log("prodId", this.state.prodId);
 
         this.setState({ fields });
+        this.onGet();
         this.setState({ policyId: ClaimArr[0].policyId });
         console.log("Claimsendlist: ", this.state.Claimsendlist);
 
         this.policyDetailsfun(ClaimArr[0].policyNo);
         this.claimAmountTable();
-        this.claimDetailsfun(ClaimArr[0].claimId);
+       
         this.documentView(oid, false, true);
 
         // this.paymentDetailsfun(ClaimArr[0].claimId);
@@ -693,14 +740,13 @@ class ClaimProcess extends React.Component {
             this.setState({ approved: true });
         }
 
-        this.onGet();
-        this.handleBankdetails(oid);
+       
+        //this.handleBankdetails(oid);
         this.setState({ showtable: false });
         //this.claimAmountTable();
     }
 
     componentDidMount() {
-
         let ClaimDecision = "Claims Decision";
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + ClaimDecision + ``, {
             method: 'get',
@@ -799,195 +845,7 @@ class ClaimProcess extends React.Component {
         console.log("datamodel ", datamodel);
     }
 
-    onModelChange = (evt, name) => {
-        debugger;
-        let BankDataModelDTO = this.state.BankDataModelDTO;
-        let data = BankDataModelDTO[name];
-        data.type = name;
-        data[evt.target.name] = evt.target.value;
-        //if (name == "Customer") {
-        let bank = this.state.Bankarray;
-        let index = bank.findIndex(e => e.name == name);
-        let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
-        bankvalue[0].Value = evt.target.value;
-        this.setState({ bank });
-        //}
-        this.setState({ /*bank,*/ data, BankDataModelDTO });
-    };
-
-    oncustomerselect = () => {
-        debugger;
-        let bank = this.state.BankDataModelDTO;
-        let bankdata = this.state.Bankdata.Customer;
-        let cbank = this.state.BankDetails;
-        let jsondata = CustomerBankDetails;
-
-        bankdata["Account Holder Name"] = cbank.accountHolderName;
-        bankdata["Account No."] = cbank.accountNumber;
-        bankdata["Account Type"] = cbank.accountType;
-        bankdata["Bank Name"] = cbank.bankName;
-        bankdata["IFSC Code"] = cbank.ifsccode;
-        bankdata["Bank Branch Address"] = cbank.bankBranchAddress;
-        bankdata.type = "Customer";
-
-        jsondata[0].Value = cbank.accountHolderName;
-        jsondata[1].Value = cbank.accountNumber;
-        jsondata[2].Value = cbank.accountType;
-        jsondata[3].Value = cbank.bankName;
-        jsondata[4].Value = cbank.ifsccode;
-        jsondata[5].Value = cbank.bankBranchAddress;
-
-        bank["Customer"] = bankdata;
-
-        this.setState({ bankdata, jsondata, bank });
-        console.log("bankdata: ", CustomerBankDetails);
-    }
-
-    renderPage = (Bankfieldsmodel, name) => {
-
-        if (Bankfieldsmodel.UIControl == "TextField") {
-
-            return (<CustomInput
-                labelText={Bankfieldsmodel.Name}
-                //  required={true}
-                name={Bankfieldsmodel.Name}
-                // value={Bankfieldsmodel.Value}
-                onChange={(e) => this.onModelChange(e, name)}
-                formControlProps={{ fullWidth: true }}
-            />
-
-            );
-
-
-        }
-        else if (Bankfieldsmodel.UIControl == "Datetime") {
-
-            return (
-                < CustomDateTimePicker
-                    timeformate={true}
-                    disabled={false}
-                    width='13rem'
-                    //required={true}
-                    disableFuture={true}
-                    minDate={this.state.ClaimIntemationDate}
-                    maxDate={new Date()}
-                    labelText={Bankfieldsmodel.Name}
-                    name={Bankfieldsmodel.Name}
-                    value={Bankfieldsmodel.Value}
-                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)} />
-            );
-        }
-
-        else if (Bankfieldsmodel.UIControl == "Dropdown") {
-
-            return (
-                <MasterDropdown
-                    // required={true}
-                    labelText={Bankfieldsmodel.Name}
-                    // id="Type"
-                    lstObject={this.state.AccountTypedata}
-                    filterName='Account Type'
-                    //value={Bankfieldsmodel.Value}
-                    name={Bankfieldsmodel.Name}
-                    onChange={(e) => this.onModelChange(e, name)}
-                    formControlProps={{ fullWidth: true }}
-                />
-
-            );
-
-
-        }
-
-    }
-
-    renderPage1 = (Bankfieldsmodel, name) => {
-        if (Bankfieldsmodel.UIControl == "TextField") {
-            return (<CustomInput
-                labelText={Bankfieldsmodel.Name}
-                //  required={true}
-                name={Bankfieldsmodel.Name}
-                value={Bankfieldsmodel.Value}
-                onChange={(e) => this.onModelChange(e, name)}
-                formControlProps={{ fullWidth: true }}
-            />
-
-            );
-
-
-        }
-        else if (Bankfieldsmodel.UIControl == "Datetime") {
-            return (
-                < CustomDateTimePicker
-                    timeformate={true}
-                    disabled={false}
-                    width='13rem'
-                    //required={true}
-                    minDate={this.state.ClaimIntemationDate}
-                    maxDate={new Date()}
-                    //minDate={new Date(this.state.claimDetailsData.lossDate)}
-                    disableFuture={true}
-                    labelText={Bankfieldsmodel.Name}
-                    name={Bankfieldsmodel.Name}
-                    value={Bankfieldsmodel.Value}
-                    onChange={(event) => this.onDateChange('datetime', "Bankfieldsmodel", Bankfieldsmodel.Name, name, event)
-                    } />
-            );
-        }
-        else if (Bankfieldsmodel.UIControl == "Dropdown") {
-
-            return (
-                <MasterDropdown
-                    // required={true}
-                    labelText={Bankfieldsmodel.Name}
-                    // id="Type"
-                    lstObject={this.state.AccountTypedata}
-                    filterName='Account Type'
-                    value={Bankfieldsmodel.Value}
-                    name={Bankfieldsmodel.Name}
-                    onChange={(e) => this.onModelChange(e, name)}
-                    formControlProps={{ fullWidth: true }}
-                />
-
-            );
-
-
-        }
-
-    }
-
-
-
-    onDateChange = (formate, type, name, objname, event) => {
-        const { validdate } = this.state;
-        this.setState({ validdate: false });
-        //var today = event.toDate();
-        //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        var today = event.toDate();
-        // var date = today.toISOString();
-        var date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
-
-        const ClaimDataDTO = this.state.ClaimDTO;
-        ClaimDataDTO[name] = date;
-        this.setState({ ClaimDataDTO });
-
-        let BankDataModelDTO = this.state.BankDataModelDTO;
-        let data = BankDataModelDTO[objname];
-        data[name] = date;
-
-        //if (objname == "Customer") {
-        let bank = this.state.Bankarray;
-        let index = bank.findIndex(e => e.name == objname);
-        let bankvalue = bank[index].BankDetails.filter(a => a.Name == name)
-        bankvalue[0].Value = date;
-        this.setState({ bank });
-        //}
-
-        this.setState({ data });
-
-        this.change(event, name, formate, date, type);
-
-    };
-
+   
 
 
     datechange = (date) => {
@@ -1044,23 +902,7 @@ class ClaimProcess extends React.Component {
        // this.state.ClaimDTO.eventDate = Cdate;
     };
 
-    handleBankdetails = (id) => {
-        let that = this;
-        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimBankDetails?claimid=` + id + ``, {
-            method: 'Get',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-        }).then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            console.log('Response data', data);
-            that.setState({ BankDetails: data });
-            console.log('Response bank data', that.state.BankDetails);
-        });
-    }
+   
 
     setstatus = (type, event) => {
         this.setState({ [event.target.name]: event.target.value });
@@ -1113,7 +955,7 @@ class ClaimProcess extends React.Component {
     claimAmountTable = () => {
 
         let arr = this.state.claimTableData.map((prop, key) => {
-            return prop.coverDynamic.filter(c => c.Header == "Vehicle Number")[0].Details;
+            return (prop.coverDynamic.filter(c => c.Header == "Vehicle Number").length > 0) ? prop.coverDynamic.filter(c => c.Header == "Vehicle Number")[0].Details : "";
 
         });
         this.state.vehicleActivity.vehicleNumbers = Array.from(new Set(arr));
@@ -1185,13 +1027,14 @@ class ClaimProcess extends React.Component {
             .then(data => {
 
                 this.setState({ claimTableData: data[1] });
-
+                this.state.claimamt.approvedClaimAmounts = data[1][0].approvedClaimAmounts;
                 this.claimAmountTable(this.state.claimTableData);
 
                 this.state.claimDetailsData.lossDate = new Date(data[0][0][1]).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
                 this.state.claimDetailsData.totalClaimedAmount = data[0][3][1];
+                this.state.fields.AdditionalDetails.Performer = data[0][8][1];
 
                 //if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
 
@@ -1231,7 +1074,55 @@ class ClaimProcess extends React.Component {
                     this.setState({ vehicleclaimsurvey: false });
                 }
 
-
+                if (data.length > 2 && data[2].length > 0) {
+                    let arr = [];
+                    for (var i = 0; i < data[2].length; i++) {
+                        let obj = {};
+                        obj.name = data[2][i].payeeType;
+                        obj.BankDetails = JSON.parse(JSON.stringify(BankdetailsFields));
+                        arr.push(obj);
+                        if (this.state.ProductClaimData.length > 0) {
+                            let checkboxindex = this.state.ProductClaimData.findIndex(s => s.mValue == data[2][i].payeeType);
+                            if (checkboxindex != -1) {
+                                this.state.ProductClaimData[checkboxindex].mIsRequired = true;
+                            }
+                        }
+                        console.log("checkboxindex", this.state.ProductClaimData, data[2][i].payeeType);
+                        let bank = arr;
+                        let index = bank.findIndex(e => e.name == data[2][i].payeeType);
+                        let bankvalue = bank[index].BankDetails.filter(a => a.Name == "Account Holder Name")
+                        bankvalue[0].Value = data[2][i].accountHolderName;
+                        bankvalue = bank[index].BankDetails.filter(a => a.Name == "Account No.")
+                        bankvalue[0].Value = data[2][i].accountNumber;
+                        bankvalue = bank[index].BankDetails.filter(a => a.Name == "Account Type")
+                        bankvalue[0].Value = data[2][i].accountType;
+                        bankvalue = bank[index].BankDetails.filter(a => a.Name == "Bank Name")
+                        bankvalue[0].Value = data[2][i].bankName;
+                        bankvalue = bank[index].BankDetails.filter(a => a.Name == "IFSC Code")
+                        bankvalue[0].Value = data[2][i].ifsccode;
+                        bankvalue = bank[index].BankDetails.filter(a => a.Name == "Bank Branch Address")
+                        bankvalue[0].Value = data[2][i].bankBranchAddress;
+                        bankvalue = bank[index].BankDetails.filter(a => a.Name == "Amount Paid")
+                        bankvalue[0].Value = data[2][i].amountPaid;
+                        bankvalue = bank[index].BankDetails.filter(a => a.Name == "Date Of Payment")
+                        bankvalue[0].Value = data[2][i].dataOfPayment;
+                        let tempObj = Object.assign({}, this.state.Bankdata1);
+                        tempObj["type"] = data[2][i].payeeType;
+                        tempObj["Bank Name"] = data[2][i].bankName;
+                        tempObj["Account Holder Name"] = data[2][i].accountHolderName;
+                        tempObj["Account No."] = data[2][i].accountNumber;
+                        tempObj["Account Type"] = data[2][i].accountType;
+                        tempObj["IFSC Code"] = data[2][i].ifsccode;
+                        tempObj["Bank Branch Address"] = data[2][i].bankBranchAddress;
+                        tempObj["Amount Paid"] = data[2][i].amountPaid;
+                        tempObj["Date Of Payment"] = data[2][i].dataOfPayment;
+                        this.state.BankDataModelDTO[data[2][i].payeeType] = Object.assign(this.state.BankDataModelDTO[data[2][i].payeeType], tempObj);
+                        //this.setState({ bank });	
+                    }
+                    this.setState({ OtherClaimBankDetails: arr });
+                }
+                this.setState({ renderpage: true });
+                console.log("this.state.OtherClaimBankDetails", this.state.OtherClaimBankDetails);
 
             });
 
@@ -1307,7 +1198,7 @@ class ClaimProcess extends React.Component {
 
     documentLinkView = (dmsdocId) => {
         console.log("1234567", dmsdocId);
-        debugger;
+       
         fetch(`${ClaimConfig.NotificationUrl}/api/DMS/DownloadView?id=` + dmsdocId, {
 
             method: 'get',
@@ -1393,11 +1284,13 @@ class ClaimProcess extends React.Component {
             console.log("ClaimIntimationDetails ", this.state.claimTableData[i].approvedClaimAmounts);
         }
         this.state.fields.approvedClaimAmount = amt;
+        this.state.claimamt.approvedClaimAmounts = amt;
         this.setState({});
         console.log("ClaimIntimationDetails claimAmount ", this.state.fields.approvedClaimAmount);
         this.claimAmountTable();
 
-        if (this.state.claimTableData[index].approvedClaimAmounts > this.state.claimTableData[index].claimAmounts) {
+        if (Number(this.state.claimTableData[index].approvedClaimAmounts) > Number(this.state.claimTableData[index].claimAmounts)) {	
+
 
             this.state.ValidationUI = false;
             this.state.errorstatus = true;
@@ -1529,46 +1422,11 @@ class ClaimProcess extends React.Component {
 
                 console.log("ProductClaimData", this.state.ProductClaimData);
 
-
+                this.claimDetailsfun(this.state.claimId);
             });
     }
 
-    handleCheckbox = (event, name, i) => {
-        debugger;
-        let element = this.state.Bankarray;
-        if (event.target.checked == true) {
-            if (name != "Customer") {
-                this.state.Bankdata1.type = name;
-                this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], this.state.Bankdata1);
-                let Bankelement = {};
-                let array = [];
-                Bankelement.name = name;
-                //Bankelement.BankDetails = [...array, ...BankdetailsFields];
-                Bankelement.BankDetails = JSON.parse(JSON.stringify(BankdetailsFields));;
-                element.push(Bankelement);
-            }
-            else {
-                this.oncustomerselect();
-                //this.state.BankDataModelDTO[name] = this.state.Bankdata.Customer;
-                this.setState({ displaycust: true });
-                let CustBankelement = {};
-                CustBankelement.name = name;
-                CustBankelement.BankDetails = CustomerBankDetails;
-                element.push(CustBankelement);
-            }
-            console.log("Bankarray: ", this.state.Bankarray);
-        }
-        if (event.target.checked == false) {
-            let empty = {};
-            //this.state.BankDataModelDTO[name] = Object.assign(this.state.BankDataModelDTO[name], empty);
-            this.state.BankDataModelDTO[name] = empty;
-            let index = element.findIndex(e => e.name == name);
-            element.splice(index, 1);
-            console.log("Bankarray: ", element);
-        }
-        this.setState({ element });
-        console.log("BankDataModelDTO: ", this.state.BankDataModelDTO);
-    }
+    
 
     renderRedirect = () => {
         const Claimdata = this.state.ClaimResetData;
@@ -1637,6 +1495,14 @@ class ClaimProcess extends React.Component {
         AdditionalDetails[e.target.name] = e.target.value;
         this.setState({ AdditionalDetails });
 
+    }
+
+    handleCheckboxUpdate = (event, name, i) => {
+        if (event.target.checked == true) {
+            this.state.ProductClaimData[i].mIsRequired = true;
+        } else if (event.target.checked == false) {
+            this.state.ProductClaimData[i].mIsRequired = false;
+        }
     }
 
     render() {
@@ -1876,7 +1742,7 @@ class ClaimProcess extends React.Component {
                         <TableContentLoader />
                     </Card>
                 }
-                {this.state.open && this.state.approved ?
+                {this.state.open && this.state.approved && this.state.renderpage  ?
                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                         <Card >
                             <CardBody>
@@ -1888,7 +1754,7 @@ class ClaimProcess extends React.Component {
                                         </div>
                                     </Animated>
                                 </GridContainer>
-                                <ClaimSearch TableData={this.state.TableData} handleClaimAmount={this.handleClaimAmount} ClaimDTO={this.state.ClaimDTO}
+                                {/*   <ClaimSearch TableData={this.state.TableData} handleClaimAmount={this.handleClaimAmount} ClaimDTO={this.state.ClaimDTO}
                                     fields={this.state.fields} claimamt={this.state.claimamt} ClaimAppAmount={this.ClaimAppAmount}
                                     ApprovedAmountData={this.state.ApprovedAmountData} disabled={this.state.disabled} claimId={this.state.fields.claimId}
                                     SetDecision={this.SetDecision} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} approved={this.state.approved}
@@ -1908,7 +1774,24 @@ class ClaimProcess extends React.Component {
                                     handleActivitylog={this.handleActivitylog} claimstatusflag={this.state.claimstatusflag} claimsremarksflag={this.state.claimsremarksflag}
                                     Bankarray={this.state.Bankarray} vehicleclaimstate={this.state.vehicleclaimstate} vehicleclaimdriver={this.state.vehicleclaimdriver} vehicleclaimsurvey={this.state.vehicleclaimsurvey}
                                     PerformerFlag={this.state.PerformerFlag} handlePerformerFun={this.handlePerformerFun}
-                                />
+                                />*/}
+                                <div>
+                                    <Card className="claimSearch">
+                                        <CardBody>
+                                            <Wizard id="proWiz"
+                                                validate
+                                                steps={[
+                                                    { stepName: <TranslationContainer translationKey="PolicyDetails" />, stepComponent: PolicyDetails, stepId: "PolicyDetails", stepData: this },
+                                                    { stepName: <TranslationContainer translationKey="DocumentDetails" />, stepComponent: DocDetails, stepId: "DocDetails", stepData: this },
+                                                    { stepName: <TranslationContainer translationKey="ClaimDetails" />, stepComponent: ClaimDetails, stepId: "ClaimDetails", stepData: this },
+                                                    // { stepName: "Payment Details", stepComponent: PaymentDetails, stepId: "PaymentDetails", stepData: props },	
+                                                ]}
+                                            //title=""	
+                                            //subtitle=""	
+                                            />
+                                        </CardBody>
+                                    </Card>
+                                </div>
                             </CardBody>
                         </Card>
                     </Animated>
