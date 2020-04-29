@@ -156,6 +156,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
                 var orgstucture = orgDTO.OrgStructure;
                 foreach (var item in orgstucture)
+
                 {
                     try
                     {
@@ -205,23 +206,45 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             //return organizationDTOs;
         }
 
-        public async Task<AVOOrganizationDTO> GetOrganization(int orgId, ApiContext apiContext)
+        public async Task<AVOOrganizationNewDTO> GetOrganization(int orgId, ApiContext apiContext)
         {
-
+            try { 
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            AVOOrganizationDTO _organizationDTO = new AVOOrganizationDTO();
+                AVOOrganizationNewDTO _organizationDTO = new AVOOrganizationNewDTO();
             TblOrganization _tblOrg = _context.TblOrganization.Where(org => org.OrganizationId == orgId)
                                         .Include(add => add.TblOrgAddress)
                                         .Include(spoc => spoc.TblOrgSpocDetails)
+                                        .Include(add => add.TblOrgStructure)
                                         .FirstOrDefault();
-            _organizationDTO = _mapper.Map<AVOOrganizationDTO>(_tblOrg);
+            _organizationDTO = _mapper.Map<AVOOrganizationNewDTO>(_tblOrg);
             return _organizationDTO;
         }
+            catch (Exception ex)
+            {
+                return null;
+            }
+}
+        //public async Task<AVOOrganizationDTO> GetOrganization(int orgId, ApiContext apiContext)
+        //{
+
+        //    _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+        //    AVOOrganizationDTO _organizationDTO = new AVOOrganizationDTO();
+        //    TblOrganization _tblOrg = _context.TblOrganization.Where(org => org.OrganizationId == orgId)
+        //                                .Include(add => add.TblOrgAddress)
+        //                                .Include(spoc => spoc.TblOrgSpocDetails)
+        //                                .FirstOrDefault();
+        //    _organizationDTO = _mapper.Map<AVOOrganizationDTO>(_tblOrg);
+        //    return _organizationDTO;
+        //}
+
 
         public async Task<IEnumerable<AVOOrganizationDTO>> SearchOrganizationById(int orgId, ApiContext apiContext)
         {
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration)); ;
+            try
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration)); ;
             var _org = _context.TblOrganization.Where(org => org.OrganizationId == orgId)
                         .Include(add => add.TblOrgAddress)
                         .Include(add => add.TblOrgOffice)
@@ -231,9 +254,15 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             var _OrgDTO = _mapper.Map<List<AVOOrganizationDTO>>(_org);
             return _OrgDTO;
         }
+            catch (Exception ex)
+            {
+                return null;
+            }
+}
 
-        public async Task<IEnumerable<AVOOrganizationDTO>> SearchOrganization(OrgSearchDTO searchorg, ApiContext apiContext)
+        public async Task<IEnumerable<AVOOrganizationNewDTO>> SearchOrganization(OrgSearchDTO searchorg, ApiContext apiContext)
         {
+            try {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var _org = _context.TblOrganization
                  .Include(add => add.TblOrgAddress)
@@ -241,9 +270,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                  .Include(add => add.TblOrgStructure)
                  .Include(spoc => spoc.TblOrgSpocDetails)
                  .ToList();
-            var _OrgDTO = _mapper.Map<List<AVOOrganizationDTO>>(_org);
+            var _OrgDTO = _mapper.Map<List<AVOOrganizationNewDTO>>(_org);
             return _OrgDTO;
         }
+            catch (Exception ex)
+            {
+                return null;
+            }
+}
 
         public int TestMethod(ApiContext apiContext)
         {
