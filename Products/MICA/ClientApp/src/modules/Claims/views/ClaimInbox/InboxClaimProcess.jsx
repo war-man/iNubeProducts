@@ -528,10 +528,28 @@ class InboxClaimProcess extends React.Component {
                                     }
 
 
+                            }
+                            else if (data.status == 9) {
+
+                                if (data.errors.length > 0) {
+                                    swal({
+
+                                        text: data.errors[0].errorMessage,
+                                        icon: "error"
+                                    });
+                                } else {
+                                    swal({
+
+                                        text: data.responseMessage,
+                                        icon: "error"
+                                    });
                                 }
-                                //this.renderRedirect();
-                            });
-                   
+
+
+                            }
+                            //this.renderRedirect();
+                        });
+
                 } else {
                     //this.setState({ errormessage: true });
                     if (this.state.fields.claimStatusId == "") {
@@ -570,7 +588,7 @@ class InboxClaimProcess extends React.Component {
     handleAmountValidation = () => {
 
         let amt = 0;
-
+       
         const workshopvalue = Number(this.state.BankDataModelDTO["Workshop"]["Amount Paid"]) || 0;
         const custvalue = Number(this.state.BankDataModelDTO["Customer"]["Amount Paid"]) || 0;
         const financevalue = Number(this.state.BankDataModelDTO["Financier"]["Amount Paid"]) || 0;

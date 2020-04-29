@@ -23,11 +23,13 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<CreateOfficeResponse> CreateOffice(AVOOrgOffice aVOOrgOffice, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetNewBranchDropdown(int posid, ApiContext apiContext);
         Task<List<MasterDto>> GetDesignation(int orgid, ApiContext apiContext);
-        Task<List<Dictionary<string,int>>> GetMappingDetails(int orgid,int offid, ApiContext apiContext);
+        Task<List<vacantPositiondto>> GetVecPositions(decimal orgid, ApiContext apiContext);
         Task<List<MasterDto>> GetEmployee(int orgid, int offid, int desgiId, ApiContext apiContext);
         Task<int> GetCount(int empid, ApiContext Context);
+        Task<int> GetVacantPositonCount(string designame, ApiContext apiContext);
         Task<AVOOrgEmployee> GetEmployeeDetailsById(int empid, ApiContext apiContext);
         Task<CreateOfficeResponse> Saveoffice(AvoOfficeDto Officedto, ApiContext apiContext);
-        Task<IEnumerable<AVOOrgEmployee>> SearchPeople(string EmpCode, ApiContext apiContext);
+        Task<IEnumerable<AVOOrgEmployee>> SearchPeople(SearchPeople searchPeople, ApiContext apiContext);
+        Task<CreateOfficeResponse> SaveEmplMappingDetails(AVOOrgEmployee avOOrgEmployee, ApiContext apiContext);
     }
 }

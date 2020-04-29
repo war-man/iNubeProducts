@@ -93,11 +93,13 @@ namespace iNube.Services.Partners.Helpers
 
             CreateMap<AVOOrgEmployee, Entities.AVO.TblOrgEmployee>()
              .ForMember(dest => dest.TblOrgEmpAddress, opt => opt.MapFrom(src => src.AVOOrgEmpAddress))
-             .ForMember(dest => dest.TblOrgEmpEducation, opt => opt.MapFrom(src => src.AVOOrgEmpEducation)).ReverseMap();
+             .ForMember(dest => dest.TblOrgEmpEducation, opt => opt.MapFrom(src => src.AVOOrgEmpEducation))
+             .ForMember(dest=>dest.Position,opt=>opt.MapFrom(src=>src.Position)).ReverseMap();
 
             CreateMap<Entities.AVO.TblOrgEmployee, AVOOrgEmployee>().ReverseMap();
             CreateMap<Entities.AVO.TblOrgEmpAddress, AVOOrgEmpAddress>().ReverseMap();
             CreateMap<Entities.AVO.TblOrgEmpEducation, AVOOrgEmpEducation>().ReverseMap();
+            CreateMap<Entities.AVO.TblOrgPositions, AvoOrgPositions>().ReverseMap();
 
             //CreateMap<PartnersDTO, TblPartners>()
             //.ForMember(dest => dest.TblPartnerAddress, opt => opt.MapFrom(src => src.PartnerAddress)).ReverseMap();

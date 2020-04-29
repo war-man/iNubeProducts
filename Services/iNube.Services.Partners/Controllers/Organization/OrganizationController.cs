@@ -288,11 +288,21 @@ namespace iNube.Services.Partners.Controllers.Organization
 
             return Ok(response);
         }
+
+        // || AVO
         [HttpGet]
         public async Task<IActionResult> GetCount(int empid)
         {
            
             var response = await _avoorgService.GetCount(empid, Context);
+            return Ok(response);
+        }
+        // ||AVO
+        [HttpGet]
+        public async Task<IActionResult>GetVacantPositonCount(string designame)
+        {
+
+            var response = await _avoorgService.GetVacantPositonCount(designame, Context);
             return Ok(response);
         }
 
@@ -321,21 +331,40 @@ namespace iNube.Services.Partners.Controllers.Organization
 
 
         // Search People ||AVO
-        [HttpGet]
-        public async Task<IActionResult> SearchPeople (string EmpCode)
+        [HttpPost]
+        public async Task<IActionResult> SearchPeople (SearchPeople searchPeople)
         {
-            var searchData = await _avoorgService.SearchPeople(EmpCode, Context);
+            var searchData = await _avoorgService.SearchPeople(searchPeople, Context);
             return Ok(searchData);
         }
 
 
         [HttpGet]
-        public async Task<IActionResult> GetMappingDetails(int orgid, int offid)
+        public async Task<IActionResult> GetVecPositions(decimal orgid)
         {
-            var isFilter = true;
-            var response = await _avoorgService.GetMappingDetails(orgid,offid, Context);
+            
+            var response = await _avoorgService.GetVecPositions(orgid, Context);
          
             return Ok(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SaveEmplMappingDetails([FromBody] AVOOrgEmployee avOOrgEmployee)
+        {
+            // save 
+            var response = await _avoorgService.SaveEmplMappingDetails(avOOrgEmployee, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                default:
+                    return Forbid();
+            }
+
+
         }
 
 
