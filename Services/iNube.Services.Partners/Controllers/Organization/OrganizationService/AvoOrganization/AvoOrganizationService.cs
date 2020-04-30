@@ -603,6 +603,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<List<vacantPositiondto>> GetVecPositions(decimal orgid, ApiContext apiContext)
         {
+            //get context
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var totalPosition = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid && a.StructureTypeId==28).ToList();
             List<vacantPositiondto> ddDTOs = new List<vacantPositiondto>();
