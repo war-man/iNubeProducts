@@ -123,6 +123,7 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            ValidIFSCCode:false,
             renderpage: false,
             PerformerFlag: true,
             ClaimIntemationDate: null,
@@ -408,6 +409,29 @@ class InboxClaimProcess extends React.Component {
     handleClose = () => {
         this.setState({ openpop: false });
     };
+    BankPayeeValidation = () => {
+      
+        console.log("Bankarray in model", this.state.OtherClaimBankDetails);
+
+        for (var I = 0; I < this.state.OtherClaimBankDetails.length; I++) {
+            let validList = this.state.OtherClaimBankDetails[I].BankDetails.filter(S => S.Validation == true && S.Name =="IFSC Code");
+            if (validList != null && validList.length > 0) {
+                this.state.ValidIFSCCode = true;
+                this.setState({ ValidIFSCCode: true });
+               
+            } 
+            console.log("validateLists", validList);
+          
+        }
+
+        let otherClaimBankDetails = this.state.OtherClaimBankDetails;
+        //let index = bank.findIndex(e => e.name == name);
+        //let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
+        //bankvalue[0].Value = evt.target.value;
+        //bankvalue[0].Validation = this.Validation(evt, bankvalue[0].ValidationType);
+        //this.setState({ bank });
+    }
+
     internalCallFormSubmit = (data) => {
         let field = this.state.fields;
         field.claimManagerRemarks = data.claimManagerRemarks;
@@ -422,8 +446,11 @@ class InboxClaimProcess extends React.Component {
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
         this.handleAmountValidation();
+        this.state.ValidIFSCCode=false;
+        this.BankPayeeValidation();
        
         if (this.state.approveamtvalidation === true) {
+            if (this.state.ValidIFSCCode == false) {
                 if (this.state.ValidationUI === true) {
 
                     this.setState({ claimsdecisionshow: true });
@@ -465,45 +492,46 @@ class InboxClaimProcess extends React.Component {
 
                     this.setState({ detailsdto });
 
-                    fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimProcess`, {
-                        method: 'Post',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                        },
-                        body: JSON.stringify(field)
-                    }).then(response => response.json())
-                        .then(data => {
-                            console.log("response: ", data)
-                            //      if (data.status == 200) {
-                            //  this.state.claimId = data.claimId;
-                            //  this.setState({ claimnumber: data.claimNumber });
-                            if (data.status == 3) {
-                                swal({
-                                    text: data.responseMessage,
-                                    icon: "success",
-                                    buttons: [false, "OK"],
-                                }).then((willDelete) => {
-                                    if (willDelete) {
-                                        this.handlepagereload();
-                                    }
-                                });
-                            } else if (data.status == 7) {
 
-                                if (data.errors.length > 0) {
+                        fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimProcess`, {
+                            method: 'Post',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                            },
+                            body: JSON.stringify(field)
+                        }).then(response => response.json())
+                            .then(data => {
+                                console.log("response: ", data)
+                                //      if (data.status == 200) {
+                                //  this.state.claimId = data.claimId;
+                                //  this.setState({ claimnumber: data.claimNumber });
+                                if (data.status == 3) {
                                     swal({
-
-                                        text: data.errors[0].errorMessage,
-                                        icon: "error"
-                                    });
-                                } else {
-                                    swal({
-
                                         text: data.responseMessage,
-                                        icon: "error"
+                                        icon: "success",
+                                        buttons: [false, "OK"],
+                                    }).then((willDelete) => {
+                                        if (willDelete) {
+                                            this.handlepagereload();
+                                        }
                                     });
-                                }
+                                } else if (data.status == 7) {
+
+                                    if (data.errors.length > 0) {
+                                        swal({
+
+                                            text: data.errors[0].errorMessage,
+                                            icon: "error"
+                                        });
+                                    } else {
+                                        swal({
+
+                                            text: data.responseMessage,
+                                            icon: "error"
+                                        });
+                                    }
 
 
                             }
@@ -540,11 +568,12 @@ class InboxClaimProcess extends React.Component {
                         this.setState({ claimsremarksflag: true });
                         swal("", "Please enter Claim manager remarks", "error");
                     }
-                    else {
-
+                   
                     }
                 }
-
+            else {
+                swal("", "IFSC Code should be in correct format (eg: CNBK1234567)", "error");
+            }
         } else {
             swal("", "Approved amount cannot be greater than balance sum insured", "error");
         }
@@ -644,7 +673,12 @@ class InboxClaimProcess extends React.Component {
         fields.claimId = ClaimArr[0].claimId;
         fields.claimStatusId = ClaimArr[0].claimStatusId;
         fields.claimManagerRemarks = ClaimArr[0].claimManagerRemarks;
-        fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
+
+        if (ClaimArr[0].approvedClaimAmount != null) {
+            fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
+        } else {
+            fields.approvedClaimAmount = 0;
+        }
         //this.state.claimamt.approvedClaimAmounts = ClaimArr[0].insurableApprovedAmount;
 
         this.state.prodId = ClaimArr[0].productIdPk;

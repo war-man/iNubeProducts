@@ -66,7 +66,13 @@ namespace iNube.Services.Partners.Helpers
             .ForMember(dest => dest.TblOrgAddress, opt => opt.MapFrom(src => src.AVOOrgAddress))
             .ForMember(dest => dest.TblOrgSpocDetails, opt => opt.MapFrom(src => src.AVOOrgSpocDetails))
             .ForMember(dest => dest.TblOrgOffice, opt => opt.MapFrom(src => src.AVOOrgOffice)).ReverseMap();
-            //.ForMember(dest => dest.OrgStructure, opt => opt.MapFrom(src => src.OrgStructure))
+
+
+             CreateMap<AVOOrganizationNewDTO, Entities.AVO.TblOrganization>()
+            .ForMember(dest => dest.TblOrgAddress, opt => opt.MapFrom(src => src.AVOOrgAddress))
+            .ForMember(dest => dest.TblOrgSpocDetails, opt => opt.MapFrom(src => src.AVOOrgSpocDetails))
+            .ForMember(dest => dest.TblOrgOffice, opt => opt.MapFrom(src => src.AVOOrgOffice))          
+            .ForMember(dest => dest.TblOrgStructure, opt => opt.MapFrom(src => src.AVOOrgStructure)).ReverseMap();
 
 
             CreateMap<AVOOrgAddress, Entities.AVO.TblOrgAddress>();
@@ -78,8 +84,16 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<AVOOrgSpocDetails, Entities.AVO.TblOrgSpocDetails>();
             CreateMap<Entities.AVO.TblOrgSpocDetails, AVOOrgSpocDetails>();
 
-            CreateMap<TblOrgStructure, AVOOrgStructure>();
-            CreateMap<AVOOrgStructure, TblOrgStructure>();
+            CreateMap<Entities.AVO.TblOrgStructure, OrgStructure>();
+            CreateMap<OrgStructure, Entities.AVO.TblOrgStructure>();
+
+            CreateMap<Entities.AVO.TblOrgStructure, AVOOrgStructure>();
+            CreateMap<AVOOrgStructure, Entities.AVO.TblOrgStructure>();
+
+            CreateMap<TblOrgPositions, AvoOrgPositions>();
+            CreateMap<AvoOrgPositions, TblOrgPositions>();
+
+
 
             CreateMap<AVOOrgOffice, Entities.AVO.TblOrgOffice>()
             .ForMember(dest => dest.TblOfficeSpocDetails, opt => opt.MapFrom(src => src.AVOOfficeSpocDetails)).ReverseMap();

@@ -208,6 +208,7 @@ namespace iNube.Services.Partners.Models
             AVOOrgOffice = new HashSet<AVOOrgOffice>();
             AVOOrgSpocDetails = new HashSet<AVOOrgSpocDetails>();
             OrgStructure = new HashSet<OrgStructure>();
+           // AVOOrgStructure = new HashSet<AVOOrgStructure>();
         }
 
         public decimal OrganizationId { get; set; }
@@ -240,7 +241,54 @@ namespace iNube.Services.Partners.Models
         public virtual ICollection<AVOOrgAddress> AVOOrgAddress { get; set; }
         public virtual ICollection<AVOOrgOffice> AVOOrgOffice { get; set; }
         public virtual ICollection<AVOOrgSpocDetails> AVOOrgSpocDetails { get; set; }
-        public virtual ICollection<OrgStructure> OrgStructure { get; set; }
+       public virtual ICollection<OrgStructure> OrgStructure { get; set; }
+      //  public virtual ICollection<AVOOrgStructure> AVOOrgStructure { get; set; }
+        
+    }
+    public partial class AVOOrganizationNewDTO
+    {
+        public AVOOrganizationNewDTO()
+        {
+            AVOOrgAddress = new HashSet<AVOOrgAddress>();
+            AVOOrgOffice = new HashSet<AVOOrgOffice>();
+            AVOOrgSpocDetails = new HashSet<AVOOrgSpocDetails>();
+         
+            AVOOrgStructure = new HashSet<AVOOrgStructure>();
+        }
+
+        public decimal OrganizationId { get; set; }
+        public int OrgCategoryId { get; set; }
+        public int ConfigurationTypeId { get; set; }
+        public int OrgTypeId { get; set; }
+        public string OrgName { get; set; }
+        public string CorpAddressSameAs { get; set; }
+        public string MailingAddressSameAs { get; set; }
+        public byte[] OrgLogo { get; set; }
+        public string OrgWebsite { get; set; }
+        public string OrgPhoneNo { get; set; }
+        public string OrgFaxNo { get; set; }
+        public int? OrgLevels { get; set; }
+        public string OrgRegistrationNo { get; set; }
+        public string OrgRegisteringAuthority { get; set; }
+        public DateTime? OrgRegistrationDate { get; set; }
+        public string OrgServiceTaxRegistrationNumber { get; set; }
+        public string OrgPanno { get; set; }
+        public string OrgTanno { get; set; }
+        public string OrganizationCode { get; set; }
+        public bool? IsActive { get; set; }
+        public decimal? CustomerId { get; set; }
+        public decimal? ParentId { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+
+        public virtual ICollection<AVOOrgAddress> AVOOrgAddress { get; set; }
+        public virtual ICollection<AVOOrgOffice> AVOOrgOffice { get; set; }
+        public virtual ICollection<AVOOrgSpocDetails> AVOOrgSpocDetails { get; set; }
+        
+        public virtual ICollection<AVOOrgStructure> AVOOrgStructure { get; set; }
+
     }
 
     public partial class AVOOrgAddress
@@ -346,6 +394,32 @@ namespace iNube.Services.Partners.Models
         public int? SpocBrachCode { get; set; }
     }
 
+    //public partial class OrgStructure
+    //{
+    //    public OrgStructure()
+    //    {
+    //        TblOrgPositions = new HashSet<AvoOrgPositions>();
+    //    }
+    //    public string levelname { get; set; }
+    //    public string reportto { get; set; }
+    //    public int levelId { get; set; }
+    //    public string StructureType { get; set; }
+
+    //    //public decimal OrgStructureId { get; set; }
+    //    //public decimal? OrganizationId { get; set; }
+    //    //public int? LevelId { get; set; }
+    //    //public string LevelDefinition { get; set; }
+    //    //public int? RepotrsToId { get; set; }
+    //    //public decimal? ParentId { get; set; }
+    //    //public string UserName { get; set; }
+    //    //public DateTime? CreatedDateTime { get; set; }
+    //    //public bool? IsValid { get; set; }
+    //    //public int? StructureTypeId { get; set; }
+
+    //    //public virtual TblOrganization Organization { get; set; }
+    //    public virtual ICollection<AvoOrgPositions> TblOrgPositions { get; set; }
+    //}
+
     public partial class OrgStructure
     {
         public string levelname { get; set; }
@@ -356,6 +430,11 @@ namespace iNube.Services.Partners.Models
 
     public partial class AVOOrgStructure
     {
+        public AVOOrgStructure()
+        {
+            TblOrgPositions = new HashSet<AvoOrgPositions>();
+        }
+
         public decimal OrgStructureId { get; set; }
         public decimal? OrganizationId { get; set; }
         public int? LevelId { get; set; }
@@ -366,7 +445,24 @@ namespace iNube.Services.Partners.Models
         public DateTime? CreatedDateTime { get; set; }
         public bool? IsValid { get; set; }
         public int? StructureTypeId { get; set; }
+
+      //  public virtual TblOrganization Organization { get; set; }
+        public virtual ICollection<AvoOrgPositions> TblOrgPositions { get; set; }
     }
+
+    //public partial class AVOOrgStructure
+    //{
+    //    public decimal OrgStructureId { get; set; }
+    //    public decimal? OrganizationId { get; set; }
+    //    public int? LevelId { get; set; }
+    //    public string LevelDefinition { get; set; }
+    //    public int? RepotrsToId { get; set; }
+    //    public decimal? ParentId { get; set; }
+    //    public string UserName { get; set; }
+    //    public DateTime? CreatedDateTime { get; set; }
+    //    public bool? IsValid { get; set; }
+    //    public int? StructureTypeId { get; set; }
+    //}
 
     public partial class AVOOfficeSpocDetails
     {

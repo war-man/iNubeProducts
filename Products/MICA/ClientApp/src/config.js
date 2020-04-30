@@ -4,9 +4,6 @@
 //let env = "Local";
 let env = "UAT"; 
 
-
-
-
 let Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
 let partnerconfigUrl = Baseurl;
 let productConfigUrl = Baseurl;
@@ -149,5 +146,6 @@ export const config = {
     linkedin: "", //Linkedin app id
     google: "671491165170-2l31p1m7md0plbj9d5ak27uqcqo9kdpo.apps.googleusercontent.com" //Google client id  (7687687687-nq1asqrnbgordksqerer23dewqqe.apps.googleusercontent.com)
 }
+
 
 export default config

@@ -12,8 +12,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<IEnumerable<ddDTO>> GetMaster(string lMasterlist, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetLocation(string locationType, int parentID , ApiContext apiContext);
         Task<AVOOrganizationResponse> CreateOrganizationAsync(AVOOrganizationDTO orgDTO, ApiContext apiContext);
-        Task<AVOOrganizationDTO> GetOrganization(int orgId, ApiContext apiContext);
-        Task<IEnumerable<AVOOrganizationDTO>> SearchOrganization(OrgSearchDTO searchorg, ApiContext apiContext);
+
+        Task<AVOOrganizationNewDTO> GetOrganization(int orgId, ApiContext apiContext);
+        Task<IEnumerable<AVOOrganizationNewDTO>> SearchOrganization(OrgSearchDTO searchorg, ApiContext apiContext);
         Task<IEnumerable<AVOOrganizationDTO>> SearchOrganizationById(int orgId, ApiContext apiContext);
         int TestMethod(ApiContext apiContext);
         Task<IEnumerable<AVOOrganizationDTO>> GetOrgByParentId(int orgid, ApiContext apiContext);
