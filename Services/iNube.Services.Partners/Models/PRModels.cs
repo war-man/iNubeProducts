@@ -25,7 +25,7 @@ namespace iNube.Services.Partners.Models
     {
         public string mID { get; set; }
         public string mValue { get; set; }
-      
+
     }
 
     public partial class LocationDTO
@@ -156,7 +156,7 @@ namespace iNube.Services.Partners.Models
 
     public class SearchPeople
     {
-        public string EmpCode { get; set;}
+        public string EmpCode { get; set; }
     }
     public partial class OrganizationDTO
     {
@@ -260,7 +260,7 @@ namespace iNube.Services.Partners.Models
 
     public class CreateOfficeResponse : ResponseStatus
     {
-
+        public AVOOrgOffice avoorgoff { get; set; }
     }
 
     public partial class AVOOrgOffice
@@ -446,7 +446,7 @@ namespace iNube.Services.Partners.Models
         public int? SpocGenderId { get; set; }
     }
 
-  
+
 
     public partial class AvoOrgEmployeeSearch
     {
@@ -1617,7 +1617,7 @@ namespace iNube.Services.Partners.Models
         public string OfficeName { get; set; }
         public string Designation { get; set; }
 
-       public virtual AvoOrgPositions Position { get; set; }
+        public virtual AvoOrgPositions Position { get; set; }
         public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
         public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
     }
