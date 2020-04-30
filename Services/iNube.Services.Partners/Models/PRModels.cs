@@ -28,6 +28,8 @@ namespace iNube.Services.Partners.Models
 
     }
 
+   
+
     public partial class LocationDTO
     {
         public string locationType { get; set; }

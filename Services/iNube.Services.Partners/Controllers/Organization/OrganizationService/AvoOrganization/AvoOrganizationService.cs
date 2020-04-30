@@ -665,5 +665,30 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             }
 
         }
+
+        public async Task<List<ddDTO>> GetEmpDetails(decimal orgId, decimal offid, ApiContext apiContext)
+        {
+            try
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+                List<ddDTO> ddDTOs = new List<ddDTO>();
+                var positionid = _context.TblOrgPositions.FirstOrDefault(a => a.OrganizationId == orgId && a.OfficeId == offid).PositionId;
+                var scontract = _context.TblOrgEmployee.Where(a => a.PositionId == positionid)
+                    .Select(a => new ddDTO
+                    {
+                        mID = Convert.ToInt32(a.OrgEmpId),
+                        mValue=a.StaffName,
+                    });
+                
+                var contractdata = _mapper.Map<List<ddDTO>>(scontract);
+
+                return contractdata;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
     }
 }

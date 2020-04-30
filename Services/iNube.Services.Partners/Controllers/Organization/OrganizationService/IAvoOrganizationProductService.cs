@@ -32,5 +32,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<CreateOfficeResponse> Saveoffice(AvoOfficeDto Officedto, ApiContext apiContext);
         Task<IEnumerable<AVOOrgEmployee>> SearchPeople(SearchPeople searchPeople, ApiContext apiContext);
         Task<CreatePeopleResponse> SaveEmplMappingDetails(updatepositionDto avOOrgEmployee, ApiContext apiContext);
+
+        Task<List<ddDTO>> GetEmpDetails(decimal orgId,decimal offid, ApiContext apiContext);
     }
 }

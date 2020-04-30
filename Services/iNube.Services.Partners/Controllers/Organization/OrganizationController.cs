@@ -360,11 +360,21 @@ namespace iNube.Services.Partners.Controllers.Organization
                     return Ok(response);
                 case BusinessStatus.UnAuthorized:
                     return Unauthorized();
+                case BusinessStatus.Error:
+                    return Ok(response);
                 default:
                     return Forbid();
             }
 
 
+        }
+
+        // || AVO
+        [HttpGet]
+        public async Task<IActionResult> GetEmpDetails(decimal orgId, decimal offid)
+        {
+            var orgDTO = await _avoorgService.GetEmpDetails(orgId,offid, Context);
+            return Ok(orgDTO);
         }
 
 
