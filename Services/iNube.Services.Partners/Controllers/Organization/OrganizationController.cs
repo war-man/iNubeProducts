@@ -348,7 +348,7 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
         [HttpPost]
-        public async Task<IActionResult> SaveEmplMappingDetails([FromBody] AVOOrgEmployee avOOrgEmployee)
+        public async Task<IActionResult> SaveEmplMappingDetails([FromBody] updatepositionDto avOOrgEmployee)
         {
             // save 
             var response = await _avoorgService.SaveEmplMappingDetails(avOOrgEmployee, Context);

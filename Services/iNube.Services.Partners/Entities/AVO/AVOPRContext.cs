@@ -69,7 +69,7 @@ namespace iNube.Services.Partners.Entities.AVO
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<TblAllocationRate>(entity =>
             {
@@ -742,6 +742,8 @@ namespace iNube.Services.Partners.Entities.AVO
                 entity.Property(e => e.PositionId)
                     .HasColumnName("PositionID")
                     .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ReportingTo).HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.Smcode)
                     .HasColumnName("SMCode")

@@ -208,7 +208,7 @@ namespace iNube.Services.Partners.Models
             AVOOrgOffice = new HashSet<AVOOrgOffice>();
             AVOOrgSpocDetails = new HashSet<AVOOrgSpocDetails>();
             OrgStructure = new HashSet<OrgStructure>();
-           // AVOOrgStructure = new HashSet<AVOOrgStructure>();
+            // AVOOrgStructure = new HashSet<AVOOrgStructure>();
         }
 
         public decimal OrganizationId { get; set; }
@@ -241,9 +241,9 @@ namespace iNube.Services.Partners.Models
         public virtual ICollection<AVOOrgAddress> AVOOrgAddress { get; set; }
         public virtual ICollection<AVOOrgOffice> AVOOrgOffice { get; set; }
         public virtual ICollection<AVOOrgSpocDetails> AVOOrgSpocDetails { get; set; }
-       public virtual ICollection<OrgStructure> OrgStructure { get; set; }
-      //  public virtual ICollection<AVOOrgStructure> AVOOrgStructure { get; set; }
-        
+        public virtual ICollection<OrgStructure> OrgStructure { get; set; }
+        //  public virtual ICollection<AVOOrgStructure> AVOOrgStructure { get; set; }
+
     }
     public partial class AVOOrganizationNewDTO
     {
@@ -252,7 +252,7 @@ namespace iNube.Services.Partners.Models
             AVOOrgAddress = new HashSet<AVOOrgAddress>();
             AVOOrgOffice = new HashSet<AVOOrgOffice>();
             AVOOrgSpocDetails = new HashSet<AVOOrgSpocDetails>();
-         
+
             AVOOrgStructure = new HashSet<AVOOrgStructure>();
         }
 
@@ -286,7 +286,7 @@ namespace iNube.Services.Partners.Models
         public virtual ICollection<AVOOrgAddress> AVOOrgAddress { get; set; }
         public virtual ICollection<AVOOrgOffice> AVOOrgOffice { get; set; }
         public virtual ICollection<AVOOrgSpocDetails> AVOOrgSpocDetails { get; set; }
-        
+
         public virtual ICollection<AVOOrgStructure> AVOOrgStructure { get; set; }
 
     }
@@ -307,6 +307,11 @@ namespace iNube.Services.Partners.Models
     }
 
     public class CreateOfficeResponse : ResponseStatus
+    {
+        public AVOOrgOffice avoorgoff { get; set; }
+    }
+
+    public class CreatePeopleResponse: ResponseStatus
     {
         public AVOOrgOffice avoorgoff { get; set; }
     }
@@ -446,7 +451,7 @@ namespace iNube.Services.Partners.Models
         public bool? IsValid { get; set; }
         public int? StructureTypeId { get; set; }
 
-      //  public virtual TblOrganization Organization { get; set; }
+        //  public virtual TblOrganization Organization { get; set; }
         public virtual ICollection<AvoOrgPositions> TblOrgPositions { get; set; }
     }
 
@@ -1679,7 +1684,7 @@ namespace iNube.Services.Partners.Models
         {
             AVOOrgEmpAddress = new HashSet<AVOOrgEmpAddress>();
             AVOOrgEmpEducation = new HashSet<AVOOrgEmpEducation>();
-            Position = new AvoOrgPositions();
+           
         }
 
         public decimal OrgEmpId { get; set; }
@@ -1712,11 +1717,14 @@ namespace iNube.Services.Partners.Models
         public string AccountNumber { get; set; }
         public string OfficeName { get; set; }
         public string Designation { get; set; }
+        public decimal? ReportingTo { get; set; }
 
-        public virtual AvoOrgPositions Position { get; set; }
+
         public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
         public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
     }
+
+
 
     public partial class AVOOrgEmpAddress
     {
@@ -1777,6 +1785,24 @@ namespace iNube.Services.Partners.Models
         public bool? IsVacant { get; set; }
         public bool? IsActive { get; set; }
     }
+
+
+    public partial class updatepositionDto
+    {
+
+        public updatepositionDto()
+        {
+            AVOOrgEmployee = new AVOOrgEmployee();
+        }
+
+        public string DeginName { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public decimal OfficeId { get; set; }
+        public decimal EmpId { get; set; }
+        public virtual AVOOrgEmployee AVOOrgEmployee { get; set; }
+
+    }
 }
+
 
 
