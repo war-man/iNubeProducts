@@ -4929,7 +4929,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 return false;
             }
 
-            var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
+            var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();          
 
             PolicyNumberList.Distinct();
 
@@ -4973,9 +4973,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         //Billing Details Exsists for this Policy Transaction 
                         DateTime LastMonthDueDate = checkLastBilling.DueDate.Value.Date;
-                        CDFromDate = monthlySiDTO.ReportCreatedDate.Value.Date;
+                        CDFromDate = checkLastBilling.ReportCreatedDate.Value.Date;
                         monthlySiDTO.DueDate = LastMonthDueDate.AddMonths(1);
-                        monthlySiDTO.ReportCreatedDate = monthlySiDTO.ReportCreatedDate.Value.AddMonths(1);
+                        monthlySiDTO.ReportCreatedDate = checkLastBilling.ReportCreatedDate.Value.AddMonths(1);
                         CDToDate = monthlySiDTO.ReportCreatedDate.Value.Date.AddDays(-1);
                     }
 
@@ -5074,8 +5074,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 Guid guid = Guid.NewGuid();
                                 monthlySiDTO.Txnid = guid.ToString();
 
-                                var PremiumDetails = ADMonthlySI(CalculatePremium);
-                                monthlySiDTO.PremiumDetails = JsonConvert.SerializeObject(PremiumDetails);
+                                var MicaCDDTO = ADMonthlySI(CalculatePremium);
+
+
+                                ExtCDDTO ExtCdModel = new ExtCDDTO();
+                                ExtCdModel.micaCDDTO.Add(MicaCDDTO);
+                                ExtCdModel.AccountNo = Convert.ToString(PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).CDAccountNumber);
+                                ExtCdModel.Description = "Monthly SI for Policy - " + policy;
+                                ExtCdModel.Frequency = BillingFrequency;
+
+                                monthlySiDTO.PremiumDetails = JsonConvert.SerializeObject(ExtCdModel);
 
                                 _context.TblPolicyMonthlySi.Add(monthlySiDTO);
                                 _context.SaveChanges();
@@ -5246,7 +5254,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         step1++;
                         // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
-                        var res = ConvertCSVtoDataTable(filePath);
+                        var res = await ConvertCSVtoDataTable(filePath, context);
                         return res;
                     }
                     else
@@ -5445,20 +5453,38 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                 {
                                                     var TblData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
 
-                                                    TblData.PayUid = payUid;
-                                                    TblData.PayAmount = payAmount;
-                                                    TblData.PayStatus = payStatus;
-                                                    TblData.PaymentDate = paymentDate;
 
-                                                    _context.TblPolicyMonthlySi.Update(TblData);
-                                                    _context.SaveChanges();
+                                                    var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(TblData.PremiumDetails);
+
+                                                    var CallMicaCd = await _integrationService.MasterCDACC(CdDTO, context);
+
+                                                    if (CallMicaCd != null)
+                                                    {
+
+                                                        TblData.PayUid = payUid;
+                                                        TblData.PayAmount = payAmount;
+                                                        TblData.PayStatus = payStatus;
+                                                        TblData.PaymentDate = paymentDate;
+
+                                                        _context.TblPolicyMonthlySi.Update(TblData);
+                                                        _context.SaveChanges();
+                                                    }
+                                                    else
+                                                    {
+                                                        ErrorInfo errorInfo = new ErrorInfo();
+
+                                                        errorInfo.ErrorMessage = "Technical Failure Try Again";
+                                                        errorInfo.ErrorCode = "MSI010";
+                                                        errorInfo.PropertyName = PropertyName;
+                                                        uploadDTO.Errors.Add(errorInfo);
+                                                        errorflag = true;
+                                                    }
+
 
                                                 }
-                                                else
-                                                {
-                                                    errorflag = false;
-                                                    continue;
-                                                }
+
+                                                //Re-Setting Error Flag for Next Record Checking                                        
+                                                errorflag = false;
 
                                             }
 
@@ -5508,7 +5534,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
         }
 
-        private MonthlySIUploadDTO ConvertCSVtoDataTable(string strFilePath)
+        private async Task<MonthlySIUploadDTO> ConvertCSVtoDataTable(string strFilePath,ApiContext context)
         {
 
             MonthlySIUploadDTO uploadDTO = new MonthlySIUploadDTO();
@@ -5689,23 +5715,37 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         var TblData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
 
-                        TblData.PayUid = payUid;
-                        TblData.PayAmount = payAmount;
-                        TblData.PayStatus = payStatus;
-                        TblData.PaymentDate = paymentDate;               
-                        
-                        _context.TblPolicyMonthlySi.Update(TblData);
-                        _context.SaveChanges();
+                        var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(TblData.PremiumDetails);
 
+                        var CallMicaCd = await _integrationService.MasterCDACC(CdDTO, context);
+
+                        if (CallMicaCd != null)
+                        {
+                            TblData.PayUid = payUid;
+                            TblData.PayAmount = payAmount;
+                            TblData.PayStatus = payStatus;
+                            TblData.PaymentDate = paymentDate;
+
+                            _context.TblPolicyMonthlySi.Update(TblData);
+                            _context.SaveChanges();
+
+                        }
+                        else
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            errorInfo.ErrorMessage = "Technical Failure Try Again";
+                            errorInfo.ErrorCode = "MSI010";
+                            errorInfo.PropertyName = PropertyName;
+                            uploadDTO.Errors.Add(errorInfo);
+                            errorflag = true;
+                        }
+                      
                     }
-                    else
-                    {                                               
-                        errorflag = false;
-                        continue;
-                    }
+                   
+                    //Re-Setting Error Flag for Next Record Checking                                        
+                    errorflag = false;
 
-
-                
                 }
 
 

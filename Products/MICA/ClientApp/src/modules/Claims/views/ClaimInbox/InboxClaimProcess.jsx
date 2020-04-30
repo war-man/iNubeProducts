@@ -673,7 +673,12 @@ class InboxClaimProcess extends React.Component {
         fields.claimId = ClaimArr[0].claimId;
         fields.claimStatusId = ClaimArr[0].claimStatusId;
         fields.claimManagerRemarks = ClaimArr[0].claimManagerRemarks;
-        fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
+
+        if (ClaimArr[0].approvedClaimAmount != null) {
+            fields.approvedClaimAmount = ClaimArr[0].approvedClaimAmount;
+        } else {
+            fields.approvedClaimAmount = 0;
+        }
         //this.state.claimamt.approvedClaimAmounts = ClaimArr[0].insurableApprovedAmount;
 
         this.state.prodId = ClaimArr[0].productIdPk;

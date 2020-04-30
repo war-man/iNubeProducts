@@ -603,6 +603,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<List<vacantPositiondto>> GetVecPositions(decimal orgid, ApiContext apiContext)
         {
+            //get context
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var totalPosition = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid && a.StructureTypeId==28).ToList();
             List<vacantPositiondto> ddDTOs = new List<vacantPositiondto>();
@@ -636,22 +637,31 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
 
 
-        public async Task<CreateOfficeResponse> SaveEmplMappingDetails(AVOOrgEmployee avOOrgEmployee, ApiContext apiContext)
+        public async Task<CreatePeopleResponse> SaveEmplMappingDetails(updatepositionDto avOOrgEmployee, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
+               
+                var positiondata = _context.TblOrgPositions.FirstOrDefault(a => a.PositionName == avOOrgEmployee.DeginName && a.IsVacant==true);
+                positiondata.IsVacant = false;
+                _context.TblOrgPositions.Update(positiondata);
 
-                var data = _mapper.Map<TblOrgEmployee>(avOOrgEmployee);
+                var mappingdto = avOOrgEmployee.AVOOrgEmployee;
+
+                var data = _mapper.Map<TblOrgEmployee>(mappingdto);
+                data.StaffName = data.FirstName +" "+ (!string.IsNullOrEmpty(data.MiddleName)? data.MiddleName:"")+" " + (!string.IsNullOrEmpty(data.LastName) ? data.LastName:"");
+                data.PositionId = positiondata.PositionId;
+                data.ReportingTo = avOOrgEmployee.EmpId;
                 _context.TblOrgEmployee.Add(data);
                 //data.
                 _context.SaveChanges();
-                return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Data saved sucessfully " };
+                return new CreatePeopleResponse { Status = BusinessStatus.Created, ResponseMessage = $"Employee created successfully with Employee code: {data.StaffCode}." };
             }
             catch (Exception ex)
             {
 
-                return new CreateOfficeResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
+                return new CreatePeopleResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
             }
 
         }
