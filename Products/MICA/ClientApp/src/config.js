@@ -148,5 +148,4 @@ export const config = {
     google: "671491165170-2l31p1m7md0plbj9d5ak27uqcqo9kdpo.apps.googleusercontent.com" //Google client id  (7687687687-nq1asqrnbgordksqerer23dewqqe.apps.googleusercontent.com)
 }
 
-
 export default config
