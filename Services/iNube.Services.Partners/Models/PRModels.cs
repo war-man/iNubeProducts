@@ -1826,13 +1826,18 @@ namespace iNube.Services.Partners.Models
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
-    public class EmployeeRoles : ResponseStatus
+    //public class EmployeeRoles : ResponseStatus
+    //{
+    //    public EmployeeRoles()
+    //    {
+    //        Roles = new List<string>();
+    //    }
+    //   public List<string> Roles { get; set; }
+    //}
+
+    public class EmployeeRoles 
     {
-        public EmployeeRoles()
-        {
-            Roles = new List<string>();
-        }
-       public List<string> Roles { get; set; }
+        public string[] Roles { get; set; }
     }
     public partial class RoleDesigMapDTO
     {

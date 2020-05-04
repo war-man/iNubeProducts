@@ -771,16 +771,16 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                              join d in _context.TblDesignationRole on b.DesignationId equals d.DesignationId
                              select d.RoleId);
 
-            EmployeeRoles empRoles = new EmployeeRoles() {Status = BusinessStatus.Ok };
-
-            if(Roles != null)
+            //  EmployeeRoles empRoles = new EmployeeRoles() {Status = BusinessStatus.Ok };
+            EmployeeRoles employeeRoles = new EmployeeRoles();
+            if (Roles != null)
             {
-                empRoles.Roles.AddRange(Roles);
-                return empRoles;
+                employeeRoles.Roles= Roles.ToArray();
+                return employeeRoles;
             }
-            empRoles.Status = BusinessStatus.NotFound;
-            empRoles.ResponseMessage = "No Record Exist";
-            return empRoles;
+            //empRoles.Status = BusinessStatus.NotFound;
+            //empRoles.ResponseMessage = "No Record Exist";
+            return employeeRoles;
             
         }
         public async Task<RoleDesigResponse>  AssignDesigRole(RoleDesigMapDTO desigRoles, ApiContext apiContext)
@@ -797,7 +797,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                         roleDTO.DesignationId = desigRoles.DesignationId;
                         roleDTO.RoleId = desigRoles.RoleId[i];
                         TblDesignationRole _usersRole = _mapper.Map<TblDesignationRole>(roleDTO);
-
+                       
                         _context.TblDesignationRole.Add(_usersRole);
                     }
                 }
