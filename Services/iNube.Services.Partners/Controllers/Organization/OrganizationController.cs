@@ -413,5 +413,17 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.SaveDecision(data, Context);
             return Ok(response);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeRoles(string empCode)
+        {
+            var response = await _avoorgService.GetEmployeeRoles(empCode,Context);
+            return Ok(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AssignRole([FromBody] RoleDesigMapDTO desigRoles)
+        {
+            var usrrole = await _avoorgService.AssignDesigRole(desigRoles, Context);
+            return ServiceResponse(usrrole);
+        }
     }
 }

@@ -761,5 +761,79 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return decisionData;
         }
 
+        public async Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext)
+        {
+
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var Roles = (from a in _context.TblOrgEmployee.Where(emp=> emp.StaffCode== empCode)
+                             join b in _context.TblOrgPositions on a.PositionId equals b.PositionId
+                             join d in _context.TblDesignationRole on b.DesignationId equals d.DesignationId
+                             select d.RoleId);
+
+            EmployeeRoles empRoles = new EmployeeRoles() {Status = BusinessStatus.Ok };
+
+            if(Roles != null)
+            {
+                empRoles.Roles.AddRange(Roles);
+                return empRoles;
+            }
+            empRoles.Status = BusinessStatus.NotFound;
+            empRoles.ResponseMessage = "No Record Exist";
+            return empRoles;
+            
+        }
+        public async Task<RoleDesigResponse>  AssignDesigRole(RoleDesigMapDTO desigRoles, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var roledata = _context.TblOrgStructure.FirstOrDefault(x => x.OrgStructureId == desigRoles.DesignationId);
+            var roleDTO = new DesignationRoleDTO();
+            if (desigRoles.RoleId.Length != 0)
+            {
+                if (roledata == null)
+                {
+                    for (int i = 0; i < desigRoles.RoleId.Length; i++)
+                    {
+                        roleDTO.DesignationId = desigRoles.DesignationId;
+                        roleDTO.RoleId = desigRoles.RoleId[i];
+                        TblDesignationRole _usersRole = _mapper.Map<TblDesignationRole>(roleDTO);
+
+                        _context.TblDesignationRole.Add(_usersRole);
+                    }
+                }
+                else
+                {
+                    var role = _context.TblDesignationRole.Where(a => a.DesignationId == desigRoles.DesignationId);
+                    foreach (var item in role)
+                    {
+                        _context.TblDesignationRole.Remove(item);
+                    }
+                    for (int i = 0; i < desigRoles.RoleId.Length; i++)
+                    {
+                        roleDTO.DesignationId = desigRoles.DesignationId;
+                        roleDTO.RoleId = desigRoles.RoleId[i];
+                        TblDesignationRole _usersRole = _mapper.Map<TblDesignationRole>(roleDTO);
+
+                        _context.TblDesignationRole.Add(_usersRole);
+                    }
+                }
+               
+                _context.SaveChanges();
+
+                //return userRoles;
+                return new RoleDesigResponse { Status = BusinessStatus.Created, role = desigRoles, ResponseMessage = $"Role assigned to designation successfully!" };
+            }
+            else
+            {
+                var role = _context.TblDesignationRole.Where(a => a.DesignationId == desigRoles.DesignationId);
+                foreach (var item in role)
+                {
+                    _context.TblDesignationRole.Remove(item);
+                }
+
+                _context.SaveChanges();
+                return new RoleDesigResponse { Status = BusinessStatus.Created, role = desigRoles, ResponseMessage = $"Role removed from designation successfully" };
+            }
+        }
     }
 }
