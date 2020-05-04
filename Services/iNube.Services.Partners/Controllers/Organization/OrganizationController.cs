@@ -377,6 +377,13 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(orgDTO);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> searchpeoplebycode(string empcode)
+        {
+            var searchData = await _avoorgService.searchpeoplebycode(empcode, Context);
+            return Ok(searchData);
+        }
+
 
     }
 }
