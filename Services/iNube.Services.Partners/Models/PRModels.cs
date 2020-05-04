@@ -1804,6 +1804,13 @@ namespace iNube.Services.Partners.Models
         public virtual AVOOrgEmployee AVOOrgEmployee { get; set; }
 
     }
+
+    public class MovementCounts
+    {
+        public int Recommended { get; set; }
+        public int Approved { get; set; }
+        public int Rejected { get; set; }
+    }
 }
 
 

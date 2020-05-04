@@ -384,6 +384,12 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(searchData);
         }
 
-
+        // ||AVO
+        [HttpGet]
+        public async Task<IActionResult> GetMovementCount()
+        {
+            var response = await _avoorgService.GetMovementCount(Context);
+            return Ok(response);
+        }
     }
 }

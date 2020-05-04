@@ -708,5 +708,23 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
            var objdata= _SearchData[0] ;
             return objdata;
         }
+
+        public async Task<MovementCounts> GetMovementCount(ApiContext apiContext)
+        {
+
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var _movement = (from a in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
+                           join b in _context.TblMovements on a.OrgEmpId equals b.OrgEmpId
+                           select b);
+
+            MovementCounts counts = new MovementCounts();
+
+            counts.Recommended = _movement.Where(g => g.MovementStatusId == 34).Count();
+            counts.Approved = _movement.Where(g => g.MovementStatusId == 35).Count();
+            counts.Rejected = _movement.Where(g => g.MovementStatusId == 36).Count();
+
+            return counts;
+        }
     }
 }
