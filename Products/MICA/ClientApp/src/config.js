@@ -138,7 +138,7 @@ export const config = {
 
     apiUrl: '',
     localUrl: '',
-    ruleEngineUrl: '',
+   
     rulelocalUrl: '',
     localRuleUrl: '',
 

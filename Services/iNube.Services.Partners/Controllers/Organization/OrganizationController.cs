@@ -376,7 +376,13 @@ namespace iNube.Services.Partners.Controllers.Organization
             var orgDTO = await _avoorgService.GetEmpDetails(orgId,offid, Context);
             return Ok(orgDTO);
         }
-
+        // || AVO
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeDetailsById(int empid)
+        {
+            var orgDTO = await _avoorgService.GetEmployeeDetailsById(empid, Context);
+            return Ok(orgDTO);
+        }
         [HttpPost]
         public async Task<IActionResult> searchpeoplebycode(string empcode)
         {
