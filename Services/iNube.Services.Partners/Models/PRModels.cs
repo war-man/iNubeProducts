@@ -1857,6 +1857,11 @@ namespace iNube.Services.Partners.Models
         public int DesigRoleId { get; set; }
 
     }
+
+    public class MovementDTO
+    {
+        public int movementStatusId { get; set; }
+    }
 }
 
 

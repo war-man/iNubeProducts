@@ -225,15 +225,17 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetOffbyOrgid(orgid, Context);
             return Ok(response);
         }
-        [HttpGet]
-        public async Task<IActionResult> GetEmployeeDetails()
+
+        //  || AVO
+        [HttpPost]
+        public async Task<IActionResult> GetEmployeeDetails(AvoOrgEmployeeSearch emp)
         {
-            var response = await _avoorgService.GetEmployeeDetails(Context);
+            var response = await _avoorgService.GetEmployeeDetails(emp, Context);
             return Ok(response);
         }
         //  || AVO
 
-      
+
         [HttpPost]
         public async Task<IActionResult> CreateOffice([FromBody] AVOOrgOffice aVOOrgOffice)
         {
@@ -424,6 +426,14 @@ namespace iNube.Services.Partners.Controllers.Organization
         {
             var usrrole = await _avoorgService.AssignDesigRole(desigRoles, Context);
             return ServiceResponse(usrrole);
+        }
+
+        // ||AVO
+        [HttpPost]
+        public async Task<IActionResult> SearchEmployeeDetailsByMovStatus([FromBody]MovementDTO movementDTO)
+        {
+            var searchData = await _avoorgService.SearchEmployeeDetailsByMovStatus(movementDTO, Context);
+            return Ok(searchData);
         }
     }
 }
