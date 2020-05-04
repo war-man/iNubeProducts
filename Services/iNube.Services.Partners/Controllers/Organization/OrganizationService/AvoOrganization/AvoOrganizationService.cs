@@ -364,7 +364,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return ddDTOs;
         }
 
-        public async Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(ApiContext apiContext)
+        public async Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(AvoOrgEmployeeSearch empdata, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -399,6 +399,11 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       };
             //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
 
+            if (empdata.OrgEmpId > 0)
+            {
+                Emp = Emp.Where(bi => bi.OrgEmpId == empdata.OrgEmpId);
+
+            }
             return Emp;
         }
 
@@ -452,7 +457,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       };
             //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
 
-            return Emp;
+            return Emp.Distinct();
         }
         public async Task<List<MasterDto>> GetDesignation(int orgid, ApiContext apiContext)
         {
@@ -754,6 +759,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var _tblmovements = _mapper.Map<TblMovements>(data);
+            _tblmovements.MovementStatusId = 34;
+
             _context.TblMovements.Add(_tblmovements);
 
             _context.SaveChanges();
