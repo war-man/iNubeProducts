@@ -1826,6 +1826,11 @@ namespace iNube.Services.Partners.Models
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+
+    public class MovementDTO
+    {
+        public int movementStatusId { get; set; }
+    }
 }
 
 

@@ -407,5 +407,13 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.SaveDecision(data, Context);
             return Ok(response);
         }
+
+        // ||AVO
+        [HttpPost]
+        public async Task<IActionResult> SearchEmployeeDetailsByMovStatus([FromBody]MovementDTO movementDTO)
+        {
+            var searchData = await _avoorgService.SearchEmployeeDetailsByMovStatus(movementDTO, Context);
+            return Ok(searchData);
+        }
     }
 }

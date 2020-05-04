@@ -39,5 +39,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<MovementCounts> GetMovementCount(ApiContext apiContext);
         Task<AVOOrgEmployee> UpdateEmployee(AVOOrgEmployee Empdata, ApiContext apiContext);
         Task<AVOMovements> SaveDecision(AVOMovements data, ApiContext apiContext);
+        Task<IEnumerable<AvoOrgEmployeeSearch>> SearchEmployeeDetailsByMovStatus(MovementDTO movementDTO, ApiContext apiContext);
     }
 }

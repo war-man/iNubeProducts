@@ -761,5 +761,42 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return decisionData;
         }
 
+        public async Task<IEnumerable<AvoOrgEmployeeSearch>> SearchEmployeeDetailsByMovStatus (MovementDTO movementDTO, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var Emp = from emp in _context.TblOrgEmployee
+                      join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
+                      join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
+                      where mov.MovementStatusId == movementDTO.movementStatusId
+
+                      select new AvoOrgEmployeeSearch
+                      {
+                          OrgEmpId = emp.OrgEmpId,
+                          StaffCode = emp.StaffCode,
+                          StaffName = emp.StaffName,
+                          PositionId = emp.PositionId,
+                          Position = pos.PositionName,
+                          Email = emp.Email,
+                          PhoneNumber = emp.PhoneNumber,
+                          StaffTypeId = emp.StaffTypeId,
+                          Function = emp.Function,
+                          AppointmentDate = emp.AppointmentDate,
+                          Smcode = emp.Smcode,
+                          Imdcode = emp.Imdcode,
+                          StaffStatus = emp.StaffStatus,
+                          CreatedBy = emp.CreatedBy,
+                          CreatedDate = emp.CreatedDate,
+                          ModifiedBy = emp.ModifiedBy,
+                          ModifiedDate = emp.ModifiedDate,
+                          MovementId = mov.MovementId,
+                          MovementStatusId = mov.MovementStatusId,
+                          OrganizationId = pos.OrganizationId,
+
+                      };
+
+            return Emp;
+        }
+
     }
 }
