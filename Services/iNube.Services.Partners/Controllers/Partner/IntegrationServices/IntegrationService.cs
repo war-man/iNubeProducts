@@ -122,6 +122,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             if (!string.IsNullOrEmpty(apiContext.Token))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
 
             using (var response = await client.GetAsync(url))
@@ -142,9 +143,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-
+            if (apiContext.Token != null)
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+            }
             using (var response = await client.GetAsync(url))
             using (var content = response.Content)
             {
@@ -166,6 +169,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             if (apiContext.Token != null)
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
 
             HttpContent contentPost = null;

@@ -16,6 +16,7 @@ namespace iNube.Services.Partners.Entities.AVO
         }
 
         public virtual DbSet<TblAllocationRate> TblAllocationRate { get; set; }
+        public virtual DbSet<TblDesignationRole> TblDesignationRole { get; set; }
         public virtual DbSet<TblDiscountLoadingChart> TblDiscountLoadingChart { get; set; }
         public virtual DbSet<TblMasCity> TblMasCity { get; set; }
         public virtual DbSet<TblMasCommonTypes> TblMasCommonTypes { get; set; }
@@ -69,7 +70,7 @@ namespace iNube.Services.Partners.Entities.AVO
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblAllocationRate>(entity =>
             {
@@ -81,6 +82,16 @@ namespace iNube.Services.Partners.Entities.AVO
                 entity.Property(e => e.Product)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblDesignationRole>(entity =>
+            {
+                entity.HasKey(e => e.DesigRoleId)
+                    .HasName("PK__tblDesig__0D66D288C89EB7A3");
+
+                entity.ToTable("tblDesignationRole", "PR");
+
+                entity.Property(e => e.DesignationId).HasColumnType("numeric(18, 0)");
             });
 
             modelBuilder.Entity<TblDiscountLoadingChart>(entity =>

@@ -1826,6 +1826,32 @@ namespace iNube.Services.Partners.Models
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+    public class EmployeeRoles : ResponseStatus
+    {
+        public EmployeeRoles()
+        {
+            Roles = new List<string>();
+        }
+       public List<string> Roles { get; set; }
+    }
+    public partial class RoleDesigMapDTO
+    {
+        public decimal DesignationId { get; set; }
+        public string[] RoleId { get; set; }
+        public decimal EnvId { get; set; }
+    }
+    public class RoleDesigResponse : ResponseStatus
+    {
+        public RoleDesigMapDTO role { get; set; }
+    }
+
+    public partial class DesignationRoleDTO
+    {
+        public decimal DesignationId { get; set; }
+        public string RoleId { get; set; }
+        public int DesigRoleId { get; set; }
+
+    }
 
     public class MovementDTO
     {
