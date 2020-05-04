@@ -691,21 +691,22 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             }
         }
 
-        public async Task<IEnumerable<AVOOrgEmployee>> searchpeoplebycode(string  empcode, ApiContext apiContext)
+        public async Task<AVOOrgEmployee> searchpeoplebycode(string  empcode, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var SearchData = _context.TblOrgEmployee.Select(a => a)
-                 .Include(add => add.TblOrgEmpAddress)
-                 .ToList();
+                 .Include(add => add.TblOrgEmpAddress).ToList();
+                 
 
             if (!string.IsNullOrEmpty(empcode))
             {
-                SearchData = SearchData.Where(a => a.StaffCode == empcode).Select(a => a).ToList();
+                SearchData = SearchData.Where(a => a.StaffCode == empcode).Select(a => a).ToList(); 
             }
 
             var _SearchData = _mapper.Map<List<AVOOrgEmployee>>(SearchData);
-            return _SearchData;
+           var objdata= _SearchData[0] ;
+            return objdata;
         }
     }
 }

@@ -35,6 +35,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         Task<List<ddDTO>> GetEmpDetails(decimal orgId,decimal offid, ApiContext apiContext);
 
-        Task<IEnumerable<AVOOrgEmployee>> searchpeoplebycode(string empcode, ApiContext apiContext);
+        Task<AVOOrgEmployee> searchpeoplebycode(string empcode, ApiContext apiContext);
     }
 }
