@@ -372,12 +372,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             var Emp = from emp in _context.TblOrgEmployee
                       join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
+                      join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
                       select new AvoOrgEmployeeSearch
                       {
                           OrgEmpId = emp.OrgEmpId,
                           StaffCode = emp.StaffCode,
                           StaffName = emp.StaffName,
                           PositionId = emp.PositionId,
+                          Position = pos.PositionName,
                           Email = emp.Email,
                           PhoneNumber = emp.PhoneNumber,
                           StaffTypeId = emp.StaffTypeId,
@@ -391,7 +393,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           ModifiedBy = emp.ModifiedBy,
                           ModifiedDate = emp.ModifiedDate,
                           MovementId = mov.MovementId,
-                          MovementStatusId = mov.MovementStatusId
+                          MovementStatusId = mov.MovementStatusId,
+                          OrganizationId = pos.OrganizationId,
 
                       };
             //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
@@ -726,5 +729,37 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             return counts;
         }
+
+        public async Task<AVOOrgEmployee> UpdateEmployee(AVOOrgEmployee Empdata, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+                var peopledata = _mapper.Map<TblOrgEmployee>(Empdata);
+                // var tbl_people = _context.TblOrgEmployee.Find(peopledata.OrgEmpId);
+
+                _context.TblOrgEmployee.Update(peopledata);
+                _context.SaveChanges();
+                var empDTO = _mapper.Map<AVOOrgEmployee>(peopledata);
+                return empDTO;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<AVOMovements> SaveDecision(AVOMovements data, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var _tblmovements = _mapper.Map<TblMovements>(data);
+            _context.TblMovements.Add(_tblmovements);
+
+            _context.SaveChanges();
+            var decisionData = _mapper.Map<AVOMovements>(_tblmovements);
+            return decisionData;
+        }
+
     }
 }

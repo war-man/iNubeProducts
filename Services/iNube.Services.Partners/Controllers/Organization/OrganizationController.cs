@@ -391,5 +391,21 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetMovementCount(Context);
             return Ok(response);
         }
+
+        // ||AVO
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmployee(AVOOrgEmployee Empdata)
+        {
+            var response = await _avoorgService.UpdateEmployee(Empdata, Context);
+            return Ok(response);
+        }
+
+        // ||AVO
+        [HttpPost]
+        public async Task<IActionResult> SaveDecision(AVOMovements data)
+        {
+            var response = await _avoorgService.SaveDecision(data, Context);
+            return Ok(response);
+        }
     }
 }

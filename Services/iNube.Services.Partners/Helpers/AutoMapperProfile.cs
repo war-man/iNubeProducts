@@ -136,7 +136,7 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<PinCodeDTO, Entities.AVO.TblMasPinCode>();
             CreateMap<Entities.AVO.TblMasPinCode, PinCodeDTO>();
 
-
+            CreateMap<Entities.AVO.TblMovements, AVOMovements>().ReverseMap();
 
         }
 

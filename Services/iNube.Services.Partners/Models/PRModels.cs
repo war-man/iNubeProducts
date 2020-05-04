@@ -557,6 +557,7 @@ namespace iNube.Services.Partners.Models
         public string StaffCode { get; set; }
         public string StaffName { get; set; }
         public decimal? PositionId { get; set; }
+        public string Position { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public decimal? StaffTypeId { get; set; }
@@ -569,7 +570,7 @@ namespace iNube.Services.Partners.Models
         public DateTime? CreatedDate { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
-
+        public decimal? OrganizationId { get; set; }
         public decimal MovementId { get; set; }
         public decimal? MovementStatusId { get; set; }
     }
@@ -1810,6 +1811,20 @@ namespace iNube.Services.Partners.Models
         public int Recommended { get; set; }
         public int Approved { get; set; }
         public int Rejected { get; set; }
+    }
+    public partial class AVOMovements
+    {
+        public decimal MovementId { get; set; }
+        public int? MovementTypeId { get; set; }
+        public decimal? OrgEmpId { get; set; }
+        public decimal? MovementStatusId { get; set; }
+        public decimal? RecommendedByid { get; set; }
+        public decimal? CurrentPositionId { get; set; }
+        public decimal? NewPositionId { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 }
 
