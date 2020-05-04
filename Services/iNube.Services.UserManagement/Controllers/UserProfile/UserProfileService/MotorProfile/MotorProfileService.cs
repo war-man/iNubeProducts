@@ -29,7 +29,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             throw new NotImplementedException();
         }
 
-        public UserResponse CreateProfileUser(UserDTO user, ApiContext apiContext)
+        public async Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

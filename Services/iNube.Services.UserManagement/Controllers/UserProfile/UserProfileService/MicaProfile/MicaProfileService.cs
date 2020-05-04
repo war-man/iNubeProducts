@@ -47,7 +47,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             return _UsrDTO;
         }
 
-        public UserResponse CreateProfileUser(UserDTO user, ApiContext apiContext)
+        public async  Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext)
         {
 
             CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);

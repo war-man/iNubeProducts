@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using iNube.Utility.Framework.Model;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Entities.MICACP;
+using iNube.Services.UserManagement.Controllers.Role.RoleService;
+using iNube.Services.UserManagement.Controllers.CustomerProvisioning.IntegrationService;
 
 namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileService.MicaProfile
 {
@@ -21,10 +23,14 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         private bool Result;
         public static int otpvalue { get; set; }
         private readonly IEmailService _emailService;
-        public AvoProfileService(IMapper mapper, IEmailService emailService)
+        private readonly IRoleProductService _avoRoleService;
+        private readonly IIntegrationService _integrationService;
+        public AvoProfileService(IMapper mapper, IEmailService emailService, IRoleProductService avoRoleService,IIntegrationService integrationService)
         {
             _emailService = emailService;
             _mapper = mapper;
+            _avoRoleService = avoRoleService;
+            _integrationService = integrationService;
         }
 
         public UserDetailsDTO GetUserByUserId(string Id, ApiContext apiContext)
@@ -46,7 +52,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             return _UsrDTO;
         }
 
-        public UserResponse CreateProfileUser(UserDTO user, ApiContext apiContext)
+        public  async  Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext)
         {
             CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
             DbManager._TimeZone = UserDateTime.KeyValue;
@@ -70,6 +76,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 var aspNet = _context.AspNetUsers.SingleOrDefault(x => x.UserName == userDetails.Email);
                 if (aspNet == null)
                 {
+                  
                     userDetails.UserName = userDetails.Email;
                     userDetails.CreatedBy = apiContext.UserId;
                     userDetails.CreatedDate = DateTimeNow;
@@ -92,10 +99,25 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _users.FirstTimeLogin = 0;
                         _users.LastPasswordChanged = DateTimeNow;
                         _users.PasswordHash = Utilities.GenerateDefaultPassword();
+                        if (!string.IsNullOrEmpty(userDetails.EmployeeNumber))
+                        {
+
+                            EmployeeRoles employeeRoles = new EmployeeRoles();
+                              var Roledata = await _integrationService.GetEmployeeRoles(userDetails.EmployeeNumber,apiContext);
+                            employeeRoles.Roles = Roledata.Roles;
+                            UserRoleMapDTO userRoleMapDTO = new UserRoleMapDTO();
+                            userRoleMapDTO.UserId = _users.Id;
+                            userRoleMapDTO.RoleId = employeeRoles.Roles;
+                            _avoRoleService.AssignRole(userRoleMapDTO, apiContext);
+                            var userdata = _users.TblUserDetails.FirstOrDefault();
+                            userdata.RoleId = Roledata.Roles[0];
+                        }
                         emailTest.To = userDetails.Email;
                         emailTest.Subject = "User profile creation";
                         emailTest.Message = "Your account has been created with Username:" + _users.UserName + " and password: Mica@123 \n" + "This is a system generated password. Kindly reset the same after log in.";
+                      
                         _context.AspNetUsers.Add(_users);
+
                     }
                     _context.SaveChanges();
                     var _usersDTOs = _mapper.Map<UserDTO>(_users);
@@ -727,5 +749,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             }
 
         }
+        
+      
     }
 }

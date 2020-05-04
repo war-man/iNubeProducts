@@ -16,7 +16,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
     {
         IEnumerable<ddDTO> GetMaster(string lMasterlist, ApiContext apiContext);
         IEnumerable<ddDTO> GetLocation(string locationType, int parentID, ApiContext apiContext);
-        UserResponse CreateProfileUser(UserDTO user, ApiContext apiContext);
+        Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext);
         EmployeeDTO CreateProfileemployee(EmployeeDTO emp, ApiContext apiContext);
         UserDetailsDTO GetUserByUserId(string Id, ApiContext apiContext);
         UserDTO ChangeEmailId(UserDTO _userDTO, ApiContext apiContext);
@@ -67,9 +67,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             return _userproductService(apiContext.ProductType).SearchUserById(userId, apiContext);
         }
 
-        public UserResponse CreateProfileUser(UserDTO user, ApiContext apiContext)
+        public async Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext)
         {
-            return _userproductService(apiContext.ProductType).CreateProfileUser(user, apiContext);
+            return await _userproductService(apiContext.ProductType).CreateProfileUser(user, apiContext);
         }
         //public UserDTO CreateProfileUser(UserDTO user)
         //{
