@@ -422,6 +422,10 @@ namespace iNube.Services.Partners.Entities.AVO
 
                 entity.Property(e => e.MovementTypeId).HasColumnName("MovementTypeID");
 
+                entity.Property(e => e.NewBranchId)
+                    .HasColumnName("NewBranchID")
+                    .HasColumnType("numeric(18, 0)");
+
                 entity.Property(e => e.NewPositionId)
                     .HasColumnName("NewPositionID")
                     .HasColumnType("numeric(18, 0)");
@@ -429,6 +433,10 @@ namespace iNube.Services.Partners.Entities.AVO
                 entity.Property(e => e.OrgEmpId)
                     .HasColumnName("OrgEmpID")
                     .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Reason)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.RecommendedByid)
                     .HasColumnName("RecommendedBYID")

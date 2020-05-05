@@ -16,5 +16,7 @@ namespace iNube.Services.Partners.Entities.AVO
         public DateTime? CreatedDate { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public decimal? NewBranchId { get; set; }
+        public string Reason { get; set; }
     }
 }

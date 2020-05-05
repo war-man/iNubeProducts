@@ -1825,6 +1825,8 @@ namespace iNube.Services.Partners.Models
         public DateTime? CreatedDate { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public decimal? NewBranchId { get; set; }
+        public string Reason { get; set; }
     }
     //public class EmployeeRoles : ResponseStatus
     //{
