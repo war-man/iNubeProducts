@@ -856,7 +856,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           OrgEmpId = emp.OrgEmpId,
                           StaffCode = emp.StaffCode,
                           StaffName = emp.StaffName,
-                          PositionId = emp.PositionId,
                           Position = pos.PositionName,
                           Email = emp.Email,
                           PhoneNumber = emp.PhoneNumber,
@@ -877,6 +876,52 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       };
 
             return Emp;
+        }
+
+        public async Task<AVOMovements> UpdateEmployeePosition(PositionStatusDTO movements, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+                
+                var movementdata = _context.TblMovements.SingleOrDefault(x => x.OrgEmpId == movements.OrgEmpId);
+                var pdata = _context.TblOrgPositions.SingleOrDefault(x => x.OrganizationId == movements.OrgEmpId);
+                if (movements.MovementStatusId == 34)//Recommended
+                {
+
+                    movementdata.MovementStatusId = movements.MovementStatusId;
+                    //movementdata.Remarks = movements.Remarks;
+                    movementdata.ModifiedDate = DateTime.Now;
+                    movementdata.ModifiedBy = apiContext.UserId;
+                }            
+                if(movements.MovementStatusId == 35)//approved
+                {
+                    movementdata.MovementStatusId = movements.MovementStatusId;
+                    //movementdata.Remarks = movements.Remarks;
+                    movementdata.ModifiedDate = DateTime.Now;
+                    movementdata.ModifiedBy = apiContext.UserId;
+
+                    pdata.DesignationId = movementdata.NewPositionId;
+                    _context.TblOrgPositions.Update(pdata);
+                }
+                if(movements.MovementStatusId == 36)//rejected
+                {
+                    movementdata.MovementStatusId = movements.MovementStatusId;
+                    //movementdata.Remarks = movements.Remarks;
+                    movementdata.ModifiedDate = DateTime.Now;
+                    movementdata.ModifiedBy = apiContext.UserId;
+                }
+                _context.TblMovements.Update(movementdata);
+
+                var mapData = _mapper.Map<AVOMovements>(movementdata);
+                _context.SaveChanges();
+
+                return mapData;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
     }
