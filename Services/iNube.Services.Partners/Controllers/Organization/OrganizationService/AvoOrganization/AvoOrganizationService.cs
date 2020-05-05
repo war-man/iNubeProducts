@@ -890,14 +890,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 {
 
                     movementdata.MovementStatusId = movements.MovementStatusId;
-                    //movementdata.Remarks = movements.Remarks;
+                    movementdata.Reason = movements.Remarks;
                     movementdata.ModifiedDate = DateTime.Now;
                     movementdata.ModifiedBy = apiContext.UserId;
                 }            
                 if(movements.MovementStatusId == 35)//approved
                 {
                     movementdata.MovementStatusId = movements.MovementStatusId;
-                    //movementdata.Remarks = movements.Remarks;
+                    movementdata.Reason = movements.Remarks;
                     movementdata.ModifiedDate = DateTime.Now;
                     movementdata.ModifiedBy = apiContext.UserId;
 
@@ -907,7 +907,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 if(movements.MovementStatusId == 36)//rejected
                 {
                     movementdata.MovementStatusId = movements.MovementStatusId;
-                    //movementdata.Remarks = movements.Remarks;
+                    movementdata.Reason = movements.Remarks;
                     movementdata.ModifiedDate = DateTime.Now;
                     movementdata.ModifiedBy = apiContext.UserId;
                 }
