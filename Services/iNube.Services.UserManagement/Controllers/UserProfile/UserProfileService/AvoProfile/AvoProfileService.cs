@@ -23,9 +23,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         private bool Result;
         public static int otpvalue { get; set; }
         private readonly IEmailService _emailService;
-        private readonly IRoleProductService _avoRoleService;
+        private readonly IRoleService _avoRoleService;
         private readonly IIntegrationService _integrationService;
-        public AvoProfileService(IMapper mapper, IEmailService emailService, IRoleProductService avoRoleService,IIntegrationService integrationService)
+        public AvoProfileService(IMapper mapper, IEmailService emailService, IRoleService avoRoleService, IIntegrationService integrationService)
         {
             _emailService = emailService;
             _mapper = mapper;
@@ -52,7 +52,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             return _UsrDTO;
         }
 
-        public  async  Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext)
+        public async Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext)
         {
             CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
             DbManager._TimeZone = UserDateTime.KeyValue;
@@ -76,10 +76,10 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 var aspNet = _context.AspNetUsers.SingleOrDefault(x => x.UserName == userDetails.Email);
                 if (aspNet == null)
                 {
-                  
+
                     userDetails.UserName = userDetails.Email;
                     userDetails.CreatedBy = apiContext.UserId;
-                    userDetails.CreatedDate = DateTimeNow;
+                    //userDetails.CreatedDate = DateTimeNow;
                     userDetails.IsActive = true;
                     if (userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
                     {
@@ -97,29 +97,18 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _users.UserName = userDetails.Email;
                         _users.Email = userDetails.Email;
                         _users.FirstTimeLogin = 0;
-                        _users.LastPasswordChanged = DateTimeNow;
+                        //_users.LastPasswordChanged = DateTimeNow;
                         _users.PasswordHash = Utilities.GenerateDefaultPassword();
-                        if (!string.IsNullOrEmpty(userDetails.EmployeeNumber))
-                        {
 
-                            EmployeeRoles employeeRoles = new EmployeeRoles();
-                              var Roledata = await _integrationService.GetEmployeeRoles(userDetails.EmployeeNumber,apiContext);
-                            employeeRoles.Roles = Roledata.Roles;
-                            UserRoleMapDTO userRoleMapDTO = new UserRoleMapDTO();
-                            userRoleMapDTO.UserId = _users.Id;
-                            userRoleMapDTO.RoleId = employeeRoles.Roles;
-                            _avoRoleService.AssignRole(userRoleMapDTO, apiContext);
-                            var userdata = _users.TblUserDetails.FirstOrDefault();
-                            userdata.RoleId = Roledata.Roles[0];
-                        }
                         emailTest.To = userDetails.Email;
                         emailTest.Subject = "User profile creation";
                         emailTest.Message = "Your account has been created with Username:" + _users.UserName + " and password: Mica@123 \n" + "This is a system generated password. Kindly reset the same after log in.";
-                      
+
                         _context.AspNetUsers.Add(_users);
 
                     }
                     _context.SaveChanges();
+
                     var _usersDTOs = _mapper.Map<UserDTO>(_users);
 
                     _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
@@ -137,7 +126,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                     }
                     customerUsers.UserName = userDetails.Email;
                     customerUsers.Email = userDetails.Email;
-                    customerUsers.CreatedDate = DateTimeNow;
+                    //customerUsers.CreatedDate = DateTimeNow;
                     customerUsers.ContactNumber = userDetails.ContactNumber;
                     customerUsers.UserId = _users.Id;
                     customerUsers.IsActive = true;
@@ -146,6 +135,18 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
                     _cpcontext.TblCustomerUsers.Add(customerUsers);
                     _cpcontext.SaveChanges();
+
+                    if (!string.IsNullOrEmpty(userDetails.EmployeeNumber))
+                    {
+
+                        EmployeeRoles employeeRoles = new EmployeeRoles();
+                        var Roledata = await _integrationService.GetEmployeeRoles(userDetails.EmployeeNumber, apiContext);
+                        employeeRoles.Roles = Roledata.Roles;
+                        UserRoleMapDTO userRoleMapDTO = new UserRoleMapDTO();
+                        userRoleMapDTO.UserId = _users.Id;
+                        userRoleMapDTO.RoleId = employeeRoles.Roles;
+                        _avoRoleService.AssignRole(userRoleMapDTO, apiContext);
+                    }
 
                     SendEmailAsync(emailTest);
                     return new UserResponse { Status = BusinessStatus.Created, users = _usersDTOs, Id = _usersDTOs.Id, ResponseMessage = $"User created successfully! \n for user: {_usersDTOs.Email}" };
@@ -159,7 +160,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             {
                 AspNetUsers _users = _mapper.Map<AspNetUsers>(user);
                 userDetails.ModifiedBy = apiContext.UserId;
-                userDetails.ModifiedDate = DateTimeNow;
+                //userDetails.ModifiedDate = DateTimeNow;
 
                 var useraddr = _context.TblUserAddress.Where(p => p.Id == userDetails.UserId);
                 foreach (var item in useraddr)
@@ -184,7 +185,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 var cpdata = _cpcontext.TblCustomerUsers.SingleOrDefault(a => a.UserName == userDetails.Email);
                 TblCustomerUsers customerUsers = new TblCustomerUsers();
 
-                customerUsers.ModifiedDate = DateTimeNow;
+                //customerUsers.ModifiedDate = DateTimeNow;
                 customerUsers.Email = userDetails.Email;
                 customerUsers.ContactNumber = userDetails.ContactNumber;
 
@@ -749,7 +750,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             }
 
         }
-        
-      
+
+
     }
 }
