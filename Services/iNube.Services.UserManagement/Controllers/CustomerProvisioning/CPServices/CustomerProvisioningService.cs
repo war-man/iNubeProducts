@@ -152,7 +152,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             try
             {
 
-                var result = _userService.CreateProfileUser(userDTO, apiContext);
+                var result =await _userService.CreateProfileUser(userDTO, apiContext);
                 //var envids = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).Select(x=>x);
                 if (Convert.ToInt32(result.Status) == 7)
                 {

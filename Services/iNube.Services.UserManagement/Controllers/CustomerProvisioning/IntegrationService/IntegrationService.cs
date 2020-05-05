@@ -16,7 +16,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
     {
         Task<CustomersDTO> GetCustProvisioningDetailsAsync(decimal customerId, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetReportNameForPermissionsDetails(string Url, ApiContext apiContext);
-     
+        Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext);
     }
 
 
@@ -24,7 +24,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl, PartnerDevUrl;
 
         public IntegrationService(IConfiguration configuration)
         {
@@ -40,7 +40,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
-
+           
         }
 
         //      //readonly string BillingConfigUrl = "https://localhost:44362";
@@ -53,13 +53,18 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
             var uri = BillingUrl + "/api/Billing/GetCustProvisioningDetailsAsync?customerId=" + customerId;
             return await GetApiInvoke<CustomersDTO>(uri, apiContext);
         }
+        public async Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext)
+        {
+            var uri = PartnerUrl + "/api/Organization/GetEmployeeRoles?empCode=" + empCode;
+            //var uri = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Organization/GetEmployeeRoles?empCode=" + empCode;
+            return await GetApiInvoke<EmployeeRoles>(uri, apiContext);
+        }
         public async Task<IEnumerable<ddDTO>> GetReportNameForPermissionsDetails(string Url, ApiContext apiContext)
         {
             var uri = Url;
             //var uri = "https://localhost:44351/api/Report/GetReportNameForPermissions";
             return await GetListApiInvoke<ddDTO>(uri, apiContext);
         }
-
         public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();

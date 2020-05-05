@@ -823,5 +823,9 @@ namespace iNube.Services.UserManagement.Models
     {
         public DynamicPermissionsDTO reportperm { get; set; }
     }
-
+    //Integration
+    public class EmployeeRoles
+    {
+        public string[] Roles { get; set; }
+    }
 }

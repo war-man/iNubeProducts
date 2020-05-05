@@ -20,7 +20,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<IEnumerable<AVOOrganizationDTO>> GetOrgByParentId(int orgid, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetOrgDropdown(ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetOffbyOrgid(int orgid,ApiContext apiContext);
-        Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(ApiContext apiContext);
+        Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(AvoOrgEmployeeSearch emp, ApiContext apiContext);
         Task<CreateOfficeResponse> CreateOffice(AVOOrgOffice aVOOrgOffice, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetNewBranchDropdown(int posid, ApiContext apiContext);
         Task<List<MasterDto>> GetDesignation(int orgid, ApiContext apiContext);
@@ -41,5 +41,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<AVOMovements> SaveDecision(AVOMovements data, ApiContext apiContext);
         Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext);
         Task<RoleDesigResponse> AssignDesigRole(RoleDesigMapDTO desigRoles, ApiContext apiContext);
+        Task<IEnumerable<AvoOrgEmployeeSearch>> SearchEmployeeDetailsByMovStatus(MovementDTO movementDTO, ApiContext apiContext);
     }
 }

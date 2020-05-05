@@ -59,9 +59,9 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile
 
         // POST: api/UserProfile/CreateProfileUser
         [HttpPost]
-        public IActionResult CreateProfileUser([FromBody] UserDTO usersDTOs)
+        public async Task<IActionResult> CreateProfileUser([FromBody] UserDTO usersDTOs)
         {
-            var response = _userService.CreateProfileUser(usersDTOs, Context);
+            var response = await _userService.CreateProfileUser(usersDTOs, Context);
             return ServiceResponse(response);
             //switch (response.Status)
             //{
