@@ -1869,8 +1869,6 @@ namespace iNube.Services.Partners.Models
     {
         public decimal? OrgEmpId { get; set; }
         public decimal? MovementStatusId { get; set; }
-        public decimal? NewPositionId { get; set; }
-        public decimal? DesignationId { get; set; }
         public string Remarks { get; set; }
 
     }
