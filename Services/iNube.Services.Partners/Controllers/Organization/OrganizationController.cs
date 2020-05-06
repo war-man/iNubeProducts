@@ -392,6 +392,14 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(searchData);
         }
 
+       
+        [HttpPut]
+        public async Task<IActionResult> ModifyPeople(AVOOrgEmployee tblRetentionGroupDto)
+        {
+            //tblRetentionGroupDto.RetentionGroupId = retentionGID;
+            await _avoorgService.ModifyPeople(tblRetentionGroupDto, Context);
+            return Ok();
+        }
         // ||AVO
         [HttpGet]
         public async Task<IActionResult> GetMovementCount()
