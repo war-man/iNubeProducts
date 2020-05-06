@@ -18,7 +18,7 @@ phases:
       
   post_build:
     commands:
-
+     
         - echo clearing s3 bucket for Edelweiss Production UI
         - aws s3 rm s3://egiswitch.edelweissinsurance.com
         - echo $CODEBUILD_SRC_DIR
