@@ -135,8 +135,12 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<Entities.AVO.TblMasCity, CityDTO>();
             CreateMap<PinCodeDTO, Entities.AVO.TblMasPinCode>();
             CreateMap<Entities.AVO.TblMasPinCode, PinCodeDTO>();
+            
 
-            CreateMap<Entities.AVO.TblMovements, AVOMovements>().ReverseMap();
+            CreateMap<AVOMovementDetailsDTO, Entities.AVO.TblMovementDetails>();
+            CreateMap<Entities.AVO.TblMovementDetails, AVOMovementDetailsDTO>();
+            CreateMap<AVOMovements, Entities.AVO.TblMovements>()
+                .ForMember(dest => dest.TblMovementDetails, opt => opt.MapFrom(src => src.AvoMovementDetails)).ReverseMap();
 
         }
 

@@ -452,5 +452,13 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok();
 
         }
+
+        // ||AVO
+        [HttpGet]
+        public async Task<IActionResult> GetReporteeGrid(int Empcode, int position)
+        {
+            var response = await _avoorgService.GetReporteeGrid(Empcode, position, Context);
+            return Ok(response);
+        }
     }
 }

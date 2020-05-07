@@ -1814,6 +1814,10 @@ namespace iNube.Services.Partners.Models
     }
     public partial class AVOMovements
     {
+        public AVOMovements()
+        {
+            AvoMovementDetails = new HashSet<AVOMovementDetailsDTO>();
+        }
         public decimal MovementId { get; set; }
         public int? MovementTypeId { get; set; }
         public decimal? OrgEmpId { get; set; }
@@ -1827,6 +1831,8 @@ namespace iNube.Services.Partners.Models
         public DateTime? ModifiedDate { get; set; }
         public decimal? NewBranchId { get; set; }
         public string Reason { get; set; }
+
+        public virtual ICollection<AVOMovementDetailsDTO> AvoMovementDetails { get; set; }
     }
     //public class EmployeeRoles : ResponseStatus
     //{
@@ -1871,6 +1877,40 @@ namespace iNube.Services.Partners.Models
         public decimal? MovementStatusId { get; set; }
         public string Remarks { get; set; }
 
+    }
+    public class AVOReportee
+    {
+        public decimal OrgEmpId { get; set; }
+        public string StaffCode { get; set; }
+        public string StaffName { get; set; }
+        public decimal? PositionId { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+
+    }
+    public class AVOReporteeGrid
+    {
+        public AVOReporteeGrid()
+        {
+            reporteedata = new List<AVOReportee>();
+            masterData = new List<MasterDto>();
+        }
+        public List<AVOReportee> reporteedata { get; set; }
+        public List<MasterDto> masterData { get; set; }
+
+    }
+
+    public partial class AVOMovementDetailsDTO
+    {
+        public decimal MovementDetailsId { get; set; }
+        public decimal? MovementId { get; set; }
+        public int? MovementFormId { get; set; }
+        public int? MovementSubFormId { get; set; }
+        public decimal? MovingId { get; set; }
+        public decimal? MovedTo { get; set; }
+        public decimal? Status { get; set; }
+
+        //  public virtual AVOMovements Movement { get; set; }
     }
 }
 

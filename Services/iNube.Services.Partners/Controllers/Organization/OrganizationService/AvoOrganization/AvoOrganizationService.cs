@@ -366,6 +366,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return ddDTOs;
         }
 
+
         public async Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(AvoOrgEmployeeSearch empdata, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -373,7 +374,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
 
             var Emp = from emp in _context.TblOrgEmployee
-                      join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
+                          //join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
                       join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
                       select new AvoOrgEmployeeSearch
                       {
@@ -394,12 +395,11 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           CreatedDate = emp.CreatedDate,
                           ModifiedBy = emp.ModifiedBy,
                           ModifiedDate = emp.ModifiedDate,
-                          MovementId = mov.MovementId,
-                          MovementStatusId = mov.MovementStatusId,
+                          // MovementId = mov.MovementId,
+                          // MovementStatusId = mov.MovementStatusId,
                           OrganizationId = pos.OrganizationId,
 
                       };
-            //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
 
             if (empdata.OrgEmpId > 0)
             {
@@ -1002,5 +1002,65 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return accountDTO;
         }
 
+        public async Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            position = 2;
+
+            var _emp = from emp in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
+                       select emp;
+
+            var record = _emp.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
+            //var Emp = _context.TblOrgEmployee.Select(x => x).Where(c => c.OrgEmpId == Empcode).Select(x => x.PositionId);
+
+            var pos = _context.TblOrgPositions.Where(x => x.PositionId > record.SingleOrDefault()).Select(x => x).Take(position);
+
+            AVOReporteeGrid val = new AVOReporteeGrid();
+            List<AVOReportee> val2 = new List<AVOReportee>();
+            List<MasterDto> masval = new List<MasterDto>();
+            foreach (var i in pos)
+            {
+                // AVOOrgEmployee Ival = new AVOOrgEmployee();
+                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+
+                foreach (var v in Ival)
+                {
+                    AVOReportee val3 = new AVOReportee();
+                    val3.OrgEmpId = v.OrgEmpId;
+                    val3.StaffCode = v.StaffCode;
+                    val3.StaffName = v.StaffName;
+                    val3.PositionId = v.PositionId;
+                    val3.Email = v.Email;
+                    val3.PhoneNumber = v.PhoneNumber;
+
+                    val2.Add(val3);
+
+                }
+                val.reporteedata = val2;
+            }
+
+            var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x).Take(position);
+
+            foreach (var i in pos1)
+            {
+                // AVOOrgEmployee Ival = new AVOOrgEmployee();
+                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+
+                foreach (var v in Ival)
+                {
+                    MasterDto val3 = new MasterDto();
+                    val3.mID = Convert.ToInt32(v.OrgEmpId);
+                    val3.mValue = v.StaffName;
+
+                    masval.Add(val3);
+
+                }
+                val.masterData = masval;
+            }
+
+
+            return val;
+        }
     }
 }

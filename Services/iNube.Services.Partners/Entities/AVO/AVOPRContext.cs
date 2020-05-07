@@ -27,6 +27,7 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual DbSet<TblMasPinCode> TblMasPinCode { get; set; }
         public virtual DbSet<TblMasPlan> TblMasPlan { get; set; }
         public virtual DbSet<TblMasState> TblMasState { get; set; }
+        public virtual DbSet<TblMovementDetails> TblMovementDetails { get; set; }
         public virtual DbSet<TblMovements> TblMovements { get; set; }
         public virtual DbSet<TblOfficeSpocDetails> TblOfficeSpocDetails { get; set; }
         public virtual DbSet<TblOrgAddress> TblOrgAddress { get; set; }
@@ -387,6 +388,39 @@ namespace iNube.Services.Partners.Entities.AVO
                     .WithMany(p => p.TblMasState)
                     .HasForeignKey(d => d.CountryId)
                     .HasConstraintName("FK_tblMasState_tblMasCountry");
+            });
+
+            modelBuilder.Entity<TblMovementDetails>(entity =>
+            {
+                entity.HasKey(e => e.MovementDetailsId);
+
+                entity.ToTable("tblMovementDetails", "PR");
+
+                entity.Property(e => e.MovementDetailsId)
+                    .HasColumnName("MovementDetailsID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.MovedTo).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.MovementFormId).HasColumnName("MovementFormID");
+
+                entity.Property(e => e.MovementId)
+                    .HasColumnName("MovementID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.MovementSubFormId).HasColumnName("MovementSubFormID");
+
+                entity.Property(e => e.MovingId)
+                    .HasColumnName("MovingID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Status).HasColumnType("numeric(18, 0)");
+
+                entity.HasOne(d => d.Movement)
+                    .WithMany(p => p.TblMovementDetails)
+                    .HasForeignKey(d => d.MovementId)
+                    .HasConstraintName("FK_tblMovementDetails_tblMovements");
             });
 
             modelBuilder.Entity<TblMovements>(entity =>
