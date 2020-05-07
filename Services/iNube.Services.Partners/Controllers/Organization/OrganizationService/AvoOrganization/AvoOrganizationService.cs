@@ -403,9 +403,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
                       };
 
-            if (empdata.OrgEmpId > 0)
+            if (empdata.StaffCode != "")
             {
-                Emp = Emp.Where(bi => bi.OrgEmpId == empdata.OrgEmpId);
+                Emp = Emp.Where(bi => Convert.ToInt32(bi.StaffCode) == Convert.ToInt32(empdata.StaffCode));
 
             }
             return Emp;
