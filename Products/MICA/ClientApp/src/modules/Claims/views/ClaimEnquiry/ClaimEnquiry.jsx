@@ -398,6 +398,7 @@ class ClaimEnquiry extends React.Component {
 
     editFunction(id, oid) {
         this.state.BankArray = [];
+        this.state.CustArray = [];
         console.log("pid", oid);
         console.log("officelist data", this.state.Claimlist);
         var CArr = this.state.Claimlist;
