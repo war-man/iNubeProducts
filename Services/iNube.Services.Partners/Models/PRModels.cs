@@ -1873,7 +1873,8 @@ namespace iNube.Services.Partners.Models
 
     public class PositionStatusDTO
     {
-        public decimal? OrgEmpId { get; set; }
+        //public decimal? OrgEmpId { get; set; }
+        public decimal? MovementId { get; set; }
         public decimal? MovementStatusId { get; set; }
         public string Remarks { get; set; }
 

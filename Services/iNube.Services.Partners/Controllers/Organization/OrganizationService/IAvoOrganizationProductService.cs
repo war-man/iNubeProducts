@@ -2,6 +2,7 @@
 using iNube.Services.Partners.Models;
 using iNube.Utility.Framework.Model;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
@@ -44,7 +45,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<RoleDesigResponse> AssignDesigRole(RoleDesigMapDTO desigRoles, ApiContext apiContext);
         Task<IEnumerable<AvoOrgEmployeeSearch>> SearchEmployeeDetailsByMovStatus(MovementDTO movementDTO, ApiContext apiContext);
         Task<AVOMovements> UpdateEmployeePosition(PositionStatusDTO movements, ApiContext apiContext);
-
+        Task<ResponseStatus> CreateNewPosition(decimal OrgEmpId, ApiContext apiContext);
         Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext);
     }
 }

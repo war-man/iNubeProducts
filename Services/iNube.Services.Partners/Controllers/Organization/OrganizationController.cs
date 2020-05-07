@@ -460,5 +460,14 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetReporteeGrid(Empcode, position, Context);
             return Ok(response);
         }
+
+        // ||AVO
+        [HttpPut]
+        public async Task<IActionResult> CreateNewPosition(int OrgEmpId)
+        {
+            await _avoorgService.CreateNewPosition(OrgEmpId,Context);
+            return Ok();
+
+        }
     }
 }
