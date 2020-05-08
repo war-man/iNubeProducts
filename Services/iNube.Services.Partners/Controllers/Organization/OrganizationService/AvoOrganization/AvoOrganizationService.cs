@@ -972,11 +972,13 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             movData.Status = 1;
                         }
                     }
-                    //Create new position
-                    var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+                   
                 }
                 _context.TblMovements.Update(movementdata);
                 var mapData = _mapper.Map<AVOMovements>(movementdata);
+
+                //Create new position
+                var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
 
                 _context.SaveChanges();
                 return mapData;
