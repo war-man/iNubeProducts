@@ -274,8 +274,47 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                      .Include(add => add.TblOrgStructure)
                      .Include(spoc => spoc.TblOrgSpocDetails)
                      .ToList();
-                var _OrgDTO = _mapper.Map<List<AVOOrganizationNewDTO>>(_org);
+
+                var _org1 = from bi in _context.TblOrganization.OrderByDescending(p => p.OrganizationId)
+                            select bi;
+                if (!string.IsNullOrEmpty(searchorg.OrgName))
+                {
+                    var _contract = _context.TblOrganization.SingleOrDefault(x => x.OrgName == searchorg.OrgName);
+                    _org1 = _org1.Where(bi => bi.OrganizationId == _contract.OrganizationId);
+                }
+
+                if (searchorg.OrganizationId > 0)
+                {
+                    _org1 = _org1.Where(bi => bi.OrganizationId == searchorg.OrganizationId);
+
+                }
+                if (searchorg.OrgPhoneNo != "")
+                {
+                    _org1 = _org1.Where(bi => bi.OrgPhoneNo == searchorg.OrgPhoneNo);
+
+                }
+                if (searchorg.OrgRegistrationNo != "")
+                {
+                    _org1 = _org1.Where(bi => bi.OrgRegistrationNo == searchorg.OrgRegistrationNo);
+
+                }
+                if (searchorg.OrgWebsite != "")
+                {
+                    _org1 = _org1.Where(bi => bi.OrgWebsite == searchorg.OrgWebsite);
+
+                }
+                var _OrgDTO = _mapper.Map<IEnumerable<AVOOrganizationNewDTO>>(_org1);
+                foreach (var item in _OrgDTO)
+                {
+                    item.OrgName = item.OrgName;
+                    item.OrganizationId = item.OrganizationId;
+                    item.OrgPhoneNo = item.OrgPhoneNo;
+                    item.OrgRegistrationNo = item.OrgRegistrationNo;
+                    item.OrgWebsite = item.OrgWebsite;
+                }
                 return _OrgDTO;
+
+
             }
             catch (Exception ex)
             {
@@ -1114,7 +1153,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 val3.StaffCode = v.StaffCode;
                 val3.StaffName = v.StaffName;
                 val3.PositionId = v.PositionId;
-                val3.Email = v.Email;
+                val3.Email = v.Email; 
                 val3.PhoneNumber = v.PhoneNumber;
 
                 val2.Add(val3);
