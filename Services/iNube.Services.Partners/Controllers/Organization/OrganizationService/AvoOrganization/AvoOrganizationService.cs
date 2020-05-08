@@ -1184,7 +1184,28 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         return val;
     }
+        public async Task<IEnumerable<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var movData = from a in _context.TblMovements
+                          join b in _context.TblMovementDetails on a.MovementId equals b.MovementId
+                          select new MovementDetails
+                          {
+                              MovementTypeId = a.MovementTypeId,
+                              NewBranchId = a.NewBranchId,
+                              NewPositionId = a.NewPositionId,
+                              Reason = a.Reason,
+                              MovementFormId = b.MovementFormId,
+                              MovementId = b.MovementId,
+                              MovedTo = b.MovedTo
+                          };
+
+            var _movData = _mapper.Map<List<MovementDetails>>(movData);
+            return _movData;
+
+        }
 
 
-}
+    }
 }

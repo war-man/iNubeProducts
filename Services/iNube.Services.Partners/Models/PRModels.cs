@@ -1913,6 +1913,17 @@ namespace iNube.Services.Partners.Models
 
         //  public virtual AVOMovements Movement { get; set; }
     }
+    public class MovementDetails
+    {
+        public decimal? MovementId { get; set; }
+        public int? MovementTypeId { get; set; }
+        public decimal? NewBranchId { get; set; }
+        public string Reason { get; set; }
+        public decimal? NewPositionId { get; set; }
+        public int? MovementFormId { get; set; }
+        public decimal? MovingId { get; set; }
+        public decimal? MovedTo { get; set; }
+    }
 }
 
 
