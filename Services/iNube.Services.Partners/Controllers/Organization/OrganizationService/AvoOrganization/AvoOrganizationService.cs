@@ -978,7 +978,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 var mapData = _mapper.Map<AVOMovements>(movementdata);
 
                 //Create new position
-                var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+               // var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
 
                 _context.SaveChanges();
                 return mapData;
@@ -1026,7 +1026,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 //pdata.ModifiedDate = DateTime.Now;
                 //_context.TblOrgPositions.Update(pdata);
                 //_context.SaveChanges();
-                var postionCheck = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == pdata.OrganizationId && x.IsVacant == true);
+                var postionCheck = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == pdata.OrganizationId
+                && x.OfficeId == movementData.NewBranchId && x.DesignationId == movementData.NewPositionId
+                && x.ParentId==pdata.ParentId && x.IsVacant == true);
                 if (postionCheck == null)
                 {
                     TblOrgPositions position = new TblOrgPositions();
