@@ -113,7 +113,6 @@ if (env === "UAT") {
     NotificationUrl = Baseurl;
 }
 
-
 export const config = {
     env: env,
     product: 'Mica',
