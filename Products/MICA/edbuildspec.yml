@@ -13,7 +13,7 @@ phases:
   build:
     commands:
       - cd  $CODEBUILD_SRC_DIR
-      - cd Products/MICA/ClientApp 
+      - cd Products/MICA/ClientApp  
       - npm run build
       
   post_build:
