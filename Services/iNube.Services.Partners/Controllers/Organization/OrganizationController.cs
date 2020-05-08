@@ -472,8 +472,10 @@ namespace iNube.Services.Partners.Controllers.Organization
 
         //  || AVO
         [HttpGet]
-        public async Task<IActionResult> GetMovementDetails([FromBody]MovementDetails movement)
+        public async Task<IActionResult> GetMovementDetails(int MovementId)
         {
+            MovementDetails movement = new MovementDetails();
+            movement.MovementId = MovementId;
             var response = await _avoorgService.GetMovementDetails(movement, Context);
             return Ok(response);
         }
