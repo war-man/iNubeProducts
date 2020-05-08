@@ -890,7 +890,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 var movementdata = _context.TblMovements.FirstOrDefault(x => x.MovementId == movements.MovementId);
                 var positiondata = (from pos in _context.TblOrgPositions
                                     join emp in _context.TblOrgEmployee on pos.PositionId equals emp.PositionId
-                                    where emp.OrgEmpId == movements.OrgEmpId
+                                    where emp.OrgEmpId == movementdata.OrgEmpId
                                     select (pos));
                 var pdata = positiondata.FirstOrDefault();
 
