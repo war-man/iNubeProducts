@@ -54,13 +54,14 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 if (user.AccessFailedCount < 5)
                 {
                     user.AccessFailedCount = user.AccessFailedCount + 1;
-                    _context.SaveChanges();
                     return null;
                 }
                 else
                 {
+                    user.AccessFailedCount = 0;
                 }
             }
+            _context.SaveChanges();
             // authentication successful
             AspNetUsersDTO userDTO = _mapper.Map<AspNetUsersDTO>(user);
             return userDTO;

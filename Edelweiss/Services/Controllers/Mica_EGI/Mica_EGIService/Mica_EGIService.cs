@@ -2985,6 +2985,45 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             FinalDto.Add(CdModel);
                             return FinalDto;
 
+                        //This Method is for Policy Bazaar API - Billing Frequency Monthly
+                        case "PolicyCreation":
+                            ADPremium = ADMonthly(DeserilizedPremiumData, taxType);
+                            FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                            FinalTaxTotal = FTPremium.TaxAmount.TaxAmount + ADPremium.TaxAmount.TaxAmount;
+                            //AD & FD CREDIT
+                            CdModel.PremiumDTO.Add(ADPremium);
+                            CdModel.PremiumDTO.Add(FTPremium);
+                            CdModel.Type = "PolicyCreation";
+                            CdModel.TxnType = "Credit";
+                            CdModel.FtPerDay = FtPerDay;
+                            CdModel.AdPerDay = AdPerDay;
+                            CdModel.TxnAmount = Ad60days + Ft365days;
+                            CdModel.TaxAmount = FinalTaxTotal;
+                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+
+                            //FT & AD CREDIT OBJECT
+                            FinalDto.Add(CdModel);
+
+                            CdModel = new MicaCDDTO();
+
+                            //ONLY FT TAX TOTAL SO AGAIN UPDATING
+                            FinalTaxTotal = FTPremium.TaxAmount.TaxAmount;
+
+                            CdModel.PremiumDTO.Add(FTPremium);
+                            CdModel.Type = "PolicyCreation";
+                            CdModel.TxnType = "Debit";
+                            CdModel.FtPerDay = FtPerDay;
+                            CdModel.AdPerDay = AdPerDay;
+                            CdModel.TxnAmount = Ft365days;
+                            CdModel.TaxAmount = FinalTaxTotal;
+                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            
+                            //FT DEBIT OBJECT
+                            FinalDto.Add(CdModel);
+
+                            return FinalDto;
+
+
                     }
 
                 }
@@ -3024,6 +3063,48 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
                             FinalDto.Add(CdModel);
                             return FinalDto;
+
+
+
+                        //This Method is for Policy Bazaar API - Billing Frequency Monthly
+                        case "PolicyCreation":
+                            ADPremium = ADYearly(DeserilizedPremiumData, taxType);
+                            FTPremium = FTYearly(DeserilizedPremiumData, taxType);
+                            FinalTaxTotal = FTPremium.TaxAmount.TaxAmount + ADPremium.TaxAmount.TaxAmount;
+                            //AD & FD CREDIT
+                            CdModel.PremiumDTO.Add(ADPremium);
+                            CdModel.PremiumDTO.Add(FTPremium);
+                            CdModel.Type = "PolicyCreation";
+                            CdModel.TxnType = "Credit";
+                            CdModel.FtPerDay = FtPerDay;
+                            CdModel.AdPerDay = AdPerDay;
+                            CdModel.TxnAmount = Ad365days + Ft365days;
+                            CdModel.TaxAmount = FinalTaxTotal;
+                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+
+                            //FT & AD CREDIT OBJECT
+                            FinalDto.Add(CdModel);
+
+                            CdModel = new MicaCDDTO();
+
+                            //ONLY FT TAX TOTAL SO AGAIN UPDATING
+                            FinalTaxTotal = FTPremium.TaxAmount.TaxAmount;
+
+                            CdModel.PremiumDTO.Add(FTPremium);
+                            CdModel.Type = "PolicyCreation";
+                            CdModel.TxnType = "Debit";
+                            CdModel.FtPerDay = FtPerDay;
+                            CdModel.AdPerDay = AdPerDay;
+                            CdModel.TxnAmount = Ft365days;
+                            CdModel.TaxAmount = FinalTaxTotal;
+                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+
+                            //FT DEBIT OBJECT
+                            FinalDto.Add(CdModel);
+
+                            return FinalDto;
+
+
 
                     }
 

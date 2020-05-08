@@ -5,6 +5,11 @@ namespace iNube.Services.Partners.Entities.AVO
 {
     public partial class TblMovements
     {
+        public TblMovements()
+        {
+            TblMovementDetails = new HashSet<TblMovementDetails>();
+        }
+
         public decimal MovementId { get; set; }
         public int? MovementTypeId { get; set; }
         public decimal? OrgEmpId { get; set; }
@@ -18,5 +23,7 @@ namespace iNube.Services.Partners.Entities.AVO
         public DateTime? ModifiedDate { get; set; }
         public decimal? NewBranchId { get; set; }
         public string Reason { get; set; }
+
+        public virtual ICollection<TblMovementDetails> TblMovementDetails { get; set; }
     }
 }

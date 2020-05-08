@@ -392,6 +392,14 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(searchData);
         }
 
+       
+        [HttpPut]
+        public async Task<IActionResult> ModifyPeople(AVOOrgEmployee tblRetentionGroupDto)
+        {
+            //tblRetentionGroupDto.RetentionGroupId = retentionGID;
+            await _avoorgService.ModifyPeople(tblRetentionGroupDto, Context);
+            return Ok();
+        }
         // ||AVO
         [HttpGet]
         public async Task<IActionResult> GetMovementCount()
@@ -443,6 +451,31 @@ namespace iNube.Services.Partners.Controllers.Organization
             await _avoorgService.UpdateEmployeePosition(movements, Context);
             return Ok();
 
+        }
+
+        // ||AVO
+        [HttpGet]
+        public async Task<IActionResult> GetReporteeGrid(int Empcode, int position)
+        {
+            var response = await _avoorgService.GetReporteeGrid(Empcode, position, Context);
+            return Ok(response);
+        }
+
+        // ||AVO
+        [HttpPut]
+        public async Task<IActionResult> CreateNewPosition(int OrgEmpId)
+        {
+            await _avoorgService.CreateNewPosition(OrgEmpId,Context);
+            return Ok();
+
+        }
+
+        //  || AVO
+        [HttpGet]
+        public async Task<IActionResult> GetMovementDetails([FromBody]MovementDetails movement)
+        {
+            var response = await _avoorgService.GetMovementDetails(movement, Context);
+            return Ok(response);
         }
     }
 }

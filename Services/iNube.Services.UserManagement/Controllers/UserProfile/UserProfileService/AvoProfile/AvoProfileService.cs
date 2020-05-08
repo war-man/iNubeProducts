@@ -96,10 +96,10 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                         _users.Id = Guid.NewGuid().ToString();
                         _users.UserName = userDetails.Email;
                         _users.Email = userDetails.Email;
-                        _users.FirstTimeLogin = 0;
-                        //_users.LastPasswordChanged = DateTimeNow;
+                        _users.FirstTimeLogin = 1;
+                        _users.LastPasswordChanged = DateTimeNow;
                         _users.PasswordHash = Utilities.GenerateDefaultPassword();
-
+                        _users.IsActive = true;
                         emailTest.To = userDetails.Email;
                         emailTest.Subject = "User profile creation";
                         emailTest.Message = "Your account has been created with Username:" + _users.UserName + " and password: Mica@123 \n" + "This is a system generated password. Kindly reset the same after log in.";

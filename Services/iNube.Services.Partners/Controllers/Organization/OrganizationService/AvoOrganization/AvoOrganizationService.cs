@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -272,8 +274,47 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                      .Include(add => add.TblOrgStructure)
                      .Include(spoc => spoc.TblOrgSpocDetails)
                      .ToList();
-                var _OrgDTO = _mapper.Map<List<AVOOrganizationNewDTO>>(_org);
+
+                var _org1 = from bi in _context.TblOrganization.OrderByDescending(p => p.OrganizationId)
+                            select bi;
+                if (!string.IsNullOrEmpty(searchorg.OrgName))
+                {
+                    var _contract = _context.TblOrganization.SingleOrDefault(x => x.OrgName == searchorg.OrgName);
+                    _org1 = _org1.Where(bi => bi.OrganizationId == _contract.OrganizationId);
+                }
+
+                if (searchorg.OrganizationId > 0)
+                {
+                    _org1 = _org1.Where(bi => bi.OrganizationId == searchorg.OrganizationId);
+
+                }
+                if (searchorg.OrgPhoneNo != "")
+                {
+                    _org1 = _org1.Where(bi => bi.OrgPhoneNo == searchorg.OrgPhoneNo);
+
+                }
+                if (searchorg.OrgRegistrationNo != "")
+                {
+                    _org1 = _org1.Where(bi => bi.OrgRegistrationNo == searchorg.OrgRegistrationNo);
+
+                }
+                if (searchorg.OrgWebsite != "")
+                {
+                    _org1 = _org1.Where(bi => bi.OrgWebsite == searchorg.OrgWebsite);
+
+                }
+                var _OrgDTO = _mapper.Map<IEnumerable<AVOOrganizationNewDTO>>(_org1);
+                foreach (var item in _OrgDTO)
+                {
+                    item.OrgName = item.OrgName;
+                    item.OrganizationId = item.OrganizationId;
+                    item.OrgPhoneNo = item.OrgPhoneNo;
+                    item.OrgRegistrationNo = item.OrgRegistrationNo;
+                    item.OrgWebsite = item.OrgWebsite;
+                }
                 return _OrgDTO;
+
+
             }
             catch (Exception ex)
             {
@@ -366,6 +407,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return ddDTOs;
         }
 
+
         public async Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(AvoOrgEmployeeSearch empdata, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -373,7 +415,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
 
             var Emp = from emp in _context.TblOrgEmployee
-                      join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
+                          //join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
                       join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
                       select new AvoOrgEmployeeSearch
                       {
@@ -394,16 +436,15 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           CreatedDate = emp.CreatedDate,
                           ModifiedBy = emp.ModifiedBy,
                           ModifiedDate = emp.ModifiedDate,
-                          MovementId = mov.MovementId,
-                          MovementStatusId = mov.MovementStatusId,
+                          // MovementId = mov.MovementId,
+                          // MovementStatusId = mov.MovementStatusId,
                           OrganizationId = pos.OrganizationId,
 
                       };
-            //  var employeeList = _mapper.Map<IEnumerable<AvoOrgEmployeeSearch>>(Emp);
 
-            if (empdata.OrgEmpId > 0)
+            if (empdata.StaffCode != "")
             {
-                Emp = Emp.Where(bi => bi.OrgEmpId == empdata.OrgEmpId);
+                Emp = Emp.Where(bi => Convert.ToInt32(bi.StaffCode) == Convert.ToInt32(empdata.StaffCode));
 
             }
             return Emp;
@@ -885,16 +926,21 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
-
-                var movementdata = _context.TblMovements.FirstOrDefault(x => x.OrgEmpId == movements.OrgEmpId);
+                var movementdata = _context.TblMovements.FirstOrDefault(x => x.MovementId == movements.MovementId);
                 var positiondata = (from pos in _context.TblOrgPositions
                                     join emp in _context.TblOrgEmployee on pos.PositionId equals emp.PositionId
-                                    where emp.OrgEmpId == movements.OrgEmpId
+                                    where emp.OrgEmpId == movementdata.OrgEmpId
                                     select (pos));
-
-                //var pdata = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == movements.OrgEmpId);
                 var pdata = positiondata.FirstOrDefault();
+
                 if (movements.MovementStatusId == 34)//Recommended
+                {
+                    movementdata.MovementStatusId = movements.MovementStatusId;
+                    movementdata.Reason = movements.Remarks;
+                    movementdata.ModifiedDate = DateTime.Now;
+                    movementdata.ModifiedBy = apiContext.UserId;
+                }
+                if (movements.MovementStatusId == 36)//rejected
                 {
                     movementdata.MovementStatusId = movements.MovementStatusId;
                     movementdata.Reason = movements.Remarks;
@@ -907,28 +953,263 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     movementdata.Reason = movements.Remarks;
                     movementdata.ModifiedDate = DateTime.Now;
                     movementdata.ModifiedBy = apiContext.UserId;
-                    pdata.DesignationId = movementdata.NewPositionId;
-                    _context.TblOrgPositions.Update(pdata);
-                }
-                if (movements.MovementStatusId == 36)//rejected
-                {
-                    movementdata.MovementStatusId = movements.MovementStatusId;
-                    movementdata.Reason = movements.Remarks;
-                    movementdata.ModifiedDate = DateTime.Now;
-                    movementdata.ModifiedBy = apiContext.UserId;
+                    //pdata.DesignationId = movementdata.NewPositionId;
+                    //_context.TblOrgPositions.Update(pdata);
+
+                    //Updating Movement details table
+                    var movementDetailsData = _context.TblMovementDetails.Where(x => x.MovementId == movementdata.MovementId).ToList();
+                    foreach (var movData in movementDetailsData)
+                    {
+                        if (movData.MovementFormId == 1009)
+                        {
+                            var reportee = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovingId).PositionId;
+                            var supervisorPos = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovedTo).PositionId;
+
+                            var reporteePos = _context.TblOrgPositions.FirstOrDefault(x => x.PositionId == reportee);
+                            reporteePos.ParentId = supervisorPos;
+
+                            _context.TblOrgPositions.Update(reporteePos);
+                            movData.Status = 1;
+                        }
+                    }
+                   
                 }
                 _context.TblMovements.Update(movementdata);
-
                 var mapData = _mapper.Map<AVOMovements>(movementdata);
-                _context.SaveChanges();
 
+                //Create new position
+               // var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+
+                _context.SaveChanges();
                 return mapData;
             }
+                
             catch (Exception ex)
             {
                 throw ex;
             }
         }
+
+        public async Task<ResponseStatus> CreateNewPosition(decimal MovementId, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            //Random Numb
+            int _min = 1000;
+            int _max = 9999;
+            Random _rdm = new Random();
+
+            ResponseStatus response = new ResponseStatus()
+            {
+                Status = BusinessStatus.Created
+            };
+            
+
+             var movementData = _context.TblMovements.FirstOrDefault(x => x.MovementId == MovementId);
+            if (movementData == null) {
+                response.Status = BusinessStatus.Error;
+                return response ;
+            }
+            
+
+            var positiondata = (from pos in _context.TblOrgPositions
+                                join emp in _context.TblOrgEmployee on pos.PositionId equals emp.PositionId
+                                where emp.OrgEmpId == movementData.OrgEmpId
+                                select (pos));
+        
+            var pdata = positiondata.FirstOrDefault();
+
+            if (pdata != null)
+            {
+                //update IsVacant as true into existing row
+                //pdata.IsVacant = true;
+                //pdata.ModifiedBy = apiContext.UserId;
+                //pdata.ModifiedDate = DateTime.Now;
+                //_context.TblOrgPositions.Update(pdata);
+                //_context.SaveChanges();
+                var postionCheck = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == pdata.OrganizationId
+                && x.OfficeId == movementData.NewBranchId && x.DesignationId == movementData.NewPositionId
+                && x.ParentId==pdata.ParentId && x.IsVacant == true);
+                if (postionCheck == null)
+                {
+                    TblOrgPositions position = new TblOrgPositions();
+                    position.OrganizationId = pdata.OrganizationId;
+                    position.OfficeId = (decimal)movementData.NewBranchId;
+                    position.DesignationId = movementData.NewPositionId;
+                    position.PositionName = pdata.PositionName + _rdm.Next(_min, _max);
+                    position.RepOrgId = pdata.RepOrgId;
+                    position.RepOfficeId = pdata.RepOfficeId;
+                    position.ParentId = pdata.ParentId;//for whom he is Reporting to
+                    position.ParentLineId = pdata.ParentLineId;
+                    position.ReportingId = pdata.ReportingId;
+                    position.CreatedBy = apiContext.UserId;
+                    position.CreatedDate = DateTime.Now;
+                    position.IsVacant = false;
+                    position.IsActive = true;
+                    _context.TblOrgPositions.Add(position);
+                    _context.SaveChanges();
+
+                    response.Id= position.PositionId.ToString();
+                }
+                else
+                response.Id= postionCheck.PositionId.ToString();
+            }
+            return response;
+        }
+
+    public async Task<AVOOrgEmployee> ModifyPeople(AVOOrgEmployee tblRetentionGroupDto, ApiContext apiContext)
+    {
+        // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+        _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+        var tbl_participant = _mapper.Map<AVOOrgEmployee>(tblRetentionGroupDto);
+        var tbl_particiant = _context.TblOrgEmployee.Find(tbl_participant.OrgEmpId);
+        var tbl_address = _context.TblOrgEmpAddress.FirstOrDefault(a => a.OrgEmpId == tbl_participant.OrgEmpId);
+        var tbl_edu = _context.TblOrgEmpEducation.FirstOrDefault(a => a.OrgEmpId == tbl_participant.OrgEmpId);
+
+        // update user properties
+        tbl_particiant.AccountNumber = tblRetentionGroupDto.AccountNumber;
+        tbl_particiant.AppointmentDate = tblRetentionGroupDto.AppointmentDate;
+        tbl_particiant.BankName = tblRetentionGroupDto.BankName;
+        tbl_particiant.BranchName = tblRetentionGroupDto.BranchName;
+        tbl_particiant.DateOfJoining = tblRetentionGroupDto.DateOfJoining;
+        tbl_particiant.Dob = tblRetentionGroupDto.Dob;
+        tbl_particiant.Email = tblRetentionGroupDto.Email;
+        tbl_particiant.FirstName = tblRetentionGroupDto.FirstName;
+        tbl_particiant.GenderId = tblRetentionGroupDto.GenderId;
+        tbl_particiant.LastName = tblRetentionGroupDto.LastName;
+        tbl_particiant.MaritalStatusId = tblRetentionGroupDto.MaritalStatusId;
+        tbl_particiant.MiddleName = tblRetentionGroupDto.MiddleName;
+        tbl_particiant.ModifiedBy = tblRetentionGroupDto.ModifiedBy;
+        tbl_particiant.ModifiedDate = tblRetentionGroupDto.ModifiedDate;
+        tbl_particiant.PhoneNumber = tblRetentionGroupDto.PhoneNumber;
+        tbl_particiant.PhoneNumber1 = tblRetentionGroupDto.PhoneNumber1;
+        tbl_particiant.ReportingTo = tblRetentionGroupDto.ReportingTo;
+        tbl_particiant.SalutationId = tblRetentionGroupDto.SalutationId;
+        tbl_particiant.StaffCode = tblRetentionGroupDto.StaffCode;
+        tbl_particiant.StaffName = tblRetentionGroupDto.StaffName;
+        tbl_particiant.StaffStatus = tblRetentionGroupDto.StaffStatus;
+        tbl_particiant.StaffTypeId = tblRetentionGroupDto.StaffTypeId;
+
+        foreach (var adddto in tbl_participant.AVOOrgEmpAddress)
+        {
+
+
+            tbl_address.EmpAddressLine1 = adddto.EmpAddressLine1;
+            tbl_address.EmpAddressLine2 = adddto.EmpAddressLine2;
+            tbl_address.EmpAddressLine3 = adddto.EmpAddressLine3;
+            tbl_address.EmpAddressType = adddto.EmpAddressType;
+            tbl_address.EmpCityId = adddto.EmpCityId;
+            tbl_address.EmpCountryId = adddto.EmpCountryId;
+            tbl_address.EmpDistrictId = adddto.EmpDistrictId;
+            tbl_address.EmpPincodeId = adddto.EmpPincodeId;
+            _context.TblOrgEmpAddress.Update(tbl_address);
+
+
+        }
+
+        foreach (var edudto in tbl_participant.AVOOrgEmpEducation)
+        {
+
+            tbl_edu.GradeOrPercentage = edudto.GradeOrPercentage;
+            tbl_edu.Certification = edudto.Certification;
+            tbl_edu.Year = edudto.Year;
+            _context.TblOrgEmpEducation.Update(tbl_edu);
+
+        }
+
+
+
+
+        //var tbl_empaddress = _context.TblOrgEmpAddress.Find(tbl_participant.OrgEmpId);
+        //tbl_empaddress.EmpAddressLine1 = tblRetentionGroupDto.AVOOrgEmpAddress[0].EmpA
+
+        _context.TblOrgEmployee.Update(tbl_particiant);
+        _context.SaveChanges();
+        var accountDTO = _mapper.Map<AVOOrgEmployee>(tbl_particiant);
+        return accountDTO;
+    }
+
+    public async Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext)
+    {
+        _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+        position = 2;
+
+        var _emp = from emp in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
+                   select emp;
+
+        var record = _emp.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
+        //var Emp = _context.TblOrgEmployee.Select(x => x).Where(c => c.OrgEmpId == Empcode).Select(x => x.PositionId);
+
+        var pos = _context.TblOrgPositions.Where(x => x.PositionId > record.SingleOrDefault()).Select(x => x).Take(position);
+
+        AVOReporteeGrid val = new AVOReporteeGrid();
+        List<AVOReportee> val2 = new List<AVOReportee>();
+        List<MasterDto> masval = new List<MasterDto>();
+        foreach (var i in pos)
+        {
+            // AVOOrgEmployee Ival = new AVOOrgEmployee();
+            var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+
+            foreach (var v in Ival)
+            {
+                AVOReportee val3 = new AVOReportee();
+                val3.OrgEmpId = v.OrgEmpId;
+                val3.StaffCode = v.StaffCode;
+                val3.StaffName = v.StaffName;
+                val3.PositionId = v.PositionId;
+                val3.Email = v.Email; 
+                val3.PhoneNumber = v.PhoneNumber;
+
+                val2.Add(val3);
+
+            }
+            val.reporteedata = val2;
+        }
+
+        var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x).Take(position);
+
+        foreach (var i in pos1)
+        {
+            // AVOOrgEmployee Ival = new AVOOrgEmployee();
+            var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+
+            foreach (var v in Ival)
+            {
+                MasterDto val3 = new MasterDto();
+                val3.mID = Convert.ToInt32(v.OrgEmpId);
+                val3.mValue = v.StaffName;
+
+                masval.Add(val3);
+
+            }
+            val.masterData = masval;
+        }
+
+
+        return val;
+    }
+        public async Task<IEnumerable<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var movData = from a in _context.TblMovements
+                          join b in _context.TblMovementDetails on a.MovementId equals b.MovementId
+                          select new MovementDetails
+                          {
+                              MovementTypeId = a.MovementTypeId,
+                              NewBranchId = a.NewBranchId,
+                              NewPositionId = a.NewPositionId,
+                              Reason = a.Reason,
+                              MovementFormId = b.MovementFormId,
+                              MovementId = b.MovementId,
+                              MovedTo = b.MovedTo
+                          };
+
+            var _movData = _mapper.Map<List<MovementDetails>>(movData);
+            return _movData;
+
+        }
+
 
     }
 }

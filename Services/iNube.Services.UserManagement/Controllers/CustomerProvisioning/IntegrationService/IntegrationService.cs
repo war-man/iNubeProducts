@@ -55,8 +55,8 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.Integra
         }
         public async Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext)
         {
-            var uri = PartnerUrl + "/api/Organization/GetEmployeeRoles?empCode=" + empCode;
-            //var uri = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Organization/GetEmployeeRoles?empCode=" + empCode;
+            //var uri = PartnerUrl + "/api/Organization/GetEmployeeRoles?empCode=" + empCode;
+            var uri = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Organization/GetEmployeeRoles?empCode=" + empCode;
             return await GetApiInvoke<EmployeeRoles>(uri, apiContext);
         }
         public async Task<IEnumerable<ddDTO>> GetReportNameForPermissionsDetails(string Url, ApiContext apiContext)

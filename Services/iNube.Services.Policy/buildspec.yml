@@ -13,12 +13,12 @@ phases:
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
     commands:
-      - echo Build started on `date`
+      - echo Build started on `date` 
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:policylatest Services/iNube.Services.Policy
       - docker tag $REPOSITORY_URI:policylatest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
-    commands:
+    commands: 
       - echo Build completed on `date` 
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:policylatest

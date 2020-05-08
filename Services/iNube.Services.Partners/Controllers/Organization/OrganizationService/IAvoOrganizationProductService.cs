@@ -2,6 +2,7 @@
 using iNube.Services.Partners.Models;
 using iNube.Utility.Framework.Model;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
@@ -36,6 +37,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<List<ddDTO>> GetEmpDetails(decimal orgId,decimal offid, ApiContext apiContext);
 
         Task<AVOOrgEmployee> searchpeoplebycode(string empcode, ApiContext apiContext);
+        Task<AVOOrgEmployee> ModifyPeople(AVOOrgEmployee tblRetentionGroupDto, ApiContext apiContext);
         Task<MovementCounts> GetMovementCount(ApiContext apiContext);
         Task<AVOOrgEmployee> UpdateEmployee(AVOOrgEmployee Empdata, ApiContext apiContext);
         Task<AVOMovements> SaveDecision(AVOMovements data, ApiContext apiContext);
@@ -43,5 +45,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<RoleDesigResponse> AssignDesigRole(RoleDesigMapDTO desigRoles, ApiContext apiContext);
         Task<IEnumerable<AvoOrgEmployeeSearch>> SearchEmployeeDetailsByMovStatus(MovementDTO movementDTO, ApiContext apiContext);
         Task<AVOMovements> UpdateEmployeePosition(PositionStatusDTO movements, ApiContext apiContext);
+        Task<ResponseStatus> CreateNewPosition(decimal OrgEmpId, ApiContext apiContext);
+        Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext);
+        Task<IEnumerable<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext);
     }
 }

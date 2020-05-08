@@ -10,15 +10,15 @@ phases:
       - cd  $CODEBUILD_SRC_DIR
       - cd Products/MICA/ClientApp
       - npm install
-  build:
+  build: 
     commands:
       - cd  $CODEBUILD_SRC_DIR
-      - cd Products/MICA/ClientApp
+      - cd Products/MICA/ClientApp  
       - npm run build
       
   post_build:
     commands:
-
+     
         - echo clearing s3 bucket for Edelweiss Production UI
         - aws s3 rm s3://egiswitch.edelweissinsurance.com
         - echo $CODEBUILD_SRC_DIR
