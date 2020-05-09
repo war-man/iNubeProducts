@@ -34,6 +34,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         UserDTO DeleteUserById(string Id, ApiContext apiContext);
         UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext context);
         UserNameById GetUserNameById(string Id, ApiContext apiContext);
+        UnlockResponse UnlockUser(string userid, ApiContext apiContext);
     }
 
     public class UserProfileService : IUserProfileService
@@ -164,13 +165,20 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         {
             return _userproductService(apiContext.ProductType).UserEmailValidations(emailid, apiContext);
         }
+
         public UserDTO DeleteUserById(string Id, ApiContext apiContext)
         {
             return _userproductService(apiContext.ProductType).DeleteUserById(Id, apiContext);
         }
+
         public UserNameById GetUserNameById(string Id, ApiContext apiContext)
         {
             return _userproductService(apiContext.ProductType).GetUserNameById(Id, apiContext);
+        }
+
+        public UnlockResponse UnlockUser(string userid, ApiContext apiContext)
+        {
+            return _userproductService(apiContext.ProductType).UnlockUser(userid, apiContext);
         }
     }
 }

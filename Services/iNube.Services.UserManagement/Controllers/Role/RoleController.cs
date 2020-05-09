@@ -134,5 +134,12 @@ namespace iNube.Services.UserManagement.Controllers.Role
             var response = _roleService.SaveDynamicPermission(configDTO, Context);
             return Ok(response);
         }
+
+        [HttpPost]
+        public IActionResult UpdateEmpRole(EmpRoleMapDTO empRole)
+        {
+            var response = _roleService.UpdateEmpRole(empRole, Context);
+            return Ok(response);
+        }
     }
 }

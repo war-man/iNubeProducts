@@ -374,5 +374,11 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile
             return Ok(response);
         }
 
+        [HttpGet]
+        public IActionResult UnlockUser(string userid)
+        {
+            var response = _userService.UnlockUser(userid, Context);
+            return Ok(response);
+        }
     }
 }

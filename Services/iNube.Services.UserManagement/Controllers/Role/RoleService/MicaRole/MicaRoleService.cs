@@ -19,7 +19,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         private IIntegrationService _integrationService;
         //private RoleIntegrationService _integrationService;
         public IConfiguration _config;
-       
+
         //public MicaRoleService(MICAUMContext context, RoleIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
         public MicaRoleService(MICAUMContext context, IIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
         {
@@ -155,6 +155,88 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
 
                 _context.SaveChanges();
                 return new UserRoleResponse { Status = BusinessStatus.Created, role = userRoles, ResponseMessage = $"Role removed successfully" };
+            }
+        }
+
+        public EmpRoleResponse UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext)
+        {
+            if (empRoles.EnvId > 0)
+            {
+                _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, empRoles.EnvId.ToString());
+            }
+            else
+            {
+                _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+
+            var userid = _context.TblUserDetails.FirstOrDefault(a => a.EmployeeNumber == empRoles.Empcode).UserId;
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            UserRoleMapDTO userRoles = new UserRoleMapDTO();
+            userRoles.UserId = userid;
+            userRoles.RoleId = empRoles.RoleId;
+            var roledata = _context.AspNetUserRoles.FirstOrDefault(x => x.UserId == userRoles.UserId);
+            UserRolesDTO roleDTO = new UserRolesDTO();
+            if (userRoles.RoleId.Length != 0)
+            {
+                if (roledata == null)
+                {
+                    for (int i = 0; i < userRoles.RoleId.Length; i++)
+                    {
+                        roleDTO.UserId = userRoles.UserId;
+                        roleDTO.RoleId = userRoles.RoleId[i];
+                        AspNetUserRoles _usersRole = _mapper.Map<AspNetUserRoles>(roleDTO);
+
+                        _context.AspNetUserRoles.Add(_usersRole);
+                        // _context.SaveChanges();
+                    }
+                }
+                else
+                {
+                    var role = _context.AspNetUserRoles.Where(a => a.UserId == userRoles.UserId);
+                    foreach (var item in role)
+                    {
+                        _context.AspNetUserRoles.Remove(item);
+                    }
+                    for (int i = 0; i < userRoles.RoleId.Length; i++)
+                    {
+                        roleDTO.UserId = userRoles.UserId;
+                        roleDTO.RoleId = userRoles.RoleId[i];
+                        AspNetUserRoles _usersRole = _mapper.Map<AspNetUserRoles>(roleDTO);
+
+                        _context.AspNetUserRoles.Add(_usersRole);
+                    }
+                }
+                var user = _context.TblUserDetails.SingleOrDefault(x => x.UserId == userRoles.UserId);
+
+                //if (string.IsNullOrEmpty(user.RoleId))
+                //{
+                user.RoleId = userRoles.RoleId[0].ToString();
+                //}
+                _context.SaveChanges();
+
+                //return userRoles;
+                return new EmpRoleResponse { Status = BusinessStatus.Created, ResponseMessage = $"Role assigned successfully!" };
+            }
+            else
+            {
+                var role = _context.AspNetUserRoles.Where(a => a.UserId == userRoles.UserId);
+                foreach (var item in role)
+                {
+                    _context.AspNetUserRoles.Remove(item);
+                }
+
+                //var user = _context.TblUserDetails.SingleOrDefault(x => x.UserId == userRoles.UserId);
+                //user.RoleId = "";
+
+                var permissions = _context.TblUserPermissions.Where(s => s.UserId == userRoles.UserId);
+
+                foreach (var item in permissions)
+                {
+                    _context.TblUserPermissions.Remove(item);
+                }
+
+                _context.SaveChanges();
+                return new EmpRoleResponse { Status = BusinessStatus.Created, ResponseMessage = $"Role removed successfully" };
             }
         }
 

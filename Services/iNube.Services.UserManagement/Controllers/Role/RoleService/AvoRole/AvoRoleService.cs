@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using iNube.Services.UserManagement.Controllers.CustomerProvisioning.IntegrationService;
 using iNube.Services.UserManagement.Entities.AVO;
 using iNube.Services.UserManagement.Helpers;
 using iNube.Services.UserManagement.Models;
@@ -17,10 +18,13 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         private AVOUMContext _context;
         private IMapper _mapper;
         public IConfiguration _config;
+        private IIntegrationService _integrationService;
 
-        public AvoRoleService(IMapper mapper, IConfiguration configuration)
+        public AvoRoleService(IIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
         {
+            _integrationService = integrationService;
             _mapper = mapper;
+            _config = configuration;
         }
 
         public IEnumerable<RolesDTO> GetRoles(ApiContext apiContext)
@@ -149,6 +153,89 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
 
                 _context.SaveChanges();
                 return new UserRoleResponse { Status = BusinessStatus.Created, role = userRoles, ResponseMessage = $"Role removed successfully" };
+            }
+        }
+
+        public EmpRoleResponse UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext)
+        {
+            if (empRoles.EnvId > 0)
+            {
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, empRoles.EnvId.ToString());
+            }
+            else
+            {
+                _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            }
+            var userid = _context.TblUserDetails.FirstOrDefault(a => a.EmployeeNumber == empRoles.Empcode).UserId;
+
+            UserRoleMapDTO userRoles = new UserRoleMapDTO();
+            userRoles.UserId = userid;
+            userRoles.RoleId = empRoles.RoleId;
+            userRoles.EnvId = empRoles.EnvId;
+            //_context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var roledata = _context.AspNetUserRoles.FirstOrDefault(x => x.UserId == userRoles.UserId);
+            UserRolesDTO roleDTO = new UserRolesDTO();
+            if (userRoles.RoleId.Length != 0)
+            {
+                if (roledata == null)
+                {
+                    for (int i = 0; i < userRoles.RoleId.Length; i++)
+                    {
+                        roleDTO.UserId = userRoles.UserId;
+                        roleDTO.RoleId = userRoles.RoleId[i];
+                        AspNetUserRoles _usersRole = _mapper.Map<AspNetUserRoles>(roleDTO);
+
+                        _context.AspNetUserRoles.Add(_usersRole);
+                        // _context.SaveChanges();
+                    }
+                }
+                else
+                {
+                    var role = _context.AspNetUserRoles.Where(a => a.UserId == userRoles.UserId);
+                    foreach (var item in role)
+                    {
+                        _context.AspNetUserRoles.Remove(item);
+                    }
+                    for (int i = 0; i < userRoles.RoleId.Length; i++)
+                    {
+                        roleDTO.UserId = userRoles.UserId;
+                        roleDTO.RoleId = userRoles.RoleId[i];
+                        AspNetUserRoles _usersRole = _mapper.Map<AspNetUserRoles>(roleDTO);
+
+                        _context.AspNetUserRoles.Add(_usersRole);
+                    }
+                }
+                var user = _context.TblUserDetails.SingleOrDefault(x => x.UserId == userRoles.UserId);
+
+                //if (string.IsNullOrEmpty(user.RoleId))
+                //{
+                user.RoleId = userRoles.RoleId[0].ToString();
+                //}
+                _context.SaveChanges();
+
+                //return userRoles;
+                return new EmpRoleResponse { Status = BusinessStatus.Created, ResponseMessage = $"Role assigned successfully!" };
+            }
+            else
+            {
+                var role = _context.AspNetUserRoles.Where(a => a.UserId == userRoles.UserId);
+                foreach (var item in role)
+                {
+                    _context.AspNetUserRoles.Remove(item);
+                }
+
+                //var user = _context.TblUserDetails.SingleOrDefault(x => x.UserId == userRoles.UserId);
+                //user.RoleId = "";
+
+                var permissions = _context.TblUserPermissions.Where(s => s.UserId == userRoles.UserId);
+
+                foreach (var item in permissions)
+                {
+                    _context.TblUserPermissions.Remove(item);
+                }
+
+                _context.SaveChanges();
+                return new EmpRoleResponse { Status = BusinessStatus.Created, ResponseMessage = $"Role removed successfully" };
             }
         }
 
@@ -295,19 +382,102 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             }
         }
 
-        public Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext)
+        public async Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var data = _context.TblDynamicConfig.OrderByDescending(a => a.CreatedDate).ToList();
+            List<DynamicResponse> result = new List<DynamicResponse>();
+            foreach (var item in data)
+            {
+                var response = await _integrationService.GetReportNameForPermissionsDetails(item.Url, apiContext);
+                DynamicResponse respon = new DynamicResponse();
+                respon.name = item.ItemType;
+                List<RPermissionDTO> rperm = new List<RPermissionDTO>();
+                List<RPermissionDTO> list = new List<RPermissionDTO>();
+                var resddto = response.Select(a => new RPermissionDTO
+                {
+                    mID = a.mID,
+                    mValue = a.mValue,
+                    Label = a.mValue,
+                    Collapse = "false",
+                    Status = false,
+                    Children = list,
+                    mType = item.ItemType,
+                }).ToList();
+                rperm.AddRange(resddto);
+                respon.mdata.AddRange(rperm);
+                result.Add(respon);
+            }
+            return result;
         }
 
         public IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var response = _context.TblDynamicPermissions.Where(b => b.Roleid == Roleid && b.DynamicType == itemType && b.UserorRole == "Role")
+                    .Select(a => new DynamicPermissionsDTO
+                    {
+                        DynamicPermissionId = a.DynamicPermissionId,
+                        DynamicId = a.DynamicId,
+                        DynamicName = a.DynamicName,
+                        DynamicType = a.DynamicType,
+                        Userid = a.Userid,
+                        Roleid = a.Roleid,
+                        UserorRole = a.UserorRole,
+                        IsActive = a.IsActive,
+                        SortOrderBy = a.SortOrderBy,
+                        CreatedBy = a.CreatedBy,
+                        CreatedDate = a.CreatedDate,
+                        mID = Convert.ToInt32(a.DynamicId),
+                        mValue = a.DynamicName,
+                        mType = a.DynamicType,
+                    }).ToList();
+
+            response = response.Where(a => a.Userid == null).Select(n => n).ToList();
+
+            return response;
         }
 
         public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            var data = _context.TblDynamicPermissions.Where(a => a.Roleid == configDTO.RoleId && a.UserorRole == "Role").ToList();
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+
+            TblDynamicPermissions dynamicPermissions = null;
+            foreach (var item in data)
+            {
+                _context.TblDynamicPermissions.Remove(item);
+            }
+
+            DynamicPermissionsDTO permissionsDTO = new DynamicPermissionsDTO();
+            foreach (var item in configDTO.PermissionIds)
+            {
+                dynamicPermissions = new TblDynamicPermissions();
+                dynamicPermissions.DynamicId = item.mID;
+                dynamicPermissions.DynamicName = item.mValue;
+                dynamicPermissions.DynamicType = item.mType;
+                dynamicPermissions.Roleid = configDTO.RoleId;
+                dynamicPermissions.IsActive = true;
+                dynamicPermissions.UserorRole = "Role";
+                dynamicPermissions.CreatedBy = apiContext.UserId;
+                dynamicPermissions.CreatedDate = DateTimeNow;
+
+                _context.TblDynamicPermissions.Add(dynamicPermissions);
+            }
+
+            _context.SaveChanges();
+            if (configDTO.PermissionIds.Count != 0)
+            {
+                return new DynamicResponseResponse { Status = BusinessStatus.Created, Id = dynamicPermissions.Roleid, ResponseMessage = $"Assigned Report Permissions successfully!!" };
+            }
+            else
+            {
+                return new DynamicResponseResponse { Status = BusinessStatus.Ok, ResponseMessage = $"No Report Permissions Assigned!" };
+            }
         }
     }
 }

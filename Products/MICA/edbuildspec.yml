@@ -7,10 +7,10 @@ phases:
      
   pre_build:
     commands:
-      - cd  $CODEBUILD_SRC_DIR
+      - cd  $CODEBUILD_SRC_DIR 
       - cd Products/MICA/ClientApp
       - npm install
-  build: 
+  build:  
     commands:
       - cd  $CODEBUILD_SRC_DIR
       - cd Products/MICA/ClientApp  
