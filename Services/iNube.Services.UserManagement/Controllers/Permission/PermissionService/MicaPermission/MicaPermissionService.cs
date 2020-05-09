@@ -24,7 +24,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         private MICAUMContext _context;
         private IMapper _mapper;
         private IIntegrationService _integrationService;
-      
+
         public MicaPermissionService(IMapper mapper, IIntegrationService integrationService)
         {
             _integrationService = integrationService;
@@ -241,13 +241,491 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
 
         public IEnumerable<MasPermissionDTO> GetRolePermissions(UserRoleMapDTO userPermissionDTO, ApiContext apiContext)
         {
-            return GetUserRolePermissions(userPermissionDTO, apiContext);
+            return GetChildRolePermissions(userPermissionDTO, apiContext);
         }
 
         #endregion
 
+        public IEnumerable<MasPermissionDTO> GetUserRolePermissions(UserRoleMapDTO userPermissionDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var ruleNames = _context.AspNetRoles.Where(r => userPermissionDTO.RoleId.Contains(r.Id)).ToList();
+            var menuPermission = (from permission in _context.TblUserPermissions
+                                  join c in _context.TblMasPermission on permission.PermissionId equals c.PermissionId
+                                  where userPermissionDTO.RoleId.Contains(permission.RoleId) && c.ItemType != "Dashboard"
+                                   && permission.UserorRole == "Role"
+                                  select new MasPermissionDTO
+                                  {
+                                      PermissionId = c.PermissionId,
+                                      ItemType = c.ItemType,
+                                      ParentId = c.ParentId,
+                                      MenuId = c.MenuId,
+                                      ItemDescription = c.ItemDescription,
+                                      Label = c.ItemDescription,
+                                      Url = c.Url,
+                                      PathTo = c.PathTo,
+                                      Collapse = c.Collapse,
+                                      State = c.State,
+                                      Mini = c.Mini,
+                                      Icon = c.Icon,
+                                      Redirect = c.Redirect,
+                                      Component = c.Component,
+                                      Status = true,
+                                      RoleId = permission.RoleId,
+                                      RoleName = ruleNames.First(r => r.Id == permission.RoleId).Name
+                                  }).ToList();
+
+            var userPermissions = from c in _context.TblMasPermission
+                                  join permission in _context.TblUserPermissions on c.PermissionId equals permission.PermissionId
+                                  where permission.UserId == userPermissionDTO.UserId
+                                  && permission.UserorRole == "User"
+                                  select permission;
+
+            if (userPermissions.Any())
+            {
+                foreach (var item in userPermissions)
+                {
+                    var mPermission = menuPermission.FirstOrDefault(m => m.PermissionId == item.PermissionId && m.RoleId == item.RoleId);
+                    if (mPermission != null)
+                    {
+                        mPermission.Status = false;
+                    }
+                }
+            }
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menuPermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menuPermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
+        }
+
+        public IEnumerable<MasPermissionDTO> GetUserRoleDashboard(UserRoleMapDTO userPermissionDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var ruleNames = _context.AspNetRoles.Where(r => userPermissionDTO.RoleId.Contains(r.Id)).ToList();
+            var menuPermission = (from permission in _context.TblUserPermissions
+                                  join c in _context.TblMasPermission on permission.PermissionId equals c.PermissionId
+                                  where userPermissionDTO.RoleId.Contains(permission.RoleId) && c.ItemType == "Dashboard"
+                                   && permission.UserorRole == "Role"
+                                  select new MasPermissionDTO
+                                  {
+                                      PermissionId = c.PermissionId,
+                                      ItemType = c.ItemType,
+                                      ParentId = c.ParentId,
+                                      MenuId = c.MenuId,
+                                      ItemDescription = c.ItemDescription,
+                                      Label = c.ItemDescription,
+                                      Url = c.Url,
+                                      PathTo = c.PathTo,
+                                      Collapse = c.Collapse,
+                                      State = c.State,
+                                      Mini = c.Mini,
+                                      Icon = c.Icon,
+                                      Redirect = c.Redirect,
+                                      Component = c.Component,
+                                      Status = true,
+                                      RoleId = permission.RoleId,
+                                      RoleName = ruleNames.First(r => r.Id == permission.RoleId).Name
+                                  }).ToList();
+
+            var userPermissions = from c in _context.TblMasPermission
+                                  join permission in _context.TblUserPermissions on c.PermissionId equals permission.PermissionId
+                                  where permission.UserId == userPermissionDTO.UserId
+                                  && permission.UserorRole == "User"
+                                  select permission;
+
+            if (userPermissions.Any())
+            {
+                foreach (var item in userPermissions)
+                {
+                    var mPermission = menuPermission.FirstOrDefault(m => m.PermissionId == item.PermissionId && m.RoleId == item.RoleId);
+                    if (mPermission != null)
+                    {
+                        mPermission.Status = false;
+                    }
+                }
+            }
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menuPermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menuPermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
+        }
+
+        public IEnumerable<MasPermissionDTO> GetUserRoleReports(UserRoleMapDTO userPermissionDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var ruleNames = _context.AspNetRoles.Where(r => userPermissionDTO.RoleId.Contains(r.Id)).ToList();
+            var menuPermission = (from permission in _context.TblUserPermissions
+                                  join c in _context.TblMasPermission on permission.PermissionId equals c.PermissionId
+                                  where userPermissionDTO.RoleId.Contains(permission.RoleId) && c.ItemType == "Reports"
+                                   && permission.UserorRole == "Role"
+                                  select new MasPermissionDTO
+                                  {
+                                      PermissionId = c.PermissionId,
+                                      ItemType = c.ItemType,
+                                      ParentId = c.ParentId,
+                                      MenuId = c.MenuId,
+                                      ItemDescription = c.ItemDescription,
+                                      Label = c.ItemDescription,
+                                      Url = c.Url,
+                                      PathTo = c.PathTo,
+                                      Collapse = c.Collapse,
+                                      State = c.State,
+                                      Mini = c.Mini,
+                                      Icon = c.Icon,
+                                      Redirect = c.Redirect,
+                                      Component = c.Component,
+                                      Status = true,
+                                      RoleId = permission.RoleId,
+                                      RoleName = ruleNames.First(r => r.Id == permission.RoleId).Name
+                                  }).ToList();
+
+            var userPermissions = from c in _context.TblMasPermission
+                                  join permission in _context.TblUserPermissions on c.PermissionId equals permission.PermissionId
+                                  where permission.UserId == userPermissionDTO.UserId
+                                  && permission.UserorRole == "User"
+                                  select permission;
+
+            if (userPermissions.Any())
+            {
+                foreach (var item in userPermissions)
+                {
+                    var mPermission = menuPermission.FirstOrDefault(m => m.PermissionId == item.PermissionId && m.RoleId == item.RoleId);
+                    if (mPermission != null)
+                    {
+                        mPermission.Status = false;
+                    }
+                }
+            }
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menuPermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menuPermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
+        }
+
+        public IEnumerable<MasPermissionDTO> Roledashboard(RoleDashDTO roleDashDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var ruleNames = _context.AspNetRoles.Where(r => roleDashDTO.RoleId.Contains(r.Id)).ToList();
+            var menuPermission = _context.TblMasPermission.Where(r => r.ItemType == "Dashboard")
+                .Select(c => new MasPermissionDTO
+                {
+                    PermissionId = c.PermissionId,
+                    mID = c.PermissionId,
+                    ItemType = c.ItemType,
+                    ParentId = c.ParentId,
+                    MenuId = c.MenuId,
+                    mValue = c.ItemDescription,
+                    ItemDescription = c.ItemDescription,
+                    Label = c.ItemDescription,
+                    Url = c.Url,
+                    PathTo = c.PathTo,
+                    Collapse = c.Collapse,
+                    State = c.State,
+                    Mini = c.Mini,
+                    Icon = c.Icon,
+                    Redirect = c.Redirect,
+                    Component = c.Component,
+                    Status = false,
+                    RoleId = roleDashDTO.RoleId,
+                    RoleName = ruleNames.First(r => r.Id == roleDashDTO.RoleId).Name
+                }
+                ).ToList();
+
+            var dashPermissions = from c in _context.TblMasPermission
+                                  join permission in _context.TblUserPermissions on c.PermissionId equals permission.PermissionId
+                                  where permission.RoleId == roleDashDTO.RoleId
+                                  && permission.UserorRole == "Role"
+                                  select permission;
+
+            if (dashPermissions.Any())
+            {
+                foreach (var item in dashPermissions)
+                {
+                    var mPermission = menuPermission.FirstOrDefault(m => m.PermissionId == item.PermissionId && m.RoleId == item.RoleId);
+                    if (mPermission != null)
+                    {
+                        mPermission.Status = true;
+                    }
+                }
+            }
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menuPermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menuPermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
+        }
+
+        public IEnumerable<MasPermissionDTO> GetRoleReports(RoleDashDTO roleDashDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var ruleNames = _context.AspNetRoles.Where(r => roleDashDTO.RoleId.Contains(r.Id)).ToList();
+            var menuPermission = _context.TblMasPermission.Where(r => r.ItemType == "Reports")
+                .Select(c => new MasPermissionDTO
+                {
+                    PermissionId = c.PermissionId,
+                    mID = c.PermissionId,
+                    ItemType = c.ItemType,
+                    ParentId = c.ParentId,
+                    MenuId = c.MenuId,
+                    mValue = c.ItemDescription,
+                    ItemDescription = c.ItemDescription,
+                    Label = c.ItemDescription,
+                    Url = c.Url,
+                    PathTo = c.PathTo,
+                    Collapse = c.Collapse,
+                    State = c.State,
+                    Mini = c.Mini,
+                    Icon = c.Icon,
+                    Redirect = c.Redirect,
+                    Component = c.Component,
+                    Status = false,
+                    RoleId = roleDashDTO.RoleId,
+                    RoleName = ruleNames.First(r => r.Id == roleDashDTO.RoleId).Name
+                }
+                ).ToList();
+
+            var dashPermissions = from c in _context.TblMasPermission
+                                  join permission in _context.TblUserPermissions on c.PermissionId equals permission.PermissionId
+                                  where permission.RoleId == roleDashDTO.RoleId
+                                  && permission.UserorRole == "Role"
+                                  select permission;
+
+            if (dashPermissions.Any())
+            {
+                foreach (var item in dashPermissions)
+                {
+                    var mPermission = menuPermission.FirstOrDefault(m => m.PermissionId == item.PermissionId && m.RoleId == item.RoleId);
+                    if (mPermission != null)
+                    {
+                        mPermission.Status = true;
+                    }
+                }
+            }
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menuPermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menuPermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
+        }
+
+        public IEnumerable<MasPermissionDTO> GetRolePermbyid(RolepermissionsDTO RolePermissionDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var ruleNames = _context.AspNetRoles.Where(r => RolePermissionDTO.RoleId.Contains(r.Id)).ToList();
+            var menupermission = _context.TblMasPermission.Where(r => r.ItemType == "Menu")
+                .Select(c => new MasPermissionDTO
+                {
+                    PermissionId = c.PermissionId,
+                    ItemType = c.ItemType,
+                    ParentId = c.ParentId,
+                    MenuId = c.MenuId,
+                    ItemDescription = c.ItemDescription,
+                    Label = c.ItemDescription,
+                    Url = c.Url,
+                    PathTo = c.PathTo,
+                    Collapse = c.Collapse,
+                    State = c.State,
+                    Mini = c.Mini,
+                    Icon = c.Icon,
+                    Redirect = c.Redirect,
+                    Component = c.Component,
+                    Status = false,
+                    RoleId = RolePermissionDTO.RoleId,
+                    RoleName = ruleNames.FirstOrDefault(r => r.Id == RolePermissionDTO.RoleId).Name
+                }).ToList();
+
+            var rolePermissions = from c in _context.TblMasPermission
+                                  join permission in _context.TblUserPermissions on c.PermissionId equals permission.PermissionId
+                                  where permission.RoleId == RolePermissionDTO.RoleId
+                                  && permission.UserorRole == "Role"
+                                  select permission;
+
+            if (rolePermissions.Any())
+            {
+                foreach (var item in rolePermissions)
+                {
+                    var mPermission = menupermission.FirstOrDefault(m => m.PermissionId == item.PermissionId && m.RoleId == item.RoleId);
+                    if (mPermission != null)
+                    {
+                        mPermission.Status = true;
+                    }
+                }
+            }
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menupermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menupermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
+        }
+
+        public IEnumerable<MasPermissionDTO> GetAllPermissions(ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var menupermission = _context.TblMasPermission.Where(r => r.ItemType == "Menu")
+                .Select(c => new MasPermissionDTO
+                {
+                    PermissionId = c.PermissionId,
+                    ItemType = c.ItemType,
+                    ParentId = c.ParentId,
+                    MenuId = c.MenuId,
+                    ItemDescription = c.ItemDescription,
+                    Label = c.ItemDescription,
+                    Url = c.Url,
+                    PathTo = c.PathTo,
+                    Collapse = c.Collapse,
+                    State = c.State,
+                    Mini = c.Mini,
+                    Icon = c.Icon,
+                    Redirect = c.Redirect,
+                    Component = c.Component,
+                    Status = false,
+                }).ToList();
+
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menupermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menupermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
+        }
+
         #region Private Method
-        private IEnumerable<MasPermissionDTO> GetUserRolePermissions(UserRoleMapDTO userPermissionDTO, ApiContext apiContext)
+        private IEnumerable<MasPermissionDTO> GetChildRolePermissions(UserRoleMapDTO userPermissionDTO, ApiContext apiContext)
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var ruleNames = _context.AspNetRoles.Where(r => userPermissionDTO.RoleId.Contains(r.Id)).ToList();

@@ -833,6 +833,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return employeeRoles;
 
         }
+
         public async Task<RoleDesigResponse> AssignDesigRole(RoleDesigMapDTO desigRoles, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -885,6 +886,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 return new RoleDesigResponse { Status = BusinessStatus.Created, role = desigRoles, ResponseMessage = $"Role removed from designation successfully" };
             }
         }
+
         public async Task<IEnumerable<AvoOrgEmployeeSearch>> SearchEmployeeDetailsByMovStatus(MovementDTO movementDTO, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
