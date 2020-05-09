@@ -1924,6 +1924,58 @@ namespace iNube.Services.Partners.Models
         public decimal? MovingId { get; set; }
         public decimal? MovedTo { get; set; }
     }
+
+
+    //Creating Model for Hierarchy
+
+
+    public class HierarchyDTO
+    {
+        public HierarchyDTO()
+        {
+            HierarchyItemDTOs = new List<HierarchyItemDTO>();
+        }
+        public string Name { get; set; }  //Vinod
+
+        public string Designation { get; set; } //CEO
+        public int? Count { get; set; }
+
+
+        public virtual List<HierarchyItemDTO> HierarchyItemDTOs { get; set; }
+
+    }
+
+    //Crating childDto    //ravi,Nagraj    CTO level
+    public class HierarchyItemDTO
+    {
+        public string Name { get; set; }  //Vinod
+
+        public string Designation { get; set; } //CEO
+        public int? Count { get; set; }
+
+    }
+    public class ParetAndPosoition
+    {
+        
+        public int? ParentId { get; set; }
+        public int? Positionid { get; set; }
+
+    }
+    public class FetchData
+    {
+
+        public int? ParentId { get; set; }
+        public int? Positionid { get; set; }
+        public string PostionName { get; set; }
+        public string StaffName { get; set; }
+        public int? Designationid { get; set; }
+         
+        public virtual List<FetchData> Children { get; set; }
+    }
+
+
+    
+
 }
 
 

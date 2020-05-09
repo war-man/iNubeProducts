@@ -1211,5 +1211,118 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         }
 
 
-    }
+
+        // || AVO
+
+        public async Task<HierarchyDTO> GetHierarchy(int orgid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            HierarchyDTO hierarchyDTO = new HierarchyDTO();
+            //List<HierarchyItemDTO> hierarchyItemsDTO = new List<HierarchyItemDTO>();
+
+            //var officeid = _context.TblOrgOffice.FirstOrDefault(a => a.OrganizationId == orgid).OrgOfficeId;
+
+
+            //var Positiondetails = _context.TblOrgPositions.Where(a => a.OfficeId == officeid).ToList();
+
+            //List<HierarchyItemDTO> hierarchyItemDTOs = new List<HierarchyItemDTO>();
+            //HierarchyItemDTO hierarchyItemDTO = new HierarchyItemDTO();
+            //ParetAndPosoition paretAndPosoition = new ParetAndPosoition();
+            //List<ParetAndPosoition> paretAndPosoitions = new List<ParetAndPosoition>();
+            //var postionid = 8;
+
+            // var hierarchy = ChildData(postionid, hierarchyItemDTOs, hierarchyItemDTO, paretAndPosoition, paretAndPosoitions, apiContext);
+
+            //  hierarchyDTO.HierarchyItemDTOs = hierarchy;
+            List<FetchData> Data = null;
+
+            Data =
+                (from objposition in _context.TblOrgPositions.Where(a => a.OrganizationId == orgid)
+                 join objempdetails in _context.TblOrgEmployee
+                 on objposition.PositionId equals objempdetails.PositionId
+               
+                 // where objtblpolicy.Createdby == userId
+                 select new FetchData
+                 {
+                     
+                    PostionName= objposition.PositionName,
+                    Positionid= Convert.ToInt32(objposition.PositionId),
+                    ParentId=Convert.ToInt32(objposition.ParentId),
+                    StaffName= objempdetails.StaffName,
+                    Designationid= Convert.ToInt32(objposition.DesignationId)
+
+                 }).ToList();
+
+           
+            var checkdata = Data;
+            var c=Data.Where(a=>a.Designationid==1).
+                  Select(async b => new FetchData
+                  {
+
+                      PostionName = b.PostionName,
+                      Positionid = Convert.ToInt32(b.Positionid),
+                      ParentId = Convert.ToInt32(b.ParentId),
+                      StaffName = b.StaffName,
+                      Designationid = Convert.ToInt32(b.Designationid),
+                      Children= await GetChildData(Data, b.ParentId, apiContext)
+
+                  });
+
+            var d = c;
+            foreach (var designationid in Data)
+            {
+
+            }
+            return hierarchyDTO;
+
+        }
+
+        public async Task<List<FetchData>> GetChildData(List<FetchData> fetchDatas,int? parentid,ApiContext apiContext)
+        {
+            return null;
+        }
+        public async Task<List<HierarchyItemDTO>> ChildData(int positonid, List<HierarchyItemDTO> hierarchyItemDTOs, HierarchyItemDTO hierarchyItemDTO, ParetAndPosoition paretAndPosoition, List<ParetAndPosoition> paretAndPosoitions, ApiContext apiContext)
+        {
+           
+            var positiondetails = _context.TblOrgPositions.Where(a => a.ParentId == positonid).ToList();//got 3 rows
+
+            foreach(var item in positiondetails)
+            {
+                paretAndPosoition = new ParetAndPosoition();
+                paretAndPosoition.ParentId = Convert.ToInt32(item.ParentId);
+                paretAndPosoition.Positionid = Convert.ToInt32(item.PositionId);
+
+                paretAndPosoitions.Add(paretAndPosoition);
+
+            }
+            List<int> l = new List<int>();
+            foreach(var postionid in paretAndPosoitions)
+            {
+                hierarchyItemDTO = new HierarchyItemDTO();
+                hierarchyItemDTO.Count = paretAndPosoitions.Count();
+                var des = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == postionid.Positionid).PositionName.ToString();
+                hierarchyItemDTO.Designation = des;
+                var name= _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == postionid.Positionid).StaffName.ToString(); 
+                hierarchyItemDTO.Name = name;
+                hierarchyItemDTOs.Add(hierarchyItemDTO);
+                l.Add(Convert.ToInt32(postionid.Positionid));
+   
+            }
+            var positionid = 0;
+            for(var i=1;i<=l.Count;i++)  //8,9,41
+            {
+                positionid = l[1];
+                l.RemoveAt(i);
+                ChildData(positionid, hierarchyItemDTOs, hierarchyItemDTO, paretAndPosoition, paretAndPosoitions, apiContext);
+            }
+
+            return hierarchyItemDTOs;
+        }
+
+
+
+
+
+
+        }
 }
