@@ -1956,7 +1956,7 @@ namespace iNube.Services.Partners.Models
     }
     public class ParetAndPosoition
     {
-        
+
         public int? ParentId { get; set; }
         public int? Positionid { get; set; }
 
@@ -1969,12 +1969,23 @@ namespace iNube.Services.Partners.Models
         public string PostionName { get; set; }
         public string StaffName { get; set; }
         public int? Designationid { get; set; }
-         
+
         public virtual List<FetchData> Children { get; set; }
+    }
+    public class EmpRoleMapDTO
+    {
+        public string Empcode { get; set; }
+        public string[] RoleId { get; set; }
+    }
+    public class EmpRoleResponse: Response
+    {
+
     }
 
 
-    
+
+
+
 
 }
 

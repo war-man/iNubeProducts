@@ -1274,7 +1274,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       ParentId = Convert.ToInt32(b.ParentId),
                       StaffName = b.StaffName,
                       Designationid = Convert.ToInt32(b.Designationid),
-                      Children= await GetChildData(Data, b.ParentId, apiContext)
+                      Children=  GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
 
                   });
 
@@ -1287,9 +1287,22 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         }
 
-        public async Task<List<FetchData>> GetChildData(List<FetchData> fetchDatas,int? parentid,ApiContext apiContext)
+        public List<FetchData> GetChildData(List<FetchData> fetchDatas,int? positionid,ApiContext apiContext)
         {
-            return null;
+            List<FetchData> data1 =fetchDatas.Where(a=>a.ParentId==positionid).
+                  Select( b => new FetchData
+                  {
+                      PostionName = b.PostionName,
+                      Positionid = Convert.ToInt32(b.Positionid),
+                      ParentId = Convert.ToInt32(b.ParentId),
+                      StaffName = b.StaffName,
+                      Designationid = Convert.ToInt32(b.Designationid),
+                      Children = GetChildData(fetchDatas, Convert.ToInt32(b.Positionid), apiContext)
+
+                  }).ToList();
+
+
+            return data1;
         }
         public async Task<List<HierarchyItemDTO>> ChildData(int positonid, List<HierarchyItemDTO> hierarchyItemDTOs, HierarchyItemDTO hierarchyItemDTO, ParetAndPosoition paretAndPosoition, List<ParetAndPosoition> paretAndPosoitions, ApiContext apiContext)
         {
@@ -1334,5 +1347,5 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
 
 
-        }
+    }
 }
