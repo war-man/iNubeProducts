@@ -494,6 +494,18 @@ namespace iNube.Services.UserManagement.Models
         public decimal EnvId { get; set; }
     }
 
+    public class EmpRoleResponse : ResponseStatus
+    {
+        public EmpRoleMapDTO role { get; set; }
+    }
+
+    public partial class EmpRoleMapDTO
+    {
+        public string Empcode { get; set; }
+        public string[] RoleId { get; set; }
+        public decimal EnvId { get; set; }
+    }
+
     public partial class RoleDashDTO
     {
         public string RoleId { get; set; }
@@ -827,5 +839,15 @@ namespace iNube.Services.UserManagement.Models
     public class EmployeeRoles
     {
         public string[] Roles { get; set; }
+    }
+
+    public class Unlockeduser
+    {
+        public string userid { get; set; }
+    }
+
+    public class UnlockResponse : ResponseStatus
+    {
+        public Unlockeduser unlock { get; set; }
     }
 }

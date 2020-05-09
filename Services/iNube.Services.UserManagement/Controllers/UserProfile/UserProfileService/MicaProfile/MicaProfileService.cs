@@ -47,7 +47,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             return _UsrDTO;
         }
 
-        public async  Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext)
+        public async Task<UserResponse> CreateProfileUser(UserDTO user, ApiContext apiContext)
         {
 
             CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
@@ -729,6 +729,16 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 throw ex;
             }
 
+        }
+
+        public UnlockResponse UnlockUser(string userid, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+
+            var user = _context.AspNetUsers.FirstOrDefault(a => a.Id == userid);
+            user.AccessFailedCount = 0;
+            var _user = _mapper.Map<UserDTO>(user);
+            return new UnlockResponse { Status = BusinessStatus.Updated, Id = _user.Id, ResponseMessage = $"User unlocked successfully!" };
         }
     }
 }

@@ -108,5 +108,10 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         {
             throw new NotImplementedException();
         }
+
+        public UnlockResponse UnlockUser(string userid, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

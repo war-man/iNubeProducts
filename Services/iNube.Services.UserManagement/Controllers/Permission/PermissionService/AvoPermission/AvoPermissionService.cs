@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using iNube.Services.UserManagement.Controllers.CustomerProvisioning.IntegrationService;
 using iNube.Services.UserManagement.Controllers.Permission.PermissionService;
 using iNube.Services.UserManagement.Entities.AVO;
 using iNube.Services.UserManagement.Helpers;
@@ -26,14 +27,15 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
     {
         private AVOUMContext _context;
         private IMapper _mapper;
-
+        private IIntegrationService _integrationService;
         /// <summary>
         /// Initializes a new instance of the <see cref="AvoPermissionService"/> class.
         /// </summary>
         /// <param name="mapper">The mapper.</param>
-        public AvoPermissionService(IMapper mapper)
+        public AvoPermissionService(IMapper mapper, IIntegrationService integrationService)
         {
             _mapper = mapper;
+            _integrationService = integrationService;
         }
 
         #region Public Methods        
@@ -291,6 +293,25 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                 newRolePermissions.Status = true;
                 _context.TblUserPermissions.Add(newRolePermissions);
             }
+            //foreach (var item in permissionIds.RolePermissionIds)
+            //{
+            //    var newPermission = item.PermissionIds.ToList();
+            //    var existingPerm = _context.TblUserPermissions.Where(t => t.RoleId == permissionIds.RoleId && t.UserorRole == "Role").ToList();
+            //    //Delete which are not in current permissions--
+            //    var delPermission = existingPerm.Where(m => !item.PermissionIds.Contains((int)m.PermissionId)).ToList();
+            //    foreach (var perm in delPermission)
+            //    {
+            //        _context.Remove(perm);
+            //        existingPerm.Remove(perm);
+            //    }
+            //    var includedPermission = existingPerm.Where(m => item.PermissionIds.Contains((int)m.PermissionId)).ToList();
+            //    foreach (var incPerm in includedPermission)
+            //    {
+            //        newPermission.Remove((int)incPerm.PermissionId);
+            //    }
+            //Add new record
+
+            //}
             _context.SaveChanges();
             return new NewRolePermissionResponse { Status = BusinessStatus.Created, Id = newRolePermissions?.UserPermissionsId.ToString(), ResponseMessage = $"Assigned Permissions successfully!!" };
         }
@@ -505,22 +526,198 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
 
         public IEnumerable<MasPermissionDTO> GetReports(ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var menuPermission = _context.TblMasPermission.Where(r => r.ItemType == "Reports")
+                .Select(c => new MasPermissionDTO
+                {
+                    PermissionId = c.PermissionId,
+                    mID = c.PermissionId,
+                    ItemType = c.ItemType,
+                    ParentId = c.ParentId,
+                    MenuId = c.MenuId,
+                    mValue = c.ItemDescription,
+                    ItemDescription = c.ItemDescription,
+                    Label = c.ItemDescription,
+                    Url = c.Url,
+                    PathTo = c.PathTo,
+                    Collapse = c.Collapse,
+                    State = c.State,
+                    Mini = c.Mini,
+                    Icon = c.Icon,
+                    Redirect = c.Redirect,
+                    Component = c.Component,
+                    Status = false,
+                    //RoleId = permission.RoleId,
+                    //RoleName = ruleNames.First(r => r.Id == permission.RoleId).Name
+                }
+                ).ToList();
+            IEnumerable<MasPermissionDTO> _masPermissionDTOs = menuPermission
+                           .Where(c => (c.ParentId == 0))
+                           .Select(c => new MasPermissionDTO()
+                           {
+                               PermissionId = c.PermissionId,
+                               ItemType = c.ItemType,
+                               ParentId = c.ParentId,
+                               MenuId = c.MenuId,
+                               ItemDescription = c.ItemDescription,
+                               Label = c.ItemDescription,
+                               Url = c.Url,
+                               PathTo = c.PathTo,
+                               Collapse = c.Collapse,
+                               State = c.State,
+                               Mini = c.Mini,
+                               Icon = c.Icon,
+                               Redirect = c.Redirect,
+                               Component = c.Component,
+                               Status = c.Status,
+                               RoleId = c.RoleId,
+                               RoleName = c.RoleName,
+                               Children = GetMenuChildren(menuPermission, c.PermissionId, c.RoleId)
+                           });
+            return _masPermissionDTOs;
         }
 
         public DynamicReportResponse GetReportOnRoles(UserRoleReportDTO reportDTO, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var ruleNames = _context.AspNetRoles.Where(r => reportDTO.RoleId.Contains(r.Id)).ToList();
+
+            DynamicReportResponse dynamicrpt = new DynamicReportResponse();
+            foreach (var item in reportDTO.RoleId)
+            {
+                var reports = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid))
+                .Select(b => b).ToList();
+
+                DynamicResponse dynamic = new DynamicResponse();
+                List<RPermissionDTO> list = new List<RPermissionDTO>();
+                var result = reports.Select(c => new RPermissionDTO
+                {
+                    mID = Convert.ToInt32(c.DynamicId),
+                    mValue = c.DynamicName,
+                    Label = c.DynamicName,
+                    Collapse = "false",
+                    Status = true,
+                    Children = list,
+                    Roleid = c.Roleid,
+                    Userid = c.Userid,
+                    UserorRole = c.UserorRole,
+                    mType = c.DynamicType,
+                    RoleName = ruleNames.FirstOrDefault(r => r.Id == item).Name
+                }).ToList();
+
+                var userreports = result.Where(a => item.Contains(a.Roleid) && a.Userid == reportDTO.UserId && a.UserorRole == "User")
+                .Select(b => b).ToList();
+
+                if (userreports.Any())
+                {
+                    foreach (var item1 in userreports)
+                    {
+                        var rpermission = result.FirstOrDefault(a => a.mID == item1.mID/*&& a.Roleid == item.RoleId*/);
+                        if (rpermission != null)
+                        {
+                            rpermission.Status = false;
+                        }
+                    }
+                }
+
+                if (result.Count != 0)
+                {
+                    dynamic.name = ruleNames.FirstOrDefault(r => r.Id == item).Name;
+                    dynamic.mdata.AddRange(result);
+                    dynamicrpt.DynamicResponse.Add(dynamic);
+                }
+            }
+            return dynamicrpt;
         }
 
         public async Task<DynamicReportResponse> GetReportByRole(RoleReportDTO reportDTO, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+
+            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Report");
+            var rresponse = await _integrationService.GetReportNameForPermissionsDetails(data.Url, apiContext);
+            var ruleNames = _context.AspNetRoles.FirstOrDefault(r => r.Id == reportDTO.RoleId);
+            DynamicReportResponse dynamicrpt = new DynamicReportResponse();
+            DynamicResponse respon = new DynamicResponse();
+            List<RPermissionDTO> list = new List<RPermissionDTO>();
+            var resddto = rresponse.Select(a => new RPermissionDTO
+            {
+                mID = a.mID,
+                mValue = a.mValue,
+                Label = a.mValue,
+                Collapse = "false",
+                Status = false,
+                Children = list,
+                mType = data.ItemType,
+            }).ToList();
+
+            var response = _context.TblDynamicPermissions.Where(a => a.Roleid == reportDTO.RoleId && a.UserorRole == "Role").Select(b => b).ToList();
+            if (response.Any())
+            {
+                foreach (var item1 in response)
+                {
+                    var rpermission = resddto.FirstOrDefault(a => a.mID == item1.DynamicId/*&& a.Roleid == item.RoleId*/);
+                    if (rpermission != null)
+                    {
+                        rpermission.Status = true;
+                    }
+                }
+            }
+            respon.name = ruleNames.Name;
+            respon.mdata.AddRange(resddto);
+            dynamicrpt.DynamicResponse.Add(respon);
+            //DynamicResponse dynamic = new DynamicResponse();
+            //List<RPermissionDTO> list = new List<RPermissionDTO>();
+            return dynamicrpt;
         }
 
         public async Task<UserReportPermissionResponse> SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext)
         {
-            throw new NotImplementedException();
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Report");
+            var rresponse = await _integrationService.GetReportNameForPermissionsDetails(data.Url, apiContext);
+
+            TblDynamicPermissions reportPermissions = null;
+            foreach (var item in reportDTO.RolePermissionIds)
+            {
+                var newPermission = item.PermissionIds.ToList();
+                var existingPerm = _context.TblDynamicPermissions.Where(t => t.Userid == reportDTO.UserId && t.UserorRole == "User" && t.Roleid == item.RoleId).ToList();
+                //Delete which are not in current permissions--
+                var delPermission = existingPerm.Where(m => !item.PermissionIds.Contains((int)m.DynamicId)).ToList();
+                foreach (var perm in delPermission)
+                {
+                    _context.Remove(perm);
+                    existingPerm.Remove(perm);
+                }
+                var includedPermission = existingPerm.Where(m => item.PermissionIds.Contains((int)m.DynamicId)).ToList();
+                foreach (var incPerm in includedPermission)
+                {
+                    newPermission.Remove((int)incPerm.DynamicId);
+                }
+                //Add new record
+                foreach (var permissionId in newPermission)
+                {
+                    reportPermissions = new TblDynamicPermissions();
+                    reportPermissions.Userid = reportDTO.UserId;
+                    reportPermissions.DynamicId = permissionId;
+                    reportPermissions.IsActive = true;
+                    reportPermissions.DynamicType = data.ItemType;
+                    reportPermissions.DynamicName = rresponse.FirstOrDefault(a => a.mID == permissionId).mValue;
+                    reportPermissions.Roleid = item.RoleId;
+                    reportPermissions.UserorRole = "User";
+                    reportPermissions.CreatedBy = apiContext.UserId;
+                    reportPermissions.CreatedDate = DatetimeNow;
+
+                    _context.TblDynamicPermissions.Add(reportPermissions);
+                }
+            }
+            _context.SaveChanges();
+            return new UserReportPermissionResponse { Status = BusinessStatus.Created, ResponseMessage = $"Report permissions assigned successfully!!" };
         }
         #endregion
     }

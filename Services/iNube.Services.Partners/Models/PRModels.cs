@@ -28,7 +28,7 @@ namespace iNube.Services.Partners.Models
 
     }
 
-   
+
 
     public partial class LocationDTO
     {
@@ -313,7 +313,7 @@ namespace iNube.Services.Partners.Models
         public AVOOrgOffice avoorgoff { get; set; }
     }
 
-    public class CreatePeopleResponse: ResponseStatus
+    public class CreatePeopleResponse : ResponseStatus
     {
         public AVOOrgOffice avoorgoff { get; set; }
     }
@@ -1687,7 +1687,7 @@ namespace iNube.Services.Partners.Models
         {
             AVOOrgEmpAddress = new HashSet<AVOOrgEmpAddress>();
             AVOOrgEmpEducation = new HashSet<AVOOrgEmpEducation>();
-           
+
         }
 
         public decimal OrgEmpId { get; set; }
@@ -1843,7 +1843,7 @@ namespace iNube.Services.Partners.Models
     //   public List<string> Roles { get; set; }
     //}
 
-    public class EmployeeRoles 
+    public class EmployeeRoles
     {
         public string[] Roles { get; set; }
     }
@@ -1923,6 +1923,18 @@ namespace iNube.Services.Partners.Models
         public int? MovementFormId { get; set; }
         public decimal? MovingId { get; set; }
         public decimal? MovedTo { get; set; }
+    }
+
+    public class EmpRoleResponse : ResponseStatus
+    {
+        public EmpRoleMapDTO role { get; set; }
+    }
+
+    public partial class EmpRoleMapDTO
+    {
+        public string Empcode { get; set; }
+        public string[] RoleId { get; set; }
+        public decimal EnvId { get; set; }
     }
 }
 

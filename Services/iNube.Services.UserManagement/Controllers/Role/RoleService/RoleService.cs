@@ -16,6 +16,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
         IEnumerable<RolesDTO> GetRoles(ApiContext apiContext);
         IEnumerable<RolesDTO> GetRolePermissionsById(string roleid, ApiContext apiContext);
         UserRoleResponse AssignRole(UserRoleMapDTO userRoles, ApiContext apiContext);
+        EmpRoleResponse UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext);
         IEnumerable<RolesDTO> GetUserRole(string userId, ApiContext apiContext);
         IEnumerable<RolesDTO> GetAllUserRoles(string userId, ApiContext apiContext);
         RoleResponse CreateRole(RolesDTO role, ApiContext apiContext);
@@ -49,6 +50,11 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
         public UserRoleResponse AssignRole(UserRoleMapDTO userRoles, ApiContext apiContext)
         {
             return _roleService(apiContext.ProductType).AssignRole(userRoles, apiContext);
+        }
+
+        public EmpRoleResponse UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext)
+        {
+            return _roleService(apiContext.ProductType).UpdateEmpRole(empRoles, apiContext);
         }
 
         public IEnumerable<MasPermissionDTO> GetMasPermissions(string perType)
