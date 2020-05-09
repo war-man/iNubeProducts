@@ -614,9 +614,9 @@ class ClaimEnquiry extends React.Component {
     }
 
     claimAmountTable = () => {
-
+      
         let arr = this.state.claimTableData.map((prop, key) => {
-            return prop.coverDynamic.filter(c => c.Header == "Vehicle Number")[0].Details;
+            return (prop.coverDynamic.filter(c => c.Header == "Vehicle Number").length > 0) ? prop.coverDynamic.filter(c => c.Header == "Vehicle Number")[0].Details : "";
 
         });
         this.state.vehicleActivity.vehicleNumbers = Array.from(new Set(arr));
