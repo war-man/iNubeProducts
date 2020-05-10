@@ -1224,69 +1224,86 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         // || AVO
 
-        public async Task<List<FetchData>> GetHierarchy(int orgid, ApiContext apiContext)
+        public async Task<List<FetchData>> GetHierarchy(int OrgId, string type, string keyValue, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            HierarchyDTO hierarchyDTO = new HierarchyDTO();
-            //List<HierarchyItemDTO> hierarchyItemsDTO = new List<HierarchyItemDTO>();
-
-            //var officeid = _context.TblOrgOffice.FirstOrDefault(a => a.OrganizationId == orgid).OrgOfficeId;
-
-
-            //var Positiondetails = _context.TblOrgPositions.Where(a => a.OfficeId == officeid).ToList();
-
-            //List<HierarchyItemDTO> hierarchyItemDTOs = new List<HierarchyItemDTO>();
-            //HierarchyItemDTO hierarchyItemDTO = new HierarchyItemDTO();
-            //ParetAndPosoition paretAndPosoition = new ParetAndPosoition();
-            //List<ParetAndPosoition> paretAndPosoitions = new List<ParetAndPosoition>();
-            //var postionid = 8;
-
-            // var hierarchy = ChildData(postionid, hierarchyItemDTOs, hierarchyItemDTO, paretAndPosoition, paretAndPosoitions, apiContext);
-
-            //  hierarchyDTO.HierarchyItemDTOs = hierarchy;
             List<FetchData> Data = null;
-
-            Data =
-                (from objposition in _context.TblOrgPositions.Where(a => a.OrganizationId == orgid)
-                 join objempdetails in _context.TblOrgEmployee
-                 on objposition.PositionId equals objempdetails.PositionId
-               
-                 // where objtblpolicy.Createdby == userId
-                 select new FetchData
-                 {
-                     
-                    PostionName= objposition.PositionName,
-                    Positionid= Convert.ToInt32(objposition.PositionId),
-                    ParentId=Convert.ToInt32(objposition.ParentId),
-                    StaffName= objempdetails.StaffName,
-                    Designationid= Convert.ToInt32(objposition.DesignationId)
-
-                 }).ToList();
-
-           
-            var checkdata = Data;
-            var c=Data.Where(a=>a.Designationid==1).
-                  Select(b => new FetchData
-                  {
-
-                      PostionName = b.PostionName,
-                      Positionid = Convert.ToInt32(b.Positionid),
-                      ParentId = Convert.ToInt32(b.ParentId),
-                      StaffName = b.StaffName,
-                      Designationid = Convert.ToInt32(b.Designationid),
-                      Children= GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
-
-                  }).ToList();
-
-            var d = c;
-            // return c;
-            return checkdata;
-
+            if (type == "People")
+            {
+                return GetPeopleHierachy(OrgId, type, keyValue, apiContext);
+            }
+            return Data;
         }
-
-        public List<FetchData> GetChildData(List<FetchData> fetchDatas,int? positionid,ApiContext apiContext)
+        private List<FetchData> GetPeopleHierachy(int OrgId, string type, string keyValue, ApiContext apiContext)
         {
-            List<FetchData> data1 =fetchDatas.Where(a=>a.ParentId==positionid).
+            List<FetchData> Data = null;
+            if (keyValue != null)
+            {
+                Data =
+               (from objdesig in _context.TblOrgStructure.Where(a => a.OrganizationId == OrgId)
+                join objposition in _context.TblOrgPositions on objdesig.OrgStructureId equals objposition.DesignationId
+                join objempdetails in _context.TblOrgEmployee.Where(emp => emp.StaffCode == keyValue) on objposition.PositionId equals objempdetails.PositionId
+
+                select new FetchData
+                {
+                    PostionName = objdesig.LevelDefinition,
+                    Positionid = Convert.ToInt32(objposition.PositionId),
+                    ParentId = Convert.ToInt32(objposition.ParentId),
+                    StaffName = objempdetails.StaffName,
+                    Designationid = Convert.ToInt32(objposition.DesignationId),
+                    LevelId = objdesig.LevelId,
+                }).ToList();
+            }
+            else
+            {
+                Data =
+                    (from objdesig in _context.TblOrgStructure.Where(a => a.OrganizationId == OrgId)
+                     join objposition in _context.TblOrgPositions on objdesig.OrgStructureId equals objposition.DesignationId
+                     join objempdetails in _context.TblOrgEmployee on objposition.PositionId equals objempdetails.PositionId
+
+                     select new FetchData
+                     {
+                         PostionName = objdesig.LevelDefinition,
+                         Positionid = Convert.ToInt32(objposition.PositionId),
+                         ParentId = Convert.ToInt32(objposition.ParentId),
+                         StaffName = objempdetails.StaffName,
+                         Designationid = Convert.ToInt32(objposition.DesignationId),
+                         LevelId = objdesig.LevelId,
+                     }).ToList();
+            }
+
+            var checkdata = Data;
+            var hierData = Data.Where(a => a.LevelId == 1).
+                  Select(b => new FetchData
+                  {
+                      PostionName = b.PostionName,
+                      Positionid = Convert.ToInt32(b.Positionid),
+                      ParentId = Convert.ToInt32(b.ParentId),
+                      StaffName = b.StaffName,
+                      LevelId = b.LevelId,
+                      Designationid = Convert.ToInt32(b.Designationid),
+                      Children = GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
+                  }).ToList();
+            //foreach (var item in hierData)
+            //{
+            //    int catCount=0;
+            //    GetChildCount(item, ref catCount);
+            //}
+            //hierData[0].Count = Data.Count();
+            return hierData;
+        }
+        public void GetChildCount(FetchData fetchDatas, ref int count)
+        {
+            foreach (var item in fetchDatas.Children)
+            {
+                GetChildCount(item, ref count);
+            }
+            count += fetchDatas.Children.Count;
+            fetchDatas.TotalCount = count;
+        }
+        public List<FetchData> GetChildData(List<FetchData> fetchDatas, int? positionid,  ApiContext apiContext)
+        {
+            List<FetchData> data1 = fetchDatas.Where(b => b.ParentId == positionid).
                   Select(b => new FetchData
                   {
                       PostionName = b.PostionName,
@@ -1294,13 +1311,13 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       ParentId = Convert.ToInt32(b.ParentId),
                       StaffName = b.StaffName,
                       Designationid = Convert.ToInt32(b.Designationid),
-                      Children =GetChildData(fetchDatas, Convert.ToInt32(b.Positionid), apiContext)
+                      Children = GetChildData(fetchDatas, Convert.ToInt32(b.Positionid),  apiContext)
 
                   }).ToList();
-
 
             return data1;
         }
+
         public async Task<List<HierarchyItemDTO>> ChildData(int positonid, List<HierarchyItemDTO> hierarchyItemDTOs, HierarchyItemDTO hierarchyItemDTO, ParetAndPosoition paretAndPosoition, List<ParetAndPosoition> paretAndPosoitions, ApiContext apiContext)
         {
            

@@ -1963,14 +1963,15 @@ namespace iNube.Services.Partners.Models
     }
     public class FetchData
     {
-
         public int? ParentId { get; set; }
         public int? Positionid { get; set; }
         public string PostionName { get; set; }
         public string StaffName { get; set; }
         public int? Designationid { get; set; }
-
+        public int? LevelId { get; set; }
         public virtual List<FetchData> Children { get; set; }
+        public int Count => Children.Count;
+        public int TotalCount { get; set; }
     }
     public class EmpRoleMapDTO
     {

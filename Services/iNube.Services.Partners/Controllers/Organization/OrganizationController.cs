@@ -481,9 +481,9 @@ namespace iNube.Services.Partners.Controllers.Organization
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetHierarchy(int orgid)
+        public async Task<IActionResult> GetHierarchy(int OrgId,string Type,string KeyValue)
         {
-            var response = await _avoorgService.GetHierarchy(orgid, Context);
+            var response = await _avoorgService.GetHierarchy(OrgId,Type, KeyValue, Context);
             return Ok(response);
         }
     }

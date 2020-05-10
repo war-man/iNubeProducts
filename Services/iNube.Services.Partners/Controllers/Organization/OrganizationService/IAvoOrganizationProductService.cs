@@ -48,7 +48,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<ResponseStatus> CreateNewPosition(decimal OrgEmpId, ApiContext apiContext);
         Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext);
         //Task<HierarchyDTO> GetHierarchy(int orgid, ApiContext apiContext);
-        Task<List<FetchData>> GetHierarchy(int orgid, ApiContext apiContext);
+        Task<List<FetchData>> GetHierarchy(int OrgId, string type, string keyValue, ApiContext apiContext);
         Task<IEnumerable<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext);
     }
 }
