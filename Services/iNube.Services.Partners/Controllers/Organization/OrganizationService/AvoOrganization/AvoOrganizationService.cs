@@ -1224,7 +1224,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         // || AVO
 
-        public async Task<HierarchyDTO> GetHierarchy(int orgid, ApiContext apiContext)
+        public async Task<List<FetchData>> GetHierarchy(int orgid, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             HierarchyDTO hierarchyDTO = new HierarchyDTO();
@@ -1266,7 +1266,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
            
             var checkdata = Data;
             var c=Data.Where(a=>a.Designationid==1).
-                  Select(async b => new FetchData
+                  Select(b => new FetchData
                   {
 
                       PostionName = b.PostionName,
@@ -1274,30 +1274,27 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       ParentId = Convert.ToInt32(b.ParentId),
                       StaffName = b.StaffName,
                       Designationid = Convert.ToInt32(b.Designationid),
-                      Children=  GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
+                      Children= GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
 
-                  });
+                  }).ToList();
 
             var d = c;
-            foreach (var designationid in Data)
-            {
-
-            }
-            return hierarchyDTO;
+            // return c;
+            return checkdata;
 
         }
 
         public List<FetchData> GetChildData(List<FetchData> fetchDatas,int? positionid,ApiContext apiContext)
         {
             List<FetchData> data1 =fetchDatas.Where(a=>a.ParentId==positionid).
-                  Select( b => new FetchData
+                  Select(b => new FetchData
                   {
                       PostionName = b.PostionName,
                       Positionid = Convert.ToInt32(b.Positionid),
                       ParentId = Convert.ToInt32(b.ParentId),
                       StaffName = b.StaffName,
                       Designationid = Convert.ToInt32(b.Designationid),
-                      Children = GetChildData(fetchDatas, Convert.ToInt32(b.Positionid), apiContext)
+                      Children =GetChildData(fetchDatas, Convert.ToInt32(b.Positionid), apiContext)
 
                   }).ToList();
 
