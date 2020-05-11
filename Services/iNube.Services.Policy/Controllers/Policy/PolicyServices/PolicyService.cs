@@ -76,10 +76,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<ProposalResponse> UpdateProposal(dynamic modifydata, ApiContext apiContext);
         Task<ProposalResponse> PolicyEndoresemenet(dynamic endoresementDto, ApiContext apiContext);
         Task<Dictionary<dynamic, dynamic>> DynamicMapper(dynamic inputmodel, string mappingname, ApiContext apiContext);
-        Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext);
         Task<dynamic> InternalGetPolicyDetailsByNumber(string policyNumber, ApiContext apiContext);
         Task<DailyDTO> GetDailyAccountDetails(string policyNumber, int month, int year, string TxnEventType, ApiContext apiContext);
         Task<List<UploadDocument>> GetPolicyDocumentsByNumber(string policyNumber, ApiContext apiContext);
+        Task<PolicyResponse> GeneratePolicy(dynamic policyDTO, ApiContext apiContext);
 
         Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext);
@@ -87,6 +87,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext);
         Task<bool> ProposalCancellationScheduler(ApiContext apiContext);
         Task<bool> SmsScheduler(ApiContext apiContext);
+
     }
     public class PolicyService : IPolicyService
     {
@@ -718,10 +719,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).GetProposalByMobileNo(MobNo, apiContext);
         }
-        public async Task<dynamic> ProposalValidation(dynamic proposalDto, ApiContext apiContext)
-        {
-            return await _policyProductService(apiContext.ProductType).ProposalValidation(proposalDto, apiContext);
-        }
+        
 
         
 
@@ -793,5 +791,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).SmsScheduler(apiContext);
         }
+
+        public async Task<PolicyResponse> GeneratePolicy(dynamic policyDTO, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).GeneratePolicy(policyDTO, apiContext);
+        }
+
     }
 }

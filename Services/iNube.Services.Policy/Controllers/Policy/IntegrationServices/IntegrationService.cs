@@ -56,7 +56,9 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyCancelRequest, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         Task<PolicyStatusResponseDTO> PolicyStatusUpdate(PolicyStatusDTO policyStatusDTO, ApiContext apiContext);
+        Task<ResponseStatus> VehicleStatusUpdate(VehicleStatusDTO VehicleStatusDTO, ApiContext apiContext);
         //GetMappingParams(string mappingname, ApiContext apiContext)
+
 
         Task<ResponseStatus> SendSMSAsync(Models.SMSRequest SmsRequest, ApiContext apiContext);
         Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext);
@@ -95,7 +97,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         public async Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendEmailAsync";
-            return await PostApiInvoke<Models.EmailRequest, ResponseStatus>(uri, apiContext, EmailRequest );
+            return await PostApiInvoke<Models.EmailRequest, ResponseStatus>(uri, apiContext, EmailRequest);
         }
         //      //Acccounting Module
         //      //public async Task<IEnumerable<AccountMapDetailsDto>> GetAccountMapAsync(ApiContext apiContext)
@@ -339,6 +341,16 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await PostApiInvoke<dynamic, PolicyStatusResponseDTO>(uri, apiContext, policyStatusDTO);
 
         }
+        public async Task<ResponseStatus> VehicleStatusUpdate(VehicleStatusDTO VehicleStatusDTO, ApiContext apiContext)
+        {
+
+            var uri = ExtensionUrl + "/api/Mica_EGI/VehicleStatusUpdate";
+
+            return await PutApiInvoke<VehicleStatusDTO, ResponseStatus>(uri, apiContext, VehicleStatusDTO);
+
+        }
+
+
         public async Task<MasterCDDTO> CDAccountCreation(string accountnumber, ApiContext apiContext)
         {
 
@@ -347,19 +359,19 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await GetApiInvoke<MasterCDDTO>(uri, apiContext);
 
         }
-        public async Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string type,ApiContext apiContext)
+        public async Task<CDBalanceDTO> GetCDAccountDetails(string accountnumber, string type, ApiContext apiContext)
         {
 
-            var uri = PartnerUrl + "/api/Accounts/GetAccountBalance?accountnumber=" + accountnumber+ "&TxnEventType="+ type;
+            var uri = PartnerUrl + "/api/Accounts/GetAccountBalance?accountnumber=" + accountnumber + "&TxnEventType=" + type;
 
             return await GetApiInvoke<CDBalanceDTO>(uri, apiContext);
 
         }
-      
+
         public async Task<DailyDTO> GetDailyTransaction(string accountnumber, int month, int year, string TxnEventType, ApiContext apiContext)
         {
 
-            var uri = PartnerUrl + "/api/Accounts/GetDailyTransaction?accountnumber="+ accountnumber + "&month="+ month + "&year="+ year + "&TxnEventType="+ TxnEventType;
+            var uri = PartnerUrl + "/api/Accounts/GetDailyTransaction?accountnumber=" + accountnumber + "&month=" + month + "&year=" + year + "&TxnEventType=" + TxnEventType;
 
             return await GetApiInvoke<DailyDTO>(uri, apiContext);
 
@@ -506,5 +518,37 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
 
 
+
+        private async Task<TResponse> PutApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+
+                HttpContent contentPost = null;
+                if (request != null)
+                {
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    string postBody = JsonConvert.SerializeObject(request);
+                    var content = new StringContent(postBody, Encoding.UTF8, "application/json");
+                    contentPost = content;
+                }
+                using (var response = await client.PutAsync(requestUri, contentPost))
+                {
+                    using (var content = response.Content)
+                    {
+                        return await content.ReadAsAsync<TResponse>();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return new TResponse();
+            }
+
+        }
     }
 }

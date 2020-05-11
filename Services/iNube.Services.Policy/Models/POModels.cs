@@ -1685,6 +1685,12 @@ namespace iNube.Services.Policy.Models
         public string FileName { get; set; }
         public byte[] FileData { get; set; }
     }
+    public partial class VehicleStatusDTO
+    {
+        public string PolicyNumber { get; set; }
+        public string VehicleNumber { get; set; }
+        public bool Status { get; set; }
+    }
 
 
 }

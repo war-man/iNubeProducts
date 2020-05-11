@@ -577,12 +577,6 @@ namespace iNube.Services.Policy.Controllers.Policy
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> ProposalValidation(dynamic proposalDto)
-        {
-            var response = await _policyService.ProposalValidation(proposalDto, Context);
-            return ServiceResponse(response);
-        }
 
         [HttpGet]
         public async Task<IActionResult> InternalGetPolicyDetailsByNumber(string policyNumber)
@@ -686,5 +680,26 @@ namespace iNube.Services.Policy.Controllers.Policy
             return Ok(response);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> GeneratePolicy([FromBody]dynamic policyDTO)
+        {
+            var response = await _policyService.GeneratePolicy(policyDTO, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return BadRequest(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.Error:
+                    return BadRequest(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized(response);
+                case BusinessStatus.PreConditionFailed:
+                    return Ok(response);
+
+                default:
+                    return NotFound(response);
+            }
+        }
     }
 }

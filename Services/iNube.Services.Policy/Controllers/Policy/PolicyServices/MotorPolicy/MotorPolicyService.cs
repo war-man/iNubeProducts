@@ -334,5 +334,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<PolicyResponse> GeneratePolicy(dynamic policyDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
