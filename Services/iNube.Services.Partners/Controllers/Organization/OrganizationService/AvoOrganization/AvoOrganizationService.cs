@@ -656,18 +656,18 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         {
             //get context
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var totalPosition = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid && a.StructureTypeId == 28).ToList();
+            //var totalPosition = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid && a.StructureTypeId == 28).ToList();
+            var totalPosition = _context.TblOrgPositions.Where(a => a.OrganizationId == orgid).ToList();
             List<vacantPositiondto> ddDTOs = new List<vacantPositiondto>();
             vacantPositiondto ddDTO = new vacantPositiondto();
-            var positname = "";
             foreach (var positions in totalPosition)
             {
-                var count = _context.TblOrgPositions.Where(a => a.DesignationId == positions.OrgStructureId && a.IsVacant == true).Count();
+                var count = _context.TblOrgPositions.Where(a => a.IsVacant == true).Count();
                 if (count > 0)
                 {
                     ddDTO = new vacantPositiondto();
-                    ddDTO.mID = positions.LevelDefinition;
-                    ddDTO.mValue = positions.LevelDefinition;
+                    ddDTO.mID = positions.PositionName;
+                    ddDTO.mValue = positions.PositionName;
                     ddDTOs.Add(ddDTO);
                 }
 
@@ -703,6 +703,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 var data = _mapper.Map<TblOrgEmployee>(mappingdto);
                 data.StaffName = data.FirstName + " " + (!string.IsNullOrEmpty(data.MiddleName) ? data.MiddleName : "") + " " + (!string.IsNullOrEmpty(data.LastName) ? data.LastName : "");
                 data.PositionId = positiondata.PositionId;
+                data.CreatedBy = apiContext.UserId;
+                data.CreatedDate = DateTime.Now;
                 //data.ReportingTo = avOOrgEmployee.EmpId;
                 _context.TblOrgEmployee.Add(data);
                 //data.
