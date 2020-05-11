@@ -662,7 +662,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             vacantPositiondto ddDTO = new vacantPositiondto();
             foreach (var positions in totalPosition)
             {
-                var count = _context.TblOrgPositions.Where(a => a.IsVacant == true).Count();
+                var count = _context.TblOrgPositions.Where(a => a.PositionName == positions.PositionName && a.IsVacant == true).Count();
                 if (count > 0)
                 {
                     ddDTO = new vacantPositiondto();
