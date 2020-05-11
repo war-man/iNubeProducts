@@ -800,15 +800,21 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         public async Task<AVOMovements> SaveDecision(AVOMovements data, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+                var _tblmovements = _mapper.Map<TblMovements>(data);
+                _tblmovements.MovementStatusId = 34;
 
-            var _tblmovements = _mapper.Map<TblMovements>(data);
-            _tblmovements.MovementStatusId = 34;
+                _context.TblMovements.Add(_tblmovements);
 
-            _context.TblMovements.Add(_tblmovements);
-
-            _context.SaveChanges();
-            var decisionData = _mapper.Map<AVOMovements>(_tblmovements);
-            return decisionData;
+                _context.SaveChanges();
+                var decisionData = _mapper.Map<AVOMovements>(_tblmovements);
+                return decisionData;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public async Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext)
@@ -1204,6 +1210,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             var movData = from a in _context.TblMovements
                           join b in _context.TblMovementDetails on a.MovementId equals b.MovementId
+                          where b.MovementId == movement.MovementId
                           select new MovementDetails
                           {
                               MovementTypeId = a.MovementTypeId,
