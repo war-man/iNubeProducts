@@ -21,7 +21,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
 
 
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl,ExtensionUrl;
 
         public IntegrationService(IConfiguration configuration)
         {
@@ -93,7 +93,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
 
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 //throw;
@@ -132,7 +132,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();
@@ -162,7 +162,8 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
                     }
                 }
             }
-            catch (Exception ex)
+
+            catch (Exception)
             {
 
                 return new List<TResponse>();

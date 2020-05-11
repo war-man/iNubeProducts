@@ -50,7 +50,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 var acntDTO = _mapper.Map<CoaaccountsDto>(dto);
                 return new AccountResponce { Status = BusinessStatus.Created, ResponseMessage = $"Account successfully created! \n Account Name: {acntDTO.AccountName}" };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -86,7 +86,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
 
                 return new CoaMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Mapping Succesfully Done for MICA Account Name: {actDto.AccountName} and Account Code: {caomapDTO.MicaAccountCode}" };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -104,7 +104,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 var transMapDto = _mapper.Map<TransactionRuleMappingDto>(dto);
                 return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Journal Entry Create Succesfully For:{transMapDto.RuleName}" };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -139,7 +139,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 var tranasactionDto = _mapper.Map<TransactionHeaderDto>(dto);
                 return new TransactionResponse { Status = BusinessStatus.Created, ResponseMessage = $"Transaction Succesfully Done for " };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -210,7 +210,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 });
                 return accountDTOS;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -233,7 +233,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 });
                 return subLedgerDTOS;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -321,7 +321,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 });
                 return transaction;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             return null;
@@ -348,7 +348,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 var coaMappingDetails = _mapper.Map<IEnumerable<CoaAccountMappingDto>>(coaMapppingDto);
                 return coaMappingDetails;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -380,7 +380,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 var journalList = _mapper.Map<IEnumerable<JournalEntryConfriguationDto>>(journalDtos);
                 return journalList;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             return null;
@@ -407,7 +407,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                 return accountList;
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -794,7 +794,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //ex
                 }

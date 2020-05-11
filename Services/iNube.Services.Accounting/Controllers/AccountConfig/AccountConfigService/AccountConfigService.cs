@@ -71,8 +71,11 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.AccountConfigServi
         }
 
 
+
         //Delete CoaMapping
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async void DeleteCoaMapping(decimal AccountMappingId, ApiContext apiContext)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             _accountsService(apiContext.ProductType).DeleteCoaMapping(AccountMappingId, apiContext);
         }
