@@ -47,6 +47,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<AVOMovements> UpdateEmployeePosition(PositionStatusDTO movements, ApiContext apiContext);
         Task<ResponseStatus> CreateNewPosition(decimal OrgEmpId, ApiContext apiContext);
         Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext);
-        Task<IEnumerable<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext);
+        Task<List<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext);
     }
 }

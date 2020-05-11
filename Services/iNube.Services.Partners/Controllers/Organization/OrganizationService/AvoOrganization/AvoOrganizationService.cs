@@ -1188,7 +1188,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         return val;
     }
-        public async Task<IEnumerable<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext)
+        public async Task<List<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
