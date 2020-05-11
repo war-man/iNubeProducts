@@ -1801,7 +1801,7 @@ namespace iNube.Services.Partners.Models
         public string DeginName { get; set; }
         public decimal? OrganizationId { get; set; }
         public decimal OfficeId { get; set; }
-        public decimal EmpId { get; set; }
+        //public decimal EmpId { get; set; }
         public virtual AVOOrgEmployee AVOOrgEmployee { get; set; }
 
     }

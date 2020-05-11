@@ -703,7 +703,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 var data = _mapper.Map<TblOrgEmployee>(mappingdto);
                 data.StaffName = data.FirstName + " " + (!string.IsNullOrEmpty(data.MiddleName) ? data.MiddleName : "") + " " + (!string.IsNullOrEmpty(data.LastName) ? data.LastName : "");
                 data.PositionId = positiondata.PositionId;
-                data.ReportingTo = avOOrgEmployee.EmpId;
+                //data.ReportingTo = avOOrgEmployee.EmpId;
                 _context.TblOrgEmployee.Add(data);
                 //data.
                 _context.SaveChanges();
@@ -1202,8 +1202,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             }
 
 
-        return val;
-    }
+            return val;
+        }
         public async Task<List<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1308,7 +1308,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             count += fetchDatas.Children.Count;
             fetchDatas.TotalCount = count;
         }
-        public List<FetchData> GetChildData(List<FetchData> fetchDatas, int? positionid,  ApiContext apiContext)
+        public List<FetchData> GetChildData(List<FetchData> fetchDatas, int? positionid, ApiContext apiContext)
         {
             List<FetchData> data1 = fetchDatas.Where(b => b.ParentId == positionid).
                   Select(b => new FetchData
@@ -1318,7 +1318,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       ParentId = Convert.ToInt32(b.ParentId),
                       StaffName = b.StaffName,
                       Designationid = Convert.ToInt32(b.Designationid),
-                      Children = GetChildData(fetchDatas, Convert.ToInt32(b.Positionid),  apiContext)
+                      Children = GetChildData(fetchDatas, Convert.ToInt32(b.Positionid), apiContext)
 
                   }).ToList();
 
@@ -1327,10 +1327,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<List<HierarchyItemDTO>> ChildData(int positonid, List<HierarchyItemDTO> hierarchyItemDTOs, HierarchyItemDTO hierarchyItemDTO, ParetAndPosoition paretAndPosoition, List<ParetAndPosoition> paretAndPosoitions, ApiContext apiContext)
         {
-           
+
             var positiondetails = _context.TblOrgPositions.Where(a => a.ParentId == positonid).ToList();//got 3 rows
 
-            foreach(var item in positiondetails)
+            foreach (var item in positiondetails)
             {
                 paretAndPosoition = new ParetAndPosoition();
                 paretAndPosoition.ParentId = Convert.ToInt32(item.ParentId);
@@ -1340,20 +1340,20 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             }
             List<int> l = new List<int>();
-            foreach(var postionid in paretAndPosoitions)
+            foreach (var postionid in paretAndPosoitions)
             {
                 hierarchyItemDTO = new HierarchyItemDTO();
                 hierarchyItemDTO.Count = paretAndPosoitions.Count();
                 var des = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == postionid.Positionid).PositionName.ToString();
                 hierarchyItemDTO.Designation = des;
-                var name= _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == postionid.Positionid).StaffName.ToString(); 
+                var name = _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == postionid.Positionid).StaffName.ToString();
                 hierarchyItemDTO.Name = name;
                 hierarchyItemDTOs.Add(hierarchyItemDTO);
                 l.Add(Convert.ToInt32(postionid.Positionid));
-   
+
             }
             var positionid = 0;
-            for(var i=1;i<=l.Count;i++)  //8,9,41
+            for (var i = 1; i <= l.Count; i++)  //8,9,41
             {
                 positionid = l[1];
                 l.RemoveAt(i);
