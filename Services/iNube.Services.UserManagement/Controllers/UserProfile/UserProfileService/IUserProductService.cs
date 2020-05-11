@@ -29,5 +29,6 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         UserDTO DeleteUserById(string Id, ApiContext apiContext);
         UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext apiContext);
         UserNameById GetUserNameById(string Id, ApiContext apiContext);
+        UnlockResponse UnlockUser(string userid, ApiContext apiContext);
     }
 }

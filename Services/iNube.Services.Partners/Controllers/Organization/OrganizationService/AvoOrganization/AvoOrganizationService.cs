@@ -833,6 +833,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return employeeRoles;
 
         }
+
         public async Task<RoleDesigResponse> AssignDesigRole(RoleDesigMapDTO desigRoles, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -885,6 +886,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 return new RoleDesigResponse { Status = BusinessStatus.Created, role = desigRoles, ResponseMessage = $"Role removed from designation successfully" };
             }
         }
+
         public async Task<IEnumerable<AvoOrgEmployeeSearch>> SearchEmployeeDetailsByMovStatus(MovementDTO movementDTO, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -972,18 +974,25 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             movData.Status = 1;
                         }
                     }
-                   
+                    //based on designation change Updating new designation roles to the user account
+                    var empid = _context.TblMovements.FirstOrDefault(a => a.MovementId == movements.MovementId);
+                    EmpRoleMapDTO empRole = new EmpRoleMapDTO();
+                    var employee = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
+                    empRole.Empcode = employee.StaffCode;
+                    var roles = await GetEmployeeRoles(empRole.Empcode, apiContext);
+                    empRole.RoleId = roles.Roles;
+                    var changeDesig = await _integrationService.UpdateEmpRole(empRole, apiContext);
                 }
                 _context.TblMovements.Update(movementdata);
                 var mapData = _mapper.Map<AVOMovements>(movementdata);
 
                 //Create new position
-               // var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+                // var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
 
                 _context.SaveChanges();
                 return mapData;
             }
-                
+
             catch (Exception ex)
             {
                 throw ex;
@@ -1002,20 +1011,21 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             {
                 Status = BusinessStatus.Created
             };
-            
 
-             var movementData = _context.TblMovements.FirstOrDefault(x => x.MovementId == MovementId);
-            if (movementData == null) {
+
+            var movementData = _context.TblMovements.FirstOrDefault(x => x.MovementId == MovementId);
+            if (movementData == null)
+            {
                 response.Status = BusinessStatus.Error;
-                return response ;
+                return response;
             }
-            
+
 
             var positiondata = (from pos in _context.TblOrgPositions
                                 join emp in _context.TblOrgEmployee on pos.PositionId equals emp.PositionId
                                 where emp.OrgEmpId == movementData.OrgEmpId
                                 select (pos));
-        
+
             var pdata = positiondata.FirstOrDefault();
 
             if (pdata != null)
@@ -1028,7 +1038,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 //_context.SaveChanges();
                 var postionCheck = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == pdata.OrganizationId
                 && x.OfficeId == movementData.NewBranchId && x.DesignationId == movementData.NewPositionId
-                && x.ParentId==pdata.ParentId && x.IsVacant == true);
+                && x.ParentId == pdata.ParentId && x.IsVacant == true);
                 if (postionCheck == null)
                 {
                     TblOrgPositions position = new TblOrgPositions();
@@ -1048,142 +1058,142 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     _context.TblOrgPositions.Add(position);
                     _context.SaveChanges();
 
-                    response.Id= position.PositionId.ToString();
+                    response.Id = position.PositionId.ToString();
                 }
                 else
-                response.Id= postionCheck.PositionId.ToString();
+                    response.Id = postionCheck.PositionId.ToString();
             }
             return response;
         }
 
-    public async Task<AVOOrgEmployee> ModifyPeople(AVOOrgEmployee tblRetentionGroupDto, ApiContext apiContext)
-    {
-        // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-        _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-        var tbl_participant = _mapper.Map<AVOOrgEmployee>(tblRetentionGroupDto);
-        var tbl_particiant = _context.TblOrgEmployee.Find(tbl_participant.OrgEmpId);
-        var tbl_address = _context.TblOrgEmpAddress.FirstOrDefault(a => a.OrgEmpId == tbl_participant.OrgEmpId);
-        var tbl_edu = _context.TblOrgEmpEducation.FirstOrDefault(a => a.OrgEmpId == tbl_participant.OrgEmpId);
-
-        // update user properties
-        tbl_particiant.AccountNumber = tblRetentionGroupDto.AccountNumber;
-        tbl_particiant.AppointmentDate = tblRetentionGroupDto.AppointmentDate;
-        tbl_particiant.BankName = tblRetentionGroupDto.BankName;
-        tbl_particiant.BranchName = tblRetentionGroupDto.BranchName;
-        tbl_particiant.DateOfJoining = tblRetentionGroupDto.DateOfJoining;
-        tbl_particiant.Dob = tblRetentionGroupDto.Dob;
-        tbl_particiant.Email = tblRetentionGroupDto.Email;
-        tbl_particiant.FirstName = tblRetentionGroupDto.FirstName;
-        tbl_particiant.GenderId = tblRetentionGroupDto.GenderId;
-        tbl_particiant.LastName = tblRetentionGroupDto.LastName;
-        tbl_particiant.MaritalStatusId = tblRetentionGroupDto.MaritalStatusId;
-        tbl_particiant.MiddleName = tblRetentionGroupDto.MiddleName;
-        tbl_particiant.ModifiedBy = tblRetentionGroupDto.ModifiedBy;
-        tbl_particiant.ModifiedDate = tblRetentionGroupDto.ModifiedDate;
-        tbl_particiant.PhoneNumber = tblRetentionGroupDto.PhoneNumber;
-        tbl_particiant.PhoneNumber1 = tblRetentionGroupDto.PhoneNumber1;
-        tbl_particiant.ReportingTo = tblRetentionGroupDto.ReportingTo;
-        tbl_particiant.SalutationId = tblRetentionGroupDto.SalutationId;
-        tbl_particiant.StaffCode = tblRetentionGroupDto.StaffCode;
-        tbl_particiant.StaffName = tblRetentionGroupDto.StaffName;
-        tbl_particiant.StaffStatus = tblRetentionGroupDto.StaffStatus;
-        tbl_particiant.StaffTypeId = tblRetentionGroupDto.StaffTypeId;
-
-        foreach (var adddto in tbl_participant.AVOOrgEmpAddress)
+        public async Task<AVOOrgEmployee> ModifyPeople(AVOOrgEmployee tblRetentionGroupDto, ApiContext apiContext)
         {
+            // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var tbl_participant = _mapper.Map<AVOOrgEmployee>(tblRetentionGroupDto);
+            var tbl_particiant = _context.TblOrgEmployee.Find(tbl_participant.OrgEmpId);
+            var tbl_address = _context.TblOrgEmpAddress.FirstOrDefault(a => a.OrgEmpId == tbl_participant.OrgEmpId);
+            var tbl_edu = _context.TblOrgEmpEducation.FirstOrDefault(a => a.OrgEmpId == tbl_participant.OrgEmpId);
 
+            // update user properties
+            tbl_particiant.AccountNumber = tblRetentionGroupDto.AccountNumber;
+            tbl_particiant.AppointmentDate = tblRetentionGroupDto.AppointmentDate;
+            tbl_particiant.BankName = tblRetentionGroupDto.BankName;
+            tbl_particiant.BranchName = tblRetentionGroupDto.BranchName;
+            tbl_particiant.DateOfJoining = tblRetentionGroupDto.DateOfJoining;
+            tbl_particiant.Dob = tblRetentionGroupDto.Dob;
+            tbl_particiant.Email = tblRetentionGroupDto.Email;
+            tbl_particiant.FirstName = tblRetentionGroupDto.FirstName;
+            tbl_particiant.GenderId = tblRetentionGroupDto.GenderId;
+            tbl_particiant.LastName = tblRetentionGroupDto.LastName;
+            tbl_particiant.MaritalStatusId = tblRetentionGroupDto.MaritalStatusId;
+            tbl_particiant.MiddleName = tblRetentionGroupDto.MiddleName;
+            tbl_particiant.ModifiedBy = tblRetentionGroupDto.ModifiedBy;
+            tbl_particiant.ModifiedDate = tblRetentionGroupDto.ModifiedDate;
+            tbl_particiant.PhoneNumber = tblRetentionGroupDto.PhoneNumber;
+            tbl_particiant.PhoneNumber1 = tblRetentionGroupDto.PhoneNumber1;
+            tbl_particiant.ReportingTo = tblRetentionGroupDto.ReportingTo;
+            tbl_particiant.SalutationId = tblRetentionGroupDto.SalutationId;
+            tbl_particiant.StaffCode = tblRetentionGroupDto.StaffCode;
+            tbl_particiant.StaffName = tblRetentionGroupDto.StaffName;
+            tbl_particiant.StaffStatus = tblRetentionGroupDto.StaffStatus;
+            tbl_particiant.StaffTypeId = tblRetentionGroupDto.StaffTypeId;
 
-            tbl_address.EmpAddressLine1 = adddto.EmpAddressLine1;
-            tbl_address.EmpAddressLine2 = adddto.EmpAddressLine2;
-            tbl_address.EmpAddressLine3 = adddto.EmpAddressLine3;
-            tbl_address.EmpAddressType = adddto.EmpAddressType;
-            tbl_address.EmpCityId = adddto.EmpCityId;
-            tbl_address.EmpCountryId = adddto.EmpCountryId;
-            tbl_address.EmpDistrictId = adddto.EmpDistrictId;
-            tbl_address.EmpPincodeId = adddto.EmpPincodeId;
-            _context.TblOrgEmpAddress.Update(tbl_address);
-
-
-        }
-
-        foreach (var edudto in tbl_participant.AVOOrgEmpEducation)
-        {
-
-            tbl_edu.GradeOrPercentage = edudto.GradeOrPercentage;
-            tbl_edu.Certification = edudto.Certification;
-            tbl_edu.Year = edudto.Year;
-            _context.TblOrgEmpEducation.Update(tbl_edu);
-
-        }
-
-
-
-
-        //var tbl_empaddress = _context.TblOrgEmpAddress.Find(tbl_participant.OrgEmpId);
-        //tbl_empaddress.EmpAddressLine1 = tblRetentionGroupDto.AVOOrgEmpAddress[0].EmpA
-
-        _context.TblOrgEmployee.Update(tbl_particiant);
-        _context.SaveChanges();
-        var accountDTO = _mapper.Map<AVOOrgEmployee>(tbl_particiant);
-        return accountDTO;
-    }
-
-    public async Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext)
-    {
-        _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-        position = 2;
-
-        var _emp = from emp in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
-                   select emp;
-
-        var record = _emp.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
-        //var Emp = _context.TblOrgEmployee.Select(x => x).Where(c => c.OrgEmpId == Empcode).Select(x => x.PositionId);
-
-        var pos = _context.TblOrgPositions.Where(x => x.PositionId > record.SingleOrDefault()).Select(x => x).Take(position);
-
-        AVOReporteeGrid val = new AVOReporteeGrid();
-        List<AVOReportee> val2 = new List<AVOReportee>();
-        List<MasterDto> masval = new List<MasterDto>();
-        foreach (var i in pos)
-        {
-            // AVOOrgEmployee Ival = new AVOOrgEmployee();
-            var Ival = _emp.Where(x => x.PositionId == i.PositionId);
-
-            foreach (var v in Ival)
+            foreach (var adddto in tbl_participant.AVOOrgEmpAddress)
             {
-                AVOReportee val3 = new AVOReportee();
-                val3.OrgEmpId = v.OrgEmpId;
-                val3.StaffCode = v.StaffCode;
-                val3.StaffName = v.StaffName;
-                val3.PositionId = v.PositionId;
-                val3.Email = v.Email; 
-                val3.PhoneNumber = v.PhoneNumber;
 
-                val2.Add(val3);
+
+                tbl_address.EmpAddressLine1 = adddto.EmpAddressLine1;
+                tbl_address.EmpAddressLine2 = adddto.EmpAddressLine2;
+                tbl_address.EmpAddressLine3 = adddto.EmpAddressLine3;
+                tbl_address.EmpAddressType = adddto.EmpAddressType;
+                tbl_address.EmpCityId = adddto.EmpCityId;
+                tbl_address.EmpCountryId = adddto.EmpCountryId;
+                tbl_address.EmpDistrictId = adddto.EmpDistrictId;
+                tbl_address.EmpPincodeId = adddto.EmpPincodeId;
+                _context.TblOrgEmpAddress.Update(tbl_address);
+
 
             }
-            val.reporteedata = val2;
-        }
 
-        var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x).Take(position);
-
-        foreach (var i in pos1)
-        {
-            // AVOOrgEmployee Ival = new AVOOrgEmployee();
-            var Ival = _emp.Where(x => x.PositionId == i.PositionId);
-
-            foreach (var v in Ival)
+            foreach (var edudto in tbl_participant.AVOOrgEmpEducation)
             {
-                MasterDto val3 = new MasterDto();
-                val3.mID = Convert.ToInt32(v.OrgEmpId);
-                val3.mValue = v.StaffName;
 
-                masval.Add(val3);
+                tbl_edu.GradeOrPercentage = edudto.GradeOrPercentage;
+                tbl_edu.Certification = edudto.Certification;
+                tbl_edu.Year = edudto.Year;
+                _context.TblOrgEmpEducation.Update(tbl_edu);
 
             }
-            val.masterData = masval;
+
+
+
+
+            //var tbl_empaddress = _context.TblOrgEmpAddress.Find(tbl_participant.OrgEmpId);
+            //tbl_empaddress.EmpAddressLine1 = tblRetentionGroupDto.AVOOrgEmpAddress[0].EmpA
+
+            _context.TblOrgEmployee.Update(tbl_particiant);
+            _context.SaveChanges();
+            var accountDTO = _mapper.Map<AVOOrgEmployee>(tbl_particiant);
+            return accountDTO;
         }
+
+        public async Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            position = 2;
+
+            var _emp = from emp in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
+                       select emp;
+
+            var record = _emp.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
+            //var Emp = _context.TblOrgEmployee.Select(x => x).Where(c => c.OrgEmpId == Empcode).Select(x => x.PositionId);
+
+            var pos = _context.TblOrgPositions.Where(x => x.PositionId > record.SingleOrDefault()).Select(x => x).Take(position);
+
+            AVOReporteeGrid val = new AVOReporteeGrid();
+            List<AVOReportee> val2 = new List<AVOReportee>();
+            List<MasterDto> masval = new List<MasterDto>();
+            foreach (var i in pos)
+            {
+                // AVOOrgEmployee Ival = new AVOOrgEmployee();
+                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+
+                foreach (var v in Ival)
+                {
+                    AVOReportee val3 = new AVOReportee();
+                    val3.OrgEmpId = v.OrgEmpId;
+                    val3.StaffCode = v.StaffCode;
+                    val3.StaffName = v.StaffName;
+                    val3.PositionId = v.PositionId;
+                    val3.Email = v.Email;
+                    val3.PhoneNumber = v.PhoneNumber;
+
+                    val2.Add(val3);
+
+                }
+                val.reporteedata = val2;
+            }
+
+            var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x).Take(position);
+
+            foreach (var i in pos1)
+            {
+                // AVOOrgEmployee Ival = new AVOOrgEmployee();
+                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+
+                foreach (var v in Ival)
+                {
+                    MasterDto val3 = new MasterDto();
+                    val3.mID = Convert.ToInt32(v.OrgEmpId);
+                    val3.mValue = v.StaffName;
+
+                    masval.Add(val3);
+
+                }
+                val.masterData = masval;
+            }
 
 
         return val;
@@ -1209,6 +1219,146 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return _movData;
 
         }
+
+
+
+        // || AVO
+
+        public async Task<List<FetchData>> GetHierarchy(int OrgId, string type, string keyValue, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<FetchData> Data = null;
+            if (type == "People")
+            {
+                return GetPeopleHierachy(OrgId, type, keyValue, apiContext);
+            }
+            return Data;
+        }
+        private List<FetchData> GetPeopleHierachy(int OrgId, string type, string keyValue, ApiContext apiContext)
+        {
+            List<FetchData> Data = null;
+            if (keyValue != null)
+            {
+                Data =
+               (from objdesig in _context.TblOrgStructure.Where(a => a.OrganizationId == OrgId)
+                join objposition in _context.TblOrgPositions on objdesig.OrgStructureId equals objposition.DesignationId
+                join objempdetails in _context.TblOrgEmployee.Where(emp => emp.StaffCode == keyValue) on objposition.PositionId equals objempdetails.PositionId
+
+                select new FetchData
+                {
+                    PostionName = objdesig.LevelDefinition,
+                    Positionid = Convert.ToInt32(objposition.PositionId),
+                    ParentId = Convert.ToInt32(objposition.ParentId),
+                    StaffName = objempdetails.StaffName,
+                    Designationid = Convert.ToInt32(objposition.DesignationId),
+                    LevelId = objdesig.LevelId,
+                }).ToList();
+            }
+            else
+            {
+                Data =
+                    (from objdesig in _context.TblOrgStructure.Where(a => a.OrganizationId == OrgId)
+                     join objposition in _context.TblOrgPositions on objdesig.OrgStructureId equals objposition.DesignationId
+                     join objempdetails in _context.TblOrgEmployee on objposition.PositionId equals objempdetails.PositionId
+
+                     select new FetchData
+                     {
+                         PostionName = objdesig.LevelDefinition,
+                         Positionid = Convert.ToInt32(objposition.PositionId),
+                         ParentId = Convert.ToInt32(objposition.ParentId),
+                         StaffName = objempdetails.StaffName,
+                         Designationid = Convert.ToInt32(objposition.DesignationId),
+                         LevelId = objdesig.LevelId,
+                     }).ToList();
+            }
+
+            var checkdata = Data;
+            var hierData = Data.Where(a => a.LevelId == 1).
+                  Select(b => new FetchData
+                  {
+                      PostionName = b.PostionName,
+                      Positionid = Convert.ToInt32(b.Positionid),
+                      ParentId = Convert.ToInt32(b.ParentId),
+                      StaffName = b.StaffName,
+                      LevelId = b.LevelId,
+                      Designationid = Convert.ToInt32(b.Designationid),
+                      Children = GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
+                  }).ToList();
+            //foreach (var item in hierData)
+            //{
+            //    int catCount=0;
+            //    GetChildCount(item, ref catCount);
+            //}
+            //hierData[0].Count = Data.Count();
+            return hierData;
+        }
+        public void GetChildCount(FetchData fetchDatas, ref int count)
+        {
+            foreach (var item in fetchDatas.Children)
+            {
+                GetChildCount(item, ref count);
+            }
+            count += fetchDatas.Children.Count;
+            fetchDatas.TotalCount = count;
+        }
+        public List<FetchData> GetChildData(List<FetchData> fetchDatas, int? positionid,  ApiContext apiContext)
+        {
+            List<FetchData> data1 = fetchDatas.Where(b => b.ParentId == positionid).
+                  Select(b => new FetchData
+                  {
+                      PostionName = b.PostionName,
+                      Positionid = Convert.ToInt32(b.Positionid),
+                      ParentId = Convert.ToInt32(b.ParentId),
+                      StaffName = b.StaffName,
+                      Designationid = Convert.ToInt32(b.Designationid),
+                      Children = GetChildData(fetchDatas, Convert.ToInt32(b.Positionid),  apiContext)
+
+                  }).ToList();
+
+            return data1;
+        }
+
+        public async Task<List<HierarchyItemDTO>> ChildData(int positonid, List<HierarchyItemDTO> hierarchyItemDTOs, HierarchyItemDTO hierarchyItemDTO, ParetAndPosoition paretAndPosoition, List<ParetAndPosoition> paretAndPosoitions, ApiContext apiContext)
+        {
+           
+            var positiondetails = _context.TblOrgPositions.Where(a => a.ParentId == positonid).ToList();//got 3 rows
+
+            foreach(var item in positiondetails)
+            {
+                paretAndPosoition = new ParetAndPosoition();
+                paretAndPosoition.ParentId = Convert.ToInt32(item.ParentId);
+                paretAndPosoition.Positionid = Convert.ToInt32(item.PositionId);
+
+                paretAndPosoitions.Add(paretAndPosoition);
+
+            }
+            List<int> l = new List<int>();
+            foreach(var postionid in paretAndPosoitions)
+            {
+                hierarchyItemDTO = new HierarchyItemDTO();
+                hierarchyItemDTO.Count = paretAndPosoitions.Count();
+                var des = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == postionid.Positionid).PositionName.ToString();
+                hierarchyItemDTO.Designation = des;
+                var name= _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == postionid.Positionid).StaffName.ToString(); 
+                hierarchyItemDTO.Name = name;
+                hierarchyItemDTOs.Add(hierarchyItemDTO);
+                l.Add(Convert.ToInt32(postionid.Positionid));
+   
+            }
+            var positionid = 0;
+            for(var i=1;i<=l.Count;i++)  //8,9,41
+            {
+                positionid = l[1];
+                l.RemoveAt(i);
+                ChildData(positionid, hierarchyItemDTOs, hierarchyItemDTO, paretAndPosoition, paretAndPosoitions, apiContext);
+            }
+
+            return hierarchyItemDTOs;
+        }
+
+
+
+
 
 
     }

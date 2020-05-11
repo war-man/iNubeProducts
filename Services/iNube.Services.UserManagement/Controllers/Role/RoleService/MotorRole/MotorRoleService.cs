@@ -14,6 +14,11 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MotorRole
             throw new NotImplementedException();
         }
 
+        public EmpRoleResponse UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<RolesDTO> GetRoles(ApiContext apiContext)
         {
             throw new NotImplementedException();

@@ -479,5 +479,12 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetMovementDetails(movement, Context);
             return Ok(response);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHierarchy(int OrgId,string Type,string KeyValue)
+        {
+            var response = await _avoorgService.GetHierarchy(OrgId,Type, KeyValue, Context);
+            return Ok(response);
+        }
     }
 }

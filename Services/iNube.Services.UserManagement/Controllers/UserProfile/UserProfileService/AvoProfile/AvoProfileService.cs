@@ -751,6 +751,14 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
         }
 
+        public UnlockResponse UnlockUser(string userid, ApiContext apiContext)
+        {
+            _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
 
+            var user = _context.AspNetUsers.FirstOrDefault(a => a.Id == userid);
+            user.AccessFailedCount = 0;
+            var _user = _mapper.Map<UserDTO>(user);
+            return new UnlockResponse { Status = BusinessStatus.Updated, Id = _user.Id, ResponseMessage = $"User unlocked successfully!" };
+        }
     }
 }

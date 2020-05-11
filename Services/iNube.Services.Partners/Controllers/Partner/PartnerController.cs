@@ -269,5 +269,9 @@ namespace iNube.Services.Partners.Controllers.Partner
             var response = new ResponseStatus() { Status = BusinessStatus.Ok , ResponseMessage ="testing" };
             return Ok(response);
         }
+
+        //  ||  AVO
+
+      
     }
 }

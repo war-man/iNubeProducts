@@ -25,7 +25,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal productId, ApiContext apiContext);
         Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
-
+        Task<EmpRoleResponse> UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -60,7 +60,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         //Accounting CreateTransaction
         public async Task<TransactionsResponse> CreateTranasactionAsync(TransactionHeaderDto transaction, ApiContext apiContext)
         {
-            var uri = AccountingUrl+ "/api/AccountConfig/CreateTransaction";
+            var uri = AccountingUrl + "/api/AccountConfig/CreateTransaction";
             return await PostApiInvoke<TransactionHeaderDto, TransactionsResponse>(uri, apiContext, transaction);
         }
 
@@ -89,7 +89,15 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             var productList = await PostApiInvoke<UserDTO, UserResponse>(uri, apiContext, userDTO);
             return productList;
         }
-         
+
+        public async Task<EmpRoleResponse> UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext)
+        {
+            var uri = UserUrl + "";
+            var productList = await GetApiInvoke<EmpRoleResponse>(uri, new ApiContext());
+            return productList;
+        }
+
+
         public async Task<ResponseStatus> SendNotificationAsync(Partners.Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
