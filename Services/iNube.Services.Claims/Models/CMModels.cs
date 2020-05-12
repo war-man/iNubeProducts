@@ -1284,7 +1284,9 @@ namespace iNube.Services.Claims.Models
         public JsonWithFilesFormDataModelBinder(IOptions<MvcJsonOptions> jsonOptions)
         {
             _jsonOptions = jsonOptions;
+#pragma warning disable CS0618 // Type or member is obsolete
             _formFileModelBinder = new FormFileModelBinder();
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public async Task BindModelAsync(ModelBindingContext bindingContext)

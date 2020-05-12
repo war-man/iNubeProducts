@@ -135,7 +135,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement
         }
 
         [HttpPost]
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IActionResult> UploadFiles(int claimId)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             var Response = new ResponseStatus() { Status = BusinessStatus.Created };
             try

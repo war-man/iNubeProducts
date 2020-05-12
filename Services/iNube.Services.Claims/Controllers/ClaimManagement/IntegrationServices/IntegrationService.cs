@@ -49,7 +49,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl,AllocRuleEngineUrl;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl,  ExtensionUrl,AllocRuleEngineUrl;
 
         public IntegrationService(IConfiguration configuration)
         {
@@ -291,7 +291,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();
@@ -321,7 +321,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new List<TResponse>();
@@ -352,7 +352,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();
@@ -389,7 +389,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new List<TResponse>();

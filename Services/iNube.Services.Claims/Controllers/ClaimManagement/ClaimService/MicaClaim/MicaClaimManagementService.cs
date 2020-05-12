@@ -246,7 +246,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                 return Responce;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -443,7 +443,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                 return Responce;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -640,7 +640,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                 return Responce;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -654,7 +654,8 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
 
-            decimal PolicyId = 0; string claimNumber = ""; decimal premiumAmount = 0;
+            decimal PolicyId = 0;
+            //string claimNumber = ""; decimal premiumAmount = 0;
             try
             {
                 Errors = GetClaimRequestValidation(claimDetail);
@@ -873,7 +874,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             {
                 await _emailService.SendEmail(emailTest.To, emailTest.Subject, emailTest.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
 
@@ -1145,7 +1146,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             return statevalue;
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<ClaimDTOGWP> GetClaimGWP(ClaimDTOGWP claimgwp, ApiContext apiContext)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             throw new NotImplementedException();
         }
@@ -1361,7 +1364,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     return _list;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1517,7 +1520,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     return _list;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1674,7 +1677,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     return _list;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1692,7 +1695,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             return _paymentlist;
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<BankDocumentDTO> GetDocumentId(string filename, ApiContext apiContext)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             TblBankDocument bankDocument = new TblBankDocument();
 
@@ -1979,7 +1984,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
 
 
@@ -2003,7 +2008,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     {
                         var account = AccountMapApproval(apiContext, claimsDTO);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         //Accounting Log Fail...
 
@@ -2048,7 +2053,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     return new ClaimProcessResponseDTO() { Status = BusinessStatus.NotFound, ResponseMessage = $"No record Found for this Claim Number:{claimsDTO.ClaimNumber}" };
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new ClaimProcessResponseDTO() { Status = BusinessStatus.Error, ResponseMessage = "Claims Process Fails" };
             }
@@ -2306,7 +2311,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     FullfinalData.Add(bandata);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -2597,7 +2602,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.ProductIdPk = pk[0].ProductIdPk;
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }
@@ -2694,7 +2699,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.InsuredMobileNo = pk[0].MobileNumber;
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }
