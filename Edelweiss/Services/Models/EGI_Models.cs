@@ -706,5 +706,15 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public bool Status { get; set; }
     }
 
+    public partial class MonthlySIDTO
+    {
+        public string PolicyNumber { get; set; }
+        public int Month { get; set; }
+        public int Year { get; set; }
+        public string PaymentReferenceId { get; set; }
+        public decimal PaidAmount { get; set; }
+        public DateTime PaymentDate { get; set; }
+
+    }
 }
 

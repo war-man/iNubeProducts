@@ -71,6 +71,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<decimal> GetSIFromMakeModel(decimal VehicleId, ApiContext context);
         Task<CityMasDTO> GetStateCode(string CityName,ApiContext context);
         Task<ResponseStatus> VehicleStatusUpdate(VehicleStatusDTO vehicleStatus, ApiContext context);
+        Task<ResponseStatus> MonthlySIPayment(MonthlySIDTO monthlySIDTO, ApiContext context);
 
     }
 
@@ -171,8 +172,52 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
                     else
                     {
-                        response.GetSchedule.SwitchStatus = false;
-                        response.GetSchedule.SwitchEnabled = true;
+                        bool? CurrentDayStat = false;
+
+                        switch (CurrentDay)
+                        {
+                            case "Monday":
+                                CurrentDayStat = scheduledata.Mon;
+                                break;
+
+                            case "Tuesday":
+                                CurrentDayStat = scheduledata.Tue;
+                                break;
+
+
+                            case "Wednesday":
+                                CurrentDayStat = scheduledata.Wed;
+                                break;
+
+
+                            case "Thursday":
+                                CurrentDayStat = scheduledata.Thu;
+                                break;
+
+
+                            case "Friday":
+                                CurrentDayStat = scheduledata.Fri;
+                                break;
+
+
+                            case "Saturday":
+                                CurrentDayStat = scheduledata.Sat;
+                                break;
+
+
+
+                            case "Sunday":
+                                CurrentDayStat = scheduledata.Sun;
+                                break;
+
+
+                                // default: break;
+                        }
+
+
+
+                        response.GetSchedule.SwitchStatus = CurrentDayStat;
+                        response.GetSchedule.SwitchEnabled = false;
                     }
 
                     response.Status = BusinessStatus.Ok;
@@ -1574,8 +1619,65 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             tblSwitchlog.VehicleNumber = VehicleRegistrationNo;
                             tblSwitchlog.SwitchStatus = false;
                             tblSwitchlog.CreatedDate = IndianTime;
+                            tblSwitchlog.SwitchType = "Manual";
 
                             _context.TblSwitchLog.Add(tblSwitchlog);
+
+                            if (ScheduleData.VehicleType == "PC")
+                            {
+                                var DailyData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == PolicyNo && x.TxnDate.Value.Date == IndianTime.Date);
+
+                                if (DailyData != null)
+                                {
+                                    DailyData.ActivePc = DailyData.ActivePc - 1;
+                                    _context.TblDailyActiveVehicles.Update(DailyData);
+                                }
+                                else
+                                {
+                                    //TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+
+                                    //tblDailyActive.PolicyNumber = PolicyNo;
+                                    //tblDailyActive.ActivePc = 0;
+                                    //tblDailyActive.ActiveTw = 0;
+                                    //tblDailyActive.TotalPremium = 0;
+                                    //tblDailyActive.TxnDate = IndianTime;
+                                    //tblDailyActive.FromTax = 0;
+                                    //tblDailyActive.ToTax = 0;
+                                    //tblDailyActive.BasePremium = 0;
+
+                                    //_context.TblDailyActiveVehicles.Add(tblDailyActive);
+                                }
+
+                            }
+                            else if (ScheduleData.VehicleType == "TW")
+                            {
+                                var DailyData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == PolicyNo && x.TxnDate.Value.Date == IndianTime.Date);
+
+                                if (DailyData != null)
+                                {
+                                    DailyData.ActiveTw = DailyData.ActiveTw - 1;
+                                    _context.TblDailyActiveVehicles.Update(DailyData);
+                                }
+                                else
+                                {
+                                    //TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+
+                                    //tblDailyActive.PolicyNumber = PolicyNo;
+                                    //tblDailyActive.ActivePc = 0;
+                                    //tblDailyActive.ActiveTw = 0;
+                                    //tblDailyActive.TotalPremium = 0;
+                                    //tblDailyActive.TxnDate = IndianTime;
+                                    //tblDailyActive.FromTax = 0;
+                                    //tblDailyActive.ToTax = 0;
+                                    //tblDailyActive.BasePremium = 0;
+
+                                    //_context.TblDailyActiveVehicles.Add(tblDailyActive);
+
+                                }
+
+                            }
+
+
                             _context.SaveChanges();
                         }
                         else
@@ -1646,8 +1748,66 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             tblSwitchlog.VehicleNumber = VehicleRegistrationNo;
                             tblSwitchlog.SwitchStatus = false;
                             tblSwitchlog.CreatedDate = IndianTime;
+                            tblSwitchlog.SwitchType = "Manual";
+
 
                             _context.TblSwitchLog.Add(tblSwitchlog);
+
+                            if (ScheduleData.VehicleType == "PC")
+                            {
+                                var DailyData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == PolicyNo && x.TxnDate.Value.Date == IndianTime.Date);
+
+                                if(DailyData != null)
+                                {
+                                    DailyData.ActivePc = DailyData.ActivePc - 1;
+                                    _context.TblDailyActiveVehicles.Update(DailyData);
+                                }
+                                else
+                                {
+                                    //TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+
+                                    //tblDailyActive.PolicyNumber = PolicyNo;
+                                    //tblDailyActive.ActivePc = 0;
+                                    //tblDailyActive.ActiveTw = 0;
+                                    //tblDailyActive.TotalPremium = 0;
+                                    //tblDailyActive.TxnDate = IndianTime;
+                                    //tblDailyActive.FromTax = 0;
+                                    //tblDailyActive.ToTax = 0;
+                                    //tblDailyActive.BasePremium = 0;
+
+                                    //_context.TblDailyActiveVehicles.Add(tblDailyActive);
+                                }
+
+                            }
+                            else if (ScheduleData.VehicleType == "TW")
+                            {
+                                var DailyData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == PolicyNo && x.TxnDate.Value.Date == IndianTime.Date);
+
+                                if (DailyData != null)
+                                {
+                                    DailyData.ActiveTw = DailyData.ActiveTw - 1;
+                                    _context.TblDailyActiveVehicles.Update(DailyData);
+                                }
+                                else
+                                {
+                                    //TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+
+                                    //tblDailyActive.PolicyNumber = PolicyNo;
+                                    //tblDailyActive.ActivePc = 0;
+                                    //tblDailyActive.ActiveTw = 0;
+                                    //tblDailyActive.TotalPremium = 0;
+                                    //tblDailyActive.TxnDate = IndianTime;
+                                    //tblDailyActive.FromTax = 0;
+                                    //tblDailyActive.ToTax = 0;
+                                    //tblDailyActive.BasePremium = 0;
+
+                                    //_context.TblDailyActiveVehicles.Add(tblDailyActive);
+
+                                }
+
+                            }
+
+
                             _context.SaveChanges();
                         }
                         else
@@ -3938,18 +4098,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             PremiumReturnDto DifferentialPremium = new PremiumReturnDto();
 
-            if (String.IsNullOrEmpty(endorsementPremium.PolicyNo) && endorsementPremium.SI > 0)
+            if (String.IsNullOrEmpty(endorsementPremium.PolicyNo))
             {
                 ErrorInfo errorInfo = new ErrorInfo();
 
                 DifferentialPremium.ResponseMessage = "Mandatory Fields missing";
                 DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
-                errorInfo.ErrorMessage = "Policy Number or SumInsured is Missing";
+                errorInfo.ErrorMessage = "Policy Number is Missing";
                 errorInfo.ErrorCode = "GEN002";
                 errorInfo.PropertyName = "MandatoryFieldsMissing";
                 DifferentialPremium.Errors.Add(errorInfo);
                 return DifferentialPremium;
 
+            }
+            else if(endorsementPremium.SI <= 0)
+            {
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                DifferentialPremium.ResponseMessage = "SumInsured Cannot be negative or zero";
+                DifferentialPremium.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "SumInsured Cannot be negative or zero";
+                errorInfo.ErrorCode = "ExtEP005";
+                errorInfo.PropertyName = "SumInsured";
+                DifferentialPremium.Errors.Add(errorInfo);
+                return DifferentialPremium;
             }
             else if (endorsementPremium.PcCount < 0)
             {
@@ -5949,11 +6121,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 if(verifyVehicle == false)
                 {
                     var getdata = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == item.PolicyNo && x.VehicleRegistrationNo == item.VehicleRegistrationNo);
-
+                    
                     if (getdata != null)
                     {
+                        if (getdata.IsActive == false)
+                        {
+                            continue;
+                        }
+
                         getdata.IsActive = false;
                         _context.TblSchedule.Update(getdata);
+                    }
+                    else
+                    {
+                        continue;
                     }
 
                     var checkSwitchlog = _context.TblSwitchLog.LastOrDefault(x=>x.PolicyNo == item.PolicyNo && x.VehicleNumber == item.VehicleRegistrationNo && x.CreatedDate.Value.Date == CurrentDate && x.SwitchStatus == true);
@@ -6004,6 +6185,58 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
 
+        }
+
+        public async Task<ResponseStatus> MonthlySIPayment(MonthlySIDTO monthlySIDTO,ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+            ResponseStatus response = new ResponseStatus();
+            ErrorInfo errorInfo = new ErrorInfo();
+
+
+            var MonthlySIData = _context.TblPolicyMonthlySi.FirstOrDefault(x=>x.PolicyNo == monthlySIDTO.PolicyNumber && x.DueDate.Value.Month == monthlySIDTO.Month && x.DueDate.Value.Year == monthlySIDTO.Year);
+
+            if(MonthlySIData != null)
+            {
+                if(MonthlySIData.Amount == monthlySIDTO.PaidAmount)
+                {
+
+                    MonthlySIData.PayUid = monthlySIDTO.PaymentReferenceId.ToString();
+                    MonthlySIData.PayAmount = monthlySIDTO.PaidAmount.ToString();
+                    MonthlySIData.PaymentDate = monthlySIDTO.PaymentDate;
+                    MonthlySIData.PayStatus = "Successful";
+
+                    response.ResponseMessage = "Monthly SI Successfully Updated";
+                    response.Status = BusinessStatus.Ok;
+
+                    _context.TblPolicyMonthlySi.Update(MonthlySIData);
+                    _context.SaveChanges();
+
+                }
+                else
+                {
+                    response.ResponseMessage = "Amount paid doesn’t match with calculated premium in MICA";
+                    response.Id = monthlySIDTO.PolicyNumber;
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Premium Miss Match";
+                    errorInfo.ErrorCode = "MSI001";
+                    errorInfo.PropertyName = "Amount";
+                    response.Errors.Add(errorInfo);
+                }
+            }
+            else
+            {
+                response.ResponseMessage = "Invalid Policy Number";
+                response.Id = monthlySIDTO.PolicyNumber;       
+                response.Status = BusinessStatus.NotFound;
+                errorInfo.ErrorMessage = "Policy Number Not Found";
+                errorInfo.ErrorCode = "MSI002";
+                errorInfo.PropertyName = "PolicyNumber";
+                response.Errors.Add(errorInfo);
+            }
+
+            return response;
         }
 
     }
