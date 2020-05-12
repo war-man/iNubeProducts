@@ -439,6 +439,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           // MovementId = mov.MovementId,
                           // MovementStatusId = mov.MovementStatusId,
                           OrganizationId = pos.OrganizationId,
+                          BranchName = emp.BranchName,
 
                       };
 

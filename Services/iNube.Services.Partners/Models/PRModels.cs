@@ -573,6 +573,7 @@ namespace iNube.Services.Partners.Models
         public decimal? OrganizationId { get; set; }
         public decimal MovementId { get; set; }
         public decimal? MovementStatusId { get; set; }
+        public string BranchName { get; set; }
     }
 
     public partial class AvoOrgPositions
