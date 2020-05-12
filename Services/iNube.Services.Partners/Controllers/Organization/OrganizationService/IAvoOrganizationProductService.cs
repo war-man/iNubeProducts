@@ -30,7 +30,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<int> GetCount(int empid, ApiContext Context);
         Task<int> GetVacantPositonCount(string designame, ApiContext apiContext);
         Task<AVOOrgEmployee> GetEmployeeDetailsById(int empid, ApiContext apiContext);
-        Task<CreateOfficeResponse> Saveoffice(AvoOfficeDto Officedto, ApiContext apiContext);
+        Task<Createposition> CreatePosition(NewPositionDTO Officedto, ApiContext apiContext);
         Task<IEnumerable<AVOOrgEmployee>> SearchPeople(SearchPeople searchPeople, ApiContext apiContext);
         Task<CreatePeopleResponse> SaveEmplMappingDetails(updatepositionDto avOOrgEmployee, ApiContext apiContext);
 

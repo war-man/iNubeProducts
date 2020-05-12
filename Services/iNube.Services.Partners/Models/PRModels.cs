@@ -1980,7 +1980,7 @@ namespace iNube.Services.Partners.Models
         public string Empcode { get; set; }
         public string[] RoleId { get; set; }
     }
-    public class EmpRoleResponse: Response
+    public class EmpRoleResponse : Response
     {
 
     }
@@ -2032,10 +2032,19 @@ namespace iNube.Services.Partners.Models
 
     }
 
+    public class Createposition : ResponseStatus
+    {
 
+    }
 
-
-
+    public class NewPositionDTO
+    {
+        public decimal? EmpId { get; set; }
+        public int Newpositioncount { get; set; }
+        public decimal OrganizationId { get; set; }
+        public decimal OfficeId { get; set; }
+        public decimal DesignationId { get; set; }
+    }
 
 }
 

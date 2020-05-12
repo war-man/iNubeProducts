@@ -264,10 +264,10 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
         [HttpGet]
-        public  async Task<IActionResult> GetDesignation(int orgid)
+        public async Task<IActionResult> GetDesignation(int orgid)
         {
             var isFilter = true;
-            var response =await _avoorgService.GetDesignation(orgid, Context);
+            var response = await _avoorgService.GetDesignation(orgid, Context);
             if (isFilter)
             {
                 var masterdata = response.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
@@ -278,7 +278,7 @@ namespace iNube.Services.Partners.Controllers.Organization
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployee(int orgid,int offid, int desgiId)
+        public async Task<IActionResult> GetEmployee(int orgid, int offid, int desgiId)
         {
             var isFilter = true;
             var response = await _avoorgService.GetEmployee(orgid, offid, desgiId, Context);
@@ -295,13 +295,13 @@ namespace iNube.Services.Partners.Controllers.Organization
         [HttpGet]
         public async Task<IActionResult> GetCount(int empid)
         {
-           
+
             var response = await _avoorgService.GetCount(empid, Context);
             return Ok(response);
         }
         // ||AVO
         [HttpGet]
-        public async Task<IActionResult>GetVacantPositonCount(string designame)
+        public async Task<IActionResult> GetVacantPositonCount(string designame)
         {
 
             var response = await _avoorgService.GetVacantPositonCount(designame, Context);
@@ -312,10 +312,10 @@ namespace iNube.Services.Partners.Controllers.Organization
 
 
         [HttpPost]
-        public async Task<IActionResult> CreatePosition([FromBody] AvoOfficeDto Officedto)
+        public async Task<IActionResult> CreatePosition(NewPositionDTO Officedto)
         {
             // save 
-            var response = await _avoorgService.Saveoffice(Officedto, Context);
+            var response = await _avoorgService.CreatePosition(Officedto, Context);
             switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:
@@ -334,7 +334,7 @@ namespace iNube.Services.Partners.Controllers.Organization
 
         // Search People ||AVO
         [HttpPost]
-        public async Task<IActionResult> SearchPeople (SearchPeople searchPeople)
+        public async Task<IActionResult> SearchPeople(SearchPeople searchPeople)
         {
             var searchData = await _avoorgService.SearchPeople(searchPeople, Context);
             return Ok(searchData);
@@ -344,9 +344,9 @@ namespace iNube.Services.Partners.Controllers.Organization
         [HttpGet]
         public async Task<IActionResult> GetVecPositions(decimal orgid)
         {
-            
+
             var response = await _avoorgService.GetVecPositions(orgid, Context);
-         
+
             return Ok(response);
         }
         [HttpPost]
@@ -375,7 +375,7 @@ namespace iNube.Services.Partners.Controllers.Organization
         [HttpGet]
         public async Task<IActionResult> GetEmpDetails(decimal orgId, decimal offid)
         {
-            var orgDTO = await _avoorgService.GetEmpDetails(orgId,offid, Context);
+            var orgDTO = await _avoorgService.GetEmpDetails(orgId, offid, Context);
             return Ok(orgDTO);
         }
         // || AVO
@@ -392,7 +392,7 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(searchData);
         }
 
-       
+
         [HttpPut]
         public async Task<IActionResult> ModifyPeople(AVOOrgEmployee tblRetentionGroupDto)
         {
@@ -426,7 +426,7 @@ namespace iNube.Services.Partners.Controllers.Organization
         [HttpGet]
         public async Task<IActionResult> GetEmployeeRoles(string empCode)
         {
-            var response = await _avoorgService.GetEmployeeRoles(empCode,Context);
+            var response = await _avoorgService.GetEmployeeRoles(empCode, Context);
             return Ok(response);
         }
         [HttpPost]
@@ -465,7 +465,7 @@ namespace iNube.Services.Partners.Controllers.Organization
         [HttpPut]
         public async Task<IActionResult> CreateNewPosition(int OrgEmpId)
         {
-            await _avoorgService.CreateNewPosition(OrgEmpId,Context);
+            await _avoorgService.CreateNewPosition(OrgEmpId, Context);
             return Ok();
 
         }
@@ -481,9 +481,9 @@ namespace iNube.Services.Partners.Controllers.Organization
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetHierarchy(int OrgId,string Type,string KeyValue)
+        public async Task<IActionResult> GetHierarchy(int OrgId, string Type, string KeyValue)
         {
-            var response = await _avoorgService.GetHierarchy(OrgId,Type, KeyValue, Context);
+            var response = await _avoorgService.GetHierarchy(OrgId, Type, KeyValue, Context);
             return Ok(response);
         }
 

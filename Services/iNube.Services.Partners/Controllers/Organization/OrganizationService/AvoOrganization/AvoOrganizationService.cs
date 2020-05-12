@@ -583,17 +583,15 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         }
 
 
-        public async Task<CreateOfficeResponse> Saveoffice(AvoOfficeDto Officedto, ApiContext apiContext)
+        public async Task<Createposition> CreatePosition(NewPositionDTO Officedto, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
-
-                //  var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
-                var positioncount = Officedto.newpositioncount;
+                var positioncount = Officedto.Newpositioncount;
                 for (var i = 0; i < positioncount; i++)
                 {
-                    var positionName = _context.TblOrgStructure.FirstOrDefault(a => a.OrganizationId == Officedto.DesignationId).LevelDefinition;
+                    var positionName = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == Officedto.DesignationId).LevelDefinition;
                     var parentId = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == Officedto.EmpId).PositionId;
                     TblOrgPositions tblOrgPositions = new TblOrgPositions();
                     tblOrgPositions.OrganizationId = Officedto.OrganizationId;
@@ -607,16 +605,18 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     tblOrgPositions.IsVacant = true;
                     _context.TblOrgPositions.Add(tblOrgPositions);
                 }
+
                 _context.SaveChanges();
-                return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Data saved sucessfully " };
+
+                return new Createposition { Status = BusinessStatus.Created, ResponseMessage = $" Data saved sucessfully!" };
             }
             catch (Exception ex)
             {
-
-                return new CreateOfficeResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
+                return new Createposition { Status = BusinessStatus.Error, ResponseMessage = $"Something Went Wrong" };
             }
-
         }
+
+
 
         public async Task<IEnumerable<AVOOrgEmployee>> SearchPeople(SearchPeople searchPeople, ApiContext apiContext)
         {
