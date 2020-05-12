@@ -968,18 +968,21 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
                     //Updating Movement details table
                     var movementDetailsData = _context.TblMovementDetails.Where(x => x.MovementId == movementdata.MovementId).ToList();
-                    foreach (var movData in movementDetailsData)
+                    if (movementDetailsData != null)
                     {
-                        if (movData.MovementFormId == 1009)
+                        foreach (var movData in movementDetailsData)
                         {
-                            var reportee = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovingId).PositionId;
-                            var supervisorPos = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovedTo).PositionId;
+                            if (movData.MovementFormId == 1009)
+                            {
+                                var reportee = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovingId).PositionId;
+                                var supervisorPos = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovedTo).PositionId;
 
-                            var reporteePos = _context.TblOrgPositions.FirstOrDefault(x => x.PositionId == reportee);
-                            reporteePos.ParentId = supervisorPos;
+                                var reporteePos = _context.TblOrgPositions.FirstOrDefault(x => x.PositionId == reportee);
+                                reporteePos.ParentId = supervisorPos;
 
-                            _context.TblOrgPositions.Update(reporteePos);
-                            movData.Status = 1;
+                                _context.TblOrgPositions.Update(reporteePos);
+                                movData.Status = 1;
+                            }
                         }
                     }
                     //based on designation change Updating new designation roles to the user account
