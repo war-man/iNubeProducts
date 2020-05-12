@@ -592,22 +592,23 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 for (var i = 0; i < positioncount; i++)
                 {
                     var positionName = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == Officedto.DesignationId).LevelDefinition;
-                    var parentId = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == Officedto.EmpId).PositionId;
                     TblOrgPositions tblOrgPositions = new TblOrgPositions();
-                    tblOrgPositions.OrganizationId = Officedto.OrganizationId;
-                    tblOrgPositions.OfficeId = Officedto.OfficeId;
-                    tblOrgPositions.DesignationId = Officedto.DesignationId;
-                    tblOrgPositions.PositionName = positionName;
-                    tblOrgPositions.RepOrgId = Officedto.OrganizationId;
-                    tblOrgPositions.RepOfficeId = Officedto.OfficeId;
-                    if (parentId != null)
+                    if (Officedto.EmpId != null)
                     {
+                        var parentId = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == Officedto.EmpId).PositionId;
                         tblOrgPositions.ParentId = parentId;
                     }
                     else
                     {
                         tblOrgPositions.ParentId = null;
                     }
+
+                    tblOrgPositions.OrganizationId = Officedto.OrganizationId;
+                    tblOrgPositions.OfficeId = Officedto.OfficeId;
+                    tblOrgPositions.DesignationId = Officedto.DesignationId;
+                    tblOrgPositions.PositionName = positionName;
+                    tblOrgPositions.RepOrgId = Officedto.OrganizationId;
+                    tblOrgPositions.RepOfficeId = Officedto.OfficeId;
                     tblOrgPositions.IsActive = true;
                     tblOrgPositions.IsVacant = true;
                     _context.TblOrgPositions.Add(tblOrgPositions);
