@@ -50,5 +50,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<List<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext);
         Task<List<FetchData>> GetHierarchy(int OrgId, string type, string keyValue, ApiContext apiContext);
         Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext);
+        Task<EmpMappingData> GetEmpMappingData(string empcode,ApiContext apiContext);
     }
 }

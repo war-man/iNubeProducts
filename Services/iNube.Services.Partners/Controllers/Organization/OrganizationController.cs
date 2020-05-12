@@ -493,5 +493,12 @@ namespace iNube.Services.Partners.Controllers.Organization
             var orgDTO = await _avoorgService.ViewDetailsByEmpCode(empcode, Context);
             return Ok(orgDTO);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmpMappingData(string empcode)
+        {
+            var response = await _avoorgService.GetEmpMappingData(empcode,Context);
+            return Ok(response);
+        }
     }
 }

@@ -1389,7 +1389,20 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return mappeddata;
         }
 
+        public async Task<EmpMappingData> GetEmpMappingData(string empcode, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            EmpMappingData mappingData = new EmpMappingData();
 
+            var positionid = _context.TblOrgEmployee.FirstOrDefault(a => a.StaffCode == empcode);
+            var Data = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == positionid.PositionId);
+
+            mappingData.Designation = Data.PositionName;
+            mappingData.OrgId = Data.OrganizationId;
+            mappingData.OffID = Data.OfficeId;
+
+            return mappingData;
+        }
 
 
     }

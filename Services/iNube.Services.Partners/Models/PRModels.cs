@@ -2046,6 +2046,13 @@ namespace iNube.Services.Partners.Models
         public int DesignationId { get; set; }
     }
 
+    public class EmpMappingData
+    {
+        public decimal? OrgId { get; set; }
+        public decimal? OffID { get; set; }
+        public string Designation { get; set; }
+    }
+
 }
 
 
