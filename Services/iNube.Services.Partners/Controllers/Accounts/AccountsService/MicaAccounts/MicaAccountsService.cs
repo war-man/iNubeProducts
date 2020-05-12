@@ -1251,6 +1251,7 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             cDDTO.AccountNo = micaCD.AccountNo;
             cDDTO.Description = micaCD.Description;
             cDDTO.Frequency = micaCD.Frequency;
+            cDDTO.UserDateTime = micaCD.UserDateTime;
 
             foreach (var Data in micaCD.micaCDDTO)
             {
@@ -1338,8 +1339,16 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
             CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
             dbHelper._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow;
+            if (cDDTO.UserDateTime == null)
+            {
+                DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+            }
+            else
+            {
+                DateTimeNow = (DateTime)cDDTO.UserDateTime;
 
-            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+            }
             if (cdaccount != null)
             {
                 if (cDDTO.cdTransactionsMasterDTO.Count() > 0)

@@ -1501,6 +1501,7 @@ namespace iNube.Services.Policy.Models
         public string Description { get; set; }
         public string Frequency { get; set; }
         public string AccountNo { get; set; }
+        public DateTime? UserDateTime { get; set; }
         public List<MicaCDDTO> micaCDDTO { get; set; }
     }
     public class CDMapper

@@ -94,6 +94,8 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<AvoOrgPositions, TblOrgPositions>();
 
 
+          //  CreateMap<OrgOfficeDTO, Entities.AVO.TblOrgOffice>()
+          //.ForMember(dest => dest.TblOfficeSpocDetails, opt => opt.MapFrom(src => src.OfficeSpocDetails)).ReverseMap();
 
             CreateMap<AVOOrgOffice, Entities.AVO.TblOrgOffice>()
             .ForMember(dest => dest.TblOfficeSpocDetails, opt => opt.MapFrom(src => src.AVOOfficeSpocDetails)).ReverseMap();

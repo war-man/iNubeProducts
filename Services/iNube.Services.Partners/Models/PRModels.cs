@@ -1610,6 +1610,7 @@ namespace iNube.Services.Partners.Models
         public string AccountNo { get; set; }
         public string Description { get; set; }
         public string Frequency { get; set; }
+        public DateTime? UserDateTime { get; set; }
         public List<CdTransactionsMasterDTO> cdTransactionsMasterDTO { get; set; }
     }
     public class MicaCD
@@ -1617,7 +1618,7 @@ namespace iNube.Services.Partners.Models
         public string AccountNo { get; set; }
         public string Description { get; set; }
         public string Frequency { get; set; }
-
+        public DateTime? UserDateTime { get; set; }
         public List<MicaCDDTO> micaCDDTO { get; set; }
     }
     public class DailyDTO : ResponseStatus
