@@ -137,7 +137,9 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
                 {
                     var docid = id.docId;
 
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     AddTags(docid, tagName, tagValue);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
                 }
                 return new DMSResponse { dMSDTOs = dMSDTOList, Docid = dMSDTO.docId, fileName = dMSDTO.fileName, Status = iNube.Utility.Framework.Model.BusinessStatus.Ok };
@@ -289,7 +291,9 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
             var database = client.GetDatabase(_settings.DatabaseName);
             var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
             DMSDTO dMSDTO = new DMSDTO();
+#pragma warning disable CS0618 // Type or member is obsolete
             var totaldoc = await collection.CountAsync(new BsonDocument());
+#pragma warning restore CS0618 // Type or member is obsolete
             List<string> documetId = new List<string>();
             var filter = Builders<DMSDTO>.Filter.ElemMatch(x => x.tagDTOs, x => x.tagName == tagName) & Builders<DMSDTO>.Filter.ElemMatch(x => x.tagDTOs, x => x.tagValue == tagvalue);
             var res = await collection.Find(filter).ToListAsync();

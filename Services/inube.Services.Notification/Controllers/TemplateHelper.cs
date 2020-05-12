@@ -69,7 +69,7 @@ namespace inube.Services.Notification.Controllers
             {
                 await _emailService.SendEmail(emailTest.To, emailTest.Subject, emailTest.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;

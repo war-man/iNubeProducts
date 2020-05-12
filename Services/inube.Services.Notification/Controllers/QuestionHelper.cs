@@ -18,8 +18,8 @@ namespace inube.Services.Notification
 {
     public class QuestionHelper
     {
-        private readonly IEmailService _emailService;
-        private readonly IConfiguration _configuration;
+       // private readonly IEmailService _emailService;
+       // private readonly IConfiguration _configuration;
       
 
 

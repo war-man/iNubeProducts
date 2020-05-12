@@ -18,7 +18,7 @@ namespace iNube.Services.Notification.Controllers.IntegrationServices
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, RatingUrl, ExtensionUrl;
 
         public IntegrationService(IConfiguration configuration)
         {
@@ -94,7 +94,7 @@ namespace iNube.Services.Notification.Controllers.IntegrationServices
 
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 //throw;
@@ -129,7 +129,7 @@ namespace iNube.Services.Notification.Controllers.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();
@@ -163,7 +163,7 @@ namespace iNube.Services.Notification.Controllers.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new List<TResponse>();

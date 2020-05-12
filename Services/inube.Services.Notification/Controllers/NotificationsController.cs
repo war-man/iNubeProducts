@@ -208,7 +208,7 @@ namespace inube.Services.Notification.Controllers
 
                        // var des = (InsuranceCertificateModel)Newtonsoft.Json.JsonConvert.DeserializeObject(request.NotificationPayload, typeof(InsuranceCertificateModel));
                     }
-                    catch(Exception e)
+                    catch (Exception)
                     {
 
                     }
@@ -235,7 +235,7 @@ namespace inube.Services.Notification.Controllers
                         SendSMS(request.smsRequest);
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                 }
             }
