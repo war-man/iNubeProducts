@@ -219,7 +219,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 new Claim("OrgId",Convert.ToString(userDetails.OrganizationId)),
                 new Claim("PartnerId",Convert.ToString(userDetails.PartnerId)),
                 new Claim("Role",roleName),
-                new Claim("Name",userDetails.FirstName),
+                new Claim("Name",userDetails.EmployeeNumber),
                 new Claim("UserName",userDetails.UserName),
                 new Claim("ProductType",productType),
                 new Claim("ServerType",envId.ToString()),

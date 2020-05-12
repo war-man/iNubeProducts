@@ -591,7 +591,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 var positioncount = Convert.ToInt32(Officedto.Newpositioncount);
                 for (var i = 0; i < positioncount; i++)
                 {
-                    var positionName = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == Convert.ToDecimal(Officedto.DesignationId)).LevelDefinition;
+                    Random random = new Random();
+                    int ran = random.Next(10001, 99999);
+                    var position = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == Convert.ToDecimal(Officedto.DesignationId));
+                    var positionname = position.LevelDefinition;
                     TblOrgPositions tblOrgPositions = new TblOrgPositions();
                     if (Officedto.EmpId != null)
                     {
@@ -606,7 +609,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     tblOrgPositions.OrganizationId = Officedto.OrganizationId;
                     tblOrgPositions.OfficeId = Officedto.OfficeId;
                     tblOrgPositions.DesignationId = Officedto.DesignationId;
-                    tblOrgPositions.PositionName = positionName;
+                    tblOrgPositions.PositionName = positionname + ran;
                     tblOrgPositions.RepOrgId = Officedto.OrganizationId;
                     tblOrgPositions.RepOfficeId = Officedto.OfficeId;
                     tblOrgPositions.IsActive = true;

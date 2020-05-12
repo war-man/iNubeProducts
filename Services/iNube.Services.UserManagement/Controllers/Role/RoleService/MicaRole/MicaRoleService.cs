@@ -14,17 +14,16 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
 {
     public class MicaRoleService : IRoleProductService
     {
-        private MICAUMContext _context;
+        MICAUMContext _context;
         private IMapper _mapper;
         private IIntegrationService _integrationService;
         //private RoleIntegrationService _integrationService;
         public IConfiguration _config;
 
         //public MicaRoleService(MICAUMContext context, RoleIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
-        public MicaRoleService(MICAUMContext context, IIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
+        public MicaRoleService(IIntegrationService integrationService, IMapper mapper, IConfiguration configuration)
         {
             _integrationService = integrationService;
-            _context = context;
             _mapper = mapper;
             _config = configuration;
         }
@@ -440,6 +439,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
 
         public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)
         {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
             var data = _context.TblDynamicPermissions.Where(a => a.Roleid == configDTO.RoleId && a.UserorRole == "Role").ToList();
 
             CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
