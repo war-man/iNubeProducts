@@ -64,7 +64,7 @@ namespace iNube.Services.Partners.Controllers.Office
         public async Task<IActionResult> GetOffice(string OfficeCode)
 
         {
-            OrgOfficeDTO _OfficeDTOs =await _officeService.GetOffice(OfficeCode, Context);
+            AVOOrgOffice _OfficeDTOs =await _officeService.GetOffice(OfficeCode, Context);
             
             return Ok(_OfficeDTOs);
         }
@@ -76,6 +76,7 @@ namespace iNube.Services.Partners.Controllers.Office
 
             return Ok(_OfficeDTOs);
         }
+       
 
         [HttpGet]
         public async Task<IActionResult> GetAllOffice()

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using iNube.Services.Partners.Entities;
+//using iNube.Services.Partners.Entities;
+using iNube.Services.Partners.Entities.AVO;
 using iNube.Services.Partners.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +18,12 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
 
     public class AvoOfficeService : IOfficeProductService
     {
-        private MICAPRContext _context;
+        private AVOPRContext _context;
         private IMapper _mapper;
         private readonly IConfiguration _configuration;
 
 
-        public AvoOfficeService(MICAPRContext context, IMapper mapper, IConfiguration configuration)
+        public AvoOfficeService(AVOPRContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
@@ -33,7 +34,7 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
         public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO,ApiContext apiContext)
         {
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var office = _mapper.Map<TblOrgOffice>(officeDTO);
             //_context.Entry(office).State=(office.OrgOfficeId == 0)?EntityState.Added : EntityState.Modified;
@@ -51,37 +52,49 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
              return new OfficeResponse { Status =BusinessStatus.Ok,   ResponseMessage = $" Office ID {office.OrgOfficeId} successfully {(officeDTO.OrgOfficeId == 0 ? "created " : "modified")}  for {officeDTO.OfficeName}!" };
           }
 
-        public async Task<OrgOfficeDTO> GetOffice(string OfficeCode, ApiContext apiContext)
+        public async Task<AVOOrgOffice> GetOffice(string OfficeCode, ApiContext apiContext)
         {
+            
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            try
+            {
+                AVOOrgOffice _organizationDTO = new AVOOrgOffice();
             TblOrgOffice _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
                                     .Include(add => add.TblOfficeSpocDetails)
                                     .FirstOrDefault();
-            OrgOfficeDTO _officeDTO = _mapper.Map<OrgOfficeDTO>(_tblOrgOffice);
+                AVOOrgOffice _officeDTO = _mapper.Map<AVOOrgOffice>(_tblOrgOffice);
             return _officeDTO;
-
-
         }
-        public async Task<IEnumerable<OrgOfficeDTO>> SearchOfficeData(string OfficeCode, ApiContext apiContext)
-        {
+            catch (Exception ex)
+            {
+                return null;
+            }
 
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+}
+        public async Task<IEnumerable<AVOOrgOffice>> SearchOfficeData(string OfficeCode, ApiContext apiContext)
+        {
+            try
+            {
+
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             // OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
-            var _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode== OfficeCode)
+            var _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
                                     .Include(add => add.TblOfficeSpocDetails)
                                     .ToList();
-            var _officeDTO = _mapper.Map<IEnumerable<OrgOfficeDTO>>(_tblOrgOffice);
+            var _officeDTO = _mapper.Map<IEnumerable<AVOOrgOffice>>(_tblOrgOffice);
             return _officeDTO;
-
+}
+            catch (Exception ex)
+            {
+                return null;
+            }
 
         }
         public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
         {
-            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddDTO> officeDTOs;
 
             officeDTOs = _context.TblOrgOffice
