@@ -600,7 +600,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     tblOrgPositions.PositionName = positionName;
                     tblOrgPositions.RepOrgId = Officedto.OrganizationId;
                     tblOrgPositions.RepOfficeId = Officedto.OfficeId;
-                    tblOrgPositions.ParentId = parentId;
+                    if (parentId != null)
+                    {
+                        tblOrgPositions.ParentId = parentId;
+                    }
+                    else
+                    {
+                        tblOrgPositions.ParentId = null;
+                    }
                     tblOrgPositions.IsActive = true;
                     tblOrgPositions.IsVacant = true;
                     _context.TblOrgPositions.Add(tblOrgPositions);
