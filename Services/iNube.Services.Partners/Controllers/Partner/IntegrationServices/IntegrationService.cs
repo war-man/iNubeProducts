@@ -106,7 +106,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         public async Task<EmpRoleResponse> UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext)
         {
             var uri = UserUrl + "/api/Role/UpdateEmpRole";
-            var productList = await PostApiInvoke<EmpRoleMapDTO, EmpRoleResponse>(uri, new ApiContext(), empRoles);
+            var productList = await PostApiInvoke<EmpRoleMapDTO, EmpRoleResponse>(uri, apiContext, empRoles);
             return productList;
         }
 
