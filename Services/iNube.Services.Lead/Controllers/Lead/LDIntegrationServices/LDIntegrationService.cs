@@ -81,7 +81,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LDIntegrationServices
                         //for 400 errors also same response is expected.
                         return await content.ReadAsAsync<TResponse>();
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         return new TResponse();
                     }

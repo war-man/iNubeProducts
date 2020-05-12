@@ -80,7 +80,7 @@ namespace iNube.Services.NeedAnalysis.Controllers.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();

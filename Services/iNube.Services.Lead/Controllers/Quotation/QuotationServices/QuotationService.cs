@@ -116,7 +116,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
       
         public async Task<QuotationModel> QuotationPdfGeneration(QuotePoolDTO quotePoolDTO, ApiContext apiContext)
         {
-            int count = 0;
+           // int count = 0;
             Lead.Models.NotificationRequest notificationRequest = new Lead.Models.NotificationRequest();
             QuotationModel QuoteData = new QuotationModel();
             QuoteData.ProposerName = quotePoolDTO.ProposerName;
@@ -649,7 +649,9 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
 
 
             }
+#pragma warning disable CS0168 // Variable is declared but never used
             catch (Exception ex)
+#pragma warning restore CS0168 // Variable is declared but never used
             {
 
 

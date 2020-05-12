@@ -129,7 +129,7 @@ namespace iNube.Services.NeedAnalysis.Controllers.NeedAnalysis.NeedAnalysisServi
             var date = arr1[0];
             var calYear = Convert.ToInt32(Year) - Convert.ToInt32(birthYear);
             var CalMonth = Convert.ToInt32(Month) - Convert.ToInt32(birthMonth);// monthDiff(BirthDate,dt); //              
-            var calcAge = 0;
+            //var calcAge = 0;
             if (CalMonth < 0 || (CalMonth == 0 && Convert.ToInt32(date) < Convert.ToInt32(birthdate)))
             {
                 calYear--;

@@ -117,7 +117,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.IntegrationServices
 
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 //throw;
@@ -147,7 +147,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();
@@ -177,7 +177,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new List<TResponse>();
@@ -209,7 +209,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();

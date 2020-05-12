@@ -168,7 +168,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             var ruleproperties = GetProperties(leadDTO);
             foreach (var rm in ruleMapList)
             {
-                var paraColName = "";
+               //var paraColName = "";
                 try
                 {
                     if (leadDTO.GetType().GetProperty(rm.Param1) != null)
@@ -180,7 +180,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }
@@ -357,10 +357,10 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             
             var tbl_lead = _context.TblContacts.Find(lead.ContactId);
             var tbl_opportunity = _context.TblOpportunity.Find(lead.ContactId);
-            bool IsProspect = true;
+            //bool IsProspect = true;
 
             // update user properties
-           // tbl_lead.ContactId = leadDTO.ContactID;
+            // tbl_lead.ContactId = leadDTO.ContactID;
             tbl_lead.ContactTypeId = leadDTO.ContactTypeId;
             tbl_lead.ContactType = _context.TblmasLdcommonTypes.First(c => c.CommonTypeId == leadDTO.ContactTypeId).Value;
             tbl_lead.FirstName = leadDTO.FirstName;
