@@ -222,5 +222,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var response = await _quotationService.VehicleStatusUpdate(vehicleStatus, Context);
             return Ok(response);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> MonthlySIPayment(MonthlySIDTO monthlySIDTO)
+        {
+            var response = await _quotationService.MonthlySIPayment(monthlySIDTO, Context);
+            return ServiceResponse(response);
+        }
+
     }
 }
