@@ -2039,11 +2039,11 @@ namespace iNube.Services.Partners.Models
 
     public class NewPositionDTO
     {
-        public decimal? EmpId { get; set; }
-        public int Newpositioncount { get; set; }
-        public decimal OrganizationId { get; set; }
-        public decimal OfficeId { get; set; }
-        public decimal DesignationId { get; set; }
+        public int? EmpId { get; set; }
+        public string Newpositioncount { get; set; }
+        public int OrganizationId { get; set; }
+        public int OfficeId { get; set; }
+        public int DesignationId { get; set; }
     }
 
 }

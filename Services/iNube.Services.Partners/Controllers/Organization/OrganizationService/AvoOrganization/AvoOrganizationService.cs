@@ -588,10 +588,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
-                var positioncount = Officedto.Newpositioncount;
+                var positioncount = Convert.ToInt32(Officedto.Newpositioncount);
                 for (var i = 0; i < positioncount; i++)
                 {
-                    var positionName = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == Officedto.DesignationId).LevelDefinition;
+                    var positionName = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == Convert.ToDecimal(Officedto.DesignationId)).LevelDefinition;
                     TblOrgPositions tblOrgPositions = new TblOrgPositions();
                     if (Officedto.EmpId != null)
                     {
