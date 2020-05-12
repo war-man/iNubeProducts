@@ -32,7 +32,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl,LeadUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
 
         public IntegrationService(IConfiguration configuration)
         {
@@ -50,14 +50,15 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
+            LeadUrl = _configuration["Integration_Url:Lead:LeadUrl"];
 
         }
 
         public async Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext)
         {
-            // var uri = ProductUrl + "/api/Product/GetInsurableRiskDetails?ProductId=" + empcode;
+             var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
 
-            var uri = "https://localhost:44347/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
+       
             var res = await GetApiInvoke<ViewDetails>(uri, apiContext);
             return res;
 
