@@ -32,7 +32,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl,LeadUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl, LeadUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, DMSUrl, RatingUrl, ExtensionUrl;
 
         public IntegrationService(IConfiguration configuration)
         {
@@ -56,9 +56,9 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         public async Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext)
         {
-             var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
+            var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
 
-       
+
             var res = await GetApiInvoke<ViewDetails>(uri, apiContext);
             return res;
 
@@ -105,8 +105,8 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         public async Task<EmpRoleResponse> UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext)
         {
-            var uri = UserUrl + "";
-            var productList = await GetApiInvoke<EmpRoleResponse>(uri, new ApiContext());
+            var uri = UserUrl + "/api/Role/UpdateEmpRole";
+            var productList = await PostApiInvoke<EmpRoleMapDTO, EmpRoleResponse>(uri, new ApiContext(), empRoles);
             return productList;
         }
 
