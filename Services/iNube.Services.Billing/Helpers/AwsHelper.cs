@@ -64,9 +64,9 @@ namespace inube.Services.Billing.Helpers
                     };
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var syz = "";
+               // var syz = "";
                 return null;
             }
             

@@ -263,7 +263,9 @@ namespace iNube.Services.Billing.Models
     public class CustomerResponse : ResponseStatus
     {
         public CustomersDTO customer { get; set; }
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         public BusinessStatus Status { get; internal set; }
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
     }
 
     public partial class CustomersDTO

@@ -94,7 +94,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 return accountMapList;
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -123,7 +123,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 return accountMapList;
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1068,7 +1068,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 var _history = _mapper.Map<List<InvoiceConfigHistory>>(history);
                 return _history;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1479,7 +1479,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 return invoiceConfigDto;
                 //}
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -1913,7 +1913,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                     connection.Close();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -2036,7 +2036,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             decimal rate = 0;
             int itemPolicy = 0;
             int tempPolicycount = 0;
-            int temp = 0;
+            //int temp = 0;
             int length = slab.Count();
             foreach (var pList in policyList)
             {
