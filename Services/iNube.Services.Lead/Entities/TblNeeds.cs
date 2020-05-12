@@ -14,6 +14,7 @@ namespace iNube.Services.Lead.Entities
         public int? StatusId { get; set; }
         public string NeedName { get; set; }
         public bool? IsDeleted { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual TblLifeNeedAnalysis NeedAnalysis { get; set; }
     }

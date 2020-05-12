@@ -65,6 +65,7 @@ namespace iNube.Services.Lead.Entities
         public string SurrenderYear { get; set; }
         public bool? IsSurrender { get; set; }
         public DateTime? RiskCommencementDate { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual TblContacts Contact { get; set; }
         public virtual ICollection<TblQuoteMemberDetials> TblQuoteMemberDetials { get; set; }

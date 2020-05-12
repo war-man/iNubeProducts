@@ -49,5 +49,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext);
         Task<List<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext);
         Task<List<FetchData>> GetHierarchy(int OrgId, string type, string keyValue, ApiContext apiContext);
+        Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext);
     }
 }

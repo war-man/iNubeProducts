@@ -486,5 +486,12 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetHierarchy(OrgId,Type, KeyValue, Context);
             return Ok(response);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewDetailsByEmpCode(string empcode)
+        {
+            var orgDTO = await _avoorgService.ViewDetailsByEmpCode(empcode, Context);
+            return Ok(orgDTO);
+        }
     }
 }

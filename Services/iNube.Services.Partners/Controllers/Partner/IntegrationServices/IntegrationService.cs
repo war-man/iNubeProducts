@@ -26,6 +26,8 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         Task<EmpRoleResponse> UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext);
+
+        Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -48,6 +50,16 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
+
+        }
+
+        public async Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext)
+        {
+            // var uri = ProductUrl + "/api/Product/GetInsurableRiskDetails?ProductId=" + empcode;
+
+            var uri = "https://localhost:44347/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
+            var res = await GetApiInvoke<ViewDetails>(uri, apiContext);
+            return res;
 
         }
 

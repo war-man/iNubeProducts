@@ -934,7 +934,22 @@ namespace iNube.Services.Lead.Models
         public long? TotalGap { get; set; }
         public string TypeofHospitalization { get; set; }
     }
+    public partial class ViewDetails
+    {
+        public ViewDetails()
+        {
+            suspect = new List<LeadDTO>();
+            prospect = new List<LeadDTO>();
+        }
 
+        public List<LeadDTO> suspect { get; set; }
+        public List<LeadDTO> prospect { get; set; }
+    }
+    public partial class StagContactId
+    {
+        public int? stagid { get; set; }
+        public int? contactid { get; set; }
+    }
     //needAnalysis
 }
 

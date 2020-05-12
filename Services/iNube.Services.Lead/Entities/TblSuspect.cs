@@ -18,6 +18,7 @@ namespace iNube.Services.Lead.Entities
         public bool? IsActive { get; set; }
         public decimal? Status { get; set; }
         public bool? IsSelected { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual TblProspect Prospect { get; set; }
     }

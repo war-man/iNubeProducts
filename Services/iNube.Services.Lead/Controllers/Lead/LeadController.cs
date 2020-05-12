@@ -145,6 +145,13 @@ namespace iNube.Services.Lead.Controllers.Lead
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
+        [HttpGet]
+        public IActionResult ViewDetailsByPositionId(string Positionid)
+        {
+            var suspects = _leadService.ViewDetailsByPositionId(Positionid, Context);
+            return Ok(suspects);
+
+        }
 
     }
 }

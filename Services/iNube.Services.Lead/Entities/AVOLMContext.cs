@@ -63,13 +63,13 @@ namespace iNube.Services.Lead.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=AVOLifeP2;User ID=AVOLifeUserP2;Password=AVOLife*User123;");
+                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=AVOLifeP2;User ID=AVOLifeUserP2;Password=AVOLife*User123;Trusted_Connection=False;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<TblAddress>(entity =>
             {
@@ -187,6 +187,11 @@ namespace iNube.Services.Lead.Entities
 
                 entity.Property(e => e.Gender)
                     .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.IntroducerCode)
@@ -504,6 +509,11 @@ namespace iNube.Services.Lead.Entities
                     .HasColumnName("GSProtection_SumAssured_SA")
                     .HasColumnType("numeric(18, 2)");
 
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.HospitalizationFund).HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.HospitalizationGap).HasColumnType("numeric(18, 0)");
@@ -791,6 +801,11 @@ namespace iNube.Services.Lead.Entities
 
                 entity.Property(e => e.HalfyearlyPremium)
                     .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.IsAfc)
@@ -1739,6 +1754,11 @@ namespace iNube.Services.Lead.Entities
 
                 entity.Property(e => e.NeedId).HasColumnName("NeedID");
 
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.NeedAnalysisId).HasColumnName("NeedAnalysisID");
 
                 entity.Property(e => e.NeedName).IsUnicode(false);
@@ -1809,6 +1829,11 @@ namespace iNube.Services.Lead.Entities
 
                 entity.Property(e => e.Createdby)
                     .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.NeedAnalysisId).HasColumnName("NeedAnalysisID");
@@ -2012,6 +2037,11 @@ namespace iNube.Services.Lead.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.GradeId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.IndustryExperience).HasColumnType("numeric(9, 2)");
 
@@ -2321,6 +2351,11 @@ namespace iNube.Services.Lead.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.FirstName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 

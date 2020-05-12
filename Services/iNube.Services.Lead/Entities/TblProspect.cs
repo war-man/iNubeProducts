@@ -60,6 +60,7 @@ namespace iNube.Services.Lead.Entities
         public bool? IsIntegartionServiceSuccess { get; set; }
         public DateTime? InterviewScheduleDate { get; set; }
         public DateTime? InterviewScheduleTime { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual TblAddress CommAddress { get; set; }
         public virtual TblAddress PermAddress { get; set; }

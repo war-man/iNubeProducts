@@ -191,6 +191,7 @@ namespace iNube.Services.Lead.Entities
         public bool? Chkconfirm { get; set; }
         public string NotePadPath { get; set; }
         public bool? Chkprodconfirm { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual TblContacts Contact { get; set; }
         public virtual ICollection<TblNeedEducationCalculator> TblNeedEducationCalculator { get; set; }

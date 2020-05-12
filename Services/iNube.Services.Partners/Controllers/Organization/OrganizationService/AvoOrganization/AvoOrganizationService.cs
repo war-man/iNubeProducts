@@ -1365,7 +1365,17 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return hierarchyItemDTOs;
         }
 
-
+        public async Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext)
+        {
+            //get context
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var positionid = _context.TblOrgEmployee.FirstOrDefault(a => a.StaffCode == empcode).PositionId;
+            var posint = Convert.ToInt32(positionid);
+            var strposid = posint.ToString();
+            var data = await _integrationService.ViewDetailsByEmpCode(strposid, apiContext);
+            var mappeddata = _mapper.Map<ViewDetails>(data);
+            return mappeddata;
+        }
 
 
 

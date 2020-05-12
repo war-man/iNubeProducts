@@ -1982,6 +1982,53 @@ namespace iNube.Services.Partners.Models
     {
 
     }
+    public partial class ViewDetails
+    {
+        public ViewDetails()
+        {
+            suspect = new List<LeadDTO>();
+            prospect = new List<LeadDTO>();
+        }
+
+        public List<LeadDTO> suspect { get; set; }
+        public List<LeadDTO> prospect { get; set; }
+    }
+    public partial class LeadDTO
+    {
+        public int ContactID { get; set; }
+        public int? ContactTypeId { get; set; }
+        public string ContactType { get; set; }
+        public string Salutation { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string MobileNo { get; set; }
+        public string PhoneNo { get; set; }
+        public string Work { get; set; }
+        public string EmailID { get; set; }
+        public string NICNO { get; set; }
+        public string Place { get; set; }
+        public string PassportNo { get; set; }
+        public string LeadNo { get; set; }
+        public DateTime LeadDate { get; set; }
+
+        public string Currency { get; set; }
+        public string Gender { get; set; }
+        public decimal? MaritalStatusID { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public int Age { get; set; }
+        public int OccupationID { get; set; }
+        public string MonthlyIncome { get; set; }
+        //public int AddressID { get; set; }
+        public string SpouseName { get; set; }
+        public DateTime? SpouseDob { get; set; }
+        public int? SpouseAge { get; set; }
+        public DateTime? CreationDate { get; set; }
+
+        //public virtual AddressDTO Address { get; set; }
+        //public virtual opportunityDTO opportunity { get; set; }
+
+
+    }
 
 
 

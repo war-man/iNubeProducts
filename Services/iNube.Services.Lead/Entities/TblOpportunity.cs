@@ -17,6 +17,7 @@ namespace iNube.Services.Lead.Entities
         public bool? IsDeleted { get; set; }
         public string AllocatedFrom { get; set; }
         public string Createdby { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual TblContacts Contact { get; set; }
         public virtual TblLifeNeedAnalysis NeedAnalysis { get; set; }

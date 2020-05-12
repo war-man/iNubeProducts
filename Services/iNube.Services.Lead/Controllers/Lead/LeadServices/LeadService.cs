@@ -28,6 +28,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         IEnumerable<ddDTO> GetLocation(string locationType, int parentID, ApiContext context);
         IEnumerable<LifeQqDTO> FetchLifeQqdata();
         IEnumerable<LeadDTO> FetchTblContactsdata();
+        ViewDetails ViewDetailsByPositionId(string Positionid, ApiContext context);
     }
 
     public class LeadService : ILeadService
@@ -431,7 +432,133 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             var _tblContactsdata = _mapper.Map<List<LeadDTO>>(tblContactsdata);
             return _tblContactsdata;
         }
+        public ViewDetails ViewDetailsByPositionId(string Positionid, ApiContext context)
+        {
 
-      
+            // var DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
+            var DATA = _context.TblOpportunity.Where(a => a.HandledBy == Positionid).ToList();
+            LeadDTO suspect = new LeadDTO();
+            List<LeadDTO> suspects = new List<LeadDTO>();
+
+            LeadDTO propect = new LeadDTO();
+            List<LeadDTO> propects = new List<LeadDTO>();
+
+            StagContactId SuspectstagContactId = new StagContactId();
+            List<StagContactId> SuspectstagContactIds = new List<StagContactId>();
+            StagContactId ProspectstagContactId = new StagContactId();
+            List<StagContactId> ProspecttagContactIds = new List<StagContactId>();
+            foreach(var item in DATA)
+            {
+                if(item.StageId==1)
+                {
+                    SuspectstagContactId = new StagContactId();
+                    SuspectstagContactId.contactid = item.ContactId;
+                    SuspectstagContactId.stagid = item.StageId;
+                    SuspectstagContactIds.Add(SuspectstagContactId);
+
+                }
+                if (item.StageId == 2)
+                {
+                    ProspectstagContactId = new StagContactId();
+                    ProspectstagContactId.contactid = item.ContactId;
+                    ProspectstagContactId.stagid = item.StageId;
+                    ProspecttagContactIds.Add(ProspectstagContactId);
+
+                }
+            }
+            foreach(var item in SuspectstagContactIds)
+            {
+                suspect = new LeadDTO();
+                var Tblpropsectdata = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.contactid);
+                var prospectdata = _mapper.Map<LeadDTO>(Tblpropsectdata);
+                suspect.Address = prospectdata.Address;
+                suspect.Age = prospectdata.Age;
+                suspect.ContactType = prospectdata.ContactType;
+                suspect.DateOfBirth = prospectdata.DateOfBirth;
+                suspect.EmailID = prospectdata.EmailID;
+                suspect.FirstName = prospectdata.FirstName;
+
+                suspect.Currency = prospectdata.Currency;
+                suspect.CreationDate = prospectdata.CreationDate;
+                suspect.Gender = prospectdata.Gender;
+                suspect.LastName = prospectdata.LastName;
+                suspect.MobileNo = prospectdata.MobileNo;
+                suspect.MonthlyIncome = prospectdata.MonthlyIncome;
+
+                suspect.NICNO = prospectdata.NICNO;
+                suspect.OccupationID = prospectdata.OccupationID;
+                suspect.opportunity = prospectdata.opportunity;
+                suspect.PassportNo = prospectdata.PassportNo;
+                suspect.PhoneNo = prospectdata.PhoneNo;
+                suspect.Place = prospectdata.Place;
+
+                suspect.Age = prospectdata.Age;
+                suspect.Salutation = prospectdata.Salutation;
+                suspect.SpouseAge = prospectdata.SpouseAge;
+                suspect.SpouseName = prospectdata.SpouseName;
+                suspect.MaritalStatusID = prospectdata.MaritalStatusID;
+                suspect.LeadNo = prospectdata.LeadNo;
+
+                suspects.Add(suspect);
+
+            }
+            foreach (var item in ProspecttagContactIds)
+            {
+                propect = new LeadDTO();
+                var Tblpropsectdata = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.contactid);
+                var suspectdata = _mapper.Map<LeadDTO>(Tblpropsectdata);
+                propect.Address = suspectdata.Address;
+                propect.Age = suspectdata.Age;
+                propect.ContactType = suspectdata.ContactType;
+                propect.DateOfBirth = suspectdata.DateOfBirth;
+                propect.EmailID = suspectdata.EmailID;
+                propect.FirstName = suspectdata.FirstName;
+
+
+                propect.Currency = suspectdata.Currency;
+                propect.CreationDate = suspectdata.CreationDate;
+                propect.Gender = suspectdata.Gender;
+                propect.LastName = suspectdata.LastName;
+                propect.MobileNo = suspectdata.MobileNo;
+                propect.MonthlyIncome = suspectdata.MonthlyIncome;
+
+                propect.NICNO = suspectdata.NICNO;
+                propect.OccupationID = suspectdata.OccupationID;
+                propect.opportunity = suspectdata.opportunity;
+                propect.PassportNo = suspectdata.PassportNo;
+                propect.PhoneNo = suspectdata.PhoneNo;
+                propect.Place = suspectdata.Place;
+
+                propect.Age = suspectdata.Age;
+                propect.Salutation = suspectdata.Salutation;
+                propect.SpouseAge = suspectdata.SpouseAge;
+                propect.SpouseName = suspectdata.SpouseName;
+                propect.MaritalStatusID = suspectdata.MaritalStatusID;
+                propect.LeadNo = suspectdata.LeadNo;
+
+                propects.Add(propect);
+
+            }
+            ViewDetails viewDetails = new ViewDetails();
+            viewDetails.prospect = propects;
+            viewDetails.suspect = suspects;
+           
+
+
+            //var pooldata = _mapper.Map<List<LeadDTO>>(DATA);
+            //foreach (var item in pooldata)
+            //{
+            //    if (item.Address == null)
+            //    {
+            //        item.Address = new AddressDTO();
+            //    }
+            //}
+
+            //return pooldata;
+            return viewDetails;
+
+        }
+
+
     }
 }

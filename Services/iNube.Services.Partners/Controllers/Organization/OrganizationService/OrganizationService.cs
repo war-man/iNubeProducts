@@ -21,6 +21,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<IEnumerable<OrganizationDTO>> SearchOrganization(OrgSearchDTO searchorg, ApiContext apiContext);
         Task<IEnumerable<OrganizationDTO>> SearchOrganizationById(int orgId, ApiContext apiContext);
         Task<IEnumerable<OrganizationDTO>> GetOrgByParentId(int orgid, ApiContext apiContext);
+
+        
     }
 
     public class OrganizationService : IOrganizationService

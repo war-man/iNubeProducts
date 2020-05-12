@@ -56,6 +56,7 @@ namespace iNube.Services.Lead.Entities
         public string Currency { get; set; }
         public string Title { get; set; }
         public DateTime? CreationDate { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual TblAddress Address { get; set; }
         public virtual TblContacts ParentContact { get; set; }
