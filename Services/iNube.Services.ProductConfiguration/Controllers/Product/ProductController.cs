@@ -70,7 +70,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
         [AllowAnonymous]
         [HttpPost]
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IActionResult> GetAssignProduct(AssignProductList AssignProductList)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //            var response =await _AvoProductService.GetRiderSumAssured(mapQuoteDTO);
             return Ok();

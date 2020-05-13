@@ -44,7 +44,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service
     public class PSDService : IPSDService
     {
         IPSDDataBaseSetting _settings;
-        private readonly IMongoCollection<TreeMasterDTO> _tree;
+       // private readonly IMongoCollection<TreeMasterDTO> _tree;
         public PSDService(IPSDDataBaseSetting settings)
         {
             _settings = settings;
@@ -115,7 +115,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service
             return treeDTOs;
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IEnumerable> Save(dynamic PSDData)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             var client = new MongoClient(_settings.ConnectionString);
             var database = client.GetDatabase(_settings.DatabaseName);
@@ -141,7 +143,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service
                     FinalDTO.PsdName = jsonToken.ToString();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 
@@ -170,7 +172,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service
             return treeDTOs;
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IEnumerable> SaveAttribute (AttributeDTO AttributeData)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             var client = new MongoClient(_settings.ConnectionString);
             var database = client.GetDatabase(_settings.DatabaseName);
@@ -213,7 +217,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service
                     count++;
                 }
             }
-            catch(Exception e)
+            catch (Exception)
             {
 
             }
@@ -222,7 +226,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD.PSD_Service
             return data.ToJson();
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IEnumerable> SaveAttributeTag(AttributeTagDTO Tags)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             var client = new MongoClient(_settings.ConnectionString);
             var database = client.GetDatabase(_settings.DatabaseName);

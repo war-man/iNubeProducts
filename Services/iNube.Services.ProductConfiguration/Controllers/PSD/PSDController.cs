@@ -74,7 +74,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD
         //}
 
         [HttpGet]
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IActionResult> GetMasterData(string sMasterlist)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             var commonTypesDTOs = _psdService.GetMaster(sMasterlist);
             // var masterdata = commonTypesDTOs.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
@@ -91,7 +93,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.PSD
         }
 
         [HttpPost]
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IActionResult> Save(dynamic PSDData)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
 
             var data =_psdService.Save(PSDData);

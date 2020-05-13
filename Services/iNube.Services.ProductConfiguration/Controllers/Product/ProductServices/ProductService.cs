@@ -69,7 +69,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
     public class ProductService : IProductService
     {
-        private MICAPCContext _context;
+       // private readonly MICAPCContext _context;
         private IMapper _mapper;
         private readonly IServiceProvider _serviceProvider;
         private ILoggerManager _logger;

@@ -40,7 +40,7 @@ namespace iNube.Services.ProductConfiguration.Helpers
                 //var resItems = mapper.DefaultContext.Mapper.Map<IEnumerable<TR>>(items).ToList();
                 //Items = items;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 

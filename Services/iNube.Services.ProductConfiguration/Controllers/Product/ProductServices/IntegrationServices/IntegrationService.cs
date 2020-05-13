@@ -107,7 +107,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
 
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 //throw;
@@ -146,7 +146,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();
@@ -176,7 +176,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new List<TResponse>();

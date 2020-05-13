@@ -61,7 +61,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 return new ProductResponse { Status = BusinessStatus.Created, product = productDTO, ResponseMessage = $"Product successfully created! \n Product Name: {productDTO.ProductName} & Product Code: {productDTO.ProductCode}" };
             }
 
-            catch (Exception ex)
+            catch (Exception)
             {
                 // _logger.LogError("Creatre Product Exception get called");
                 return new ProductResponse { Status = BusinessStatus.Error };
@@ -1383,7 +1383,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     }
                     ProductRcbInsurableDetails.Add(insurableRcbdetailsDTO);
                 }
-                catch (Exception E)
+                catch (Exception)
                 {
 
                 }
@@ -1440,7 +1440,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     await _emailService.SendEmail(emailDTO.To, emailDTO.Subject, emailDTO.Message);
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                     throw;
@@ -1477,11 +1477,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             //    var tblProduct = _context.TblProducts.FirstOrDefault(item => item.ProductCode == productCode);
 
-            var value = "";
-            //string connectionString = "Server=inubepeg.database.windows.net;Database=MICAProd;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
-            //using (SqlConnection connection = new SqlConnection(connectionString))
-            //{
-            //    // string queryForCol = "select * from[PC].[tblBenifitRangeDetails] where BenifitID IN(select BenefitID from[PC].[tblProductBenefits] where CoverID IN(select CoverID from[PC].[tblProductCovers] where insurableitemId IN(select InsurableItemId from[PC].[tblProductInsurableItems]where productid ="+ tblProduct.ProductId + ")))";
+            //var value = "";
+                              //string connectionString = "Server=inubepeg.database.windows.net;Database=MICAProd;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+                              //using (SqlConnection connection = new SqlConnection(connectionString))
+                              //{
+                              //    // string queryForCol = "select * from[PC].[tblBenifitRangeDetails] where BenifitID IN(select BenefitID from[PC].[tblProductBenefits] where CoverID IN(select CoverID from[PC].[tblProductCovers] where insurableitemId IN(select InsurableItemId from[PC].[tblProductInsurableItems]where productid ="+ tblProduct.ProductId + ")))";
 
 
             //    connection.Open();
@@ -1587,8 +1587,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 {
                     return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx file" };
                 }
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
                 bool sms = true;
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
                 bool email = true;
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
                 dt.Columns.Add("PromoCode1", typeof(string));
                 dt.Columns.Add("PromoCode2", typeof(string));
                 //dt.Columns.Add("PolicyNumber", typeof(string));
@@ -1675,7 +1679,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 return new ProductResponse() { Status = BusinessStatus.NotFound, ResponseMessage = $"PromoCode is not valid" };
             }
         }
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<dynamic> GetProductRateConfig(int productid, ApiContext apiContext)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //_context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             //var mapData=_context.TblProductRatingMapping.Where(s => s.ProductId == productid).ToList();
@@ -1699,7 +1705,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 expandoDict.Add(propertyName, propertyValue);
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<List<ProductRatingMapping>> GetProductRateMapping(int productid, ApiContext apiContext)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             //_context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             //var mapData = _context.TblProductRatingMapping.Where(s => s.ProductId == productid)
