@@ -51,7 +51,9 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
         //this is used for proposal pool and partial form data
         public List<InboxDetailsDto> ProposalPoll()
         {
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
             var userId = "sahir";
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
             var ProposalData =
                 (from objtblpolicy in Context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
                                                                       || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192)
@@ -96,7 +98,9 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
         {
 
 
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
             var userId = "sahir";
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
             var ProposalData = (from objtblpolicy in Context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
                                                               || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192 || a.PolicyStageStatusId == 194 || a.PolicyStageStatusId == 195 || a.PolicyStageStatusId == 196 || a.PolicyStageStatusId == 197 || a.PolicyStageStatusId == 198
                                                               || a.PolicyStageStatusId == 1068 || a.PolicyStageStatusId == 1447 || a.PolicyStageStatusId == 1448 || a.PolicyStageStatusId == 2374 || a.PolicyStageStatusId == 2375 || a.PolicyStageStatusId == 2376 || a.PolicyStageStatusId == 2490 || a.PolicyStageStatusId == 2491)
@@ -145,7 +149,7 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
                     ProposalData = new List<InboxDetailsDto>();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 log4net.GlobalContext.Properties["ErrorCode"] = "Error";//InboxDetails() have to see
                                                                         // Logger.Error(ex);
@@ -196,11 +200,13 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
                     }
                     else if (objUWInbox.Message == "Processed")
                     {
+#pragma warning disable CS0168 // Variable is declared but never used
                         List<decimal?> PolicyIDs;//(Context.tblPolicyUWRemarkHistories.Where(a => a.CreatedBy == USerInfo.Id && a.CommonID != null
-                                                 //                         && (a.Decision == CrossCuttingConstants.UWDecisionAccepted || a.Decision == CrossCuttingConstants.UWDecisionDecline
-                                                 //                         || a.Decision == CrossCuttingConstants.UWDecisionPostPone || a.Decision == CrossCuttingConstants.UWDecisionWithDrawn || a.Decision == CrossCuttingConstants.UWDecisionReferToUW
-                                                 //                          || a.Decision == CrossCuttingConstants.UWDecisionOutStandingReq || a.Decision == CrossCuttingConstants.UWDecisionNotTaken
-                                                 //                          || a.Decision == CrossCuttingConstants.UWDecisionCounterOffer)).Select(a => a.PolicyID)).ToList();
+#pragma warning restore CS0168 // Variable is declared but never used
+                              //                         && (a.Decision == CrossCuttingConstants.UWDecisionAccepted || a.Decision == CrossCuttingConstants.UWDecisionDecline
+                              //                         || a.Decision == CrossCuttingConstants.UWDecisionPostPone || a.Decision == CrossCuttingConstants.UWDecisionWithDrawn || a.Decision == CrossCuttingConstants.UWDecisionReferToUW
+                              //                          || a.Decision == CrossCuttingConstants.UWDecisionOutStandingReq || a.Decision == CrossCuttingConstants.UWDecisionNotTaken
+                              //                          || a.Decision == CrossCuttingConstants.UWDecisionCounterOffer)).Select(a => a.PolicyID)).ToList();
 
 
                         objUWInbox.LstProposals = (from objpolicy in Context.TblPolicy//.Where(a => PolicyIDs.Contains(a.PolicyId))
@@ -289,7 +295,7 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 log4net.GlobalContext.Properties["ErrorCode"] = "Error";//Codes.GetErrorCode();
                                                                         // Logger.Error(ex);
@@ -380,7 +386,9 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
         {
 
             {
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
                 var userId = "sahir";
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
                 var PolicyOwnerDetailsData =
                     (from objtblpolicy in Context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
                                                                           || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192)
