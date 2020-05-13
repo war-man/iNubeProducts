@@ -2053,6 +2053,14 @@ namespace iNube.Services.Partners.Models
         public string Designation { get; set; }
     }
 
+    public class Supervisor
+    {
+        public decimal? MovementId { get; set; }
+        public string StaffName { get; set; }
+        public decimal OrgEmpId { get; set; }
+        public int MovementStatus { get; set; }
+    }
+
 }
 
 

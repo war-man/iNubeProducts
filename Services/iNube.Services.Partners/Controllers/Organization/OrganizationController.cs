@@ -500,5 +500,24 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetEmpMappingData(empcode,Context);
             return Ok(response);
         }
+
+        //  || AVO
+        [HttpGet]
+        public async Task<IActionResult> GetNewSupervisorByMovementId(int MovementId, int MovementStatusId)
+        {
+            Supervisor supervisor = new Supervisor();
+            supervisor.MovementId = MovementId;
+            supervisor.MovementStatus = MovementStatusId;
+            var response = await _avoorgService.GetNewSupervisorByMovementId(supervisor, Context);
+            return Ok(response);
+        }
+
+        // ||AVO
+        [HttpGet]
+        public async Task<IActionResult> ViewReporteeGrid(int Empcode, int MovementId, int MovementStatusId)
+        {
+            var response = await _avoorgService.ViewReporteeGrid(Empcode, MovementId, MovementStatusId, Context);
+            return Ok(response);
+        }
     }
 }
