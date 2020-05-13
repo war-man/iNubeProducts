@@ -1975,15 +1975,18 @@ namespace iNube.Services.Partners.Models
         public int Count => Children.Count;
         public int TotalCount { get; set; }
     }
-    public class EmpRoleMapDTO
+    public class EmpRoleResponse : ResponseStatus
+    {
+        public EmpRoleMapDTO role { get; set; }
+    }
+
+    public partial class EmpRoleMapDTO
     {
         public string Empcode { get; set; }
         public string[] RoleId { get; set; }
+        public decimal EnvId { get; set; }
     }
-    public class EmpRoleResponse : Response
-    {
 
-    }
     public partial class ViewDetails
     {
         public ViewDetails()

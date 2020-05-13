@@ -520,17 +520,19 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         public async Task<List<MasterDto>> GetEmployee(int orgid, int offid, int desgiId, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var positionid = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == orgid && x.OfficeId == offid && x.DesignationId == desgiId).PositionId;
-
-            var masterdata = _context.TblOrgEmployee.Where(s => s.PositionId == positionid)
-                                                    .Select(x => new MasterDto
-                                                    {
-                                                        mID = Convert.ToInt32(x.OrgEmpId),
-                                                        mType = "Employee",
-                                                        mValue = x.StaffName
-                                                    }).ToList();
-            return masterdata;
-
+            var desg = _context.TblOrgStructure.FirstOrDefault(x => x.OrganizationId == orgid && x.OrgStructureId == desgiId);
+            List<decimal> PositionIds = new List<decimal>();
+            PositionIds.Add(desg.OrgStructureId);
+            PositionIds.Add((decimal)desg.ParentId);
+            var Data = (from objposition in _context.TblOrgPositions.Where(x => x.OrganizationId == orgid && x.OfficeId == offid && PositionIds.Contains(Convert.ToDecimal(x.DesignationId)))
+                        join objempdetails in _context.TblOrgEmployee on objposition.PositionId equals objempdetails.PositionId
+                        select new MasterDto
+                        {
+                            mID = Convert.ToInt32(objempdetails.OrgEmpId),
+                            mType = "Employee",
+                            mValue = objempdetails.StaffName
+                        }).ToList();
+            return Data;
 
         }
 
@@ -1005,12 +1007,16 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     var roles = await GetEmployeeRoles(empRole.Empcode, apiContext);
                     empRole.RoleId = roles.Roles;
                     var changeDesig = await _integrationService.UpdateEmpRole(empRole, apiContext);
+
+                    //Create new position
+                    var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
+                    promote.PositionId = Convert.ToDecimal(newPos.Id);
                 }
                 _context.TblMovements.Update(movementdata);
                 var mapData = _mapper.Map<AVOMovements>(movementdata);
 
-                //Create new position
-                // var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+
 
                 _context.SaveChanges();
                 return mapData;
