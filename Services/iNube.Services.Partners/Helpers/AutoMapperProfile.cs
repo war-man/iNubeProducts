@@ -84,8 +84,8 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<AVOOrgSpocDetails, Entities.AVO.TblOrgSpocDetails>();
             CreateMap<Entities.AVO.TblOrgSpocDetails, AVOOrgSpocDetails>();
 
-            CreateMap<Entities.AVO.TblOrgStructure, OrgStructure>();
-            CreateMap<OrgStructure, Entities.AVO.TblOrgStructure>();
+            //CreateMap<Entities.AVO.TblOrgStructure, OrgStructure>();
+            //CreateMap<OrgStructure, Entities.AVO.TblOrgStructure>();
 
             CreateMap<Entities.AVO.TblOrgStructure, AVOOrgStructure>();
             CreateMap<AVOOrgStructure, Entities.AVO.TblOrgStructure>();

@@ -167,7 +167,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                         tblOrg.LevelDefinition = item.levelname;
                         if (!string.IsNullOrEmpty(item.levelname))
                         {
-                            if (item.reportto == "self")
+                            if (item.reportto == "0")
                             {
                                 tblOrg.RepotrsToId = null;
                                 tblOrg.ParentId = null;
@@ -1413,7 +1413,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return mappingData;
         }
 
-        public async Task<List<Supervisor>> GetNewSupervisorByMovementId(Supervisor supervisor,ApiContext apiContext)
+        public async Task<List<Supervisor>> GetNewSupervisorByMovementId(Supervisor supervisor, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -1431,7 +1431,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         }
 
-        public async Task<AVOReporteeGrid> ViewReporteeGrid(int Empcode,int MovementId,int MovementStatusId, ApiContext apiContext)
+        public async Task<AVOReporteeGrid> ViewReporteeGrid(int Empcode, int MovementId, int MovementStatusId, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 

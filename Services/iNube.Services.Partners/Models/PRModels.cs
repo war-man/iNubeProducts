@@ -2066,7 +2066,10 @@ namespace iNube.Services.Partners.Models
         public int MovementStatus { get; set; }
     }
 
+    public partial class EMPDistributeDTO
+    {
+        public string Empcode { get; set; }
+        public decimal PrimaryIds { get; set; }
+    }
+
 }
-
-
-
