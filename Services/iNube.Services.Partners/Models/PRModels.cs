@@ -1889,6 +1889,8 @@ namespace iNube.Services.Partners.Models
         public decimal? PositionId { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public decimal? MovedTo { get; set; }
+        public int? MovingFormId { get; set; }
 
     }
     public class AVOReporteeGrid
