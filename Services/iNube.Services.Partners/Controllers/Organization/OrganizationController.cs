@@ -531,5 +531,12 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = _avoorgService.DesignationRoles(designationid, Context);
             return Ok(response);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmpHierarchy(string Empcode)
+        {
+            var response = await _avoorgService.GetEmpHierarchy(Empcode, Context);
+            return Ok(response);
+        }
     }
 }

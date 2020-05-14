@@ -2077,5 +2077,22 @@ namespace iNube.Services.Partners.Models
         public string Empcode { get; set; }
         public decimal PrimaryIds { get; set; }
     }
+    public class EmpHierarchyData : ResponseStatus
+    {
+        public EmpHierarchyData()
+        {
+            StaffCodes = new List<EmpHierarchy>();
+        }
+        public List<EmpHierarchy> StaffCodes { get; set; }
+    }
+    public class EmpHierarchy 
+    {
+        public int? ParentID { get; set; }
+        public int? PositionID { get; set; }
+        public string StaffName { get; set; }
+        public string Staffcode { get; set; }
+        public string LevelDefinition { get; set; }
+        public int? LevelId { get; set; }        
+    }
 
 }

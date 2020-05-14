@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using iNube.Services.Partners.Entities.AVO;
+using iNube.Services.Partners.Helpers;
 using iNube.Services.Partners.Models;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
@@ -1238,8 +1239,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         }
         public async Task<List<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext)
         {
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
             var movData = from a in _context.TblMovements
                           join b in _context.TblMovementDetails on a.MovementId equals b.MovementId
                           where b.MovementId == movement.MovementId
@@ -1509,6 +1512,34 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             EmployeeRoles roles = new EmployeeRoles();
             roles.Roles = roledata.ToArray();
             return roles;
+        }
+
+        public async Task<DataTable>  GetEmpHierarchy(string empcode, ApiContext apiContext)
+        {
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+           EmpHierarchy emp = new EmpHierarchy();
+            // Get Emp Pos
+            var empdetail = _context.TblOrgEmployee.FirstOrDefault(e => e.StaffCode == empcode);
+            string connectionString = _context.Database.GetDbConnection().ConnectionString;
+            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            string dbConnectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
+            DataTable dt = new DataTable();
+            //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+            using (SqlConnection connection = new SqlConnection(dbConnectionString))
+            {
+                string queryForCol = $"WITH cte_Hierarchy (PositionID,ParentID,staffcode,staffName,LevelDefinition,LevelId) AS  ( select pos.PositionID,pos.ParentID,emp.staffcode,emp.staffName,desig.LevelDefinition,desig.LevelId from [PR].[tblOrgPositions] pos inner join [PR].[tblOrgEmployee] emp on emp.PositionId= pos.PositionID inner join [PR].[tblOrgStructure] desig on desig.OrgStructureId= pos.designationId where pos.PositionId = {empdetail.PositionId} union all select t1.PositionID,t1.ParentID,emp1.staffcode,emp1.staffName,desig1.LevelDefinition,desig1.LevelId from [PR].[tblOrgPositions] t1  inner join [PR].[tblOrgEmployee] emp1 on emp1.PositionId= t1.PositionID inner join [PR].[tblOrgStructure] desig1 on desig1.OrgStructureId= t1.designationId inner join cte_Hierarchy t2 on t1.ParentID = t2.PositionId ) select * from cte_Hierarchy ";
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(queryForCol, connection))
+                {
+                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
+                    sqlDataAdapter.Fill(dt);
+                }
+                connection.Close();
+            }
+            return dt;
         }
     }
 }
