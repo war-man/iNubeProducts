@@ -680,16 +680,17 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //var totalPosition = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid && a.StructureTypeId == 28).ToList();
             var totalPosition = _context.TblOrgPositions.Where(a => a.OrganizationId == orgid).ToList();
+            var designations = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid).Select(a => a);
             List<vacantPositiondto> ddDTOs = new List<vacantPositiondto>();
             vacantPositiondto ddDTO = new vacantPositiondto();
             foreach (var positions in totalPosition)
             {
-                var count = _context.TblOrgPositions.Where(a => a.PositionName == positions.PositionName && a.IsVacant == true).Count();
+                var count = _context.TblOrgPositions.Where(a => a.DesignationId == positions.DesignationId && a.IsVacant == true).Count();
                 if (count > 0)
                 {
                     ddDTO = new vacantPositiondto();
-                    ddDTO.mID = positions.PositionName;
-                    ddDTO.mValue = positions.PositionName;
+                    ddDTO.mID = designations.FirstOrDefault(a => a.OrgStructureId == positions.DesignationId).OrgStructureId;
+                    ddDTO.mValue = designations.FirstOrDefault(a => a.OrgStructureId == positions.DesignationId).LevelDefinition;
                     ddDTOs.Add(ddDTO);
                 }
 
@@ -699,11 +700,11 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         }
 
-        public async Task<int> GetVacantPositonCount(string designame, ApiContext apiContext)
+        public async Task<int> GetVacantPositonCount(decimal designame, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var count = _context.TblOrgPositions.Where(a => a.PositionName == designame && a.IsVacant == true).Count();
+            var count = _context.TblOrgPositions.Where(a => a.DesignationId == designame && a.IsVacant == true).Count();
             return count;
         }
 
@@ -716,7 +717,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             try
             {
 
-                var positiondata = _context.TblOrgPositions.FirstOrDefault(a => a.PositionName == avOOrgEmployee.DeginName && a.IsVacant == true);
+                var positiondata = _context.TblOrgPositions.FirstOrDefault(a => a.DesignationId == avOOrgEmployee.DeginName && a.IsVacant == true);
                 positiondata.IsVacant = false;
                 _context.TblOrgPositions.Update(positiondata);
 
@@ -1418,9 +1419,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             var positionid = _context.TblOrgEmployee.FirstOrDefault(a => a.StaffCode == empcode);
             var Data = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == positionid.PositionId);
 
-            mappingData.Designation = Data.PositionName;
-            mappingData.OrgId = Data.OrganizationId;
-            mappingData.OffID = Data.OfficeId;
+            mappingData.Designation = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == Data.DesignationId).LevelDefinition;
+            mappingData.Organization = _context.TblOrganization.FirstOrDefault(a => a.OrganizationId == Data.OrganizationId).OrgName;
+            mappingData.Office = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == Data.OfficeId).OfficeName;
 
             return mappingData;
         }
@@ -1514,13 +1515,13 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return roles;
         }
 
-        public async Task<DataTable>  GetEmpHierarchy(string empcode, ApiContext apiContext)
+        public async Task<DataTable> GetEmpHierarchy(string empcode, ApiContext apiContext)
         {
             if (_context == null)
             {
                 _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             }
-           EmpHierarchy emp = new EmpHierarchy();
+            EmpHierarchy emp = new EmpHierarchy();
             // Get Emp Pos
             var empdetail = _context.TblOrgEmployee.FirstOrDefault(e => e.StaffCode == empcode);
             string connectionString = _context.Database.GetDbConnection().ConnectionString;

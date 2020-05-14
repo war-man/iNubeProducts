@@ -301,7 +301,7 @@ namespace iNube.Services.Partners.Controllers.Organization
         }
         // ||AVO
         [HttpGet]
-        public async Task<IActionResult> GetVacantPositonCount(string designame)
+        public async Task<IActionResult> GetVacantPositonCount(decimal designame)
         {
 
             var response = await _avoorgService.GetVacantPositonCount(designame, Context);

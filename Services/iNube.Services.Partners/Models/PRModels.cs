@@ -23,9 +23,8 @@ namespace iNube.Services.Partners.Models
 
     public partial class vacantPositiondto
     {
-        public string mID { get; set; }
+        public decimal mID { get; set; }
         public string mValue { get; set; }
-
     }
 
 
@@ -1795,18 +1794,16 @@ namespace iNube.Services.Partners.Models
 
     public partial class updatepositionDto
     {
-
         public updatepositionDto()
         {
             AVOOrgEmployee = new AVOOrgEmployee();
         }
 
-        public string DeginName { get; set; }
+        public decimal DeginName { get; set; }
         public decimal? OrganizationId { get; set; }
         public decimal OfficeId { get; set; }
-        //public decimal EmpId { get; set; }
-        public virtual AVOOrgEmployee AVOOrgEmployee { get; set; }
 
+        public virtual AVOOrgEmployee AVOOrgEmployee { get; set; }
     }
 
     public class MovementCounts
@@ -2091,8 +2088,8 @@ namespace iNube.Services.Partners.Models
 
     public class EmpMappingData
     {
-        public decimal? OrgId { get; set; }
-        public decimal? OffID { get; set; }
+        public string Organization { get; set; }
+        public string Office { get; set; }
         public string Designation { get; set; }
     }
 

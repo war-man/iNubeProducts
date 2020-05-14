@@ -28,7 +28,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<List<vacantPositiondto>> GetVecPositions(decimal orgid, ApiContext apiContext);
         Task<List<MasterDto>> GetEmployee(int orgid, int offid, int desgiId, ApiContext apiContext);
         Task<int> GetCount(int empid, ApiContext Context);
-        Task<int> GetVacantPositonCount(string designame, ApiContext apiContext);
+        Task<int> GetVacantPositonCount(decimal designame, ApiContext apiContext);
         Task<AVOOrgEmployee> GetEmployeeDetailsById(int empid, ApiContext apiContext);
         Task<Createposition> CreatePosition(NewPositionDTO Officedto, ApiContext apiContext);
         Task<IEnumerable<AVOOrgEmployee>> SearchPeople(SearchPeople searchPeople, ApiContext apiContext);
