@@ -3,12 +3,14 @@ using iNube.Services.Lead.Models;
 using iNube.Services.Quotation.Controllers.Quotation.QuotationService;
 using iNube.Services.Quotation.Models;
 using iNube.Utility.Framework;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iNube.Services.Quotation.Controllers.Quotation
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class QuotationController : BaseApiController
     {
         public IQuotationService _quotationService;
@@ -34,6 +36,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation
 
         // GET: api/LoadProspectInfo
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> LoadProspectInfo(int ContactId)
         {
 
@@ -49,7 +52,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation
         public  IActionResult QuotationPool()
         {
 
-            var response = _quotationService.QuotationPool();
+            var response = _quotationService.QuotationPool(Context);
 
             return Ok(response);
         }

@@ -20,8 +20,8 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         
         IEnumerable<ddDTO> GetMaster(string lMasterlist);
         Task<LeadResponse> SaveSuspectAsync(LeadDTO leadDTO,ApiContext context);
-        IEnumerable<LeadDTO> ContactPool(String type, ApiContext context);
-        IEnumerable<LeadDTO> SuspectPool(int incStageId, ApiContext context);
+        Task<IEnumerable<LeadDTO>> ContactPoolAsync(String type, ApiContext context);
+        Task<IEnumerable<LeadDTO>> SuspectPoolAsync(int incStageId, ApiContext context);
         List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context);
         
         LeadResponse ModifySuspect(LeadDTO leadDTO, ApiContext context);
@@ -241,17 +241,17 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         }
 
         // RuleEngine Validation 
-        public IEnumerable<LeadDTO> ContactPool(String type, ApiContext context)
+        public async Task<IEnumerable<LeadDTO>> ContactPoolAsync(String type, ApiContext context)
         {
             IEnumerable<LeadDTO> lst;
             switch (type)
             {
 
                 case "Lead":
-                    lst = SuspectPool(1, context);
+                    lst = await SuspectPoolAsync(1, context);
                     return lst;
                 case "Prospect":
-                    lst = SuspectPool(2, context);
+                    lst = await SuspectPoolAsync(2, context);
                     return lst;
                 default: return new List<LeadDTO>();
 
@@ -259,26 +259,49 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             }
 
         }
-        public IEnumerable<LeadDTO> SuspectPool(int incStageId,ApiContext context)
+        public async Task<IEnumerable<LeadDTO>> SuspectPoolAsync(int incStageId,ApiContext context)
         {
-           
-         
-            IEnumerable<LeadDTO> suspects = (from Opportunity in _context.TblOpportunity.Where(a => a.StageId == incStageId && a.IsDeleted != true /*&& a.Createdby == userId*/)
-                                             join Contact in _context.TblContacts/*.Where(b => b.CreatedBy == userId)*/
-                                             on Opportunity.ContactId equals Contact.ContactId
-                                             orderby Contact.ContactId descending
-                                             select new LeadDTO
-                                             {
-                                
+            List<LeadDTO> suspects = new List<LeadDTO>();
+            if (string.IsNullOrEmpty(context.Name))
+            {
+                suspects = (from Opportunity in _context.TblOpportunity.Where(a => a.StageId == incStageId && a.IsDeleted != true /*&& a.Createdby == userId*/)
+                            join Contact in _context.TblContacts/*.Where(b => b.CreatedBy == userId)*/
+                            on Opportunity.ContactId equals Contact.ContactId
+                            orderby Contact.ContactId descending
+                            select new LeadDTO
+                            {
+
                                 ContactType = Contact.ContactType,
                                 ContactID = Contact.ContactId,
                                 FirstName = Contact.FirstName,
                                 Place = Contact.Place,
                                 MobileNo = Contact.MobileNo,
-                                CreationDate=Contact.CreationDate,
-                                
-                            });
-            
+                                CreationDate = Contact.CreationDate,
+
+                            }).ToList();
+            }
+            else
+            {
+                // Get Emp Hirarchy
+                var empList = await _integrationService.GetEmpHierarchyAsync(context.Name, context);
+                var staffCodes = empList.Select(rt => Convert.ToInt64(rt.PositionID).ToString());  
+                suspects = (from Opportunity in _context.TblOpportunity.Where(a => a.StageId == incStageId && a.IsDeleted != true && staffCodes.Contains(a.HandledBy))
+                            join Contact in _context.TblContacts/*.Where(b => b.CreatedBy == userId)*/
+                            on Opportunity.ContactId equals Contact.ContactId
+                            orderby Contact.ContactId descending
+                            select new LeadDTO
+                            {
+
+                                ContactType = Contact.ContactType,
+                                ContactID = Contact.ContactId,
+                                FirstName = Contact.FirstName,
+                                Place = Contact.Place,
+                                MobileNo = Contact.MobileNo,
+                                CreationDate = Contact.CreationDate,
+
+                            }).ToList();
+            }
+
 
             var suspectpool = _mapper.Map<IEnumerable<LeadDTO>>(suspects);
             return suspects;

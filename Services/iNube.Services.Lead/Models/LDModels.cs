@@ -992,6 +992,15 @@ namespace iNube.Services.Lead.Models
         public string MovedTo { get; set; }
     }
     //needAnalysis
+    public class EmpHierarchy
+    {
+        public decimal ParentID { get; set; }
+        public decimal PositionID { get; set; }
+        public string StaffName { get; set; }
+        public string Staffcode { get; set; }
+        public string LevelDefinition { get; set; }
+        public int LevelId { get; set; }
+    }
 }
 
 
