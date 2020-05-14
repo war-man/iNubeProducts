@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using iNube.Services.Policy.Controllers.Proposal.IntegrationService.iNube.Services.Proposal.Controllers.ProposalConfig.IntegrationService;
 using iNube.Services.Policy.Entities;
+using iNube.Services.Policy.Entities.AvoEntities;
 using iNube.Services.Policy.Models;
 using iNube.Utility.Framework.Model;
 using System;
@@ -21,6 +22,9 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
         List<MasCommonTypesDto> MastertypeData();
           
         ProposalResponce PartialFormDataSave(Models.ProposalModel.PolicyDto policyDto, ApiContext Context);
+
+        Task<ProposalDto> GetProposalByQuotNO(string quotoNo, ApiContext Context);
+        Task<policyDto> GetPolicyByQuotNO(string proposalNo, ApiContext Context);
 
     }
     public class ProposalService : IProposalService
@@ -156,6 +160,58 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
 
             }
             return null;
+        }
+
+        public async Task<ProposalDto> GetProposalByQuotNO(string quotoNo, ApiContext Context)
+        {
+          //  _context = (ProposalContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var Proposaldata = (from tblMapper in _context.TblPolicy
+
+                                 where (tblMapper.QuoteNo == quotoNo && tblMapper.PolicyNo==null)
+
+                                 join tblMapperDetails in _context.TblPolicyMemberDetails on tblMapper.PolicyId equals tblMapperDetails.PolicyId
+
+                                 select new ProposalDto
+
+                                 {
+                                     Name = tblMapperDetails.FirstName,
+
+                                     ProposalNumber = tblMapper.ProposalNo,
+                                     ContactNumner = tblMapperDetails.Mobile,
+                                     MovedTo = "",
+                                    // CityName = tblMapperDetails,
+
+                                 }).FirstOrDefault();
+            return Proposaldata;
+
+        }
+        public async Task<policyDto> GetPolicyByQuotNO(string proposalNo, ApiContext Context)
+        {
+            //  _context = (ProposalContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var Policydata = (from tblMapper in _context.TblPolicy
+
+                                where (tblMapper.ProposalNo == proposalNo && tblMapper.PolicyNo !=null)
+
+                                join tblMapperDetails in _context.TblPolicyMemberDetails on tblMapper.PolicyId equals tblMapperDetails.PolicyId
+
+                                select new policyDto
+
+                                {
+
+                                    PolicyNumber = tblMapper.ProposalNo,
+                                    ContactNumner = tblMapperDetails.Mobile,
+                                    MovedTo = "",
+                                    PolicyStatus= Convert.ToInt32(tblMapper.PolicyStatusId),
+                                    PremiumAmount= tblMapperDetails.BasicPremium,
+                                    Mode= tblMapper.PaymentMethod,
+                                    
+                                    // CityName = tblMapperDetails,
+
+                                }).FirstOrDefault();
+            return Policydata;
+
         }
     }
 }

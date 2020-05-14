@@ -28,7 +28,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         IEnumerable<ddDTO> GetLocation(string locationType, int parentID, ApiContext context);
         IEnumerable<LifeQqDTO> FetchLifeQqdata();
         IEnumerable<LeadDTO> FetchTblContactsdata();
-        ViewDetails ViewDetailsByPositionId(string Positionid, ApiContext context);
+        Task<ViewDetails> ViewDetailsByPositionIdAsync(string Positionid, ApiContext context);
     }
 
     public class LeadService : ILeadService
@@ -432,7 +432,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             var _tblContactsdata = _mapper.Map<List<LeadDTO>>(tblContactsdata);
             return _tblContactsdata;
         }
-        public ViewDetails ViewDetailsByPositionId(string Positionid, ApiContext context)
+        public async Task<ViewDetails> ViewDetailsByPositionIdAsync(string Positionid, ApiContext context)
         {
 
             // var DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
@@ -447,7 +447,18 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             List<StagContactId> SuspectstagContactIds = new List<StagContactId>();
             StagContactId ProspectstagContactId = new StagContactId();
             List<StagContactId> ProspecttagContactIds = new List<StagContactId>();
-            foreach(var item in DATA)
+            List<ProposalDto> proposalDtos = new List<ProposalDto>();
+
+
+            QuotationDto quotationDto = new QuotationDto();
+            List<QuotationDto> quotationDtos = new List<QuotationDto>();
+           
+            List<policyDto> policyDtos = new List<policyDto>();
+
+            ViewDetails viewDetails = new ViewDetails();
+          
+
+            foreach (var item in DATA)
             {
                 if(item.StageId==1)
                 {
@@ -538,11 +549,55 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
                 propects.Add(propect);
 
+
+                //Quotation data call
+
+                // var tblLifeQqdata = _context.TblLifeQq.FirstOrDefault(a => a.ContactId == item.contactid).LifeQqid;
+                var tblLifeQqdata = (from tblMapper in _context.TblLifeQq
+
+                                     where (tblMapper.ContactId == item.contactid)
+
+                                     join tblMapperDetails in _context.TblQuoteMemberDetials on tblMapper.LifeQqid equals tblMapperDetails.LifeQqid
+
+                                     select new QuotationDto
+
+                                     {
+                                         Name = tblMapperDetails.Name,
+
+                                         QuotNumber = tblMapper.QuoteNo,
+                                         ContactNumner = suspect.MobileNo,
+                                         MovedTo = "",
+                                         //CityName = suspectdata.Address.city.ToString(),
+
+                                     }).FirstOrDefault();
+                //tblLifeQqdata.ContactNumner = suspectdata.MobileNo;
+
+                quotationDtos.Add(tblLifeQqdata);
+
+                var proposaldata = await _integrationService.GetProposalByQuotNO(tblLifeQqdata.QuotNumber,context) ;
+                ProposalDto proposalDto = proposaldata;
+                proposalDtos.Add(proposalDto);
+
+
+                var policydata = await _integrationService.GetPolicyByProposalNO(proposalDto.ProposalNumber, context);
+
+                //doing for the policy
+
+                policyDto policyDto = policydata;
+                policyDtos.Add(policyDto);
+
+
+
+
             }
-            ViewDetails viewDetails = new ViewDetails();
+            //for Quotation
             viewDetails.prospect = propects;
             viewDetails.suspect = suspects;
-           
+            viewDetails.quotationDtos = quotationDtos;
+            viewDetails.proposalDtos = proposalDtos;
+            viewDetails.policyDtos = policyDtos;
+
+
 
 
             //var pooldata = _mapper.Map<List<LeadDTO>>(DATA);

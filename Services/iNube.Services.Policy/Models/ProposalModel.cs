@@ -826,6 +826,27 @@ namespace iNube.Services.Policy.Models
             public Models.ProposalModel.PolicyDto plcreated { get; set; }
         }
 
+        public partial class ProposalDto
+        {
+            public string ProposalNumber { get; set; }
+            public string Name { get; set; }
+
+            public string ContactNumner { get; set; }
+            public string CityName { get; set; }
+            public string MovedTo { get; set; }
+        }
+
+        public partial class policyDto
+        {
+            public string PolicyNumber { get; set; }
+            public int PolicyStatus { get; set; }
+            public string Mode { get; set; }
+            public string PremiumAmount { get; set; }
+            public string ContactNumner { get; set; }
+            public string CityName { get; set; }
+            public string MovedTo { get; set; }
+        }
+
     }
 
 

@@ -17,6 +17,9 @@ namespace iNube.Services.Lead.Controllers.Lead.LDIntegrationServices
         Task<IEnumerable<GetRulesWithParameters>> GetRulesWithParamAsync(ApiContext apiContext);
         Task<IEnumerable<GetRulesWithParametersDropDown>> GetRulesWithParammAsync(ApiContext apiContext);
         Task<IEnumerable<GetRuleMappingDetails>> GetRuleMapAsync(ApiContext apiContext);
+        Task<ProposalDto> GetProposalByQuotNO(string quotoNo, ApiContext Context);
+
+        Task<policyDto> GetPolicyByProposalNO(string proposalNo, ApiContext Context);
 
     }
     public class LDIntegrationService : ILDIntegrationService
@@ -57,6 +60,59 @@ namespace iNube.Services.Lead.Controllers.Lead.LDIntegrationServices
             var ruleExe = await PostApiInvoke<dynamic, ResponseStatus>(uri, apiContext, Serialize);
             return ruleExe;
 
+        }
+        public async Task<ProposalDto> GetProposalByQuotNO(string quotoNo, ApiContext apiContext)
+        {
+            // var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + quotoNo;
+
+           // http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com
+
+
+          //  var uri = "https://localhost:44351/api/Proposal/GetProposalByQuotNO?quotoNo=" + quotoNo;
+
+            var uri = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Proposal/GetProposalByQuotNO?quotoNo=" + quotoNo;
+
+            var res = await GetApiInvoke<ProposalDto>(uri, apiContext);
+            return res;
+
+        }
+
+
+
+        public async Task<policyDto> GetPolicyByProposalNO(string proposalNo, ApiContext Context)
+        {
+            // var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + quotoNo;
+            var uri = "https://localhost:44351/api/Proposal/GetProposalByQuotNO?quotoNo=" + proposalNo;
+
+            var res = await GetApiInvoke<policyDto>(uri, Context);
+            return res;
+
+        }
+
+
+        public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
+        {
+            HttpClient client = new HttpClient();
+
+            if (!string.IsNullOrEmpty(apiContext.Token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+            }
+
+            using (var response = await client.GetAsync(url))
+            using (var content = response.Content)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var serviceResponse = await content.ReadAsAsync<TResponse>();
+                    if (serviceResponse != null)
+                    {
+                        return serviceResponse;
+                    }
+                }
+            }
+            return new TResponse();
         }
 
         private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()

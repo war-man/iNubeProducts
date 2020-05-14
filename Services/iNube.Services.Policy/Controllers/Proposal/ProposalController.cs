@@ -57,6 +57,7 @@ namespace iNube.Services.Policy.Controllers.Proposal
         }
 
 
+
         
 
         [HttpGet("GetMasterData")]
@@ -90,6 +91,19 @@ namespace iNube.Services.Policy.Controllers.Proposal
                 default:
                     return Forbid();
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProposalByQuotNO(string quotoNo)
+        {
+            var suspects =await _proposalService.GetProposalByQuotNO(quotoNo, Context);
+            return Ok(suspects);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPolicyByProposalNO(string proposalNo)
+        {
+            var suspects = await _proposalService.GetPolicyByQuotNO(proposalNo, Context);
+            return Ok(suspects);
         }
 
         // GET: api/Proposal

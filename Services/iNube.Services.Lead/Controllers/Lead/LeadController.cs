@@ -146,9 +146,9 @@ namespace iNube.Services.Lead.Controllers.Lead
             return Ok(response);
         }
         [HttpGet]
-        public IActionResult ViewDetailsByPositionId(string Positionid)
+        public async Task<IActionResult> ViewDetailsByPositionId(string Positionid)
         {
-            var suspects = _leadService.ViewDetailsByPositionId(Positionid, Context);
+            var suspects =await _leadService.ViewDetailsByPositionIdAsync(Positionid, Context);
             return Ok(suspects);
 
         }
