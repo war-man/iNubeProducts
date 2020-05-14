@@ -1074,7 +1074,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 //_context.SaveChanges();
                 var postionCheck = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == pdata.OrganizationId
                 && x.OfficeId == movementData.NewBranchId && x.DesignationId == movementData.NewPositionId
-                && x.ParentId == pdata.ParentId && x.IsVacant == true);
+                && x.IsVacant == true);
                 if (postionCheck == null)
                 {
                     TblOrgPositions position = new TblOrgPositions();
