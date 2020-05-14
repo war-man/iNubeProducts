@@ -160,6 +160,7 @@ namespace iNube.Services.Partners.Models
     {
         public string EmpCode { get; set; }
     }
+
     public partial class OrganizationDTO
     {
         public OrganizationDTO()
@@ -1723,7 +1724,7 @@ namespace iNube.Services.Partners.Models
         public string OfficeName { get; set; }
         public string Designation { get; set; }
         public decimal? ReportingTo { get; set; }
-
+        public string Supervisorname { get; set; }
 
         public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
         public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
@@ -2064,6 +2065,11 @@ namespace iNube.Services.Partners.Models
         public decimal? MovedTo { get; set; }
         public decimal OrgEmpId { get; set; }
         public int MovementStatusId { get; set; }
+    }
+
+    public partial class EMPDistribute
+    {
+        public List<EMPDistributeDTO> EMPDistributeDTO { get; set; }
     }
 
     public partial class EMPDistributeDTO

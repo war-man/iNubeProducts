@@ -174,8 +174,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             }
                             else
                             {
-                                tblOrg.RepotrsToId = _organization.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.reportto).LevelId;
-                                tblOrg.ParentId = _organization.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.reportto).LevelId;
+                                var parentid = _organization.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.reportto).OrgStructureId;
+                                tblOrg.RepotrsToId = Convert.ToInt32(parentid);
+                                tblOrg.ParentId = Convert.ToInt32(parentid);
                             }
                         }
                         tblOrg.UserName = apiContext.UserName;
