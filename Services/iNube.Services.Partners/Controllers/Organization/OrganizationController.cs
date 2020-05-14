@@ -503,11 +503,12 @@ namespace iNube.Services.Partners.Controllers.Organization
 
         //  || AVO
         [HttpGet]
-        public async Task<IActionResult> GetNewSupervisorByMovementId(int MovementId, int MovementStatusId)
+        public async Task<IActionResult> GetNewSupervisorByMovementId(decimal OrgEmpId,decimal MovementId, int MovementStatusId)
         {
             Supervisor supervisor = new Supervisor();
+            supervisor.OrgEmpId = OrgEmpId;
             supervisor.MovementId = MovementId;
-            supervisor.MovementStatus = MovementStatusId;
+            supervisor.MovementStatusId = MovementStatusId;
             var response = await _avoorgService.GetNewSupervisorByMovementId(supervisor, Context);
             return Ok(response);
         }

@@ -1677,6 +1677,7 @@ class ProductConfig extends React.Component {
             if (type === "InsurableCategory") {
                 this.GetMasterService('Switchon', value);
                 this.GetMasterService('CoverEvent', event.target.value);
+                this.GetRiskClaimMaster('Risk', 0, event.target.value);
                 this.GetRiskClaimMaster('Claim', 0, event.target.value);
               
              //Extra Feature

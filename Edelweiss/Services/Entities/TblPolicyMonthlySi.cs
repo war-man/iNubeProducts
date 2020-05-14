@@ -5,6 +5,11 @@ namespace MicaExtension_EGI.Entities
 {
     public partial class TblPolicyMonthlySi
     {
+        public TblPolicyMonthlySi()
+        {
+            TblSiexception = new HashSet<TblSiexception>();
+        }
+
         public int ReportId { get; set; }
         public DateTime? DueDate { get; set; }
         public string PolicyNo { get; set; }
@@ -28,5 +33,8 @@ namespace MicaExtension_EGI.Entities
         public DateTime? ReportCreatedDate { get; set; }
         public string PremiumDetails { get; set; }
         public DateTime? PaymentDate { get; set; }
+        public string Source { get; set; }
+
+        public virtual ICollection<TblSiexception> TblSiexception { get; set; }
     }
 }

@@ -301,6 +301,7 @@ class CreateCDaccount extends React.Component {
         console.log(this.state.cdAccountsDTO.productName);
         const { show } = this.state.show;
         this.setState({ show: true });
+        let that = this;
         console.log("create payment", this.state.cdAccountsDTO);
         if (this.state.cdAccountsDTO.partnerId != "" && this.state.cdAccountsDTO.productId != "" && this.state.cdAccountsDTO.lob != "" && this.state.cdAccountsDTO.cob != "" && this.state.cdAccountsDTO.thresholdValue != "" && this.state.cdAccountsDTO.dropLimit != "" && eval(this.state.cdAccountsDTO.thresholdValue) > eval(this.state.cdAccountsDTO.dropLimit)) {
          
@@ -325,7 +326,7 @@ class CreateCDaccount extends React.Component {
                             text: msg,
                             icon: "success"
                         });
-                      this.reset();
+                        that.reset();
                         //this.setState({ redirect: true });
                         //this.renderRedirect();
                      

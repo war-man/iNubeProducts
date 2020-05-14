@@ -5266,6 +5266,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             dynamic PolicyData = JsonConvert.DeserializeObject(CDDetails.FirstOrDefault(x => x.Action == "Issue Policy").UpdatedResponse);
 
+                            var Source = PolicyData["Source"];
+
+                            if (Source != null)
+                            {
+                                monthlySiDTO.Source = Source;
+                            }
+
                             string StateCode = PolicyData["stateCode"];
                             TaxTypeDTO TaxType = await TaxTypeForStateCode(StateCode, context);
 
@@ -5324,6 +5331,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                 monthlySiDTO.Amount = monthlySiDTO.TotalAmountChargeable;
 
+                                
                                 Guid guid = Guid.NewGuid();
                                 monthlySiDTO.Txnid = guid.ToString();
 
@@ -5467,6 +5475,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         public async Task<MonthlySIUploadDTO> MonthlySIUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext context)
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
 
             string filePath = "";
             int step1 = 0;
@@ -5705,8 +5714,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                 if (errorflag == false)
                                                 {
                                                     var TblData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
-
-
+                                                                                                        
                                                     var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(TblData.PremiumDetails);
 
                                                     var CallMicaCd = await _integrationService.MasterCDACC(CdDTO, context);
@@ -5721,6 +5729,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                                         _context.TblPolicyMonthlySi.Update(TblData);
                                                         _context.SaveChanges();
+
                                                     }
                                                     else
                                                     {
@@ -6194,24 +6203,69 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             ResponseStatus response = new ResponseStatus();
             ErrorInfo errorInfo = new ErrorInfo();
 
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            if (monthlySIDTO.PolicyNumber != null)
+            {
+                response.ResponseMessage = "Policy Number Missing";
+                response.Id = monthlySIDTO.PolicyNumber;
+                response.Status = BusinessStatus.InputValidationFailed;
+                errorInfo.ErrorMessage = "Mandatory Field Missing";
+                errorInfo.ErrorCode = "MSI003";
+                errorInfo.PropertyName = "PolicyNumber";
+                response.Errors.Add(errorInfo);
+
+                return response;
+            }
+
+            if (monthlySIDTO.PaymentReferenceId != null)
+            {
+                response.ResponseMessage = "Payment Refrence Id Missing";
+                response.Id = monthlySIDTO.PaymentReferenceId;
+                response.Status = BusinessStatus.InputValidationFailed;
+                errorInfo.ErrorMessage = "Mandatory Field Missing";
+                errorInfo.ErrorCode = "MSI004";
+                errorInfo.PropertyName = "PaymentReferenceId";
+                response.Errors.Add(errorInfo);
+
+                return response;
+            }
 
             var MonthlySIData = _context.TblPolicyMonthlySi.FirstOrDefault(x=>x.PolicyNo == monthlySIDTO.PolicyNumber && x.DueDate.Value.Month == monthlySIDTO.Month && x.DueDate.Value.Year == monthlySIDTO.Year);
 
             if(MonthlySIData != null)
             {
-                if(MonthlySIData.Amount == monthlySIDTO.PaidAmount)
-                {
+                var DifferenceAmount = monthlySIDTO.PaidAmount - MonthlySIData.TotalAmountChargeable;
 
-                    MonthlySIData.PayUid = monthlySIDTO.PaymentReferenceId.ToString();
-                    MonthlySIData.PayAmount = monthlySIDTO.PaidAmount.ToString();
-                    MonthlySIData.PaymentDate = monthlySIDTO.PaymentDate;
-                    MonthlySIData.PayStatus = "Successful";
+                if (DifferenceAmount >= -1)
+                {                 
 
-                    response.ResponseMessage = "Monthly SI Successfully Updated";
-                    response.Status = BusinessStatus.Ok;
+                    var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(MonthlySIData.PremiumDetails);
 
-                    _context.TblPolicyMonthlySi.Update(MonthlySIData);
-                    _context.SaveChanges();
+                    var CallMicaCd = await _integrationService.MasterCDACC(CdDTO, context);
+
+                    if (CallMicaCd != null)
+                    {
+                        MonthlySIData.PayUid = monthlySIDTO.PaymentReferenceId.ToString();
+                        MonthlySIData.PayAmount = monthlySIDTO.PaidAmount.ToString();
+                        MonthlySIData.PaymentDate = monthlySIDTO.PaymentDate;
+                        MonthlySIData.PayStatus = "Successful";
+
+                        response.ResponseMessage = "Monthly SI Successfully Updated";
+                        response.Status = BusinessStatus.Updated;
+
+                        _context.TblPolicyMonthlySi.Update(MonthlySIData);
+                    }
+                    else
+                    {
+                        response.ResponseMessage = "MICA Updation Failed";
+                        response.Id = monthlySIDTO.PolicyNumber;
+                        response.Status = BusinessStatus.Error;
+                        errorInfo.ErrorMessage = "Updation Failed";
+                        errorInfo.ErrorCode = "MSI005";
+                        errorInfo.PropertyName = "Update Failed";
+                        response.Errors.Add(errorInfo);
+                    }
 
                 }
                 else
@@ -6223,7 +6277,23 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     errorInfo.ErrorCode = "MSI001";
                     errorInfo.PropertyName = "Amount";
                     response.Errors.Add(errorInfo);
+
+                    TblSiexception SiException = new TblSiexception();
+
+                    SiException.ReportId = MonthlySIData.ReportId;
+                    SiException.RequestObject = JsonConvert.SerializeObject(monthlySIDTO); ;
+                    SiException.RequestAmount = monthlySIDTO.PaidAmount;
+                    SiException.DifferenceAmount = DifferenceAmount * (-1);
+                    SiException.Status = true;
+                    SiException.CreatedDate = IndianTime;
+                    SiException.Source = MonthlySIData.Source;
+
+                    _context.TblSiexception.Add(SiException);
+
                 }
+
+                _context.SaveChanges();
+
             }
             else
             {

@@ -167,7 +167,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                         tblOrg.LevelDefinition = item.levelname;
                         if (!string.IsNullOrEmpty(item.levelname))
                         {
-                            if (item.reportto == "self")
+                            if (item.reportto == "0")
                             {
                                 tblOrg.RepotrsToId = null;
                                 tblOrg.ParentId = null;
@@ -999,8 +999,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             }
                         }
                     }
-                    //based on designation change Updating new designation roles to the user account
                     var empid = _context.TblMovements.FirstOrDefault(a => a.MovementId == movements.MovementId);
+
+                    //Create new position
+                    var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
+                    promote.PositionId = Convert.ToDecimal(newPos.Id);
+
+                    //based on designation change Updating new designation roles to the user account
                     EmpRoleMapDTO empRole = new EmpRoleMapDTO();
                     var employee = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
                     empRole.Empcode = employee.StaffCode;
@@ -1008,10 +1014,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     empRole.RoleId = roles.Roles;
                     var changeDesig = await _integrationService.UpdateEmpRole(empRole, apiContext);
 
-                    //Create new position
-                    var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
-                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
-                    promote.PositionId = Convert.ToDecimal(newPos.Id);
+
                 }
                 _context.TblMovements.Update(movementdata);
                 var mapData = _mapper.Map<AVOMovements>(movementdata);
@@ -1413,72 +1416,73 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return mappingData;
         }
 
-        public async Task<List<Supervisor>> GetNewSupervisorByMovementId(Supervisor supervisor,ApiContext apiContext)
+        public async Task<List<Supervisor>> GetNewSupervisorByMovementId(Supervisor supervisor, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var supData = from a in _context.TblMovementDetails
-                          join b in _context.TblOrgEmployee on a.MovedTo equals b.OrgEmpId
-                          join c in _context.TblMovements on a.MovementId equals c.MovementId
-                          where a.MovementId == supervisor.MovementId && c.MovementStatusId == supervisor.MovementStatus
+            var supData = from a in _context.TblOrgEmployee
+                          join b in _context.TblMovements on a.OrgEmpId equals b.OrgEmpId
+                          join c in _context.TblMovementDetails on b.MovementId equals c.MovementId
+                          where b.MovementId == supervisor.MovementId && b.MovementStatusId == supervisor.MovementStatusId
+                          && a.OrgEmpId == supervisor.OrgEmpId
                           select new Supervisor
                           {
-                              StaffName = b.StaffName,
-                              OrgEmpId = b.OrgEmpId
+                             MovedTo=c.MovedTo
                           };
             var _supData = _mapper.Map<List<Supervisor>>(supData);
             return _supData;
 
         }
 
-        public async Task<AVOReporteeGrid> ViewReporteeGrid(int Empcode,int MovementId,int MovementStatusId, ApiContext apiContext)
+        public async Task<AVOReporteeGrid> ViewReporteeGrid(int Empcode, int MovementId, int MovementStatusId, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var _emp = from a in _context.TblMovementDetails
-                        join b in _context.TblOrgEmployee on a.MovedTo equals b.OrgEmpId
-                        join c in _context.TblMovements on a.MovementId equals c.MovementId
-                        where a.MovementId == MovementId && c.MovementStatusId == MovementStatusId
-                        select b;
+            var _emp = from a in _context.TblOrgEmployee
+                       join b in _context.TblMovements on a.OrgEmpId equals b.OrgEmpId
+                       join c in _context.TblMovementDetails on b.MovementId equals c.MovementId
+                       where b.MovementId == MovementId && b.MovementStatusId == MovementStatusId
+                       select new { a, c };
 
-            var record = _emp.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
+            var record = _emp.FirstOrDefault(x => x.a.OrgEmpId == Empcode).a.PositionId;
 
-            var pos = _context.TblOrgPositions.Where(x => x.PositionId > record.SingleOrDefault()).Select(x => x);
+            var pos = _context.TblOrgPositions.Where(x => x.PositionId >= record).Select(x => x);
 
             AVOReporteeGrid val = new AVOReporteeGrid();
             List<AVOReportee> val2 = new List<AVOReportee>();
             List<MasterDto> masval = new List<MasterDto>();
             foreach (var i in pos)
             {
-                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+                var Ival = _emp.Where(x => x.a.PositionId == i.PositionId);
 
                 foreach (var v in Ival)
                 {
                     AVOReportee val3 = new AVOReportee();
-                    val3.OrgEmpId = v.OrgEmpId;
-                    val3.StaffCode = v.StaffCode;
-                    val3.StaffName = v.StaffName;
-                    val3.PositionId = v.PositionId;
-                    val3.Email = v.Email;
-                    val3.PhoneNumber = v.PhoneNumber;
-
+                    val3.OrgEmpId = v.a.OrgEmpId;
+                    val3.StaffCode = v.a.StaffCode;
+                    val3.StaffName = v.a.StaffName;
+                    val3.PositionId = v.a.PositionId;
+                    val3.Email = v.a.Email;
+                    val3.PhoneNumber = v.a.PhoneNumber;
+                    val3.MovedTo = v.c.MovedTo;
+                    val3.MovingFormId = v.c.MovementFormId;
                     val2.Add(val3);
 
                 }
                 val.reporteedata = val2;
             }
 
-            var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x);
+            var pos1 = _context.TblOrgPositions.Where(x => x.PositionId <= record).Select(x => x);
 
             foreach (var i in pos1)
             {
-                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+                var Ival = _emp.Where(x => x.a.PositionId == i.PositionId);
 
                 foreach (var v in Ival)
                 {
                     MasterDto val3 = new MasterDto();
-                    val3.mID = Convert.ToInt32(v.OrgEmpId);
-                    val3.mValue = v.StaffName;
+                    val3.mID = Convert.ToInt32(v.a.OrgEmpId);
+                    val3.mValue = v.a.StaffName;
 
                     masval.Add(val3);
 
