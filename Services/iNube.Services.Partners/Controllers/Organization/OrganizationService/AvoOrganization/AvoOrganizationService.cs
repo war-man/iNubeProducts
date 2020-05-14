@@ -1498,5 +1498,16 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             return val;
         }
+
+        public async Task<EmployeeRoles> DesignationRoles(string designationid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var roledata = _context.TblDesignationRole.Where(a => a.DesignationId == Convert.ToDecimal(designationid)).Select(a => a.RoleId).ToList();
+
+            EmployeeRoles roles = new EmployeeRoles();
+            roles.Roles = roledata.ToArray();
+            return roles;
+        }
     }
 }

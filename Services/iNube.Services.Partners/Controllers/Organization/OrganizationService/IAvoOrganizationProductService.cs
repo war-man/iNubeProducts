@@ -53,5 +53,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<EmpMappingData> GetEmpMappingData(string empcode,ApiContext apiContext);
         Task<List<Supervisor>> GetNewSupervisorByMovementId(Supervisor supervisor, ApiContext apiContext);
         Task<AVOReporteeGrid> ViewReporteeGrid(int Empcode, int MovementId, int MovementStatusId, ApiContext apiContext);
+        Task<EmployeeRoles> DesignationRoles(string designationid, ApiContext apiContext);
     }
 }
