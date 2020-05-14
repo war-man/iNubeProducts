@@ -18,14 +18,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
     public class AvoOrganizationService : IAvoOrganizationProductService
     {
-        private AVOPRContext _context;
+        private AVOPRContext _context = null;
         private IMapper _mapper;
         private readonly IConfiguration _configuration;
 
         private IIntegrationService _integrationService;
         public AvoOrganizationService(AVOPRContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
         {
-            _context = context;
+           // _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _configuration = configuration;
@@ -835,9 +835,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext)
         {
-
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
             var Roles = (from a in _context.TblOrgEmployee.Where(emp => emp.StaffCode == empCode)
                          join b in _context.TblOrgPositions on a.PositionId equals b.PositionId
                          join d in _context.TblDesignationRole on b.DesignationId equals d.DesignationId
@@ -947,16 +948,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<AVOMovements> UpdateEmployeePosition(PositionStatusDTO movements, ApiContext apiContext)
         {
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
             try
             {
                 var movementdata = _context.TblMovements.FirstOrDefault(x => x.MovementId == movements.MovementId);
-                var positiondata = (from pos in _context.TblOrgPositions
-                                    join emp in _context.TblOrgEmployee on pos.PositionId equals emp.PositionId
-                                    where emp.OrgEmpId == movementdata.OrgEmpId
-                                    select (pos));
-                var pdata = positiondata.FirstOrDefault();
-
+               
                 if (movements.MovementStatusId == 34)//Recommended
                 {
                     movementdata.MovementStatusId = movements.MovementStatusId;
@@ -999,29 +998,23 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             }
                         }
                     }
-                    var empid = _context.TblMovements.FirstOrDefault(a => a.MovementId == movements.MovementId);
+                    //var empid = _context.TblMovements.FirstOrDefault(a => a.MovementId == movements.MovementId);
 
                     //Create new position
                     var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
-                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
+                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == movementdata.OrgEmpId);
                     promote.PositionId = Convert.ToDecimal(newPos.Id);
 
                     //based on designation change Updating new designation roles to the user account
                     EmpRoleMapDTO empRole = new EmpRoleMapDTO();
-                    var employee = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
-                    empRole.Empcode = employee.StaffCode;
+                    empRole.Empcode = promote.StaffCode;
                     var roles = await GetEmployeeRoles(empRole.Empcode, apiContext);
                     empRole.RoleId = roles.Roles;
                     var changeDesig = await _integrationService.UpdateEmpRole(empRole, apiContext);
-
-
                 }
                 _context.TblMovements.Update(movementdata);
-                var mapData = _mapper.Map<AVOMovements>(movementdata);
-
-
-
                 _context.SaveChanges();
+                var mapData = _mapper.Map<AVOMovements>(movementdata);               
                 return mapData;
             }
 
@@ -1033,7 +1026,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<ResponseStatus> CreateNewPosition(decimal MovementId, ApiContext apiContext)
         {
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
             //Random Numb
             int _min = 1000;
             int _max = 9999;
@@ -1085,15 +1081,18 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     position.ReportingId = pdata.ReportingId;
                     position.CreatedBy = apiContext.UserId;
                     position.CreatedDate = DateTime.Now;
-                    position.IsVacant = false;
+                    position.IsVacant = true;
                     position.IsActive = true;
                     _context.TblOrgPositions.Add(position);
                     _context.SaveChanges();
-
+                    position.IsVacant = false;
                     response.Id = position.PositionId.ToString();
                 }
                 else
+                {
+                    postionCheck.IsVacant = false;
                     response.Id = postionCheck.PositionId.ToString();
+                }
             }
             return response;
         }
