@@ -76,16 +76,23 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
         {
             try
             {
-
+                List<TblOrgOffice> lstOffice = new List<TblOrgOffice>();
                 _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            // OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
-            var _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
-                                    .Include(add => add.TblOfficeSpocDetails)
-                                    .ToList();
-            var _officeDTO = _mapper.Map<IEnumerable<AVOOrgOffice>>(_tblOrgOffice);
-            return _officeDTO;
-}
+                // OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
+                var _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
+                                        .Include("TblOfficeSpocDetails")
+                                        .FirstOrDefault();
+                var _tblOrgOfficeSpoc = _context.TblOfficeSpocDetails.Where(org => org.OfficeId == _tblOrgOffice.OrgOfficeId)
+                                        .FirstOrDefault();
+                if (_tblOrgOfficeSpoc != null)
+                {
+                    _tblOrgOffice.TblOfficeSpocDetails.Add(_tblOrgOfficeSpoc);
+                }
+                lstOffice.Add(_tblOrgOffice);
+                var _officeDTO = _mapper.Map<IEnumerable<AVOOrgOffice>>(lstOffice);
+                return _officeDTO;
+            }
             catch (Exception ex)
             {
                 return null;
