@@ -25,7 +25,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         private IIntegrationService _integrationService;
         public AvoOrganizationService(AVOPRContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
         {
-           // _context = context;
+            // _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _configuration = configuration;
@@ -649,12 +649,18 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             foreach (var item in _SearchData)
             {
-                var designation = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == item.PositionId);
-                if (designation != null)
+                var positions = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == item.PositionId);
+                var designatioinid = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == positions.DesignationId).LevelDefinition;
+                if (positions != null)
                 {
-                    item.Designation = designation.PositionName;
+                    item.Designation = designatioinid;
                 }
-                var offname = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == designation.OfficeId);
+                var supervisor = _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == positions.ParentId);
+                if (supervisor != null)
+                {
+                    item.Supervisorname = supervisor.StaffName;
+                }
+                var offname = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == positions.OfficeId);
                 if (offname != null)
                 {
                     item.OfficeName = offname.OfficeName;
@@ -955,7 +961,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             try
             {
                 var movementdata = _context.TblMovements.FirstOrDefault(x => x.MovementId == movements.MovementId);
-               
+
                 if (movements.MovementStatusId == 34)//Recommended
                 {
                     movementdata.MovementStatusId = movements.MovementStatusId;
@@ -1014,7 +1020,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 }
                 _context.TblMovements.Update(movementdata);
                 _context.SaveChanges();
-                var mapData = _mapper.Map<AVOMovements>(movementdata);               
+                var mapData = _mapper.Map<AVOMovements>(movementdata);
                 return mapData;
             }
 
@@ -1426,7 +1432,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           && a.OrgEmpId == supervisor.OrgEmpId
                           select new Supervisor
                           {
-                             MovedTo=c.MovedTo
+                              MovedTo = c.MovedTo
                           };
             var _supData = _mapper.Map<List<Supervisor>>(supData);
             return _supData;
