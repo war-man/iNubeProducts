@@ -3697,7 +3697,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public async Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject, ApiContext context)
+        public async Task<List<RuleEngineResponse>> RuleMapper (string TxnType, dynamic SourceObject, ApiContext context)
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
                        
@@ -3956,7 +3956,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
 
                     return engineResponse;
-                //case "EndorementAdd":
+
+
+                //PolicyBazaar Related Validation            
+                case "PolicyCreation":
+                  return  GenericMapper(SourceObject);
 
 
                 //    return RuleEngine;
@@ -6235,6 +6239,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             if(MonthlySIData != null)
             {
+                
+                if(MonthlySIData.PayUid != null)
+                {
+                    response.ResponseMessage = "Payment Details is Already Updated";
+                    response.Id = monthlySIDTO.PolicyNumber;
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Data Cannot be Modified";
+                    errorInfo.ErrorCode = "MSI005";
+                    errorInfo.PropertyName = "MonthlySI";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+
                 var DifferenceAmount = monthlySIDTO.PaidAmount - MonthlySIData.TotalAmountChargeable;
 
                 if (DifferenceAmount >= -1)
@@ -6262,7 +6281,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         response.Id = monthlySIDTO.PolicyNumber;
                         response.Status = BusinessStatus.Error;
                         errorInfo.ErrorMessage = "Updation Failed";
-                        errorInfo.ErrorCode = "MSI005";
+                        errorInfo.ErrorCode = "MSI006";
                         errorInfo.PropertyName = "Update Failed";
                         response.Errors.Add(errorInfo);
                     }
@@ -6308,6 +6327,308 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return response;
         }
+
+        private List<RuleEngineResponse> GenericMapper(dynamic SourceObject)
+        {          
+            int successcount = 0;
+            int failcount = 0;
+            var DriverRiskItem = SourceObject["InsurableItem"][0]["RiskItems"];
+            var VehicleRiskItem = SourceObject["InsurableItem"][1]["RiskItems"];
+            var NoOfVehicles = Convert.ToInt32(SourceObject["noOfPC"]) + Convert.ToInt32(SourceObject["noOfTW"]);
+
+            List<RuleEngineResponse> engineResponse = new List<RuleEngineResponse>();
+            try
+            {
+                foreach (var item in DriverRiskItem)
+                {
+                    var driverExp = item["Driving Experience"];
+                    if (driverExp >= 1)
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Driving Experience";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for driver experience cannot be less than one year";
+                        resobj.Code = "GEPO001";
+                        engineResponse.Add(resobj);
+                        successcount++;
+
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Driving Experience";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Driver Experience cannot be less than one year";
+                        resobj.Code = "GEPO001";
+                        engineResponse.Add(resobj);
+                        failcount++;
+
+                    }
+                }
+
+                if (Convert.ToInt32(SourceObject["driverExp"]) > Convert.ToInt32(SourceObject["driverAge"]) - 18)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "driverExp";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Years of driving experience cannot be greater than the difference in current age and 18";
+                    resobj.Code = "GEPO002";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "driverExp";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for driver experience";
+                    resobj.Code = "GEPO002";
+                    engineResponse.Add(resobj);
+                    successcount++;
+                }
+                if (SourceObject["noOfPC"] == 1)
+                {
+                    if (SourceObject["si"] <= 2000000)
+                    {
+
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for sum insured";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Sum Insured is exceeding the limit defined";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        failcount++;
+                    }
+                }
+                else if (SourceObject["noOfPC"] == 2)
+                {
+                    if (SourceObject["si"] <= 4000000)
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for sum insured";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Sum Insured is exceeding the limit defined";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        failcount++;
+                    }
+
+                }
+                else if (SourceObject["noOfPC"] == 3)
+                {
+                    if (SourceObject["si"] <= 6000000)
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for sum insured";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Sum Insured is exceeding the limit defined";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        failcount++;
+                    }
+
+                }
+
+                if (NoOfVehicles > 0 && NoOfVehicles <= 3)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "noOfVehicles";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for number of vehicles is exceeding the limit defined";
+                    resobj.Code = "GEPO009";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "noOfVehicles";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Number of vehicles is exceeding the limit defined";
+                    resobj.Code = "GEPO009";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                }
+
+                if (SourceObject["noOfPC"] > 0 && SourceObject["noOfPC"] >= 1)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "noOfPC";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for minimum one PC required";
+                    resobj.Code = "GEPO010";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "noOfPC";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Minimum One PC required";
+                    resobj.Code = "GEPO010";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+
+                }
+                if (SourceObject["additionalDriver"] > 0 && SourceObject["additionalDriver"] <= 2)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "additionalDriver";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for number of additional drivers cannot be more than 2";
+                    resobj.Code = "GEPO011";
+                    engineResponse.Add(resobj);
+                    successcount++;
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "additionalDriver";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Number of additional drivers cannot be more than 2";
+                    resobj.Code = "GEPO011";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                }
+                if (SourceObject["billingFrequency"] == "Monthly" || SourceObject["billingFrequency"] == "Yearly")
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "billingFrequency";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for billing frequency can either be monthly/yearly";
+                    resobj.Code = "GEPO012";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "billingFrequency";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Billing Frequency can either be Monthly/Yearly";
+                    resobj.Code = "GEPO012";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+
+                }
+                if (SourceObject["driverAge"] >= 18)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "driverAge";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for age of driver cannot be less than 18 years";
+                    resobj.Code = "GEPO014";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "driverAge";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Age of driver cannot be less than 18 years";
+                    resobj.Code = "GEPO014";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+
+                }
+                foreach (var item in VehicleRiskItem)
+                {
+                    var vehicleType = item["Vehicle Type"];
+                    if (vehicleType == "PC" || vehicleType == "TW")
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Vehicle Type";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for vehicle type mismatch";
+                        resobj.Code = "GEPO015";
+                        engineResponse.Add(resobj);
+                        successcount++;
+
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Vehicle Type";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Vehicle type mismatch";
+                        resobj.Code = "GEPO015";
+                        engineResponse.Add(resobj);
+                        failcount++;
+
+                    }
+                }
+
+
+                if (failcount > 0)
+                {
+                    RuleEngineResponse res4obj = new RuleEngineResponse();
+                    res4obj.ValidatorName = "Final Result";
+                    res4obj.Outcome = "Fail";
+                    res4obj.Message = "One or More conditions failed";
+                    res4obj.Code = "GEPO016";
+                    engineResponse.Add(res4obj);
+                }
+                else
+                {
+                    RuleEngineResponse res4obj = new RuleEngineResponse();
+                    res4obj.ValidatorName = "Final Result";
+                    res4obj.Outcome = "Success";
+                    res4obj.Message = "Conditions Successful";
+                    res4obj.Code = "GEPO017";
+                    engineResponse.Add(res4obj);
+
+                }
+
+
+            }
+            catch
+            {
+                return new List<RuleEngineResponse>();
+            }
+
+           return engineResponse;
+          
+        }
+
 
     }
 }
