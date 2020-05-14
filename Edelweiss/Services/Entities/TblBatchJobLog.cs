@@ -10,7 +10,7 @@ namespace MicaExtension_EGI.Entities
             TblBatchJobDetailsLog = new HashSet<TblBatchJobDetailsLog>();
         }
 
-        public int BatchLogId { get; set; }
+        public decimal BatchLogId { get; set; }
         public string BatchName { get; set; }
         public string BatchMode { get; set; }
         public DateTime? StartDateTime { get; set; }
