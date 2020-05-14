@@ -1184,21 +1184,23 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             position = 2;
 
-            var _emp = from emp in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
-                       select emp;
+            //var _emp = from emp in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
+            //           select emp;
 
-            var record = _emp.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
+            var record = _context.TblOrgEmployee.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
             //var Emp = _context.TblOrgEmployee.Select(x => x).Where(c => c.OrgEmpId == Empcode).Select(x => x.PositionId);
 
-            var pos = _context.TblOrgPositions.Where(x => x.PositionId > record.SingleOrDefault()).Select(x => x).Take(position);
+            var pos = _context.TblOrgPositions.Where(x => x.ParentId == record.SingleOrDefault()).Select(x => x);
 
+            //var posss = _context.TblOrgPositions.Where(x => x.PositionId == record.SingleOrDefault()).Select(x => x.ParentId).Single();
+            //var pos = _context.TblOrgPositions.Where(x => x.PositionId == posss).Select(x => x);
             AVOReporteeGrid val = new AVOReporteeGrid();
             List<AVOReportee> val2 = new List<AVOReportee>();
             List<MasterDto> masval = new List<MasterDto>();
             foreach (var i in pos)
             {
                 // AVOOrgEmployee Ival = new AVOOrgEmployee();
-                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+                var Ival = _context.TblOrgEmployee.Where(x => x.PositionId == i.PositionId);
 
                 foreach (var v in Ival)
                 {
@@ -1216,24 +1218,40 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 val.reporteedata = val2;
             }
 
-            var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x).Take(position);
+            // var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x).Take(position);
+            var pos1 = _context.TblOrgPositions.Where(x => x.PositionId == record.SingleOrDefault()).Select(x => x).SingleOrDefault();
+            //var designation = _context.TblOrgStructure.Where(x => x.OrgStructureId == pos1.SingleOrDefault()).Select(x => x.ParentId);
+            var desg = _context.TblOrgStructure.FirstOrDefault(x => x.OrgStructureId == pos1.DesignationId);
+            List<decimal> PositionIds = new List<decimal>();
+            PositionIds.Add(desg.OrgStructureId);
+            PositionIds.Add((decimal)desg.ParentId);
+            var Data = (from objposition in _context.TblOrgPositions.Where(x => x.OrganizationId == pos1.OrganizationId && x.OfficeId == pos1.OfficeId && PositionIds.Contains(Convert.ToDecimal(x.DesignationId)))
+                        join objempdetails in _context.TblOrgEmployee on objposition.PositionId equals objempdetails.PositionId
+                        select new MasterDto
+                        {
+                            mID = Convert.ToInt32(objempdetails.OrgEmpId),
+                            //  mType = "Employee",
+                            mValue = objempdetails.StaffName
+                        }).ToList();
+            //   return Data;
+            val.masterData = Data;
 
-            foreach (var i in pos1)
-            {
-                // AVOOrgEmployee Ival = new AVOOrgEmployee();
-                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+            //foreach (var i in pos1)
+            //{
+            //    // AVOOrgEmployee Ival = new AVOOrgEmployee();
+            //    var Ival = _context.TblOrgEmployee.Where(x => x.PositionId == i.ParentId);
 
-                foreach (var v in Ival)
-                {
-                    MasterDto val3 = new MasterDto();
-                    val3.mID = Convert.ToInt32(v.OrgEmpId);
-                    val3.mValue = v.StaffName;
+            //    foreach (var v in Ival)
+            //    {
+            //        MasterDto val3 = new MasterDto();
+            //        val3.mID = Convert.ToInt32(v.OrgEmpId);
+            //        val3.mValue = v.StaffName;
 
-                    masval.Add(val3);
+            //        masval.Add(val3);
 
-                }
-                val.masterData = masval;
-            }
+            //    }
+            //    val.masterData = masval;
+            //}
 
 
             return val;
