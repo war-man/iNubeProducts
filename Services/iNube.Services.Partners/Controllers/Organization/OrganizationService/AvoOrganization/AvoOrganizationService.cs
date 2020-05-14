@@ -502,7 +502,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             //          };
 
-            var Emp = from pos in _context.TblOrgPositions where(pos.PositionId == posid)
+            var Emp = from pos in _context.TblOrgPositions
+                      where (pos.PositionId == posid)
                       join off in _context.TblOrgOffice on pos.OrganizationId equals off.OrganizationId
                       select new ddDTO
                       {
@@ -689,32 +690,30 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //var totalPosition = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid && a.StructureTypeId == 28).ToList();
             var totalPosition = _context.TblOrgPositions.Where(a => a.OrganizationId == orgid).ToList();
-            var designations = _context.TblOrgStructure.Where(a => a.OrganizationId == orgid).Select(a => a);
             List<vacantPositiondto> ddDTOs = new List<vacantPositiondto>();
             vacantPositiondto ddDTO = new vacantPositiondto();
             foreach (var positions in totalPosition)
             {
-                var count = _context.TblOrgPositions.Where(a => a.DesignationId == positions.DesignationId && a.IsVacant == true).Count();
+                var count = _context.TblOrgPositions.Where(a => a.PositionName == positions.PositionName && a.IsVacant == true).Count();
                 if (count > 0)
                 {
                     ddDTO = new vacantPositiondto();
-                    ddDTO.mID = designations.FirstOrDefault(a => a.OrgStructureId == positions.DesignationId).OrgStructureId;
-                    ddDTO.mValue = designations.FirstOrDefault(a => a.OrgStructureId == positions.DesignationId).LevelDefinition;
+                    ddDTO.mID = positions.PositionName;
+                    ddDTO.mValue = positions.PositionName;
                     ddDTOs.Add(ddDTO);
                 }
 
             }
             return ddDTOs;
-
-
         }
 
-        public async Task<int> GetVacantPositonCount(decimal designame, ApiContext apiContext)
+        public async Task<string> GetSupervisorname(string designame, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var count = _context.TblOrgPositions.Where(a => a.DesignationId == designame && a.IsVacant == true).Count();
-            return count;
+            var positions = _context.TblOrgPositions.Where(a => a.PositionName == designame && a.IsVacant == true).FirstOrDefault();
+            var supervisorname = _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == positions.ParentId).StaffName;
+            return supervisorname;
         }
 
 
@@ -1015,6 +1014,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                                 movData.Status = 1;
                             }
                         }
+
                     }
                     //var empid = _context.TblMovements.FirstOrDefault(a => a.MovementId == movements.MovementId);
 

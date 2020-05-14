@@ -301,10 +301,10 @@ namespace iNube.Services.Partners.Controllers.Organization
         }
         // ||AVO
         [HttpGet]
-        public async Task<IActionResult> GetVacantPositonCount(decimal designame)
+        public async Task<IActionResult> GetSupervisorname(string designame)
         {
 
-            var response = await _avoorgService.GetVacantPositonCount(designame, Context);
+            var response = await _avoorgService.GetSupervisorname(designame, Context);
             return Ok(response);
         }
 

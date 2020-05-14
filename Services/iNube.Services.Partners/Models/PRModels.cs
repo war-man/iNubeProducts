@@ -23,7 +23,7 @@ namespace iNube.Services.Partners.Models
 
     public partial class vacantPositiondto
     {
-        public decimal mID { get; set; }
+        public string mID { get; set; }
         public string mValue { get; set; }
     }
 
@@ -2108,7 +2108,7 @@ namespace iNube.Services.Partners.Models
 
     public partial class EMPDistributeDTO
     {
-        public string Empcode { get; set; }
+        public decimal PositionId { get; set; }
         public decimal PrimaryIds { get; set; }
     }
     public class EmpHierarchyData : ResponseStatus
@@ -2119,14 +2119,14 @@ namespace iNube.Services.Partners.Models
         }
         public List<EmpHierarchy> StaffCodes { get; set; }
     }
-    public class EmpHierarchy 
+    public class EmpHierarchy
     {
         public int? ParentID { get; set; }
         public int? PositionID { get; set; }
         public string StaffName { get; set; }
         public string Staffcode { get; set; }
         public string LevelDefinition { get; set; }
-        public int? LevelId { get; set; }        
+        public int? LevelId { get; set; }
     }
 
 }
