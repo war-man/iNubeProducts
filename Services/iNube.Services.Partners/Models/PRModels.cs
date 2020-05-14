@@ -2061,9 +2061,9 @@ namespace iNube.Services.Partners.Models
     public class Supervisor
     {
         public decimal? MovementId { get; set; }
-        public string StaffName { get; set; }
+        public decimal? MovedTo { get; set; }
         public decimal OrgEmpId { get; set; }
-        public int MovementStatus { get; set; }
+        public int MovementStatusId { get; set; }
     }
 
     public partial class EMPDistributeDTO

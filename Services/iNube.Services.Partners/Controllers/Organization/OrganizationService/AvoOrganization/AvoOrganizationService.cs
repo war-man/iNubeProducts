@@ -1420,14 +1420,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var supData = from a in _context.TblMovementDetails
-                          join b in _context.TblOrgEmployee on a.MovedTo equals b.OrgEmpId
-                          join c in _context.TblMovements on a.MovementId equals c.MovementId
-                          where a.MovementId == supervisor.MovementId && c.MovementStatusId == supervisor.MovementStatus
+            var supData = from a in _context.TblOrgEmployee
+                          join b in _context.TblMovements on a.OrgEmpId equals b.OrgEmpId
+                          join c in _context.TblMovementDetails on b.MovementId equals c.MovementId
+                          where b.MovementId == supervisor.MovementId && b.MovementStatusId == supervisor.MovementStatusId
+                          && a.OrgEmpId == supervisor.OrgEmpId
                           select new Supervisor
                           {
-                              StaffName = b.StaffName,
-                              OrgEmpId = b.OrgEmpId
+                             MovedTo=c.MovedTo
                           };
             var _supData = _mapper.Map<List<Supervisor>>(supData);
             return _supData;
@@ -1445,7 +1445,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                        select new { a, c };
 
             var record = _emp.FirstOrDefault(x => x.a.OrgEmpId == Empcode).a.PositionId;
-            //var Emp = _context.TblOrgEmployee.Select(x => x).Where(c => c.OrgEmpId == Empcode).Select(x => x.PositionId);
 
             var pos = _context.TblOrgPositions.Where(x => x.PositionId >= record).Select(x => x);
 
@@ -1454,7 +1453,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             List<MasterDto> masval = new List<MasterDto>();
             foreach (var i in pos)
             {
-                // AVOOrgEmployee Ival = new AVOOrgEmployee();
                 var Ival = _emp.Where(x => x.a.PositionId == i.PositionId);
 
                 foreach (var v in Ival)
@@ -1478,7 +1476,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             foreach (var i in pos1)
             {
-                // AVOOrgEmployee Ival = new AVOOrgEmployee();
                 var Ival = _emp.Where(x => x.a.PositionId == i.PositionId);
 
                 foreach (var v in Ival)
