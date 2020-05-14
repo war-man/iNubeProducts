@@ -5476,7 +5476,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
-            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
 
             string filePath = "";
             int step1 = 0;
@@ -6239,17 +6238,34 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var DifferenceAmount = monthlySIDTO.PaidAmount - MonthlySIData.TotalAmountChargeable;
 
                 if (DifferenceAmount >= -1)
-                {
+                {                 
 
-                    MonthlySIData.PayUid = monthlySIDTO.PaymentReferenceId.ToString();
-                    MonthlySIData.PayAmount = monthlySIDTO.PaidAmount.ToString();
-                    MonthlySIData.PaymentDate = monthlySIDTO.PaymentDate;
-                    MonthlySIData.PayStatus = "Successful";
+                    var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(MonthlySIData.PremiumDetails);
 
-                    response.ResponseMessage = "Monthly SI Successfully Updated";
-                    response.Status = BusinessStatus.Updated;
+                    var CallMicaCd = await _integrationService.MasterCDACC(CdDTO, context);
 
-                    _context.TblPolicyMonthlySi.Update(MonthlySIData);                    
+                    if (CallMicaCd != null)
+                    {
+                        MonthlySIData.PayUid = monthlySIDTO.PaymentReferenceId.ToString();
+                        MonthlySIData.PayAmount = monthlySIDTO.PaidAmount.ToString();
+                        MonthlySIData.PaymentDate = monthlySIDTO.PaymentDate;
+                        MonthlySIData.PayStatus = "Successful";
+
+                        response.ResponseMessage = "Monthly SI Successfully Updated";
+                        response.Status = BusinessStatus.Updated;
+
+                        _context.TblPolicyMonthlySi.Update(MonthlySIData);
+                    }
+                    else
+                    {
+                        response.ResponseMessage = "MICA Updation Failed";
+                        response.Id = monthlySIDTO.PolicyNumber;
+                        response.Status = BusinessStatus.Error;
+                        errorInfo.ErrorMessage = "Updation Failed";
+                        errorInfo.ErrorCode = "MSI005";
+                        errorInfo.PropertyName = "Update Failed";
+                        response.Errors.Add(errorInfo);
+                    }
 
                 }
                 else
