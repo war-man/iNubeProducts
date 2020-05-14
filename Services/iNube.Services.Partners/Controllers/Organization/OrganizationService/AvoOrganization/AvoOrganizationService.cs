@@ -999,8 +999,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             }
                         }
                     }
-                    //based on designation change Updating new designation roles to the user account
                     var empid = _context.TblMovements.FirstOrDefault(a => a.MovementId == movements.MovementId);
+
+                    //Create new position
+                    var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
+                    promote.PositionId = Convert.ToDecimal(newPos.Id);
+
+                    //based on designation change Updating new designation roles to the user account
                     EmpRoleMapDTO empRole = new EmpRoleMapDTO();
                     var employee = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
                     empRole.Empcode = employee.StaffCode;
@@ -1008,10 +1014,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     empRole.RoleId = roles.Roles;
                     var changeDesig = await _integrationService.UpdateEmpRole(empRole, apiContext);
 
-                    //Create new position
-                    var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
-                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
-                    promote.PositionId = Convert.ToDecimal(newPos.Id);
+
                 }
                 _context.TblMovements.Update(movementdata);
                 var mapData = _mapper.Map<AVOMovements>(movementdata);
