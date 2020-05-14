@@ -492,8 +492,17 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
 
-            var Emp = from emp in _context.TblOrgEmployee
-                      join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
+            //var Emp = from emp in _context.TblOrgEmployee
+            //          join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
+            //          join off in _context.TblOrgOffice on pos.OrganizationId equals off.OrganizationId
+            //          select new ddDTO
+            //          {
+            //              mID = Convert.ToInt32(off.OrgOfficeId),
+            //              mValue = off.OfficeName,
+
+            //          };
+
+            var Emp = from pos in _context.TblOrgPositions where(pos.PositionId == posid)
                       join off in _context.TblOrgOffice on pos.OrganizationId equals off.OrganizationId
                       select new ddDTO
                       {
