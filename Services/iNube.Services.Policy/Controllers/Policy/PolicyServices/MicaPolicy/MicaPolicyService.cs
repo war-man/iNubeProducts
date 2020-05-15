@@ -646,7 +646,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //}
             return Errors;
         }
-        private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail,DateTime dateTime)
+        private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail,DateTime dateTime,dynamic Request=null)
         {
             mappedPolicy.PolicyIssueDate = dateTime;
 
@@ -663,7 +663,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             try
             {
                 EndorsementDetailsDTO tblEndorsementDetails = new EndorsementDetailsDTO();
-                tblEndorsementDetails.EnddorsementRequest = policyDetail.ToString();
+                tblEndorsementDetails.EnddorsementRequest = Request!=null? Request.ToString():null;
                 tblEndorsementDetails.IsPremiumRegister = true;
                 tblEndorsementDetails.PolicyId = policy.PolicyId;
                 tblEndorsementDetails.Action = action;
@@ -4258,8 +4258,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 //Step1:Validate of Request Object
 
-
-
+                var RequestData = ProposalDetail;
                 var res = await _integrationService.RuleMapper(ProposalDetail, "Proposal", apiContext);
                 if (res != null)
                 {
@@ -4430,7 +4429,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                                PolicyId = SavePolicyDetails(mappedPolicy, ProposalDetail, DatetimeNow);
+                                PolicyId = SavePolicyDetails(mappedPolicy, ProposalDetail, DatetimeNow, RequestData);
 
                                 //Step9:Post CD Account entries 
 
@@ -6429,8 +6428,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 SingleCover singleCover = new SingleCover();
                 decimal PolicyId = 0;
-              
 
+                var PolicyRequest = policyDTO;
 
                 DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
            
@@ -6522,9 +6521,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     /*Partner Section*/
                                     var partnerCode = "";
                                     if (policyDTO["Source"] != null)
-
                                     {
                                         partnerCode = policyDTO["Source"].ToString();
+                                    }
+                                    else {
+                                        return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = "Source cannot be empty" };
                                     }
                                     PartnersDTO partnerDetails = null;
                                     partnerDetails = await _integrationService.GetPartnerDetailByCodeAsync(partnerCode, apiContext);
@@ -6604,7 +6605,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                        
 
-                                        PolicyId = SavePolicyDetails(mappedPolicy, policyDTO, DatetimeNow);
+                                        PolicyId = SavePolicyDetails(mappedPolicy, policyDTO, DatetimeNow, PolicyRequest);
 
                                         //Step9:Post CD Account entries 
 
