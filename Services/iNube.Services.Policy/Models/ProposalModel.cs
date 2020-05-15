@@ -640,6 +640,15 @@ namespace iNube.Services.Policy.Models
 
 
         //Proposal
+        public class EmpHierarchy
+        {
+            public decimal ParentID { get; set; }
+            public decimal PositionID { get; set; }
+            public string StaffName { get; set; }
+            public string Staffcode { get; set; }
+            public string LevelDefinition { get; set; }
+            public int LevelId { get; set; }
+        }
         public partial class LeadDTO
         {
             public int ContactID { get; set; }
@@ -792,6 +801,89 @@ namespace iNube.Services.Policy.Models
 
             public string DaysInForCancellation { get; set; }
         }
+        public class PandingRequirementsDto
+        {
+            public string ProposalNo { get; set; }
+            public string QuoteNo { get; set; }
+            public string FullName { get; set; }
+            public string ProductName { get; set; }//this data will come from tblProducts
+            public decimal? Premium { get; set; }
+            public string Premiumlkr { get; set; }//(objProposalPayments.AnnualPremium + objProposalPayments.AdditionalPremium)
+            public string IssueDate { get; set; }//objpolicy.CreatedDate.ToString()
+                                                 //public List<SubmittedProposals> LstSubmittedProposals { get; set; }
+                                                 //public List<InboxDetails> objProposalDetails { get; set; }
+                                                 //public List<TblLifeQqDto> LstTblLifeQqDto { get; set; }
+                                                 //public List<TblOrganizationDto> LstTblOrganization { get; set; }
+
+        }
+        public class UWInboxDto
+        {
+            public List<InboxDetailsDto> LstInboxDetails { get; set; }
+
+
+
+            public string Message { get; set; }
+            public string UserName { get; set; }
+
+            public int UWPoolCount { get; set; }
+            public int SubmittedProposals { get; set; }
+            public int AllocationCount { get; set; }
+            public int AcceptedCount { get; set; }
+            public int RejectCount { get; set; }
+            public int PostponeCount { get; set; }
+            public int WithDrawnCount { get; set; }
+            public int CounterOffer { get; set; }
+            public int NotTakenCount { get; set; }
+            public int ReferToSRUWCount { get; set; }
+            public int OutStandingCount { get; set; }
+            public List<PandingRequirementsDto> LstProposals { get; internal set; }
+        }
+        public class CrossCuttingConstantsDto
+        {
+
+
+            #region Relationships
+            public const string Relationship = "PolicyRelationShip";
+            public const string ProposerCode = "Proposer";
+            public const string NomineeCode = "Nominee";
+            public const string InsuredCode = "Insured";
+            #endregion
+
+
+
+            public const string itemTypeProduct = "Product";
+            public const string itemTypeMenu = "Menu";
+            public const string itemTypePayment = "Payment";
+            public const string PageNameUsers = "Users";
+            public const string PageNameRoles = "Roles";
+            public const string AppNameAgent = "IMD";
+            public const string AppNameEmployee = "Employee";
+            public const string AllowedChars = "abcdefghijkmnGHJKLMNOPQRSTUVWXYZ234567opqrstuoM4jBpAw39Qoo3aSGyLiYnFqi5wYSpL2vwxyzABCDEF89@!#$&*";
+
+            // UW Decision
+            public const string UWDecisionAccepted = "184";
+            public const string UWDecisionAcceptwithloading = "185";
+            public const string UWDecisionDecline = "187";
+            public const string UWDecisionPostPone = "1449";
+            public const string UWDecisionWithDrawn = "2299";
+            public const string UWDecisionReferToUW = "2298";
+            public const string UWDecisionOutStandingReq = "1177";
+            public const string UWDecisionCounterOffer = "186";
+            public const string UWDecisionNotTaken = "1176";
+
+            // Stage Status ID
+            public const int PolicyStageStatusIssued = 194;
+            public const int PolicyStageStatusDecline = 196;
+            public const int PolicyStageStatusReferToUW = 193;
+            public const int PolicyStageStatusOutStandingReq = 2375;
+            public const int PolicyStageStatusCounterOffer = 2376;
+            public const int PolicyStageStatusnotTaken = 2374;
+            public const int PolicyStageStatusPending = 191;
+            public const int PolicyStageStatusWithDrawn = 2491;
+            public const int PolicyStageStatusPostPone = 2490;
+            public const int PolicyStageStatusNotTakenUp = 2374;
+
+        }
     }
 
     //Questionnarries
@@ -846,6 +938,7 @@ namespace iNube.Services.Policy.Models
             public string CityName { get; set; }
             public string MovedTo { get; set; }
         }
+        
 
     }
 
