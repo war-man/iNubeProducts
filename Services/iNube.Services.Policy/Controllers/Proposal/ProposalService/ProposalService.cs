@@ -25,7 +25,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
         ProposalResponce PartialFormDataSave(Models.ProposalModel.PolicyDto policyDto, ApiContext Context);
 
         Task<List<ProposalDto>> GetProposalByPositionId(int postid, ApiContext Context);
-        Task<policyDto> GetPolicyByQuotNO(string proposalNo, ApiContext Context);
+        Task<List<policyDto>> GetPolicyByHandledBy(int handledid, ApiContext Context);
         Task<List<InboxDetailsDto>> FetchProposalSubmittedDetailsAsync(ApiContext apiContext);
         Task<List<PandingRequirementsDto>> FetchPendingRequirementsAsync(ApiContext apiContext);
         Task<bool> UpdateEmpProposalData(EMPDistribute eMPDistribute, ApiContext apiContext);
@@ -225,13 +225,13 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             return Proposaldata;
 
         }
-        public async Task<policyDto> GetPolicyByQuotNO(string proposalNo, ApiContext Context)
+        public async Task<List<policyDto>> GetPolicyByHandledBy(int handledid, ApiContext Context)
         {
             //  _context = (ProposalContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var Policydata = (from tblMapper in _context.TblPolicy
 
-                              where (tblMapper.ProposalNo == proposalNo && tblMapper.PolicyNo != null)
+                              where (tblMapper.HandledBy == handledid.ToString() && tblMapper.PolicyNo != null)
 
                               join tblMapperDetails in _context.TblPolicyMemberDetails on tblMapper.PolicyId equals tblMapperDetails.PolicyId
 
@@ -248,7 +248,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
 
                                   // CityName = tblMapperDetails,
 
-                              }).FirstOrDefault();
+                              }).ToList();
             return Policydata;
 
         }

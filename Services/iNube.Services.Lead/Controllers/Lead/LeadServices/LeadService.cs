@@ -464,9 +464,13 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         {
 
             // var DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
-            var DATA = _context.TblOpportunity.Where(a => a.HandledBy == Positionid).ToList();
-            //var DATA = (from contact in _context.TblOpportunity)
-            //_context.TblOpportunity.Where(a => a.HandledBy == Positionid).ToList();
+            //var DATA = _context.TblOpportunity.Where(a => a.HandledBy == Positionid).ToList();
+            var DATA = (from oppurtunity in _context.TblOpportunity
+                        join contact in _context.TblContacts on oppurtunity.ContactId equals contact.ContactId
+                        where oppurtunity.HandledBy == Positionid
+                        select new { oppurtunity, contact })
+                        .ToList();
+
             LeadDTO suspect = new LeadDTO();
             List<LeadDTO> suspects = new List<LeadDTO>();
 
@@ -490,19 +494,19 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
             foreach (var item in DATA)
             {
-                if (item.StageId == 1)
+                if (item.oppurtunity.StageId == 1)
                 {
                     SuspectstagContactId = new StagContactId();
-                    SuspectstagContactId.contactid = item.ContactId;
-                    SuspectstagContactId.stagid = item.StageId;
+                    SuspectstagContactId.contactid = item.oppurtunity.ContactId;
+                    SuspectstagContactId.stagid = item.oppurtunity.StageId;
                     SuspectstagContactIds.Add(SuspectstagContactId);
 
                 }
-                if (item.StageId == 2)
+                if (item.oppurtunity.StageId == 2)
                 {
                     ProspectstagContactId = new StagContactId();
-                    ProspectstagContactId.contactid = item.ContactId;
-                    ProspectstagContactId.stagid = item.StageId;
+                    ProspectstagContactId.contactid = item.oppurtunity.ContactId;
+                    ProspectstagContactId.stagid = item.oppurtunity.StageId;
                     ProspecttagContactIds.Add(ProspectstagContactId);
 
                 }
@@ -511,9 +515,11 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             foreach (var item in SuspectstagContactIds)
             {
                 suspect = new LeadDTO();
-                var Tblpropsectdata = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.contactid);
+                //var Tblpropsectdata = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.contactid);
+                var Tblpropsectdata = DATA.FirstOrDefault(a => a.contact.ContactId == item.contactid).contact;
                 var prospectdata = _mapper.Map<LeadDTO>(Tblpropsectdata);
                 suspect.Address = prospectdata.Address;
+                suspect.ContactID = prospectdata.ContactID;
                 suspect.Age = prospectdata.Age;
                 suspect.ContactType = prospectdata.ContactType;
                 suspect.DateOfBirth = prospectdata.DateOfBirth;
@@ -547,9 +553,11 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             foreach (var item in ProspecttagContactIds)
             {
                 propect = new LeadDTO();
-                var Tblpropsectdata = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.contactid);
+                //var Tblpropsectdata = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.contactid);
+                var Tblpropsectdata = DATA.FirstOrDefault(a => a.contact.ContactId == item.contactid).contact;
                 var suspectdata = _mapper.Map<LeadDTO>(Tblpropsectdata);
                 propect.Address = suspectdata.Address;
+                propect.ContactID = suspectdata.ContactID;
                 propect.Age = suspectdata.Age;
                 propect.ContactType = suspectdata.ContactType;
                 propect.DateOfBirth = suspectdata.DateOfBirth;
@@ -607,20 +615,28 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             quotationDtos.Add(tblLifeQqdata);
 
 
-            var proposaldata = await _integrationService.GetProposalByQuotNO(tblLifeQqdata.QuotNumber, context);
-            ProposalDto proposalDto = proposaldata;
-            proposalDtos.Add(proposalDto);
-
-
-            var policydata = await _integrationService.GetPolicyByProposalNO(proposalDto.ProposalNumber, context);
+            var proposaldata = await _integrationService.GetProposaByHandledByid(Convert.ToInt32(Positionid), context);
+            ProposalDto proposalDto = new ProposalDto();
+            foreach (var item in proposaldata)
+            {
+                proposalDto = new ProposalDto();
+                proposalDto = item;
+                proposalDtos.Add(proposalDto);
+            }
+            //  var policydata = await _integrationService.GetPolicyByProposalNO(proposalDto.ProposalNumber, context);
 
             //doing for the policy
 
-            policyDto policyDto = policydata;
-            policyDtos.Add(policyDto);
+            // policyDto policyDto = policydata;
 
-
-
+            var policydata = await _integrationService.GetPolicyByHandledBy(Convert.ToInt32(Positionid), context);
+            policyDto policyDto = new policyDto();
+            foreach (var item in policydata)
+            {
+                policyDto = new policyDto();
+                policyDto = item;
+                policyDtos.Add(policyDto);
+            }
 
 
             //for Quotation
@@ -629,24 +645,10 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             viewDetails.quotationDtos = quotationDtos;
             viewDetails.proposalDtos = proposalDtos;
             viewDetails.policyDtos = policyDtos;
-
-
-
-
-            //var pooldata = _mapper.Map<List<LeadDTO>>(DATA);
-            //foreach (var item in pooldata)
-            //{
-            //    if (item.Address == null)
-            //    {
-            //        item.Address = new AddressDTO();
-            //    }
-            //}
-
             //return pooldata;
             return viewDetails;
 
         }
-
         public async Task<bool> UpdateEmpProspectData(EMPDistribute eMPDistribute, ApiContext apiContext)
         {
 

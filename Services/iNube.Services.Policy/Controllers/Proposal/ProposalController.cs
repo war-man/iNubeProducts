@@ -102,9 +102,9 @@ namespace iNube.Services.Policy.Controllers.Proposal
             return Ok(suspects);
         }
         [HttpGet]
-        public async Task<IActionResult> GetPolicyByProposalNO(string proposalNo)
+        public async Task<IActionResult> GetPolicyByHandledBy(int handledByid)
         {
-            var suspects = await _proposalService.GetPolicyByQuotNO(proposalNo, Context);
+            var suspects = await _proposalService.GetPolicyByHandledBy(handledByid, Context);
             return Ok(suspects);
         }
 
