@@ -67,11 +67,11 @@ namespace iNube.Services.Lead.Controllers.Lead.LDIntegrationServices
         {
             // var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + quotoNo;
 
-           // http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com
+            // http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com
 
 
-          //  var uri = "https://localhost:44351/api/Proposal/GetProposalByQuotNO?quotoNo=" + quotoNo;
-
+            //  var uri = "https://localhost:44351/api/Proposal/GetProposalByQuotNO?quotoNo=" + quotoNo;
+            //http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Proposal/GetProposalByQuotNO?quotoNo=
             var uri = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Proposal/GetProposalByQuotNO?quotoNo=" + quotoNo;
 
             var res = await GetApiInvoke<ProposalDto>(uri, apiContext);
@@ -84,7 +84,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LDIntegrationServices
         public async Task<policyDto> GetPolicyByProposalNO(string proposalNo, ApiContext Context)
         {
             // var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + quotoNo;
-            var uri = "https://localhost:44351/api/Proposal/GetProposalByQuotNO?quotoNo=" + proposalNo;
+            var uri = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Proposal/GetPolicyByProposalNO?proposalNo=" + proposalNo;
 
             var res = await GetApiInvoke<policyDto>(uri, Context);
             return res;
