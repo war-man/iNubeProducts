@@ -83,11 +83,8 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             LoggerManager logger = new LoggerManager(_configuration);
             
             var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
-            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", uri, "3", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
-           // return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
-           var result = await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
-            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", result.Dbconnection, "Final Return in integration Call", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
-            return result;
+            return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+       
         }
         
         public async Task<List<PolicyDetailsDTO>> GetPolicyList(string productCode, ApiContext apiContext)
@@ -202,23 +199,16 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             LoggerManager logger = new LoggerManager(_configuration);          
 
            if (!string.IsNullOrEmpty(apiContext.Token))
-            {
-                logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", apiContext.Token, "--CHeck empty GETAPIInvoke--", new ApiContext() { ProductType = "Mica", ServerType = "297" });
-
-
+            {               
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
             }
 
             using (var response = await client.GetAsync(url))
             using (var content = response.Content)
-            {
-                logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", response.ToString(), "GETAPIInvoke---Before", new ApiContext() { ProductType = "Mica", ServerType = "297" });
-
+            {              
                 if (response.IsSuccessStatusCode)
                 {
                     var serviceResponse = await content.ReadAsAsync<TResponse>();
-                    logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", serviceResponse.ToString(), "GETAPIInvoke---After", new ApiContext() { ProductType = "Mica", ServerType = "297" });
-
 
                     if (serviceResponse != null)
                     {
