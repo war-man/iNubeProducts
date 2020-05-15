@@ -60,9 +60,18 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             try
             {
                 AVOOrgOffice _organizationDTO = new AVOOrgOffice();
-            TblOrgOffice _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
-                                    .Include(add => add.TblOfficeSpocDetails)
-                                    .FirstOrDefault();
+                TblOrgOffice _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
+                                        .Include(add => add.TblOfficeSpocDetails)
+                                        .FirstOrDefault();
+
+
+                //TblOrgOffice _tblOrgOffice = from off in _context.TblOrgOffice
+                //                             where OfficeCode == OfficeCode
+                //                             join spo in _context.TblOfficeSpocDetails on off.OrgOfficeId equals spo.OfficeId
+                //                             select spo;
+
+
+
                 AVOOrgOffice _officeDTO = _mapper.Map<AVOOrgOffice>(_tblOrgOffice);
             return _officeDTO;
         }
@@ -76,22 +85,29 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
         {
             try
             {
-                List<TblOrgOffice> lstOffice = new List<TblOrgOffice>();
+
                 _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
                 // OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
+
+
                 var _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
-                                        .Include("TblOfficeSpocDetails")
-                                        .FirstOrDefault();
-                var _tblOrgOfficeSpoc = _context.TblOfficeSpocDetails.Where(org => org.OfficeId == _tblOrgOffice.OrgOfficeId)
-                                        .FirstOrDefault();
-                if (_tblOrgOfficeSpoc != null)
-                {
-                    _tblOrgOffice.TblOfficeSpocDetails.Add(_tblOrgOfficeSpoc);
-                }
-                lstOffice.Add(_tblOrgOffice);
-                var _officeDTO = _mapper.Map<IEnumerable<AVOOrgOffice>>(lstOffice);
-                return _officeDTO;
+                                        .Include(add => add.TblOfficeSpocDetails)
+                                        .ToList();
+
+
+                //var _tblOrgOfficeSpoc = _context.TblOfficeSpocDetails.Select(x => x);
+                //foreach
+
+                //TblOrgOffice _tblOrgOffice = from off in _context.TblOrgOffice
+                //                             where OfficeCode == OfficeCode
+                //                             join spo in _context.TblOfficeSpocDetails on off.OrgOfficeId equals spo.OfficeId
+                //                             select new (off,spo);
+
+                var _officeDTO = _mapper.Map<IEnumerable<AVOOrgOffice>>(_tblOrgOffice);
+            return _officeDTO;
+
+                
             }
             catch (Exception ex)
             {
@@ -99,23 +115,45 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             }
 
         }
-        public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
+        public async Task<List<MasterDto>> GetAllOfficeData( ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            IEnumerable<ddDTO> officeDTOs;
+            var masterdata = _context.TblOrgOffice
+                                                    .Select(x => new MasterDto
+                                                    {
+                                                        mID = Convert.ToInt32(x.OfficeLevelId),
+                                                        mType = "office",
+                                                        mValue = x.OfficeName
+                                                    }).ToList();
+            return masterdata;
 
-            officeDTOs = _context.TblOrgOffice
-             .Select(c => new ddDTO
-             {
-                 mID = (int)c.OfficeLevelId,
-                 mValue = c.OfficeName,
-                 mType = "office"
-             });
-
-
-            return officeDTOs;
 
         }
+//        public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
+//        {
+//            try
+//            {
+
+//                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+//            IEnumerable<ddDTO> officeDTOs;
+
+//            officeDTOs = _context.TblOrgOffice
+//             .Select(c => new ddDTO
+//             {
+//                 mID = (int)c.OfficeLevelId,
+//                 mValue = c.OfficeName,
+//                 mType = "office"
+//             })
+//                .ToList();
+
+//                return officeDTOs;
+//        }
+//            catch (Exception ex)
+//            {
+//                return null;
+//            }
+
+//}
 
         public int TestMethod()
         {

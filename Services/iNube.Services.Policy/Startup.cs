@@ -10,7 +10,7 @@ using iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MicaReport
 using iNube.Services.Policy.Controllers.DynamicReports.ReportServices.MotorReport;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.Policy.Controllers.Policy.PolicyServices;
-using iNube.Services.Policy.Controllers.Proposal.IntegrationService.iNube.Services.Proposal.Controllers.ProposalConfig.IntegrationService;
+using iNube.Services.Policy.Controllers.Proposal.IntegrationService;
 using iNube.Services.Policy.Controllers.Proposal.ProposalService;
 using iNube.Services.Policy.Entities;
 using iNube.Services.Policy.Entities.AVO.DynamicReportEntities;
@@ -112,7 +112,7 @@ namespace iNube.Services.Policy
                 c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
                 c.RoutePrefix = Configuration["Swagger:Url"].ToString();
             });
-            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
+           
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -122,6 +122,7 @@ namespace iNube.Services.Policy
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()

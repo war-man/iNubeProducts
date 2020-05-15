@@ -940,17 +940,67 @@ namespace iNube.Services.Lead.Models
         {
             suspect = new List<LeadDTO>();
             prospect = new List<LeadDTO>();
+
+            quotationDtos = new List<QuotationDto>();
+            proposalDtos = new List<ProposalDto>();
+
+            policyDtos = new List<policyDto>();
+           
         }
 
         public List<LeadDTO> suspect { get; set; }
         public List<LeadDTO> prospect { get; set; }
+
+        public List<QuotationDto> quotationDtos { get; set; }
+        public List<ProposalDto> proposalDtos { get; set; }
+
+        public List<policyDto> policyDtos { get; set; }
+       
     }
     public partial class StagContactId
     {
         public int? stagid { get; set; }
         public int? contactid { get; set; }
     }
+    //Quotation
+    public partial class QuotationDto
+    {
+        public string QuotNumber { get; set; }
+        public string Name { get; set; }
+
+        public string ContactNumner { get; set; }
+        public string CityName { get; set; }
+        public string MovedTo { get; set; }
+    }
+    public partial class ProposalDto
+    {
+        public string ProposalNumber { get; set; }
+        public string Name { get; set; }
+
+        public string ContactNumner { get; set; }
+        public string CityName { get; set; }
+        public string MovedTo { get; set; }
+    }
+    public partial class policyDto
+    {
+        public string PolicyNumber { get; set; }
+        public int PolicyStatus { get; set; }
+        public string Mode { get; set; }
+        public string PremiumAmount { get; set; }
+        public string ContactNumner { get; set; }
+        public string CityName { get; set; }
+        public string MovedTo { get; set; }
+    }
     //needAnalysis
+    public class EmpHierarchy
+    {
+        public decimal ParentID { get; set; }
+        public decimal PositionID { get; set; }
+        public string StaffName { get; set; }
+        public string Staffcode { get; set; }
+        public string LevelDefinition { get; set; }
+        public int LevelId { get; set; }
+    }
 }
 
 

@@ -20,6 +20,7 @@ namespace iNube.Services.Policy.Entities
         public virtual DbSet<TblNumberingScheme> TblNumberingScheme { get; set; }
         public virtual DbSet<TblPolicy> TblPolicy { get; set; }
         public virtual DbSet<TblPolicyDetails> TblPolicyDetails { get; set; }
+        public virtual DbSet<TblPolicyException> TblPolicyException { get; set; }
         public virtual DbSet<TblPolicyInsurableDetails> TblPolicyInsurableDetails { get; set; }
         public virtual DbSet<TblPolicyPayment> TblPolicyPayment { get; set; }
         public virtual DbSet<TblPolicyRefund> TblPolicyRefund { get; set; }
@@ -30,7 +31,7 @@ namespace iNube.Services.Policy.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
@@ -334,6 +335,74 @@ namespace iNube.Services.Policy.Entities
                     .WithMany(p => p.TblPolicyDetails)
                     .HasForeignKey(d => d.PolicyId)
                     .HasConstraintName("FK_tblPolicyDetails_tblPolicy");
+            });
+
+            modelBuilder.Entity<TblPolicyException>(entity =>
+            {
+                entity.HasKey(e => e.ExceptionId)
+                    .HasName("PK__TblPolic__26981D8844B90317");
+
+                entity.ToTable("TblPolicyException", "PO");
+
+                entity.Property(e => e.ExceptionId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Adtotal)
+                    .HasColumnName("ADTotal")
+                    .HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Frequency)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Fttotal)
+                    .HasColumnName("FTTotal")
+                    .HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.NoofPcs).HasColumnName("NoofPCs");
+
+                entity.Property(e => e.NoofTws).HasColumnName("NoofTWs");
+
+                entity.Property(e => e.PaidAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.PaymentDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentReferenceId)
+                    .HasColumnName("PaymentReferenceID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PbtotalPremium)
+                    .HasColumnName("PBTotalPremium")
+                    .HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.PolicyNumber)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SumInsured).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TotalPremium).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TransactionDate).HasColumnType("datetime");
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TxnId)
+                    .HasColumnName("TxnID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<TblPolicyInsurableDetails>(entity =>

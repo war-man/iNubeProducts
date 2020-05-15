@@ -301,10 +301,10 @@ namespace iNube.Services.Partners.Controllers.Organization
         }
         // ||AVO
         [HttpGet]
-        public async Task<IActionResult> GetVacantPositonCount(string designame)
+        public async Task<IActionResult> GetSupervisorname(string designame)
         {
 
-            var response = await _avoorgService.GetVacantPositonCount(designame, Context);
+            var response = await _avoorgService.GetSupervisorname(designame, Context);
             return Ok(response);
         }
 
@@ -480,6 +480,7 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
 
+        //  ||AVO
         [HttpGet]
         public async Task<IActionResult> GetHierarchy(int OrgId, string Type, string KeyValue)
         {
@@ -487,6 +488,7 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
 
+        //  ||AVO
         [HttpGet]
         public async Task<IActionResult> ViewDetailsByEmpCode(string empcode)
         {
@@ -494,16 +496,17 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(orgDTO);
         }
 
+        //  ||AVO
         [HttpGet]
         public async Task<IActionResult> GetEmpMappingData(string empcode)
         {
-            var response = await _avoorgService.GetEmpMappingData(empcode,Context);
+            var response = await _avoorgService.GetEmpMappingData(empcode, Context);
             return Ok(response);
         }
 
         //  || AVO
         [HttpGet]
-        public async Task<IActionResult> GetNewSupervisorByMovementId(decimal OrgEmpId,decimal MovementId, int MovementStatusId)
+        public async Task<IActionResult> GetNewSupervisorByMovementId(decimal OrgEmpId, decimal MovementId, int MovementStatusId)
         {
             Supervisor supervisor = new Supervisor();
             supervisor.OrgEmpId = OrgEmpId;
@@ -513,11 +516,26 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
 
-        // ||AVO
+        //  ||AVO
         [HttpGet]
         public async Task<IActionResult> ViewReporteeGrid(int Empcode, int MovementId, int MovementStatusId)
         {
             var response = await _avoorgService.ViewReporteeGrid(Empcode, MovementId, MovementStatusId, Context);
+            return Ok(response);
+        }
+
+        //  ||AVO
+        [HttpGet]
+        public async Task<IActionResult> DesignationRoles(string designationid)
+        {
+            var response = _avoorgService.DesignationRoles(designationid, Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmpHierarchy(string Empcode)
+        {
+            var response = await _avoorgService.GetEmpHierarchy(Empcode, Context);
             return Ok(response);
         }
     }

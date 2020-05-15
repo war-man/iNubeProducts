@@ -40,7 +40,7 @@ namespace iNube.Services.Policy.Controllers.Policy
         [HttpPost]
         public async Task<IActionResult> CreatePolicy([FromBody]dynamic policyDTO)
         {
-            var response=await _policyService.CreateMultiCoverPolicy(policyDTO, Context);
+            var response=await _policyService.GeneratePolicy(policyDTO, Context);
             switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:
@@ -679,11 +679,11 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = await _policyService.SmsScheduler(Context);
             return Ok(response);
         }
-
+        //old Policy Creation
         [HttpPost]
         public async Task<IActionResult> GeneratePolicy([FromBody]dynamic policyDTO)
         {
-            var response = await _policyService.GeneratePolicy(policyDTO, Context);
+            var response = await _policyService.CreateMultiCoverPolicy(policyDTO, Context);
             switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:

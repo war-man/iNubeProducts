@@ -1,5 +1,5 @@
-﻿using iNube.Services.Lead.Models;
-using iNube.Services.Quotation.Models;
+﻿
+using iNube.Services.Proposal.Models;
 using iNube.Utility.Framework.Model;
 using Newtonsoft.Json;
 using System;
@@ -9,67 +9,18 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace iNube.Services.Quotation.Controllers.Quotation.IntegrationServices
+namespace iNube.Services.Proposal.Controllers.ProposalConfig.IntegrationServices
 {
     public interface IIntegrationService
     {
         //Task<PartnersDTO> GetPartnerDetailAsync(string partnerId,ApiContext apiContext);
 
-        Task<IEnumerable<LeadDTO>> GetProspectInfo(int ContactId);
-        Task<LeadDTO> SaveProspect(LeadDTO leadDTO);
-        Task<ResponseStatus> SendNotificationAsync(Lead.Models.NotificationRequest notificationRequest, ApiContext apiContext);
-        Task<AVOProductDTO> GetAVOProduct(int productid);
-        Task<LifeQuoteDTO> GetQuotePremium(LifeQuoteDTO objQuote);
         Task<IEnumerable<EmpHierarchy>> GetEmpHierarchyAsync(string Empcode, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
 
-        //readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-
-        //readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-        //readonly string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-
-        string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-
-
-        public async Task<LifeQuoteDTO> GetQuotePremium(LifeQuoteDTO objQuote)
-        {
-            var uri = "https://inubeservicesproductconfiguration.azurewebsites.net/api/Product/CalculateQuotePremium?AnnualMode=false";
-
-            return await PostApiInvoke<LifeQuoteDTO, LifeQuoteDTO>(uri, objQuote);
-        }
-
-        public async Task<AVOProductDTO> GetAVOProduct(int productid)
-        {
-            var uri = "https://localhost:44347/api/Product/GetProducts?ProductId=" + productid;
-            return await GetApiInvoke<AVOProductDTO>(uri);
-        }
-
-        public async Task<IEnumerable<LeadDTO>> GetProspectInfo(int ContactId)
-        {
-            var uri = "https://localhost:44347/api/Lead/LoadSuspectInformation?ContactID="+ContactId;
-            return await GetListApiInvoke<LeadDTO>(uri);
-            
-        }
-
-        public async Task<LeadDTO>  SaveProspect(LeadDTO leadDTO)
-        {
-            var uri = "https://localhost:44347/api/Lead/SaveSuspect";
-            return await PostApiInvoke<LeadDTO,LeadDTO>(uri, leadDTO);
-
-
-        }
-
-
         
-        public async Task<ResponseStatus> SendNotificationAsync(Lead.Models.NotificationRequest notificationRequest, ApiContext apiContext)
-        {
-            //local-http://localhost:53000
-            notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-            var uri = notificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
-            return await PostApiInvoke<Lead.Models.NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
-        }
 
         public async Task<IEnumerable<EmpHierarchy>> GetEmpHierarchyAsync(string Empcode, ApiContext apiContext)
         {

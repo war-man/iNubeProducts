@@ -5,12 +5,14 @@ using iNube.Services.Policy.Controllers.Proposal.ProposalService;
 using iNube.Services.Policy.Models;
 using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iNube.Services.Policy.Controllers.Proposal
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class ProposalController : BaseApiController
     {
 
@@ -20,10 +22,10 @@ namespace iNube.Services.Policy.Controllers.Proposal
         public ProposalController(IProposalService proposalService)
         {
             _proposalService = proposalService;
-          
+
         }
 
-                     
+
         [HttpGet]
         public async Task<IActionResult> LifeQqData()
         {
@@ -32,9 +34,9 @@ namespace iNube.Services.Policy.Controllers.Proposal
             return Ok(response);
         }
         [HttpGet]
-        public  IActionResult GetmasQuestions()
+        public IActionResult GetmasQuestions()
         {
-            var response =  _proposalService.GetMasQuestions();
+            var response = _proposalService.GetMasQuestions();
             return Ok(response);
         }
 
@@ -46,10 +48,10 @@ namespace iNube.Services.Policy.Controllers.Proposal
             return Ok(response);
         }
         [HttpGet("GetProposalIncompleteData")]
-        public IActionResult ProposalPoll()
+        public async Task<IActionResult> ProposalPoll()
         {
 
-            var response = _proposalService.ProposalPoll();
+            var response = await _proposalService.ProposalPollAsync(Context);
 
 
             return Ok(response);
@@ -57,7 +59,8 @@ namespace iNube.Services.Policy.Controllers.Proposal
         }
 
 
-        
+
+
 
         [HttpGet("GetMasterData")]
 
@@ -78,7 +81,7 @@ namespace iNube.Services.Policy.Controllers.Proposal
         [HttpPost("PartialFormData")]
         public IActionResult CreateAccounts([FromBody]Models.ProposalModel.PolicyDto policyDto)
         {
-            var response = _proposalService.PartialFormDataSave(policyDto,Context);
+            var response = _proposalService.PartialFormDataSave(policyDto, Context);
             switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:
@@ -90,6 +93,19 @@ namespace iNube.Services.Policy.Controllers.Proposal
                 default:
                     return Forbid();
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProposalByPositionId(int posid)
+        {
+            var suspects = await _proposalService.GetProposalByPositionId(posid, Context);
+            return Ok(suspects);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPolicyByHandledBy(int handledByid)
+        {
+            var suspects = await _proposalService.GetPolicyByHandledBy(handledByid, Context);
+            return Ok(suspects);
         }
 
         // GET: api/Proposal
@@ -122,6 +138,40 @@ namespace iNube.Services.Policy.Controllers.Proposal
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FetchProposalSubmittedDetails()
+        {
+            var response = await _proposalService.FetchProposalSubmittedDetailsAsync(Context);
+            return Ok(response);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> FetchPendingRequirements()
+        {
+            var response = await _proposalService.FetchPendingRequirementsAsync(Context);
+
+            //PLContext Context = new PLContext();
+            //// ProposalInboxDTO obj = new ProposalInboxDTO();
+            return Ok(response);
+
+            //givinig null because message data its not getting
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmpProposalData(EMPDistribute eMPDistribute)
+        {
+            var response = await _proposalService.UpdateEmpProposalData(eMPDistribute, Context);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmpPolicyData(EMPDistribute eMPDistribute)
+        {
+            var response = await _proposalService.UpdateEmpPolicyData(eMPDistribute, Context);
+            return Ok(response);
         }
     }
 }

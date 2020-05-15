@@ -18,6 +18,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
     {
         Task<PartnerResponse> CreatePartnerAsync(PartnersDTO partnerDTO, ApiContext apiContext);
         Task<PartnersDTO> GetPartner(int partnerID, ApiContext apiContext);
+        Task<PartnersDTO> GetPartnerDetailsByPartnerCode(string partnerCode, ApiContext apiContext);
         Task<IEnumerable<ddDTO>> GetMasterAsync(ApiContext apiContext, string sMasterList, string partnerId = "");
         Task<IEnumerable<PolicyAgreementDTO>> GetAssignProduct(decimal partnerId,ApiContext apiContext);
         Task<PolicyAgreementResponse> SaveAssignProduct(AssignProductDTO assignProductDto, ApiContext apiContext);
@@ -83,6 +84,10 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         public async Task<PartnersDTO> GetPartner(int partnerId, ApiContext apiContext)
         {
             return await _partnerProductService(apiContext.ProductType).GetPartner(partnerId, apiContext);
+        }
+        public async Task<PartnersDTO> GetPartnerDetailsByPartnerCode(string partnerCode, ApiContext apiContext)
+        {
+            return await _partnerProductService(apiContext.ProductType).GetPartnerDetailsByPartnerCode(partnerCode, apiContext);
         }
         /// <summary>
         /// Saves the assign product.

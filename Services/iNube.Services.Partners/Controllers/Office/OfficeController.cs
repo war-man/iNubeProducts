@@ -76,15 +76,28 @@ namespace iNube.Services.Partners.Controllers.Office
 
             return Ok(_OfficeDTOs);
         }
-       
-
         [HttpGet]
         public async Task<IActionResult> GetAllOffice()
         {
-            var _OfficeDTOs =await _officeService.GetAllOfficeData(Context);
-            var masterdata = _OfficeDTOs.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
-            return Ok(masterdata);
+            var isFilter = true;
+            var response = await _officeService.GetAllOfficeData(Context);
+            if (isFilter)
+            {
+                var masterdata = response.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
+                return Ok(masterdata);
+            }
+
+            return Ok(response);
         }
+
+
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllOffice()
+        //{
+        //    var _OfficeDTOs =await _officeService.GetAllOfficeData(Context);
+        //    var masterdata = _OfficeDTOs.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
+        //    return Ok(masterdata);
+        //}
 
     }
 }
