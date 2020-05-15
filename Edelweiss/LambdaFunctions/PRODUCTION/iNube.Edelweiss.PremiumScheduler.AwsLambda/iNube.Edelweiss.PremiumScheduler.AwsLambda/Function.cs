@@ -4,8 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-
 using Amazon.Lambda.Core;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -38,20 +39,55 @@ namespace iNube.Edelweiss.PremiumScheduler.AwsLambda
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
 
-            //HTTP GET
-            using (var response = await client.GetAsync(client.BaseAddress))
-            using (var content = response.Content)
+            try
             {
-                if (response.IsSuccessStatusCode)
+                //HTTP GET
+                using (var response = await client.GetAsync(client.BaseAddress))
+                using (var content = response.Content)
                 {
-                    var serviceResponse = await content.ReadAsStringAsync();
-
-                    if (serviceResponse != null)
+                    if (response.IsSuccessStatusCode)
                     {
-                        return serviceResponse;
-                    }
+                        var serviceResponse = await content.ReadAsStringAsync();
 
+                        if (!String.IsNullOrEmpty(serviceResponse))
+                        {
+                            var request = new PublishRequest
+                            {
+                                Message = $"Premium Booking Scheduler successfully executed & Its Status - " + serviceResponse,
+                                TopicArn = "arn:aws:sns:ap-south-1:471379395009:SchedulerTopic",
+                            };
+
+
+                            var awsconfig = new AmazonSimpleNotificationServiceClient(Amazon.RegionEndpoint.APSouth1);
+                            var AwsSns = await awsconfig.PublishAsync(request);
+
+                            return serviceResponse;
+                        }
+                        else
+                        {
+                            var request = new PublishRequest
+                            {
+                                Message = $"Premium Booking scheduler failed - reponse did not come as expected",
+                                TopicArn = "arn:aws:sns:ap-south-1:471379395009:SchedulerTopic",
+                            };
+
+                            var awsconfig = new AmazonSimpleNotificationServiceClient(Amazon.RegionEndpoint.APSouth1);
+                            var AwsSns = await awsconfig.PublishAsync(request);
+                        }
+
+                    }
                 }
+            }
+            catch
+            {
+                var request = new PublishRequest
+                {
+                    Message = $"Premium Booking failed due to some exception",
+                    TopicArn = "arn:aws:sns:ap-south-1:471379395009:SchedulerTopic",
+                };
+
+                var awsconfig = new AmazonSimpleNotificationServiceClient(Amazon.RegionEndpoint.APSouth1);
+                var AwsSns = await awsconfig.PublishAsync(request);
             }
 
             return false;

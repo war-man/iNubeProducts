@@ -18,6 +18,6 @@
     "function-role"        : "arn:aws:iam::471379395009:role/lambda_exec_NightSchedulerProd",
     "tracing-mode"         : "PassThrough",
     "environment-variables" : "",
-    "function-subnets"      : "subnet-0aa78f3624ee42804,subnet-0af77830edcf44b4c,subnet-057c4fbcd707f905f,subnet-053fcbbaf3a334ec4",
+    "function-subnets"      : "subnet-0aa78f3624ee42804,subnet-057c4fbcd707f905f",
     "function-security-groups" : "sg-01dccc30c1f5f8230,sg-08bb592009fd57dde"
 }
