@@ -5139,7 +5139,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     proposalResponse.ResponseMessage = data.ResponseMessage;
                     proposalResponse.Id = data.Id;
                     //return proposalResponse;
-                    return new ProposalResponse { Status = BusinessStatus.Updated, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
+                    return new ProposalResponse { Status = data.Status, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
 
                 }
 
@@ -5156,7 +5156,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     proposalResponse.ResponseMessage = data.ResponseMessage;
                     proposalResponse.Id = data.Id;
                     //return proposalResponse;
-                    return new ProposalResponse { Status = BusinessStatus.Updated, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
+                    return new ProposalResponse { Status = data.Status, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
 
                 }
 
@@ -5167,7 +5167,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                     var data = await RemoveInsurableItem(endoresementDto, apiContext);
 
-                    return new ProposalResponse { Status = BusinessStatus.Deleted, ResponseMessage = data.ResponseMessage };
+                    return new ProposalResponse { Status = data.Status, ResponseMessage = data.ResponseMessage };
 
                     //return data;
                 }
