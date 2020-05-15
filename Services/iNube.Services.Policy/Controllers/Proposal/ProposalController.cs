@@ -5,12 +5,14 @@ using iNube.Services.Policy.Controllers.Proposal.ProposalService;
 using iNube.Services.Policy.Models;
 using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iNube.Services.Policy.Controllers.Proposal
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class ProposalController : BaseApiController
     {
 
@@ -46,15 +48,16 @@ namespace iNube.Services.Policy.Controllers.Proposal
             return Ok(response);
         }
         [HttpGet("GetProposalIncompleteData")]
-        public IActionResult ProposalPoll()
+        public async Task<IActionResult> ProposalPoll()
         {
 
-            var response = _proposalService.ProposalPoll();
+            var response = await _proposalService.ProposalPollAsync(Context);
 
 
             return Ok(response);
 
         }
+
 
 
         
@@ -92,6 +95,19 @@ namespace iNube.Services.Policy.Controllers.Proposal
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetProposalByPositionId(int posid)
+        {
+            var suspects =await _proposalService.GetProposalByPositionId(posid, Context);
+            return Ok(suspects);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPolicyByProposalNO(string proposalNo)
+        {
+            var suspects = await _proposalService.GetPolicyByQuotNO(proposalNo, Context);
+            return Ok(suspects);
+        }
+
         // GET: api/Proposal
         [HttpGet]
         public IEnumerable<string> Get()
@@ -122,6 +138,26 @@ namespace iNube.Services.Policy.Controllers.Proposal
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FetchProposalSubmittedDetails()
+        {
+            var response =await  _proposalService.FetchProposalSubmittedDetailsAsync(Context);
+            return Ok(response);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> FetchPendingRequirements()
+        {
+            var response = await _proposalService.FetchPendingRequirementsAsync(Context);
+
+            //PLContext Context = new PLContext();
+            //// ProposalInboxDTO obj = new ProposalInboxDTO();
+            return Ok(response);
+
+            //givinig null because message data its not getting
         }
     }
 }

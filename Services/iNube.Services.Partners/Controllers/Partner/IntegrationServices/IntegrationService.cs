@@ -28,6 +28,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<EmpRoleResponse> UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext);
 
         Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext);
+       
     }
     public class IntegrationService : IIntegrationService
     {
@@ -56,13 +57,14 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         public async Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext)
         {
-            var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
+              var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
 
-
+           // var uri = "https://localhost:44351/api/Proposal/GetProposalByQuotNO?quotoNo=" + empcode;
             var res = await GetApiInvoke<ViewDetails>(uri, apiContext);
             return res;
 
         }
+       
 
         public async Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext)
         {

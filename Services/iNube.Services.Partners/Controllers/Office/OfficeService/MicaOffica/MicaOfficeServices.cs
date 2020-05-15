@@ -127,21 +127,34 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             }
 
         }
-
-        public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
+        public async Task<List<MasterDto>> GetAllOfficeData(ApiContext apiContext)
         {
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            IEnumerable<ddDTO> officeDTOs;
+            var masterdata = _context.TblOrgOffice
+                                                    .Select(x => new MasterDto
+                                                    {
+                                                        mID = Convert.ToInt32(x.OfficeLevelId),
+                                                        mType = "office",
+                                                        mValue = x.OfficeName
+                                                    }).ToList();
+            return masterdata;
 
-            officeDTOs = _context.TblOrgOffice
-             .Select(c => new ddDTO
-             {
-                 mID = (int)c.OfficeLevelId,
-                 mValue = c.OfficeName,
-                 mType = "office"
-             });
-            return officeDTOs;
+
         }
+        //public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
+        //{
+        //    _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+        //    IEnumerable<ddDTO> officeDTOs;
+
+        //    officeDTOs = _context.TblOrgOffice
+        //     .Select(c => new ddDTO
+        //     {
+        //         mID = (int)c.OfficeLevelId,
+        //         mValue = c.OfficeName,
+        //         mType = "office"
+        //     });
+        //    return officeDTOs;
+        //}
 
         public int TestMethod()
         {

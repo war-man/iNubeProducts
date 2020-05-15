@@ -11,9 +11,9 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
 
         Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO,ApiContext apiContext);
         Task<AVOOrgOffice> GetOffice(string OfficeCode, ApiContext apiContext);
-        Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext);
+       // Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext);
         Task<IEnumerable<AVOOrgOffice>> SearchOfficeData(string OfficeCode, ApiContext apiContext);
-
+        Task<List<MasterDto>> GetAllOfficeData( ApiContext apiContext);
         int TestMethod();
     }
 }

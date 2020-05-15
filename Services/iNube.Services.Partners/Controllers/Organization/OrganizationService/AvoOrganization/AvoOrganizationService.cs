@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using iNube.Services.Partners.Entities.AVO;
+using iNube.Services.Partners.Helpers;
 using iNube.Services.Partners.Models;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
@@ -18,14 +19,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
     public class AvoOrganizationService : IAvoOrganizationProductService
     {
-        private AVOPRContext _context;
+        private AVOPRContext _context = null;
         private IMapper _mapper;
         private readonly IConfiguration _configuration;
 
         private IIntegrationService _integrationService;
         public AvoOrganizationService(AVOPRContext context, IMapper mapper, IIntegrationService integrationService, IConfiguration configuration)
         {
-            _context = context;
+            // _context = context;
             _mapper = mapper;
             _integrationService = integrationService;
             _configuration = configuration;
@@ -174,8 +175,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             }
                             else
                             {
-                                tblOrg.RepotrsToId = _organization.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.reportto).LevelId;
-                                tblOrg.ParentId = _organization.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.reportto).LevelId;
+                                var parentid = _organization.TblOrgStructure.FirstOrDefault(a => a.LevelDefinition == item.reportto).OrgStructureId;
+                                tblOrg.RepotrsToId = Convert.ToInt32(parentid);
+                                tblOrg.ParentId = Convert.ToInt32(parentid);
                             }
                         }
                         tblOrg.UserName = apiContext.UserName;
@@ -490,8 +492,18 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             //  var Emp = _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate);
 
-            var Emp = from emp in _context.TblOrgEmployee
-                      join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
+            //var Emp = from emp in _context.TblOrgEmployee
+            //          join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
+            //          join off in _context.TblOrgOffice on pos.OrganizationId equals off.OrganizationId
+            //          select new ddDTO
+            //          {
+            //              mID = Convert.ToInt32(off.OrgOfficeId),
+            //              mValue = off.OfficeName,
+
+            //          };
+
+            var Emp = from pos in _context.TblOrgPositions
+                      where (pos.PositionId == posid)
                       join off in _context.TblOrgOffice on pos.OrganizationId equals off.OrganizationId
                       select new ddDTO
                       {
@@ -649,12 +661,18 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             foreach (var item in _SearchData)
             {
-                var designation = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == item.PositionId);
-                if (designation != null)
+                var positions = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == item.PositionId);
+                var designatioinid = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == positions.DesignationId).LevelDefinition;
+                if (positions != null)
                 {
-                    item.Designation = designation.PositionName;
+                    item.Designation = designatioinid;
                 }
-                var offname = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == designation.OfficeId);
+                var supervisor = _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == positions.ParentId);
+                if (supervisor != null)
+                {
+                    item.Supervisorname = supervisor.StaffName;
+                }
+                var offname = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == positions.OfficeId);
                 if (offname != null)
                 {
                     item.OfficeName = offname.OfficeName;
@@ -687,16 +705,15 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             }
             return ddDTOs;
-
-
         }
 
-        public async Task<int> GetVacantPositonCount(string designame, ApiContext apiContext)
+        public async Task<string> GetSupervisorname(string designame, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var count = _context.TblOrgPositions.Where(a => a.PositionName == designame && a.IsVacant == true).Count();
-            return count;
+            var positions = _context.TblOrgPositions.Where(a => a.PositionName == designame && a.IsVacant == true).FirstOrDefault();
+            var supervisorname = _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == positions.ParentId).StaffName;
+            return supervisorname;
         }
 
 
@@ -835,9 +852,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<EmployeeRoles> GetEmployeeRoles(string empCode, ApiContext apiContext)
         {
-
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
             var Roles = (from a in _context.TblOrgEmployee.Where(emp => emp.StaffCode == empCode)
                          join b in _context.TblOrgPositions on a.PositionId equals b.PositionId
                          join d in _context.TblDesignationRole on b.DesignationId equals d.DesignationId
@@ -947,15 +965,13 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<AVOMovements> UpdateEmployeePosition(PositionStatusDTO movements, ApiContext apiContext)
         {
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
             try
             {
                 var movementdata = _context.TblMovements.FirstOrDefault(x => x.MovementId == movements.MovementId);
-                var positiondata = (from pos in _context.TblOrgPositions
-                                    join emp in _context.TblOrgEmployee on pos.PositionId equals emp.PositionId
-                                    where emp.OrgEmpId == movementdata.OrgEmpId
-                                    select (pos));
-                var pdata = positiondata.FirstOrDefault();
 
                 if (movements.MovementStatusId == 34)//Recommended
                 {
@@ -999,26 +1015,21 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             }
                         }
                     }
+                    //Create new position
+                    var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
+                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == movementdata.OrgEmpId);
+                    promote.PositionId = Convert.ToDecimal(newPos.Id);
+
                     //based on designation change Updating new designation roles to the user account
-                    var empid = _context.TblMovements.FirstOrDefault(a => a.MovementId == movements.MovementId);
                     EmpRoleMapDTO empRole = new EmpRoleMapDTO();
-                    var employee = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
-                    empRole.Empcode = employee.StaffCode;
+                    empRole.Empcode = promote.StaffCode;
                     var roles = await GetEmployeeRoles(empRole.Empcode, apiContext);
                     empRole.RoleId = roles.Roles;
                     var changeDesig = await _integrationService.UpdateEmpRole(empRole, apiContext);
-
-                    //Create new position
-                    var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
-                    var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == empid.OrgEmpId);
-                    promote.PositionId = Convert.ToDecimal(newPos.Id);
                 }
                 _context.TblMovements.Update(movementdata);
-                var mapData = _mapper.Map<AVOMovements>(movementdata);
-
-
-
                 _context.SaveChanges();
+                var mapData = _mapper.Map<AVOMovements>(movementdata);
                 return mapData;
             }
 
@@ -1030,7 +1041,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         public async Task<ResponseStatus> CreateNewPosition(decimal MovementId, ApiContext apiContext)
         {
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
             //Random Numb
             int _min = 1000;
             int _max = 9999;
@@ -1067,7 +1081,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 //_context.SaveChanges();
                 var postionCheck = _context.TblOrgPositions.FirstOrDefault(x => x.OrganizationId == pdata.OrganizationId
                 && x.OfficeId == movementData.NewBranchId && x.DesignationId == movementData.NewPositionId
-                && x.ParentId == pdata.ParentId && x.IsVacant == true);
+                && x.IsVacant == true);
                 if (postionCheck == null)
                 {
                     TblOrgPositions position = new TblOrgPositions();
@@ -1082,15 +1096,18 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     position.ReportingId = pdata.ReportingId;
                     position.CreatedBy = apiContext.UserId;
                     position.CreatedDate = DateTime.Now;
-                    position.IsVacant = false;
+                    position.IsVacant = true;
                     position.IsActive = true;
                     _context.TblOrgPositions.Add(position);
                     _context.SaveChanges();
-
+                    position.IsVacant = false;
                     response.Id = position.PositionId.ToString();
                 }
                 else
+                {
+                    postionCheck.IsVacant = false;
                     response.Id = postionCheck.PositionId.ToString();
+                }
             }
             return response;
         }
@@ -1173,21 +1190,23 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             position = 2;
 
-            var _emp = from emp in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
-                       select emp;
+            //var _emp = from emp in _context.TblOrgEmployee.OrderByDescending(p => p.CreatedDate)
+            //           select emp;
 
-            var record = _emp.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
+            var record = _context.TblOrgEmployee.Where(x => x.OrgEmpId == Empcode).Select(x => x.PositionId);
             //var Emp = _context.TblOrgEmployee.Select(x => x).Where(c => c.OrgEmpId == Empcode).Select(x => x.PositionId);
 
-            var pos = _context.TblOrgPositions.Where(x => x.PositionId > record.SingleOrDefault()).Select(x => x).Take(position);
+            var pos = _context.TblOrgPositions.Where(x => x.ParentId == record.SingleOrDefault()).Select(x => x);
 
+            //var posss = _context.TblOrgPositions.Where(x => x.PositionId == record.SingleOrDefault()).Select(x => x.ParentId).Single();
+            //var pos = _context.TblOrgPositions.Where(x => x.PositionId == posss).Select(x => x);
             AVOReporteeGrid val = new AVOReporteeGrid();
             List<AVOReportee> val2 = new List<AVOReportee>();
             List<MasterDto> masval = new List<MasterDto>();
             foreach (var i in pos)
             {
                 // AVOOrgEmployee Ival = new AVOOrgEmployee();
-                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+                var Ival = _context.TblOrgEmployee.Where(x => x.PositionId == i.PositionId);
 
                 foreach (var v in Ival)
                 {
@@ -1205,32 +1224,50 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 val.reporteedata = val2;
             }
 
-            var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x).Take(position);
+            // var pos1 = _context.TblOrgPositions.Where(x => x.PositionId < record.SingleOrDefault()).Select(x => x).Take(position);
+            var pos1 = _context.TblOrgPositions.Where(x => x.PositionId == record.SingleOrDefault()).Select(x => x).SingleOrDefault();
+            //var designation = _context.TblOrgStructure.Where(x => x.OrgStructureId == pos1.SingleOrDefault()).Select(x => x.ParentId);
+            var desg = _context.TblOrgStructure.FirstOrDefault(x => x.OrgStructureId == pos1.DesignationId);
+            List<decimal> PositionIds = new List<decimal>();
+            PositionIds.Add(desg.OrgStructureId);
+            PositionIds.Add((decimal)desg.ParentId);
+            var Data = (from objposition in _context.TblOrgPositions.Where(x => x.OrganizationId == pos1.OrganizationId && x.OfficeId == pos1.OfficeId && PositionIds.Contains(Convert.ToDecimal(x.DesignationId)))
+                        join objempdetails in _context.TblOrgEmployee on objposition.PositionId equals objempdetails.PositionId
+                        select new MasterDto
+                        {
+                            mID = Convert.ToInt32(objempdetails.OrgEmpId),
+                            //  mType = "Employee",
+                            mValue = objempdetails.StaffName
+                        }).ToList();
+            //   return Data;
+            val.masterData = Data;
 
-            foreach (var i in pos1)
-            {
-                // AVOOrgEmployee Ival = new AVOOrgEmployee();
-                var Ival = _emp.Where(x => x.PositionId == i.PositionId);
+            //foreach (var i in pos1)
+            //{
+            //    // AVOOrgEmployee Ival = new AVOOrgEmployee();
+            //    var Ival = _context.TblOrgEmployee.Where(x => x.PositionId == i.ParentId);
 
-                foreach (var v in Ival)
-                {
-                    MasterDto val3 = new MasterDto();
-                    val3.mID = Convert.ToInt32(v.OrgEmpId);
-                    val3.mValue = v.StaffName;
+            //    foreach (var v in Ival)
+            //    {
+            //        MasterDto val3 = new MasterDto();
+            //        val3.mID = Convert.ToInt32(v.OrgEmpId);
+            //        val3.mValue = v.StaffName;
 
-                    masval.Add(val3);
+            //        masval.Add(val3);
 
-                }
-                val.masterData = masval;
-            }
+            //    }
+            //    val.masterData = masval;
+            //}
 
 
             return val;
         }
         public async Task<List<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext)
         {
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
             var movData = from a in _context.TblMovements
                           join b in _context.TblMovementDetails on a.MovementId equals b.MovementId
                           where b.MovementId == movement.MovementId
@@ -1406,9 +1443,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             var positionid = _context.TblOrgEmployee.FirstOrDefault(a => a.StaffCode == empcode);
             var Data = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == positionid.PositionId);
 
-            mappingData.Designation = Data.PositionName;
-            mappingData.OrgId = Data.OrganizationId;
-            mappingData.OffID = Data.OfficeId;
+            mappingData.Designation = _context.TblOrgStructure.FirstOrDefault(a => a.OrgStructureId == Data.DesignationId).LevelDefinition;
+            mappingData.Organization = _context.TblOrganization.FirstOrDefault(a => a.OrganizationId == Data.OrganizationId).OrgName;
+            mappingData.Office = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == Data.OfficeId).OfficeName;
 
             return mappingData;
         }
@@ -1417,14 +1454,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var supData = from a in _context.TblMovementDetails
-                          join b in _context.TblOrgEmployee on a.MovedTo equals b.OrgEmpId
-                          join c in _context.TblMovements on a.MovementId equals c.MovementId
-                          where a.MovementId == supervisor.MovementId && c.MovementStatusId == supervisor.MovementStatus
+            var supData = from a in _context.TblOrgEmployee
+                          join b in _context.TblMovements on a.OrgEmpId equals b.OrgEmpId
+                          join c in _context.TblMovementDetails on b.MovementId equals c.MovementId
+                          where b.MovementId == supervisor.MovementId && b.MovementStatusId == supervisor.MovementStatusId
+                          && a.OrgEmpId == supervisor.OrgEmpId
                           select new Supervisor
                           {
-                              StaffName = b.StaffName,
-                              OrgEmpId = b.OrgEmpId
+                              MovedTo = c.MovedTo
                           };
             var _supData = _mapper.Map<List<Supervisor>>(supData);
             return _supData;
@@ -1442,7 +1479,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                        select new { a, c };
 
             var record = _emp.FirstOrDefault(x => x.a.OrgEmpId == Empcode).a.PositionId;
-            //var Emp = _context.TblOrgEmployee.Select(x => x).Where(c => c.OrgEmpId == Empcode).Select(x => x.PositionId);
 
             var pos = _context.TblOrgPositions.Where(x => x.PositionId >= record).Select(x => x);
 
@@ -1451,7 +1487,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             List<MasterDto> masval = new List<MasterDto>();
             foreach (var i in pos)
             {
-                // AVOOrgEmployee Ival = new AVOOrgEmployee();
                 var Ival = _emp.Where(x => x.a.PositionId == i.PositionId);
 
                 foreach (var v in Ival)
@@ -1475,7 +1510,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             foreach (var i in pos1)
             {
-                // AVOOrgEmployee Ival = new AVOOrgEmployee();
                 var Ival = _emp.Where(x => x.a.PositionId == i.PositionId);
 
                 foreach (var v in Ival)
@@ -1492,6 +1526,45 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
 
             return val;
+        }
+
+        public async Task<EmployeeRoles> DesignationRoles(string designationid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var roledata = _context.TblDesignationRole.Where(a => a.DesignationId == Convert.ToDecimal(designationid)).Select(a => a.RoleId).ToList();
+
+            EmployeeRoles roles = new EmployeeRoles();
+            roles.Roles = roledata.ToArray();
+            return roles;
+        }
+
+        public async Task<DataTable> GetEmpHierarchy(string empcode, ApiContext apiContext)
+        {
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+            EmpHierarchy emp = new EmpHierarchy();
+            // Get Emp Pos
+            var empdetail = _context.TblOrgEmployee.FirstOrDefault(e => e.StaffCode == empcode);
+            string connectionString = _context.Database.GetDbConnection().ConnectionString;
+            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            string dbConnectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
+            DataTable dt = new DataTable();
+            //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+            using (SqlConnection connection = new SqlConnection(dbConnectionString))
+            {
+                string queryForCol = $"WITH cte_Hierarchy (PositionID,ParentID,staffcode,staffName,LevelDefinition,LevelId) AS  ( select pos.PositionID,pos.ParentID,emp.staffcode,emp.staffName,desig.LevelDefinition,desig.LevelId from [PR].[tblOrgPositions] pos inner join [PR].[tblOrgEmployee] emp on emp.PositionId= pos.PositionID inner join [PR].[tblOrgStructure] desig on desig.OrgStructureId= pos.designationId where pos.PositionId = {empdetail.PositionId} union all select t1.PositionID,t1.ParentID,emp1.staffcode,emp1.staffName,desig1.LevelDefinition,desig1.LevelId from [PR].[tblOrgPositions] t1  inner join [PR].[tblOrgEmployee] emp1 on emp1.PositionId= t1.PositionID inner join [PR].[tblOrgStructure] desig1 on desig1.OrgStructureId= t1.designationId inner join cte_Hierarchy t2 on t1.ParentID = t2.PositionId ) select * from cte_Hierarchy ";
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(queryForCol, connection))
+                {
+                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
+                    sqlDataAdapter.Fill(dt);
+                }
+                connection.Close();
+            }
+            return dt;
         }
     }
 }

@@ -411,6 +411,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             if (!string.IsNullOrEmpty(apiContext.Token))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
             using (var response = await client.GetAsync(url))
             using (var content = response.Content)
@@ -436,7 +437,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
                 //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 //client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                if (!string.IsNullOrEmpty(apiContext.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
                 using (var response = await client.GetAsync(url))
                 using (var content = response.Content)
                 {
@@ -472,6 +477,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
@@ -502,6 +508,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;

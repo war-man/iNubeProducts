@@ -48,7 +48,7 @@ namespace iNube.Services.Policy.Entities.AvoEntities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblMasCommonTypes>(entity =>
             {
@@ -209,6 +209,11 @@ namespace iNube.Services.Policy.Entities.AvoEntities
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
                 entity.Property(e => e.DepositPremium).HasMaxLength(30);
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.IntroducerCode)
                     .HasMaxLength(20)
@@ -478,6 +483,11 @@ namespace iNube.Services.Policy.Entities.AvoEntities
 
                 entity.Property(e => e.Gender)
                     .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.HomeNo)

@@ -7,17 +7,19 @@ using System.Text;
 using System.Threading.Tasks;
 using static iNube.Services.Policy.Models.ProposalModel;
 using iNube.Services.Policy.Models;
+using iNube.Utility.Framework.Model;
 
 namespace iNube.Services.Policy.Controllers.Proposal.IntegrationService
 {
-    namespace iNube.Services.Proposal.Controllers.ProposalConfig.IntegrationService
-    {
+  
 
         public interface IPOIntegrationService
         {
             Task<IEnumerable<LifeQqDTO>> fetchLifeQqDataAsync();
             Task<IEnumerable<LeadDTO>> FetchTblContactsdataAsync();
-        }
+        Task<IEnumerable<EmpHierarchy>> GetEmpHierarchyAsync(string Empcode, ApiContext apiContext);
+
+    }
 
         public class POIntegrationService : IPOIntegrationService
         {
@@ -37,8 +39,13 @@ namespace iNube.Services.Policy.Controllers.Proposal.IntegrationService
                 return tblContactsData;
             }
 
-         
-            public async Task<TResponse> GetApiInvoke<TResponse>(string url) where TResponse : new()
+        public async Task<IEnumerable<EmpHierarchy>> GetEmpHierarchyAsync(string Empcode, ApiContext apiContext)
+        {
+            var uri = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Organization/GetEmpHierarchy?Empcode=" + Empcode;
+            var empDetails = await GetListApiInvoke<EmpHierarchy>(uri, apiContext);
+            return empDetails;
+        }
+        public async Task<TResponse> GetApiInvoke<TResponse>(string url) where TResponse : new()
             {
                 HttpClient client = new HttpClient();
                 using (var response = await client.GetAsync(url))
@@ -101,9 +108,31 @@ namespace iNube.Services.Policy.Controllers.Proposal.IntegrationService
                 }
 
             }
+        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
+        {
+            HttpClient client = new HttpClient();
 
-
+            if (!string.IsNullOrEmpty(apiContext.Token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+            }
+            using (var response = await client.GetAsync(url))
+            using (var content = response.Content)
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
+                    if (serviceResponse != null)
+                    {
+                        return serviceResponse;
+                    }
+                }
+            }
+            return new List<TResponse>();
         }
-    }
 
+
+    }
 }
+

@@ -3,6 +3,7 @@ using iNube.Components.RuleEngine.Helpers;
 using iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigService;
 using iNube.Services.Proposal.Models;
 using iNube.Services.Proposal.PLEntities;
+using iNube.Utility.Framework;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,8 @@ namespace iNube.Services.Proposal.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class ProposalConfigController : ControllerBase
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public class ProposalConfigController : BaseApiController
     {
         private IProposalService _proposalService;
         private IMapper _mapper;
@@ -39,7 +41,7 @@ namespace iNube.Services.Proposal.Controllers
         public IActionResult ProposalPoll()
         {
 
-            var response = _proposalService.ProposalPoll();
+            var response = _proposalService.ProposalPoll(Context);
 
             //PLContext Context = new PLContext();
             //// ProposalInboxDTO obj = new ProposalInboxDTO();
@@ -50,7 +52,7 @@ namespace iNube.Services.Proposal.Controllers
         [HttpGet]
         public IActionResult FetchProposalSubmittedDetails()
         {
-            var response = _proposalService.FetchProposalSubmittedDetails();
+            var response = _proposalService.FetchProposalSubmittedDetails(Context);
             return Ok(response);
         }
 
@@ -59,7 +61,7 @@ namespace iNube.Services.Proposal.Controllers
         [HttpGet]
         public IActionResult FetchPendingRequirements()
         {
-            var response = _proposalService.FetchPendingRequirements();
+            var response = _proposalService.FetchPendingRequirements(Context);
 
             //PLContext Context = new PLContext();
             //// ProposalInboxDTO obj = new ProposalInboxDTO();
@@ -71,7 +73,7 @@ namespace iNube.Services.Proposal.Controllers
         [HttpGet]
         public IActionResult FetchProposal()
         {
-            var response = _proposalService.FetchProposal();
+            var response = _proposalService.FetchProposal(Context);
 
           
             return Ok(response);            
@@ -99,7 +101,7 @@ namespace iNube.Services.Proposal.Controllers
         [HttpGet]
         public IActionResult PartialFormData()
         {
-            var response = _proposalService.PartialFormData();
+            var response = _proposalService.PartialFormData(Context);
 
 
             return Ok(response);
@@ -108,7 +110,7 @@ namespace iNube.Services.Proposal.Controllers
         [HttpGet]
         public IActionResult PolicyOwnerDetails()
         {
-            var response = _proposalService.PolicyOwnerDetails();
+            var response = _proposalService.PolicyOwnerDetails(Context);
             return Ok(response);
         }
 
@@ -123,7 +125,7 @@ namespace iNube.Services.Proposal.Controllers
 
         {
             var isFilter = true;
-            var response = _proposalService.MastertypeData();
+            var response = _proposalService.MastertypeData(Context);
             if (isFilter)
             {
                 var masterdata = response.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });

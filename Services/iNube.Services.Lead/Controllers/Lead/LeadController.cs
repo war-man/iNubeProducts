@@ -31,9 +31,9 @@ namespace iNube.Services.Lead.Controllers.Lead
         }
         [HttpGet]
 
-        public IActionResult ContactPool(String type)
+        public async Task<IActionResult> ContactPool(String type)
         {
-            var contact = _leadService.ContactPool(type, Context);
+            var contact =await _leadService.ContactPoolAsync(type, Context);
             return Ok(contact);
         }
 
@@ -76,9 +76,9 @@ namespace iNube.Services.Lead.Controllers.Lead
         }
 
         [HttpGet]
-        public IActionResult SuspectPool(int incStageId)
+        public async Task<IActionResult> SuspectPool(int incStageId)
         {
-            var suspects = _leadService.SuspectPool(incStageId, Context);
+            var suspects =await  _leadService.SuspectPoolAsync(incStageId, Context);
             return Ok(suspects);
         }
           
@@ -146,9 +146,9 @@ namespace iNube.Services.Lead.Controllers.Lead
             return Ok(response);
         }
         [HttpGet]
-        public IActionResult ViewDetailsByPositionId(string Positionid)
+        public async Task<IActionResult> ViewDetailsByPositionId(string Positionid)
         {
-            var suspects = _leadService.ViewDetailsByPositionId(Positionid, Context);
+            var suspects =await _leadService.ViewDetailsByPositionIdAsync(Positionid, Context);
             return Ok(suspects);
 
         }

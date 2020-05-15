@@ -30,6 +30,7 @@ namespace MicaExtension_EGI.Entities
         public virtual DbSet<TblScheduleReport> TblScheduleReport { get; set; }
         public virtual DbSet<TblSchedulerLog> TblSchedulerLog { get; set; }
         public virtual DbSet<TblSendOtp> TblSendOtp { get; set; }
+        public virtual DbSet<TblSiexception> TblSiexception { get; set; }
         public virtual DbSet<TblSwitchLog> TblSwitchLog { get; set; }
         public virtual DbSet<TblSwitchStatus> TblSwitchStatus { get; set; }
         public virtual DbSet<TblVehicleDetails> TblVehicleDetails { get; set; }
@@ -51,9 +52,15 @@ namespace MicaExtension_EGI.Entities
             modelBuilder.Entity<TblBatchJobDetailsLog>(entity =>
             {
                 entity.HasKey(e => e.BatchDetailLogId)
-                    .HasName("PK__TblBatch__BF81F62FC572E278");
+                    .HasName("PK__TblBatch__BF81F62F01625E41");
 
                 entity.ToTable("TblBatchJobDetailsLog", "QM");
+
+                entity.Property(e => e.BatchDetailLogId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.BatchLogId).HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.TxnEndDateTime).HasColumnType("datetime");
 
@@ -62,15 +69,19 @@ namespace MicaExtension_EGI.Entities
                 entity.HasOne(d => d.BatchLog)
                     .WithMany(p => p.TblBatchJobDetailsLog)
                     .HasForeignKey(d => d.BatchLogId)
-                    .HasConstraintName("FK__TblBatchJ__Batch__3943762B");
+                    .HasConstraintName("FK__TblBatchJ__Batch__45A94D10");
             });
 
             modelBuilder.Entity<TblBatchJobLog>(entity =>
             {
                 entity.HasKey(e => e.BatchLogId)
-                    .HasName("PK__TblBatch__5927836E3B59DB2E");
+                    .HasName("PK__TblBatch__5927836E368B5FB3");
 
                 entity.ToTable("TblBatchJobLog", "QM");
+
+                entity.Property(e => e.BatchLogId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.BatchMode)
                     .HasMaxLength(25)
@@ -267,6 +278,10 @@ namespace MicaExtension_EGI.Entities
 
                 entity.Property(e => e.ReportCreatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.Source)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.TotalAmountChargeable).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.UserCredentials)
@@ -435,6 +450,33 @@ namespace MicaExtension_EGI.Entities
                 entity.Property(e => e.Otp)
                     .HasColumnName("OTP")
                     .HasMaxLength(250);
+            });
+
+            modelBuilder.Entity<TblSiexception>(entity =>
+            {
+                entity.HasKey(e => e.ExceptionId)
+                    .HasName("PK__TblSIExc__26981D88E44F22A6");
+
+                entity.ToTable("TblSIException", "QM");
+
+                entity.Property(e => e.ExceptionId)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DifferenceAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RequestAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.Source).HasMaxLength(50);
+
+                entity.HasOne(d => d.Report)
+                    .WithMany(p => p.TblSiexception)
+                    .HasForeignKey(d => d.ReportId)
+                    .HasConstraintName("FK__TblSIExce__Repor__3C1FE2D6");
             });
 
             modelBuilder.Entity<TblSwitchLog>(entity =>

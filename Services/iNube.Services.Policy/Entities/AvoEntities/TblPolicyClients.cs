@@ -62,6 +62,7 @@ namespace iNube.Services.Policy.Entities.AvoEntities
         public string CountryOccupation { get; set; }
         public string ProposerTelepohoneNo { get; set; }
         public string ProposerEamilId { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual TblPolicyClientAddress PermanetAddress { get; set; }
         public virtual ICollection<TblPolicyRelationship> TblPolicyRelationship { get; set; }

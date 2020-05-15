@@ -1,0 +1,23 @@
+
+{
+    "Information" : [
+        "This file provides default values for the deployment wizard inside Visual Studio and the AWS Lambda commands added to the .NET Core CLI.",
+        "To learn more about the Lambda commands with the .NET Core CLI execute the following command at the command line in the project root directory.",
+        "dotnet lambda help",
+        "All the command line options for the Lambda command can be specified in this file."
+    ],
+    "profile"     : "EdelweissProductionProfile",
+    "region"      : "ap-south-1",
+    "configuration" : "Release",
+    "framework"     : "netcoreapp2.1",
+    "function-runtime" : "dotnetcore2.1",
+    "function-memory-size" : 256,
+    "function-timeout"     : 900,
+    "function-handler"     : "iNube.Edelweiss.NightSchedule.AwsLambda::iNube.Edelweiss.NightSchedule.AwsLambda.Function::FunctionHandler",
+    "function-name"        : "NightSchedulerProd",
+    "function-role"        : "arn:aws:iam::471379395009:role/lambda_exec_NightSchedulerProd",
+    "tracing-mode"         : "PassThrough",
+    "environment-variables" : "",
+    "function-subnets"      : "subnet-0aa78f3624ee42804,subnet-0af77830edcf44b4c,subnet-057c4fbcd707f905f,subnet-053fcbbaf3a334ec4",
+    "function-security-groups" : "sg-01dccc30c1f5f8230,sg-08bb592009fd57dde"
+}

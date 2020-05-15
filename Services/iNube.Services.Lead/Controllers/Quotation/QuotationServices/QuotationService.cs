@@ -21,7 +21,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
     {
         Task<IEnumerable<LeadDTO>> LoadProspectInfo(int ContactID);
         void SaveProspectInfo(LeadDTO leadDTO);
-        List<QuotePoolDTO> QuotationPool();
+        List<QuotePoolDTO> QuotationPool(ApiContext context);
         LifeQqDTO CreateQuote(LifeQqDTO lifeQq);
         Task<QuotationModel> QuotationPdfGeneration(QuotePoolDTO quotePoolDTO, ApiContext apiContext);
         Task<LifeQuoteDTO> SaveQuote(LifeQuoteDTO objQuote);
@@ -66,9 +66,12 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
             return;
         }
 
-        public List<QuotePoolDTO> QuotationPool()
+        public List<QuotePoolDTO> QuotationPool(ApiContext context)
         {
-            var QuotationData = _context.TblLifeQq.OrderByDescending(c => c.CreateDate).Include(x => x.Contact)
+            List<QuotePoolDTO> QuotationData = new List<QuotePoolDTO>();
+            if (string.IsNullOrEmpty(context.Name))
+            {
+                 QuotationData = _context.TblLifeQq.OrderByDescending(c => c.CreateDate).Include(x => x.Contact)
                                                   .Select(x => new QuotePoolDTO
                                                   {
                                                       ContactType = x.Contact.ContactType,
@@ -76,8 +79,20 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
                                                       ProposerName = x.Contact.FirstName + " " + x.Contact.LastName,
                                                       EmiratesID = x.Contact.Nicno,
                                                       LeadNo = x.Contact.LeadNo
-                                                  });
-
+                                                  }).ToList();
+            }
+            else
+            {
+                QuotationData = _context.TblLifeQq.OrderByDescending(c => c.CreateDate).Include(x => x.Contact)
+                                                  .Select(x => new QuotePoolDTO
+                                                  {
+                                                      ContactType = x.Contact.ContactType,
+                                                      QuoteNo = x.QuoteNo,
+                                                      ProposerName = x.Contact.FirstName + " " + x.Contact.LastName,
+                                                      EmiratesID = x.Contact.Nicno,
+                                                      LeadNo = x.Contact.LeadNo
+                                                  }).ToList();
+            }
 
             var pooldata = _mapper.Map<List<QuotePoolDTO>>(QuotationData);
 

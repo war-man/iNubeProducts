@@ -25,7 +25,6 @@ namespace iNube.Services.Partners.Models
     {
         public string mID { get; set; }
         public string mValue { get; set; }
-
     }
 
 
@@ -160,6 +159,7 @@ namespace iNube.Services.Partners.Models
     {
         public string EmpCode { get; set; }
     }
+
     public partial class OrganizationDTO
     {
         public OrganizationDTO()
@@ -1723,7 +1723,7 @@ namespace iNube.Services.Partners.Models
         public string OfficeName { get; set; }
         public string Designation { get; set; }
         public decimal? ReportingTo { get; set; }
-
+        public string Supervisorname { get; set; }
 
         public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
         public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
@@ -1794,7 +1794,6 @@ namespace iNube.Services.Partners.Models
 
     public partial class updatepositionDto
     {
-
         public updatepositionDto()
         {
             AVOOrgEmployee = new AVOOrgEmployee();
@@ -1803,9 +1802,8 @@ namespace iNube.Services.Partners.Models
         public string DeginName { get; set; }
         public decimal? OrganizationId { get; set; }
         public decimal OfficeId { get; set; }
-        //public decimal EmpId { get; set; }
-        public virtual AVOOrgEmployee AVOOrgEmployee { get; set; }
 
+        public virtual AVOOrgEmployee AVOOrgEmployee { get; set; }
     }
 
     public class MovementCounts
@@ -1995,11 +1993,48 @@ namespace iNube.Services.Partners.Models
         {
             suspect = new List<LeadDTO>();
             prospect = new List<LeadDTO>();
+            quotationDtos = new List<QuotationDto>();
+            proposalDtos = new List<ProposalDto>();
+
+            policyDtos = new List<policyDto>();
         }
 
         public List<LeadDTO> suspect { get; set; }
         public List<LeadDTO> prospect { get; set; }
+        public List<QuotationDto> quotationDtos { get; set; }
+        public List<ProposalDto> proposalDtos { get; set; }
+
+        public List<policyDto> policyDtos { get; set; }
     }
+    public partial class QuotationDto
+    {
+        public string QuotNumber { get; set; }
+        public string Name { get; set; }
+
+        public string ContactNumner { get; set; }
+        public string CityName { get; set; }
+        public string MovedTo { get; set; }
+    }
+    public partial class ProposalDto
+    {
+        public string ProposalNumber { get; set; }
+        public string Name { get; set; }
+
+        public string ContactNumner { get; set; }
+        public string CityName { get; set; }
+        public string MovedTo { get; set; }
+    }
+    public partial class policyDto
+    {
+        public string PolicyNumber { get; set; }
+        public int PolicyStatus { get; set; }
+        public string Mode { get; set; }
+        public string PremiumAmount { get; set; }
+        public string ContactNumner { get; set; }
+        public string CityName { get; set; }
+        public string MovedTo { get; set; }
+    }
+    //needAnalysis
     public partial class LeadDTO
     {
         public int ContactID { get; set; }
@@ -2053,23 +2088,45 @@ namespace iNube.Services.Partners.Models
 
     public class EmpMappingData
     {
-        public decimal? OrgId { get; set; }
-        public decimal? OffID { get; set; }
+        public string Organization { get; set; }
+        public string Office { get; set; }
         public string Designation { get; set; }
     }
 
     public class Supervisor
     {
         public decimal? MovementId { get; set; }
-        public string StaffName { get; set; }
+        public decimal? MovedTo { get; set; }
         public decimal OrgEmpId { get; set; }
-        public int MovementStatus { get; set; }
+        public int MovementStatusId { get; set; }
+    }
+
+    public partial class EMPDistribute
+    {
+        public List<EMPDistributeDTO> EMPDistributeDTO { get; set; }
     }
 
     public partial class EMPDistributeDTO
     {
-        public string Empcode { get; set; }
+        public decimal PositionId { get; set; }
         public decimal PrimaryIds { get; set; }
+    }
+    public class EmpHierarchyData : ResponseStatus
+    {
+        public EmpHierarchyData()
+        {
+            StaffCodes = new List<EmpHierarchy>();
+        }
+        public List<EmpHierarchy> StaffCodes { get; set; }
+    }
+    public class EmpHierarchy
+    {
+        public int? ParentID { get; set; }
+        public int? PositionID { get; set; }
+        public string StaffName { get; set; }
+        public string Staffcode { get; set; }
+        public string LevelDefinition { get; set; }
+        public int? LevelId { get; set; }
     }
 
 }

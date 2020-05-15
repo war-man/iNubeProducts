@@ -22,13 +22,13 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
         //ActionResult ModifyProposal(string PolicyID, string userType = null);
         // ProposalInboxDTO FetchProposalIncompleteDetails(ProposalInboxDTO objProposalData);
         // void ProposalPool();
-        List<InboxDetailsDto> ProposalPoll();
-        List<PolicyOwnerDetailsDto> PolicyOwnerDetails();
-        List<InboxDetailsDto> FetchProposalSubmittedDetails();
-        List<PandingRequirementsDto> FetchPendingRequirements();
-        List<FetchProposalDataDto> FetchProposal();
-        List<FetchProposalDataDto> PartialFormData();
-        List<TblPlcommonTypesDto> MastertypeData();
+        List<InboxDetailsDto> ProposalPoll(ApiContext apiContext);
+        List<PolicyOwnerDetailsDto> PolicyOwnerDetails(ApiContext apiContext);
+        List<InboxDetailsDto> FetchProposalSubmittedDetails(ApiContext apiContext);
+        List<PandingRequirementsDto> FetchPendingRequirements(ApiContext apiContext);
+        List<FetchProposalDataDto> FetchProposal(ApiContext apiContext);
+        List<FetchProposalDataDto> PartialFormData(ApiContext apiContext);
+        List<TblPlcommonTypesDto> MastertypeData(ApiContext apiContext);
       //  List<TblPolicyDto> SaveProposal();
         // PolicyDto SubmitModifyProposal(PolicyDto tblPolicyDto);
     }
@@ -49,12 +49,15 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
 
 
         //this is used for proposal pool and partial form data
-        public List<InboxDetailsDto> ProposalPoll()
+        public List<InboxDetailsDto> ProposalPoll(ApiContext apiContext)
         {
+            List<InboxDetailsDto> ProposalData = new List<InboxDetailsDto>();
 #pragma warning disable CS0219 // Variable is assigned but its value is never used
             var userId = "sahir";
 #pragma warning restore CS0219 // Variable is assigned but its value is never used
-            var ProposalData =
+            if (string.IsNullOrEmpty(apiContext.Name))
+            {
+                ProposalData =
                 (from objtblpolicy in Context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
                                                                       || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192)
                  join objtbllifeQQ in Context.TblLifeQq
@@ -91,10 +94,53 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
                      ProposalStatus = commontype.Description,
                      FullName = (policyClients.FullName != "CORP" ? Context.TblPlcommonTypes.Where(a => a.Code == policyClients.Title).Select(b => b.ShortDesc).FirstOrDefault() + " " + policyClients.FirstName + " " + policyClients.LastName : policyClients.CorporateName)
                  }).ToList();
-            var pooldata = _mapper.Map<List<InboxDetailsDto>>(ProposalData);
+            }
+            else
+            {
+                // Get Emp Hirarchy
+                //var empList = await _integrationService.GetEmpHierarchyAsync(context.Name, context); staffCodes.Contains(a.HandledBy) &&
+                //var staffCodes = empList.Select(rt => Convert.ToInt64(rt.PositionID).ToString());
+                ProposalData =
+                (from objtblpolicy in Context.TblPolicy.Where(a =>  (a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
+                                                                      || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192))
+                 join objtbllifeQQ in Context.TblLifeQq
+                 on objtblpolicy.QuoteNo equals objtbllifeQQ.QuoteNo
+                 join Contact in Context.TblContacts
+                 on objtbllifeQQ.ContactId equals Contact.ContactId
+                 join relationship in Context.TblPolicyRelationship
+                 on objtblpolicy.PolicyId equals relationship.PolicyId
+                 join objproduct in Context.TblProducts
+                 on objtblpolicy.ProductId equals objproduct.ProductId
+                 join policyClients in Context.TblPolicyClients
+                 on relationship.PolicyClientId equals policyClients.PolicyClientId
+                 join commontype in Context.TblPlcommonTypes
+                 on objtblpolicy.PolicyStageStatusId equals commontype.CommonTypesId
+                 join objTblPolicyExtensionDto in Context.TblPolicyExtension
+                 on objtblpolicy.PlanId equals objTblPolicyExtensionDto.PolicyId
+                 // where objtblpolicy.Createdby == userId
+                 select new InboxDetailsDto
+                 {
+                     PolicyID = objtblpolicy.PolicyId,
+                     QuoteNo = objtblpolicy.QuoteNo,
+                     FirstName = policyClients.FirstName,
+                     ProposalNo = objtblpolicy.ProposalNo,
+                     NIC = policyClients.Newnicno,
+                     Salutation = policyClients.Title,
+                     Surname = policyClients.LastName,
+                     // PreferredLanguage = objtblpolicy.PreferredLanguage,
+                     // ProductCode = Common.ProductCode,
+                     PlanName = objproduct.ProductName,
+                     PaymentFrequency = objtblpolicy.PaymentFrequency,
+                     Need = objTblPolicyExtensionDto.ProposalNeed,
+                     LeadNo = Contact.LeadNo,
+                     Banca = Contact.IntroducerCode,
+                     ProposalStatus = commontype.Description,
+                     FullName = (policyClients.FullName != "CORP" ? Context.TblPlcommonTypes.Where(a => a.Code == policyClients.Title).Select(b => b.ShortDesc).FirstOrDefault() + " " + policyClients.FirstName + " " + policyClients.LastName : policyClients.CorporateName)
+                 }).ToList();
+            }  var pooldata = _mapper.Map<List<InboxDetailsDto>>(ProposalData);
             return pooldata;
         }
-        public List<InboxDetailsDto> FetchProposalSubmittedDetails()
+        public List<InboxDetailsDto> FetchProposalSubmittedDetails(ApiContext apiContext)
         {
 
 
@@ -157,7 +203,7 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
             var poolProposaldata = _mapper.Map<List<InboxDetailsDto>>(ProposalData);
             return poolProposaldata;
         }
-        public List<PandingRequirementsDto> FetchPendingRequirements()
+        public List<PandingRequirementsDto> FetchPendingRequirements(ApiContext apiContext)
         {
             UWInboxDto objUWInbox = new UWInboxDto();
             try
@@ -304,7 +350,7 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
 
         }
 
-        public List<FetchProposalDataDto> FetchProposal()
+        public List<FetchProposalDataDto> FetchProposal(ApiContext apiContext)
         {
             var FetchProposalData = (
                 from objTblPolicyDto in Context.TblPolicy
@@ -356,7 +402,7 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
         //}
 
 
-        public List<FetchProposalDataDto> PartialFormData()
+        public List<FetchProposalDataDto> PartialFormData(ApiContext apiContext)
         {
             var partialFormData = (
                 from objtblpolicy in Context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
@@ -382,7 +428,7 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
         }
 
         //Policy Owner Details
-        public List<PolicyOwnerDetailsDto> PolicyOwnerDetails()
+        public List<PolicyOwnerDetailsDto> PolicyOwnerDetails(ApiContext apiContext)
         {
 
             {
@@ -461,7 +507,7 @@ namespace iNube.Services.Proposal.Controllers.ProposalConfig.ProposalConfigServi
 
 
         //Get master data
-        public List<TblPlcommonTypesDto> MastertypeData()
+        public List<TblPlcommonTypesDto> MastertypeData(ApiContext apiContext)
         {
 
 

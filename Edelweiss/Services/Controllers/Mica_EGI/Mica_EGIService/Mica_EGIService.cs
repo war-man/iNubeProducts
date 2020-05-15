@@ -3697,7 +3697,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public async Task<List<RuleEngineResponse>> RuleMapper(string TxnType, dynamic SourceObject, ApiContext context)
+        public async Task<List<RuleEngineResponse>> RuleMapper (string TxnType, dynamic SourceObject, ApiContext context)
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
                        
@@ -3956,7 +3956,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
 
                     return engineResponse;
-                //case "EndorementAdd":
+
+
+                //PolicyBazaar Related Validation            
+                case "PolicyCreation":
+                  return  GenericMapper(SourceObject);
 
 
                 //    return RuleEngine;
@@ -5266,6 +5270,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             dynamic PolicyData = JsonConvert.DeserializeObject(CDDetails.FirstOrDefault(x => x.Action == "Issue Policy").UpdatedResponse);
 
+                            var Source = PolicyData["Source"];
+
+                            if (Source != null)
+                            {
+                                monthlySiDTO.Source = Source;
+                            }
+
                             string StateCode = PolicyData["stateCode"];
                             TaxTypeDTO TaxType = await TaxTypeForStateCode(StateCode, context);
 
@@ -5324,6 +5335,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                 monthlySiDTO.Amount = monthlySiDTO.TotalAmountChargeable;
 
+                                
                                 Guid guid = Guid.NewGuid();
                                 monthlySiDTO.Txnid = guid.ToString();
 
@@ -5468,6 +5480,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
 
+
             string filePath = "";
             int step1 = 0;
             try
@@ -5506,7 +5519,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     if (fileExt == ".CSV" || fileExt == ".csv")
                     {
                         step1++;
-                        // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
+
+                        var CheckPolicyBazaar = FindIndex(filePath, "policy Bazaar Monthly SI Amount");
+                      
+                        if(CheckPolicyBazaar != 0)
+                        {
+                            var CsvResponse = await CSVUpload(filePath, context);
+                            return CsvResponse;
+                        }
+
                         var res = await ConvertCSVtoDataTable(filePath, context);
                         return res;
                     }
@@ -5705,8 +5726,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                 if (errorflag == false)
                                                 {
                                                     var TblData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
-
-
+                                                                                                        
                                                     var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(TblData.PremiumDetails);
 
                                                     var CallMicaCd = await _integrationService.MasterCDACC(CdDTO, context);
@@ -5721,6 +5741,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                                         _context.TblPolicyMonthlySi.Update(TblData);
                                                         _context.SaveChanges();
+
                                                     }
                                                     else
                                                     {
@@ -5756,7 +5777,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                         }
                                         
                                         }
-                                    }                               
+
+                                }                               
                                 catch (Exception ex)
                                 {
                                     var error = ex.ToString();
@@ -5814,6 +5836,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 var paymentDateIndex = FindIndex(strFilePath, "payment Date");
 
                 logx++;
+
+                var CheckPolicyBazaar = FindIndex(strFilePath, "policy Bazaar Monthly SI Amount");
+
 
                 while (!sr.EndOfStream)
                 {
@@ -6194,24 +6219,84 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             ResponseStatus response = new ResponseStatus();
             ErrorInfo errorInfo = new ErrorInfo();
 
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            if (String.IsNullOrEmpty(monthlySIDTO.PolicyNumber))
+            {
+                response.ResponseMessage = "Policy Number Missing";
+                response.Id = monthlySIDTO.PolicyNumber;
+                response.Status = BusinessStatus.InputValidationFailed;
+                errorInfo.ErrorMessage = "Mandatory Field Missing";
+                errorInfo.ErrorCode = "MSI003";
+                errorInfo.PropertyName = "PolicyNumber";
+                response.Errors.Add(errorInfo);
+
+                return response;
+            }
+
+            if (String.IsNullOrEmpty(monthlySIDTO.PaymentReferenceId))
+            {
+                response.ResponseMessage = "Payment Refrence Id Missing";
+                response.Id = monthlySIDTO.PaymentReferenceId;
+                response.Status = BusinessStatus.InputValidationFailed;
+                errorInfo.ErrorMessage = "Mandatory Field Missing";
+                errorInfo.ErrorCode = "MSI004";
+                errorInfo.PropertyName = "PaymentReferenceId";
+                response.Errors.Add(errorInfo);
+
+                return response;
+            }
 
             var MonthlySIData = _context.TblPolicyMonthlySi.FirstOrDefault(x=>x.PolicyNo == monthlySIDTO.PolicyNumber && x.DueDate.Value.Month == monthlySIDTO.Month && x.DueDate.Value.Year == monthlySIDTO.Year);
 
             if(MonthlySIData != null)
             {
-                if(MonthlySIData.Amount == monthlySIDTO.PaidAmount)
+                
+                if(MonthlySIData.PayUid != null)
                 {
+                    response.ResponseMessage = "Payment Details is Already Updated";
+                    response.Id = monthlySIDTO.PolicyNumber;
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Data Cannot be Modified";
+                    errorInfo.ErrorCode = "MSI005";
+                    errorInfo.PropertyName = "MonthlySI";
+                    response.Errors.Add(errorInfo);
 
-                    MonthlySIData.PayUid = monthlySIDTO.PaymentReferenceId.ToString();
-                    MonthlySIData.PayAmount = monthlySIDTO.PaidAmount.ToString();
-                    MonthlySIData.PaymentDate = monthlySIDTO.PaymentDate;
-                    MonthlySIData.PayStatus = "Successful";
+                    return response;
+                }
 
-                    response.ResponseMessage = "Monthly SI Successfully Updated";
-                    response.Status = BusinessStatus.Ok;
 
-                    _context.TblPolicyMonthlySi.Update(MonthlySIData);
-                    _context.SaveChanges();
+                var DifferenceAmount = monthlySIDTO.PaidAmount - MonthlySIData.TotalAmountChargeable;
+
+                if (DifferenceAmount >= -1)
+                {                 
+
+                    var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(MonthlySIData.PremiumDetails);
+
+                    var CallMicaCd = await _integrationService.MasterCDACC(CdDTO, context);
+
+                    if (CallMicaCd != null)
+                    {
+                        MonthlySIData.PayUid = monthlySIDTO.PaymentReferenceId.ToString();
+                        MonthlySIData.PayAmount = monthlySIDTO.PaidAmount.ToString();
+                        MonthlySIData.PaymentDate = monthlySIDTO.PaymentDate;
+                        MonthlySIData.PayStatus = "Successful";
+
+                        response.ResponseMessage = "Monthly SI Successfully Updated";
+                        response.Status = BusinessStatus.Updated;
+
+                        _context.TblPolicyMonthlySi.Update(MonthlySIData);
+                    }
+                    else
+                    {
+                        response.ResponseMessage = "MICA Updation Failed";
+                        response.Id = monthlySIDTO.PolicyNumber;
+                        response.Status = BusinessStatus.Error;
+                        errorInfo.ErrorMessage = "Updation Failed";
+                        errorInfo.ErrorCode = "MSI006";
+                        errorInfo.PropertyName = "Update Failed";
+                        response.Errors.Add(errorInfo);
+                    }
 
                 }
                 else
@@ -6223,7 +6308,23 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     errorInfo.ErrorCode = "MSI001";
                     errorInfo.PropertyName = "Amount";
                     response.Errors.Add(errorInfo);
+
+                    TblSiexception SiException = new TblSiexception();
+
+                    SiException.ReportId = MonthlySIData.ReportId;
+                    SiException.RequestObject = JsonConvert.SerializeObject(monthlySIDTO); ;
+                    SiException.RequestAmount = monthlySIDTO.PaidAmount;
+                    SiException.DifferenceAmount = DifferenceAmount * (-1);
+                    SiException.Status = true;
+                    SiException.CreatedDate = IndianTime;
+                    SiException.Source = MonthlySIData.Source;
+
+                    _context.TblSiexception.Add(SiException);
+
                 }
+
+                _context.SaveChanges();
+
             }
             else
             {
@@ -6239,6 +6340,558 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return response;
         }
 
+        private List<RuleEngineResponse> GenericMapper(dynamic SourceObject)
+        {          
+            int successcount = 0;
+            int failcount = 0;
+            var DriverRiskItem = SourceObject["InsurableItem"][0]["RiskItems"];
+            var VehicleRiskItem = SourceObject["InsurableItem"][1]["RiskItems"];
+            var NoOfVehicles = Convert.ToInt32(SourceObject["noOfPC"]) + Convert.ToInt32(SourceObject["noOfTW"]);
+
+            List<RuleEngineResponse> engineResponse = new List<RuleEngineResponse>();
+            try
+            {
+                foreach (var item in DriverRiskItem)
+                {
+                    var driverExp = item["Driving Experience"];
+                    if (driverExp >= 1)
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Driving Experience";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for driver experience cannot be less than one year";
+                        resobj.Code = "GEPO001";
+                        engineResponse.Add(resobj);
+                        successcount++;
+
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Driving Experience";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Driver Experience cannot be less than one year";
+                        resobj.Code = "GEPO001";
+                        engineResponse.Add(resobj);
+                        failcount++;
+
+                    }
+                }
+
+                if (Convert.ToInt32(SourceObject["driverExp"]) > Convert.ToInt32(SourceObject["driverAge"]) - 18)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "driverExp";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Years of driving experience cannot be greater than the difference in current age and 18";
+                    resobj.Code = "GEPO002";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "driverExp";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for driver experience";
+                    resobj.Code = "GEPO002";
+                    engineResponse.Add(resobj);
+                    successcount++;
+                }
+                if (SourceObject["noOfPC"] == 1)
+                {
+                    if (SourceObject["si"] <= 2000000)
+                    {
+
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for sum insured";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Sum Insured is exceeding the limit defined";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        failcount++;
+                    }
+                }
+                else if (SourceObject["noOfPC"] == 2)
+                {
+                    if (SourceObject["si"] <= 4000000)
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for sum insured";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Sum Insured is exceeding the limit defined";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        failcount++;
+                    }
+
+                }
+                else if (SourceObject["noOfPC"] == 3)
+                {
+                    if (SourceObject["si"] <= 6000000)
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for sum insured";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "SI";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Sum Insured is exceeding the limit defined";
+                        resobj.Code = "GEPO008";
+                        engineResponse.Add(resobj);
+                        failcount++;
+                    }
+
+                }
+
+                if (NoOfVehicles > 0 && NoOfVehicles <= 3)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "noOfVehicles";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for number of vehicles is exceeding the limit defined";
+                    resobj.Code = "GEPO009";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "noOfVehicles";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Number of vehicles is exceeding the limit defined";
+                    resobj.Code = "GEPO009";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                }
+
+                if (SourceObject["noOfPC"] > 0 && SourceObject["noOfPC"] >= 1)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "noOfPC";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for minimum one PC required";
+                    resobj.Code = "GEPO010";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "noOfPC";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Minimum One PC required";
+                    resobj.Code = "GEPO010";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+
+                }
+                if (SourceObject["additionalDriver"] > 0 && SourceObject["additionalDriver"] <= 2)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "additionalDriver";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for number of additional drivers cannot be more than 2";
+                    resobj.Code = "GEPO011";
+                    engineResponse.Add(resobj);
+                    successcount++;
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "additionalDriver";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Number of additional drivers cannot be more than 2";
+                    resobj.Code = "GEPO011";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                }
+                if (SourceObject["billingFrequency"] == "Monthly" || SourceObject["billingFrequency"] == "Yearly")
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "billingFrequency";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for billing frequency can either be monthly/yearly";
+                    resobj.Code = "GEPO012";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "billingFrequency";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Billing Frequency can either be Monthly/Yearly";
+                    resobj.Code = "GEPO012";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+
+                }
+                if (SourceObject["driverAge"] >= 18)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "driverAge";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for age of driver cannot be less than 18 years";
+                    resobj.Code = "GEPO014";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "driverAge";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Age of driver cannot be less than 18 years";
+                    resobj.Code = "GEPO014";
+                    engineResponse.Add(resobj);
+                    failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+
+                }
+                foreach (var item in VehicleRiskItem)
+                {
+                    var vehicleType = item["Vehicle Type"];
+                    if (vehicleType == "PC" || vehicleType == "TW")
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Vehicle Type";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for vehicle type mismatch";
+                        resobj.Code = "GEPO015";
+                        engineResponse.Add(resobj);
+                        successcount++;
+
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Vehicle Type";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Vehicle type mismatch";
+                        resobj.Code = "GEPO015";
+                        engineResponse.Add(resobj);
+                        failcount++;
+
+                    }
+                }
+
+
+                if (failcount > 0)
+                {
+                    RuleEngineResponse res4obj = new RuleEngineResponse();
+                    res4obj.ValidatorName = "Final Result";
+                    res4obj.Outcome = "Fail";
+                    res4obj.Message = "One or More conditions failed";
+                    res4obj.Code = "GEPO016";
+                    engineResponse.Add(res4obj);
+                }
+                else
+                {
+                    RuleEngineResponse res4obj = new RuleEngineResponse();
+                    res4obj.ValidatorName = "Final Result";
+                    res4obj.Outcome = "Success";
+                    res4obj.Message = "Conditions Successful";
+                    res4obj.Code = "GEPO017";
+                    engineResponse.Add(res4obj);
+
+                }
+
+
+            }
+            catch
+            {
+                return new List<RuleEngineResponse>();
+            }
+
+           return engineResponse;
+          
+        }
+
+        private async Task<MonthlySIUploadDTO> CSVUpload (string strFilePath, ApiContext context)
+        {
+
+            MonthlySIUploadDTO uploadDTO = new MonthlySIUploadDTO();
+
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+
+            int logx = 0;
+
+            StreamReader sr = null;
+            try
+            {
+                sr = new StreamReader(strFilePath);
+                string[] headers = sr.ReadLine().Split(',');
+                DataTable dt = new DataTable();
+                foreach (string header in headers)
+                {
+                    dt.Columns.Add(header);
+                }
+                logx++;
+
+                //finding index of every column
+                var TxnidIndex = FindIndex(strFilePath, "mICA Txn ID");
+                var payUidindex = FindIndex(strFilePath, "payment Reference ID");
+                var payAmountIndex = FindIndex(strFilePath, "paid Amount");
+                var payStatusIndex = FindIndex(strFilePath, "payment Status");
+                var paymentDateIndex = FindIndex(strFilePath, "payment Date");
+                logx++;
+
+                while (!sr.EndOfStream)
+                {
+                    string[] rows = Regex.Split(sr.ReadLine(), ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    DataRow dr = dt.NewRow();
+
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        dr[i] = rows[i];
+                    }
+                    dt.Rows.Add(dr);
+                }
+
+                var count = dt.Rows.Count;
+
+                var errorflag = false;
+
+
+                for (var i = 0; i < count; i++)
+                {
+                    var txnid = dt.Rows[i][TxnidIndex].ToString().Replace("\"", "").Trim();
+                    var payUid = dt.Rows[i][payUidindex].ToString().Replace("\"", "").Trim();
+                    var payAmount = dt.Rows[i][payAmountIndex].ToString().Replace("\"", "").Trim();
+                    var payStatus = dt.Rows[i][payStatusIndex].ToString().Replace("\"", "").Trim();
+
+                    //EPPlusHelper - For Validation Of Date in Excel
+                    var paymentDate = EPPlusHelper.ValidateDate(dt.Rows[i][paymentDateIndex].ToString().Replace("\"", "").Trim());
+
+                    var PropertyName = "";
+
+                    if (String.IsNullOrEmpty(txnid))
+                    {
+
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        errorInfo.ErrorMessage = "Txn Id Missing";
+                        errorInfo.ErrorCode = "MSI001";
+                        errorInfo.PropertyName = Convert.ToString(i + 1); //Row Number
+                        uploadDTO.Errors.Add(errorInfo);
+                        errorflag = true;
+                        PropertyName = Convert.ToString(i + 1);
+                    }
+                    else
+                    {
+                        PropertyName = txnid;
+                    }
+
+                    if (String.IsNullOrEmpty(payUid))
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        errorInfo.ErrorMessage = "Pay Uid Missing";
+                        errorInfo.ErrorCode = "MSI002";
+                        errorInfo.PropertyName = PropertyName;
+                        uploadDTO.Errors.Add(errorInfo);
+                        errorflag = true;
+                    }
+
+
+
+                    if (String.IsNullOrEmpty(payAmount))
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        errorInfo.ErrorMessage = "Pay Amount Missing";
+                        errorInfo.ErrorCode = "MSI003";
+                        errorInfo.PropertyName = PropertyName;
+                        uploadDTO.Errors.Add(errorInfo);
+                        errorflag = true;
+                    }
+
+                    if (String.IsNullOrEmpty(payStatus))
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        errorInfo.ErrorMessage = "Pay Status Missing";
+                        errorInfo.ErrorCode = "MSI004";
+                        errorInfo.PropertyName = PropertyName;
+                        uploadDTO.Errors.Add(errorInfo);
+                        errorflag = true;
+                    }
+
+                    if (payStatus != "Successful")
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        errorInfo.ErrorMessage = "Pay Status is Not Sucessful";
+                        errorInfo.ErrorCode = "MSI005";
+                        errorInfo.PropertyName = PropertyName;
+                        uploadDTO.Errors.Add(errorInfo);
+                        errorflag = true;
+                    }
+                    if (paymentDate == null)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        errorInfo.ErrorMessage = "Payment Date Missing / Not Proper";
+                        errorInfo.ErrorCode = "MSI006";
+                        errorInfo.PropertyName = PropertyName;
+                        uploadDTO.Errors.Add(errorInfo);
+                        errorflag = true;
+                    }
+
+                    var checkTxnid = _context.TblPolicyMonthlySi.Any(x => x.Txnid == txnid);
+
+                    if (checkTxnid == false)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        errorInfo.ErrorMessage = "No Such TxnId";
+                        errorInfo.ErrorCode = "MSI007";
+                        errorInfo.PropertyName = PropertyName;
+                        uploadDTO.Errors.Add(errorInfo);
+                        errorflag = true;
+                    }
+
+                    if (checkTxnid == true)
+                    {
+                        //This Helps to Find out data is saved previously or not
+                        var checkData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
+
+                        if (!String.IsNullOrEmpty(checkData.PayUid))
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+                            errorInfo.ErrorMessage = "Data is Already Updated for this Txn Id Duplicate Record";
+                            errorInfo.ErrorCode = "MSI008";
+                            errorInfo.PropertyName = PropertyName;
+                            uploadDTO.Errors.Add(errorInfo);
+                            errorflag = true;
+                        }
+
+                        if (!String.IsNullOrEmpty(payAmount))
+                        {
+                            if (Convert.ToDecimal(payAmount) < checkData.TotalAmountChargeable)
+                            {
+
+                                ErrorInfo errorInfo = new ErrorInfo();
+
+                                errorInfo.ErrorMessage = "Pay Amount is Less Than the Billed Amount";
+                                errorInfo.ErrorCode = "MSI009";
+                                errorInfo.PropertyName = PropertyName;
+                                uploadDTO.Errors.Add(errorInfo);
+                                errorflag = true;
+                            }
+                        }
+
+                    }
+
+
+
+                    if (errorflag == false)
+                    {
+                        var TblData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.Txnid == txnid);
+
+                        var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(TblData.PremiumDetails);
+
+                        var CallMicaCd = await _integrationService.MasterCDACC(CdDTO, context);
+
+                        if (CallMicaCd != null)
+                        {
+                            TblData.PayUid = payUid;
+                            TblData.PayAmount = payAmount;
+                            TblData.PayStatus = payStatus;
+                            TblData.PaymentDate = paymentDate;
+
+                            _context.TblPolicyMonthlySi.Update(TblData);
+
+                            var ExceptionData = _context.TblSiexception.FirstOrDefault(x => x.ReportId == TblData.ReportId);
+
+                            if (ExceptionData != null)
+                            {
+                                ExceptionData.Status = false;
+                                ExceptionData.ModifiedDate = IndianTime;
+                                _context.TblSiexception.Update(ExceptionData);
+                            }
+
+                            _context.SaveChanges();
+
+                        }
+                        else
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            errorInfo.ErrorMessage = "Technical Failure Try Again";
+                            errorInfo.ErrorCode = "MSI010";
+                            errorInfo.PropertyName = PropertyName;
+                            uploadDTO.Errors.Add(errorInfo);
+                            errorflag = true;
+                        }
+
+                    }
+
+                    //Re-Setting Error Flag for Next Record Checking                                        
+                    errorflag = false;
+
+                }
+
+
+
+                if (uploadDTO.Errors.Count > 0)
+                {
+                    uploadDTO.ResponseMessage = "Document Uploaded for Sucess One & Failed Transactions Are in Errors";
+                    uploadDTO.Status = BusinessStatus.Ok;
+                    return uploadDTO;
+                }
+                else
+                {
+                    return new MonthlySIUploadDTO { Status = BusinessStatus.Ok, ResponseMessage = $"Document Uploaded Successfully" };
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                logx++;
+                return new MonthlySIUploadDTO { Status = BusinessStatus.Error, ResponseMessage = $"Document uploaded with following Erros " + ex.ToString(), MessageKey = logx.ToString() };
+            }
+            finally
+            {
+                sr.Dispose();
+            }
+        }
     }
 }
 

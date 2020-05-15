@@ -68,10 +68,10 @@ namespace iNube.Services.UserManagement.Validations
                .WithMessage("Mobile Number is required")
                .WithErrorCode("MobileNumber_required");
 
-            RuleFor(request => request.PanNo)
-               .NotEmpty()
-               .WithMessage("Pan Number is required")
-               .WithErrorCode("PanNumber_required");
+            //RuleFor(request => request.PanNo)
+            //   .NotEmpty()
+            //   .WithMessage("Pan Number is required")
+            //   .WithErrorCode("PanNumber_required");
 
 
             RuleFor(request => request.Email)
