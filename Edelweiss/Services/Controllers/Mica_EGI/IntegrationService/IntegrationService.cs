@@ -79,9 +79,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         }
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
-        {
-            LoggerManager logger = new LoggerManager(_configuration);
-            
+        {                      
             var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
        
@@ -195,8 +193,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-            HttpClient client = new HttpClient();
-            LoggerManager logger = new LoggerManager(_configuration);          
+            HttpClient client = new HttpClient();   
 
            if (!string.IsNullOrEmpty(apiContext.Token))
             {               
