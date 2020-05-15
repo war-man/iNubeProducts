@@ -272,6 +272,12 @@ namespace iNube.Services.Partners.Controllers.Partner
 
         //  ||  AVO
 
-      
+        // GET: api/Partner/GetPartnerDetails
+        [HttpGet]
+        public async Task<IActionResult> GetPartnerDetailsByPartnerCode(string partnerCode)
+        {
+            PartnersDTO _partnerDTO = await _partnerService.GetPartnerDetailsByPartnerCode(partnerCode, Context);
+            return Ok(_partnerDTO);
+        }
     }
 }

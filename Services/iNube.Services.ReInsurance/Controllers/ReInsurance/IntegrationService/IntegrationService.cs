@@ -58,9 +58,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();
-           if (!string.IsNullOrEmpty(apiContext.Token))
+            if (!string.IsNullOrEmpty(apiContext.Token))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
 
             using (var response = await client.GetAsync(url))
@@ -107,16 +108,15 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
             {
                 HttpClient client = new HttpClient();
 
-
+                if (!string.IsNullOrEmpty(apiContext.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
                 HttpContent contentPost = null;
                 if (request != null)
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    if (!string.IsNullOrEmpty(apiContext.Token))
-                    {
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    }
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
@@ -143,14 +143,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
             {
                 HttpClient client = new HttpClient();
                 HttpContent contentPost = null;
+                if (!string.IsNullOrEmpty(apiContext.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
                 if (request != null)
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    if (!string.IsNullOrEmpty(apiContext.Token))
-                    {
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    }
                     string postBody = JsonConvert.SerializeObject(request);
                     //dynamic dynamicObject = JsonConvert.DeserializeObject(postBody);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
@@ -180,8 +180,11 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                 HttpClient client = new HttpClient();
                 //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                //client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                if (!string.IsNullOrEmpty(apiContext.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
                 using (var response = await client.GetAsync(url))
                 using (var content = response.Content)
                 {

@@ -2907,7 +2907,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
 
                             _context.TblPolicyInsurableDetails.AddRange(lstPolicyInsurableDetailsDto);
-                            _context.SaveChanges();
+                           
                         }
                     }
 
@@ -3178,7 +3178,37 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         }
                                         else
                                         {
-                                            return new EndorsmentDTO { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Calculate Premium Amount {CalculatePremiumResponse.TotalAmount} differs with payment collected amount {paymentinfoRequest[0].Amount}" };
+                                            if (json1["Source"] == "PolicyBazaar")
+                                            {
+                                                //Exception table call 
+                                                TblPolicyException tblPolicyException = new TblPolicyException();
+                                                tblPolicyException.TransactionDate = DatetimeNow;
+                                                tblPolicyException.TransactionType = "Endorsement";
+                                                tblPolicyException.PolicyNumber = PolicyNo;
+                                               // tblPolicyException.NoofPcs = json1["noOfPC"];
+                                                //tblPolicyException.NoofTws = json1["noOfTW"];
+                                               // tblPolicyException.NoofAddnlDrivers = json1["additionalDriver"];
+                                               // tblPolicyException.PrimaryDriverAge = json1["driverAge"];
+                                               // tblPolicyException.PrimaryDriverExperience = json1["driverExp"];
+                                                tblPolicyException.SumInsured = Convert.ToDecimal(insurableItemRequest["si"]);
+                                                tblPolicyException.Frequency = json1["billingFrequency"];
+                                                Guid guid = Guid.NewGuid();
+                                                tblPolicyException.TxnId = guid.ToString();
+                                                tblPolicyException.Fttotal = CalculatePremiumResponse.PremiumDTO.FirstOrDefault(s => s.Type == "FT").TotalAmount;
+                                                tblPolicyException.Adtotal = CalculatePremiumResponse.PremiumDTO.FirstOrDefault(s => s.Type == "AD").TotalAmount;
+                                                tblPolicyException.TotalPremium = CalculatePremiumResponse.TotalAmount;
+                                                tblPolicyException.PbtotalPremium = paymentinfoRequest[0].Amount;
+
+                                                tblPolicyException.Status = true;
+                                                tblPolicyException.CreatedDate = DatetimeNow;
+
+                                                tblPolicyException.RequestObject = insurableItemRequest.ToString(); ;
+                                                _context.TblPolicyException.Add(tblPolicyException);
+                                                _context.SaveChanges();
+                                            }
+                                           // return new PolicyResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = "Json  saved in Exception table" };
+                                        
+                                        return new EndorsmentDTO { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Calculate Premium Amount {CalculatePremiumResponse.TotalAmount} differs with payment collected amount {paymentinfoRequest[0].Amount}" };
 
                                         }
                                     }
@@ -6386,7 +6416,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return true;
 
         }
-        public async Task<PolicyResponse> GeneratePolicy(dynamic IssuepolicyDTO, ApiContext apiContext)
+        public async Task<PolicyResponse> GeneratePolicy(dynamic policyDTO, ApiContext apiContext)
         {
             //Step1:Validate of Request Object
 
@@ -6404,9 +6434,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
            
-                var PolicyObj = JsonConvert.DeserializeObject<ExpandoObject>(IssuepolicyDTO.ToString());
+                var PolicyObj = JsonConvert.DeserializeObject<ExpandoObject>(policyDTO.ToString());
 
-                var res = await _integrationService.RuleMapper(IssuepolicyDTO, "Policy", apiContext);
+                var res = await _integrationService.RuleMapper(policyDTO, "Policy", apiContext);
 
                 var seriaizeListofres = JsonConvert.SerializeObject(res);
                 List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
@@ -6434,29 +6464,24 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         }
 
                     }
-                if (IssuepolicyDTO["PolicyNumber"] != null)
+                if (policyDTO["PolicyNumber"] != null)
                 {
-                    string PolicyNo = (string)IssuepolicyDTO["PolicyNumber"];
+                    string PolicyNo = (string)policyDTO["PolicyNumber"];
 
                     var tblPolicy = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == PolicyNo);
 
                   //  step: 3 update the insurable fileds
                     if (tblPolicy == null)
                     {
-                        //var PolicyDTO  = JsonConvert.DeserializeObject<ExpandoObject>(IssuepolicyDTO.ToString());
+                        
 
-                        //AddProperty(PolicyDTO, "Tax", );
-
-                        //var tempobj = JsonConvert.SerializeObject(PolicyDTO);
-                        //IssuepolicyDTO = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
-
-                        List<MicaCDDTO> CDmap = await _integrationService.CDMapper(IssuepolicyDTO, "PolicyCreation", apiContext);
+                        List<MicaCDDTO> CDmap = await _integrationService.CDMapper(policyDTO, "PolicyCreation", apiContext);
                         if (CDmap.Count() > 0)
                         {
                             var CalculatePremiumResponse = CDmap.FirstOrDefault(s => s.TotalAmount > 0);
 
                             //Step3:Check Premium vs Payment Amount
-                            var paymentinfo = IssuepolicyDTO["PaymentInfo"];
+                            var paymentinfo = policyDTO["PaymentInfo"];
                             if (paymentinfo != null)
                             {
                                 var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
@@ -6464,14 +6489,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
                                 {
 
-                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(IssuepolicyDTO.ToString());
+                                    var expObj = JsonConvert.DeserializeObject<ExpandoObject>(policyDTO.ToString());
 
 
 
 
-                                    Errors = GetPolicyRequestValidation(IssuepolicyDTO);
+                                    Errors = GetPolicyRequestValidation(policyDTO);
 
-                                    var productCode = IssuepolicyDTO["Product Code"].ToString();
+                                    var productCode = policyDTO["Product Code"].ToString();
                                     if (Errors.Count > 0)
                                     {
                                         return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, Errors = Errors };
@@ -6495,41 +6520,41 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                     var policyRiskDetails = await _integrationService.GetInsurableRiskDetails(productId, apiContext);
                                     /*Partner Section*/
-                                    //var partnerId = "";
-                                    //if (IssuepolicyDTO["Partner ID"] != null)
+                                    var partnerCode = "";
+                                    if (policyDTO["Source"] != null)
 
-                                    //{
-                                    //    partnerId = IssuepolicyDTO["Partner ID"].ToString();
-                                    //}
+                                    {
+                                        partnerCode = policyDTO["Source"].ToString();
+                                    }
                                     PartnersDTO partnerDetails = null;
-                                    //partnerDetails = await _integrationService.GetPartnerDetailAsync(partnerId, apiContext);
-                                    //if (partnerDetails != null)
-                                    //{
-                                    //    if (partnerDetails.PartnerId <= 0)
+                                    partnerDetails = await _integrationService.GetPartnerDetailByCodeAsync(partnerCode, apiContext);
+                                    if (partnerDetails != null)
+                                    {
+                                        if (partnerDetails.PartnerId <= 0)
 
-                                    //    {
+                                        {
 
-                                    //        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PartnerID", PropertyName = "PartnerID", ErrorMessage = $"PartnerID : {partnerDetails.PartnerId} Not Found" };
+                                            ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "PartnerCode", PropertyName = "PartnerCode", ErrorMessage = $"PartnerCode : {partnerCode} Not Found" };
 
-                                    //        Errors.Add(errorInfo);
+                                            Errors.Add(errorInfo);
 
-                                    //        return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+                                            return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
 
-                                    //    }
-                                    //}
-                                    //if (policyRiskDetails.ProductRcbDetails.Count <= 0)
-                                    //{
-                                    //    ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "RiskDetail", PropertyName = "RiskDetail", ErrorMessage = $"RiskDetail for product : {partnerId} Not Found" };
-                                    //    Errors.Add(errorInfo);
-                                    //    return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
-                                    //}
+                                        }
+                                    }
+                                    if (policyRiskDetails.ProductRcbDetails.Count <= 0)
+                                    {
+                                        ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "RiskDetail", PropertyName = "RiskDetail", ErrorMessage = $"RiskDetail for productId : {productId} Not Found" };
+                                        Errors.Add(errorInfo);
+                                        return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+                                    }
 
                                     //Step4:Genrate Policy Number
-                                    var mappedPolicy = await MapAndValidateInsurablePolicyAsync(IssuepolicyDTO, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "PolicyNo", apiContext);
-                                    if (IssuepolicyDTO["si"] != null)
+                                    var mappedPolicy = await MapAndValidateInsurablePolicyAsync(policyDTO, productDetails, partnerDetails, policyRiskDetails, Errors, singleCover, "PolicyNo", apiContext);
+                                    if (policyDTO["si"] != null)
                                     {
-                                        mappedPolicy.SumInsured = Convert.ToDecimal(IssuepolicyDTO["si"]);
-                                        mappedPolicy.BalanceSumInsued = Convert.ToInt32(IssuepolicyDTO["si"]);
+                                        mappedPolicy.SumInsured = Convert.ToDecimal(policyDTO["si"]);
+                                        mappedPolicy.BalanceSumInsued = Convert.ToInt32(policyDTO["si"]);
                                     }
                                     if (Errors.Count == 0)
                                     {
@@ -6547,14 +6572,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         }
 
 
-                                        var ProposalObj = JsonConvert.DeserializeObject<ExpandoObject>(IssuepolicyDTO.ToString());
-                                        AddProperty(expObj, "ProposalNumber", mappedPolicy.ProposalNo);
-                                        AddProperty(expObj, "Balance SumInsured", IssuepolicyDTO["si"]);
+                                        var ProposalObj = JsonConvert.DeserializeObject<ExpandoObject>(policyDTO.ToString());
+                                        //AddProperty(expObj, "ProposalNumber", mappedPolicy.ProposalNo);
+                                        AddProperty(expObj, "Balance SumInsured", policyDTO["si"]);
                                         AddProperty(expObj, "No. of Claim", 0);
                                         AddProperty(expObj, "PolicyStatus", "InActive");
 
                                         var Proposaltempobj = JsonConvert.SerializeObject(expObj);
-                                        IssuepolicyDTO = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
+                                        policyDTO = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
 
 
 
@@ -6573,13 +6598,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                         AddProperty(expObj, "PremiumDetails", CDmap);
                                         var tempobj = JsonConvert.SerializeObject(expObj);
-                                        IssuepolicyDTO = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
+                                        policyDTO = JsonConvert.DeserializeObject<dynamic>(tempobj.ToString());
 
                                         //Step8:Save Proposal in all relevant table
 
+                                       
 
-
-                                        PolicyId = SavePolicyDetails(mappedPolicy, IssuepolicyDTO, DatetimeNow);
+                                        PolicyId = SavePolicyDetails(mappedPolicy, policyDTO, DatetimeNow);
 
                                         //Step9:Post CD Account entries 
 
@@ -6607,6 +6632,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                         TblPolicy policyUpdate = _context.TblPolicy.Find(PolicyId);
                                         var Amount = paymentinfoRequest[0].Amount;
+
 
                                         if (businessStatus == BusinessStatus.Created)
 
@@ -6664,8 +6690,33 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     }
                                 }
                                 else {
-                            //Exception table call 
-                             return new PolicyResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage= "Json  saved in Exception table" }; ;
+                                    //Exception table call 
+                                    TblPolicyException tblPolicyException = new TblPolicyException();
+                                    tblPolicyException.TransactionDate = DatetimeNow;
+                                    tblPolicyException.TransactionType = "Policy Issuance";
+                                    tblPolicyException.PolicyNumber = PolicyNo;
+                                    tblPolicyException.NoofPcs = policyDTO["noOfPC"];
+                                    tblPolicyException.NoofTws = policyDTO["noOfTW"];
+                                    tblPolicyException.NoofAddnlDrivers = policyDTO["additionalDriver"];
+                                    tblPolicyException.PrimaryDriverAge = policyDTO["driverAge"];
+                                    tblPolicyException.PrimaryDriverExperience = policyDTO["driverExp"];
+                                    tblPolicyException.SumInsured = policyDTO["si"];
+                                    tblPolicyException.Frequency = policyDTO["billingFrequency"];
+                                    Guid guid = Guid.NewGuid();
+                                    tblPolicyException.TxnId = guid.ToString();
+                                    tblPolicyException.Fttotal = CalculatePremiumResponse.PremiumDTO.FirstOrDefault(s=>s.Type=="FT").TotalAmount;
+                                    tblPolicyException.Adtotal = CalculatePremiumResponse.PremiumDTO.FirstOrDefault(s => s.Type == "AD").TotalAmount;
+                                    tblPolicyException.TotalPremium = CalculatePremiumResponse.TotalAmount;
+                                    tblPolicyException.PbtotalPremium = paymentinfoRequest[0].Amount;
+
+                                    tblPolicyException.Status = true;
+                                    tblPolicyException.CreatedDate = DatetimeNow;
+                                
+                                    tblPolicyException.RequestObject = policyDTO.ToString(); ;
+                                    _context.TblPolicyException.Add(tblPolicyException);
+                                    _context.SaveChanges();
+
+                                    return new PolicyResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Calculate Premium Amount {CalculatePremiumResponse.TotalAmount} differs with payment collected amount {paymentinfoRequest[0].Amount}" };
                                 }
                             }
                             else {
@@ -6683,14 +6734,14 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                        }
                         else
                         {
-                            //policy Already exist
-                            return null;
+                        //policy Already exist
+                       return new PolicyResponse { Status = BusinessStatus.PreConditionFailed, ResponseMessage = $"Policy is already exist for this Policy Number:{PolicyNo}" }; 
                         }
                     }
                     else
                         {
-                            //PolicyNumber is required
-                            return null;
+                    //PolicyNumber is required
+                    return new PolicyResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Policy Number is required" };
 
                         }
                     }

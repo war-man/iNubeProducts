@@ -386,5 +386,10 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         {
             throw new NotImplementedException();
         }
+
+        public Task<PartnersDTO> GetPartnerDetailsByPartnerCode(string partnerCode, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

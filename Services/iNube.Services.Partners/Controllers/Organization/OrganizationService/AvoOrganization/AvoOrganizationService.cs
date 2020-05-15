@@ -1015,6 +1015,85 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                                 movData.Status = 1;
                             }
                         }
+                        var movementsdata = movementDetailsData.Where(a => a.MovementFormId == 1010).ToList();
+                        if (movementsdata != null)
+                        {
+                            //Prospect
+                            var prospectcount = movementsdata.Where(a => a.MovementSubFormId == 37).Count();
+                            if (prospectcount != 0)
+                            {
+                                //prospect
+                                var prospect = movementsdata.Where(a => a.MovementSubFormId == 37)
+                                    .Select(a => new EMPDistributeDTO
+                                    {
+                                        PositionId = Convert.ToDecimal(_context.TblOrgEmployee.FirstOrDefault(b => b.OrgEmpId == a.MovedTo).PositionId),
+                                        PrimaryIds = Convert.ToDecimal(a.MovingId)
+                                    }).ToList();
+                                EMPDistribute eMPDistribute = new EMPDistribute();
+                                eMPDistribute.EMPDistributeDTO.AddRange(prospect);
+                                var prospectcall = await _integrationService.UpdateEmpProspectData(eMPDistribute, apiContext);
+                            }
+                            //Quotation
+                            var quotationcount = movementsdata.Where(a => a.MovementSubFormId == 38).Count();
+                            if (quotationcount != 0)
+                            {
+                                //quotation
+                                var quotation = movementsdata.Where(a => a.MovementSubFormId == 38)
+                                    .Select(a => new EMPDistributeDTO
+                                    {
+                                        PositionId = Convert.ToDecimal(_context.TblOrgEmployee.FirstOrDefault(b => b.OrgEmpId == a.MovedTo).PositionId),
+                                        PrimaryIds = Convert.ToDecimal(a.MovingId)
+                                    }).ToList();
+                                EMPDistribute eMPDistribute = new EMPDistribute();
+                                eMPDistribute.EMPDistributeDTO.AddRange(quotation);
+                                var prospectcall = await _integrationService.UpdateEmpQuotationData(eMPDistribute, apiContext);
+                            }
+                            //Proposal
+                            var proposalcount = movementsdata.Where(a => a.MovementSubFormId == 39).Count();
+                            if (proposalcount != 0)
+                            {
+                                //proposal
+                                var proposal = movementsdata.Where(a => a.MovementSubFormId == 39)
+                                    .Select(a => new EMPDistributeDTO
+                                    {
+                                        PositionId = Convert.ToDecimal(_context.TblOrgEmployee.FirstOrDefault(b => b.OrgEmpId == a.MovedTo).PositionId),
+                                        PrimaryIds = Convert.ToDecimal(a.MovingId)
+                                    }).ToList();
+                                EMPDistribute eMPDistribute = new EMPDistribute();
+                                eMPDistribute.EMPDistributeDTO.AddRange(proposal);
+                                var prospectcall = await _integrationService.UpdateEmpProposalData(eMPDistribute, apiContext);
+                            }
+                            //Policy
+                            var policycount = movementsdata.Where(a => a.MovementSubFormId == 40).Count();
+                            if (policycount != 0)
+                            {
+                                //policy
+                                var policy = movementsdata.Where(a => a.MovementSubFormId == 40)
+                                    .Select(a => new EMPDistributeDTO
+                                    {
+                                        PositionId = Convert.ToDecimal(_context.TblOrgEmployee.FirstOrDefault(b => b.OrgEmpId == a.MovedTo).PositionId),
+                                        PrimaryIds = Convert.ToDecimal(a.MovingId)
+                                    }).ToList();
+                                EMPDistribute eMPDistribute = new EMPDistribute();
+                                eMPDistribute.EMPDistributeDTO.AddRange(policy);
+                                var prospectcall = await _integrationService.UpdateEmpPolicyData(eMPDistribute, apiContext);
+                            }
+                            //Suspect
+                            var suspectcount = movementsdata.Where(a => a.MovementSubFormId == 43).Count();
+                            if (suspectcount != 0)
+                            {
+                                //policy
+                                var suspect = movementsdata.Where(a => a.MovementSubFormId == 40)
+                                    .Select(a => new EMPDistributeDTO
+                                    {
+                                        PositionId = Convert.ToDecimal(_context.TblOrgEmployee.FirstOrDefault(b => b.OrgEmpId == a.MovedTo).PositionId),
+                                        PrimaryIds = Convert.ToDecimal(a.MovingId)
+                                    }).ToList();
+                                EMPDistribute eMPDistribute = new EMPDistribute();
+                                eMPDistribute.EMPDistributeDTO.AddRange(suspect);
+                                var suspectcall = await _integrationService.UpdateEmpSuspectData(eMPDistribute, apiContext);
+                            }
+                        }
                     }
                     //Create new position
                     var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);

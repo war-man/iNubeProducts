@@ -29,6 +29,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
         //LeadDTO SaveSuspect(LeadDTO leadDTO);
         //IEnumerable<LeadDTO> SuspectPool();
         //LeadDTO ModifySuspect(LeadDTO leadDTO);
+        Task<bool> UpdateEmpQuotationData(EMPDistribute eMPDistribute, ApiContext apiContext);
     }
 
     public class QuotationService : IQuotationService
@@ -47,13 +48,13 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
             _configuration = configuration;
         }
 
-  
+
         public async Task<IEnumerable<LeadDTO>> LoadProspectInfo(int ContactID)
         {
 
             var ProspectData = await _integrationService.GetProspectInfo(ContactID);
 
-            
+
             return ProspectData;
 
 
@@ -61,7 +62,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
 
         public void SaveProspectInfo(LeadDTO leadDTO)
         {
-            var SuspectData =  _integrationService.SaveProspect(leadDTO);
+            var SuspectData = _integrationService.SaveProspect(leadDTO);
 
             return;
         }
@@ -71,15 +72,15 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
             List<QuotePoolDTO> QuotationData = new List<QuotePoolDTO>();
             if (string.IsNullOrEmpty(context.Name))
             {
-                 QuotationData = _context.TblLifeQq.OrderByDescending(c => c.CreateDate).Include(x => x.Contact)
-                                                  .Select(x => new QuotePoolDTO
-                                                  {
-                                                      ContactType = x.Contact.ContactType,
-                                                      QuoteNo = x.QuoteNo,
-                                                      ProposerName = x.Contact.FirstName + " " + x.Contact.LastName,
-                                                      EmiratesID = x.Contact.Nicno,
-                                                      LeadNo = x.Contact.LeadNo
-                                                  }).ToList();
+                QuotationData = _context.TblLifeQq.OrderByDescending(c => c.CreateDate).Include(x => x.Contact)
+                                                 .Select(x => new QuotePoolDTO
+                                                 {
+                                                     ContactType = x.Contact.ContactType,
+                                                     QuoteNo = x.QuoteNo,
+                                                     ProposerName = x.Contact.FirstName + " " + x.Contact.LastName,
+                                                     EmiratesID = x.Contact.Nicno,
+                                                     LeadNo = x.Contact.LeadNo
+                                                 }).ToList();
             }
             else
             {
@@ -107,10 +108,10 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
 
             if (response == null)
             {
-                lifeQq.QuoteNo = ""; 
+                lifeQq.QuoteNo = "";
 
                 var SaveQuote = _mapper.Map<TblLifeQq>(lifeQq);
-                 _context.Add(SaveQuote);
+                _context.Add(SaveQuote);
                 _context.SaveChanges();
 
             }
@@ -120,7 +121,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
 
             }
 
-          
+
 
             return lifeQq;
         }
@@ -128,10 +129,10 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
 
         //Quotation notify
 
-      
+
         public async Task<QuotationModel> QuotationPdfGeneration(QuotePoolDTO quotePoolDTO, ApiContext apiContext)
         {
-           // int count = 0;
+            // int count = 0;
             Lead.Models.NotificationRequest notificationRequest = new Lead.Models.NotificationRequest();
             QuotationModel QuoteData = new QuotationModel();
             QuoteData.ProposerName = quotePoolDTO.ProposerName;
@@ -182,7 +183,7 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
                 TblLifeQq objlifeQQ = new TblLifeQq();
 
                 string userId = _context.TblContacts.SingleOrDefault(x => x.FirstName == objQuote.UserName).ContactId.ToString();
-             
+
                 objlifeQQ.Createdby = userId;
                 if (objQuote.RefNo == null)
                 {
@@ -673,6 +674,18 @@ namespace iNube.Services.Quotation.Controllers.Quotation.QuotationService
                 //  log4net.GlobalContext.Properties["ErrorCode"] = Codes.GetErrorCode();
                 //Logger.Error(ex);
             }
+        }
+
+        public async Task<bool> UpdateEmpQuotationData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            foreach (var item in eMPDistribute.EMPDistributeDTO)
+            {
+                var data = _context.TblLifeQq.FirstOrDefault(a => a.LifeQqid == item.PrimaryIds);
+                data.HandledBy = item.PositionId.ToString();
+                _context.Update(data);
+            }
+            _context.SaveChanges();
+            return true;
         }
 
     }

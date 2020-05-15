@@ -52,6 +52,7 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
             if (!string.IsNullOrEmpty(apiContext.Token))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
             using (var response = await client.GetAsync(url))
             using (var content = response.Content)
@@ -77,8 +78,12 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
                 //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 //client.BaseAddress = new Uri(url);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-            using (var response = await client.GetAsync(url))
+                if (!string.IsNullOrEmpty(apiContext.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
+                using (var response = await client.GetAsync(url))
             using (var content = response.Content)
             {
                 if (response.IsSuccessStatusCode)
@@ -113,13 +118,16 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
             try
             {
                 HttpClient client = new HttpClient();
-               
 
+                if (!string.IsNullOrEmpty(apiContext.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
                 HttpContent contentPost = null;
                 if (request != null)
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
@@ -146,10 +154,14 @@ namespace iNube.Services.Accounting.Controllers.AccountConfig.IntegrationService
             {
                 HttpClient client = new HttpClient();
                 HttpContent contentPost = null;
+                if (!string.IsNullOrEmpty(apiContext.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
                 if (request != null)
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;

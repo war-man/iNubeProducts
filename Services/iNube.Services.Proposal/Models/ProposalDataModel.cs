@@ -914,7 +914,15 @@ namespace iNube.Services.Proposal.Models
         public List<InboxDetailsDto> objProposalDetails { get; set; }
         public List<SubmittedProposalsDto> LstSubmittedProposals { get; set; }
     }
-
+    public class EmpHierarchy
+    {
+        public decimal ParentID { get; set; }
+        public decimal PositionID { get; set; }
+        public string StaffName { get; set; }
+        public string Staffcode { get; set; }
+        public string LevelDefinition { get; set; }
+        public int LevelId { get; set; }
+    }
     public class InboxDetailsDto
     {
         public string QuoteNo { get; set; }

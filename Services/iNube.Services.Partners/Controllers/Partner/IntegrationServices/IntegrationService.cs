@@ -26,9 +26,12 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         Task<EmpRoleResponse> UpdateEmpRole(EmpRoleMapDTO empRoles, ApiContext apiContext);
-
         Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext);
-       
+        Task<bool> UpdateEmpQuotationData(EMPDistribute eMPDistribute, ApiContext apiContext);
+        Task<bool> UpdateEmpProspectData(EMPDistribute eMPDistribute, ApiContext apiContext);
+        Task<bool> UpdateEmpSuspectData(EMPDistribute eMPDistribute, ApiContext apiContext);
+        Task<bool> UpdateEmpProposalData(EMPDistribute eMPDistribute, ApiContext apiContext);
+        Task<bool> UpdateEmpPolicyData(EMPDistribute eMPDistribute, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -57,14 +60,14 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         public async Task<ViewDetails> ViewDetailsByEmpCode(string empcode, ApiContext apiContext)
         {
-              var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
+            var uri = LeadUrl + "/api/Lead/ViewDetailsByPositionId?Positionid=" + empcode;
 
-           // var uri = "https://localhost:44351/api/Proposal/GetProposalByQuotNO?quotoNo=" + empcode;
+            // var uri = "https://localhost:44351/api/Proposal/GetProposalByQuotNO?quotoNo=" + empcode;
             var res = await GetApiInvoke<ViewDetails>(uri, apiContext);
             return res;
 
         }
-       
+
 
         public async Task<IEnumerable<TransactionRuleMappingDto>> GetAccountMapDetailsAsync(ApiContext apiContext)
         {
@@ -112,23 +115,60 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return productList;
         }
 
+        public async Task<bool> UpdateEmpQuotationData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            var uri = LeadUrl + "/api/Quotation/UpdateEmpQuotationData";
+            var productlist = await PostApiInvoke<EMPDistribute, bool>(uri, apiContext, eMPDistribute);
+            return productlist;
+        }
+
+        public async Task<bool> UpdateEmpProspectData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            var uri = LeadUrl + "/api/Lead/UpdateEmpProspectData";
+            var productlist = await PostApiInvoke<EMPDistribute, bool>(uri, apiContext, eMPDistribute);
+            return productlist;
+        }
+
+        public async Task<bool> UpdateEmpSuspectData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            var uri = LeadUrl + "/api/Lead/UpdateEmpSuspectData";
+            var productlist = await PostApiInvoke<EMPDistribute, bool>(uri, apiContext, eMPDistribute);
+            return productlist;
+        }
+
+        public async Task<bool> UpdateEmpProposalData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            var uri = LeadUrl + "/api/Lead/UpdateEmpProposalData";
+            var productlist = await PostApiInvoke<EMPDistribute, bool>(uri, apiContext, eMPDistribute);
+            return productlist;
+        }
+
+        public async Task<bool> UpdateEmpPolicyData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            var uri = LeadUrl + "/api/Proposal/UpdateEmpPolicyData";
+            var productlist = await PostApiInvoke<EMPDistribute, bool>(uri, apiContext, eMPDistribute);
+            return productlist;
+        }
 
         public async Task<ResponseStatus> SendNotificationAsync(Partners.Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
             return await PostApiInvoke<Partners.Models.NotificationRequest, ResponseStatus>(uri, apiContext, notificationRequest);
         }
+
         public async Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal productId, ApiContext apiContext)
         {
             var uri = ProductUrl + "/api/Product/GetInsurableRiskDetails?ProductId=" + productId;
             return await GetApiInvoke<ProductRiskDetailsDTO>(uri, apiContext);
 
         }
+
         public async Task<dynamic> GetRateParamsAsync(decimal rateId, ApiContext apiContext)
         {
             var uri = RatingUrl + "/api/RatingConfig/GetHandleEvents?EventId=" + rateId;
             return await GetApiInvoke<dynamic>(uri, apiContext);
         }
+
         public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
         {
 
