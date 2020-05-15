@@ -5554,8 +5554,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                             sheetNameValue = sheetName1.Name;
                                         }
                                         ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetNameValue];
-
-
+                                                                              
                                         // EPPlusHelper.GetColumnByName()
                                         int TxnidIndex = worksheet.GetColumnByName("txn Id");
                                         int payUidindex = worksheet.GetColumnByName("pay Uid");
@@ -6892,6 +6891,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 sr.Dispose();
             }
         }
+        
     }
 }
 
