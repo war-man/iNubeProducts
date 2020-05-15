@@ -1646,5 +1646,62 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             }
             return dt;
         }
+
+        public async Task<List<MasterDto>> GetDesignationMovement(int orgid,int pos, int movementType, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var des = _context.TblOrgPositions.Where(s => s.OrganizationId == orgid && s.PositionId == pos).Select(x => x).SingleOrDefault();
+
+            var Data = new List<MasterDto>();
+            //Promotion
+            if (movementType == 29)
+            { 
+            var desg = _context.TblOrgStructure.FirstOrDefault(x => x.OrganizationId == orgid && x.OrgStructureId == des.DesignationId);
+            List<decimal> PositionIds = new List<decimal>();
+            PositionIds.Add(desg.OrgStructureId);
+            PositionIds.Add((decimal)desg.ParentId);
+             Data = (from objposition in _context.TblOrgPositions.Where(x => x.OrganizationId == orgid && x.OfficeId == des.OfficeId && PositionIds.Contains(Convert.ToDecimal(x.DesignationId)))
+                        select new MasterDto
+                        {
+                            mID = Convert.ToInt32(objposition.PositionId),
+                            mType = "Designation",
+                            mValue = objposition.PositionName
+                        }).ToList();
+            
+            }
+            if (movementType == 30)
+            {
+                var desg = _context.TblOrgStructure.Where(x => x.OrganizationId == orgid && x.ParentId == des.DesignationId).Select(x => x);
+                List<decimal> PositionIds = new List<decimal>();
+                foreach (var i in desg)
+                {
+                    PositionIds.Add(i.OrgStructureId);
+                   // PositionIds.Add((decimal)desg.ParentId);
+                }
+               
+                Data = (from objposition in _context.TblOrgPositions.Where(x => x.OrganizationId == orgid && x.OfficeId == des.OfficeId && PositionIds.Contains(Convert.ToDecimal(x.DesignationId)))
+                        select new MasterDto
+                        {
+                            mID = Convert.ToInt32(objposition.PositionId),
+                            mType = "Designation",
+                            mValue = objposition.PositionName
+                        }).ToList();
+
+            }
+
+            if (movementType == 32)
+            {
+               
+                Data = (from objposition in _context.TblOrgPositions.Where(x => x.OrganizationId == orgid && x.DesignationId == des.DesignationId)
+                        select new MasterDto
+                        {
+                            mID = Convert.ToInt32(objposition.PositionId),
+                            mType = "Designation",
+                            mValue = objposition.PositionName
+                        }).ToList();
+
+            }
+            return Data;
+        }
     }
 }

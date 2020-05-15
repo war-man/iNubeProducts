@@ -538,5 +538,20 @@ namespace iNube.Services.Partners.Controllers.Organization
             var response = await _avoorgService.GetEmpHierarchy(Empcode, Context);
             return Ok(response);
         }
+
+       
+        [HttpGet]
+        public async Task<IActionResult> GetDesignationMovement(int orgid, int pos, int movementType)
+        {
+            var isFilter = true;
+            var response = await _avoorgService.GetDesignationMovement(orgid, pos, movementType, Context);
+            if (isFilter)
+            {
+                var masterdata = response.GroupBy(c => new { c.mType }).Select(mdata => new { mdata.Key.mType, mdata, });
+                return Ok(masterdata);
+            }
+
+            return Ok(response);
+        }
     }
 }
