@@ -135,11 +135,19 @@ namespace iNube.Services.Quotation.Controllers.Quotation
         public void Delete(int id)
         {
         }
+
         [HttpPost]
         public async Task<IActionResult> EmailQuotation([FromBody]QuotePoolDTO quotePoolDTO)
         {
             var response = await _quotationService.QuotationPdfGeneration(quotePoolDTO, Context);
             return ServiceResponse(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmpQuotationData(EMPDistribute eMPDistribute)
+        {
+            var response = await _quotationService.UpdateEmpQuotationData(eMPDistribute, Context);
+            return Ok(response);
         }
 
     }

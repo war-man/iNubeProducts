@@ -942,6 +942,15 @@ namespace iNube.Services.Policy.Models
 
     }
 
+    public partial class EMPDistribute
+    {
+        public List<EMPDistributeDTO> EMPDistributeDTO { get; set; }
+    }
 
+    public partial class EMPDistributeDTO
+    {
+        public decimal PositionId { get; set; }
+        public decimal PrimaryIds { get; set; }
+    }
 }
 

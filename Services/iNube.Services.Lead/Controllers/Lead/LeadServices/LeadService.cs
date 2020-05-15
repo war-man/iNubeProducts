@@ -12,6 +12,7 @@ using iNube.Services.Lead.Controllers.Lead.LDIntegrationServices;
 using System.Dynamic;
 using System.Threading.Tasks;
 using Swashbuckle.AspNetCore.Swagger;
+using iNube.Services.Quotation.Models;
 
 namespace iNube.Services.Lead.Controllers.Lead.LeadService
 {
@@ -30,6 +31,8 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         IEnumerable<LifeQqDTO> FetchLifeQqdata();
         IEnumerable<LeadDTO> FetchTblContactsdata();
         Task<ViewDetails> ViewDetailsByPositionIdAsync(string Positionid, ApiContext context);
+        Task<bool> UpdateEmpProspectData(EMPDistribute eMPDistribute, ApiContext apiContext);
+        Task<bool> UpdateEmpSuspectData(EMPDistribute eMPDistribute, ApiContext apiContext);
     }
 
     public class LeadService : ILeadService
@@ -644,6 +647,31 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
         }
 
+        public async Task<bool> UpdateEmpProspectData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
 
+            foreach (var item in eMPDistribute.EMPDistributeDTO)
+            {
+                var data = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.PrimaryIds);
+                data.HandledBy = item.PositionId.ToString();
+                _context.Update(data);
+            }
+
+            _context.SaveChanges();
+            return true;
+        }
+
+        public async Task<bool> UpdateEmpSuspectData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            foreach (var item in eMPDistribute.EMPDistributeDTO)
+            {
+                var data = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.PrimaryIds);
+                data.HandledBy = item.PositionId.ToString();
+                _context.Update(data);
+            }
+
+            _context.SaveChanges();
+            return true;
+        }
     }
 }

@@ -12,6 +12,7 @@ using AutoMapper;
 using iNube.Utility.Framework;
 using Microsoft.AspNetCore.Authorization;
 using iNube.Utility.Framework.Model;
+using iNube.Services.Quotation.Models;
 
 namespace iNube.Services.Lead.Controllers.Lead
 {
@@ -23,7 +24,7 @@ namespace iNube.Services.Lead.Controllers.Lead
     {
         public ILeadService _leadService;
 
-        public  LeadController(ILeadService leadService)
+        public LeadController(ILeadService leadService)
         {
             _leadService = leadService;
 
@@ -33,7 +34,7 @@ namespace iNube.Services.Lead.Controllers.Lead
 
         public async Task<IActionResult> ContactPool(String type)
         {
-            var contact =await _leadService.ContactPoolAsync(type, Context);
+            var contact = await _leadService.ContactPoolAsync(type, Context);
             return Ok(contact);
         }
 
@@ -53,14 +54,14 @@ namespace iNube.Services.Lead.Controllers.Lead
             return Ok(locationData);
         }
 
-       
-       
-        
+
+
+
         [HttpPost]
         public IActionResult ModifySuspect([FromBody]LeadDTO leadDTO)
         {
-            var response = _leadService.ModifySuspect(leadDTO,Context);
-         
+            var response = _leadService.ModifySuspect(leadDTO, Context);
+
 
             switch (response.Status)
             {
@@ -78,16 +79,16 @@ namespace iNube.Services.Lead.Controllers.Lead
         [HttpGet]
         public async Task<IActionResult> SuspectPool(int incStageId)
         {
-            var suspects =await  _leadService.SuspectPoolAsync(incStageId, Context);
+            var suspects = await _leadService.SuspectPoolAsync(incStageId, Context);
             return Ok(suspects);
         }
-          
-              
+
+
         [HttpPost]
         public async Task<IActionResult> SaveSuspect([FromBody]LeadDTO leadDTO)
         {
-            var response = await _leadService.SaveSuspectAsync(leadDTO,Context);
-               switch (response.Status)
+            var response = await _leadService.SaveSuspectAsync(leadDTO, Context);
+            switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:
                     return Ok(response);
@@ -102,13 +103,13 @@ namespace iNube.Services.Lead.Controllers.Lead
         [HttpGet]
         public IActionResult LoadSuspectInformation(int ContactID)
         {
-            var suspects = _leadService.LoadSuspectInformation(ContactID,Context);
+            var suspects = _leadService.LoadSuspectInformation(ContactID, Context);
             return Ok(suspects);
-           
+
         }
-            
-               [HttpGet]
-        public IActionResult GetMaster(string lMasterlist ,bool isFilter = true)
+
+        [HttpGet]
+        public IActionResult GetMaster(string lMasterlist, bool isFilter = true)
         {
             var commonTypesDTOs = _leadService.GetMaster(lMasterlist);
 
@@ -137,21 +138,35 @@ namespace iNube.Services.Lead.Controllers.Lead
             var lifeQqdataDTOs = _leadService.FetchTblContactsdata();
             return Ok(lifeQqdataDTOs);
         }
-		
-		 [HttpGet]
+
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
         {
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
+
         [HttpGet]
         public async Task<IActionResult> ViewDetailsByPositionId(string Positionid)
         {
-            var suspects =await _leadService.ViewDetailsByPositionIdAsync(Positionid, Context);
+            var suspects = await _leadService.ViewDetailsByPositionIdAsync(Positionid, Context);
             return Ok(suspects);
 
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmpProspectData(EMPDistribute eMPDistribute)
+        {
+            var response = await _leadService.UpdateEmpProspectData(eMPDistribute, Context);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmpSuspectData(EMPDistribute eMPDistribute)
+        {
+            var response = await _leadService.UpdateEmpSuspectData(eMPDistribute, Context);
+            return Ok(response);
+        }
     }
 }

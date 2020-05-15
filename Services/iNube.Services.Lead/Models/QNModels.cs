@@ -27,24 +27,34 @@ namespace iNube.Services.Quotation.Models
 
     }
 
+    public partial class EMPDistribute
+    {
+        public List<EMPDistributeDTO> EMPDistributeDTO { get; set; }
+    }
+
+    public partial class EMPDistributeDTO
+    {
+        public decimal PositionId { get; set; }
+        public decimal PrimaryIds { get; set; }
+    }
 
     public class LifeQuoteDTO
     {
         public LifeQuoteDTO()
         {
 
-              objProspect = new ProspectDTO();
-              ObjQuotationPreviousInsurance = new QuotationPreviousInsuranceDTO();
-        //    lstGender = new List<Common.MasterListItem>();
-        //    lstOccupation = new List<Common.MasterListItem>();
-              objProductDetials = new ProductDetialsDTO();
-              objQuoteMemberDetails = new List<QuoteMemberDetailsDTO>();
+            objProspect = new ProspectDTO();
+            ObjQuotationPreviousInsurance = new QuotationPreviousInsuranceDTO();
+            //    lstGender = new List<Common.MasterListItem>();
+            //    lstOccupation = new List<Common.MasterListItem>();
+            objProductDetials = new ProductDetialsDTO();
+            objQuoteMemberDetails = new List<QuoteMemberDetailsDTO>();
             //    LstBenefitOverView = new List<BenifitDetails>();
             //    LstPremiumOverview = new List<BenifitDetails>();
 
             ////LstIllustation is Missing from the AVO Product Model 
 
-                LstIllustation = new List<IllustationDTO>();
+            LstIllustation = new List<IllustationDTO>();
             //    objQuoteMemberDetails = new List<QuoteMemberDetails>();
             //    ListPlan = new List<MasterListItem>();
             //    LstPolicyTerm = new List<MasterListItem>();
@@ -57,9 +67,9 @@ namespace iNube.Services.Quotation.Models
             //    objPreviousInsuranceList = new List<PreviousInsuranceList>();
             objChildDetials = new List<ChildDetailsDTO>();
             objSpouseDetials = new SpouseDetailsDTO();
-        //    lstSAM = new List<MasterListItem>();
-        //    Error = new Error();
-        //    LstDrawDownDetails = new List<Common.DrawDownDetails>();
+            //    lstSAM = new List<MasterListItem>();
+            //    Error = new Error();
+            //    LstDrawDownDetails = new List<Common.DrawDownDetails>();
         }
 
         public string RefNo { get; set; }
@@ -134,7 +144,7 @@ namespace iNube.Services.Quotation.Models
         public byte[] ByteArray { get; set; }
         public byte[] ByteArray1 { get; set; }
         public string QuotePDFPath { get; set; }
-       // public Error Error { get; set; }
+        // public Error Error { get; set; }
         public string ProposerSignPath { get; set; }
         public string WPProposerSignPath { get; set; }
         public string Signature { get; set; }

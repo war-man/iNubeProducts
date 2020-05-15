@@ -22,10 +22,10 @@ namespace iNube.Services.Policy.Controllers.Proposal
         public ProposalController(IProposalService proposalService)
         {
             _proposalService = proposalService;
-          
+
         }
 
-                     
+
         [HttpGet]
         public async Task<IActionResult> LifeQqData()
         {
@@ -34,9 +34,9 @@ namespace iNube.Services.Policy.Controllers.Proposal
             return Ok(response);
         }
         [HttpGet]
-        public  IActionResult GetmasQuestions()
+        public IActionResult GetmasQuestions()
         {
-            var response =  _proposalService.GetMasQuestions();
+            var response = _proposalService.GetMasQuestions();
             return Ok(response);
         }
 
@@ -60,7 +60,7 @@ namespace iNube.Services.Policy.Controllers.Proposal
 
 
 
-        
+
 
         [HttpGet("GetMasterData")]
 
@@ -81,7 +81,7 @@ namespace iNube.Services.Policy.Controllers.Proposal
         [HttpPost("PartialFormData")]
         public IActionResult CreateAccounts([FromBody]Models.ProposalModel.PolicyDto policyDto)
         {
-            var response = _proposalService.PartialFormDataSave(policyDto,Context);
+            var response = _proposalService.PartialFormDataSave(policyDto, Context);
             switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:
@@ -98,7 +98,7 @@ namespace iNube.Services.Policy.Controllers.Proposal
         [HttpGet]
         public async Task<IActionResult> GetProposalByPositionId(int posid)
         {
-            var suspects =await _proposalService.GetProposalByPositionId(posid, Context);
+            var suspects = await _proposalService.GetProposalByPositionId(posid, Context);
             return Ok(suspects);
         }
         [HttpGet]
@@ -143,7 +143,7 @@ namespace iNube.Services.Policy.Controllers.Proposal
         [HttpGet]
         public async Task<IActionResult> FetchProposalSubmittedDetails()
         {
-            var response =await  _proposalService.FetchProposalSubmittedDetailsAsync(Context);
+            var response = await _proposalService.FetchProposalSubmittedDetailsAsync(Context);
             return Ok(response);
         }
 
@@ -158,6 +158,20 @@ namespace iNube.Services.Policy.Controllers.Proposal
             return Ok(response);
 
             //givinig null because message data its not getting
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmpProposalData(EMPDistribute eMPDistribute)
+        {
+            var response = await _proposalService.UpdateEmpProposalData(eMPDistribute, Context);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmpPolicyData(EMPDistribute eMPDistribute)
+        {
+            var response = await _proposalService.UpdateEmpPolicyData(eMPDistribute, Context);
+            return Ok(response);
         }
     }
 }

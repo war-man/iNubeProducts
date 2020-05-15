@@ -21,13 +21,15 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
         IEnumerable<QuestionsListDTO> GetMasQuestions();
         Task<List<InboxDetailsDto>> ProposalPollAsync(ApiContext apiContext);
         List<MasCommonTypesDto> MastertypeData();
-          
+
         ProposalResponce PartialFormDataSave(Models.ProposalModel.PolicyDto policyDto, ApiContext Context);
 
         Task<List<ProposalDto>> GetProposalByPositionId(int postid, ApiContext Context);
         Task<policyDto> GetPolicyByQuotNO(string proposalNo, ApiContext Context);
         Task<List<InboxDetailsDto>> FetchProposalSubmittedDetailsAsync(ApiContext apiContext);
         Task<List<PandingRequirementsDto>> FetchPendingRequirementsAsync(ApiContext apiContext);
+        Task<bool> UpdateEmpProposalData(EMPDistribute eMPDistribute, ApiContext apiContext);
+        Task<bool> UpdateEmpPolicyData(EMPDistribute eMPDistribute, ApiContext apiContext);
     }
     public class ProposalService : IProposalService
     {
@@ -57,19 +59,19 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
         public IEnumerable<QuestionsListDTO> GetMasQuestions()
         {
             var questions = (from objLsQuestions in _context.TblMasLifeQuestionnaires
-                                 select new QuestionsListDTO
-                                 {
-                                     QuestionID = objLsQuestions.Qid,
-                                     QuestionText = objLsQuestions.Qtext,
-                                     QuestionType = objLsQuestions.Qtype,
-                                     ControlType = objLsQuestions.ControlType,
-                                     Gender = objLsQuestions.Gender,
-                                     Value = objLsQuestions.Value,
-                                     Answer = "",
-                                     SubControlType = objLsQuestions.SubControlType,
-                                     QuestionIndex = (int)objLsQuestions.SequenceNo,
+                             select new QuestionsListDTO
+                             {
+                                 QuestionID = objLsQuestions.Qid,
+                                 QuestionText = objLsQuestions.Qtext,
+                                 QuestionType = objLsQuestions.Qtype,
+                                 ControlType = objLsQuestions.ControlType,
+                                 Gender = objLsQuestions.Gender,
+                                 Value = objLsQuestions.Value,
+                                 Answer = "",
+                                 SubControlType = objLsQuestions.SubControlType,
+                                 QuestionIndex = (int)objLsQuestions.SequenceNo,
 
-                                 }).ToList();
+                             }).ToList();
 
 
             var lstQues = _mapper.Map<IEnumerable<QuestionsListDTO>>(questions);
@@ -82,45 +84,9 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             List<InboxDetailsDto> ProposalData = new List<InboxDetailsDto>();
             if (string.IsNullOrEmpty(apiContext.Name))
             {
-                 ProposalData =
-                (from objtblpolicy in _context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
-                                                                      || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192)
-                 join relationship in _context.TblPolicyRelationship
-                 on objtblpolicy.PolicyId equals relationship.PolicyId
-                  join policyClients in _context.TblPolicyClients
-                 on relationship.PolicyClientId equals policyClients.PolicyClientId
-                 join commontype in _context.TblMasCommonTypes
-                 on objtblpolicy.PolicyStageStatusId equals commontype.CommonTypesId
-                 join objTblPolicyExtensionDto in _context.TblPolicyExtension
-                 on objtblpolicy.PlanId equals objTblPolicyExtensionDto.PolicyId
-                 // where objtblpolicy.Createdby == userId
-                 select new InboxDetailsDto
-                 {
-                     PolicyID = objtblpolicy.PolicyId,
-                     QuoteNo = objtblpolicy.QuoteNo,
-                     FirstName = policyClients.FirstName,
-                     ProposalNo = objtblpolicy.ProposalNo,
-                     NIC = policyClients.Newnicno,
-                     Salutation = policyClients.Title,
-                     Surname = policyClients.LastName,
-                     // PreferredLanguage = objtblpolicy.PreferredLanguage,
-                     // ProductCode = Common.ProductCode,
-                     //  PlanName = objproduct.ProductName,
-                     PaymentFrequency = objtblpolicy.PaymentFrequency,
-                     Need = objTblPolicyExtensionDto.ProposalNeed,
-                     // LeadNo = Contact.LeadNo,
-                     //  Banca = Contact.IntroducerCode,
-                     ProposalStatus = commontype.Description,
-                     FullName = (policyClients.FullName != "CORP" ? _context.TblMasCommonTypes.Where(a => a.Code == policyClients.Title).Select(b => b.ShortDesc).FirstOrDefault() + " " + policyClients.FirstName + " " + policyClients.LastName : policyClients.CorporateName)
-                 }).ToList();
-            }
-            else
-            {
-                var empList = await _integrationService.GetEmpHierarchyAsync(apiContext.Name, apiContext);
-                var staffCodes = empList.Select(rt => Convert.ToInt64(rt.PositionID).ToString()); 
-                 ProposalData = 
-               (from objtblpolicy in _context.TblPolicy.Where(a => staffCodes.Contains(a.HandledBy) && ( a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
-                                                                     || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192))
+                ProposalData =
+               (from objtblpolicy in _context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
+                                                                     || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192)
                 join relationship in _context.TblPolicyRelationship
                 on objtblpolicy.PolicyId equals relationship.PolicyId
                 join policyClients in _context.TblPolicyClients
@@ -129,8 +95,8 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                 on objtblpolicy.PolicyStageStatusId equals commontype.CommonTypesId
                 join objTblPolicyExtensionDto in _context.TblPolicyExtension
                 on objtblpolicy.PlanId equals objTblPolicyExtensionDto.PolicyId
-                 // where objtblpolicy.Createdby == userId
-                 select new InboxDetailsDto
+                // where objtblpolicy.Createdby == userId
+                select new InboxDetailsDto
                 {
                     PolicyID = objtblpolicy.PolicyId,
                     QuoteNo = objtblpolicy.QuoteNo,
@@ -139,16 +105,52 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                     NIC = policyClients.Newnicno,
                     Salutation = policyClients.Title,
                     Surname = policyClients.LastName,
-                     // PreferredLanguage = objtblpolicy.PreferredLanguage,
-                     // ProductCode = Common.ProductCode,
-                     //  PlanName = objproduct.ProductName,
-                     PaymentFrequency = objtblpolicy.PaymentFrequency,
+                    // PreferredLanguage = objtblpolicy.PreferredLanguage,
+                    // ProductCode = Common.ProductCode,
+                    //  PlanName = objproduct.ProductName,
+                    PaymentFrequency = objtblpolicy.PaymentFrequency,
                     Need = objTblPolicyExtensionDto.ProposalNeed,
-                     // LeadNo = Contact.LeadNo,
-                     //  Banca = Contact.IntroducerCode,
-                     ProposalStatus = commontype.Description,
+                    // LeadNo = Contact.LeadNo,
+                    //  Banca = Contact.IntroducerCode,
+                    ProposalStatus = commontype.Description,
                     FullName = (policyClients.FullName != "CORP" ? _context.TblMasCommonTypes.Where(a => a.Code == policyClients.Title).Select(b => b.ShortDesc).FirstOrDefault() + " " + policyClients.FirstName + " " + policyClients.LastName : policyClients.CorporateName)
                 }).ToList();
+            }
+            else
+            {
+                var empList = await _integrationService.GetEmpHierarchyAsync(apiContext.Name, apiContext);
+                var staffCodes = empList.Select(rt => Convert.ToInt64(rt.PositionID).ToString());
+                ProposalData =
+              (from objtblpolicy in _context.TblPolicy.Where(a => staffCodes.Contains(a.HandledBy) && (a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
+                                                                    || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192))
+               join relationship in _context.TblPolicyRelationship
+               on objtblpolicy.PolicyId equals relationship.PolicyId
+               join policyClients in _context.TblPolicyClients
+               on relationship.PolicyClientId equals policyClients.PolicyClientId
+               join commontype in _context.TblMasCommonTypes
+               on objtblpolicy.PolicyStageStatusId equals commontype.CommonTypesId
+               join objTblPolicyExtensionDto in _context.TblPolicyExtension
+               on objtblpolicy.PlanId equals objTblPolicyExtensionDto.PolicyId
+               // where objtblpolicy.Createdby == userId
+               select new InboxDetailsDto
+               {
+                   PolicyID = objtblpolicy.PolicyId,
+                   QuoteNo = objtblpolicy.QuoteNo,
+                   FirstName = policyClients.FirstName,
+                   ProposalNo = objtblpolicy.ProposalNo,
+                   NIC = policyClients.Newnicno,
+                   Salutation = policyClients.Title,
+                   Surname = policyClients.LastName,
+                   // PreferredLanguage = objtblpolicy.PreferredLanguage,
+                   // ProductCode = Common.ProductCode,
+                   //  PlanName = objproduct.ProductName,
+                   PaymentFrequency = objtblpolicy.PaymentFrequency,
+                   Need = objTblPolicyExtensionDto.ProposalNeed,
+                   // LeadNo = Contact.LeadNo,
+                   //  Banca = Contact.IntroducerCode,
+                   ProposalStatus = commontype.Description,
+                   FullName = (policyClients.FullName != "CORP" ? _context.TblMasCommonTypes.Where(a => a.Code == policyClients.Title).Select(b => b.ShortDesc).FirstOrDefault() + " " + policyClients.FirstName + " " + policyClients.LastName : policyClients.CorporateName)
+               }).ToList();
             }
             var pooldata = _mapper.Map<List<InboxDetailsDto>>(ProposalData);
             return pooldata;
@@ -177,6 +179,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
 
 
         }
+
         //save partial form data
 
         public ProposalResponce PartialFormDataSave(Models.ProposalModel.PolicyDto policyDto, ApiContext apiContext)
@@ -189,7 +192,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                 _context.TblPolicy.Add(dto);
                 _context.SaveChanges();
                 var formdataDTO = _mapper.Map<Models.ProposalModel.PolicyDto>(dto);
-                return new ProposalResponce { Status = BusinessStatus.Created, ResponseMessage = $"Partial Form Data Saved for: {formdataDTO.ProposalNo}"  };
+                return new ProposalResponce { Status = BusinessStatus.Created, ResponseMessage = $"Partial Form Data Saved for: {formdataDTO.ProposalNo}" };
             }
             catch (Exception ex)
             {
@@ -204,7 +207,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
 
             var Proposaldata = (from tblMapper in _context.TblPolicy
 
-                                where (tblMapper.HandledBy== postid.ToString() && tblMapper.PolicyNo == null)
+                                where (tblMapper.HandledBy == postid.ToString() && tblMapper.PolicyNo == null)
 
                                 join tblMapperDetails in _context.TblPolicyMemberDetails on tblMapper.PolicyId equals tblMapperDetails.PolicyId
 
@@ -228,24 +231,24 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
 
             var Policydata = (from tblMapper in _context.TblPolicy
 
-                                where (tblMapper.ProposalNo == proposalNo && tblMapper.PolicyNo !=null)
+                              where (tblMapper.ProposalNo == proposalNo && tblMapper.PolicyNo != null)
 
-                                join tblMapperDetails in _context.TblPolicyMemberDetails on tblMapper.PolicyId equals tblMapperDetails.PolicyId
+                              join tblMapperDetails in _context.TblPolicyMemberDetails on tblMapper.PolicyId equals tblMapperDetails.PolicyId
 
-                                select new policyDto
+                              select new policyDto
 
-                                {
+                              {
 
-                                    PolicyNumber = tblMapper.ProposalNo,
-                                    ContactNumner = tblMapperDetails.Mobile,
-                                    MovedTo = "",
-                                    PolicyStatus= Convert.ToInt32(tblMapper.PolicyStatusId),
-                                    PremiumAmount= tblMapperDetails.BasicPremium,
-                                    Mode= tblMapper.PaymentMethod,
-                                    
-                                    // CityName = tblMapperDetails,
+                                  PolicyNumber = tblMapper.ProposalNo,
+                                  ContactNumner = tblMapperDetails.Mobile,
+                                  MovedTo = "",
+                                  PolicyStatus = Convert.ToInt32(tblMapper.PolicyStatusId),
+                                  PremiumAmount = tblMapperDetails.BasicPremium,
+                                  Mode = tblMapper.PaymentMethod,
 
-                                }).FirstOrDefault();
+                                  // CityName = tblMapperDetails,
+
+                              }).FirstOrDefault();
             return Policydata;
 
         }
@@ -260,47 +263,47 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             List<InboxDetailsDto> ProposalData = new List<InboxDetailsDto>();
             if (string.IsNullOrEmpty(apiContext.Name))
             {
-                 ProposalData = (from objtblpolicy in _context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
-                                                              || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192 || a.PolicyStageStatusId == 194 || a.PolicyStageStatusId == 195 || a.PolicyStageStatusId == 196 || a.PolicyStageStatusId == 197 || a.PolicyStageStatusId == 198
-                                                              || a.PolicyStageStatusId == 1068 || a.PolicyStageStatusId == 1447 || a.PolicyStageStatusId == 1448 || a.PolicyStageStatusId == 2374 || a.PolicyStageStatusId == 2375 || a.PolicyStageStatusId == 2376 || a.PolicyStageStatusId == 2490 || a.PolicyStageStatusId == 2491)
-                                        // join lifeqq in _context.TblLifeQq
-                                        // on objtblpolicy.QuoteNo equals lifeqq.QuoteNo
-                                        //join Common in _context.tblProducts on objtblpolicy.ProductID equals Common.ProductId
-                                        // join Contact in _context.TblContacts
-                                        // on lifeqq.ContactId equals Contact.ContactId
-                                        // join objproduct in _context.TblProducts
-                                        // on objtblpolicy.ProductId equals objproduct.ProductId
-                                        //  join commontype in _context.TblPlcommonTypes
-                                        //  on objtblpolicy.PolicyStageStatusId equals commontype.CommonTypesId
-                                    join relationship in _context.TblPolicyRelationship
-                                    on objtblpolicy.PolicyId equals relationship.PolicyId
-                                    join objTblPolicyExtensionDto in _context.TblPolicyExtension
-                                     on objtblpolicy.PlanId equals objTblPolicyExtensionDto.PolicyId
-                                    join policyClients in _context.TblPolicyClients
-                                    on relationship.PolicyClientId equals policyClients.PolicyClientId
-                                    // where objtblpolicy.Createdby == UserInfo.Id
-                                    select new InboxDetailsDto
-                                    {
-                                        PolicyID = objtblpolicy.PolicyId,
-                                        ProposalNo = objtblpolicy.ProposalNo,
-                                        QuoteNo = objtblpolicy.QuoteNo,
-                                        FirstName = policyClients.FirstName,
-                                        Surname = policyClients.LastName,
-                                        NIC = policyClients.Newnicno,
-                                        Salutation = policyClients.Title,
+                ProposalData = (from objtblpolicy in _context.TblPolicy.Where(a => a.PolicyStageStatusId == 1153 || a.PolicyStageStatusId == 476 || a.PolicyStageStatusId == 477 || a.PolicyStageStatusId == 193
+                                                             || a.PolicyStageStatusId == 191 || a.PolicyStageStatusId == 192 || a.PolicyStageStatusId == 194 || a.PolicyStageStatusId == 195 || a.PolicyStageStatusId == 196 || a.PolicyStageStatusId == 197 || a.PolicyStageStatusId == 198
+                                                             || a.PolicyStageStatusId == 1068 || a.PolicyStageStatusId == 1447 || a.PolicyStageStatusId == 1448 || a.PolicyStageStatusId == 2374 || a.PolicyStageStatusId == 2375 || a.PolicyStageStatusId == 2376 || a.PolicyStageStatusId == 2490 || a.PolicyStageStatusId == 2491)
+                                    // join lifeqq in _context.TblLifeQq
+                                    // on objtblpolicy.QuoteNo equals lifeqq.QuoteNo
+                                    //join Common in _context.tblProducts on objtblpolicy.ProductID equals Common.ProductId
+                                    // join Contact in _context.TblContacts
+                                    // on lifeqq.ContactId equals Contact.ContactId
+                                    // join objproduct in _context.TblProducts
+                                    // on objtblpolicy.ProductId equals objproduct.ProductId
+                                    //  join commontype in _context.TblPlcommonTypes
+                                    //  on objtblpolicy.PolicyStageStatusId equals commontype.CommonTypesId
+                                join relationship in _context.TblPolicyRelationship
+                                on objtblpolicy.PolicyId equals relationship.PolicyId
+                                join objTblPolicyExtensionDto in _context.TblPolicyExtension
+                                 on objtblpolicy.PlanId equals objTblPolicyExtensionDto.PolicyId
+                                join policyClients in _context.TblPolicyClients
+                                on relationship.PolicyClientId equals policyClients.PolicyClientId
+                                // where objtblpolicy.Createdby == UserInfo.Id
+                                select new InboxDetailsDto
+                                {
+                                    PolicyID = objtblpolicy.PolicyId,
+                                    ProposalNo = objtblpolicy.ProposalNo,
+                                    QuoteNo = objtblpolicy.QuoteNo,
+                                    FirstName = policyClients.FirstName,
+                                    Surname = policyClients.LastName,
+                                    NIC = policyClients.Newnicno,
+                                    Salutation = policyClients.Title,
 
-                                        // PlanName = objproduct.ProductName,
-                                        PaymentFrequency = objtblpolicy.PaymentFrequency,
-                                        Need = objTblPolicyExtensionDto.ProposalNeed,
-                                        //SubmittedPropMobile = objtblpolicyclients.MobileNo,
-                                        //SubmittedPropHome = objtblpolicyclients.HomeNo,
-                                        //SubmittedPropWork = objtblpolicyclients.WorkNo,
-                                        // SubmittedPropEmail = objtblpolicyclients.EmailID,
-                                        //  LeadNo = Contact.LeadNo,
-                                        // ProposalStatus = commontype.Description,
-                                        //FullName = (policyClients.FullName != "CORP" ? _context.TblPlcommonTypes.Where(a => a.Code == policyClients.Title).Select(b => b.ShortDesc).FirstOrDefault() + " " + policyClients.FirstName + " " + policyClients.LastName : policyClients.CorporateName)
-                                        //SubmittedPropInforce = "",
-                                    }).OrderByDescending(a => a.ProposalNo).ToList();
+                                    // PlanName = objproduct.ProductName,
+                                    PaymentFrequency = objtblpolicy.PaymentFrequency,
+                                    Need = objTblPolicyExtensionDto.ProposalNeed,
+                                    //SubmittedPropMobile = objtblpolicyclients.MobileNo,
+                                    //SubmittedPropHome = objtblpolicyclients.HomeNo,
+                                    //SubmittedPropWork = objtblpolicyclients.WorkNo,
+                                    // SubmittedPropEmail = objtblpolicyclients.EmailID,
+                                    //  LeadNo = Contact.LeadNo,
+                                    // ProposalStatus = commontype.Description,
+                                    //FullName = (policyClients.FullName != "CORP" ? _context.TblPlcommonTypes.Where(a => a.Code == policyClients.Title).Select(b => b.ShortDesc).FirstOrDefault() + " " + policyClients.FirstName + " " + policyClients.LastName : policyClients.CorporateName)
+                                    //SubmittedPropInforce = "",
+                                }).OrderByDescending(a => a.ProposalNo).ToList();
             }
             else
             {
@@ -357,7 +360,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             }
             catch (Exception)
             {
-                
+
             }
             var poolProposaldata = _mapper.Map<List<InboxDetailsDto>>(ProposalData);
             return poolProposaldata;
@@ -375,11 +378,11 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                     if (objUWInbox.Message == "Pending")
                     {
                         objUWInbox.LstProposals = (from objpolicy in _context.TblPolicy//where condition i have to put form UserId
-                                                                                      //  join objproduct in _context.tblProducts
-                                                                                      //  on objpolicy.ProductID equals objproduct.ProductId
+                                                                                       //  join objproduct in _context.tblProducts
+                                                                                       //  on objpolicy.ProductID equals objproduct.ProductId
                                                    join objtblpolicyrelationship in _context.TblPolicyRelationship on objpolicy.PolicyId equals objtblpolicyrelationship.PolicyId
                                                    join objtblpolicyclients in _context.TblPolicyClients on objtblpolicyrelationship.PolicyClientId equals objtblpolicyclients.PolicyClientId
-                                                 //  join objProposalPayments in _context.TblProposalPremium on objpolicy.PolicyId equals objProposalPayments.PolicyId
+                                                   //  join objProposalPayments in _context.TblProposalPremium on objpolicy.PolicyId equals objProposalPayments.PolicyId
                                                    where //objpolicy.PolicyStageStatusID == CrossCuttingConstants.PolicyStageStatusDecline ||
                                                    objpolicy.PolicyStageStatusId == CrossCuttingConstantsDto.PolicyStageStatusPending
                                                    || objpolicy.PolicyStageStatusId == CrossCuttingConstantsDto.PolicyStageStatusCounterOffer
@@ -395,8 +398,8 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                                                        //  PolicyTerm = objpolicy.PolicyTerm,
                                                        // IssueDate = objpolicy.CreatedDate,
                                                        IssueDate = objpolicy.CreatedDate.ToString(),
-                                                      // Premium = (objProposalPayments.AnnualPremium + objProposalPayments.AdditionalPremium),
-                                                      // Premiumlkr = (objProposalPayments.AnnualPremium + objProposalPayments.AdditionalPremium).ToString(),
+                                                       // Premium = (objProposalPayments.AnnualPremium + objProposalPayments.AdditionalPremium),
+                                                       // Premiumlkr = (objProposalPayments.AnnualPremium + objProposalPayments.AdditionalPremium).ToString(),
                                                        // AdditionalPremium = objProposalPayments.AdditionalPremium,
                                                    }).ToList();
                         for (int i = 0; i < objUWInbox.LstProposals.Count(); i++)
@@ -416,11 +419,11 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
 
 
                         objUWInbox.LstProposals = (from objpolicy in _context.TblPolicy//.Where(a => PolicyIDs.Contains(a.PolicyId))
-                                                                                      // join objproduct in _context.tblProducts
-                                                                                      //on objpolicy.ProductId equals objproduct.ProductId
+                                                                                       // join objproduct in _context.tblProducts
+                                                                                       //on objpolicy.ProductId equals objproduct.ProductId
                                                    join objtblpolicyrelationship in _context.TblPolicyRelationship on objpolicy.PolicyId equals objtblpolicyrelationship.PolicyId
                                                    join objtblpolicyclients in _context.TblPolicyClients on objtblpolicyrelationship.PolicyClientId equals objtblpolicyclients.PolicyClientId
-                                                  // join objProposalPayments in _context.TblProposalPremium on objpolicy.PolicyId equals objProposalPayments.PolicyId
+                                                   // join objProposalPayments in _context.TblProposalPremium on objpolicy.PolicyId equals objProposalPayments.PolicyId
                                                    select new PandingRequirementsDto
                                                    {
                                                        ProposalNo = objpolicy.ProposalNo,
@@ -432,7 +435,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                                                        // PolicyTerm = objpolicy.PolicyTerm,
                                                        IssueDate = objpolicy.CreatedDate.ToString(),
 
-                                                     //  Premium = (objProposalPayments.AnnualPremium + objProposalPayments.AdditionalPremium),
+                                                       //  Premium = (objProposalPayments.AnnualPremium + objProposalPayments.AdditionalPremium),
                                                        // Decision = objpolicy.PolicyStageStatusID.ToString(),
 
                                                    }).ToList().Select(c => new PandingRequirementsDto
@@ -504,10 +507,10 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                                                            // join objproduct in _context.tblProducts
                                                            //on objpolicy.ProductID equals objproduct.ProductId
 
-                            //join AspnetUsers in _context.AspNetUsers on objpolicy.Createdby equals AspnetUsers.Id
-                            //join objUserdetails in _context.tblUserDetails on AspnetUsers.UserName equals objUserdetails.LoginID
-                            // join objUserChannelMap in _context.tblUserChannelMaps on objUserdetails.NodeID equals objUserChannelMap.NodeId
-                            // join objChannel in _context.tblmasChannels on objUserChannelMap.ChannelID equals objChannel.ChannelID
+                                                           //join AspnetUsers in _context.AspNetUsers on objpolicy.Createdby equals AspnetUsers.Id
+                                                           //join objUserdetails in _context.tblUserDetails on AspnetUsers.UserName equals objUserdetails.LoginID
+                                                           // join objUserChannelMap in _context.tblUserChannelMaps on objUserdetails.NodeID equals objUserChannelMap.NodeId
+                                                           // join objChannel in _context.tblmasChannels on objUserChannelMap.ChannelID equals objChannel.ChannelID
 
 
                                                        join objtblpolicyrelationship in _context.TblPolicyRelationship on objpolicy.PolicyId equals objtblpolicyrelationship.PolicyId
@@ -551,10 +554,36 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             }
             catch (Exception)
             {
-                
+
             }
             return objUWInbox.LstProposals;
 
+        }
+
+        public async Task<bool> UpdateEmpProposalData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            foreach (var item in eMPDistribute.EMPDistributeDTO)
+            {
+                var data = _context.TblPolicy.FirstOrDefault(a => a.ProposalNo == item.PrimaryIds.ToString());
+                data.HandledBy = item.PositionId.ToString();
+                _context.Update(data);
+            }
+
+            _context.SaveChanges();
+            return true;
+        }
+
+        public async Task<bool> UpdateEmpPolicyData(EMPDistribute eMPDistribute, ApiContext apiContext)
+        {
+            foreach (var item in eMPDistribute.EMPDistributeDTO)
+            {
+                var data = _context.TblPolicy.FirstOrDefault(a => a.PolicyNo == item.PrimaryIds.ToString());
+                data.HandledBy = item.PositionId.ToString();
+                _context.Update(data);
+            }
+
+            _context.SaveChanges();
+            return true;
         }
 
     }
