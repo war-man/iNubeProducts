@@ -935,7 +935,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
                       join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
                       where mov.MovementStatusId == movementDTO.movementStatusId
-
+                      
                       select new AvoOrgEmployeeSearch
                       {
                           OrgEmpId = emp.OrgEmpId,
@@ -943,6 +943,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           StaffName = emp.StaffName,
                           PositionId = emp.PositionId,
                           Position = pos.PositionName,
+                          BranchName=emp.BranchName,
                           Email = emp.Email,
                           PhoneNumber = emp.PhoneNumber,
                           StaffTypeId = emp.StaffTypeId,
