@@ -6435,7 +6435,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
            
                 var PolicyObj = JsonConvert.DeserializeObject<ExpandoObject>(policyDTO.ToString());
 
-                var res = await _integrationService.RuleMapper(policyDTO, "Policy", apiContext);
+                var res = await _integrationService.RuleMapper(policyDTO, "PolicyCreation", apiContext);
 
                 var seriaizeListofres = JsonConvert.SerializeObject(res);
                 List<ErrorDetailsData> Listofres = JsonConvert.DeserializeObject<List<ErrorDetailsData>>(seriaizeListofres.ToString());
