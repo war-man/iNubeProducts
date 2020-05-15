@@ -6675,7 +6675,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             //  var paytmtransactionResponce = await _integrationService.DoTransactionByPayment(PolicyId, Amount, mappedPolicy.MobileNumber, apiContext);
 
 
-                                            return new PolicyResponse { Status = BusinessStatus.Created, Id = mappedPolicy.PolicyNo, ResponseMessage = $"Policy created Successfully" };
+                                            return new PolicyResponse { Status = BusinessStatus.Created, Id = mappedPolicy.PolicyNo, ResponseMessage = $"Policy created successfully for this Policy Number:{mappedPolicy.PolicyNo}" };
 
                                         }
                                         else

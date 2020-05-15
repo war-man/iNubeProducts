@@ -205,7 +205,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         }
           public async Task<PartnersDTO> GetPartnerDetailByCodeAsync(string partnerCode, ApiContext apiContext)
         {
-            var uri = PartnerUrl + "api/Partner/GetPartnerDetailsByPartnerCode?partnerCode=" + partnerCode;
+            var uri = PartnerUrl + "/api/Partner/GetPartnerDetailsByPartnerCode?partnerCode=" + partnerCode;
             return await GetApiInvoke<PartnersDTO>(uri, apiContext);
         }
 
