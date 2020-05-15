@@ -15,6 +15,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
     {
         Task<PremiumReturnDto> PremiumCalCulattion(PremiumRequestDTO dynamicData, ApiContext apiContext);
         Task<PartnersDTO> GetPartnerDetailAsync(string partnerId, ApiContext apiContext);
+        Task<PartnersDTO> GetPartnerDetailByCodeAsync(string partnerId, ApiContext apiContext);
         Task<ProductDTO> GetProductDetailAsync(string productId, ApiContext apiContext);
         Task<IEnumerable<ProductRcbdetailsDTO>> GetRiskPolicyDetailAsync(string productId, ApiContext apiContext);
         Task<CdTransactionsResponse> DoTransaction(PolicyBookingTransaction policyBookingTransaction, ApiContext apiContext);
@@ -200,6 +201,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         public async Task<PartnersDTO> GetPartnerDetailAsync(string partnerId, ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Partner/GetPartnerDetails?partnerId=" + partnerId;
+            return await GetApiInvoke<PartnersDTO>(uri, apiContext);
+        }
+          public async Task<PartnersDTO> GetPartnerDetailByCodeAsync(string partnerCode, ApiContext apiContext)
+        {
+            var uri = PartnerUrl + "/api/Partner/GetPartnerDetails?partnerId=" + partnerCode;
             return await GetApiInvoke<PartnersDTO>(uri, apiContext);
         }
 

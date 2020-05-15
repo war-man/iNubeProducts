@@ -57,8 +57,10 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             dbHelper._TimeZone = UserDateTime.KeyValue;
 
             DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
-
-
+            var IsvalidPartnerCode=_context.TblPartners.Any(s => s.PartnerCode != partnerDTO.PartnerCode);
+            if (IsvalidPartnerCode) 
+            {
+             
             TblPartners partner = _mapper.Map<TblPartners>(partnerDTO);
             partnerDTO.Flag = false;
             // _context.Entry(partner).State = partner.PartnerId == 0 ? EntityState.Added : EntityState.Modified;
@@ -94,6 +96,12 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             lstParameters.Add(partnerDTO.PartnerName);
 
             return new PartnerResponse() { Status = BusinessStatus.Created, Id = partnerDTO.PartnerId.ToString(), partner = partnerDTO,ResponseMessage = $"Partner ID: {partnerDTO.PartnerId} successfully {(partnerDTO.Flag == true ? "created " : "modified")} for Partner: {partnerDTO.PartnerName}" , MessageKey = (partnerDTO.Flag == true ? "CreatePartnerMsg" : "ModifiedPartnerMsg") , MessageValue = lstParameters };
+            }
+            else
+            {
+                return new PartnerResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"PartnerCode already Exist" };
+
+            }
         }
         /// <summary>
         /// Gets the master asynchronous.
@@ -154,6 +162,17 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             TblPartners _tblPartner = _context.TblPartners.Where(org => org.PartnerId == partnerId)
+                                    .Include(add => add.TblPartnerAddress)
+                                    .FirstOrDefault();
+            PartnersDTO _partnerDTO = _mapper.Map<PartnersDTO>(_tblPartner);
+            return _partnerDTO;
+
+        }
+        public async Task<PartnersDTO> GetPartnerDetailsByPartnerCode(string partnerCode, ApiContext apiContext)
+        {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            TblPartners _tblPartner = _context.TblPartners.Where(org => org.PartnerCode == partnerCode)
                                     .Include(add => add.TblPartnerAddress)
                                     .FirstOrDefault();
             PartnersDTO _partnerDTO = _mapper.Map<PartnersDTO>(_tblPartner);
