@@ -81,6 +81,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
                 {
                     _context.TblPartnerAddress.Remove(item);
                 }
+
                 //_context.Entry(partner).State = EntityState.Modified;
                 _context.Update(partner);
             }
