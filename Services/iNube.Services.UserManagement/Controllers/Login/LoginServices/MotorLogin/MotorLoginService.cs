@@ -24,11 +24,6 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MotorLog
             throw new NotImplementedException();
         }
 
-        public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire)
-        {
-            throw new NotImplementedException();
-        }
-
         public UserLoginResponse GetUserType(string username, string productType)
         {
             throw new NotImplementedException();
@@ -45,6 +40,11 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MotorLog
         }
 
         public EnvironmentResponse GetEnvironmentConnection(string product, decimal EnvId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire, RequestToken request = null)
         {
             throw new NotImplementedException();
         }

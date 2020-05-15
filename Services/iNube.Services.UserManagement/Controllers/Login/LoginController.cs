@@ -121,13 +121,13 @@ namespace iNube.Services.UserManagement.Controllers.Login
         [HttpPost]
         public IActionResult GenerateToken(RequestToken request)
         {
-            LoginDTO loginDTO = new LoginDTO() { Username = request.Username, EnvId = request.EnvId, ProductType = request.ProductType };
+            LoginDTO loginDTO = new LoginDTO() { Username = request.Username, EnvId = request.EnvId,Password=request.Password, ProductType = request.ProductType };
             var user = _loginService.Authenticate(loginDTO);
 
             if (user == null)
                 return BadRequest(new LoginResponse { Status = iNube.Utility.Framework.Model.BusinessStatus.NotFound, ResponseMessage = "Username or password is incorrect" });
-
-            var response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId, true);
+           
+            var response = _loginService.GenerateToken(user, loginDTO.ProductType, loginDTO.EnvId, true, request);
 
             // return basic user info (without password) and token to store client side
             return Ok(response);

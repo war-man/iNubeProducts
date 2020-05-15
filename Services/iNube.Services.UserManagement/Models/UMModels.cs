@@ -710,6 +710,9 @@ namespace iNube.Services.UserManagement.Models
         public string ServerType { get; set; }
         public decimal EnvId { get; set; }
         public bool IsRefreshToken { get; set; }
+        public string SessionId { get; set; }
+        public string RoleId { get; set; }
+        public string ClaimType { get; set; }
     }
 
     public class UserNameById

@@ -204,7 +204,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             }
         }
 
-        public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire)
+        public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire,RequestToken request=null)
         {
             LoginResponse loginResponse = new LoginResponse();
             var dbConnection = GetEnvironmentConnection(productType, envId).Dbconnection;
@@ -221,6 +221,10 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 var issuer = _config["Jwt:Issuer"];
                 var audience = _config["Jwt:Audience"];
                 var expiry = isTokenExpire ? DateTime.Now.AddMinutes(180) : DateTime.Now.AddYears(3);
+                if(request != null && request.IsRefreshToken && request.RoleId=="990" && request.ClaimType=="Year")
+                {
+                    expiry = DateTime.Now.AddYears(3);
+                }
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 // Add standard claims
