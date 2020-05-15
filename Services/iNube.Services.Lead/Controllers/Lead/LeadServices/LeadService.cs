@@ -11,19 +11,20 @@ using System.Reflection;
 using iNube.Services.Lead.Controllers.Lead.LDIntegrationServices;
 using System.Dynamic;
 using System.Threading.Tasks;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace iNube.Services.Lead.Controllers.Lead.LeadService
 {
 
     public interface ILeadService
     {
-        
+
         IEnumerable<ddDTO> GetMaster(string lMasterlist);
-        Task<LeadResponse> SaveSuspectAsync(LeadDTO leadDTO,ApiContext context);
+        Task<LeadResponse> SaveSuspectAsync(LeadDTO leadDTO, ApiContext context);
         Task<IEnumerable<LeadDTO>> ContactPoolAsync(String type, ApiContext context);
         Task<IEnumerable<LeadDTO>> SuspectPoolAsync(int incStageId, ApiContext context);
         List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context);
-        
+
         LeadResponse ModifySuspect(LeadDTO leadDTO, ApiContext context);
         IEnumerable<ddDTO> GetLocation(string locationType, int parentID, ApiContext context);
         IEnumerable<LifeQqDTO> FetchLifeQqdata();
@@ -85,8 +86,8 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         /// <param name="lMasterlist"></param>
         /// <returns></returns>
 
-                                                                     
-            
+
+
         public IEnumerable<ddDTO> GetMaster(string lMasterlist)
         {
             IEnumerable<ddDTO> ddDTOs;
@@ -168,7 +169,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             var ruleproperties = GetProperties(leadDTO);
             foreach (var rm in ruleMapList)
             {
-               //var paraColName = "";
+                //var paraColName = "";
                 try
                 {
                     if (leadDTO.GetType().GetProperty(rm.Param1) != null)
@@ -231,11 +232,11 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
                 }
             }
             // RuleEngine Validation 
-        
+
             else
             {
                 return null;
-               
+
             }
 
         }
@@ -259,7 +260,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             }
 
         }
-        public async Task<IEnumerable<LeadDTO>> SuspectPoolAsync(int incStageId,ApiContext context)
+        public async Task<IEnumerable<LeadDTO>> SuspectPoolAsync(int incStageId, ApiContext context)
         {
             List<LeadDTO> suspects = new List<LeadDTO>();
             if (string.IsNullOrEmpty(context.Name))
@@ -284,7 +285,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             {
                 // Get Emp Hirarchy
                 var empList = await _integrationService.GetEmpHierarchyAsync(context.Name, context);
-                var staffCodes = empList.Select(rt => Convert.ToInt64(rt.PositionID).ToString());  
+                var staffCodes = empList.Select(rt => Convert.ToInt64(rt.PositionID).ToString());
                 suspects = (from Opportunity in _context.TblOpportunity.Where(a => a.StageId == incStageId && a.IsDeleted != true && staffCodes.Contains(a.HandledBy))
                             join Contact in _context.TblContacts/*.Where(b => b.CreatedBy == userId)*/
                             on Opportunity.ContactId equals Contact.ContactId
@@ -305,7 +306,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
             var suspectpool = _mapper.Map<IEnumerable<LeadDTO>>(suspects);
             return suspects;
-            
+
         }
         //public IEnumerable<ProspectPoolDTO> GetProspectPool(ApiContext context)
 
@@ -354,22 +355,22 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
         public List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context)
         {
-            
+
             var DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
 
-            
-          
+
+
             var pooldata = _mapper.Map<List<LeadDTO>>(DATA);
-           foreach(var item in pooldata)
+            foreach (var item in pooldata)
             {
-                if(item.Address == null)
+                if (item.Address == null)
                 {
                     item.Address = new AddressDTO();
                 }
             }
-            
+
             return pooldata;
-            
+
         }
 
         public LeadResponse ModifySuspect(LeadDTO leadDTO, ApiContext context)
@@ -377,7 +378,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             TblAddress objAddress = new TblAddress();
             TblOpportunity objopportunity = new TblOpportunity();
             var lead = _mapper.Map<TblContacts>(leadDTO);
-            
+
             var tbl_lead = _context.TblContacts.Find(lead.ContactId);
             var tbl_opportunity = _context.TblOpportunity.Find(lead.ContactId);
             //bool IsProspect = true;
@@ -404,29 +405,30 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             tbl_lead.Age = leadDTO.Age;
             tbl_lead.OccupationId = leadDTO.OccupationID;
             tbl_lead.MonthlyIncome = leadDTO.MonthlyIncome;
-          
-           
+
+
             tbl_lead.Address = new TblAddress();
-            if (leadDTO.Address != null) {
-            tbl_lead.Address.Address1 = leadDTO.Address.Address1;
+            if (leadDTO.Address != null)
+            {
+                tbl_lead.Address.Address1 = leadDTO.Address.Address1;
                 tbl_lead.Address.Address2 = leadDTO.Address.Address2;
                 tbl_lead.Address.Address3 = leadDTO.Address.Address3;
                 tbl_lead.Address.CountryId = leadDTO.Address.CountryId;
-                tbl_lead.Address.StateId =leadDTO.Address.StateId;
+                tbl_lead.Address.StateId = leadDTO.Address.StateId;
                 tbl_lead.Address.CityId = leadDTO.Address.CityId;
                 tbl_lead.Address.DistrictId = leadDTO.Address.DistrictId;
-               tbl_lead.Address.AreaId = leadDTO.Address.AreaId;
-             
-        }
+                tbl_lead.Address.AreaId = leadDTO.Address.AreaId;
 
-        
-        _context.TblAddress.Update(tbl_lead.Address);
-             tbl_lead.AddressId = objAddress.AddressId;
+            }
+
+
+            _context.TblAddress.Update(tbl_lead.Address);
+            tbl_lead.AddressId = objAddress.AddressId;
             _context.TblContacts.Update(tbl_lead);
             _context.SaveChanges();
             //tbl_lead.TblOpportunity
 
-            var objOppurtunity = _context.TblOpportunity.SingleOrDefault(x=>x.ContactId == tbl_lead.ContactId);
+            var objOppurtunity = _context.TblOpportunity.SingleOrDefault(x => x.ContactId == tbl_lead.ContactId);
 
             objOppurtunity.ContactId = leadDTO.ContactID;
             objOppurtunity.StageId = 2; // Suspect
@@ -443,9 +445,9 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         //Proposal  tblLifeQqData
         public IEnumerable<LifeQqDTO> FetchLifeQqdata()
         {
-          var lifeQqdata = _context.TblLifeQq.Select(x => x).ToList();
-          var _lifeQqdata = _mapper.Map<List<LifeQqDTO>>(lifeQqdata);
-          return _lifeQqdata;
+            var lifeQqdata = _context.TblLifeQq.Select(x => x).ToList();
+            var _lifeQqdata = _mapper.Map<List<LifeQqDTO>>(lifeQqdata);
+            return _lifeQqdata;
         }
 
         //Proposal  tblcontacts
@@ -460,6 +462,8 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
             // var DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
             var DATA = _context.TblOpportunity.Where(a => a.HandledBy == Positionid).ToList();
+            //var DATA = (from contact in _context.TblOpportunity)
+            //_context.TblOpportunity.Where(a => a.HandledBy == Positionid).ToList();
             LeadDTO suspect = new LeadDTO();
             List<LeadDTO> suspects = new List<LeadDTO>();
 
@@ -475,15 +479,15 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
             QuotationDto quotationDto = new QuotationDto();
             List<QuotationDto> quotationDtos = new List<QuotationDto>();
-           
+
             List<policyDto> policyDtos = new List<policyDto>();
 
             ViewDetails viewDetails = new ViewDetails();
-          
+
 
             foreach (var item in DATA)
             {
-                if(item.StageId==1)
+                if (item.StageId == 1)
                 {
                     SuspectstagContactId = new StagContactId();
                     SuspectstagContactId.contactid = item.ContactId;
@@ -500,7 +504,8 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
                 }
             }
-            foreach(var item in SuspectstagContactIds)
+            //var prospect = _context.TblContacts.Select(a => a);
+            foreach (var item in SuspectstagContactIds)
             {
                 suspect = new LeadDTO();
                 var Tblpropsectdata = _context.TblContacts.FirstOrDefault(a => a.ContactId == item.contactid);
@@ -571,48 +576,50 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
                 propect.LeadNo = suspectdata.LeadNo;
 
                 propects.Add(propect);
-
-
-                //Quotation data call
-
-                // var tblLifeQqdata = _context.TblLifeQq.FirstOrDefault(a => a.ContactId == item.contactid).LifeQqid;
-                var tblLifeQqdata = (from tblMapper in _context.TblLifeQq
-
-                                     where (tblMapper.ContactId == item.contactid)
-
-                                     join tblMapperDetails in _context.TblQuoteMemberDetials on tblMapper.LifeQqid equals tblMapperDetails.LifeQqid
-
-                                     select new QuotationDto
-
-                                     {
-                                         Name = tblMapperDetails.Name,
-
-                                         QuotNumber = tblMapper.QuoteNo,
-                                         ContactNumner = suspect.MobileNo,
-                                         MovedTo = "",
-                                         //CityName = suspectdata.Address.city.ToString(),
-
-                                     }).FirstOrDefault();
-                //tblLifeQqdata.ContactNumner = suspectdata.MobileNo;
-
-                quotationDtos.Add(tblLifeQqdata);
-
-                var proposaldata = await _integrationService.GetProposalByQuotNO(tblLifeQqdata.QuotNumber,context) ;
-                ProposalDto proposalDto = proposaldata;
-                proposalDtos.Add(proposalDto);
-
-
-                var policydata = await _integrationService.GetPolicyByProposalNO(proposalDto.ProposalNumber, context);
-
-                //doing for the policy
-
-                policyDto policyDto = policydata;
-                policyDtos.Add(policyDto);
-
-
-
-
             }
+
+
+            //Quotation data call
+
+            // var tblLifeQqdata = _context.TblLifeQq.FirstOrDefault(a => a.ContactId == item.contactid).LifeQqid;
+            var tblLifeQqdata = (from tblMapper in _context.TblLifeQq
+
+                                 where (tblMapper.HandledBy == Positionid)
+
+                                 join tblMapperDetails in _context.TblQuoteMemberDetials on tblMapper.LifeQqid equals tblMapperDetails.LifeQqid
+
+                                 select new QuotationDto
+
+                                 {
+                                     Name = tblMapperDetails.Name,
+
+                                     QuotNumber = tblMapper.QuoteNo,
+                                     ContactNumner = suspect.MobileNo,
+                                     MovedTo = "",
+                                     //CityName = suspectdata.Address.city.ToString(),
+
+                                 }).FirstOrDefault();
+            //tblLifeQqdata.ContactNumner = suspectdata.MobileNo;
+
+            quotationDtos.Add(tblLifeQqdata);
+
+
+            var proposaldata = await _integrationService.GetProposalByQuotNO(tblLifeQqdata.QuotNumber, context);
+            ProposalDto proposalDto = proposaldata;
+            proposalDtos.Add(proposalDto);
+
+
+            var policydata = await _integrationService.GetPolicyByProposalNO(proposalDto.ProposalNumber, context);
+
+            //doing for the policy
+
+            policyDto policyDto = policydata;
+            policyDtos.Add(policyDto);
+
+
+
+
+
             //for Quotation
             viewDetails.prospect = propects;
             viewDetails.suspect = suspects;

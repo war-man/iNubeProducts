@@ -23,7 +23,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
           
         ProposalResponce PartialFormDataSave(Models.ProposalModel.PolicyDto policyDto, ApiContext Context);
 
-        Task<ProposalDto> GetProposalByQuotNO(string quotoNo, ApiContext Context);
+        Task<List<ProposalDto>> GetProposalByPositionId(int postid, ApiContext Context);
         Task<policyDto> GetPolicyByQuotNO(string proposalNo, ApiContext Context);
 
     }
@@ -162,27 +162,27 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             return null;
         }
 
-        public async Task<ProposalDto> GetProposalByQuotNO(string quotoNo, ApiContext Context)
+        public async Task<List<ProposalDto>> GetProposalByPositionId(int postid, ApiContext Context)
         {
-          //  _context = (ProposalContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            //  _context = (ProposalContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var Proposaldata = (from tblMapper in _context.TblPolicy
 
-                                 where (tblMapper.QuoteNo == quotoNo && tblMapper.PolicyNo==null)
+                                where (tblMapper.HandledBy== postid.ToString() && tblMapper.PolicyNo == null)
 
-                                 join tblMapperDetails in _context.TblPolicyMemberDetails on tblMapper.PolicyId equals tblMapperDetails.PolicyId
+                                join tblMapperDetails in _context.TblPolicyMemberDetails on tblMapper.PolicyId equals tblMapperDetails.PolicyId
 
-                                 select new ProposalDto
+                                select new ProposalDto
 
-                                 {
-                                     Name = tblMapperDetails.FirstName,
+                                {
+                                    Name = tblMapperDetails.FirstName,
 
-                                     ProposalNumber = tblMapper.ProposalNo,
-                                     ContactNumner = tblMapperDetails.Mobile,
-                                     MovedTo = "",
+                                    ProposalNumber = tblMapper.ProposalNo,
+                                    ContactNumner = tblMapperDetails.Mobile,
+                                    MovedTo = "",
                                     // CityName = tblMapperDetails,
 
-                                 }).FirstOrDefault();
+                                }).ToList();
             return Proposaldata;
 
         }

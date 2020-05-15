@@ -42,7 +42,7 @@ namespace iNube.Services.Policy.Entities.AvoEntities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=AVOLifeP2;User ID=AVOLifeUserP2; Password=AVOLife*User123;");
+                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=AVOLifeP2;User ID=AVOLifeUserP2;Password=AVOLife*User123;Trusted_Connection=False;");
             }
         }
 
@@ -209,6 +209,11 @@ namespace iNube.Services.Policy.Entities.AvoEntities
                 entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
                 entity.Property(e => e.DepositPremium).HasMaxLength(30);
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.IntroducerCode)
                     .HasMaxLength(20)
@@ -478,6 +483,11 @@ namespace iNube.Services.Policy.Entities.AvoEntities
 
                 entity.Property(e => e.Gender)
                     .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.HomeNo)

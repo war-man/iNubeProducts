@@ -94,9 +94,9 @@ namespace iNube.Services.Policy.Controllers.Proposal
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetProposalByQuotNO(string quotoNo)
+        public async Task<IActionResult> GetProposalByPositionId(int posid)
         {
-            var suspects =await _proposalService.GetProposalByQuotNO(quotoNo, Context);
+            var suspects =await _proposalService.GetProposalByPositionId(posid, Context);
             return Ok(suspects);
         }
         [HttpGet]

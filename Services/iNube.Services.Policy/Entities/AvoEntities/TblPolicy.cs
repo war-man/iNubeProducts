@@ -78,6 +78,7 @@ namespace iNube.Services.Policy.Entities.AvoEntities
         public string IsAfc { get; set; }
         public string ModalPremium { get; set; }
         public DateTime? ProposalSubmitDate { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual ICollection<TblPolicyDocuments> TblPolicyDocuments { get; set; }
         public virtual ICollection<TblPolicyExtension> TblPolicyExtension { get; set; }
