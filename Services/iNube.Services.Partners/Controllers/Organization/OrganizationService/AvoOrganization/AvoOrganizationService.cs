@@ -725,7 +725,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             try
             {
 
-                var positiondata = _context.TblOrgPositions.FirstOrDefault(a => a.DesignationId == avOOrgEmployee.DeginName && a.IsVacant == true);
+                var positiondata = _context.TblOrgPositions.FirstOrDefault(a => a.PositionName == avOOrgEmployee.DeginName && a.IsVacant == true);
                 positiondata.IsVacant = false;
                 _context.TblOrgPositions.Update(positiondata);
 
@@ -1014,10 +1014,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                                 movData.Status = 1;
                             }
                         }
-
                     }
-                    //var empid = _context.TblMovements.FirstOrDefault(a => a.MovementId == movements.MovementId);
-
                     //Create new position
                     var newPos = await CreateNewPosition(movementdata.MovementId, apiContext);
                     var promote = _context.TblOrgEmployee.FirstOrDefault(a => a.OrgEmpId == movementdata.OrgEmpId);

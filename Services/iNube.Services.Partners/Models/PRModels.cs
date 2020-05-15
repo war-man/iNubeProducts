@@ -1799,7 +1799,7 @@ namespace iNube.Services.Partners.Models
             AVOOrgEmployee = new AVOOrgEmployee();
         }
 
-        public decimal DeginName { get; set; }
+        public string DeginName { get; set; }
         public decimal? OrganizationId { get; set; }
         public decimal OfficeId { get; set; }
 
