@@ -1320,7 +1320,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             mValue = objempdetails.StaffName
                         }).ToList();
             //   return Data;
-            val.masterData = Data;
+            var emp = Data.Where(x => x.mID != Empcode).ToList();
+            val.masterData = emp;
 
             //foreach (var i in pos1)
             //{
