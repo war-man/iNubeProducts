@@ -1197,9 +1197,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tbl_participant = _mapper.Map<AVOOrgEmployee>(tblRetentionGroupDto);
-            var tbl_particiant = _context.TblOrgEmployee.Find(tbl_participant.OrgEmpId);
-            var tbl_address = _context.TblOrgEmpAddress.FirstOrDefault(a => a.OrgEmpId == tbl_participant.OrgEmpId);
-            var tbl_edu = _context.TblOrgEmpEducation.FirstOrDefault(a => a.OrgEmpId == tbl_participant.OrgEmpId);
+            var tbl_particiant = _context.TblOrgEmployee.Where(a => a.StaffCode == tbl_participant.StaffCode).FirstOrDefault();
+            var tbl_address = _context.TblOrgEmpAddress.FirstOrDefault(a => a.OrgEmpId == tbl_particiant.OrgEmpId);
+            var tbl_edu = _context.TblOrgEmpEducation.FirstOrDefault(a => a.OrgEmpId == tbl_particiant.OrgEmpId);
 
             // update user properties
             tbl_particiant.AccountNumber = tblRetentionGroupDto.AccountNumber;
@@ -1261,7 +1261,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             _context.TblOrgEmployee.Update(tbl_particiant);
             _context.SaveChanges();
             var accountDTO = _mapper.Map<AVOOrgEmployee>(tbl_particiant);
-            return accountDTO;
+            return new AVOOrgEmployee { Status = BusinessStatus.Created, ResponseMessage = $"data modified sucessfully " }; ;
         }
 
         public async Task<AVOReporteeGrid> GetReporteeGrid(int Empcode, int position, ApiContext apiContext)

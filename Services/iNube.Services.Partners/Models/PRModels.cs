@@ -1683,7 +1683,7 @@ namespace iNube.Services.Partners.Models
 
     }
 
-    public class AVOOrgEmployee
+    public class AVOOrgEmployee:ResponseStatus
     {
         public AVOOrgEmployee()
         {
