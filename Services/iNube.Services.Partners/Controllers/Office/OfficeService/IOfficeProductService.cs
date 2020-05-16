@@ -9,11 +9,12 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
     public interface IOfficeProductService
     {
 
-        Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO,ApiContext apiContext);
+        Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext);
         Task<AVOOrgOffice> GetOffice(string OfficeCode, ApiContext apiContext);
-       // Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext);
+        // Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext);
         Task<IEnumerable<AVOOrgOffice>> SearchOfficeData(string OfficeCode, ApiContext apiContext);
-        Task<List<MasterDto>> GetAllOfficeData( ApiContext apiContext);
+        Task<List<MasterDto>> GetAllOfficeData(ApiContext apiContext);
+        Task<IEnumerable<AVOOrgOffice>> SearchOffById(int Officeid, ApiContext apiContext);
         int TestMethod();
     }
 }

@@ -24,7 +24,7 @@ namespace iNube.Services.Partners.Controllers.Office
     {
         public IOfficeService _officeService;
         private IMapper _mapper;
-       
+
         private readonly AppSettings _appSettings;
 
 
@@ -36,12 +36,12 @@ namespace iNube.Services.Partners.Controllers.Office
 
 
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> CreateOffice([FromBody]OrgOfficeDTO officeDTO)
 
         {
-            var response = await _officeService.CreateOffice(officeDTO,Context);
+            var response = await _officeService.CreateOffice(officeDTO, Context);
             switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:
@@ -57,22 +57,22 @@ namespace iNube.Services.Partners.Controllers.Office
             }
 
 
-           // return Ok(results);
+            // return Ok(results);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetOffice(string OfficeCode)
 
         {
-            AVOOrgOffice _OfficeDTOs =await _officeService.GetOffice(OfficeCode, Context);
-            
+            AVOOrgOffice _OfficeDTOs = await _officeService.GetOffice(OfficeCode, Context);
+
             return Ok(_OfficeDTOs);
         }
         [HttpGet]
         public async Task<IActionResult> SearchOffice(string OfficeCode)
 
         {
-            var _OfficeDTOs =await _officeService.SearchOfficeData(OfficeCode, Context);
+            var _OfficeDTOs = await _officeService.SearchOfficeData(OfficeCode, Context);
 
             return Ok(_OfficeDTOs);
         }
@@ -90,6 +90,12 @@ namespace iNube.Services.Partners.Controllers.Office
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SearchOffById(int Officeid)
+        {
+            var response = await _officeService.SearchOffById(Officeid, Context);
+            return Ok(response);
+        }
 
         //[HttpGet]
         //public async Task<IActionResult> GetAllOffice()

@@ -170,8 +170,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                         {
                             if (item.reportto == "0")
                             {
-                                tblOrg.RepotrsToId = null;
-                                tblOrg.ParentId = null;
+                                tblOrg.RepotrsToId = 0;
+                                tblOrg.ParentId = 0;
                             }
                             else
                             {

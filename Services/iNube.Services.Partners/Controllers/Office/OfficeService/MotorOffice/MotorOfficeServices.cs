@@ -116,6 +116,10 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             return 0;
         }
 
+        public async Task<IEnumerable<AVOOrgOffice>> SearchOffById(int Officeid, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
 
     }
 }

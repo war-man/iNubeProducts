@@ -18,6 +18,7 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
         //  Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext);
         Task<List<MasterDto>> GetAllOfficeData(ApiContext apiContext);
         Task<IEnumerable<AVOOrgOffice>> SearchOfficeData(string OfficeCode, ApiContext apiContext);
+        Task<IEnumerable<AVOOrgOffice>> SearchOffById(int Officeid, ApiContext apiContext);
 
         int TestMethod();
     }
@@ -55,6 +56,12 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
         {
             return await _officeProductService(apiContext.ProductType).GetAllOfficeData(apiContext);
         }
+
+        public async Task<IEnumerable<AVOOrgOffice>> SearchOffById(int Officeid, ApiContext apiContext)
+        {
+            return await _officeProductService(apiContext.ProductType).SearchOffById(Officeid, apiContext);
+        }
+
         public int TestMethod()
         {
             return 0;

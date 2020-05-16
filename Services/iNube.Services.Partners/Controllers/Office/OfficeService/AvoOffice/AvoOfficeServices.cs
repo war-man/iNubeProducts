@@ -31,7 +31,7 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
 
         }
 
-        public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO,ApiContext apiContext)
+        public async Task<OfficeResponse> CreateOffice(OrgOfficeDTO officeDTO, ApiContext apiContext)
         {
 
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -49,12 +49,12 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             }
             _context.SaveChanges();
             var pDTO = _mapper.Map<OrgOfficeDTO>(office);
-             return new OfficeResponse { Status =BusinessStatus.Ok,   ResponseMessage = $" Office ID {office.OrgOfficeId} successfully {(officeDTO.OrgOfficeId == 0 ? "created " : "modified")}  for {officeDTO.OfficeName}!" };
-          }
+            return new OfficeResponse { Status = BusinessStatus.Ok, ResponseMessage = $" Office ID {office.OrgOfficeId} successfully {(officeDTO.OrgOfficeId == 0 ? "created " : "modified")}  for {officeDTO.OfficeName}!" };
+        }
 
         public async Task<AVOOrgOffice> GetOffice(string OfficeCode, ApiContext apiContext)
         {
-            
+
 
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
@@ -73,41 +73,31 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
 
 
                 AVOOrgOffice _officeDTO = _mapper.Map<AVOOrgOffice>(_tblOrgOffice);
-            return _officeDTO;
-        }
+                return _officeDTO;
+            }
             catch (Exception ex)
             {
                 return null;
             }
 
-}
+        }
         public async Task<IEnumerable<AVOOrgOffice>> SearchOfficeData(string OfficeCode, ApiContext apiContext)
         {
             try
             {
-
                 _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-                // OrgOfficeDTO _organizationDTO = new OrgOfficeDTO();
-
-
-                var _tblOrgOffice = _context.TblOrgOffice.Where(org => org.OfficeCode == OfficeCode)
-                                        .Include(add => add.TblOfficeSpocDetails)
+                var _tblOrgOffice = _context.TblOrgOffice
+                    .Include(add => add.TblOfficeSpocDetails)
                                         .ToList();
 
-
-                //var _tblOrgOfficeSpoc = _context.TblOfficeSpocDetails.Select(x => x);
-                //foreach
-
-                //TblOrgOffice _tblOrgOffice = from off in _context.TblOrgOffice
-                //                             where OfficeCode == OfficeCode
-                //                             join spo in _context.TblOfficeSpocDetails on off.OrgOfficeId equals spo.OfficeId
-                //                             select new (off,spo);
+                if (!string.IsNullOrEmpty(OfficeCode))
+                {
+                    _tblOrgOffice = _tblOrgOffice.Where(a => a.OfficeCode == OfficeCode).ToList();
+                }
 
                 var _officeDTO = _mapper.Map<IEnumerable<AVOOrgOffice>>(_tblOrgOffice);
-            return _officeDTO;
-
-                
+                return _officeDTO;
             }
             catch (Exception ex)
             {
@@ -115,7 +105,7 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
             }
 
         }
-        public async Task<List<MasterDto>> GetAllOfficeData( ApiContext apiContext)
+        public async Task<List<MasterDto>> GetAllOfficeData(ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var masterdata = _context.TblOrgOffice
@@ -129,31 +119,42 @@ namespace iNube.Services.Partners.Controllers.Office.OfficeService
 
 
         }
-//        public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
-//        {
-//            try
-//            {
+        //        public async Task<IEnumerable<ddDTO>> GetAllOfficeData(ApiContext apiContext)
+        //        {
+        //            try
+        //            {
 
-//                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-//            IEnumerable<ddDTO> officeDTOs;
+        //                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+        //            IEnumerable<ddDTO> officeDTOs;
 
-//            officeDTOs = _context.TblOrgOffice
-//             .Select(c => new ddDTO
-//             {
-//                 mID = (int)c.OfficeLevelId,
-//                 mValue = c.OfficeName,
-//                 mType = "office"
-//             })
-//                .ToList();
+        //            officeDTOs = _context.TblOrgOffice
+        //             .Select(c => new ddDTO
+        //             {
+        //                 mID = (int)c.OfficeLevelId,
+        //                 mValue = c.OfficeName,
+        //                 mType = "office"
+        //             })
+        //                .ToList();
 
-//                return officeDTOs;
-//        }
-//            catch (Exception ex)
-//            {
-//                return null;
-//            }
+        //                return officeDTOs;
+        //        }
+        //            catch (Exception ex)
+        //            {
+        //                return null;
+        //            }
 
-//}
+        //}
+
+        public async Task<IEnumerable<AVOOrgOffice>> SearchOffById(int Officeid, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var _tblOrgOffice = _context.TblOrgOffice.Where(a => a.OrgOfficeId == Officeid)
+                .Include(add => add.TblOfficeSpocDetails).ToList();
+
+            var _officeDTO = _mapper.Map<IEnumerable<AVOOrgOffice>>(_tblOrgOffice);
+            return _officeDTO;
+        }
 
         public int TestMethod()
         {
