@@ -1658,7 +1658,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             {
                 var desg = _context.TblOrgStructure.FirstOrDefault(x => x.OrganizationId == orgid && x.OrgStructureId == des.DesignationId);
                 List<decimal> PositionIds = new List<decimal>();
-                PositionIds.Add(desg.OrgStructureId);
+               // PositionIds.Add(desg.OrgStructureId);
                 PositionIds.Add((decimal)desg.ParentId);
                 Data = (from objposition in _context.TblOrgStructure.Where(x => x.OrganizationId == orgid && PositionIds.Contains(Convert.ToDecimal(x.OrgStructureId)))
                         select new MasterDto
