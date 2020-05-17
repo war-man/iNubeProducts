@@ -971,6 +971,8 @@ namespace iNube.Services.Lead.Models
         public string ContactNumner { get; set; }
         public string CityName { get; set; }
         public string MovedTo { get; set; }
+
+        public int QuotationId { get; set; }
     }
     public partial class ProposalDto
     {
