@@ -1378,29 +1378,38 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             List<FetchData> Data = null;
             if (type == "People")
             {
-                return GetPeopleHierachy(OrgId, type, keyValue, apiContext);
+                return await GetPeopleHierachyAsync(OrgId, type, keyValue, apiContext);
             }
             return Data;
         }
-        private List<FetchData> GetPeopleHierachy(int OrgId, string type, string keyValue, ApiContext apiContext)
+        private async Task<List<FetchData>> GetPeopleHierachyAsync(int OrgId, string type, string keyValue, ApiContext apiContext)
         {
             List<FetchData> Data = null;
             if (keyValue != null)
             {
-                Data =
-               (from objdesig in _context.TblOrgStructure.Where(a => a.OrganizationId == OrgId)
-                join objposition in _context.TblOrgPositions on objdesig.OrgStructureId equals objposition.DesignationId
-                join objempdetails in _context.TblOrgEmployee.Where(emp => emp.StaffCode == keyValue) on objposition.PositionId equals objempdetails.PositionId
+                var dtEmp = await GetEmpHierarchy(keyValue, apiContext);
+                Data = (from DataRow dr in dtEmp.Rows
+                        select new FetchData()
+                        {
+                            Positionid = Convert.ToInt32(dr["PositionID"]),
+                            StaffName = dr["StaffName"].ToString(),
+                            ParentId = Convert.ToInt32(dr["ParentID"]),
+                            PostionName = dr["LevelDefinition"].ToString(),
+                            LevelId = Convert.ToInt32(dr["LevelId"])
+                        }).ToList();
 
-                select new FetchData
-                {
-                    PostionName = objdesig.LevelDefinition,
-                    Positionid = Convert.ToInt32(objposition.PositionId),
-                    ParentId = Convert.ToInt32(objposition.ParentId),
-                    StaffName = objempdetails.StaffName,
-                    Designationid = Convert.ToInt32(objposition.DesignationId),
-                    LevelId = objdesig.LevelId,
-                }).ToList();
+                var empHierData = Data.Where(a => a.LevelId == Convert.ToInt32(dtEmp.Rows[0]["LevelId"])).
+                 Select(b => new FetchData
+                 {
+                     PostionName = b.PostionName,
+                     Positionid = Convert.ToInt32(b.Positionid),
+                     ParentId = Convert.ToInt32(b.ParentId),
+                     StaffName = b.StaffName,
+                     LevelId = b.LevelId,
+                     Designationid = Convert.ToInt32(b.Designationid),
+                     Children = GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
+                 }).ToList();
+                  return empHierData;
             }
             else
             {
