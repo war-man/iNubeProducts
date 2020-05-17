@@ -239,7 +239,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 loginResponse.PartnerId = userDetails.PartnerId;
                 loginResponse.OrganizationId = userDetails.OrganizationId;
                 loginResponse.UserName = user.UserName;
-                loginResponse.FirstName = userDetails.FirstName;
+                loginResponse.FirstName = userDetails.EmployeeNumber;
                 loginResponse.LastName = userDetails.LastName;
                 loginResponse.IsMale = userDetails.GenderId == 1001 ? true : false;
                 loginResponse.ProfileImage = userDetails.ProfileImage;
