@@ -243,7 +243,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 loginResponse.LastName = userDetails.LastName;
                 loginResponse.IsMale = userDetails.GenderId == 1001 ? true : false;
                 loginResponse.ProfileImage = userDetails.ProfileImage;
-                loginResponse.DisplayName = loginResponse.FirstName + "  " + loginResponse.LastName;
+                loginResponse.DisplayName = userDetails.FirstName + "  " + userDetails.LastName;
                 if ((DateTime.Now.Date - user.LastPasswordChanged.Value.Date).TotalDays > 60)
                 {
                     loginResponse.PasswordExpire = true;
