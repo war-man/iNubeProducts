@@ -3690,7 +3690,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         }
                     if (IdentificationNumberCount == 0) {
-                        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = "Identification Number is not match in records" };
+                        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = "Vehicle does not exist" };
                     }
                     if (CDmap.Count > 0)
                     {
