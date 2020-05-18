@@ -3743,7 +3743,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                       
 
                         var StatusUpdate = await _integrationService.VehicleStatusUpdate(VehicleStatusDTO, apiContext);
-                        return new EndorsmentDTO() { Status = BusinessStatus.Ok, ResponseMessage = "Deleted Successfully" };
+                        return new EndorsmentDTO() { Status = BusinessStatus.Deleted, ResponseMessage = "Deleted Successfully" };
                         }
                         else
                         {

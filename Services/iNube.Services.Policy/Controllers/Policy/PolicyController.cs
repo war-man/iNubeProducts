@@ -526,6 +526,8 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return BadRequest(response);
                 case BusinessStatus.Created:
                     return Ok(response);
+                case BusinessStatus.Ok:
+                    return Ok(response);
                 case BusinessStatus.Deleted:
                     return Ok(response);
                 case BusinessStatus.Updated:
