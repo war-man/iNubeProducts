@@ -3512,7 +3512,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
 
 
-
+            int IdentificationNumberCount = 0;
 
             string EndorsementNo = "";
             var policy = _context.TblPolicy.FirstOrDefault(x => x.PolicyNo == PolicyNo);
@@ -3652,6 +3652,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                         var TblIdentificationNo = (string)jsoninsurableFields["Identification Number"];
                                                         if (InputidentificationNumber == TblIdentificationNo)
                                                         {
+                                                            IdentificationNumberCount++;
                                                             var removeitem = jsoninsurableFields;
                                                          
                                                             insurableName.RiskItems.Remove(removeitem);
@@ -3688,7 +3689,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             }
 
                         }
-
+                    if (IdentificationNumberCount == 0) {
+                        return new EndorsmentDTO() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = "Identification Number is not match in records" };
+                    }
                     if (CDmap.Count > 0)
                     {
                         var expObj = JsonConvert.DeserializeObject<ExpandoObject>(json1.ToString());
@@ -6763,6 +6766,470 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
         }
+
+        public async Task<ReportFileUploadResponse> RefundReportUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            string filePath = "";
+            int step1 = 0;
+            List<ShowReportErrorInfoDetails> errorInfoDetails = new List<ShowReportErrorInfoDetails>();
+            try
+            {
+                CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+                dbHelper._TimeZone = UserDateTime.KeyValue;
+                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+                var files = httpRequest.Form.Files;
+                //var docId = GetActiveResult(file.Name); HttpRequest
+                DataTable dt = new DataTable();
+                List<ErrorInfo> Errors = new List<ErrorInfo>();
+                _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+                foreach (var file in files)
+                {
+                    step1++;
+
+                    if (file == null || file.Length <= 0)
+                    {
+                        return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
+                    }
+                    var filename = ContentDispositionHeaderValue
+                                       .Parse(file.ContentDisposition)
+                                       .FileName
+                                       .Trim('"');
+                    var path = Path.Combine("", filename);
+                    filePath = Path.GetFullPath(path);
+                    using (FileStream fs = System.IO.File.Create(filePath))
+                    {
+                        file.CopyTo(fs);
+                        fs.Flush();
+                    }
+
+                    step1++;
+
+                    var sheetName = System.IO.Path.GetFileNameWithoutExtension(path).ToString();
+
+                    var fileExt = Path.GetExtension(file.FileName);
+
+                    if (fileExt == ".CSV" || fileExt == ".csv")
+                    {
+                        step1++;
+                        // string filepath = @"C:\Users\brajesh.kumar\Desktop\test1111.csv";
+                        var res = await ConvertCSVReporttoDataTable(filePath, apiContext, DatetimeNow);
+                        return res;
+                    }
+                    else
+                    {
+                        //var tblbankdoc = await GetDocumentId(file.Name, apiContext);
+
+                        if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
+                        {
+                            bool sms = true;
+                            bool email = true;
+                            //dt.Columns.Add("BankFileId", typeof(int));
+                            // dt.Columns.Add("Id", typeof(string));
+
+
+                            //dt.Columns.Add("PolicyNumber", typeof(string));
+                            //dt.Columns.Add("TransactionType", typeof(string));
+                            dt.Columns.Add("TxnID", typeof(string));
+                            dt.Columns.Add("PaymentReferenceID", typeof(string));
+                            dt.Columns.Add("PaidAmount", typeof(decimal));
+                            dt.Columns.Add("PaymentDate", typeof(DateTime));
+                            dt.Columns.Add("PaymentStatus", typeof(bool));
+                           // dt.Columns.Add("ModifiedDate", typeof(DateTime));
+                            //defining Global Variables
+                            ShowReportErrorInfoDetails errorInfoDetailsInfo = new ShowReportErrorInfoDetails();
+
+                            var TxnID = "";
+                           // var PolicyNumber = "";
+                            //var TransactionType = "";
+                            var PaymentReferenceId = "";
+                            var PaidAmount = "";
+                            var PaymentDate = "";
+                            var PaymentStatus = "";
+                      
+
+                            var sheetNameValue = "";
+                            using (var stream = new MemoryStream())
+                            {
+                                await file.CopyToAsync(stream, cancellationToken);
+                                try
+                                {
+                                    using (var package = new ExcelPackage(stream))
+                                    {
+                                        foreach (var sheetName1 in package.Workbook.Worksheets)
+                                        {
+                                            sheetNameValue = sheetName1.Name;
+                                        }
+                                        ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetNameValue];
+
+
+                                        // EPPlusHelper.GetColumnByName()
+                                        int txnID = worksheet.GetColumnByName("TxnID");
+                                      //  int policyNumberId = worksheet.GetColumnByName("Policy Number");
+                                      //  int transactionTypeId = worksheet.GetColumnByName("Transaction Type");
+                                        int paymentReferenceId = worksheet.GetColumnByName("PaymentReferenceID");
+                                        int paidAmountId = worksheet.GetColumnByName("PaidAmount");
+                                        int paymentDateId = worksheet.GetColumnByName("PaymentDate");
+                                        int paymentStatusId = worksheet.GetColumnByName("PaymentStatus");
+                                    //    int modifiedDateId = worksheet.GetColumnByName("ModifiedDate");
+                                     
+
+                                        if (worksheet != null)
+                                        {
+                                            var rowCount = worksheet.Dimension.Rows;
+                                            for (int row = 2; row <= rowCount; row++)
+                                            {
+                                                errorInfoDetailsInfo = new ShowReportErrorInfoDetails();
+                                                if (worksheet.Cells[row, txnID].Text.ToString().Trim() != null)
+                                                {
+                                                    TxnID = worksheet.Cells[row, txnID].Text.ToString().Trim();
+                                                }
+                                                //if (worksheet.Cells[row, policyNumberId].Text.ToString().Trim() != null)
+                                                //{
+                                                //    PolicyNumber = worksheet.Cells[row, policyNumberId].Text.ToString().Trim();
+                                                //}
+                                                //if (worksheet.Cells[row, transactionTypeId].Text.ToString().Trim() != null)
+                                                //{
+                                                //    TransactionType = worksheet.Cells[row, transactionTypeId].Text.ToString().Trim();
+                                                //}
+                                                if (worksheet.Cells[row, paymentReferenceId].Text.ToString().Trim() != null)
+                                                {
+                                                    PaymentReferenceId = worksheet.Cells[row, paymentReferenceId].Text.ToString().Trim();
+                                                }
+                                                if (worksheet.Cells[row, paidAmountId].Text.ToString().Trim() != null)
+                                                {
+                                                    PaidAmount = worksheet.Cells[row, paidAmountId].Text.ToString().Trim();
+                                                }
+                                                if (worksheet.Cells[row, paymentDateId].Text.ToString().Trim() != null)
+                                                {
+                                                    PaymentDate = worksheet.Cells[row, paymentDateId].Text.ToString().Trim();
+                                                }
+                                                //endrsNum = s0;
+                                                if (worksheet.Cells[row, paymentStatusId].Text.ToString().Trim() != null)
+                                                {
+                                                    PaymentStatus = worksheet.Cells[row, paymentStatusId].Text.ToString().Trim();
+                                                }
+                                                //if (worksheet.Cells[row, modifiedDateId].Text.ToString().Trim() != null)
+                                                //{
+                                                //    ModifiedDate = worksheet.Cells[row, modifiedDateId].Text.ToString().Trim();
+                                                //}
+
+                                                UpdateReportRefundDetails(errorInfoDetails, row, errorInfoDetailsInfo, TxnID, PaymentReferenceId,
+                                                    PaidAmount, PaymentDate, PaymentStatus, DatetimeNow);
+
+                                            }
+                                            if (errorInfoDetails.Count > 0)
+                                            {
+                                                return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded with following Erros", Errors = Errors, ErrorDetails = errorInfoDetails };
+                                            }
+                                            else
+                                            {
+                                                return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded Successfully" };
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    var error = ex.ToString();
+                                    return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter", MessageKey = step1.ToString() };
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx/csv file" };
+                        }
+                    }
+
+                }
+                if (errorInfoDetails.Count > 0)
+                {
+                    return new ReportFileUploadResponse { Status = BusinessStatus.Ok, Errors = Errors, ResponseMessage = $" {dt.Rows.Count }Document uploaded succefully with {Errors.Count} records having issues" };
+                }
+                else
+                {
+                    return new ReportFileUploadResponse { Status = BusinessStatus.Ok, ResponseMessage = $"Document uploaded succefully!" };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document upload error!" + ex.ToString(), MessageKey = step1.ToString() + " " + filePath };
+            }
+        }
+
+        public async Task<ReportFileUploadResponse> ConvertCSVReporttoDataTable(string strFilePath, ApiContext apiContext, DateTime DatetimeNow)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            List<ShowReportErrorInfoDetails> errorInfoDetails = new List<ShowReportErrorInfoDetails>();
+            int logx = 0;
+
+            StreamReader sr = null;
+            try
+            {
+                sr = new StreamReader(strFilePath);
+                string[] headers = sr.ReadLine().Split(',');
+                DataTable dt = new DataTable();
+                foreach (string header in headers)
+                {
+                    dt.Columns.Add(header);
+                }
+                logx++;
+                //finding index of every column
+                var txnIDindex = FindIndex(strFilePath, "TxnID");
+                //var PolicyNumberindex = FindIndex(strFilePath, "Policy Number");
+                //var TransactionTypeIndex = FindIndex(strFilePath, "Transaction Type");
+
+                //need to put current date time
+                // var TxnDateIndex = FindIndex("endorsement Effective Date");
+                //var TotalRefundAmountIndex = FindIndex(strFilePath, "");
+                var PaymentReferenceIdIndex = FindIndex(strFilePath, "PaymentReferenceId");
+                var AmountPaidIndex = FindIndex(strFilePath, "Amount Paid");
+                var DateOfPaymentIndex = FindIndex(strFilePath, "Date Of Payment");
+                var PaymentStatusIndex = FindIndex(strFilePath, "Payment Status");
+                logx++;
+
+                while (!sr.EndOfStream)
+                {
+                    string[] rows = Regex.Split(sr.ReadLine(), ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    DataRow dr = dt.NewRow();
+
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        dr[i] = rows[i];
+
+                        //dr1[i] = dt.Rows[i+1]["endorsement Number"];
+                    }
+                    dt.Rows.Add(dr);
+                }
+                // var c = dt.Rows[0][2];
+                var count = dt.Rows.Count;
+
+                ShowReportErrorInfoDetails errorInfoDetailsInfo = new ShowReportErrorInfoDetails();
+
+
+
+                for (var i = 0; i < count; i++)
+                {
+                    // var s = dt.Rows[i][10].ToString().Trim();
+                    errorInfoDetailsInfo = new ShowReportErrorInfoDetails();
+
+                    var txnID = dt.Rows[i][txnIDindex].ToString().Replace("\"", "").Trim();
+                   // var PolicyNumber = dt.Rows[i][PolicyNumberindex].ToString().Replace("\"", "").Trim();
+                    //var TransactionType = dt.Rows[i][TransactionTypeIndex].ToString().Replace("\"", "").Trim();
+                    var PaymentReferenceId = dt.Rows[i][PaymentReferenceIdIndex].ToString().Replace("\"", "").Trim();
+                    var AmountPaid = dt.Rows[i][AmountPaidIndex].ToString().Replace("\"", "").Trim();
+                    var PaymentStatus = dt.Rows[i][PaymentStatusIndex].ToString().Replace("\"", "").Trim();
+                    var DateOfPayment = dt.Rows[i][DateOfPaymentIndex].ToString().Replace("\"", "").Trim();
+                    UpdateReportRefundDetails(errorInfoDetails, i, errorInfoDetailsInfo, txnID, PaymentReferenceId, AmountPaid, DateOfPayment, PaymentStatus, DatetimeNow);
+                }
+                if (errorInfoDetails.Count > 0)
+                {
+                    return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded with following Erros", Errors = Errors, ErrorDetails = errorInfoDetails };
+                }
+                else
+                {
+                    return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document Uploaded Successfully" };
+                }
+            }
+            catch (Exception ex)
+            {
+                logx++;
+                return new ReportFileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document uploaded with following Erros " + ex.ToString(), MessageKey = logx.ToString() };
+            }
+            finally
+            {
+                sr.Dispose();
+            }
+        }
+
+        private void UpdateReportRefundDetails(List<ShowReportErrorInfoDetails> errorInfoDetails, int i, ShowReportErrorInfoDetails errorInfoDetailsInfo,string TxnID, string PaymentReferenceId,
+                                                   string PaidAmount, string PaymentDate,string PaymentStatus, DateTime DatetimeNow)
+        {
+            TblPolicyException PolicyRefundDetails = null;
+            List<Dictionary<string, string>> dict1 = new List<Dictionary<string, string>>();
+            var errorflag = false;
+            string TxnNumber = "", paymentstatus = "";
+            DateTime dateofpayment;
+            if (string.IsNullOrEmpty(TxnID))
+            {
+                errorInfoDetailsInfo.TxnID = TxnID;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "TxnID");
+                dict.Add("Details", "TxnID can not be empty");
+                dict1.Add(dict);
+                errorflag = true;
+                TxnNumber = i.ToString();
+            }
+            else
+            {
+                errorInfoDetailsInfo.TxnID = TxnID;
+            
+
+            }
+           
+
+
+            if (string.IsNullOrEmpty(PaidAmount))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "Amount Paid");
+                dict.Add("Details", $"Amount Paid can not be empty for TxnID {TxnID}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.AmountPaid = Convert.ToDecimal(PaidAmount);
+            }
+
+            if (string.IsNullOrEmpty(PaymentReferenceId))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "PaymentReferenceId");
+                dict.Add("Details", $"PaymentReferenceId can not be null for TxnID {TxnID}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.PaymentReferenceId = PaymentReferenceId;
+            }
+            if (string.IsNullOrEmpty(PaymentDate))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "PaymentDate");
+                dict.Add("Details", $"PaymentDate can not be null for TxnID {TxnID}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.DateofPayment = EPPlusHelper.ValidateDate(PaymentDate);
+            }
+            if (string.IsNullOrEmpty(PaymentStatus))
+            {
+
+                errorflag = true;
+                var dict = new Dictionary<string, string>();
+                dict.Add("Header", "PaymentStatus");
+                dict.Add("Details", $"Payment status can not be null for TxnID {TxnID}");
+                dict1.Add(dict);
+            }
+            else
+            {
+                errorInfoDetailsInfo.PaymentStatus = PaymentStatus;
+                paymentstatus = PaymentStatus.Replace("\"", "");
+                var succ = "Success";
+                var fail = "Failure";
+                var value1 = string.Equals(paymentstatus, succ, StringComparison.CurrentCultureIgnoreCase);
+                var value2 = string.Equals(paymentstatus, fail, StringComparison.CurrentCultureIgnoreCase);
+                if (value1 == true)
+                {
+                    errorInfoDetailsInfo.PaymentStatus = paymentstatus;
+                }
+                else if (value2 == true)
+                {
+                    errorInfoDetailsInfo.PaymentStatus = paymentstatus;
+                }
+                else
+                {
+                    var dict = new Dictionary<string, string>();
+                    dict.Add("Header", "PaymentStatus");
+                    dict.Add("Details", $"Payment status can be only successful or failure can not be other for TxnID {TxnID}");
+                    dict1.Add(dict);
+                    errorInfoDetailsInfo.PaymentStatus = PaymentStatus;
+                    errorflag = true;
+                }
+            }
+          
+            if (errorflag == false)
+            {
+                PolicyRefundDetails = _context.TblPolicyException.FirstOrDefault(et => et.TxnId == errorInfoDetailsInfo.TxnID);
+                //PolicyRefundDetails = _context.TblPolicyRefund.FirstOrDefault(et => et.EndorsementNumber == errorInfoDetailsInfo.PolicyNumber);
+
+                //if (PolicyRefundDetails == null)
+                //{
+                //    var dict = new Dictionary<string, string>();
+                //    dict.Add("Header", "EndorsementNumber");
+                //    dict.Add("Details", $"EndorsementNumber  {endorsementNo} does not exist in database");
+                //    dict1.Add(dict);
+                //    errorflag = true;
+
+                //}
+                //else if (!string.IsNullOrEmpty(PolicyRefundDetails.PaymentGatewayReferenceId))
+                //{
+                //    var dict = new Dictionary<string, string>();
+                //    dict.Add("Header", "RecordsUpdated");
+                //    dict.Add("Details", $"For EndorsementNumber  {endorsementNo} record is already updated in the database.");
+                //    dict1.Add(dict);
+                //    errorflag = true;
+
+                //}
+                //else
+                //{
+                //    var endeffectivedate = PolicyRefundDetails.EndorsementEffectivedate;//22/03/2020
+
+                //    dateofpayment = (DateTime)EPPlusHelper.ValidateDate(dtOfPmt);
+
+                //    //if value greter then 0 means first date is greater then second one
+                //    //if value less then 0 it means first date is less then second date
+                //    int value1 = DateTime.Compare(dateofpayment, Convert.ToDateTime(endeffectivedate));
+
+                //    int value2 = DateTime.Compare(dateofpayment, DatetimeNow);
+
+                //    if (value1 < 0)
+                //    {
+                //        var dict = new Dictionary<string, string>();
+                //        dict.Add("Header", "EndorsementNumber");
+                //        dict.Add("Details", $"DateofPayment can not be less then endorsementeffectivedate for EndorsementNumber  {endorsementNo} ");
+                //        dict1.Add(dict);
+                //        errorflag = true;
+                //    }
+                //    else if (value2 > 0)
+                //    {
+                //        var dict = new Dictionary<string, string>();
+                //        dict.Add("Header", "EndorsementNumber");
+                //        dict.Add("Details", $"DateofPayment can not be the future date for EndorsementNumber  {endorsementNo} ");
+                //        dict1.Add(dict);
+                //        errorflag = true;
+                //    }
+                //    else
+                //    {
+                //        errorInfoDetailsInfo.DateofPayment = dateofpayment;
+                //    }
+                // }
+
+                if (errorflag == false)
+                {
+                    PolicyRefundDetails.TransactionDate = DatetimeNow;
+                    PolicyRefundDetails.PaymentReferenceId = errorInfoDetailsInfo.PaymentReferenceId;
+                    PolicyRefundDetails.PaymentStatus = errorInfoDetailsInfo.PaymentStatus;
+                    PolicyRefundDetails.PaidAmount = errorInfoDetailsInfo.AmountPaid;
+                    PolicyRefundDetails.PaymentDate = errorInfoDetailsInfo.DateofPayment;
+                    PolicyRefundDetails.ModifiedDate = DatetimeNow;
+                    _context.TblPolicyException.Update(PolicyRefundDetails);
+                    _context.SaveChanges();
+
+                }
+                else
+                {
+                    errorInfoDetailsInfo.ErrorDescription = dict1;
+                    errorInfoDetails.Add(errorInfoDetailsInfo);
+                }
+            }
+            else
+            {
+                errorInfoDetailsInfo.ErrorDescription = dict1;
+                errorInfoDetails.Add(errorInfoDetailsInfo);
+            }
+            errorflag = false;
+        }
+
 
 
     }

@@ -359,5 +359,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<ReportFileUploadResponse> RefundReportUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

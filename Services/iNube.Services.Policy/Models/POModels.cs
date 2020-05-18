@@ -19,6 +19,20 @@ namespace iNube.Services.Policy.Models
         public List<Dictionary<string, string>> ErrorDescription { get; set; }
 
     }
+    public class ShowReportErrorInfoDetails
+    {
+      
+        public int ErroRowNo { get; set; }
+        public string TxnID { get; set; }
+     
+        public string PaymentReferenceId { get; set; }
+        public string PaymentStatus { get; set; }
+        public decimal AmountPaid { get; set; }
+        public DateTime? DateofPayment { get; set; }
+       
+        public List<Dictionary<string, string>> ErrorDescription { get; set; }
+
+    }
     public partial class ddDTOs
     {
         public int mID { get; set; }
@@ -1587,6 +1601,14 @@ namespace iNube.Services.Policy.Models
             ErrorDetails = new HashSet<ShowErrorInfoDetails>();
         }
         public virtual ICollection<ShowErrorInfoDetails> ErrorDetails { get; set; }
+    }
+    public class ReportFileUploadResponse : ResponseStatus
+    {
+        public ReportFileUploadResponse()
+        {
+            ErrorDetails = new HashSet<ShowReportErrorInfoDetails>();
+        }
+        public virtual ICollection<ShowReportErrorInfoDetails> ErrorDetails { get; set; }
     }
 
     public partial class CustomerSettingsDTO

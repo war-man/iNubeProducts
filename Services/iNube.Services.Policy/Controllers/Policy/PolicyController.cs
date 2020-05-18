@@ -629,6 +629,13 @@ namespace iNube.Services.Policy.Controllers.Policy
             return Ok(response);
         }
        
+        [HttpPost]
+        public async Task<IActionResult> RefundReportUpload(CancellationToken cancellationToken)
+        {
+            var response = await _policyService.RefundReportUpload(Request, cancellationToken, Context);
+            return Ok(response);
+        }
+       
 
         [HttpPost]
         public async Task<IActionResult> GetCDMapperDetails(EndorsementSearch endorsementSearch)

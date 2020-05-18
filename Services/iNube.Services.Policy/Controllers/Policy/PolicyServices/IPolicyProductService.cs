@@ -71,6 +71,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<List<object>> SearchPolicyDetailsByNumber(string PolicyNumber, ApiContext apiContext);
         Task<List<object>> SearchProposalDetailsByNumber(string ProposalNumber, ApiContext apiContext);
         Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<ReportFileUploadResponse> RefundReportUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext);
         Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext);
         Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext);

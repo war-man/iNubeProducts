@@ -82,6 +82,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<PolicyResponse> GeneratePolicy(dynamic policyDTO, ApiContext apiContext);
 
         Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<ReportFileUploadResponse> RefundReportUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext);
         Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext);
         Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext);
@@ -770,6 +771,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<FileUploadResponse> RefundUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             return await _policyProductService(apiContext.ProductType).RefundUpload(httpRequest, cancellationToken, apiContext);
+        }
+        public async Task<ReportFileUploadResponse> RefundReportUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).RefundReportUpload(httpRequest, cancellationToken, apiContext);
         }
 
         public async Task<List<EndorsementResponse>> GetEndoresementDetails(EndorsementSearch endorsementSearch, ApiContext apiContext)
