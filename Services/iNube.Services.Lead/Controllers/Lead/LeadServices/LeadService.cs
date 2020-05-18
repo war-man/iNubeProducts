@@ -607,7 +607,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
                                      QuotNumber = tblMapper.QuoteNo,
                                      ContactNumner = suspect.MobileNo,
                                      MovedTo = "",
-                                     QuotationId = tblMapperDetails.MemberId
+                                     QuotationId = tblMapper.LifeQqid
                                      //CityName = suspectdata.Address.city.ToString(),
 
                                  }).FirstOrDefault();
