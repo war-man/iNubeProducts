@@ -928,6 +928,63 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             tblSwitchlog.CreatedDate = IndianTime;
                             tblSwitchlog.SwitchType = "Manual";
                             _context.TblSwitchLog.Add(tblSwitchlog);
+
+                            if (ScheduleData.VehicleType == "PC")
+                            {
+                                var DailyData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == PolicyNo && x.TxnDate.Value.Date == IndianTime.Date);
+
+                                if (DailyData != null)
+                                {
+                                    DailyData.ActivePc = DailyData.ActivePc + 1;
+                                    _context.TblDailyActiveVehicles.Update(DailyData);
+                                }
+                                else
+                                {
+                                    TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+
+                                    tblDailyActive.PolicyNumber = PolicyNo;
+                                    tblDailyActive.ActivePc = 1;
+                                    tblDailyActive.ActiveTw = 0;
+                                    tblDailyActive.TotalPremium = 0;
+                                    tblDailyActive.TxnDate = IndianTime;
+                                    tblDailyActive.FromTax = 0;
+                                    tblDailyActive.ToTax = 0;
+                                    tblDailyActive.BasePremium = 0;
+
+                                    _context.TblDailyActiveVehicles.Add(tblDailyActive);
+                                }
+
+                            }
+                            else if (ScheduleData.VehicleType == "TW")
+                            {
+                                var DailyData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == PolicyNo && x.TxnDate.Value.Date == IndianTime.Date);
+
+                                if (DailyData != null)
+                                {
+                                    DailyData.ActiveTw = DailyData.ActiveTw + 1;
+                                    _context.TblDailyActiveVehicles.Update(DailyData);
+                                }
+                                else
+                                {
+                                    TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+
+                                    tblDailyActive.PolicyNumber = PolicyNo;
+                                    tblDailyActive.ActivePc = 0;
+                                    tblDailyActive.ActiveTw = 1;
+                                    tblDailyActive.TotalPremium = 0;
+                                    tblDailyActive.TxnDate = IndianTime;
+                                    tblDailyActive.FromTax = 0;
+                                    tblDailyActive.ToTax = 0;
+                                    tblDailyActive.BasePremium = 0;
+
+                                    _context.TblDailyActiveVehicles.Add(tblDailyActive);
+
+                                }
+
+                            }
+
+
+
                             _context.SaveChanges();
                         }
                         else if (checkLog.SwitchStatus == true)
@@ -955,37 +1012,37 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         switch (CurrentDay)
                         {
                             case "Monday":
-                                CurrentDayStat = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo).Mon;
+                                CurrentDayStat = ScheduleData.Mon;
                                 break;
 
                             case "Tuesday":
-                                CurrentDayStat = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo).Tue;
+                                CurrentDayStat = ScheduleData.Tue;
                                 break;
 
 
                             case "Wednesday":
-                                CurrentDayStat = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo).Wed;
+                                CurrentDayStat = ScheduleData.Wed;
                                 break;
 
 
                             case "Thursday":
-                                CurrentDayStat = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo).Thu;
+                                CurrentDayStat = ScheduleData.Thu;
                                 break;
 
 
                             case "Friday":
-                                CurrentDayStat = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo).Fri;
+                                CurrentDayStat = ScheduleData.Fri;
                                 break;
 
 
                             case "Saturday":
-                                CurrentDayStat = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo).Sat;
+                                CurrentDayStat = ScheduleData.Sat;
                                 break;
 
 
 
                             case "Sunday":
-                                CurrentDayStat = _context.TblSchedule.FirstOrDefault(x => x.PolicyNo == PolicyNo && x.VehicleRegistrationNo == VehicleRegistrationNo).Sun;
+                                CurrentDayStat = ScheduleData.Sun;
                                 break;
 
 
@@ -1003,6 +1060,61 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             tblSwitchlog.SwitchType = "Manual";
 
                             _context.TblSwitchLog.Add(tblSwitchlog);
+
+                            if (ScheduleData.VehicleType == "PC")
+                            {
+                                var DailyData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == PolicyNo && x.TxnDate.Value.Date == IndianTime.Date);
+
+                                if (DailyData != null)
+                                {
+                                    DailyData.ActivePc = DailyData.ActivePc + 1;
+                                    _context.TblDailyActiveVehicles.Update(DailyData);
+                                }
+                                else
+                                {
+                                    TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+
+                                    tblDailyActive.PolicyNumber = PolicyNo;
+                                    tblDailyActive.ActivePc = 1;
+                                    tblDailyActive.ActiveTw = 0;
+                                    tblDailyActive.TotalPremium = 0;
+                                    tblDailyActive.TxnDate = IndianTime;
+                                    tblDailyActive.FromTax = 0;
+                                    tblDailyActive.ToTax = 0;
+                                    tblDailyActive.BasePremium = 0;
+
+                                    _context.TblDailyActiveVehicles.Add(tblDailyActive);
+                                }
+
+                            }
+                            else if (ScheduleData.VehicleType == "TW")
+                            {
+                                var DailyData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.PolicyNumber == PolicyNo && x.TxnDate.Value.Date == IndianTime.Date);
+
+                                if (DailyData != null)
+                                {
+                                    DailyData.ActiveTw = DailyData.ActiveTw + 1;
+                                    _context.TblDailyActiveVehicles.Update(DailyData);
+                                }
+                                else
+                                {
+                                    TblDailyActiveVehicles tblDailyActive = new TblDailyActiveVehicles();
+
+                                    tblDailyActive.PolicyNumber = PolicyNo;
+                                    tblDailyActive.ActivePc = 0;
+                                    tblDailyActive.ActiveTw = 1;
+                                    tblDailyActive.TotalPremium = 0;
+                                    tblDailyActive.TxnDate = IndianTime;
+                                    tblDailyActive.FromTax = 0;
+                                    tblDailyActive.ToTax = 0;
+                                    tblDailyActive.BasePremium = 0;
+
+                                    _context.TblDailyActiveVehicles.Add(tblDailyActive);
+
+                                }
+
+                            }
+
                             _context.SaveChanges();
                         }
                         else
