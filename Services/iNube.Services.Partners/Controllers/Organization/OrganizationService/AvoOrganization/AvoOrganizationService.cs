@@ -458,32 +458,40 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             try
             {
-
-                var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
-                var officeReportingId = data.OfficeReportingOfficeId;
-
-                var officelevelid = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == officeReportingId).OfficeLevelId;
-                if (officelevelid == 0)
+                if (aVOOrgOffice.OrgOfficeId == 0)
                 {
-                    data.OfficeLevelId = 1;
+                    var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
+                    var officeReportingId = data.OfficeReportingOfficeId;
+
+                    var officelevelid = _context.TblOrgOffice.FirstOrDefault(a => a.OrgOfficeId == officeReportingId).OfficeLevelId;
+                    if (officelevelid == 0)
+                    {
+                        data.OfficeLevelId = 1;
+
+                    }
+                    else
+                    {
+
+                        data.OfficeLevelId = officelevelid + 1;
+                    }
+
+                    _context.TblOrgOffice.Add(data);
+                    _context.SaveChanges();
+                    return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Office created sucessfully " };
 
                 }
                 else
                 {
-
-                    data.OfficeLevelId = officelevelid + 1;
+                    var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
+                    _context.Update(data);
+                    _context.SaveChanges();
+                    return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Office modify sucessfully " };
                 }
-
-                _context.TblOrgOffice.Add(data);
-                _context.SaveChanges();
-                return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Office Created sucessfully " };
             }
             catch (Exception ex)
             {
-
                 return new CreateOfficeResponse { Status = BusinessStatus.Error, ResponseMessage = $" Something went Wrong" };
             }
-
         }
 
         public async Task<IEnumerable<ddDTO>> GetNewBranchDropdown(int posid, ApiContext apiContext)
@@ -935,7 +943,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                       join mov in _context.TblMovements on emp.OrgEmpId equals mov.OrgEmpId
                       join pos in _context.TblOrgPositions on emp.PositionId equals pos.PositionId
                       where mov.MovementStatusId == movementDTO.movementStatusId
-                      
+
                       select new AvoOrgEmployeeSearch
                       {
                           OrgEmpId = emp.OrgEmpId,
@@ -943,7 +951,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           StaffName = emp.StaffName,
                           PositionId = emp.PositionId,
                           Position = pos.PositionName,
-                          BranchName=emp.BranchName,
+                          BranchName = emp.BranchName,
                           Email = emp.Email,
                           PhoneNumber = emp.PhoneNumber,
                           StaffTypeId = emp.StaffTypeId,
@@ -1409,7 +1417,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                      Designationid = Convert.ToInt32(b.Designationid),
                      Children = GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
                  }).ToList();
-                  return empHierData;
+                return empHierData;
             }
             else
             {
@@ -1668,7 +1676,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             {
                 var desg = _context.TblOrgStructure.FirstOrDefault(x => x.OrganizationId == orgid && x.OrgStructureId == des.DesignationId);
                 List<decimal> PositionIds = new List<decimal>();
-               // PositionIds.Add(desg.OrgStructureId);
+                // PositionIds.Add(desg.OrgStructureId);
                 PositionIds.Add((decimal)desg.ParentId);
                 Data = (from objposition in _context.TblOrgStructure.Where(x => x.OrganizationId == orgid && PositionIds.Contains(Convert.ToDecimal(x.OrgStructureId)))
                         select new MasterDto
