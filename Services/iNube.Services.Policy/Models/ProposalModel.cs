@@ -926,6 +926,7 @@ namespace iNube.Services.Policy.Models
             public string ContactNumner { get; set; }
             public string CityName { get; set; }
             public string MovedTo { get; set; }
+            public int ProposalId { get; set; }
         }
 
         public partial class policyDto
@@ -937,6 +938,7 @@ namespace iNube.Services.Policy.Models
             public string ContactNumner { get; set; }
             public string CityName { get; set; }
             public string MovedTo { get; set; }
+            public int PolicyId { get; set; }
         }
         
 

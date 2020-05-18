@@ -982,7 +982,9 @@ namespace iNube.Services.Lead.Models
         public string ContactNumner { get; set; }
         public string CityName { get; set; }
         public string MovedTo { get; set; }
+        public int ProposalId { get; set; }
     }
+
     public partial class policyDto
     {
         public string PolicyNumber { get; set; }
@@ -992,6 +994,7 @@ namespace iNube.Services.Lead.Models
         public string ContactNumner { get; set; }
         public string CityName { get; set; }
         public string MovedTo { get; set; }
+        public int PolicyId { get; set; }
     }
     //needAnalysis
     public class EmpHierarchy

@@ -219,6 +219,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                                     ProposalNumber = tblMapper.ProposalNo,
                                     ContactNumner = tblMapperDetails.Mobile,
                                     MovedTo = "",
+                                    ProposalId= Convert.ToInt32(tblMapper.PolicyId),
                                     // CityName = tblMapperDetails,
 
                                 }).ToList();
@@ -245,6 +246,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                                   PolicyStatus = Convert.ToInt32(tblMapper.PolicyStatusId),
                                   PremiumAmount = tblMapperDetails.BasicPremium,
                                   Mode = tblMapper.PaymentMethod,
+                                  PolicyId= Convert.ToInt32(tblMapper.PolicyId)
 
                                   // CityName = tblMapperDetails,
 
