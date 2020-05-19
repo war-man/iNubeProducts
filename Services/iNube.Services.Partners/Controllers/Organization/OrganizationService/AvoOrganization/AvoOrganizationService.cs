@@ -1388,6 +1388,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             {
                 return await GetPeopleHierachyAsync(OrgId, type, keyValue, apiContext);
             }
+            else if (type == "Office")
+            {
+                return await GetOfficeHierachyAsync(OrgId, type, keyValue, apiContext);
+            }
             return Data;
         }
         private async Task<List<FetchData>> GetPeopleHierachyAsync(int OrgId, string type, string keyValue, ApiContext apiContext)
@@ -1720,6 +1724,77 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             }
             return Data;
+        }
+
+        private async Task<List<FetchData>> GetOfficeHierachyAsync(int OrgId, string type, string keyValue, ApiContext apiContext)
+        {
+            List<FetchData> Data = null;
+            if(OrgId <=0)
+            {
+                OrgId =(int) apiContext.OrgId;
+            }
+            var dtEmp = await GetOfficeHierarchy(OrgId, type, keyValue, apiContext);
+            if (dtEmp == null)
+            {
+                return Data;
+            }
+                Data = (from DataRow dr in dtEmp.Rows
+                        select new FetchData()
+                        {
+                            Positionid = Convert.ToInt32(dr["OrgOfficeId"]),
+                            StaffName = dr["OfficeName"].ToString(),
+                            ParentId = Convert.ToInt32(dr["OfficeReportingOfficeId"]),
+                            PostionName = dr["CityName"].ToString(),
+                            LevelId = Convert.ToInt32(dr["OfficeLevelId"])
+                        }).ToList();
+            
+            var offHierData = Data.Where(a => a.LevelId == Convert.ToInt32(dtEmp.Rows[0]["OfficeLevelId"])).
+             Select(b => new FetchData
+             {
+                 PostionName = b.PostionName,
+                 Positionid = Convert.ToInt32(b.Positionid),
+                 ParentId = Convert.ToInt32(b.ParentId),
+                 StaffName = b.StaffName,
+                 LevelId = b.LevelId,
+                 Designationid = Convert.ToInt32(b.Designationid),
+                 Children = GetChildData(Data, Convert.ToInt32(b.Positionid), apiContext)
+             }).ToList();
+            return offHierData;
+        }
+        public async Task<DataTable> GetOfficeHierarchy(int OrgId, string type, string keyValue, ApiContext apiContext)
+        {
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+            EmpHierarchy emp = new EmpHierarchy();
+            // Get Emp Pos
+            TblOrgOffice offdetail = null;
+            if (OrgId > 0 && string.IsNullOrEmpty(keyValue))
+            {
+                offdetail = _context.TblOrgOffice.FirstOrDefault(e => e.OrganizationId == OrgId);
+            }
+            else
+            {
+                offdetail = _context.TblOrgOffice.FirstOrDefault(e => e.OfficeCode == keyValue && e.OrganizationId == OrgId);
+            }
+            string connectionString = _context.Database.GetDbConnection().ConnectionString;
+            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            string dbConnectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
+            DataTable dt = new DataTable();
+            //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+            using (SqlConnection connection = new SqlConnection(dbConnectionString))
+            {
+                string queryForCol = $"WITH cte_Hierarchy (OrgOfficeId,OfficeName,OfficeCode,OfficeLevelId,OfficeReportingOfficeId,CityName) AS  ( select OrgOfficeId,OfficeName,OfficeCode,OfficeLevelId,ISNULL(OfficeReportingOfficeId,0),ct.CityName from [PR].[tblOrgOffice] off1 inner join [PR].[tblMasCity] ct on off1.OfficeCityId=ct.CityId where orgOfficeId= {offdetail.OrgOfficeId} union all select t1.OrgOfficeId,t1.OfficeName,t1.OfficeCode,t1.OfficeLevelId,ISNULL(t1.OfficeReportingOfficeId,0),ct1.CityName from [PR].[tblOrgOffice] t1 inner join [PR].[tblMasCity] ct1 on t1.OfficeCityId=ct1.CityId inner join cte_Hierarchy t2 on t1.OfficeReportingOfficeId = t2.OrgOfficeId ) select * from cte_Hierarchy ";
+                    connection.Open();
+                using (SqlCommand command = new SqlCommand(queryForCol, connection))
+                {
+                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
+                    sqlDataAdapter.Fill(dt);
+                }
+                connection.Close();
+            }
+            return dt;
         }
     }
 }
