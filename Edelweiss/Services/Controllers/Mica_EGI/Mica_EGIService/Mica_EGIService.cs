@@ -4072,15 +4072,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //PolicyBazaar Related Validation            
                 case "PolicyCreation":
-                  return  GenericMapper(SourceObject);
+                  return  GenericMapper(SourceObject);            
+
+               // case "EndorsementAdd":
+             
+            //    case "EndorsementDel":
 
 
-                //    return RuleEngine;
-
-                //case "EndorementDel":
+                //   return CdModel;
 
 
-                //    return CdModel;
 
                 //case "SwitchOnOff":
 
@@ -4593,7 +4594,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         if (PolicyStartDate.Date > CurrentDate.Date)
                         {
-                            RemainingDays = (PolicyEndDate.Date - PolicyStartDate.Date).TotalDays;
+                            RemainingDays = (PolicyEndDate.Date - PolicyStartDate.Date).TotalDays + 1; 
                         }
                         else
                         {
@@ -5024,7 +5025,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     if (PolicyStartDate.Date > CurrentDate.Date)
                     {
-                        RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+                        RemainingDays = (PolicyEndDate.Date - PolicyStartDate.Date).TotalDays + 1;
                     }
                     else
                     {
@@ -5216,7 +5217,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 if (GlobalVariables.PolicyStartDate.Date > policyRequest.EffectiveDate.Value.Date)
                 {
-                    policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - GlobalVariables.PolicyStartDate.Date).TotalDays;
+                    policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - GlobalVariables.PolicyStartDate.Date).TotalDays + 1;
                 }
                 else
                 {
