@@ -117,10 +117,13 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             {
                 var _organization = _mapper.Map<TblOrganization>(orgDTO);
 
+                Random random = new Random();
+                int rdm = random.Next(101, 999);
+
                 var orgoffspoc = orgDTO.AVOOrgSpocDetails.FirstOrDefault();
                 TblOrgOffice orgOffice = new TblOrgOffice();
                 orgOffice.OfficeName = orgDTO.OrgName;
-                orgOffice.OfficeCode = orgDTO.OrganizationCode;
+                orgOffice.OfficeCode = orgDTO.OrgName + rdm;
                 orgOffice.OfficePhoneNo = orgDTO.OrgPhoneNo;
                 orgOffice.OfficeFaxNo = orgDTO.OrgFaxNo;
                 orgOffice.OfficeLevelId = 0;
@@ -155,6 +158,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
                 _organization.TblOrgOffice.Add(orgOffice);
 
+                _organization.CreatedBy = apiContext.UserId;
+                _organization.CreatedDate = DateTime.Now;
                 var structuretype = _context.TblmasPrcommonTypes.Where(a => a.MasterType == "StructureType").Select(b => b);
 
                 var orgstucture = orgDTO.OrgStructure;
@@ -230,6 +235,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 return null;
             }
         }
+
         //public async Task<AVOOrganizationDTO> GetOrganization(int orgId, ApiContext apiContext)
         //{
 
@@ -243,7 +249,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         //    _organizationDTO = _mapper.Map<AVOOrganizationDTO>(_tblOrg);
         //    return _organizationDTO;
         //}
-
 
         public async Task<IEnumerable<AVOOrganizationDTO>> SearchOrganizationById(int orgId, ApiContext apiContext)
         {
@@ -409,7 +414,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return ddDTOs;
         }
 
-
         public async Task<IEnumerable<AvoOrgEmployeeSearch>> GetEmployeeDetails(AvoOrgEmployeeSearch empdata, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -474,6 +478,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
                         data.OfficeLevelId = officelevelid + 1;
                     }
+                    data.CreatedBy = apiContext.UserId;
+                    data.CreatedDate = DateTime.Now;
 
                     _context.TblOrgOffice.Add(data);
                     _context.SaveChanges();
@@ -483,6 +489,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 else
                 {
                     var data = _mapper.Map<TblOrgOffice>(aVOOrgOffice);
+                    data.ModifiedBy = apiContext.UserId;
+                    data.ModifiedDate = DateTime.Now;
                     _context.Update(data);
                     _context.SaveChanges();
                     return new CreateOfficeResponse { Status = BusinessStatus.Created, ResponseMessage = $" Office modify sucessfully " };
@@ -523,6 +531,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             return Emp.Distinct();
         }
+
         public async Task<List<MasterDto>> GetDesignation(int orgid, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -537,6 +546,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
 
         }
+
         public async Task<List<MasterDto>> GetEmployee(int orgid, int offid, int desgiId, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -604,7 +614,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return contractdata;
         }
 
-
         public async Task<Createposition> CreatePosition(NewPositionDTO Officedto, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -649,8 +658,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             }
         }
 
-
-
         public async Task<IEnumerable<AVOOrgEmployee>> SearchPeople(SearchPeople searchPeople, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -690,8 +697,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             return _SearchData;
         }
 
-
-
         public async Task<List<vacantPositiondto>> GetVecPositions(decimal orgid, ApiContext apiContext)
         {
             //get context
@@ -723,9 +728,6 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             var supervisorname = _context.TblOrgEmployee.FirstOrDefault(a => a.PositionId == positions.ParentId).StaffName;
             return supervisorname;
         }
-
-
-
 
         public async Task<CreatePeopleResponse> SaveEmplMappingDetails(updatepositionDto avOOrgEmployee, ApiContext apiContext)
         {
@@ -790,7 +792,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             //var SearchData = _context.TblOrgEmployee.Select(a => a)
             //     .Include(add => add.TblOrgEmpAddress).ToList();
             var SearchData = _context.TblOrgEmployee.Select(a => a)
-     .Include(add => add.TblOrgEmpAddress).Include(add => add.TblOrgEmpEducation).ToList();
+                            .Include(add => add.TblOrgEmpAddress)
+                            .Include(add => add.TblOrgEmpEducation).ToList();
 
 
             if (!string.IsNullOrEmpty(empcode))
@@ -799,6 +802,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             }
 
             var _SearchData = _mapper.Map<List<AVOOrgEmployee>>(SearchData);
+            var office = _context.TblOrgOffice.Select(a => a);
+            foreach (var item in _SearchData)
+            {
+                var position = _context.TblOrgPositions.FirstOrDefault(a => a.PositionId == item.PositionId).OfficeId;
+                item.OfficeName = office.FirstOrDefault(a => a.OrgOfficeId == position).OfficeName;
+                item.BranchCode = office.FirstOrDefault(a => a.OrgOfficeId == position).OfficeCode;
+            }
+
             var objdata = _SearchData[0];
             return objdata;
         }
@@ -1353,6 +1364,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             return val;
         }
+
         public async Task<List<MovementDetails>> GetMovementDetails(MovementDetails movement, ApiContext apiContext)
         {
             if (_context == null)
@@ -1378,10 +1390,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
         }
 
-
-
         // || AVO
-
         public async Task<List<FetchData>> GetHierarchy(int OrgId, string type, string keyValue, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1396,6 +1405,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             }
             return Data;
         }
+
         private async Task<List<FetchData>> GetPeopleHierachyAsync(int OrgId, string type, string keyValue, ApiContext apiContext)
         {
             List<FetchData> Data = null;
@@ -1463,6 +1473,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             //hierData[0].Count = Data.Count();
             return hierData;
         }
+
         public void GetChildCount(FetchData fetchDatas, ref int count)
         {
             foreach (var item in fetchDatas.Children)
@@ -1472,6 +1483,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             count += fetchDatas.Children.Count;
             fetchDatas.TotalCount = count;
         }
+
         public List<FetchData> GetChildData(List<FetchData> fetchDatas, int? positionid, ApiContext apiContext)
         {
             List<FetchData> data1 = fetchDatas.Where(b => b.ParentId == positionid).
@@ -1731,25 +1743,25 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         private async Task<List<FetchData>> GetOfficeHierachyAsync(int OrgId, string type, string keyValue, ApiContext apiContext)
         {
             List<FetchData> Data = null;
-            if(OrgId <=0)
+            if (OrgId <= 0)
             {
-                OrgId =(int) apiContext.OrgId;
+                OrgId = (int)apiContext.OrgId;
             }
             var dtEmp = await GetOfficeHierarchy(OrgId, type, keyValue, apiContext);
             if (dtEmp == null)
             {
                 return Data;
             }
-                Data = (from DataRow dr in dtEmp.Rows
-                        select new FetchData()
-                        {
-                            Positionid = Convert.ToInt32(dr["OrgOfficeId"]),
-                            StaffName = dr["OfficeName"].ToString(),
-                            ParentId = Convert.ToInt32(dr["OfficeReportingOfficeId"]),
-                            PostionName = dr["CityName"].ToString(),
-                            LevelId = Convert.ToInt32(dr["OfficeLevelId"])
-                        }).ToList();
-            
+            Data = (from DataRow dr in dtEmp.Rows
+                    select new FetchData()
+                    {
+                        Positionid = Convert.ToInt32(dr["OrgOfficeId"]),
+                        StaffName = dr["OfficeName"].ToString(),
+                        ParentId = Convert.ToInt32(dr["OfficeReportingOfficeId"]),
+                        PostionName = dr["CityName"].ToString(),
+                        LevelId = Convert.ToInt32(dr["OfficeLevelId"])
+                    }).ToList();
+
             var offHierData = Data.Where(a => a.LevelId == Convert.ToInt32(dtEmp.Rows[0]["OfficeLevelId"])).
              Select(b => new FetchData
              {
@@ -1763,6 +1775,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
              }).ToList();
             return offHierData;
         }
+
         public async Task<DataTable> GetOfficeHierarchy(int OrgId, string type, string keyValue, ApiContext apiContext)
         {
             if (_context == null)
@@ -1788,7 +1801,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             using (SqlConnection connection = new SqlConnection(dbConnectionString))
             {
                 string queryForCol = $"WITH cte_Hierarchy (OrgOfficeId,OfficeName,OfficeCode,OfficeLevelId,OfficeReportingOfficeId,CityName) AS  ( select OrgOfficeId,OfficeName,OfficeCode,OfficeLevelId,ISNULL(OfficeReportingOfficeId,0),ct.CityName from [PR].[tblOrgOffice] off1 inner join [PR].[tblMasCity] ct on off1.OfficeCityId=ct.CityId where orgOfficeId= {offdetail.OrgOfficeId} union all select t1.OrgOfficeId,t1.OfficeName,t1.OfficeCode,t1.OfficeLevelId,ISNULL(t1.OfficeReportingOfficeId,0),ct1.CityName from [PR].[tblOrgOffice] t1 inner join [PR].[tblMasCity] ct1 on t1.OfficeCityId=ct1.CityId inner join cte_Hierarchy t2 on t1.OfficeReportingOfficeId = t2.OrgOfficeId ) select * from cte_Hierarchy ";
-                    connection.Open();
+                connection.Open();
                 using (SqlCommand command = new SqlCommand(queryForCol, connection))
                 {
                     SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);

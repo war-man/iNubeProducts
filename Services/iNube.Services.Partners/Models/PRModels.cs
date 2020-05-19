@@ -1683,7 +1683,7 @@ namespace iNube.Services.Partners.Models
 
     }
 
-    public class AVOOrgEmployee:ResponseStatus
+    public class AVOOrgEmployee : ResponseStatus
     {
         public AVOOrgEmployee()
         {
@@ -1724,6 +1724,8 @@ namespace iNube.Services.Partners.Models
         public string Designation { get; set; }
         public decimal? ReportingTo { get; set; }
         public string Supervisorname { get; set; }
+        public string Officename { get; set; }
+        public string BranchCode { get; set; }
 
         public virtual ICollection<AVOOrgEmpAddress> AVOOrgEmpAddress { get; set; }
         public virtual ICollection<AVOOrgEmpEducation> AVOOrgEmpEducation { get; set; }
