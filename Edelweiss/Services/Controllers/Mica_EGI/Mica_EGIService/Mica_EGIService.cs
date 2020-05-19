@@ -6832,7 +6832,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Uid Missing";
+                        errorInfo.ErrorMessage = "Payment Reference ID Missing";
                         errorInfo.ErrorCode = "MSI002";
                         errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
@@ -6845,7 +6845,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Amount Missing";
+                        errorInfo.ErrorMessage = "Paid Amount Missing";
                         errorInfo.ErrorCode = "MSI003";
                         errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
@@ -6856,7 +6856,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Status Missing";
+                        errorInfo.ErrorMessage = "Payment Status Missing";
                         errorInfo.ErrorCode = "MSI004";
                         errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
@@ -6867,7 +6867,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Status is Not Sucessful";
+                        errorInfo.ErrorMessage = "Payment Status is Not Sucessful";
                         errorInfo.ErrorCode = "MSI005";
                         errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
@@ -6919,7 +6919,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                 ErrorInfo errorInfo = new ErrorInfo();
 
-                                errorInfo.ErrorMessage = "Pay Amount is Less Than the Billed Amount";
+                                errorInfo.ErrorMessage = "Paid Amount is Less Than the Billed Amount";
                                 errorInfo.ErrorCode = "MSI009";
                                 errorInfo.PropertyName = PropertyName;
                                 uploadDTO.Errors.Add(errorInfo);
