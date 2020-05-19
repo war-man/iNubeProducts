@@ -787,8 +787,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
+            //var SearchData = _context.TblOrgEmployee.Select(a => a)
+            //     .Include(add => add.TblOrgEmpAddress).ToList();
             var SearchData = _context.TblOrgEmployee.Select(a => a)
-                 .Include(add => add.TblOrgEmpAddress).ToList();
+     .Include(add => add.TblOrgEmpAddress).Include(add => add.TblOrgEmpEducation).ToList();
 
 
             if (!string.IsNullOrEmpty(empcode))
