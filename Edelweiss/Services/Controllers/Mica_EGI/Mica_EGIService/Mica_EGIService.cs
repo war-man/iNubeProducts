@@ -6775,7 +6775,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 logx++;
 
                 //finding index of every column
-                var TxnidIndex = FindIndex(strFilePath, "mICA Txn ID");
+                var TxnidIndex = FindIndex(strFilePath, "mica Txn ID");
                 var payUidindex = FindIndex(strFilePath, "payment Reference ID");
                 var payAmountIndex = FindIndex(strFilePath, "paid Amount");
                 var payStatusIndex = FindIndex(strFilePath, "payment Status");
