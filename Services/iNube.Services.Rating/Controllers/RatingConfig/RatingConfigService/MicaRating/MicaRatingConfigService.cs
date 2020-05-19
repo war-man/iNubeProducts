@@ -21,6 +21,7 @@ using System.Dynamic;
 using Microsoft.Extensions.Configuration;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using System.Reflection;
+using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.IntegrationServices;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.MicaRating
 {
@@ -395,8 +396,12 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                        }).ToList().FirstOrDefault();
 
                     var RatingRuleId = (int)single_Rule.rule_id;
-                    string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                    //string connectionString = _configuration.GetConnectionString("DefaultConnection");
                     //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+
+                    DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+                    string connectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
+
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
                         string queryForCol = "select Rate from [RT].[tblRating] where RatingID =" + RatingRuleId;
