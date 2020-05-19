@@ -4303,10 +4303,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         BillingFrequency = PolicyData["billingFrequency"];
                         PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
                         PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
-
-                        //Adding 1 because it should give in between days.
-                        RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays + 1;
-
+                        
+                        if (PolicyStartDate.Date > CurrentDate.Date)
+                        {
+                            //Adding 1 because it should give in between days.
+                            RemainingDays = (PolicyEndDate.Date - PolicyStartDate.Date).TotalDays + 1;
+                        }
+                        else
+                        {
+                            //Adding 1 because it should give in between days.
+                            RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays + 1;
+                        }
                     }
                     catch (Exception Ex)
                     {
@@ -4583,7 +4590,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         BillingFrequency = PolicyData["billingFrequency"];
                         PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
                         PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
-                        RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+
+                        if (PolicyStartDate.Date > CurrentDate.Date)
+                        {
+                            RemainingDays = (PolicyEndDate.Date - PolicyStartDate.Date).TotalDays;
+                        }
+                        else
+                        {
+                            RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+                        }                      
 
                     }
                     catch (Exception Ex)
@@ -5007,8 +5022,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
                     PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
 
-                    //Adding 1 because it should give in between days.
-                    RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+                    if (PolicyStartDate.Date > CurrentDate.Date)
+                    {
+                        RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+                    }
+                    else
+                    {
+                        RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+                    }                  
 
                 }
                 catch (Exception Ex)
