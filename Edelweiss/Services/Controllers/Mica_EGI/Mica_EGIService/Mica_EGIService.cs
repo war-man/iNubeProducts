@@ -5214,7 +5214,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             else
             {
-                policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
+                if (GlobalVariables.PolicyStartDate.Date > policyRequest.EffectiveDate.Value.Date)
+                {
+                    policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - GlobalVariables.PolicyStartDate.Date).TotalDays;
+                }
+                else
+                {
+                    policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
+                }
+
+
             }
             policyCancelResponse.TotalPremium = policyCancelResponse.FTPremium + policyCancelResponse.ADPremium;
 
