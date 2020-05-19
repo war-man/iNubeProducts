@@ -2771,6 +2771,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 dynamic PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
 
+                //This is to Created Date if Policy Start Date is Future Data
+                var TblPolicyData = await _integrationService.GetPolicyByNumber(PolicyNo, context);
+
+
                 if (PolicyData != null)
                 {
                     try
@@ -2779,8 +2783,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         accountRequest.accountnumber = PolicyData["CDAccountNumber"].ToString();
                         PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
 
-
-                        if(PolicyStartDate.Month == Month && PolicyStartDate.Year == Year)
+                        if(PolicyStartDate.Date > TblPolicyData.CreatedDate.Date)
+                        {
+                            accountRequest.FromDate = TblPolicyData.CreatedDate.Date;
+                            accountRequest.ToDate = CurrentDate;
+                        }
+                        else if(PolicyStartDate.Month == Month && PolicyStartDate.Year == Year)
                         {
                             accountRequest.FromDate = PolicyStartDate.Date;
                             accountRequest.ToDate = CurrentDate;
