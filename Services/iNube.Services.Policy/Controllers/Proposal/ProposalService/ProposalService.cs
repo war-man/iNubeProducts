@@ -219,7 +219,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                                     ProposalNumber = tblMapper.ProposalNo,
                                     ContactNumner = tblMapperDetails.Mobile,
                                     MovedTo = "",
-                                    ProposalId= Convert.ToInt32(tblMapper.PolicyId),
+                                    ProposalId = Convert.ToInt32(tblMapper.PolicyId),
                                     // CityName = tblMapperDetails,
 
                                 }).ToList();
@@ -246,7 +246,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
                                   PolicyStatus = Convert.ToInt32(tblMapper.PolicyStatusId),
                                   PremiumAmount = tblMapperDetails.BasicPremium,
                                   Mode = tblMapper.PaymentMethod,
-                                  PolicyId= Convert.ToInt32(tblMapper.PolicyId)
+                                  PolicyId = Convert.ToInt32(tblMapper.PolicyId)
 
                                   // CityName = tblMapperDetails,
 
@@ -566,7 +566,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
         {
             foreach (var item in eMPDistribute.EMPDistributeDTO)
             {
-                var data = _context.TblPolicy.FirstOrDefault(a => a.ProposalNo == item.PrimaryIds.ToString());
+                var data = _context.TblPolicy.FirstOrDefault(a => a.PolicyId == item.PrimaryIds);
                 data.HandledBy = item.PositionId.ToString();
                 _context.Update(data);
             }
@@ -579,7 +579,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
         {
             foreach (var item in eMPDistribute.EMPDistributeDTO)
             {
-                var data = _context.TblPolicy.FirstOrDefault(a => a.PolicyNo == item.PrimaryIds.ToString());
+                var data = _context.TblPolicy.FirstOrDefault(a => a.PolicyId == item.PrimaryIds);
                 data.HandledBy = item.PositionId.ToString();
                 _context.Update(data);
             }
