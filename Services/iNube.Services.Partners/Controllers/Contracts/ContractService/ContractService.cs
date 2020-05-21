@@ -17,9 +17,9 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
         private IMapper _mapper;
         private readonly Func<string, IContractProductService> _contractProductService;
 
-        public ContractService(/*Func<string, IContractProductService> contractProductService,*/ IMapper mapper)
+        public ContractService(Func<string, IContractProductService> contractProductService, IMapper mapper)
         {
-            //_contractProductService = contractProductService;
+            _contractProductService = contractProductService;
             _mapper = mapper;
 
         }

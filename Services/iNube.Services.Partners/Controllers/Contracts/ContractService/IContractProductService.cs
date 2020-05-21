@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace iNube.Services.Partners.Controllers.Contracts.ContractService
 {
-    interface IContractProductService
+    public interface IContractProductService
     {
-
         Task<bool> GetmasterData(ApiContext apiContext);
     }
 }
