@@ -24,6 +24,10 @@ using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Http;
 using iNube.Services.Partners.Entities.AVO;
+using iNube.Services.Partners.Controllers.Contracts.ContractService.MicaContract;
+using iNube.Services.Partners.Controllers.Contracts.ContractService.MotorContract;
+using iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContract;
+using iNube.Services.Partners.Controllers.Contracts.ContractService;
 
 namespace iNube.Services.Partners
 {
@@ -188,10 +192,6 @@ namespace iNube.Services.Partners
                 }
             });
 
-
-
-
-
             services.AddTransient<MicaAccountsService>();
             services.AddTransient<MotorAccountsService>();
             services.AddTransient<AvoAccountsService>();
@@ -211,10 +211,31 @@ namespace iNube.Services.Partners
                 }
             });
 
+
+            services.AddTransient<MicaContractService>();
+            services.AddTransient<MotorContractService>();
+            services.AddTransient<AvoContractService>();
+            services.AddTransient<Func<string, IContractProductService>>(serviceProvider => ofkey =>
+            {
+                switch (ofkey)
+                {
+                    case "Mica":
+                        return serviceProvider.GetService<MicaContractService>();
+                    case "Motor":
+                        return serviceProvider.GetService<MotorContractService>();
+                    case "Avo":
+                        return serviceProvider.GetService<AvoContractService>();
+                    default:
+                        return serviceProvider.GetService<MicaContractService>();
+
+                }
+            });
+
             // configure DI for application services
             services.AddScoped<IAccountService, AccountsService>();
             services.AddScoped<IIntegrationService, IntegrationService>();
             services.AddScoped<IOrganizationService, OrganizationService>();
+            services.AddScoped<IContractService, ContractService>();
             services.AddScoped<IAvoOrganizationProductService, AvoOrganizationService>();
             services.AddScoped<IPartnerService, PartnerService>();
             services.AddScoped<ILoggerManager, LoggerManager>();

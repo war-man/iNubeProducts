@@ -1938,25 +1938,15 @@ namespace iNube.Services.Partners.Entities.AVO
 
                 entity.Property(e => e.Months).HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.Year1)
-                    .HasColumnName("Year 1")
-                    .HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.Year1).HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.Year2)
-                    .HasColumnName("Year 2")
-                    .HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.Year2).HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.Year3)
-                    .HasColumnName("Year 3")
-                    .HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.Year3).HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.Year4)
-                    .HasColumnName("Year 4")
-                    .HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.Year4).HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.Year5)
-                    .HasColumnName("Year 5")
-                    .HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.Year5).HasColumnType("numeric(18, 0)");
             });
 
             modelBuilder.Entity<TblmasOrgMaster>(entity =>

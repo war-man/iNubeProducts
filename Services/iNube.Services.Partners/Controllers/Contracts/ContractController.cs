@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using iNube.Services.Partners.Controllers.Contracts.ContractService;
+using iNube.Services.Partners.Helpers;
+using iNube.Utility.Framework;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
+
+namespace iNube.Services.Partners.Controllers.Contracts
+{
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+
+
+    public class ContractController : BaseApiController
+    {
+        private IMapper _mapper;
+        private readonly AppSettings _appSettings;
+        public IContractService _conService;
+
+        public ContractController(IMapper mapper, IOptions<AppSettings> appSettings, IContractService conService)
+        {
+            _conService = conService;
+            _mapper = mapper;
+            _appSettings = appSettings.Value;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetmasterData()
+        {
+            var response = await _conService.GetmasterData(Context);
+            return Ok(response);
+        }
+    }
+}
