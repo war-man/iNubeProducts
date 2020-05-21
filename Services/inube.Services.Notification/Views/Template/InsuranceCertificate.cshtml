@@ -365,15 +365,15 @@
                     PREMIUM SUMMARY
                 </th>
                 <th style="text-align:left"><small>BASE PREMIUM</small></th>
-                <td>@Html.DisplayFor(model => model.premiumdetails.BasePremium)</td>
+                <td style="text-align:right">@Html.DisplayFor(model => model.premiumdetails.BasePremium)</tdstyle="text-align:right">
             </tr>
             <tr>
                 <th style="text-align:left"><small>GST</small></th>
-                <td>@Html.DisplayFor(model => model.premiumdetails.GST)</td>
+                <td style="text-align:right">@Html.DisplayFor(model => model.premiumdetails.GST)</td>
             </tr>
             <tr>
                 <th style="text-align:left"><small>TOTAL PREMIUM</small></th>
-                <td>@Html.DisplayFor(model => model.premiumdetails.TotalPremium)</td>
+                <td style="text-align:right">@Html.DisplayFor(model => model.premiumdetails.TotalPremium)</td>
             </tr>
 
     </table>
@@ -538,7 +538,7 @@
                         @Html.DisplayFor(model => premiumdetails.Name)
 
                     </td>
-                    <td>
+                    <td style="text-align:right">
                         @Html.DisplayFor(model => premiumdetails.Amount)
                     </td>
                 </tr>
@@ -549,8 +549,8 @@
     </table>
     <table align="right" cellspacing="10" height="100" width="40%" style="margin-left:146px">
         <tr>
-            <th colspan="2" align="center" valign="top">AUTHORIZED SIGNATURE</th>
 
+            <th colspan="2" align="center" valign="top">AUTHORIZED SIGNATURE <br /><br /><img src="~/images/Signature.jpg" /> </th>
         </tr>
     </table><br /><br /><br /><br /><br /><br /><br />
 

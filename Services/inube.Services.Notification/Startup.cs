@@ -15,7 +15,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -52,7 +54,21 @@ namespace inube.Services.Notification
 
             //Common Service
             services.InitializedCommonServices(Configuration);
+            //services.Configure<IISServerOptions>(options =>
+            //{
+            //    options.MaxRequestBodySize = int.MaxValue;
+            //});
 
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = 52428800; //50MB if don't set default value is: 30 MB
+            });
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = 60000000;
+                options.MultipartHeadersLengthLimit = int.MaxValue;
+            });
             services.AddMvc()
            .AddFluentValidation(options =>
            {
@@ -81,7 +97,14 @@ namespace inube.Services.Notification
             }
             app.UseAuthentication();
             app.UseHttpsRedirection();
-            app.UseMvc();
+           // app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
+            RotativaConfiguration.Setup(env);
         }
 
         private void ConfigureModuleService(IServiceCollection services)
