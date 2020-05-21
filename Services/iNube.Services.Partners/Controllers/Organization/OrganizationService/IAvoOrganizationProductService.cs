@@ -56,5 +56,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
         Task<EmployeeRoles> DesignationRoles(string designationid, ApiContext apiContext);
         Task<DataTable> GetEmpHierarchy(string empcode, ApiContext context);
         Task<List<MasterDto>> GetDesignationMovement(int orgid, int pos, int movementType, ApiContext apiContext);
+        Task<IEnumerable<EntityDTOs>> GetEntityMaster(ApiContext apiContext);
+        Task<MasterDataResponse> AddMasterData(OrgMasterDTO masterDataDTO, ApiContext apiContext);
+        Task<IEnumerable<ddDTOs>> GetOrgMaster(string masterType, int parentID, ApiContext apiContext);
+        Task<OrgEntityDTO> AddEntityData(OrgEntityDTO entityDTO, ApiContext apiContext);
     }
 }

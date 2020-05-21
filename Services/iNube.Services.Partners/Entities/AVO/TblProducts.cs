@@ -27,6 +27,7 @@ namespace iNube.Services.Partners.Entities.AVO
         public int? Priority { get; set; }
         public string MinSurrenderYear { get; set; }
         public string MinTopUpYear { get; set; }
+        public string HandledBy { get; set; }
 
         public virtual ICollection<TblProductPlan> TblProductPlan { get; set; }
         public virtual ICollection<TblProductPlanRiders> TblProductPlanRiders { get; set; }

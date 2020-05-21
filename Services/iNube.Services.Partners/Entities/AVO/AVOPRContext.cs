@@ -34,12 +34,14 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual DbSet<TblOrgEmpAddress> TblOrgEmpAddress { get; set; }
         public virtual DbSet<TblOrgEmpEducation> TblOrgEmpEducation { get; set; }
         public virtual DbSet<TblOrgEmployee> TblOrgEmployee { get; set; }
+        public virtual DbSet<TblOrgEntity> TblOrgEntity { get; set; }
         public virtual DbSet<TblOrgOffice> TblOrgOffice { get; set; }
         public virtual DbSet<TblOrgOfficeHistory> TblOrgOfficeHistory { get; set; }
         public virtual DbSet<TblOrgOfficeMapping> TblOrgOfficeMapping { get; set; }
         public virtual DbSet<TblOrgPositionRoleMapping> TblOrgPositionRoleMapping { get; set; }
         public virtual DbSet<TblOrgPositions> TblOrgPositions { get; set; }
         public virtual DbSet<TblOrgSpocDetails> TblOrgSpocDetails { get; set; }
+        public virtual DbSet<TblOrgStandards> TblOrgStandards { get; set; }
         public virtual DbSet<TblOrgStructure> TblOrgStructure { get; set; }
         public virtual DbSet<TblOrgUserPositionMapping> TblOrgUserPositionMapping { get; set; }
         public virtual DbSet<TblOrganization> TblOrganization { get; set; }
@@ -55,9 +57,12 @@ namespace iNube.Services.Partners.Entities.AVO
         public virtual DbSet<TblProductRiders> TblProductRiders { get; set; }
         public virtual DbSet<TblProductSam> TblProductSam { get; set; }
         public virtual DbSet<TblProducts> TblProducts { get; set; }
+        public virtual DbSet<TblRecruitment> TblRecruitment { get; set; }
         public virtual DbSet<TblRiderRate> TblRiderRate { get; set; }
         public virtual DbSet<TblRiderRateChart> TblRiderRateChart { get; set; }
         public virtual DbSet<TblRiders> TblRiders { get; set; }
+        public virtual DbSet<TblTargetDistibution> TblTargetDistibution { get; set; }
+        public virtual DbSet<TblmasOrgMaster> TblmasOrgMaster { get; set; }
         public virtual DbSet<TblmasPrcommonTypes> TblmasPrcommonTypes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -71,7 +76,7 @@ namespace iNube.Services.Partners.Entities.AVO
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<TblAllocationRate>(entity =>
             {
@@ -826,6 +831,30 @@ namespace iNube.Services.Partners.Entities.AVO
                     .HasConstraintName("FK_tblOrgEmployee_tblOrgPositions");
             });
 
+            modelBuilder.Entity<TblOrgEntity>(entity =>
+            {
+                entity.HasKey(e => e.MasterId)
+                    .HasName("PK_MasterID");
+
+                entity.ToTable("tblOrgEntity", "PR");
+
+                entity.Property(e => e.MasterId).HasColumnName("MasterID");
+
+                entity.Property(e => e.MasterType).HasMaxLength(50);
+
+                entity.Property(e => e.Parameter).HasMaxLength(200);
+
+                entity.Property(e => e.ParentId).HasColumnName("ParentID");
+
+                entity.Property(e => e.TypeCode).HasMaxLength(50);
+
+                entity.Property(e => e.UserInputType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Value).HasMaxLength(200);
+            });
+
             modelBuilder.Entity<TblOrgOffice>(entity =>
             {
                 entity.HasKey(e => e.OrgOfficeId);
@@ -1257,6 +1286,34 @@ namespace iNube.Services.Partners.Entities.AVO
                     .WithMany(p => p.TblOrgSpocDetails)
                     .HasForeignKey(d => d.SpocstateId)
                     .HasConstraintName("FK_tblOrgSpocDetails_tblMasState");
+            });
+
+            modelBuilder.Entity<TblOrgStandards>(entity =>
+            {
+                entity.HasKey(e => e.OrgStandardId);
+
+                entity.ToTable("tblOrgStandards", "PR");
+
+                entity.Property(e => e.OrgStandardId)
+                    .HasColumnName("OrgStandardID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.DesignationId)
+                    .HasColumnName("DesignationID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Level).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.OrganizationId)
+                    .HasColumnName("OrganizationID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ProgramId)
+                    .HasColumnName("ProgramID")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.StandardType).HasColumnType("numeric(18, 0)");
             });
 
             modelBuilder.Entity<TblOrgStructure>(entity =>
@@ -1725,6 +1782,11 @@ namespace iNube.Services.Partners.Entities.AVO
 
                 entity.Property(e => e.EffectiveTo).HasColumnType("date");
 
+                entity.Property(e => e.HandledBy)
+                    .HasColumnName("handledBy")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.MinAnnualPremium).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.MinBasicSumAssured).HasColumnType("numeric(18, 2)");
@@ -1751,6 +1813,36 @@ namespace iNube.Services.Partners.Entities.AVO
 
                 entity.Property(e => e.ProductName)
                     .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblRecruitment>(entity =>
+            {
+                entity.HasKey(e => e.RecruitmentId);
+
+                entity.ToTable("tblRecruitment", "PR");
+
+                entity.Property(e => e.RecruitmentId)
+                    .HasColumnName("RecruitmentID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Channel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Designation)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RecruitmentNo).HasMaxLength(50);
+
+                entity.Property(e => e.SubChannel)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
@@ -1831,6 +1923,62 @@ namespace iNube.Services.Partners.Entities.AVO
                 entity.Property(e => e.RiderName)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblTargetDistibution>(entity =>
+            {
+                entity.HasKey(e => e.TargetDistributionId);
+
+                entity.ToTable("tblTargetDistibution", "PR");
+
+                entity.Property(e => e.TargetDistributionId)
+                    .HasColumnName("TargetDistributionID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Months).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year1)
+                    .HasColumnName("Year 1")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year2)
+                    .HasColumnName("Year 2")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year3)
+                    .HasColumnName("Year 3")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year4)
+                    .HasColumnName("Year 4")
+                    .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Year5)
+                    .HasColumnName("Year 5")
+                    .HasColumnType("numeric(18, 0)");
+            });
+
+            modelBuilder.Entity<TblmasOrgMaster>(entity =>
+            {
+                entity.HasKey(e => e.OrgMasterId)
+                    .HasName("PK_OrgMasterID");
+
+                entity.ToTable("tblmasOrgMaster", "PR");
+
+                entity.Property(e => e.OrgMasterId).HasColumnName("OrgMasterID");
+
+                entity.Property(e => e.MasterType).HasMaxLength(50);
+
+                entity.Property(e => e.ParentId).HasColumnName("ParentID");
+
+                entity.Property(e => e.TypeCode).HasMaxLength(50);
+
+                entity.Property(e => e.UserInputType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Value).HasMaxLength(200);
             });
 
             modelBuilder.Entity<TblmasPrcommonTypes>(entity =>

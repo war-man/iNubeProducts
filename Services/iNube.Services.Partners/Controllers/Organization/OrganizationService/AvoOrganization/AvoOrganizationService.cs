@@ -113,10 +113,11 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             TblOrganization organization = _mapper.Map<TblOrganization>(orgDTO);
             //_context.Entry(organization).State = organization.OrganizationId == 0 ? EntityState.Added : EntityState.Modified;
+
+            var _organization = _mapper.Map<TblOrganization>(orgDTO);
+
             if (organization.OrganizationId == 0)
             {
-                var _organization = _mapper.Map<TblOrganization>(orgDTO);
-
                 Random random = new Random();
                 int rdm = random.Next(101, 999);
 
@@ -200,8 +201,40 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             }
             else
             {
+                var office = _context.TblOrgOffice.FirstOrDefault(a => a.OrganizationId == _organization.OrganizationId && a.OfficeName == _organization.OrgName);
+                var orgoffspoc = orgDTO.AVOOrgSpocDetails.FirstOrDefault();
+
+                office.OfficePhoneNo = orgDTO.OrgPhoneNo;
+                office.OfficeFaxNo = orgDTO.OrgFaxNo;
+                //orgOffice.OfficeReportingOfficeId = 0;
+                office.OfficeCountryId = orgoffspoc.SpoccountryId;
+                office.OfficeStateId = orgoffspoc.SpocstateId;
+                office.OfficeDistrictId = orgoffspoc.SpocdistrictId;
+                office.OfficeCityId = orgoffspoc.SpoccityId;
+                office.OfficeAddressLine1 = orgoffspoc.SpocaddressLine1;
+                office.OfficeAddressLine2 = orgoffspoc.SpocaddressLine2;
+                office.OfficeAddressLine3 = orgoffspoc.SpocaddressLine3;
+                office.OfficePincodeId = orgoffspoc.SpoccityId;
+                office.ModifiedBy = apiContext.UserId;
+                office.ModifiedDate = DateTime.Now;
+
+                var spoc = _context.TblOfficeSpocDetails.FirstOrDefault(a => a.OfficeId == office.OrgOfficeId);
+
+                spoc.Spocname = orgoffspoc.SpocfirstName;
+                spoc.Spocmobileno = orgoffspoc.Spocmobileno;
+                spoc.SpocemailId = orgoffspoc.SpocemailId;
+                spoc.Spocdesignation = orgoffspoc.Spocdesignation;
+                spoc.SpoccountryId = orgoffspoc.SpoccountryId;
+                spoc.SpocstateId = orgoffspoc.SpocstateId;
+                spoc.SpocdistrictId = orgoffspoc.SpocdistrictId;
+                spoc.SpoccityId = orgoffspoc.SpoccityId;
+                spoc.SpocaddressLine1 = orgoffspoc.SpocaddressLine1;
+                spoc.SpocaddressLine2 = orgoffspoc.SpocaddressLine2;
+                spoc.SpocaddressLine3 = orgoffspoc.SpocaddressLine3;
+                spoc.SpocpincodeId = orgoffspoc.SpoccityId;
+
                 //_context.Entry(organization).State = EntityState.Modified;
-                _context.Update(organization);
+                _context.Update(_organization);
             }
             _context.SaveChanges();
             var organizationDTOs = _mapper.Map<AVOOrganizationDTO>(organization);
@@ -1579,8 +1612,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           select new Supervisor
                           {
                               MovedTo = c.MovedTo,
-                              MovementSubFormId=c.MovementSubFormId
-                              
+                              MovementSubFormId = c.MovementSubFormId
+
                           };
             var _supData = _mapper.Map<List<Supervisor>>(supData);
             return _supData;
@@ -1813,6 +1846,80 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 connection.Close();
             }
             return dt;
+        }
+
+        public async Task<IEnumerable<EntityDTOs>> GetEntityMaster(ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            //List<int> lstParentId = new List<int> { 0, parentID };
+            var productMasters_list = _context.TblOrgEntity.ToList();
+            IEnumerable<EntityDTOs> entityDTOs;
+            entityDTOs = productMasters_list
+             .Select(c => new EntityDTOs
+             {
+                 mID = c.MasterId,
+                 mValue = c.Value,
+                 name = c.MasterType,
+                 mType = c.MasterType,
+                 mIsRequired = c.IsDisable,
+                 parameter = c.Parameter,
+                 level = c.Level,
+                 disable = c.IsDisable,
+                 parentId = c.ParentId
+             });
+
+            return entityDTOs;
+        }
+
+        public async Task<MasterDataResponse> AddMasterData(OrgMasterDTO masterDataDTO, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var masdata = _mapper.Map<TblmasOrgMaster>(masterDataDTO);
+            _context.TblmasOrgMaster.Add(masdata);
+            _context.SaveChanges();
+            var _masterDTOs = _mapper.Map<OrgMasterDTO>(masdata);
+            return new MasterDataResponse { Status = BusinessStatus.Created, master = _masterDTOs, Id = _masterDTOs.MasterType, ResponseMessage = $"MasterData added successfully!" };
+        }
+
+        public async Task<IEnumerable<ddDTOs>> GetOrgMaster(string masterType, int parentID, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<int> lstParentId = new List<int> { 0, parentID };
+            var productMasters_list = _context.TblmasOrgMaster.Where(x => x.MasterType == masterType && x.IsActive && lstParentId.Contains((int)x.ParentId))
+                .OrderByDescending(p => p.IsDisable).ThenBy(p => p.SortOrder);
+            IEnumerable<ddDTOs> ddDTOs;
+            ddDTOs = productMasters_list
+             .Select(c => new ddDTOs
+             {
+                 mID = c.OrgMasterId,
+                 mValue = c.Value,
+                 mType = c.MasterType,
+                 mIsRequired = c.IsDisable,
+
+             });
+
+            return ddDTOs;
+        }
+
+        public async Task<OrgEntityDTO> AddEntityData(OrgEntityDTO entityDTO, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var records = _context.TblOrgEntity.Where(p => p.MasterId != 0).Max(x => x.Level);
+            var _entity = _mapper.Map<TblOrgEntity>(entityDTO);
+
+            _entity.MasterType = entityDTO.MasterType;
+            _entity.TypeCode = entityDTO.TypeCode;
+            _entity.Parameter = entityDTO.Parameter;
+            _entity.IsDisable = entityDTO.IsDisable;
+            _entity.IsActive = entityDTO.IsActive;
+            _entity.Value = entityDTO.Value;
+            _entity.ParentId = entityDTO.ParentId;
+            _entity.Level = records + 1;
+
+            _context.TblOrgEntity.Add(_entity);
+            _context.SaveChanges();
+            var _entities = _mapper.Map<OrgEntityDTO>(_entity);
+            return _entities;
         }
     }
 }

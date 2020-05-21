@@ -2118,6 +2118,7 @@ namespace iNube.Services.Partners.Models
         public decimal PositionId { get; set; }
         public decimal PrimaryIds { get; set; }
     }
+
     public class EmpHierarchyData : ResponseStatus
     {
         public EmpHierarchyData()
@@ -2126,6 +2127,7 @@ namespace iNube.Services.Partners.Models
         }
         public List<EmpHierarchy> StaffCodes { get; set; }
     }
+
     public class EmpHierarchy
     {
         public int? ParentID { get; set; }
@@ -2136,4 +2138,93 @@ namespace iNube.Services.Partners.Models
         public int? LevelId { get; set; }
     }
 
+    public partial class OrgMasterDTO
+    {
+        public int OrgMasterId { get; set; }
+        public string MasterType { get; set; }
+        public string TypeCode { get; set; }
+        public string Value { get; set; }
+        public int? ParentId { get; set; }
+        public bool IsDisable { get; set; }
+        public bool IsActive { get; set; }
+        public int? SortOrder { get; set; }
+        public string UserInputType { get; set; }
+        
+    }
+
+    public partial class OrgEntityDTO
+    {
+        public int MasterId { get; set; }
+        public string MasterType { get; set; }
+        public string TypeCode { get; set; }
+        public string Value { get; set; }
+        public int? ParentId { get; set; }
+        public int? Level { get; set; }
+        public string Parameter { get; set; }
+        public bool IsDisable { get; set; }
+        public bool IsActive { get; set; }
+        public int? SortOrder { get; set; }
+        public string UserInputType { get; set; }
+    }
+
+    public partial class OrgStandardsDTO
+    {
+        public decimal OrgStandardId { get; set; }
+        public decimal? OrganizationId { get; set; }
+        public decimal? DesignationId { get; set; }
+        public decimal? Level { get; set; }
+        public decimal? ProgramId { get; set; }
+        public decimal? StandardType { get; set; }
+        public string MappingDetails { get; set; }
+    }
+
+    public partial class RecruitmentDTO
+    {
+        public decimal RecruitmentId { get; set; }
+        public string RecruitmentNo { get; set; }
+        public string Name { get; set; }
+        public string Channel { get; set; }
+        public string SubChannel { get; set; }
+        public string Designation { get; set; }
+    }
+
+    public partial class EntityDTOs
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string name { get; set; }
+        public string mType { get; set; }
+        public bool mIsRequired { get; set; }
+        public int? level { get; set; }
+        public int? parentId { get; set; }
+        public string parameter { get; set; }
+        public bool disable { get; set; }
+        public bool active { get; set; }
+        public string Value { get; set; }
+        public string Label { get; set; }
+    }
+
+    public class MasterDataResponse : ResponseStatus
+    {
+        public OrgMasterDTO master { get; set; }
+    }
+
+    public partial class ddDTOs
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+        public bool mIsRequired { get; set; }
+    }
+
+    public partial class TargetDistibutionDTO
+    {
+        public decimal TargetDistributionId { get; set; }
+        public decimal? Months { get; set; }
+        public decimal? Year1 { get; set; }
+        public decimal? Year2 { get; set; }
+        public decimal? Year3 { get; set; }
+        public decimal? Year4 { get; set; }
+        public decimal? Year5 { get; set; }
+    }
 }

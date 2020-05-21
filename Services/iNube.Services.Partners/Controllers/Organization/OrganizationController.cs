@@ -533,6 +533,7 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
 
+        //  ||AVO
         [HttpGet]
         public async Task<IActionResult> GetEmpHierarchy(string Empcode)
         {
@@ -540,7 +541,7 @@ namespace iNube.Services.Partners.Controllers.Organization
             return Ok(response);
         }
 
-       
+        //  ||AVO
         [HttpGet]
         public async Task<IActionResult> GetDesignationMovement(int orgid, int pos, int movementType)
         {
@@ -553,6 +554,34 @@ namespace iNube.Services.Partners.Controllers.Organization
             }
 
             return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEntityMaster()
+        {
+            var _searchResult = await _avoorgService.GetEntityMaster(Context);
+            return Ok(_searchResult);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddMasterData([FromBody]OrgMasterDTO orgMasterDTO)
+        {
+            var _searchResult = await _avoorgService.AddMasterData(orgMasterDTO, Context);
+            return Ok(_searchResult);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrgMaster(string masterType, int parentID)
+        {
+            var _searchResult = await _avoorgService.GetOrgMaster(masterType, parentID, Context);
+            return Ok(_searchResult);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddEntityData([FromBody]OrgEntityDTO entityDTO)
+        {
+            var _searchResult = await _avoorgService.AddEntityData(entityDTO, Context);
+            return Ok(_searchResult);
         }
     }
 }

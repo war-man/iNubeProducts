@@ -68,11 +68,11 @@ namespace iNube.Services.Partners.Helpers
             .ForMember(dest => dest.TblOrgOffice, opt => opt.MapFrom(src => src.AVOOrgOffice)).ReverseMap();
 
 
-             CreateMap<AVOOrganizationNewDTO, Entities.AVO.TblOrganization>()
-            .ForMember(dest => dest.TblOrgAddress, opt => opt.MapFrom(src => src.AVOOrgAddress))
-            .ForMember(dest => dest.TblOrgSpocDetails, opt => opt.MapFrom(src => src.AVOOrgSpocDetails))
-            .ForMember(dest => dest.TblOrgOffice, opt => opt.MapFrom(src => src.AVOOrgOffice))          
-            .ForMember(dest => dest.TblOrgStructure, opt => opt.MapFrom(src => src.AVOOrgStructure)).ReverseMap();
+            CreateMap<AVOOrganizationNewDTO, Entities.AVO.TblOrganization>()
+           .ForMember(dest => dest.TblOrgAddress, opt => opt.MapFrom(src => src.AVOOrgAddress))
+           .ForMember(dest => dest.TblOrgSpocDetails, opt => opt.MapFrom(src => src.AVOOrgSpocDetails))
+           .ForMember(dest => dest.TblOrgOffice, opt => opt.MapFrom(src => src.AVOOrgOffice))
+           .ForMember(dest => dest.TblOrgStructure, opt => opt.MapFrom(src => src.AVOOrgStructure)).ReverseMap();
 
 
             CreateMap<AVOOrgAddress, Entities.AVO.TblOrgAddress>();
@@ -94,8 +94,8 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<AvoOrgPositions, TblOrgPositions>();
 
 
-          //  CreateMap<OrgOfficeDTO, Entities.AVO.TblOrgOffice>()
-          //.ForMember(dest => dest.TblOfficeSpocDetails, opt => opt.MapFrom(src => src.OfficeSpocDetails)).ReverseMap();
+            //  CreateMap<OrgOfficeDTO, Entities.AVO.TblOrgOffice>()
+            //.ForMember(dest => dest.TblOfficeSpocDetails, opt => opt.MapFrom(src => src.OfficeSpocDetails)).ReverseMap();
 
             CreateMap<AVOOrgOffice, Entities.AVO.TblOrgOffice>()
             .ForMember(dest => dest.TblOfficeSpocDetails, opt => opt.MapFrom(src => src.AVOOfficeSpocDetails)).ReverseMap();
@@ -110,9 +110,9 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<AVOOrgEmployee, Entities.AVO.TblOrgEmployee>()
              .ForMember(dest => dest.TblOrgEmpAddress, opt => opt.MapFrom(src => src.AVOOrgEmpAddress))
              .ForMember(dest => dest.TblOrgEmpEducation, opt => opt.MapFrom(src => src.AVOOrgEmpEducation)).ReverseMap();
-             
 
-          //  CreateMap<Entities.AVO.TblOrgEmployee, AVOOrgEmployee>().ReverseMap();
+
+            //  CreateMap<Entities.AVO.TblOrgEmployee, AVOOrgEmployee>().ReverseMap();
             CreateMap<Entities.AVO.TblOrgEmpAddress, AVOOrgEmpAddress>().ReverseMap();
             CreateMap<Entities.AVO.TblOrgEmpEducation, AVOOrgEmpEducation>().ReverseMap();
             CreateMap<Entities.AVO.TblOrgPositions, AvoOrgPositions>().ReverseMap();
@@ -127,6 +127,21 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<PRcommonTypesDTO, Entities.AVO.TblmasPrcommonTypes>();
             CreateMap<Entities.AVO.TblmasPrcommonTypes, PRcommonTypesDTO>();
 
+            CreateMap<OrgMasterDTO, Entities.AVO.TblmasOrgMaster>();
+            CreateMap<Entities.AVO.TblmasOrgMaster, OrgMasterDTO>();
+
+            CreateMap<OrgEntityDTO, Entities.AVO.TblOrgEntity>();
+            CreateMap<Entities.AVO.TblOrgEntity, OrgEntityDTO>();
+
+            CreateMap<TargetDistibutionDTO, Entities.AVO.TblTargetDistibution>();
+            CreateMap<Entities.AVO.TblTargetDistibution, TargetDistibutionDTO>();
+
+            CreateMap<OrgStandardsDTO, Entities.AVO.TblOrgStandards>();
+            CreateMap<Entities.AVO.TblOrgStandards, OrgStandardsDTO>();
+
+            CreateMap<RecruitmentDTO, Entities.AVO.TblRecruitment>();
+            CreateMap<Entities.AVO.TblRecruitment, RecruitmentDTO>();
+
             CreateMap<CountryDTO, Entities.AVO.TblMasCountry>();
             CreateMap<Entities.AVO.TblMasCountry, CountryDTO>();
             CreateMap<StateDTO, Entities.AVO.TblMasState>();
@@ -137,7 +152,7 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<Entities.AVO.TblMasCity, CityDTO>();
             CreateMap<PinCodeDTO, Entities.AVO.TblMasPinCode>();
             CreateMap<Entities.AVO.TblMasPinCode, PinCodeDTO>();
-            
+
 
             CreateMap<AVOMovementDetailsDTO, Entities.AVO.TblMovementDetails>();
             CreateMap<Entities.AVO.TblMovementDetails, AVOMovementDetailsDTO>();
