@@ -1559,7 +1559,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                           && a.OrgEmpId == supervisor.OrgEmpId
                           select new Supervisor
                           {
-                              MovedTo = c.MovedTo
+                              MovedTo = c.MovedTo,
+                              MovementSubFormId=c.MovementSubFormId
+                              
                           };
             var _supData = _mapper.Map<List<Supervisor>>(supData);
             return _supData;

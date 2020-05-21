@@ -2103,6 +2103,7 @@ namespace iNube.Services.Partners.Models
         public decimal? MovedTo { get; set; }
         public decimal OrgEmpId { get; set; }
         public int MovementStatusId { get; set; }
+        public int? MovementSubFormId { get; set; }
     }
 
     public partial class EMPDistribute
