@@ -74,7 +74,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
             UserUrl = _configuration["Integration_Url:User:UserUrl"];
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
-            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:AzureRuleEngineUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
            
