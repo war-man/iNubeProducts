@@ -1187,7 +1187,8 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 {
                     TblOrgPositions position = new TblOrgPositions();
                     position.OrganizationId = pdata.OrganizationId;
-                    position.OfficeId = (decimal)movementData.NewBranchId;
+                    // position.OfficeId = (decimal)movementData.NewBranchId;
+                    position.OfficeId = Convert.ToDecimal(movementData.NewBranchId);
                     position.DesignationId = movementData.NewPositionId;
                     position.PositionName = pdata.PositionName + _rdm.Next(_min, _max);
                     position.RepOrgId = pdata.RepOrgId;
