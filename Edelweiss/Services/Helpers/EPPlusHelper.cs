@@ -11,18 +11,26 @@ namespace iNube.Services.MicaExtension_EGI.Helpers
         public static int GetColumnByName(this ExcelWorksheet ws, string columnName)
         {
             if (ws == null) throw new ArgumentNullException(nameof(ws));
-            return ws.Cells["1:1"].First(c => c.Value.ToString().ToLower() == columnName.ToLower()).Start.Column;
+
+            var rownum = ws.Cells["1:1"].FirstOrDefault(c => c.Value.ToString().ToLower() == columnName.ToLower());
+            if (rownum != null)
+            {
+                return rownum.Start.Column;
+            }
+            return -1;
+
+
         }
         public static string[] GetHeaderColumns(this ExcelWorksheet sheet)
         {
             return sheet.Cells[sheet.Dimension.Start.Row, sheet.Dimension.Start.Column, 1, sheet.Dimension.End.Column]
                 .Select(firstRowCell => firstRowCell.Text).ToArray();
         }
-		
-		public static DateTime? IsDate(string tempDate)
+
+        public static DateTime? IsDate(string tempDate)
         {
             DateTime fromDateValue;
-            var formats = new[] { "dd/MM/yyyy", "yyyy-MM-dd" ,"dd-mm-yyyy"};
+            var formats = new[] { "dd/MM/yyyy", "yyyy-MM-dd", "dd-mm-yyyy" };
             if (DateTime.TryParseExact(tempDate, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out fromDateValue))
             {
                 return fromDateValue;
@@ -92,5 +100,5 @@ namespace iNube.Services.MicaExtension_EGI.Helpers
             return age;
         }
     }
-   
+
 }
