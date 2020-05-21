@@ -2771,6 +2771,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 dynamic PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
 
+                //This is to Created Date if Policy Start Date is Future Data
+                var TblPolicyData = await _integrationService.GetPolicyByNumber(PolicyNo, context);
+
+
                 if (PolicyData != null)
                 {
                     try
@@ -2779,8 +2783,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         accountRequest.accountnumber = PolicyData["CDAccountNumber"].ToString();
                         PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
 
-
-                        if(PolicyStartDate.Month == Month && PolicyStartDate.Year == Year)
+                        if(PolicyStartDate.Date > TblPolicyData.CreatedDate.Date)
+                        {
+                            accountRequest.FromDate = TblPolicyData.CreatedDate.Date;
+                            accountRequest.ToDate = CurrentDate;
+                        }
+                        else if(PolicyStartDate.Month == Month && PolicyStartDate.Year == Year)
                         {
                             accountRequest.FromDate = PolicyStartDate.Date;
                             accountRequest.ToDate = CurrentDate;
@@ -4072,15 +4080,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //PolicyBazaar Related Validation            
                 case "PolicyCreation":
-                  return  GenericMapper(SourceObject);
+                  return  GenericMapper(SourceObject);            
+
+               // case "EndorsementAdd":
+             
+            //    case "EndorsementDel":
 
 
-                //    return RuleEngine;
-
-                //case "EndorementDel":
+                //   return CdModel;
 
 
-                //    return CdModel;
 
                 //case "SwitchOnOff":
 
@@ -4303,10 +4312,17 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         BillingFrequency = PolicyData["billingFrequency"];
                         PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
                         PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
-
-                        //Adding 1 because it should give in between days.
-                        RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays + 1;
-
+                        
+                        if (PolicyStartDate.Date > CurrentDate.Date)
+                        {
+                            //Adding 1 because it should give in between days.
+                            RemainingDays = (PolicyEndDate.Date - PolicyStartDate.Date).TotalDays + 1;
+                        }
+                        else
+                        {
+                            //Adding 1 because it should give in between days.
+                            RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays + 1;
+                        }
                     }
                     catch (Exception Ex)
                     {
@@ -4583,7 +4599,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         BillingFrequency = PolicyData["billingFrequency"];
                         PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
                         PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
-                        RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+
+                        if (PolicyStartDate.Date > CurrentDate.Date)
+                        {
+                            RemainingDays = (PolicyEndDate.Date - PolicyStartDate.Date).TotalDays + 1; 
+                        }
+                        else
+                        {
+                            RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+                        }                      
 
                     }
                     catch (Exception Ex)
@@ -5007,8 +5031,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
                     PolicyEndDate = Convert.ToDateTime(PolicyData["Policy End Date"]);
 
-                    //Adding 1 because it should give in between days.
-                    RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+                    if (PolicyStartDate.Date > CurrentDate.Date)
+                    {
+                        RemainingDays = (PolicyEndDate.Date - PolicyStartDate.Date).TotalDays + 1;
+                    }
+                    else
+                    {
+                        RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays;
+                    }                  
 
                 }
                 catch (Exception Ex)
@@ -5193,7 +5223,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             else
             {
-                policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
+                if (GlobalVariables.PolicyStartDate.Date > policyRequest.EffectiveDate.Value.Date)
+                {
+                    policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - GlobalVariables.PolicyStartDate.Date).TotalDays + 1;
+                }
+                else
+                {
+                    policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
+                }
+
+
             }
             policyCancelResponse.TotalPremium = policyCancelResponse.FTPremium + policyCancelResponse.ADPremium;
 
@@ -6775,7 +6814,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 logx++;
 
                 //finding index of every column
-                var TxnidIndex = FindIndex(strFilePath, "mICA Txn ID");
+                var TxnidIndex = FindIndex(strFilePath, "mica Txn ID");
                 var payUidindex = FindIndex(strFilePath, "payment Reference ID");
                 var payAmountIndex = FindIndex(strFilePath, "paid Amount");
                 var payStatusIndex = FindIndex(strFilePath, "payment Status");
@@ -6832,7 +6871,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Uid Missing";
+                        errorInfo.ErrorMessage = "Payment Reference ID Missing";
                         errorInfo.ErrorCode = "MSI002";
                         errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
@@ -6845,7 +6884,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Amount Missing";
+                        errorInfo.ErrorMessage = "Paid Amount Missing";
                         errorInfo.ErrorCode = "MSI003";
                         errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
@@ -6856,7 +6895,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Status Missing";
+                        errorInfo.ErrorMessage = "Payment Status Missing";
                         errorInfo.ErrorCode = "MSI004";
                         errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
@@ -6867,7 +6906,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         ErrorInfo errorInfo = new ErrorInfo();
 
-                        errorInfo.ErrorMessage = "Pay Status is Not Sucessful";
+                        errorInfo.ErrorMessage = "Payment Status is Not Sucessful";
                         errorInfo.ErrorCode = "MSI005";
                         errorInfo.PropertyName = PropertyName;
                         uploadDTO.Errors.Add(errorInfo);
@@ -6919,7 +6958,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                 ErrorInfo errorInfo = new ErrorInfo();
 
-                                errorInfo.ErrorMessage = "Pay Amount is Less Than the Billed Amount";
+                                errorInfo.ErrorMessage = "Paid Amount is Less Than the Billed Amount";
                                 errorInfo.ErrorCode = "MSI009";
                                 errorInfo.PropertyName = PropertyName;
                                 uploadDTO.Errors.Add(errorInfo);

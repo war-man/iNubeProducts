@@ -138,7 +138,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         public async Task<bool> UpdateEmpProposalData(EMPDistribute eMPDistribute, ApiContext apiContext)
         {
-            var uri = LeadUrl + "/api/Lead/UpdateEmpProposalData";
+            var uri = LeadUrl + "/api/Proposal/UpdateEmpProposalData";
             var productlist = await PostApiInvoke<EMPDistribute, bool>(uri, apiContext, eMPDistribute);
             return productlist;
         }

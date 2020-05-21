@@ -53,6 +53,8 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
 
+        Task<PolicyDTO> GetPolicyByNumber(string PolicyNumber, ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -190,6 +192,12 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             return await PostApiInvoke<CDAccountRequest,CDAccountDTO>(uri, apiContext, accountRequest);
         }
 
+
+        public async Task<PolicyDTO> GetPolicyByNumber(string PolicyNumber, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/GetPolicyByNumber?policyNumber=" + PolicyNumber;
+            return await GetApiInvoke<PolicyDTO>(uri, apiContext);
+        }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
