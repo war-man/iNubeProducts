@@ -3032,7 +3032,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                 //step:3 Call CD mapper
 
-
                                 var CDmap = await _integrationService.CDMapperList(cDMappers, "EndorsementAdd", apiContext);
                                 if (CDmap.Count > 0)
                                 {
