@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration;
 using iNube.Services.Partners.Entities;
+using iNube.Services.Partners.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace iNube.Services.Partners.Controllers.Contracts.ContractService.MotorContract
@@ -26,5 +29,9 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.MotorCon
             throw new NotImplementedException();
         }
 
+        public Task<FileUploadResponse> ContractUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using iNube.Services.Partners.Controllers.Contracts.ContractService;
@@ -36,6 +37,12 @@ namespace iNube.Services.Partners.Controllers.Contracts
         public async Task<IActionResult> GetmasterData()
         {
             var response = await _conService.GetmasterData(Context);
+            return Ok(response);
+        }
+           [HttpPost]
+        public async Task<IActionResult> ContractUpload(CancellationToken cancellationToken)
+        {
+            var response = await _conService.ContractUpload(Request, cancellationToken, Context);
             return Ok(response);
         }
     }

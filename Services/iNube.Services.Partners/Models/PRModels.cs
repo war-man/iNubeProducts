@@ -2227,4 +2227,12 @@ namespace iNube.Services.Partners.Models
         public decimal? Year4 { get; set; }
         public decimal? Year5 { get; set; }
     }
+    public class FileUploadResponse : ResponseStatus
+    {
+        public FileUploadResponse()
+        {
+           // ErrorDetails = new HashSet<ShowErrorInfoDetails>();
+        }
+      //  public virtual ICollection<ShowErrorInfoDetails> ErrorDetails { get; set; }
+    }
 }
