@@ -14,6 +14,10 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
     {
         Task<bool> GetmasterData(ApiContext apiContext);
         Task<FileUploadResponse> ContractUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<RecruitmentDTO> RecruitmentByCode(string RecNo, ApiContext apiContext);
+        Task<IncentiveResponse> IncentiveCalculation(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext);
+
     }
 
     public class ContractService : IContractService
@@ -37,6 +41,18 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
         {
             return await _contractProductService(apiContext.ProductType).ContractUpload(httpRequest, cancellationToken,apiContext);
         }
+        public async Task<RecruitmentDTO> RecruitmentByCode(string RecNo, ApiContext apiContext)
+        {
+            return await _contractProductService(apiContext.ProductType).RecruitmentByCode(RecNo, apiContext);
+        }
 
+        public async Task<IncentiveResponse> IncentiveCalculation(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
+        {
+            return await _contractProductService(apiContext.ProductType).IncentiveCalculation(httpRequest, cancellationToken, apiContext);
+        }
+        public async Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext)
+        {
+            return await _contractProductService(apiContext.ProductType).SearchTarget(tblParticipantMasterDto, apiContext);
+        }
     }
 }
