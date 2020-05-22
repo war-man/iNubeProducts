@@ -2110,6 +2110,10 @@ namespace iNube.Services.Partners.Models
 
     public partial class EMPDistribute
     {
+        public EMPDistribute()
+        {
+            EMPDistributeDTO = new List<EMPDistributeDTO>();
+        }
         public List<EMPDistributeDTO> EMPDistributeDTO { get; set; }
     }
 

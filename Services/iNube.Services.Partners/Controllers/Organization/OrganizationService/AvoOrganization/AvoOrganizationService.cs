@@ -1090,7 +1090,9 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                                         PrimaryIds = Convert.ToDecimal(a.MovingId)
                                     }).ToList();
                                 EMPDistribute eMPDistribute = new EMPDistribute();
+                                if(prospect.Count > 0) { 
                                 eMPDistribute.EMPDistributeDTO.AddRange(prospect);
+                                }
                                 var prospectcall = await _integrationService.UpdateEmpProspectData(eMPDistribute, apiContext);
                             }
                             //Quotation
@@ -1105,7 +1107,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                                         PrimaryIds = Convert.ToDecimal(a.MovingId)
                                     }).ToList();
                                 EMPDistribute eMPDistribute = new EMPDistribute();
-                                eMPDistribute.EMPDistributeDTO.AddRange(quotation);
+                                if (quotation.Count > 0)
+                                {
+                                    eMPDistribute.EMPDistributeDTO.AddRange(quotation);
+                                }
                                 var prospectcall = await _integrationService.UpdateEmpQuotationData(eMPDistribute, apiContext);
                             }
                             //Proposal
@@ -1120,7 +1125,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                                         PrimaryIds = Convert.ToDecimal(a.MovingId)
                                     }).ToList();
                                 EMPDistribute eMPDistribute = new EMPDistribute();
-                                eMPDistribute.EMPDistributeDTO.AddRange(proposal);
+                                if (proposal.Count > 0)
+                                {
+                                    eMPDistribute.EMPDistributeDTO.AddRange(proposal);
+                                }
                                 var prospectcall = await _integrationService.UpdateEmpProposalData(eMPDistribute, apiContext);
                             }
                             //Policy
@@ -1135,7 +1143,10 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                                         PrimaryIds = Convert.ToDecimal(a.MovingId)
                                     }).ToList();
                                 EMPDistribute eMPDistribute = new EMPDistribute();
-                                eMPDistribute.EMPDistributeDTO.AddRange(policy);
+                                if (policy.Count > 0)
+                                {
+                                    eMPDistribute.EMPDistributeDTO.AddRange(policy);
+                                }
                                 var prospectcall = await _integrationService.UpdateEmpPolicyData(eMPDistribute, apiContext);
                             }
                             //Suspect
