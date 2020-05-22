@@ -166,6 +166,8 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
 
                                             }
 
+
+
                                         _context.TblRecruitment.AddRange(tblRecruitments);
                                        await  _context.SaveChangesAsync();
                                         }
