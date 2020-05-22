@@ -1051,22 +1051,28 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                     //pdata.DesignationId = movementdata.NewPositionId;
                     //_context.TblOrgPositions.Update(pdata);
 
+
+
                     //Updating Movement details table
                     var movementDetailsData = _context.TblMovementDetails.Where(x => x.MovementId == movementdata.MovementId).ToList();
                     if (movementDetailsData != null)
                     {
-                        foreach (var movData in movementDetailsData)
+                        var movementdetails = movementDetailsData.Where(a => a.MovementFormId == 1009).ToList();
+                        if (movementdetails.Count() > 0)
                         {
-                            if (movData.MovementFormId == 1009)
+                            foreach (var movData in movementdetails)
                             {
-                                var reportee = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovingId).PositionId;
-                                var supervisorPos = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovedTo).PositionId;
+                                if (movData.MovementFormId == 1009)
+                                {
+                                    var reportee = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovingId).PositionId;
+                                    var supervisorPos = _context.TblOrgEmployee.FirstOrDefault(x => x.OrgEmpId == movData.MovedTo).PositionId;
 
-                                var reporteePos = _context.TblOrgPositions.FirstOrDefault(x => x.PositionId == reportee);
-                                reporteePos.ParentId = supervisorPos;
+                                    var reporteePos = _context.TblOrgPositions.FirstOrDefault(x => x.PositionId == reportee);
+                                    reporteePos.ParentId = supervisorPos;
 
-                                _context.TblOrgPositions.Update(reporteePos);
-                                movData.Status = 1;
+                                    _context.TblOrgPositions.Update(reporteePos);
+                                    movData.Status = 1;
+                                }
                             }
                         }
                         var movementsdata = movementDetailsData.Where(a => a.MovementFormId == 1010).ToList();
@@ -1137,7 +1143,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                             if (suspectcount != 0)
                             {
                                 //policy
-                                var suspect = movementsdata.Where(a => a.MovementSubFormId == 40)
+                                var suspect = movementsdata.Where(a => a.MovementSubFormId == 43)
                                     .Select(a => new EMPDistributeDTO
                                     {
                                         PositionId = Convert.ToDecimal(_context.TblOrgEmployee.FirstOrDefault(b => b.OrgEmpId == a.MovedTo).PositionId),
