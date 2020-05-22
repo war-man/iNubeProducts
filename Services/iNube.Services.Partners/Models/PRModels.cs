@@ -2153,7 +2153,7 @@ namespace iNube.Services.Partners.Models
         public bool IsActive { get; set; }
         public int? SortOrder { get; set; }
         public string UserInputType { get; set; }
-        
+
     }
 
     public partial class OrgEntityDTO
@@ -2235,8 +2235,13 @@ namespace iNube.Services.Partners.Models
     {
         public FileUploadResponse()
         {
-           // ErrorDetails = new HashSet<ShowErrorInfoDetails>();
+            // ErrorDetails = new HashSet<ShowErrorInfoDetails>();
         }
-      //  public virtual ICollection<ShowErrorInfoDetails> ErrorDetails { get; set; }
+        //  public virtual ICollection<ShowErrorInfoDetails> ErrorDetails { get; set; }
+    }
+
+    public class IncentiveResponse : ResponseStatus
+    {
+        public dynamic Incentive { get; set; }
     }
 }

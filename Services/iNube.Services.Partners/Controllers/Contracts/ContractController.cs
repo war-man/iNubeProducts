@@ -39,20 +39,27 @@ namespace iNube.Services.Partners.Controllers.Contracts
             var response = await _conService.GetmasterData(Context);
             return Ok(response);
         }
-           [HttpPost]
+
+        [HttpPost]
         public async Task<IActionResult> ContractUpload(CancellationToken cancellationToken)
         {
             var response = await _conService.ContractUpload(Request, cancellationToken, Context);
             return Ok(response);
         }
+
         [HttpGet]
         public async Task<IActionResult> RecruitmentByCode(string RecNo)
-
         {
-
             var response = await _conService.RecruitmentByCode(RecNo, Context);
-
             return Ok(response);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> IncentiveCalculation(CancellationToken cancellationToken)
+        {
+            var response = await _conService.IncentiveCalculation(Request, cancellationToken, Context);
+            return Ok(response);
+        }
+
     }
 }

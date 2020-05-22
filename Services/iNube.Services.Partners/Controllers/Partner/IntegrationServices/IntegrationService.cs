@@ -32,6 +32,7 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<bool> UpdateEmpSuspectData(EMPDistribute eMPDistribute, ApiContext apiContext);
         Task<bool> UpdateEmpProposalData(EMPDistribute eMPDistribute, ApiContext apiContext);
         Task<bool> UpdateEmpPolicyData(EMPDistribute eMPDistribute, ApiContext apiContext);
+        Task<dynamic> CheckCalculationRate(dynamic obj, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -150,6 +151,17 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return productlist;
         }
 
+        public async Task<dynamic> CheckCalculationRate(dynamic obj, ApiContext apiContext)
+        {
+            ApiContext api = new ApiContext();
+            api.ProductType = "Mica";
+            api.ServerType = "1";
+            api.Token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI1Y2M0ZTFjZi04MzYxLTQwY2QtODVjMC1hMjE3YThiZGEwYTYiLCJFbWFpbCI6ImludWJlYWRtaW5AaW51YmVzb2x1dGlvbnMuY29tIiwiT3JnSWQiOiIxMTIiLCJQYXJ0bmVySWQiOiIwIiwiUm9sZSI6ImlOdWJlIEFkbWluIiwiTmFtZSI6IkludWJlIiwiVXNlck5hbWUiOiJpbnViZWFkbWluIiwiUHJvZHVjdFR5cGUiOiJNaWNhIiwiU2VydmVyVHlwZSI6IjEiLCJleHAiOjE1OTI4MzMyMzUsImlzcyI6IkludWJlIiwiYXVkIjoiSW51YmVNSUNBIn0.gQTzj4xxg-XquWxNo7zG5bt0PJJY1hqCT3zg6eac30Y";
+            var uri = "https://inubeservicesrating.azurewebsites.net/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/53";
+            var productlist = await PostListApiInvoke<dynamic, dynamic>(uri, api, obj);
+            return productlist;
+        }
+
         public async Task<ResponseStatus> SendNotificationAsync(Partners.Models.NotificationRequest notificationRequest, ApiContext apiContext)
         {
             var uri = NotificationUrl + "/api/Notifications/SendTemplateNotificationAsync";
@@ -259,5 +271,37 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
                 }
             }
         }
+
+        private async Task<IEnumerable<TResponse>> PostListApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                HttpContent contentPost = null;
+                if (request != null)
+                {
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    string postBody = JsonConvert.SerializeObject(request);
+                    var content = new StringContent(postBody, Encoding.UTF8, "application/json");
+                    contentPost = content;
+                }
+                using (var response = await client.PostAsync(requestUri, contentPost))
+                {
+                    using (var content = response.Content)
+                    {
+                        return await content.ReadAsAsync<IEnumerable<TResponse>>();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return new List<TResponse>();
+            }
+
+        }
+
     }
 }
