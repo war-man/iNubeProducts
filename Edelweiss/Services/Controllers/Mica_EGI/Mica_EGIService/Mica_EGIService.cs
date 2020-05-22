@@ -6785,7 +6785,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     failcount++;
 
                 }
-                if (SourceObject["additionalDriver"] > 0 && SourceObject["additionalDriver"] <= 2)
+                if (SourceObject["additionalDriver"] >= 0 && SourceObject["additionalDriver"] <= 2)
                 {
                     RuleEngineResponse resobj = new RuleEngineResponse();
                     resobj.ValidatorName = "additionalDriver";
