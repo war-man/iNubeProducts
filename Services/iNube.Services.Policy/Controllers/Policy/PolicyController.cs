@@ -710,5 +710,12 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return NotFound(response);
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> PolicyActivate(DateTime policyIssueDate)
+        {
+            var response = await _policyService.PolicyActivate(policyIssueDate,Context);
+            return Ok(response);
+        }
     }
 }

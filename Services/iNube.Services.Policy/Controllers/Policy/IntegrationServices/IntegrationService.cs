@@ -58,6 +58,8 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
         Task<PolicyStatusResponseDTO> PolicyStatusUpdate(PolicyStatusDTO policyStatusDTO, ApiContext apiContext);
         Task<ResponseStatus> VehicleStatusUpdate(VehicleStatusDTO VehicleStatusDTO, ApiContext apiContext);
+        Task<PolicyAgreementResponse> ValidateAssignProduct(string partnerCode, int productId, ApiContext apiContext);
+        Task<PolicyExceptionDTO> GetPolicyExceptionDetails(dynamic SourceRequest, ApiContext apiContext);
         //GetMappingParams(string mappingname, ApiContext apiContext)
 
 
@@ -402,6 +404,22 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
 
             return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
+        public async Task<PolicyAgreementResponse> ValidateAssignProduct(string partnerCode, int productId, ApiContext apiContext)
+        {
+
+            var uri = PartnerUrl + "/api/Partner/ValidateAssignProduct?partnerCode=" + partnerCode + "&productId=" + productId;
+
+            return await GetApiInvoke<PolicyAgreementResponse>(uri, apiContext);
+
+        }
+        public async Task<PolicyExceptionDTO> GetPolicyExceptionDetails(dynamic SourceRequest, ApiContext apiContext)
+        {
+       
+            var uri = ExtensionUrl + "/api/Mica_EGI/GetPolicyExceptionDetails";
+
+            return await PostApiInvoke<dynamic, PolicyExceptionDTO>(uri, apiContext, SourceRequest);
 
         }
 

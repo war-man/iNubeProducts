@@ -279,5 +279,23 @@ namespace iNube.Services.Partners.Controllers.Partner
             PartnersDTO _partnerDTO = await _partnerService.GetPartnerDetailsByPartnerCode(partnerCode, Context);
             return Ok(_partnerDTO);
         }
+        [HttpGet]
+        public async Task<IActionResult> ValidateAssignProduct(string partnerCode,int productId)
+        {
+            var response = await _partnerService.ValidateAssignProduct(partnerCode, productId, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.NotFound:
+                    return NotFound(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                case BusinessStatus.Ok:
+                    return Ok(response);
+                default:
+                    return Forbid();
+            }
+        }
     }
 }

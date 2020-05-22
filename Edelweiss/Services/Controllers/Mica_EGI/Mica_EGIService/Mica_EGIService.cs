@@ -72,6 +72,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<CityMasDTO> GetStateCode(string CityName,ApiContext context);
         Task<ResponseStatus> VehicleStatusUpdate(VehicleStatusDTO vehicleStatus, ApiContext context);
         Task<ResponseStatus> MonthlySIPayment(MonthlySIDTO monthlySIDTO, ApiContext context);
+        Task<PolicyExceptionDTO> GetPolicyExceptionDetails(dynamic SourceObject, ApiContext context);
 
     }
 
@@ -5279,14 +5280,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(apicontext.ProductType, apicontext.ServerType, _configuration));
 
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            var CurrentDate = IndianTime.Date;
+
             GlobalVariables GlobalVariables = new GlobalVariables();
             PolicyCancelResponse policyCancelResponse = new PolicyCancelResponse();
-            bool applicationcancel =true ;
+            bool applicationcancel = true;
             if (!string.IsNullOrEmpty(policyRequest.PolicyNumber))
             {
                 applicationcancel = false;
             }
-            else {
+            else
+            {
                 applicationcancel = true;
             }
 
@@ -5294,10 +5300,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 GlobalVariables.PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apicontext);
 
-                PolicyCancelReturnDto canceldetails = await PolicyCancellationCalculator(policyRequest.PolicyNumber, null, apicontext);
-                policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
+
+                if (GlobalVariables.PolicyData["PolicyStageStatusId"] == 9 && (DateTime)GlobalVariables.PolicyData["Policy Start Date"]> CurrentDate.Date)
+                {
+                    applicationcancel = true;
+                    policyCancelResponse.FTPremium = 0;
+                }
+                else
+                {
+                    PolicyCancelReturnDto canceldetails = await PolicyCancellationCalculator(policyRequest.PolicyNumber, null, apicontext);
+                    policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
+
+                }
             }
-            else if (!string.IsNullOrEmpty(policyRequest.ProposalNumber)) {
+            else if (!string.IsNullOrEmpty(policyRequest.ProposalNumber))
+            {
                 GlobalVariables.PolicyData = await _integrationService.InternalGetProposalDetailsByNumber(policyRequest.ProposalNumber, apicontext);
                 policyCancelResponse.FTPremium = 0;
             }
@@ -5306,15 +5323,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             GlobalVariables.PolicyEndDate = (DateTime)GlobalVariables.PolicyData["Policy End Date"];
             GlobalVariables.PolicyStartDate = (DateTime)GlobalVariables.PolicyData["Policy Start Date"];
             GlobalVariables.BillingFrequency = (string)GlobalVariables.PolicyData["billingFrequency"];
-           
 
-          
+
+
 
             if (!string.IsNullOrEmpty(GlobalVariables.CdaccountNumber))
             {
                 CDBalanceDTO FTaccountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "FT", apicontext);
                 CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "AD", apicontext);
-                if (applicationcancel) {
+                if (applicationcancel)
+                {
                     policyCancelResponse.FTPremium = FTaccountdetails.TotalAvailableBalance;
                     policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance;
                 }
@@ -5329,55 +5347,49 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             else
             {
-                if (GlobalVariables.PolicyStartDate.Date > policyRequest.EffectiveDate.Value.Date)
-                {
-                    policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - GlobalVariables.PolicyStartDate.Date).TotalDays + 1;
-                }
-                else
-                {
-                    policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
-                }
-
-
+                policyCancelResponse.NoofDayRemaining = (GlobalVariables.PolicyEndDate.Date - policyRequest.EffectiveDate.Value.Date).TotalDays;
             }
             policyCancelResponse.TotalPremium = policyCancelResponse.FTPremium + policyCancelResponse.ADPremium;
 
             var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
-
-            var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from[QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + policyRequest.PolicyNumber + "'group by Month(CreatedDate) , PolicyNo";
-
-
-            try
+            if (GlobalVariables.PolicyData["PolicyStageStatusId"] != 9 && (DateTime)GlobalVariables.PolicyData["Policy Start Date"] <= CurrentDate.Date)
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from[QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + policyRequest.PolicyNumber + "'group by Month(CreatedDate) , PolicyNo";
+
+
+                try
                 {
-                    connection.Open();
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
 
-                    //TBLSWITCHLOG
-                    SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
-                    DataSet Switchds = new DataSet();
-                    SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
-                    switchadapter.Fill(Switchds, "Query1");
+                        //TBLSWITCHLOG
+                        SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
+                        DataSet Switchds = new DataSet();
+                        SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
+                        switchadapter.Fill(Switchds, "Query1");
 
-                    var Result = Switchds.Tables[0];
-                    var Days = (Result.Rows.Count > 0) ? Result.Rows[0].ItemArray[0] : 0;
+                        var Result = Switchds.Tables[0];
+                        var Days = (Result.Rows.Count > 0) ? Result.Rows[0].ItemArray[0] : 0;
 
-                    //Total Usage Shown
-                    var usedays = Convert.ToInt32(Days);
-                    // No. of days for AD
-                    if (GlobalVariables.BillingFrequency == "Monthly")
-                        policyCancelResponse.NoofUnusedDays = 60 - usedays;
-                    else
-                        policyCancelResponse.NoofUnusedDays = 365 - usedays;
+                        //Total Usage Shown
+                        var usedays = Convert.ToInt32(Days);
+                        // No. of days for AD
+                        if (GlobalVariables.BillingFrequency == "Monthly")
+                            policyCancelResponse.NoofUnusedDays = 60 - usedays;
+                        else
+                            policyCancelResponse.NoofUnusedDays = 365 - usedays;
+
+                    }
+                }
+                catch (Exception ex)
+                {
 
                 }
             }
-            catch (Exception ex)
-            {
-
-            }
             return policyCancelResponse;
         }
+
 
         public async Task<PolicyStatusResponseDTO> PolicyStatusUpdate(PolicyStatusDTO policyStatus, ApiContext context)
         {
@@ -7401,6 +7413,58 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
+        public async Task<PolicyExceptionDTO> GetPolicyExceptionDetails(dynamic SourceObject, ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+            var NoOfPC = 0;
+            var NoOfTW = 0;
+            var EndorsmentItem = SourceObject[1];
+            var EndorsmentDataItem = EndorsmentItem["Data"];
+            var VehicleRiskItem = EndorsmentItem["Data"]["InsurableItem"][0]["RiskItems"];
+            var SI = EndorsmentItem["Data"]["si"];
+            var BillingFrequency = EndorsmentItem["Data"]["billingFrequency"];
+            var PolicyNumber = EndorsmentItem["Data"]["PolicyNumber"];
+
+
+            var PolicyObject = SourceObject[0];
+            var PolicyData = PolicyObject["Data"];
+
+
+
+            if (VehicleRiskItem != null)
+            {
+                foreach (var item in VehicleRiskItem)
+                {
+                    if (item["Vehicle Type"] == "PC")
+                    {
+                        NoOfPC += 1;
+                    }
+                    else if (item["Vehicle Type"] == "TW")
+                    {
+                        NoOfTW += 1;
+                    }
+                }
+            }
+
+            PolicyExceptionDTO policyExceptionDTO = new PolicyExceptionDTO();
+
+            policyExceptionDTO.TransactionType = "Endorsement";
+            policyExceptionDTO.PolicyNumber = PolicyNumber;
+            policyExceptionDTO.NoofPcs = NoOfPC;
+            policyExceptionDTO.NoofTws = NoOfTW;
+            policyExceptionDTO.NoofAddnlDrivers = PolicyData["additionalDriver"];
+            policyExceptionDTO.PrimaryDriverAge = PolicyData["driverAge"];
+            policyExceptionDTO.PrimaryDriverExperience = PolicyData["driverExp"];
+            policyExceptionDTO.SumInsured = Convert.ToDecimal(SI);
+            policyExceptionDTO.Frequency = BillingFrequency;
+            Guid guid = Guid.NewGuid();
+            policyExceptionDTO.TxnId = guid.ToString();
+            policyExceptionDTO.Status = true;
+            policyExceptionDTO.RequestObject = EndorsmentDataItem.ToString();
+            return policyExceptionDTO;
+        }
+
+        }
     }
-}
 

@@ -23,7 +23,8 @@ namespace iNube.Services.Policy.Helpers
         public const int PolicyStageProposalCreated = 8;
         public const int PolicyStageQuoteCreated = 9;
         public const int PolicyStageExpired = 10;
-        public const int PolicyStageCancelled = 11;//policyStatus creeated
+        public const int PolicyStageStatusApproved = 11;//policyStatus creeated
+        public const int PolicyStageStatusLive = 22;//policyStatus creeated
         public const int PolicyStagePolicyIssued = 12;
         public const int PolicyStagePolicyLive = 13;
         public const int PolicyStageStatusCancelled = 21;

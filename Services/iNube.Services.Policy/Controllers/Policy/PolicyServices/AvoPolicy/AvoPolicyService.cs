@@ -364,5 +364,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> PolicyActivate(DateTime policyIssueDate, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

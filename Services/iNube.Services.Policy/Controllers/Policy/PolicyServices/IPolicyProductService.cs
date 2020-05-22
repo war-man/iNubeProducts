@@ -1,6 +1,7 @@
 ﻿using iNube.Services.Policy.Models;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -77,5 +78,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<ProposalResponse> ProposalCancellation(dynamic CancellationRequest, ApiContext apiContext);
         Task<bool> ProposalCancellationScheduler(ApiContext apiContext);
         Task<bool> SmsScheduler(ApiContext apiContext);
+        Task<bool> PolicyActivate(DateTime policyIssueDate, ApiContext apiContext);
     }
 }

@@ -391,5 +391,10 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         {
             throw new NotImplementedException();
         }
+
+        public Task<PolicyAgreementResponse> ValidateAssignProduct(string partnerCode, int productId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

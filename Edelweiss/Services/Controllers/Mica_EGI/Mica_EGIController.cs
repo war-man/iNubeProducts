@@ -135,6 +135,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
         }
 
+      
         [HttpPost]
         public async Task<IActionResult> RuleMapper(string TxnType, dynamic SourceObject)
         {
@@ -228,6 +229,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         {
             var response = await _quotationService.MonthlySIPayment(monthlySIDTO, Context);
             return ServiceResponse(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> GetPolicyExceptionDetails(dynamic SourceObject)
+        {
+            var response = await _quotationService.GetPolicyExceptionDetails(SourceObject, Context);
+            return Ok(response);
+
         }
 
     }

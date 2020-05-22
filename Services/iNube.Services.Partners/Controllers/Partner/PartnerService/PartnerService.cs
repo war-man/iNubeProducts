@@ -34,6 +34,7 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         Task<IEnumerable<PartnerDetailsDTO>> GetPartnerDetails(decimal OrgId,ApiContext apiContext);
         Task<string> GetPartnerNameById(decimal PartnerId, ApiContext apiContext);
         Task<PolicyAgreementResponse> EditAssignProductDate(EditAssignProductDTO policyAgreementDTO, ApiContext apiContext);
+        Task<PolicyAgreementResponse> ValidateAssignProduct(string partnerCode, int ProductId, ApiContext apiContext);
     }
 
     public class PartnerService : IPartnerService
@@ -191,6 +192,11 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
         public async Task<PolicyAgreementResponse> EditAssignProductDate(EditAssignProductDTO policyAgreementDTO, ApiContext apiContext)
         {
             return await _partnerProductService(apiContext.ProductType).EditAssignProductDate(policyAgreementDTO, apiContext);
+        }
+
+        public async Task<PolicyAgreementResponse> ValidateAssignProduct(string partnerCode, int ProductId, ApiContext apiContext)
+        {
+            return await _partnerProductService(apiContext.ProductType).ValidateAssignProduct(partnerCode, ProductId, apiContext);
         }
     }
 }

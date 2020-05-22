@@ -90,6 +90,8 @@ namespace iNube.Services.Policy.Helpers
 
             CreateMap<TblPolicyRefund, PolicyRefund>().ReverseMap();
 
+            CreateMap<TblPolicyException, PolicyExceptionDTO>().ReverseMap();
+
         }
 
     }

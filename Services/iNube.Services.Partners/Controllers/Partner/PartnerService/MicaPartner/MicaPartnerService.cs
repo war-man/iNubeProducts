@@ -1304,5 +1304,29 @@ namespace iNube.Services.Partners.Controllers.Partner.PartnerService
             _context.SaveChanges();
             return new PolicyAgreementResponse() {Status=BusinessStatus.Updated, ResponseMessage = "Policy End date updated successfully!" , editAssign = policyAgreementDTO , MessageKey ="DateModifiedSuccessfully"};
         }
+        public async Task<PolicyAgreementResponse> ValidateAssignProduct(string partnerCode, int productId, ApiContext apiContext)
+        {
+            _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var ParterDetails=_context.TblPartners.FirstOrDefault(s => s.PartnerCode == partnerCode);
+            if (ParterDetails != null)
+            {
+                var policyAgreements = _context.TblPolicyAgreement.FirstOrDefault(s => s.ProductIdPk == productId && s.AgentId == ParterDetails.PartnerId);
+                if (policyAgreements != null)
+                {
+                    var Policyagreements_map=_mapper.Map<PolicyAgreementDTO>(policyAgreements);
+                    return new PolicyAgreementResponse() { Status = BusinessStatus.Ok, ResponseMessage = $"Partner Code {partnerCode} is assign for this Product Id {productId}", policyAgreement = Policyagreements_map };
+                }
+                else
+                {
+                    return new PolicyAgreementResponse() { Status = BusinessStatus.NotFound, ResponseMessage = $"Partner Code {partnerCode} is not assign for this Product Id {productId}", policyAgreement = policyAgreements };
+
+                }
+            }
+            else {
+                return new PolicyAgreementResponse() { Status = BusinessStatus.NotFound, ResponseMessage = $"Partner Code {partnerCode} is not found" };
+
+            }
+        }
     }
 }
