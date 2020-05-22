@@ -33,5 +33,9 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.MicaCont
         {
             throw new NotImplementedException();
         }
+        public Task<RecruitmentDTO> RecruitmentByCode(string RecNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

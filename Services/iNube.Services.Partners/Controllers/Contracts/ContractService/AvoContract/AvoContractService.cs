@@ -198,6 +198,13 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
 
             return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document upload successfully!" };
         }
+        public async Task<RecruitmentDTO> RecruitmentByCode(string RecNo, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var data = _context.TblRecruitment.Where(a => a.RecruitmentNo == RecNo).ToList();
+            var mappeddata = _mapper.Map<RecruitmentDTO>(data[0]);
+            return mappeddata;
 
+        }
     }
 }
