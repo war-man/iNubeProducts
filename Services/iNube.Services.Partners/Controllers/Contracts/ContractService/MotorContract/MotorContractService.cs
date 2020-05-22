@@ -44,5 +44,9 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.MotorCon
             throw new NotImplementedException();
         }
 
+        public Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

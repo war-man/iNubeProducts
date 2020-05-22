@@ -2244,4 +2244,21 @@ namespace iNube.Services.Partners.Models
     {
         public dynamic Incentive { get; set; }
     }
+    public partial class TargetDto
+    {
+        public TargetDto()
+        {
+
+        }
+
+
+
+
+        public int? DesignationId { get; set; }
+        public int? Levelid { get; set; }
+        public int? ProgramId { get; set; }
+
+
+
+    }
 }
