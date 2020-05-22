@@ -62,7 +62,7 @@ namespace iNube.Services.Partners.Controllers.Contracts
             return Ok(response);
         }
         [HttpPost]
-        public async Task<IActionResult> SearchTarget(TargetDto tblParticipantMasterDto)
+        public async Task<IActionResult> SearchTarget(TargetDto tblParticipantMasterDto) 
         {
             var search = await _conService.SearchTarget(tblParticipantMasterDto, Context);
             return Ok(search);

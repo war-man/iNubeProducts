@@ -17,7 +17,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.MicaCont
         private MICAPRContext _context = null;
         private IMapper _mapper;
         private readonly IConfiguration _configuration;
-
+         
         public MicaContractService(MICAPRContext context, IMapper mapper, IConfiguration configuration)
         {
             // _context = context;

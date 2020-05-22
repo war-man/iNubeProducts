@@ -2248,7 +2248,7 @@ namespace iNube.Services.Partners.Models
     {
         public TargetDto()
         {
-
+             
         }
 
 

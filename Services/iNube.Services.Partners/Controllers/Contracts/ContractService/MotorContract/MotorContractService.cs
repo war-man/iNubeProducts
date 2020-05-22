@@ -15,7 +15,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.MotorCon
     public class MotorContractService : IContractProductService
     {
         private MICAPRContext _context = null;
-        private IMapper _mapper;
+        private IMapper _mapper; 
         private readonly IConfiguration _configuration;
 
         public MotorContractService(MICAPRContext context, IMapper mapper, IConfiguration configuration)

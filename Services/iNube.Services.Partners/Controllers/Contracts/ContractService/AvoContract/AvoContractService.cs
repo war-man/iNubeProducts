@@ -392,7 +392,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                 var result = JsonConvert.DeserializeObject<object>(apiCl);
 
 
-
+                 
 
                 // var data= serializer.DeserializeObject(result.ToString());
 
