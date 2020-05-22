@@ -318,89 +318,23 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             }
         }
 
-        public async Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext)
+       
+
+     public async Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext)
         {
             try
             {
-
-
-
                 // OrgStandardsDTO scontract = null;
                 _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-
-
-
-
                 var tblOrgStandards = _context.TblOrgStandards.Where(a => a.Level == tblParticipantMasterDto.Levelid && a.ProgramId == tblParticipantMasterDto.ProgramId).FirstOrDefault();
-
-
-
-
-                //if (tblParticipantMasterDto.DesignationId != null)
-                //{
-                //    scontract = scontract.Where(s => s.DesignationId == tblParticipantMasterDto.DesignationId);
-
-
-
-                //}
-                //if (tblParticipantMasterDto.Levelid != null)
-                //{
-                //    scontract = scontract.Where(s => s.Level == tblParticipantMasterDto.Levelid);
-
-
-
-                //}
-                //if (tblParticipantMasterDto.ProgramId != null)
-                //{
-                //    scontract = scontract.Where(s => s.ProgramId == tblParticipantMasterDto.ProgramId);
-
-
-
-                //}
-
-
-
-
 
 
                 var contractdata = _mapper.Map<OrgStandardsDTO>(tblOrgStandards);
 
 
-
-
-                // JsonSerializer.Serialize(contractdata.MappingDetails);
-
-
-
-                //var serializer = new JavaScriptSerializer();
-
-
-
-
-                //dynamic jsonObject = serializer.Deserialize<object>(contractdata.MappingDetails);
-                var apiCl = JsonConvert.SerializeObject(contractdata.MappingDetails);
-                // dynamic jsonApi = JsonConvert.DeserializeObject<dynamic>(apiCl.ToString());
-
-
-
-                // var  myProperty = Convert.MyPropertyType(jsonObject["contractdata.MappingDetails"]);
-                // var  rowString = contractdata.MappingDetails.Replace('"', ' ').Trim();
-
-
-
-                var result = JsonConvert.DeserializeObject<object>(apiCl);
-
-
-                 
-
-                // var data= serializer.DeserializeObject(result.ToString());
-
-
-
-                Object obj = result;
-                var c = obj;
-
+                var b = contractdata.MappingDetails;
+                var res = b.Replace("=", ":");
+                var result = JsonConvert.DeserializeObject<object>(res);
 
 
                 return result;
@@ -410,5 +344,11 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                 return null;
             }
         }
+
+
+
+
+
+
     }
 }
