@@ -3885,7 +3885,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         }
                         engineResponses.Add(resobj1);
-                      
+
                     }
                     catch (Exception Ex)
                     {
@@ -6496,6 +6496,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return response;
         }
 
+
         private List<RuleEngineResponse> GenericMapper(dynamic SourceObject)
         {
             int successcount = 0;
@@ -6796,8 +6797,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return engineResponse;
 
         }
-
-
 
         private async Task<MonthlySIUploadDTO> CSVUpload (string strFilePath, ApiContext context)
         {
