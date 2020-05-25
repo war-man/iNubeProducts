@@ -48,5 +48,25 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.MotorCon
         {
             throw new NotImplementedException();
         }
+
+        public Task<ContractResponse> CreateUpdateContractAsync(ContractDTO contractDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ContractResponse> GetContractDetailsById(int contractId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ContractResponse> GetContractByRecruitmentNo(string recruitmentNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ContractSearchResponse> SearchContract(ContractSearchDTO contractSearchDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

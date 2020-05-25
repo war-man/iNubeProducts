@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 
 using iNube.Services.Partners.Entities.AVO;
+using iNube.Services.Partners.Helpers;
 using iNube.Services.Partners.Models;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
@@ -27,12 +28,14 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
         private IMapper _mapper;
         private readonly IConfiguration _configuration;
         private IIntegrationService _integrationService;
+        public DbHelper dbHelper;
         public AvoContractService(AVOPRContext context, IMapper mapper, IConfiguration configuration, IIntegrationService integrationService)
         {
             // _context = context;
             _integrationService = integrationService;
             _mapper = mapper;
             _configuration = configuration;
+            dbHelper = new DbHelper(new IntegrationService(configuration));
         }
 
         public async Task<bool> GetmasterData(ApiContext apiContext)
@@ -137,7 +140,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                                         var rowCount = worksheet.Dimension.Rows;
                                         for (int row = 2; row <= rowCount; row++)
                                         {
-                                            tblRecruitment = new TblRecruitment();
+                                            tblRecruitment = new TblRecruitment() { IsActive = true, IsContract = false, CreatedBy = apiContext.UserId, CreatedDate = DateTime.Now };
                                             if (worksheet.Cells[row, idxRecruitmentNo].Text.ToString().Trim() != null)
                                             {
                                                 var recrutmentNo = worksheet.Cells[row, idxRecruitmentNo].Text.ToString().Trim();
@@ -205,12 +208,34 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
         public async Task<RecruitmentDTO> RecruitmentByCode(string RecNo, ApiContext apiContext)
         {
             _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var data = _context.TblRecruitment.Where(a => a.RecruitmentNo == RecNo).ToList();
-            var mappeddata = _mapper.Map<RecruitmentDTO>(data[0]);
-            return mappeddata;
+            var data = _context.TblRecruitment.FirstOrDefault(a => a.RecruitmentNo == RecNo);
+            if (data != null)
+            {
+                if ((bool)data.IsContract)
+                {
+                    return new RecruitmentDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"For Recruitment Number {RecNo} Contract is already Created!" };
+                }
+                var mappeddata = _mapper.Map<RecruitmentDTO>(data);
+                mappeddata.Status = BusinessStatus.Ok;
+                return mappeddata;
+            }
+            return new RecruitmentDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"Recruitment Number {RecNo} Not Found!" };
 
         }
-
+        private async Task<bool> UpdateRecruitmentContract(string RecNo, ApiContext apiContext)
+        {
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+            var data = _context.TblRecruitment.FirstOrDefault(a => a.RecruitmentNo == RecNo);
+            if (data != null)
+            {
+                data.IsContract = true;
+                _context.SaveChanges();
+            }
+            return true;
+        }
         public async Task<IncentiveResponse> IncentiveCalculation(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
             //throw new NotImplementedException();
@@ -318,19 +343,24 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             }
         }
 
-       
 
-     public async Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext)
+
+        public async Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext)
         {
             try
             {
                 // OrgStandardsDTO scontract = null;
                 _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-                var tblOrgStandards = _context.TblOrgStandards.Where(a => a.Level == tblParticipantMasterDto.Levelid && a.ProgramId == tblParticipantMasterDto.ProgramId).FirstOrDefault();
-
-
+                TblOrgStandards tblOrgStandards = null;
+                if (tblParticipantMasterDto.DesignationId > 0)
+                {
+                    tblOrgStandards = _context.TblOrgStandards.Where(a => a.Level == tblParticipantMasterDto.Levelid && a.DesignationId== tblParticipantMasterDto.DesignationId && a.ProgramId == tblParticipantMasterDto.ProgramId).FirstOrDefault();
+                }
+                else
+                {
+                    tblOrgStandards = _context.TblOrgStandards.Where(a => a.Level == tblParticipantMasterDto.Levelid && a.ProgramId == tblParticipantMasterDto.ProgramId).FirstOrDefault();
+                }
                 var contractdata = _mapper.Map<OrgStandardsDTO>(tblOrgStandards);
-
 
                 var b = contractdata.MappingDetails;
                 var res = b.Replace("=", ":");
@@ -345,10 +375,145 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             }
         }
 
+        public async Task<ContractResponse> CreateUpdateContractAsync(ContractDTO contractDTO, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
 
+            DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+            var IsRecruitmentNotExist = _context.TblContract.Any(s => s.RecruitmentNo != contractDTO.RecruitmentNo);
+            if (IsRecruitmentNotExist)
+            {
 
+                TblContract contract = _mapper.Map<TblContract>(contractDTO);
+                contractDTO.Flag = false;
+                if (contract.ContractId == 0)
+                {
+                    contract.CreatedBy = apiContext.UserId;
+                    contract.OrganizationId = apiContext.OrgId;
+                    contract.CreatedDate = DateTimeNow;
+                    _context.TblContract.Add(contract);
+                    contractDTO.Flag = true;
+                    
+                }
+                else
+                {
+                    contract.ModifiedDate = DateTimeNow;
+                    contract.ModifiedBy = apiContext.UserId;
 
+                    _context.Update(contract);
+                }
+                _context.SaveChanges();
+                if(contractDTO.Flag)
+                {
+                    await UpdateRecruitmentContract(contract.RecruitmentNo, apiContext);
+                }
+                List<string> lstParameters = new List<string>();
+                lstParameters.Add(contractDTO.ContractId.ToString());
+                lstParameters.Add(contractDTO.RecruitmentNo);
 
+                return new ContractResponse() { Status = BusinessStatus.Created, Id = contractDTO.ContractId.ToString(), contract = contractDTO, ResponseMessage = $"Contract ID: {contractDTO.ContractId} successfully {(contractDTO.Flag == true ? "created " : "modified")} for RecruitmentNo: {contractDTO.RecruitmentNo}", MessageKey = (contractDTO.Flag == true ? "CreateContractMsg" : "ModifiedContractMsg"), MessageValue = lstParameters };
+            }
+            else
+            {
+                return new ContractResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"RecruitmentNo already Exist" };
+
+            }
+        }
+        public async Task<ContractResponse> GetContractDetailsById(int contractId, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            TblContract _tblPartner = _context.TblContract.Where(org => org.ContractId == contractId)
+                                    .FirstOrDefault();
+            if (_tblPartner != null)
+            {
+                ContractDTO _contractDTO = _mapper.Map<ContractDTO>(_tblPartner);
+                return new ContractResponse { Status = BusinessStatus.Ok, contract = _contractDTO };
+            }
+            return new ContractResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"ContractId {contractId} Not Found!" };
+        }
+        public async Task<ContractResponse> GetContractByRecruitmentNo(string recruitmentNo, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            TblContract _tblPartner = _context.TblContract.Where(org => org.RecruitmentNo == recruitmentNo)
+                                    .FirstOrDefault();
+            if (_tblPartner != null)
+            {
+                ContractDTO _contractDTO = _mapper.Map<ContractDTO>(_tblPartner);
+                return new ContractResponse { Status = BusinessStatus.Ok, contract = _contractDTO };
+            }
+            return new ContractResponse { Status = BusinessStatus.NotFound, ResponseMessage = $"Recruitment No {recruitmentNo} Not Found!" };
+        }
+
+        public async Task<ContractSearchResponse> SearchContract(ContractSearchDTO contractSearchDTO, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var _tblContracts = _context.TblContract.OrderByDescending(p => p.CreatedDate).Select(x => x);
+            if (contractSearchDTO.ContractId > 0)
+            {
+                _tblContracts = _tblContracts.Where(p => p.ContractId == contractSearchDTO.ContractId);
+            }
+            if (!string.IsNullOrEmpty(contractSearchDTO.Name))
+            {
+                _tblContracts = _tblContracts.Where(p => p.Name.Contains(contractSearchDTO.Name));
+            }
+            if (!string.IsNullOrEmpty(contractSearchDTO.RecruitmentNo))
+            {
+                _tblContracts = _tblContracts.Where(p => p.RecruitmentNo.Contains(contractSearchDTO.RecruitmentNo));
+            }
+            if (!string.IsNullOrEmpty(contractSearchDTO.Channel))
+            {
+                _tblContracts = _tblContracts.Where(p => p.Channel == contractSearchDTO.Channel);
+            }
+            if (!string.IsNullOrEmpty(contractSearchDTO.SubChannel))
+            {
+                _tblContracts = _tblContracts.Where(p => p.SubChannel == contractSearchDTO.SubChannel);
+            }
+            if (contractSearchDTO.LevelId > 0)
+            {
+                _tblContracts = _tblContracts.Where(p => p.LevelId == contractSearchDTO.LevelId);
+            }
+            if (contractSearchDTO.Duration > 0)
+            {
+                _tblContracts = _tblContracts.Where(p => p.Duration == contractSearchDTO.Duration);
+            }
+            if (contractSearchDTO.Status == 24)
+            {
+                _tblContracts = _tblContracts.Where(p => p.IsActive == false);
+            }
+            if (contractSearchDTO.Status == 23)
+            {
+                _tblContracts = _tblContracts.Where(p => p.IsActive == true);
+            }
+            var contracts = _mapper.Map<List<ContractDTO>>(_tblContracts);
+            ContractSearchResponse response = new ContractSearchResponse() { Status = BusinessStatus.Ok };
+            if (contracts.Count > 0)
+            {
+                response.contracts.AddRange(contracts);
+                return response;
+            }
+            response.Status = BusinessStatus.NotFound;
+            return response;
+        }
+
+        public  async Task<bool> UpdateEmployeeContract(string RecNo, ApiContext apiContext)
+        {
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+            var data = _context.TblContract.FirstOrDefault(a => a.RecruitmentNo == RecNo);
+            if (data != null)
+            {
+                data.IsEmployee = true;
+                _context.SaveChanges();
+            }
+            return true;
+        }
 
     }
 }

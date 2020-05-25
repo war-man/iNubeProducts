@@ -68,5 +68,32 @@ namespace iNube.Services.Partners.Controllers.Contracts
             return Ok(search);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateUpdateContract([FromBody] ContractDTO contractDTO)
+        {
+             var response = await _conService.CreateUpdateContractAsync(contractDTO, Context);
+            return ServiceResponse(response);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetContractDetailsById(int contractId)
+        {
+            var response = await _conService.GetContractDetailsById(contractId, Context);
+            return Ok(response);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetContractByRecruitmentNo(string recruitmentNo)
+        {
+            var response = await _conService.GetContractByRecruitmentNo(recruitmentNo, Context);
+            return Ok(response);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SearchContract([FromBody] ContractSearchDTO data)
+        {
+            var _partnerSearchDTO = await _conService.SearchContract(data, Context);
+            return Ok(_partnerSearchDTO);
+        }
+       
+
+
     }
 }

@@ -781,8 +781,14 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 data.CreatedDate = DateTime.Now;
                 //data.ReportingTo = avOOrgEmployee.EmpId;
                 _context.TblOrgEmployee.Add(data);
-                //data.
+                var contract = _context.TblContract.FirstOrDefault(a => a.RecruitmentNo == data.RecruitmentNo);
+                if (contract != null)
+                {
+                    contract.IsEmployee = true;
+                }
                 _context.SaveChanges();
+                //Update Contract
+                
                 return new CreatePeopleResponse { Status = BusinessStatus.Created, ResponseMessage = $"Employee created successfully with Employee code: {data.StaffCode}." };
             }
             catch (Exception ex)

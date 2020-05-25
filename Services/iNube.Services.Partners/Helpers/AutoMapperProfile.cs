@@ -159,6 +159,8 @@ namespace iNube.Services.Partners.Helpers
             CreateMap<AVOMovements, Entities.AVO.TblMovements>()
                 .ForMember(dest => dest.TblMovementDetails, opt => opt.MapFrom(src => src.AvoMovementDetails)).ReverseMap();
 
+            CreateMap<ContractDTO, Entities.AVO.TblContract>().ReverseMap();
+
         }
 
     }

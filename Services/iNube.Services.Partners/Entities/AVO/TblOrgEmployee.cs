@@ -40,6 +40,7 @@ namespace iNube.Services.Partners.Entities.AVO
         public string BranchName { get; set; }
         public string AccountNumber { get; set; }
         public decimal? ReportingTo { get; set; }
+        public string RecruitmentNo { get; set; }
 
         public virtual TblOrgPositions Position { get; set; }
         public virtual ICollection<TblOrgEmpAddress> TblOrgEmpAddress { get; set; }

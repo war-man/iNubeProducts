@@ -16,6 +16,7 @@ namespace iNube.Services.Partners.Entities.AVO
         }
 
         public virtual DbSet<TblAllocationRate> TblAllocationRate { get; set; }
+        public virtual DbSet<TblContract> TblContract { get; set; }
         public virtual DbSet<TblDesignationRole> TblDesignationRole { get; set; }
         public virtual DbSet<TblDiscountLoadingChart> TblDiscountLoadingChart { get; set; }
         public virtual DbSet<TblMasCity> TblMasCity { get; set; }
@@ -70,13 +71,13 @@ namespace iNube.Services.Partners.Entities.AVO
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=AVOLifeP2;User ID=AVOLifeUserP2;Password=AVOLife*User123;");
+                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=AVOLifeP2;User ID=AVOLifeUserP2; Password=AVOLife*User123;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblAllocationRate>(entity =>
             {
@@ -88,6 +89,66 @@ namespace iNube.Services.Partners.Entities.AVO
                 entity.Property(e => e.Product)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TblContract>(entity =>
+            {
+                entity.HasKey(e => e.ContractId);
+
+                entity.ToTable("tblContract", "PR");
+
+                entity.Property(e => e.ContractId)
+                    .HasColumnName("ContractID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Allowance).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.AverageIncome).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.Channel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ContractExpirationDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ContractInceptionDate).HasColumnType("datetime");
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Designation)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LevelId).HasColumnName("LevelID");
+
+                entity.Property(e => e.ModifiedBy).HasMaxLength(450);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OrganizationId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ParentId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ProgramApplicableId).HasColumnName("ProgramApplicableID");
+
+                entity.Property(e => e.RecruitmentNo)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.SubChannel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TotalAnpTarget).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.TotalCost).HasColumnType("numeric(18, 2)");
             });
 
             modelBuilder.Entity<TblDesignationRole>(entity =>
@@ -800,6 +861,8 @@ namespace iNube.Services.Partners.Entities.AVO
                 entity.Property(e => e.PositionId)
                     .HasColumnName("PositionID")
                     .HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.RecruitmentNo).HasMaxLength(50);
 
                 entity.Property(e => e.ReportingTo).HasColumnType("decimal(18, 0)");
 
@@ -1831,9 +1894,17 @@ namespace iNube.Services.Partners.Entities.AVO
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
                 entity.Property(e => e.Designation)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedBy).HasMaxLength(450);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(100)

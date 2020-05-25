@@ -16,8 +16,11 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
         Task<FileUploadResponse> ContractUpload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<RecruitmentDTO> RecruitmentByCode(string RecNo, ApiContext apiContext);
         Task<IncentiveResponse> IncentiveCalculation(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
-        Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext);  
-
+        Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext);
+        Task<ContractResponse> CreateUpdateContractAsync(ContractDTO contractDTO, ApiContext apiContext);
+        Task<ContractResponse> GetContractDetailsById(int contractId, ApiContext apiContext);
+        Task<ContractResponse> GetContractByRecruitmentNo(string recruitmentNo, ApiContext apiContext);
+        Task<ContractSearchResponse> SearchContract(ContractSearchDTO contractSearchDTO, ApiContext apiContext);
     }
 
     public class ContractService : IContractService
@@ -53,6 +56,26 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
         public async Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext)
         {
             return await _contractProductService(apiContext.ProductType).SearchTarget(tblParticipantMasterDto, apiContext);
+        }
+
+        public async Task<ContractResponse> CreateUpdateContractAsync(ContractDTO contractDTO, ApiContext apiContext)
+        {
+            return await _contractProductService(apiContext.ProductType).CreateUpdateContractAsync(contractDTO, apiContext);
+        }
+
+        public async Task<ContractResponse> GetContractDetailsById(int contractId, ApiContext apiContext)
+        {
+            return await _contractProductService(apiContext.ProductType).GetContractDetailsById(contractId, apiContext);
+        }
+
+        public async Task<ContractResponse> GetContractByRecruitmentNo(string recruitmentNo, ApiContext apiContext)
+        {
+            return await _contractProductService(apiContext.ProductType).GetContractByRecruitmentNo(recruitmentNo, apiContext);
+        }
+
+        public async Task<ContractSearchResponse> SearchContract(ContractSearchDTO contractSearchDTO, ApiContext apiContext)
+        {
+            return await _contractProductService(apiContext.ProductType).SearchContract(contractSearchDTO, apiContext);
         }
     }
 }

@@ -16,6 +16,9 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
         Task<RecruitmentDTO> RecruitmentByCode(string RecNo, ApiContext apiContext);
         Task<IncentiveResponse> IncentiveCalculation(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<object> SearchTarget(TargetDto tblParticipantMasterDto, ApiContext apiContext);
-
+        Task<ContractResponse> CreateUpdateContractAsync(ContractDTO contractDTO, ApiContext apiContext);
+        Task<ContractResponse> GetContractDetailsById(int contractId, ApiContext apiContext);
+        Task<ContractResponse> GetContractByRecruitmentNo(string recruitmentNo, ApiContext apiContext);
+        Task<ContractSearchResponse> SearchContract(ContractSearchDTO contractSearchDTO, ApiContext apiContext);
     }
 }
