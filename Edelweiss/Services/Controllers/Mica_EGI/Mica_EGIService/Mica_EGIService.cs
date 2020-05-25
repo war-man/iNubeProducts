@@ -3880,28 +3880,28 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
 
 
-                        //DateTime Startdate = Convert.ToDateTime(SourceObject["Policy Start Date"]);
+                        DateTime Startdate = Convert.ToDateTime(SourceObject["Policy Start Date"]);
 
-                        //if (Startdate < Currentdate)
-                        //{
-                        //    RuleObject = new RuleEngineResponse();
+                        if (Startdate.Date < Currentdate.Date)
+                        {
+                            RuleObject = new RuleEngineResponse();
 
-                        //    RuleObject.ValidatorName = "Policy Start Date";
-                        //    RuleObject.Outcome = "Fail";
-                        //    RuleObject.Message = "Policy Start Date Cannot be Older than current date";
-                        //    RuleObject.Code = "EXP005";
-                        //    engineResponses.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
-                        //}
-                        //else
-                        //{
-                        //    RuleObject = new RuleEngineResponse();
+                            RuleObject.ValidatorName = "Policy Start Date";
+                            RuleObject.Outcome = "Fail";
+                            RuleObject.Message = "Policy Start Date Cannot be Older than current date";
+                            RuleObject.Code = "EXP005";
+                            engineResponses.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+                        }
+                        else
+                        {
+                            RuleObject = new RuleEngineResponse();
 
-                        //    RuleObject.ValidatorName = "Policy Start Date";
-                        //    RuleObject.Outcome = "Success";
-                        //    RuleObject.Message = "Validation done for Policy Start Date";
-                        //    RuleObject.Code = "EXP005";
+                            RuleObject.ValidatorName = "Policy Start Date";
+                            RuleObject.Outcome = "Success";
+                            RuleObject.Message = "Validation done for Policy Start Date";
+                            RuleObject.Code = "EXP005";
 
-                        //}
+                        }
 
                         engineResponses.Add(RuleObject);
                     }
