@@ -2191,6 +2191,12 @@ namespace iNube.Services.Partners.Models
         public string Channel { get; set; }
         public string SubChannel { get; set; }
         public string Designation { get; set; }
+        public bool? IsContract { get; set; }
+        public bool? IsActive { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 
     public partial class EntityDTOs
