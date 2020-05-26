@@ -50,13 +50,17 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             try
             {
 
+
                 TblRecruitment tblRecruitment = new TblRecruitment();
                 List<TblRecruitment> tblRecruitments = new List<TblRecruitment>();
                 var files = httpRequest.Form.Files;
                 //var docId = GetActiveResult(file.Name); HttpRequest
                 DataTable dt = new DataTable();
+                List<ShowErrorInfoDetails> errorInfoDetails = new List<ShowErrorInfoDetails>();
                 List<ErrorInfo> Errors = new List<ErrorInfo>();
                 _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+                var lstrecutNo = _context.TblRecruitment.Select(s => s.RecruitmentNo).ToList();
+
 
                 foreach (var file in files)
                 {
@@ -140,36 +144,45 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                                         var rowCount = worksheet.Dimension.Rows;
                                         for (int row = 2; row <= rowCount; row++)
                                         {
-                                            tblRecruitment = new TblRecruitment() { IsActive = true, IsContract = false, CreatedBy = apiContext.UserId, CreatedDate = DateTime.Now };
-                                            if (worksheet.Cells[row, idxRecruitmentNo].Text.ToString().Trim() != null)
+                                            tblRecruitment = new TblRecruitment();
+                                            var recNo = worksheet.Cells[row, idxRecruitmentNo].Text.ToString().Trim();
+                                            if (lstrecutNo.Contains(recNo) == false)
                                             {
-                                                var recrutmentNo = worksheet.Cells[row, idxRecruitmentNo].Text.ToString().Trim();
-                                                tblRecruitment.RecruitmentNo = recrutmentNo;
-                                            }
-                                            if (worksheet.Cells[row, idxName].Text.ToString().Trim() != null)
-                                            {
-                                                var Name = worksheet.Cells[row, idxName].Text.ToString().Trim();
-                                                tblRecruitment.Name = Name;
-                                            }
+                                                if (worksheet.Cells[row, idxRecruitmentNo].Text.ToString().Trim() != null)
+                                                {
+                                                    var recrutmentNo = worksheet.Cells[row, idxRecruitmentNo].Text.ToString().Trim();
+                                                    tblRecruitment.RecruitmentNo = recrutmentNo;
+                                                }
+                                                if (worksheet.Cells[row, idxName].Text.ToString().Trim() != null)
+                                                {
+                                                    var Name = worksheet.Cells[row, idxName].Text.ToString().Trim();
+                                                    tblRecruitment.Name = Name;
+                                                }
 
-                                            if (worksheet.Cells[row, idxSubchannel].Text.ToString().Trim() != null)
-                                            {
-                                                var Subchannel = worksheet.Cells[row, idxSubchannel].Text.ToString().Trim();
-                                                tblRecruitment.SubChannel = Subchannel;
-                                            }
-                                            if (worksheet.Cells[row, idxChannel].Text.ToString().Trim() != null)
-                                            {
-                                                var Channel = worksheet.Cells[row, idxChannel].Text.ToString().Trim();
-                                                tblRecruitment.Channel = Channel;
-                                            }
-                                            if (worksheet.Cells[row, idxDesignation].Text.ToString().Trim() != null)
-                                            {
-                                                var Designation = worksheet.Cells[row, idxDesignation].Text.ToString().Trim();
-                                                tblRecruitment.Designation = Designation;
-                                            }
+                                                if (worksheet.Cells[row, idxSubchannel].Text.ToString().Trim() != null)
+                                                {
+                                                    var Subchannel = worksheet.Cells[row, idxSubchannel].Text.ToString().Trim();
+                                                    tblRecruitment.SubChannel = Subchannel;
+                                                }
+                                                if (worksheet.Cells[row, idxChannel].Text.ToString().Trim() != null)
+                                                {
+                                                    var Channel = worksheet.Cells[row, idxChannel].Text.ToString().Trim();
+                                                    tblRecruitment.Channel = Channel;
+                                                }
+                                                if (worksheet.Cells[row, idxDesignation].Text.ToString().Trim() != null)
+                                                {
+                                                    var Designation = worksheet.Cells[row, idxDesignation].Text.ToString().Trim();
+                                                    tblRecruitment.Designation = Designation;
+                                                }
 
-                                            tblRecruitments.Add(tblRecruitment);
+                                                tblRecruitments.Add(tblRecruitment);
 
+                                            }
+                                            else
+                                            {
+                                                ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Recruitment Number is already present in database for row:" + row + "" };
+                                                Errors.Add(errorInfo);
+                                            }
                                         }
 
 
@@ -178,7 +191,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                                         await _context.SaveChangesAsync();
                                     }
                                 }
-                                return new FileUploadResponse { Status = BusinessStatus.Created, ResponseMessage = $"Excel Uploaded successfuylly", MessageKey = step1.ToString() };
+                                return new FileUploadResponse { Status = BusinessStatus.Created, Errors = Errors, ResponseMessage = $"Excel Uploaded successfuylly", MessageKey = step1.ToString() };
                             }
                             catch (Exception ex)
                             {

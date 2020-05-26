@@ -2315,4 +2315,11 @@ namespace iNube.Services.Partners.Models
         }
         public List<ContractDTO> contracts { get; set; }
     }
+    public class ShowErrorInfoDetails
+    {
+        public int ErroRowNo { get; set; }
+
+        public List<Dictionary<string, string>> ErrorDescription { get; set; }
+
+    }
 }
