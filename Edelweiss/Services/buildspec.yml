@@ -36,6 +36,8 @@ artifacts:
     files:
     - Edelweiss/Services/appspec.yml
     - Edelweiss/Services/taskdef.json
+    - Edelweiss/Services/devappspec.yml
+    - Edelweiss/Services/devtaskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
     - imageDetail.json      
