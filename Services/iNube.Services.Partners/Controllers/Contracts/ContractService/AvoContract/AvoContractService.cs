@@ -258,6 +258,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                 dt.Columns.Add("Channel", typeof(string));
                 dt.Columns.Add("Sub Channel", typeof(string));
                 dt.Columns.Add("Designation", typeof(string));
+                dt.Columns.Add("Level", typeof(string));
                 dt.Columns.Add("Incentive Amount", typeof(string));
                 dt.Columns.Add("ANP", typeof(string));
                 dt.Columns.Add("RP", typeof(string));
@@ -282,6 +283,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                                     dr["Channel"] = worksheet.Cells[row, 3].Value.ToString().Trim();
                                     dr["Sub Channel"] = worksheet.Cells[row, 4].Value.ToString().Trim();
                                     dr["Designation"] = worksheet.Cells[row, 5].Value.ToString().Trim();
+                                    dr["Level"] = worksheet.Cells[row, 6].Value.ToString().Trim();
                                     dr["Incentive Amount"] = worksheet.Cells[row, 7].Value.ToString().Trim();
                                     dr["ANP"] = worksheet.Cells[row, 8].Value.ToString().Trim();
                                     dr["RP"] = worksheet.Cells[row, 9].Value.ToString().Trim();
@@ -324,14 +326,15 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
 
             string empcode = dataRow["Emp Code"].ToString();
 
-            //var empname = await GetEmpName(empcode, apiContext);
+            var empname = await GetEmpName(empcode, apiContext);
 
             AddProperty(obj, "EmpCode", empcode);
-            //AddProperty(obj, "EmpName", empname);
+            AddProperty(obj, "EmpName", empname);
             AddProperty(obj, "IncentiveName", dataRow["Incentive Name"]);
             AddProperty(obj, "Channel", dataRow["Channel"]);
             AddProperty(obj, "SubChannel", dataRow["Sub Channel"]);
             AddProperty(obj, "Designation", dataRow["Designation"]);
+            AddProperty(obj, "Level", dataRow["Level"]);
             AddProperty(obj, "IncentiveAmount", dataRow["Incentive Amount"]);
             AddProperty(obj, "ANP", dataRow["ANP"]);
             AddProperty(obj, "RP", dataRow["RP"]);
@@ -358,11 +361,14 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
 
         public async Task<string> GetEmpName(string code, ApiContext apiContext)
         {
-            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var emp = _context.TblOrgEmployee.FirstOrDefault(a => a.StaffCode == code).StaffName;
+            if (_context == null)
+            {
+                _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+            var emp = _context.TblOrgEmployee.FirstOrDefault(a => a.StaffCode == code);
             if (emp != null)
             {
-                return emp;
+                return emp.StaffName;
             }
             return "Employee not exist";
         }
