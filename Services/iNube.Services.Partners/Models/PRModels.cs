@@ -143,7 +143,7 @@ namespace iNube.Services.Partners.Models
 
     public partial class OrgSearchDTO
     {
-        public decimal OrganizationId { get; set; }
+        public decimal? OrganizationId { get; set; }
         public string OrgName { get; set; }
         public string OrgWebsite { get; set; }
         public string OrgPhoneNo { get; set; }
