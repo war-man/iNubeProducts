@@ -1,5 +1,5 @@
 {
-  "family": " ed-mica-extension-ismail",
+  "family": "ed-mica-extension-ismail",
   "taskRoleArn": "",
   "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
