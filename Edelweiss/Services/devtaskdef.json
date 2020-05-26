@@ -1,11 +1,11 @@
 {
-  "family": "ed-mica-extension-ismail",
+  "family": "dev2-mica-extension",
   "taskRoleArn": "",
   "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "ed-mica-extension-ismail",
+      "name": "dev2-mica-extension",
       "image": "<IMAGE1_NAME>",
 
       "cpu": 512,
@@ -28,6 +28,6 @@
     "EC2"
   ],
   "cpu": "512",
-  "memory": "512" 
+  "memory": "512"
 
 }
