@@ -211,7 +211,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             var data = _context.TblRecruitment.FirstOrDefault(a => a.RecruitmentNo == RecNo);
             if (data != null)
             {
-                if ((bool)data.IsContract)
+                if (data.IsContract.HasValue && Convert.ToBoolean(data.IsContract))
                 {
                     return new RecruitmentDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"For Recruitment Number {RecNo} Contract is already Created!" };
                 }
