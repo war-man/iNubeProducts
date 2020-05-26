@@ -6643,13 +6643,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 foreach (var item in DriverRiskItem)
                 {
                     var driverExp = item["Driving Experience"];
+                    var driverAge = item["Age"];
                     var drvIdentificationNo = item["Identification Number"];
                     if (driverExp >= 1)
                     {
                         RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Driving Experience";
+                        resobj.ValidatorName = "Primary Driver Experience";
                         resobj.Outcome = "Success";
-                        resobj.Message = "Validation done for driver experience cannot be less than one year";
+                        resobj.Message = "Validation done for primary driver experience cannot be less than one year";
                         resobj.Code = "GEPO001";
                         engineResponse.Add(resobj);
                         successcount++;
@@ -6658,13 +6659,98 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     else
                     {
                         RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Driving Experience";
+                        resobj.ValidatorName = "Primary Driver Experience";
                         resobj.Outcome = "Fail";
-                        resobj.Message = "Driver Experience cannot be less than one year";
+                        resobj.Message = "Primary Driver Experience cannot be less than one year";
                         resobj.Code = "GEPO001";
                         engineResponse.Add(resobj);
                         failcount++;
 
+                    }
+                    if (driverExp == SourceObject["driverExp"])
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Comparing Driver Experience";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for driver experience ";
+                        resobj.Code = "GEPO017";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Comparing Driver Experience";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Primary driver driving experience and base level driver experience should be same";
+                        resobj.Code = "GEPO017";
+                        engineResponse.Add(resobj);
+                        failcount++;
+
+                    }
+
+                    if (driverAge == SourceObject["driverAge"])
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Comparing Driver Age";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for driver age ";
+                        resobj.Code = "GEPO018";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Comparing Driver Age";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Primary driver age and base level driver age must be same";
+                        resobj.Code = "GEPO018";
+                        engineResponse.Add(resobj);
+                        failcount++;
+
+                    }
+                    if (Convert.ToInt32(driverExp) > Convert.ToInt32(driverAge) - 18)
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Primary level driver experience";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Years of primary driver driving experience cannot be greater than the difference in current age and 18";
+                        resobj.Code = "GEPO019";
+                        engineResponse.Add(resobj);
+                        failcount++;
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "Primary level driver experience";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for driver experience";
+                        resobj.Code = "GEPO019";
+                        engineResponse.Add(resobj);
+                        successcount++;
+                    }
+
+                    if (driverAge >= 18)
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "driverAge";
+                        resobj.Outcome = "Success";
+                        resobj.Message = "Validation done for age of primary driver cannot be less than 18 years";
+                        resobj.Code = "GEPO020";
+                        engineResponse.Add(resobj);
+                        successcount++;
+
+                    }
+                    else
+                    {
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        resobj.ValidatorName = "driverAge";
+                        resobj.Outcome = "Fail";
+                        resobj.Message = "Age of primary driver cannot be less than 18 years";
+                        resobj.Code = "GEPO020";
+                        engineResponse.Add(resobj);
+                        failcount++;
                     }
 
                 }
@@ -6897,6 +6983,28 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
 
                 }
+                if (SourceObject["driverExp"] >= 1)
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "Driving Experience";
+                    resobj.Outcome = "Success";
+                    resobj.Message = "Validation done for driver experience cannot be less than one year";
+                    resobj.Code = "GEPO016";
+                    engineResponse.Add(resobj);
+                    successcount++;
+
+                }
+                else
+                {
+                    RuleEngineResponse resobj = new RuleEngineResponse();
+                    resobj.ValidatorName = "Driving Experience";
+                    resobj.Outcome = "Fail";
+                    resobj.Message = "Driver Experience cannot be less than one year";
+                    resobj.Code = "GEPO016";
+                    engineResponse.Add(resobj);
+                    failcount++;
+
+                }
 
                 if (failcount > 0)
                 {
@@ -6904,7 +7012,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     res4obj.ValidatorName = "Generic Final Result";
                     res4obj.Outcome = "Fail";
                     res4obj.Message = "One or More conditions failed";
-                    res4obj.Code = "GEPO016";
+                    res4obj.Code = "GEPO021";
                     engineResponse.Add(res4obj);
                 }
                 else
@@ -6913,7 +7021,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     res4obj.ValidatorName = "Generic Final Result";
                     res4obj.Outcome = "Success";
                     res4obj.Message = "Conditions Successful";
-                    res4obj.Code = "GEPO017";
+                    res4obj.Code = "GEPO022";
                     engineResponse.Add(res4obj);
 
                 }
