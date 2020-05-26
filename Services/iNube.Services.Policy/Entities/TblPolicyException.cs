@@ -31,3 +31,4 @@ namespace iNube.Services.Policy.Entities
         public bool? Status { get; set; }
     }
 }
+
