@@ -180,7 +180,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                                             }
                                             else
                                             {
-                                                ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Recruitment Number is already present in database for row:" + row + "" };
+                                                ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Recruitment Number is already present in database for row:" + row + "",PropertyName=recNo };
                                                 Errors.Add(errorInfo);
                                             }
                                         }
