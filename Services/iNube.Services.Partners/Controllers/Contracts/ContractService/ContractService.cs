@@ -21,6 +21,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
         Task<ContractResponse> GetContractDetailsById(int contractId, ApiContext apiContext);
         Task<ContractResponse> GetContractByRecruitmentNo(string recruitmentNo, ApiContext apiContext);
         Task<ContractSearchResponse> SearchContract(ContractSearchDTO contractSearchDTO, ApiContext apiContext);
+        Task<ContractDTO> GetContractDetails(string recruitmentNo, ApiContext apiContext);
     }
 
     public class ContractService : IContractService
@@ -76,6 +77,11 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
         public async Task<ContractSearchResponse> SearchContract(ContractSearchDTO contractSearchDTO, ApiContext apiContext)
         {
             return await _contractProductService(apiContext.ProductType).SearchContract(contractSearchDTO, apiContext);
+        }
+        
+        public async Task<ContractDTO> GetContractDetails(string recruitmentNo, ApiContext apiContext)
+        {
+            return await _contractProductService(apiContext.ProductType).GetContractDetails(recruitmentNo, apiContext);
         }
     }
 }

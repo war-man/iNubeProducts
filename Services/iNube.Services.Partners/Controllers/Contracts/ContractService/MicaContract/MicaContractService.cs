@@ -68,5 +68,9 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.MicaCont
         {
             throw new NotImplementedException();
         }
+        public Task<ContractDTO> GetContractDetails(string recruitmentNo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

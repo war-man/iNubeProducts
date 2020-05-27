@@ -570,6 +570,15 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             }
             return true;
         }
+        public async Task<ContractDTO> GetContractDetails(string recruitmentNo, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var contractData = _context.TblContract.Where(x => x.RecruitmentNo == recruitmentNo).Select(x => x).FirstOrDefault();
+            var _conData = _mapper.Map<ContractDTO>(contractData);
+            return _conData;
+
+        }
 
     }
 }
