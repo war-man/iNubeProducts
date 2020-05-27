@@ -464,6 +464,12 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                 if (contractDTO.Flag)
                 {
                     await UpdateRecruitmentContract(contract.RecruitmentNo, apiContext);
+                    // Generate PDF
+                    if (contractDTO.lstIllustraionModels.Count > 0)
+                    {
+                        var model = GetAnpModel(contractDTO);
+                        await SendNotificationAsync(model, "ContractCertificate", contractDTO.RecruitmentNo, apiContext);
+                    }
                 }
                 List<string> lstParameters = new List<string>();
                 lstParameters.Add(contractDTO.ContractId.ToString());
@@ -580,5 +586,50 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
 
         }
 
+
+        private ContractModel GetAnpModel(ContractDTO contract)
+        {
+            ContractModel model = new ContractModel();
+            model.RecruitmentNo = contract.RecruitmentNo;
+            model.Allowance = (decimal)contract.Allowance;
+            model.AnpTarget = (decimal)contract.TotalAnpTarget;
+            model.TotalCost = (decimal)contract.TotalCost;
+            model.Designation = contract.Designation;
+            model.Level ="Level "+ contract.LevelId;
+
+            List<ANPModel> aNPModels = new List<ANPModel>();
+            ANPModel aNPModel = null;
+            foreach (var item in contract.lstIllustraionModels)
+            {
+                aNPModel = new ANPModel();
+                aNPModel.MonthlyAnp = Convert.ToDecimal(item.oMonthlyANP);
+                aNPModel.CumulativeAnp = Convert.ToDecimal(item.oCummulativeANP);
+                aNPModel.EndingManpower = Convert.ToDecimal(item.oEndingManPower);
+                aNPModel.ActivityRatio = Convert.ToDecimal(item.oActivityRatio);
+                aNPModel.ActiveAgent = Convert.ToInt16(item.oActiveAgent);
+                aNPModels.Add(aNPModel);
+            }
+            model.lstANPModels.AddRange(aNPModels);
+            return model;
+        }
+
+        private async Task SendNotificationAsync(dynamic notificationModel,string TemplateKey, string IdentificationNumber, ApiContext apiContext)
+        {
+            try
+            {
+                Partners.Models.NotificationRequest request = new Partners.Models.NotificationRequest();
+                request.TemplateKey = TemplateKey;
+                request.AttachPDF = true;
+                request.StorageName = IdentificationNumber;
+                request.NotificationPayload = JsonConvert.SerializeObject(notificationModel);
+                request.SendEmail = true;
+                request.SendSms = false;
+                 var notificationResponse = await _integrationService.SendNotificationAsync(request, apiContext);
+            }
+            catch (Exception ex)
+            {
+                var msgr = ex.ToString();
+            }
+        }
     }
 }

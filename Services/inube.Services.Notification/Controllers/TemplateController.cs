@@ -461,7 +461,18 @@ namespace inube.Services.Notification.Template
                     ImageDTO imageDTO = new ImageDTO();
                     imageDTO.fileUploadDTOs.Add(fileUploadDTO);
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    _iDMSService.DocumentSimpleupload(imageDTO);
+                    await _iDMSService.DocumentSimpleupload(imageDTO);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                }
+                if (templateModel.ActionType == "ContractCertificate")
+                {
+                   // await templateHelper.ProcessNotificationEmailAsync(templateModel.FileName, binary, model.EmailTest);
+                    FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
+                    fileUploadDTO.IdentificationNo = templateModel.StorageName;
+                    ImageDTO imageDTO = new ImageDTO();
+                    imageDTO.fileUploadDTOs.Add(fileUploadDTO);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    await _iDMSService.DocumentSimpleupload(imageDTO);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 }
                 return new ResponseStatus() { Status = BusinessStatus.Created, MessageKey = content.FileName };
@@ -1076,6 +1087,7 @@ occurred, subject to the maximum limit as specified in the Schedule to this Poli
         private ContractModel GetAnpModel()
         {
             ContractModel model = new ContractModel();
+            model.RecruitmentNo = "R05";
             //model.cweDetails = new System.Collections.Generic.List<CweDetails>();
             model.Allowance = 50000;
             model.AnpTarget = 1900000;

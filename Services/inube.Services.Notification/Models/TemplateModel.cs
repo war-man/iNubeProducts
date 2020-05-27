@@ -76,6 +76,7 @@ namespace inube.Services.Notification.Models
         public string FileExtension { get; set; }
         public byte[] FileData { get; set; }
         public string ContentType { get; set; }
+        public string IdentificationNo { get; set; }
         public List<TagDto> tagdto { get; set; }
 
     }
@@ -166,18 +167,20 @@ namespace inube.Services.Notification.Models
         }
         public string Designation { get; set; }
         public string Level { get; set; }
+        public string RecruitmentNo { get; set; }
         public decimal Allowance { get; set; }
         public decimal TotalCost { get; set; }
         public decimal AnpTarget { get; set; }
+        public EmailRequest EmailTest { get; set; }
         public List<ANPModel> lstANPModels { get; set; }
     }
 
     public class ANPModel
     {
-      
+        public int Period { get; set; }
         public decimal MonthlyAnp { get; set; }
         public decimal CumulativeAnp { get; set; }
-        public int EndingManpower { get; set; }
+        public decimal EndingManpower { get; set; }
         public decimal ActivityRatio { get; set; }
         public int ActiveAgent { get; set; }
     }

@@ -27,14 +27,19 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
     public class DMSService1 : IDMSService
     {
         IDMSDatabaseSettings _settings;
+        MongoClientSettings mngsettings = null;
         public DMSService1(IDMSDatabaseSettings settings)
         {
             _settings = settings;
+            var mongo_url = MongoUrl.Create(_settings.ConnectionString);
+            mngsettings = MongoClientSettings.FromUrl(mongo_url);
+            mngsettings.MaxConnectionIdleTime = new TimeSpan(0, 3, 0); mngsettings.SocketTimeout = new TimeSpan(0, 3, 0);
         }
         public async Task<DocumentResp> DownloadFile(string id)
         {
             DocumentResp documentResp = new DocumentResp();
-            var client = new MongoClient(_settings.ConnectionString);
+           // var client = new MongoClient(_settings.ConnectionString);
+            var client = new MongoClient(mngsettings);
             var database = client.GetDatabase(_settings.DatabaseName);
             var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
             DMSDTO dMSDTO = new DMSDTO();
@@ -56,7 +61,8 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
         }
         public async Task<FileUploadDTO> DownloadFile1(string id)
         {
-            var client = new MongoClient(_settings.ConnectionString);
+           // var client = new MongoClient(_settings.ConnectionString);
+            var client = new MongoClient(mngsettings);
             var database = client.GetDatabase(_settings.DatabaseName);
             var collection = database.GetCollection<FileUploadDTO>(_settings.CollectionName);
             FileUploadDTO dMSDTO = new FileUploadDTO();
@@ -67,7 +73,8 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
 
         public async Task<DMSDTO> DownloadView(string id)
         {
-            var client = new MongoClient(_settings.ConnectionString);
+            //var client = new MongoClient(_settings.ConnectionString);
+            var client = new MongoClient(mngsettings);
             var database = client.GetDatabase(_settings.DatabaseName);
             var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
             DMSDTO dMSDTO = new DMSDTO();
@@ -83,7 +90,8 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
 
             if (httpRequest.Form.Files != null)
             {
-                var client = new MongoClient(_settings.ConnectionString);
+                //var client = new MongoClient(_settings.ConnectionString);
+                var client = new MongoClient(mngsettings);
                 //var db=ConnectionInfo()
                 var database = client.GetDatabase(_settings.DatabaseName);
                 DMSDTO dMSDTO = new DMSDTO();
@@ -220,12 +228,11 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
 
         public async Task<List<DMSResponse>> DocumentSimpleupload(ImageDTO fileUploadDTO)
         {
-            var client = new MongoClient(_settings.ConnectionString);
+           // var client = new MongoClient(_settings.ConnectionString);
+            var client = new MongoClient(mngsettings);
             //var db=ConnectionInfo()
             var database = client.GetDatabase(_settings.DatabaseName);
             DMSDTO dMSDTO = new DMSDTO();
-
-            // dMSDTO.docId = guid;
             DMSResponse dMSResponse = new DMSResponse();
 
             List<DMSResponse> dMSResponselist = new List<DMSResponse>();
@@ -233,7 +240,14 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
             foreach (var images in fileUploadDTO.fileUploadDTOs)
             {
                 string guid = System.Guid.NewGuid().ToString();
-                dMSDTO.docId = guid;
+                if (string.IsNullOrEmpty(images.IdentificationNo))
+                {
+                    dMSDTO.docId = guid;
+                }
+                else
+                {
+                    dMSDTO.docId = images.IdentificationNo;
+                }
 
                 dMSDTO.fileName = images.FileName;
 
@@ -266,22 +280,7 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
                 dMSResponselist.Add(dMSResponse);
 
             }
-
-            // var files = httpRequest.Form.Files;
-
-
-
-
-
-            // DMSResponse dMSResponse = new DMSResponse();
-            // dMSResponse.Docid = docid;
-
-
-            // dMSDTO.docId =guid;
             return dMSResponselist;
-            //   return new DMSResponse { Docid = dMSDTO.docId , Status=iNube.Utility.Framework.Model.BusinessStatus.Ok};
-
-
         }
 
 
@@ -313,7 +312,8 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
         }
         public async Task<List<DMSDTO>> AddTags(string id, string tagName, string tagvalue)
         {
-            var client = new MongoClient(_settings.ConnectionString);
+           // var client = new MongoClient(_settings.ConnectionString);
+            var client = new MongoClient(mngsettings);
             var database = client.GetDatabase(_settings.DatabaseName);
             var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
             List<TagDTO> tagDTOs = new List<TagDTO>();
