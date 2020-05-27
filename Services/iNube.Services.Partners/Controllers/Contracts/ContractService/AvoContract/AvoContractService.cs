@@ -438,8 +438,8 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             dbHelper._TimeZone = UserDateTime.KeyValue;
 
             DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
-            var IsRecruitmentNotExist = _context.TblContract.Any(s => s.RecruitmentNo != contractDTO.RecruitmentNo);
-            if (IsRecruitmentNotExist)
+            var IsRecruitmentExist = _context.TblContract.Any(s => s.RecruitmentNo == contractDTO.RecruitmentNo);
+            if (!IsRecruitmentExist)
             {
 
                 TblContract contract = _mapper.Map<TblContract>(contractDTO);
