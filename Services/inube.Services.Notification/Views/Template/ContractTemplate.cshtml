@@ -7,176 +7,134 @@
 
 <!DOCTYPE html>
 
-
+<html>
 <head>
     <style>
         table, th, td {
             border: 1px solid black;
-            width:auto;
+            width: auto;
             border-collapse: collapse;
         }
     </style>
 </head>
 <body>
 
-    <div>
-
-        <div style="position:absolute;left:497.71px;top:38.64px" class="cls_003"><span class="cls_003">Page 21 of 28</span></div>
-        <div style="position:absolute;left:200.06px;top:41.40px" class="cls_002"><span class="cls_002">Policies and Procedures</span></div>
-        <div style="position:absolute;left:200.06px;top:66.26px" class="cls_004"><span class="cls_004">LEADER EXPANSION AGENCY PROGRAM (L.E.A.P)</span></div>
-        <div style="position:absolute;left:72.00px;top:101.90px" class="cls_044"><span class="cls_044">ANNEX E: GOAL SHEET</span></div>
-        <div style="position:absolute;left:320.57px;top:123.98px" class="cls_044"><span class="cls_044">GOAL SHEET - LEADER (EXTERNAL)</span></div>
-        <div style="position:absolute;left:337.61px;top:146.06px" class="cls_002"><span class="cls_002">Managing Partner - Level 1</span></div>
-        <div style="position:absolute;left:109.82px;top:169.34px" class="cls_007"><span class="cls_007">Managing Partner</span></div>
-
-
-        <table>
+    <div class="container" style="padding: 20px;">
+        <table class="table table-condensed" style="width:100%;border: 1px solid #000;padding: 5px; background-image:url(/images/watermark.jpg);background-repeat:repeat">
             <tbody>
-                <tr>
-                    @*<th>@Html.DisplayFor(model => model.Designation)</th>
-                    <th>@Html.DisplayFor(model => model.Level)</th>*@
-                    <th>Allowance</th>
-                    <th>Total Cost</th>
-                    <th>Anp Target</th>
+                <div>
+                <tr style="width: 100%">
+                    <td style="width: 50%; vertical-align: top; padding: 5px;border: 1px solid #000;">
+                        <img src="~/images/PNBAllianz.png" style="float: left;">
+                    </td>
 
+                    <td rowspan="2" style="width: 100%; border: 1px solid #000;">
+                        <table style="width: 100%">
+                            <tbody>
+                                <tr>
+
+                                    <td style="width: 50%;padding: 5px;border: 1px solid #000;">
+                                        <span><strong>Policies and Procedures</strong></span><br>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 100%;padding: 5px;border: 1px solid #000;">
+                                        <span><strong>LEADER EXPANSION AGENCY PROGRAM (L.E.A.P)</strong></span><br>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </td>
                 </tr>
-                <tr>
+</div>
+                <div>
+                <p style="text-align:center;">
+                    <span><strong><u>GOAL SHEET - LEADER (EXTERNAL)</u></strong></span>
+                </p>
+                <p style="text-align:center;">  <span style="float:unset;"><strong>Managing Partner - Level 1</strong></span></p>
 
-                    <td>@Html.DisplayFor(model => model.Allowance)</td>
+               </div>
 
+                            <tr>
+                                    <table style="width: 100%">
+                                        <thead>
+                                            <tr bgcolor="#ccddff">
+                                                <th style="border: 1px solid #000;padding: 5px;">Managing Partner</th>
+                                                <th style="border: 1px solid #000;padding: 5px;">Level 1</th>
+                                            </tr>
+                                        </thead>
 
-                    <td>@Html.DisplayFor(model => model.TotalCost)</td>
+                                        <tbody>
+                                            <tr style="text-align:center;" bgcolor="#e6eeff">
+                                                <td style="border: 1px solid #000;padding: 5px;"> Allowance </td>
+                                                <td style="border: 1px solid #000;padding: 5px;" bgcolor="#ffe6ff">@Html.DisplayFor(model => model.Allowance)</td>
+                                            </tr>
+                                            <tr style="text-align:center;" bgcolor="#e6eeff">
+                                                <td style="border: 1px solid #000;padding: 5px;">Total Cost</td>
+                                                <td style="border: 1px solid #000;padding: 5px;" bgcolor="#ffe6ff">@Html.DisplayFor(model => model.TotalCost)</td>
+                                            </tr>
+                                            <tr style="text-align:center;" bgcolor="#e6eeff">
+                                                <td style="border: 1px solid #000;padding: 5px;">ANP Target</td>
+                                                <td style="border: 1px solid #000;padding: 5px;" bgcolor="#ffe6ff">@Html.DisplayFor(model => model.AnpTarget) </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </tr>
+            
+             
+                                    <table style="width: 100%">
+                                        <thead>
+                                            <tr bgcolor="#ccddff">
+                                                <th style="border: 1px solid #000;padding: 5px;">Level 1</th>
+                                                <th style="border: 1px solid #000;padding: 5px;">Year 1 Total</th>
+                                                <th style="border: 1px solid #000;padding: 5px;">Year 2 Total</th>
+                                                <th style="border: 1px solid #000;padding: 5px;">Year 3 Total</th>
+                                            </tr>
+                                        </thead>
 
+                                        <tbody>
+                                            <tr bgcolor="#e6eeff">
+                                                <td style="border: 1px solid #000;padding: 5px;"> Monthly ANP </td>
+                                                @foreach (var item in Model.lstANPModels)
+                                                {
+                                                    <td style="border: 1px solid #000;padding: 5px;text-align:center"; bgcolor="white";>@Html.DisplayFor(model => item.MonthlyAnp)</td>
+                                                }
+                                            </tr>
+                                            <tr bgcolor="#e6eeff">
+                                                <td style="border: 1px solid #000;padding: 5px;">Cumalative ANP</td>
+                                                @foreach (var item in Model.lstANPModels)
+                                                {
+                                                    <td style="border: 1px solid #000;padding: 5px;text-align:center"; bgcolor="white";>@Html.DisplayFor(model => item.CumulativeAnp)</td>
+                                                }
+                                            </tr>
+                                            <tr bgcolor="#e6eeff">
+                                                <td style="border: 1px solid #000;padding: 5px;">Ending ManPower</td>
+                                                @foreach (var item in Model.lstANPModels)
+                                                {
+                                                    <td style="border: 1px solid #000;padding: 5px;text-align:center"; bgcolor="white">@Html.DisplayFor(model => item.EndingManpower) </td>
+                                                }
+                                            </tr>
+                                            <tr bgcolor="#e6eeff">
+                                                <td style="border: 1px solid #000;padding: 5px;">Activity Ratio</td>
+                                                @foreach (var item in Model.lstANPModels)
+                                                {
+                                                    <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Html.DisplayFor(model => item.ActivityRatio) </td>
+                                                }
+                                            </tr>
+                                            <tr bgcolor="#e6eeff">
+                                                <td style="border: 1px solid #000;padding: 5px;">Active Agent</td>
+                                                @foreach (var item in Model.lstANPModels)
+                                                {
+                                                    <td style="border: 1px solid #000;padding: 5px;text-align:center"; bgcolor="white">@Html.DisplayFor(model => item.ActiveAgent) </td>
+                                                }
+                                            </tr>
+                                        </tbody>
 
-                    <td>@Html.DisplayFor(model => model.AnpTarget)</td>
+                                    </table>
 
-                </tr>
             </tbody>
         </table>
-
-        <table>
-            <tbody>
-                <tr>
-                    @*<th></th>*@
-                    @*<th>Level 1</th>
-                    <th>Year 1 Total</th>
-                    <th>Year 2 Total</th>
-                    <th>Year 3 Total</th>*@
-                    <th>Monthly ANP</th>
-                    <th>Cumalative ANP</th>
-                    <th>Ending ManPower</th>
-                    <th>Activity Ratio</th>
-                    <th>Active Agent</th>
-                </tr>
-
-                @foreach (var item in Model.lstANPModels)
-                {
-
-                    <tr>
-
-                        <td>@Html.DisplayFor(model => item.MonthlyAnp)</td>
-
-
-                        <td>@Html.DisplayFor(model => item.CumulativeAnp)</td>
-
-
-                        <td>@Html.DisplayFor(model => item.EndingManpower)</td>
-
-
-                        <td>@Html.DisplayFor(model => item.ActivityRatio)</td>
-
-
-                        <td>@Html.DisplayFor(model => item.ActiveAgent)</td>
-
-                    </tr>
-                }
-
-            </tbody>>
-        </table>
-
-
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Favorite Color</th>
-            </tr>
-            <tr>
-                <td>Bob</td>
-                <td>Yellow</td>
-            </tr>
-            <tr>
-                <td>Michelle</td>
-                <td>Purple</td>
-            </tr>
-        </table>
-        Name	Favorite Color
-        Bob	Yellow
-        Michelle	Purple
-        Table Code Sample: Complex Table
-        <table>
-            <caption>A complex table</caption>
-            <thead>
-                <tr>
-                    <th colspan="3">Manger</th>
-                    <th>Level 1
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <strong>Allowance</strong><br>
-
-                    </td>
-                    <td colspan="2">
-                        <strong>Total Cost</strong><br>
-
-                    </td>
-                    <td colspan="2">
-                        <strong>ANP Target</strong><br>
-
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>Name / Description</th>
-                    <th>Qty.</th>
-                    <th>Rohit</th>
-                    <th>Cost</th>
-                </tr>
-                <tr>
-                    <td>Paperclips</td>
-                    <td>1000</td>
-                    <td>0.01</td>
-                    <td>10.00</td>
-                </tr>
-                <tr>
-                    <td>Staples (box)</td>
-                    <td>100</td>
-                    <td>1.00</td>
-                    <td>100.00</td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th colspan="3">Subtotal</th>
-                    <td> 110.00</td>
-                </tr>
-                <tr>
-                    <th colspan="2">Tax</th>
-                    <td> 8% </td>
-                    <td>8.80</td>
-                </tr>
-                <tr>
-                    <th colspan="3">Grand Total</th>
-                    <td>$ 118.80</td>
-                </tr>
-            </tfoot>
-        </table>
-
     </div>
 </body>
-
-
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+</html>
