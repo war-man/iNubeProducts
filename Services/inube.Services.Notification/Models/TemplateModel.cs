@@ -154,4 +154,31 @@ namespace inube.Services.Notification.Models
         public DateTime? ModifiedDate { get; set; }
         public decimal? EnvId { get; set; }
     }
+
+
+    //Contract model
+
+    public class ContractModel
+    {
+        public ContractModel()
+        {
+            lstANPModels = new List<ANPModel>();
+        }
+        public string Designation { get; set; }
+        public string Level { get; set; }
+        public decimal Allowance { get; set; }
+        public decimal TotalCost { get; set; }
+        public decimal AnpTarget { get; set; }
+        public List<ANPModel> lstANPModels { get; set; }
+    }
+
+    public class ANPModel
+    {
+      
+        public decimal MonthlyAnp { get; set; }
+        public decimal CumulativeAnp { get; set; }
+        public int EndingManpower { get; set; }
+        public decimal ActivityRatio { get; set; }
+        public int ActiveAgent { get; set; }
+    }
 }
