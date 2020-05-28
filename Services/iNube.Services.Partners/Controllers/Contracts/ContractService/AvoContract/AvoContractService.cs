@@ -604,7 +604,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                 aNPModel = new ANPModel();
                 aNPModel.MonthlyAnp = Convert.ToDecimal(item.oMonthlyANP);
                 aNPModel.CumulativeAnp = Convert.ToDecimal(item.oCummulativeANP);
-                aNPModel.EndingManpower = Convert.ToDecimal(item.oEndingManPower);
+                aNPModel.EndingManpower =Math.Round( Convert.ToDecimal(item.oEndingManPower),2);
                 aNPModel.ActivityRatio = Convert.ToDecimal(item.oActivityRatio);
                 aNPModel.ActiveAgent = Convert.ToInt16(item.oActiveAgent);
                 aNPModels.Add(aNPModel);
