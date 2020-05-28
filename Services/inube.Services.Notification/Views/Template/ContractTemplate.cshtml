@@ -84,15 +84,11 @@
 
         <table style="width: 100%">
 
-
-            <tbody>
-                @{ var year = 1;
-                    // @foreach (var item in Model.lstANPModels)
-
-                    @for (var i = 0; i < Model.lstANPModels.Count; i++)
+            @{ var year = 1;
+                @for (var i = 0; i < Model.lstANPModels.Count; i++)
+                {
+                    if (i == 0)
                     {
-                        if (i == 0)
-                        {
                         <thead>
                             <tr bgcolor="#ccddff">
                                 <th style="border: 1px solid #000;padding: 5px;">Level 1</th>
@@ -104,74 +100,126 @@
                             </tr>
                         </thead>
                     }
-                    if (i == 11)
-                    {
-                        <tr bgcolor="#e6eeff">
-
-                            <!--<td style="border: 1px solid #000;padding: 5px;"> Year 3 Total </td>-->
-
-                            <td style="border: 1px solid #000;padding: 5px;"> Year 1 Total </td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].MonthlyAnp</td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].CumulativeAnp</td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower </td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent </td>
-                        </tr>
-                    }
-
-                    if (i == 23)
-                    {
-                        <tr bgcolor="#e6eeff">
-
-                            <!--<td style="border: 1px solid #000;padding: 5px;"> Year 3 Total </td>-->
-
-                            <td style="border: 1px solid #000;padding: 5px;"> Year 2 Total </td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].MonthlyAnp</td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].CumulativeAnp</td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower </td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio </td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent </td>
-                        </tr>
-                    }
-
-                    if (i == 35)
-                    {
-                        <tr bgcolor="#e6eeff">
-
-                            <!--<td style="border: 1px solid #000;padding: 5px;"> Year 3 Total </td>-->
-
-                            <td style="border: 1px solid #000;padding: 5px;"> Year 3 Total </td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].MonthlyAnp</td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].CumulativeAnp</td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower </td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
-                            <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent</td>
-                        </tr>
-                    }
-
-
-
-
-                }
-                } </tbody>
-            </table>
-
-
-            <br />
-            <table style="width: 100%">
-                <caption><strong>Year 1</strong></caption>
-
-
-
-                <tbody>
-
-                    @{ var total = 1;
-                        //@//foreach (var item in Model.lstANPModels
-                        @for (var i = total; i < Model.lstANPModels.Count; i++)
+                    <tbody>
+                        @if (i == 11)
                         {
-                            if (total == 1)
-                            {
+                            <tr bgcolor="#e6eeff">
+                                <td style="border: 1px solid #000;padding: 5px;"> Year 1 Total </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].MonthlyAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].CumulativeAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent </td>
+                            </tr>
+                        }
 
+                        @if (i == 23)
+                        {
+                            <tr bgcolor="#e6eeff">
+                                <td style="border: 1px solid #000;padding: 5px;"> Year 2 Total </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].MonthlyAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].CumulativeAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent </td>
+                            </tr>
+                        }
+
+                        @if (i == 35)
+                        {
+                            <tr bgcolor="#e6eeff">
+                                <td style="border: 1px solid #000;padding: 5px;"> Year 3 Total </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].MonthlyAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white" ;>@Model.lstANPModels[i].CumulativeAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                }
+            }
+        </table>
+
+
+        <br />
+
+        @{ var total = 1;
+            @for (var i = total; i < Model.lstANPModels.Count; i++)
+            {
+                <table style="width: 100%">
+                    @if (total == 1)
+                    {
+                        <thead>
+                            <caption> <strong>Year 1</strong></caption>
+                            <br />
+                            <tr bgcolor="#ccddff">
+                                <th style="border: 1px solid #000;padding: 5px;">Level 1</th>
+                                <th style="border: 1px solid #000;padding: 5px;">Monthly ANP</th>
+                                <th style="border: 1px solid #000;padding: 5px;">Cumalative ANP</th>
+                                <th style="border: 1px solid #000;padding: 5px;">Ending ManPower</th>
+                                <th style="border: 1px solid #000;padding: 5px;">Activity Ratio</th>
+                                <th style="border: 1px solid #000;padding: 5px;">Active Agent</th>
+                            </tr>
+                        </thead>
+                    }
+
+                    @if (total <= 12)
+                    {
+                        <tbody>
+                            <tr bgcolor="#e6eeff">
+                                <td style="border: 1px solid #000;padding: 5px;"> Month @total </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].MonthlyAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].CumulativeAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent</td>
+                            </tr>
+                        </tbody>
+                    }
+                </table>
+
+                <table style="width: 100%">
+                    @if (total > 12 && total <= 24)
+                    {
+                        if (total == 13)
+                        {
+                            <thead>
+                                <caption><strong>Year 2</strong></caption>
+                                <br />
+                                <tr bgcolor="#ccddff">
+                                    <th style="border: 1px solid #000;padding: 5px;">Level 1</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Monthly ANP</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Cumalative ANP</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Ending ManPower</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Activity Ratio</th>
+                                    <th style="border: 1px solid #000;padding: 5px;">Active Agent</th>
+                                </tr>
+                            </thead>
+
+                        }
+
+                        <tbody>
+                            <tr bgcolor="#e6eeff">
+                                <td style="border: 1px solid #000;padding: 5px;"> Month @total </td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].MonthlyAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].CumulativeAnp</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
+                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent</td>
+                            </tr>
+                        </tbody>
+                    }
+                </table>
+
+                <table style="width: 100%">
+                    @if (total > 24 && total <= 36)
+                    {
+                        @if (total == 25)
+                        {
+                            <caption><strong>Year 3</strong></caption>
+                            <br />
                             <thead>
                                 <tr bgcolor="#ccddff">
                                     <th style="border: 1px solid #000;padding: 5px;">Level 1</th>
@@ -183,13 +231,9 @@
                                 </tr>
                             </thead>
                         }
-                        @if (total <= 12)
-                        {
 
+                        <tbody>
                             <tr bgcolor="#e6eeff">
-
-                                <!--<td style="border: 1px solid #000;padding: 5px;"> Year 3 Total </td>-->
-
                                 <td style="border: 1px solid #000;padding: 5px;"> Month @total </td>
                                 <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].MonthlyAnp</td>
                                 <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].CumulativeAnp</td>
@@ -197,88 +241,14 @@
                                 <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
                                 <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent</td>
                             </tr>
-
-
-                        }
-
-                        else if (total > 12 && total <= 24)
-                        {
-                            // <h5><strong>Year 2</strong></h5>
-                            if (total == 13)
-                            {
-
-                                <thead>
-                                    <tr bgcolor="#ccddff">
-                                        <th style="border: 1px solid #000;padding: 5px;">Level 1</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Monthly ANP</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Cumalative ANP</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Ending ManPower</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Activity Ratio</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Active Agent</th>
-                                    </tr>
-                                </thead>
-
-                            }
-
-
-                            <tr bgcolor="#e6eeff">
-
-                                <!--<td style="border: 1px solid #000;padding: 5px;"> Year 3 Total </td>-->
-
-                                <td style="border: 1px solid #000;padding: 5px;"> Month @total </td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].MonthlyAnp</td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].CumulativeAnp</td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower</td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent</td>
-                            </tr>
-                        }
-
-
-                        else if (total > 24 && total <= 36)
-                        {
-                            // <h5><strong>Year 2</strong></h5>
-                            if (total == 25)
-                            {
-
-                                <thead>
-                                    <tr bgcolor="#ccddff">
-                                        <th style="border: 1px solid #000;padding: 5px;">Level 1</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Monthly ANP</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Cumalative ANP</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Ending ManPower</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Activity Ratio</th>
-                                        <th style="border: 1px solid #000;padding: 5px;">Active Agent</th>
-                                    </tr>
-                                </thead>
-
-                            }
-
-
-                            <tr bgcolor="#e6eeff">
-
-                                <!--<td style="border: 1px solid #000;padding: 5px;"> Year 3 Total </td>-->
-
-                                <td style="border: 1px solid #000;padding: 5px;"> Month @total </td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].MonthlyAnp</td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].CumulativeAnp</td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].EndingManpower</td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" bgcolor="white">@Model.lstANPModels[i].ActivityRatio</td>
-                                <td style="border: 1px solid #000;padding: 5px;text-align:center" ; bgcolor="white">@Model.lstANPModels[i].ActiveAgent</td>
-                            </tr>
-                        }
-                        else
-                        {
-
-                        }
-
-
-                        total = total + 1;
+                        </tbody>
                     }
-
-                    }
-                    </tbody>
                 </table>
-            </div>
-        </body>
-    </html>
+
+                total = total + 1;
+            }
+
+        }
+    </div>
+</body>
+</html> 
