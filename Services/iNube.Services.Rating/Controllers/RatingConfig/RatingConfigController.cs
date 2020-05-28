@@ -133,9 +133,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
         }
 
         [HttpPost("CheckIllustration/{IllustrationId}")]
-        public async Task<IActionResult> CheckIllustration(String IllustrationId, [FromBody]dynamic dynamic_param)
+        public async Task<IActionResult> CheckIllustration(String IllustrationId, int From, int To, [FromBody]dynamic dynamic_param)
         {
-            var response = await _rateService.CheckIllustration(IllustrationId, dynamic_param, Context);
+            var response = await _rateService.CheckIllustration(IllustrationId, From, To, dynamic_param, Context);
             return Ok(response);
         }
 
@@ -304,6 +304,20 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
                 default:
                     return Forbid();
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetInputOutputParam(String EventId)
+        {
+            var eventDetails = await _rateService.GetInputOutputParam(EventId, Context);
+            return Ok(eventDetails);
+        }
+
+        [HttpPost("CheckCalculationRatingMapping/{CalcualtionId}")]
+        public async Task<IActionResult> CheckCalculationRatingMapping(String CalcualtionId, [FromBody]DynamicData dynamic)
+        {
+            var response = await _rateService.CheckCalculationRatingMapping(CalcualtionId, dynamic, Context);
+            return Ok(response);
         }
 
         [HttpGet]

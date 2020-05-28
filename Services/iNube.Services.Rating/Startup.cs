@@ -8,6 +8,7 @@ using FluentValidation.AspNetCore;
 using HealthChecks.UI.Client;
 using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService;
 using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.AvoRating;
+using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.IntegrationServices;
 using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.MicaRating;
 using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.MotorRating;
 using iNube.Services.Rating.Entities;
@@ -157,6 +158,8 @@ namespace iNube.Services.Rating
 
             // configure DI for application services
             services.AddScoped<IRateConfigService, RatingConfigService>();
+            services.AddScoped<IIntegrationService, IntegrationService>();
+            
         }
     }
 
