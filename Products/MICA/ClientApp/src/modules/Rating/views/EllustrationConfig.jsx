@@ -130,16 +130,24 @@ class EllustrationConfig extends React.Component {
             parameterCard: false,
             flagButon: false,
             open: false,
-            typeList: [{ "mID": 1, "mValue": "Rate", "mType": "RateConfig" },
-                { "mID": 2, "mValue": "Parameter", "mType": "RateConfig" },
+            typeList: [//{ "mID": 1, "mValue": "Rate", "mType": "RateConfig" },
+                //{ "mID": 2, "mValue": "Parameter", "mType": "RateConfig" },
                 { "mID": 3, "mValue": "Ellustration", "mType": "RateConfig" }],
-            ellustrationList: [{ "mID": 1, "mValue": "CalYear", "mType": "RateConfig" },
-                { "mID": 2, "mValue": "NULL", "mType": "RateConfig" }],
-            ellustrationOutputList: [{ "mID": 1, "mValue": "Year", "mType": "CalYear" },
-                { "mID": 2, "mValue": "Principle", "mType": "CalYear" },
-            { "mID": 3, "mValue": "RateInterest", "mType": "CalYear" },
-            { "mID": 4, "mValue": "EMI", "mType": "CalYear" },
-            { "mID": 4, "mValue": "Balance", "mType": "CalYear" }],
+            //ellustrationList: [{ "mID": 1, "mValue": "CalYear", "mType": "RateConfig" },
+            //    { "mID": 2, "mValue": "NULL", "mType": "RateConfig" }],
+            //ellustrationOutputList: [{ "mID": 1, "mValue": "Year", "mType": "CalYear" },
+            //    { "mID": 2, "mValue": "Principle", "mType": "CalYear" },
+            //{ "mID": 3, "mValue": "RateInterest", "mType": "CalYear" },
+            //{ "mID": 4, "mValue": "EMI", "mType": "CalYear" },
+            //    { "mID": 4, "mValue": "Balance", "mType": "CalYear" }],
+            ellustrationList: [],
+            ellustrationOutputList: [],
+            CheckCondition: {
+                parameterList: [],
+                outputList: [],
+                rate:[]
+            },
+            countSaving:false
         };
 
     }
@@ -225,7 +233,8 @@ class EllustrationConfig extends React.Component {
         }
     }
 
-    DataGrid =()=> {
+    DataGrid = () => {
+        debugger
         if (this.state.EllParameterArray.length > 0) {
             this.setState({
                 newParamData: this.state.EllParameterArray.map((prop, key) => {
@@ -236,6 +245,8 @@ class EllustrationConfig extends React.Component {
                     };
                 })
             });
+            this.setState({ displayCalculationParameterGrid: true });
+            this.setState({ flagButon: true });
         }
     }
     //Addition of Rates
@@ -287,6 +298,7 @@ class EllustrationConfig extends React.Component {
         this.handleClose();
     }
     addEllustration() {
+        //debugger
         var mlt_select = this.state.fields.Ellustration.toString();
         var multiselect_array = mlt_select.split(",");
         let pMultiselectArray = this.state.multiselectEllustrationArray;
@@ -297,16 +309,97 @@ class EllustrationConfig extends React.Component {
         //Filteration and Check for Output Parameter Available for Ellustration
         let pOutputEllParamArray = this.state.OutputEllustrationArray;
         this.setState({ OutputEllustrationArray: pOutputEllParamArray });
+        var ellList = this.state.ellustrationList;
+
+        //For Input Parameter
+        let pEllParameterArray = this.state.EllParameterArray;
+        this.setState({ EllParameterArray: pEllParameterArray });
+        ////Pusing in Output
+        let pOutputParameterArray = this.state.OutputList;
+        this.setState({ OutputList: pOutputParameterArray });
+
+
         for (var i = 0; i < this.state.multiselectEllustrationArray.length; i++) {
-            for (var j = 0; j < this.state.ellustrationOutputList.length; j++) {
-                if (this.state.multiselectEllustrationArray[i].ellustrationName == this.state.ellustrationOutputList[j].mType) {
-                    pOutputEllParamArray.push({ outputParameter: this.state.ellustrationOutputList[j].mValue });
-                }
+            //Fetching Id for Particular Ellustration
+            const calculationConfigId = 0;
+            for (var k = 0; k < ellList.length; k++) {
+                if (ellList[k].calculationConfigName == this.state.multiselectEllustrationArray[i].ellustrationName)
+                    calculationConfigId = ellList[k].calculationConfigId;
             }
+            fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/GetInputOutputParam?EventId=` + calculationConfigId, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            }).then(response => response.json())
+                .then(data => {
+                    //this.state.CheckCondition = data;
+                    this.setState({ CheckCondition: data });
+                    console.log(this.state.CheckCondition)
+                    //For Addition of Output Parameter
+                    for (var j = 0; j < this.state.CheckCondition.outputList.length; j++) {
+                        pOutputEllParamArray.push({ outputParameter: this.state.CheckCondition.outputList[j] });
+                    }
+                    this.setState({ parameterCard: true });
+                    this.setState({ flagButon: true });
+
+                    // FOr addition of Input Parameter 
+                    var isActive = 1;
+                    let Type = "Param";
+                    for (var j = 0; j < this.state.CheckCondition.parameterList.length; j++) {
+                        pEllParameterArray.push({
+                            'ellustrationConfigParamName': this.state.CheckCondition.parameterList[j],
+                            'createdDate': date(),
+                            'isActive': isActive,
+                            'type': Type
+                        });
+                    }
+                    
+                    for (var j = 0; j < this.state.CheckCondition.parameterList.length; j++) {
+                        pOutputParameterArray.push({
+                            'ellustrationConfigParamName': this.state.CheckCondition.parameterList[j],
+                            'outputParam': ""
+                        });
+                    }
+                    // For Addition of Rate Parameter
+                    let TypeRate = "Rate";
+                    for (var j = 0; j < this.state.CheckCondition.rate.length; j++) {
+                        pEllParameterArray.push({
+                            'ellustrationConfigParamName': this.state.CheckCondition.rate[j],
+                            'createdDate': date(),
+                            'isActive': isActive,
+                            'type': TypeRate
+                        });
+                    }
+
+                    for (var j = 0; j < this.state.CheckCondition.rate.length; j++) {
+                        pOutputParameterArray.push({
+                            'ellustrationConfigParamName': this.state.CheckCondition.parameterList[j],
+                            'outputParam': ""
+                        });
+                    }
+
+                    debugger
+                    console.log(this.state.EllParameterArray, 'EllParamArray');
+                    this.DataGrid();    
+                });
+            //debugger
+            //for (var j = 0; j < this.state.CheckCondition.parameterList.length ; j++)
+            //{
+            //    console.log(this.state.CheckCondition.parameterList[j], 'Çh');
+            //    pOutputEllParamArray.push({ outputParameter: this.state.CheckCondition.parameterList[j]});
+            //}
+            //for (var j = 0; j < this.state.ellustrationOutputList.length; j++) {
+            //    if (this.state.multiselectEllustrationArray[i].ellustrationName == this.state.ellustrationOutputList[j].mType) {
+            //        pOutputEllParamArray.push({ outputParameter: this.state.ellustrationOutputList[j].mValue });
+            //    }
+            //}
         }
-        console.log(this.state.OutputEllustrationArray, 'Output_Ellustration_Array');
-        this.setState({ parameterCard: true });
-        this.setState({ flagButon: true });
+        //console.log(this.state.OutputEllustrationArray, 'Output_Ellustration_Array');
+        //this.setState({ parameterCard: true });
+        //this.setState({ flagButon: true });
         //swal({
         //    text: "Rates Added Successfully",
         //    icon: "success"
@@ -328,102 +421,157 @@ class EllustrationConfig extends React.Component {
                 this.setState({ RateRules: data });
                 console.log(data);
             });
+
+        fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/GetCalculationConfig`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ ellustrationList: data });
+                console.log(this.state.ellustrationList, 'EllustrationList');
+            });
+        
     }
 
     //Form Submit
     onFormSubmit = (evt) => {
+        debugger
         let isActive = 1;
         let psendingArray = this.state.sendingPrArray;
         this.setState({ sendingPrArray: psendingArray });
-        if (this.state.EllParameterArray.length != 0 && this.state.OutputEllustrationArray.length != 0 && this.state.multiselectEllustrationArray.length != 0 && this.state.fields.From != "" &&  this.state.fields.To != "") {
+        if (this.state.EllParameterArray.length != 0 && this.state.OutputEllustrationArray.length != 0 && this.state.multiselectEllustrationArray.length != 0 ) {
             //Addition of EllustrationParam into sendingArray 
-            for (var i = 0; i < this.state.EllParameterArray.length; i++) {
-                psendingArray.push({
-                    'illustrationConfigParamName': this.state.EllParameterArray[i].ellustrationConfigParamName,
-                    'type': this.state.EllParameterArray[i].type,
-                    'createdDate': date(),
-                    'isActive': isActive
-                });
-            }
-            //Addition of Rates into sendingArray 
-            if (this.state.multiselectArray.length != 0) {
-                for (var i = 0; i < this.state.multiselectArray.length; i++) {
+            if (this.state.countSaving == false) {
+                for (var i = 0; i < this.state.EllParameterArray.length; i++) {
                     psendingArray.push({
-                        'illustrationConfigParamName': this.state.multiselectArray[i].rateName,
-                        'type': 'Rate',
+                        'illustrationConfigParamName': this.state.EllParameterArray[i].ellustrationConfigParamName,
+                        'type': this.state.EllParameterArray[i].type,
                         'createdDate': date(),
                         'isActive': isActive
                     });
                 }
-            }
-            //Addition of Illustration of OutputParameter into sendingArray 
-            for (var i = 0; i < this.state.OutputEllustrationArray.length; i++) {
-                psendingArray.push({
-                    'illustrationConfigParamName': this.state.OutputEllustrationArray[i].outputParameter,
-                    'type': 'OutputParam',
-                    'createdDate': date(),
-                    'isActive': isActive
-                });
-            }
-            //Addition of Illustration (calYear) into sendingArray
-            for (var i = 0; i < this.state.multiselectEllustrationArray.length; i++) {
-                psendingArray.push({
-                    'illustrationConfigParamName': this.state.multiselectEllustrationArray[i].ellustrationName,
-                    'type': 'Illustration',
-                    'createdDate': date(),
-                    'isActive': isActive
-                });
-            }
-            console.log(this.state.sendingPrArray, 'SendingArray');
-            console.log(this.state.newParamData, 'ABC');
-            //Addition of Mapping of Input and Output Parameter into the Sending Array  for Mapping 
-            let pmappingSendingArray = this.state.mappingSendingArray;
-            this.setState({ mappingSendingArray: pmappingSendingArray });
-            for (var i = 0; i < this.state.newParamData.length; i++) {
-                pmappingSendingArray.push({
-                    'illustrationInputParam': this.state.newParamData[i].EllConfigParam,
-                    'illustrationOutputParam': this.state.newParamData[i].OutputParameter.props.value,
-                    'createdDate': date(),
-                    'isActive': isActive
-                })
-            }
-            debugger
-            console.log(this.state.mappingSendingArray, 'MappingArray');
-
-
-            var data = {
-                'illustrationConfigName': this.state.fields.EllustrationConfigName, 'from': this.state.fields.From, 'to': this.state.fields.To, 'createdDate': date(), 'isActive': isActive, 'illustrationConfigParam': this.state.sendingPrArray, 'illustrationMapping': this.state.mappingSendingArray
-            };
-            fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateIllustrationRules`, {
-                method: 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-                body: JSON.stringify(data)
-            }).then(response => response.json())
-                .then(data => {
-                    if (data.status == 2) {
-                        swal({
-                            //   title: "Perfect",
-                            text: data.responseMessage,
-                            //  text: "Account Successfully Created",
-                            icon: "success"
-                        });
-                        this.reset();
-                    } else if (data.status == 8) {
-                        swal({
-                            text: data.errors[0].errorMessage,
-                            icon: "error"
-                        });
-                    } else if (data.status == 4) {
-                        swal({
-                            text: data.errors[0].errorMessage,
-                            icon: "error"
+                //Addition of Rates into sendingArray 
+                if (this.state.multiselectArray.length != 0) {
+                    for (var i = 0; i < this.state.multiselectArray.length; i++) {
+                        psendingArray.push({
+                            'illustrationConfigParamName': this.state.multiselectArray[i].rateName,
+                            'type': 'Rate',
+                            'createdDate': date(),
+                            'isActive': isActive
                         });
                     }
-                });
+                }
+                //Addition of Illustration of OutputParameter into sendingArray 
+                for (var i = 0; i < this.state.OutputEllustrationArray.length; i++) {
+                    psendingArray.push({
+                        'illustrationConfigParamName': this.state.OutputEllustrationArray[i].outputParameter,
+                        'type': 'OutputParam',
+                        'createdDate': date(),
+                        'isActive': isActive
+                    });
+                }
+                //Addition of Illustration (calYear) into sendingArray
+                for (var i = 0; i < this.state.multiselectEllustrationArray.length; i++) {
+                    psendingArray.push({
+                        'illustrationConfigParamName': this.state.multiselectEllustrationArray[i].ellustrationName,
+                        'type': 'Illustration',
+                        'createdDate': date(),
+                        'isActive': isActive
+                    });
+                }
+                console.log(this.state.sendingPrArray, 'SendingArray');
+                console.log(this.state.newParamData, 'ABC');
+                //Addition of Mapping of Input and Output Parameter into the Sending Array  for Mapping 
+                let pmappingSendingArray = this.state.mappingSendingArray;
+                this.setState({ mappingSendingArray: pmappingSendingArray });
+                for (var i = 0; i < this.state.newParamData.length; i++) {
+                    pmappingSendingArray.push({
+                        'illustrationInputParam': this.state.newParamData[i].EllConfigParam,
+                        'illustrationOutputParam': this.state.newParamData[i].OutputParameter.props.value,
+                        'createdDate': date(),
+                        'isActive': isActive
+                    })
+                }
+                debugger
+                console.log(this.state.mappingSendingArray, 'MappingArray');
+
+
+                var data = {
+                    'illustrationConfigName': this.state.fields.EllustrationConfigName, 'from': this.state.fields.From, 'to': this.state.fields.To, 'createdDate': date(), 'isActive': isActive, 'illustrationConfigParam': this.state.sendingPrArray, 'illustrationMapping': this.state.mappingSendingArray
+                };
+                fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateIllustrationRules`, {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.status == 2) {
+                            swal({
+                                //   title: "Perfect",
+                                text: data.responseMessage,
+                                //  text: "Account Successfully Created",
+                                icon: "success"
+                            });
+                            this.reset();
+                        } else if (data.status == 8) {
+                            swal({
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        } else if (data.status == 4) {
+                            swal({
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        }
+                    });
+                this.state.countSaving = true;
+            }
+            else {
+
+                var data = {
+                    'illustrationConfigName': this.state.fields.EllustrationConfigName, 'from': this.state.fields.From, 'to': this.state.fields.To, 'createdDate': date(), 'isActive': isActive, 'illustrationConfigParam': this.state.sendingPrArray, 'illustrationMapping': this.state.mappingSendingArray
+                };
+                fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateIllustrationRules`, {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.status == 2) {
+                            swal({
+                                //   title: "Perfect",
+                                text: data.responseMessage,
+                                //  text: "Account Successfully Created",
+                                icon: "success"
+                            });
+                            this.reset();
+                        } else if (data.status == 8) {
+                            swal({
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        } else if (data.status == 4) {
+                            swal({
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        }
+                    });
+            }
         }
         else {
             swal({
@@ -447,6 +595,7 @@ class EllustrationConfig extends React.Component {
         rate['OutputParametMapEllustration'] = "";
         rate['multipleSelect'] = [];
         rate['Ellustration'] = [];
+        this.state.countSaving = false;
     }
     
 
@@ -547,7 +696,7 @@ class EllustrationConfig extends React.Component {
                                                     htmlFor="multiple-select"
                                                     className={classes.selectLabel}
                                                 >
-                                                    Illustration
+                                                    Illustration Formula
                           </InputLabel>
                                                 <Select
                                                     multiple
@@ -563,12 +712,12 @@ class EllustrationConfig extends React.Component {
                                                     {
                                                         this.state.ellustrationList.map(item =>
                                                             <MenuItem
-                                                                value={item.mValue}
+                                                                value={item.calculationConfigName}
                                                                 classes={{
                                                                     root: classes.selectMenuItem,
                                                                     selected: classes.selectMenuItemSelected
                                                                 }}
-                                                            > {item.mValue}
+                                                            > {item.calculationConfigName}
                                                             </MenuItem>
                                                         )
                                                     }
@@ -640,7 +789,7 @@ class EllustrationConfig extends React.Component {
                                         
                                         <GridItem xs={12} sm={4} md={4}>
                                                 <h4>
-                                                    <small> Parameter </small>
+                                                    <small> Input Parameter </small>
                                                 </h4>
                                                 <div className="rates-parameter-bg">
                                                     {this.state.EllParameterArray.map((item, i) => (
@@ -657,15 +806,15 @@ class EllustrationConfig extends React.Component {
                                     
                                     <GridContainer id="expression-overflow" xs={12} sm={12} md={8}>
                                         <GridItem xs={12} sm={4} md={6}>
-                                                <h4><small>Rates</small></h4>
-                                                <div className="rates-rates-bg">
-                                                    {this.state.multiselectArray.map((item, i) => (
-                                                        <Chip size="small"
-                                                            // avatar={<Avatar>M</Avatar>}
-                                                            label={item.rateName}
-                                                            onClick={() => this.onCLickRates(item.rateName)} />
-                                                    ))}
-                                                </div>
+                                            <h4><small>Output Parameters</small></h4>
+                                            <div className="rates-rates-bg">
+                                                {this.state.OutputEllustrationArray.map((item, i) => (
+                                                    <Chip size="small"
+                                                        // avatar={<Avatar>M</Avatar>}
+                                                        label={item.outputParameter}
+                                                        onClick={() => this.onOutputEllustration(item.outputParameter)} />
+                                                ))}
+                                            </div>
                                         </GridItem>
                                         <GridItem xs={12} sm={4} md={6}>
                                             <h4><small>Illustration</small></h4>
@@ -679,13 +828,13 @@ class EllustrationConfig extends React.Component {
                                             </div>
                                         </GridItem>
                                         <GridItem xs={12} sm={4} md={6}>
-                                            <h4><small>Output Parameters</small></h4>
+                                            <h4><small>Rates</small></h4>
                                             <div className="rates-rates-bg">
-                                                {this.state.OutputEllustrationArray.map((item, i) => (
+                                                {this.state.multiselectArray.map((item, i) => (
                                                     <Chip size="small"
                                                         // avatar={<Avatar>M</Avatar>}
-                                                        label={item.outputParameter}
-                                                        onClick={() => this.onOutputEllustration(item.outputParameter)} />
+                                                        label={item.rateName}
+                                                        onClick={() => this.onCLickRates(item.rateName)} />
                                                 ))}
                                             </div>
                                         </GridItem>
@@ -694,28 +843,30 @@ class EllustrationConfig extends React.Component {
                                 </CardBody>
                             </Card>
                         }
-                        {this.state.parameterCard &&
-                            <GridContainer justify="center" xs={12} className="cal-label">
-                                <GridItem xs={4} sm={12} md={4}>
 
-                                    <CustomInput labelText="From"
-                                        value={this.state.fields.From}
-                                        name='From'
-                                        onChange={this.onInputChange}
-                                        formControlProps={{ fullWidth: true }} />
-                                </GridItem>
+                        {
+                            //this.state.parameterCard &&
+                            //<GridContainer justify="center" xs={12} className="cal-label">
+                            //    <GridItem xs={4} sm={12} md={4}>
 
-                                <GridItem xs={4} sm={12} md={4}>
-                                    <CustomInput labelText="To"
-                                        value={this.state.fields.To}
-                                        name='To'
-                                        onChange={this.onInputChange}
-                                        formControlProps={{ fullWidth: true }} />
-                                </GridItem>
-                                <GridItem xs={2} sm={12} md={1}>
-                                    <IconButton id="top-bnt" onClick={() => this.executeYearCal()} > <Reset /> </IconButton>
-                                </GridItem>
-                            </GridContainer>
+                            //        <CustomInput labelText="From"
+                            //            value={this.state.fields.From}
+                            //            name='From'
+                            //            onChange={this.onInputChange}
+                            //            formControlProps={{ fullWidth: true }} />
+                            //    </GridItem>
+
+                            //    <GridItem xs={4} sm={12} md={4}>
+                            //        <CustomInput labelText="To"
+                            //            value={this.state.fields.To}
+                            //            name='To'
+                            //            onChange={this.onInputChange}
+                            //            formControlProps={{ fullWidth: true }} />
+                            //    </GridItem>
+                            //    <GridItem xs={2} sm={12} md={1}>
+                            //        <IconButton id="top-bnt" onClick={() => this.executeYearCal()} > <Reset /> </IconButton>
+                            //    </GridItem>
+                            //</GridContainer>
                         }
                         {this.state.displayCalculationParameterGrid &&
 
