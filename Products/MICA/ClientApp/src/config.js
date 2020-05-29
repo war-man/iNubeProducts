@@ -69,7 +69,7 @@ if (env === "Dev") {
     BillingConfigUrl = Baseurl;
     policyconfigUrl = Baseurl;
     claimConfigUrl = Baseurl;
-    rateConfigUrl = Baseurl;
+    rateConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
     ReportConfigUrl = Baseurl;
     dynamicPagesConfigUrl = Baseurl;
     RDLCConfigUrl = Baseurl;
@@ -105,7 +105,7 @@ if (env === "UAT") {
     BillingConfigUrl = Baseurl;
     policyconfigUrl = Baseurl;
     claimConfigUrl = Baseurl;
-    rateConfigUrl = Baseurl;
+    rateConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
     ReportConfigUrl = Baseurl;
     dynamicPagesConfigUrl = Baseurl;
     RDLCConfigUrl = Baseurl;

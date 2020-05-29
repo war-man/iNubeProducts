@@ -16,7 +16,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
     public interface IIntegrationService
     {
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
- 
+
+        Task<object> RatingCall(string id, dynamic data, ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -27,11 +29,13 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
         
         private IConfiguration _configuration;
         readonly string  UsermanangementUrl;
+        readonly string Rating;
         private static readonly HttpClient _httpClient = new HttpClient();
         public IntegrationService(IConfiguration configuration)
         {
             _configuration = configuration;
             UsermanangementUrl = _configuration["Integration_Url:User:UserUrl"];
+            Rating = _configuration["Integration_Url:Rating:RatingUrl"];
         }
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
@@ -42,6 +46,12 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
             logger.LogRequest("Rating", "Rating", result.Dbconnection, "Final Return in integration Call--DB Return", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
             return result;
 
+        }
+
+        public async Task<object> RatingCall(string id, dynamic data, ApiContext apiContext)
+        {
+            var uri = Rating + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/" + id;
+            return await PostApiInvoke<dynamic, object>(uri, apiContext, data);
         }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()

@@ -39,8 +39,10 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<IEnumerable<CalConfigParam>> GetCalConfigParam(decimal CalculationConfigId, ApiContext apiContext);
         Task<CalConfigResponse> EditCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext);
         Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext);
-        Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext);
+        Task<object> CheckIllustration(String IllustrationConfigId, int From, int To, dynamic illustration_Param, ApiContext apiContext);
         Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext);
+        Task<HandleEventConfig> GetInputOutputParam(String EventId, ApiContext apiContext);
+        Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext);
     }
 
     public class RatingConfigService : IRateConfigService
@@ -170,13 +172,21 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         {
             return await _ratesService(apiContext.ProductType).GetHandleEventsIllustration(EventIllutrationId, apiContext);
         }
-        public async Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext)
+        public async Task<object> CheckIllustration(String IllustrationConfigId, int From, int To, dynamic illustration_Param, ApiContext apiContext)
         {
-            return await _ratesService(apiContext.ProductType).CheckIllustration(IllustrationConfigId, illustration_Param, apiContext);
+            return await _ratesService(apiContext.ProductType).CheckIllustration(IllustrationConfigId, From, To, illustration_Param, apiContext);
         }
         public async Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext)
         {
             return await _ratesService(apiContext.ProductType).GetIllustrationConfig(apiContext);
+        }
+        public async Task<HandleEventConfig> GetInputOutputParam(String EventId, ApiContext apiContext)
+        {
+            return await _ratesService(apiContext.ProductType).GetInputOutputParam(EventId, apiContext);
+        }
+        public async Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext)
+        {
+            return await _ratesService(apiContext.ProductType).CheckCalculationRatingMapping(CalculationConfigId, dynamic, apiContext);
         }
     }
 }

@@ -45,6 +45,7 @@ import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/c
 
 import data_Not_found from "assets/img/data-not-found-new.png";
 import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 
 const paddingCard =
@@ -86,6 +87,8 @@ class IllustrationResult extends React.Component {
         this.state = {
             rulename: {
                 EllConfigName: "",
+                From: "",
+                To:"",
             },
             fields: {
             },
@@ -122,6 +125,11 @@ class IllustrationResult extends React.Component {
         fields[evt.target.name] = evt.target.value;
         this.setState({ fields });
     };
+    onInputChange = (evt) => {
+        let fields = this.state.rulename;
+        fields[evt.target.name] = evt.target.value;
+        this.setState({ fields });
+    };
 
     handleStateCheck = event => {
         const rulename = this.state.rulename;
@@ -148,54 +156,62 @@ class IllustrationResult extends React.Component {
 
     //Sending Data for Execution
     onFormSubmit = (evt) => {
-        var rst;
-        debugger;
-        console.log(this.state.rulename.EllConfigName);
-        this.setState({ searchTableSec: false, loader: false });
-        fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CheckIllustration/CheckIllustration/` + this.state.rulename.EllConfigName, {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-            body: JSON.stringify(this.state.fields)
-        }).then(response => response.json())
-            .then(data => {
-                this.setState({ result: data });
-                console.log(this.state.result, 'Result');
-                if (this.state.result.length > 0) {
-                    this.tabledata();
-                    //this.reset();
-                }
-                else {
-                    setTimeout(
-                        function () {
-                            this.setState({ loader: true, searchTableSec: false, nodata: true });
-                        }.bind(this), 2000
-                    );
-                }
+        if (this.state.rulename.EllConfigName != "" && this.state.rulename.From != "" && this.state.rulename.To != "") {
+            var rst;
+            debugger;
+            console.log(this.state.rulename.EllConfigName);
+            this.setState({ searchTableSec: false, loader: false });
+            fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CheckIllustration/CheckIllustration/` + this.state.rulename.EllConfigName + '?' + 'From=' + this.state.rulename.From + '&To=' + this.state.rulename.To, {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(this.state.fields)
+            }).then(response => response.json())
+                .then(data => {
+                    this.setState({ result: data });
+                    console.log(this.state.result, 'Result');
+                    if (this.state.result.length > 0) {
+                        this.tabledata(data);
+                        //this.reset();
+                    }
+                    else {
+                        setTimeout(
+                            function () {
+                                this.setState({ loader: true, searchTableSec: false, nodata: true });
+                            }.bind(this), 2000
+                        );
+                    }
+                });
+        }
+        else {
+            swal({
+                text: "Some Fields are missing",
+                icon: "error"
             });
+        }
+
     }
 
-    tabledata = (e, index) => {
+    tabledata = (data) => {
         debugger;
-        //this.setState({ searchTableSec: true });
-        this.setState({ searchTableSec: true, loader: true });
+        console.log(this.state.result, 'result');
         this.setState({
-            resultDetails: this.state.result.map((prop, key) => {
+            resultDetails: Object.keys(data[0]).map((prop, key) => {
                 return {
-                    SNo: key + 1,
-                    Balance: prop.balance,
-                    EMI: prop.emi,
-                    RateInterest: prop.interest,
-                    Principle: prop.principle,
-                    Year: prop.year,
-                    Duration: prop.duration,
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                    accessor: prop,
                 };
+              
             })
         });
+        console.log("table data", this.state.resultDetails);
+        this.setState({ searchTableSec: true, loader: true });
     }
+
+    
 
     render() {
         const { classes } = this.props;
@@ -256,7 +272,22 @@ class IllustrationResult extends React.Component {
                                             </Select>
                                         </FormControl>
                                     </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}>
 
+                                        <CustomInput labelText="From"
+                                            value={this.state.rulename.From}
+                                            name='From'
+                                            onChange={this.onInputChange}
+                                            formControlProps={{ fullWidth: true }} />
+                                    </GridItem>
+
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <CustomInput labelText="To"
+                                            value={this.state.rulename.To}
+                                            name='To'
+                                            onChange={this.onInputChange}
+                                            formControlProps={{ fullWidth: true }} />
+                                    </GridItem>
 
                                 </GridContainer>
                             </CardBody>
@@ -309,7 +340,6 @@ class IllustrationResult extends React.Component {
                                     </GridContainer>
                                 </CardBody>
                             </Card>
-
                         </GridItem>
                     </GridContainer>
                 }
@@ -317,84 +347,21 @@ class IllustrationResult extends React.Component {
                     <GridContainer xl={12}>
                         {this.state.searchTableSec ?
 
-
                             < GridItem lg={12}>
-                                    <ReactTable
-                            title={"Illustration Result"}
-                            data={this.state.resultDetails}
-                            filterable
-                            columns={[
-                                {
-                                    Header: "SNo",
-                                    accessor: "SNo",
-                                    headerClassName: 'react-table-right',
-                                    //minWidth: 40,
-                                    style: { textAlign: "center" },
-                                    resizable: false,
-                                },
-                                {
-                                    Header: "Year",
-                                    accessor: "Duration",
-                                    headerClassName: 'react-table-center',
-                                    //minWidth: 40,
-                                    style: { textAlign: "right" },
-                                    //setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                    resizable: false,
-                                },
-                                {
-                                    Header: "Principle",
-                                    accessor: "Principle",
-                                    headerClassName: 'react-table-center',
-                                    //minWidth: 40,
-                                    style: { textAlign: "right" },
-                                    //setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                    resizable: false,
-                                },
-                                {
-                                    Header: "Interest",
-                                    accessor: "RateInterest",
-                                    headerClassName: 'react-table-center',
-                                    //minWidth: 40,
-                                    style: { textAlign: "right" },
-                                    //setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                    resizable: false,
-                                },
-                                {
-                                    Header: "EMI",
-                                    accessor: "EMI",
-                                    headerClassName: 'react-table-center',
-                                    //minWidth: 40,
-                                    style: { textAlign: "right" },
-                                    //setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                    resizable: false,
-                                },
-                                {
-                                    Header: "Balance",
-                                    accessor: "Balance",
-                                    headerClassName: 'react-table-right',
-                                    //minWidth: 40,
-                                    style: { textAlign: "center" },
-                                    resizable: false,
-                                },
-                                //{
-                                //    Header: "Year",
-                                //    accessor: "Year",
-                                //    headerClassName: 'react-table-center',
-                                //    //minWidth: 40,
-                                //    style: { textAlign: "right" },
-                                //    //setCellProps: (value) => ({ style: { textAlign: "right" } }),
-                                //    resizable: false,
-                                //},
+                                <ReactTable
+                                    title={<h5><TranslationContainer translationKey={"Illustration"} /></h5>}
+                                    resultDetails
+                                    data={this.state.result}
+                                    filterable
+                                    columns={this.state.resultDetails}
+                                    defaultPageSize={4}
+                                    pageSize={([this.state.result.length + 1] < 4) ? [this.state.result.length + 1] : 4}
+                                    showPaginationTop={false}
+                                    //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                    showPaginationBottom={true}
+                                    className="-striped -highlight discription-tab"
 
-
-                            ]}
-
-                            defaultPageSize={5}
-                            showPaginationTop={false}
-                            //pageSize={([this.state.Policydetailsdata.length + 1] < 5) ? [this.state.Policydetailsdata.length + 1] : 5}
-                            showPaginationBottom
-                            className="-striped -highlight discription-tab"
-                        />
+                                />
                                 </GridItem>
                             : <GridItem lg={12}>{
                                 this.state.nodata ?

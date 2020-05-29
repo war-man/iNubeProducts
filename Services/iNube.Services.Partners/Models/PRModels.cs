@@ -1328,8 +1328,8 @@ namespace iNube.Services.Partners.Models
         public bool IsAwsS3Save { get; set; }
         public bool IsAzureBlobSave { get; set; }
         public string StorageName { get; set; }
-
         public SMSRequest smsRequest { get; set; }
+        public EmailRequest emailRequest { get; set; }
     }
     public class SMSRequest
     {
@@ -2260,6 +2260,10 @@ namespace iNube.Services.Partners.Models
     }
     public  class ContractDTO
     {
+        public ContractDTO()
+        {
+            lstIllustraionModels = new List<RatingContractModel>();
+        }
         public decimal ContractId { get; set; }
         public string RecruitmentNo { get; set; }
         public string Name { get; set; }
@@ -2289,6 +2293,7 @@ namespace iNube.Services.Partners.Models
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool Flag { get; set; }
+        public List<RatingContractModel> lstIllustraionModels { get; set; }
     }
     public class ContractResponse : ResponseStatus
     {
@@ -2320,6 +2325,52 @@ namespace iNube.Services.Partners.Models
         public int ErroRowNo { get; set; }
 
         public List<Dictionary<string, string>> ErrorDescription { get; set; }
+
+    }
+
+    //Contract Notification Model
+    public class ContractModel
+    {
+        public ContractModel()
+        {
+            lstANPModels = new List<ANPModel>();
+        }
+        public string Designation { get; set; }
+        public string Level { get; set; }
+        public string RecruitmentNo { get; set; }
+        public decimal Allowance { get; set; }
+        public decimal TotalCost { get; set; }
+        public decimal AnpTarget { get; set; }
+        public EmailRequest EmailTest { get; set; }
+        public List<ANPModel> lstANPModels { get; set; }
+    }
+
+    public class ANPModel
+    {
+        public decimal MonthlyAnp { get; set; }
+        public decimal CumulativeAnp { get; set; }
+        public decimal EndingManpower { get; set; }
+        public decimal ActivityRatio { get; set; }
+        public int ActiveAgent { get; set; }
+    }
+
+    public class RatingContractModel
+    {
+        public RatingContractModel()
+        {
+          
+        }
+        public int Period { get; set; }
+        public string ActivityRatioForMonth_Month { get; set; }
+        public string MontlyANPTargetDistRate_Month { get; set; }
+        public string MontlyANPTargetDistRate_Duration { get; set; }
+        public string oMonth { get; set; }
+        public string oMonthlyANP { get; set; }
+
+        public string oCummulativeANP { get; set; }
+        public string oEndingManPower { get; set; }
+        public string oActiveAgent { get; set; }
+        public string oActivityRatio { get; set; }
 
     }
 }

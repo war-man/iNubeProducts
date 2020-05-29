@@ -108,6 +108,7 @@ class CalculationConfig extends React.Component {
             rateflag: false,
 
             ruleobj: [],
+            countSaving: false,
             
 
             typeList: [{ "mID": 1, "mValue": "Rate", "mType": "RateConfig" },
@@ -315,7 +316,7 @@ class CalculationConfig extends React.Component {
         let rate = this.state.fields;
         rate['ExpressionResult'] = "";
         rate['Expression'] = "";
-        rate['Steps'] = "";
+        //rate['Steps'] = "";
         this.setState({ rate });
 
         let state = this.state;
@@ -342,48 +343,90 @@ class CalculationConfig extends React.Component {
 
     onFormSubmit = (evt) => {
         debugger;
-        let isActive = 1;
-        //Sorting od Sending Array 
-        let sendingArray = this.state.sendingArray.sort(function (a, b) { return a.steps - b.steps });
-        console.log(sendingArray, 'Sending');
-        //Merging Both Array With Rate Values Also 
-        this.state.CalParameterArray = this.state.CalParameterArray.concat(this.state.CalRateArray);
-        console.log(this.state.CalParameterArray, 'CalCUlationConfig')
-        //Previous
-        console.log(this.state.sendingArray, 'Sending Array');
-        var data = {
-            'calculationConfigName': this.state.fields.RateConfigName, 'createdDate': date(), 'isActive': isActive, 'calculationConfigExpression': sendingArray, 'calculationConfigParam': this.state.CalParameterArray
-        };
-        fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateCalConfigRules`, {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-            body: JSON.stringify(data)
-        }).then(response => response.json())
-            .then(data => {
-                if (data.status == 2) {
-                    swal({
-                        //   title: "Perfect",
-                        text: data.responseMessage,
-                        //  text: "Account Successfully Created",
-                        icon: "success"
-                    });
-                    this.reset();
-                } else if (data.status == 8) {
-                    swal({
-                        text: data.errors[0].errorMessage,
-                        icon: "error"
-                    });
-                } else if (data.status == 4) {
-                    swal({
-                        text: data.errors[0].errorMessage,
-                        icon: "error"
-                    });
-                }
-            });
+        if (this.state.countSaving == false) {
+            let isActive = 1;
+            //Sorting od Sending Array 
+            let sendingArray = this.state.sendingArray.sort(function (a, b) { return a.steps - b.steps });
+            console.log(sendingArray, 'Sending');
+            //Merging Both Array With Rate Values Also 
+            this.state.CalParameterArray = this.state.CalParameterArray.concat(this.state.CalRateArray);
+            console.log(this.state.CalParameterArray, 'CalCUlationConfig')
+            //Previous
+            console.log(this.state.sendingArray, 'Sending Array');
+            var data = {
+                'calculationConfigName': this.state.fields.RateConfigName, 'createdDate': date(), 'isActive': isActive, 'calculationConfigExpression': sendingArray, 'calculationConfigParam': this.state.CalParameterArray
+            };
+            fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateCalConfigRules`, {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.status == 2) {
+                        swal({
+                            //   title: "Perfect",
+                            text: data.responseMessage,
+                            //  text: "Account Successfully Created",
+                            icon: "success"
+                        });
+                        this.reset();
+                    } else if (data.status == 8) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    } else if (data.status == 4) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    }
+                });
+            debugger
+            this.state.countSaving = true;
+        }
+        else {
+            let isActive = 1;
+            //Sorting od Sending Array 
+            let sendingArray = this.state.sendingArray.sort(function (a, b) { return a.steps - b.steps });
+            var data = {
+                'calculationConfigName': this.state.fields.RateConfigName, 'createdDate': date(), 'isActive': isActive, 'calculationConfigExpression': sendingArray, 'calculationConfigParam': this.state.CalParameterArray
+            };
+            fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateCalConfigRules`, {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.status == 2) {
+                        swal({
+                            //   title: "Perfect",
+                            text: data.responseMessage,
+                            //  text: "Account Successfully Created",
+                            icon: "success"
+                        });
+                        this.reset();
+                    } else if (data.status == 8) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    } else if (data.status == 4) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    }
+                });
+        }
     }
 
     reset() {

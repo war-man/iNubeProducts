@@ -39,8 +39,11 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<IEnumerable<CalConfigParam>> GetCalConfigParam(decimal CalculationConfigId, ApiContext apiContext);
         Task<CalConfigResponse> EditCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext);
         Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext);
-        Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext);
         Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext);
+        Task<HandleEventConfig> GetInputOutputParam(String EventId, ApiContext apiContext);
+        Task<object> CheckIllustration(String IllustrationConfigId, int From, int To, dynamic illustration_Param, ApiContext apiContext);
+        //For CheckRatingCalaulationMapping 
+        Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext);
 
 
 

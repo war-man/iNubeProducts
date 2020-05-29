@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Rotativa.AspNetCore;
 using Rotativa.AspNetCore.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Mime;
 using System.Text;
@@ -460,7 +461,18 @@ namespace inube.Services.Notification.Template
                     ImageDTO imageDTO = new ImageDTO();
                     imageDTO.fileUploadDTOs.Add(fileUploadDTO);
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    _iDMSService.DocumentSimpleupload(imageDTO);
+                    await _iDMSService.DocumentSimpleupload(imageDTO);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                }
+                if (templateModel.ActionType == "ContractCertificate")
+                {
+                   // await templateHelper.ProcessNotificationEmailAsync(templateModel.FileName, binary, model.EmailTest);
+                    FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
+                    fileUploadDTO.IdentificationNo = templateModel.StorageName;
+                    ImageDTO imageDTO = new ImageDTO();
+                    imageDTO.fileUploadDTOs.Add(fileUploadDTO);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    await _iDMSService.DocumentSimpleupload(imageDTO);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 }
                 return new ResponseStatus() { Status = BusinessStatus.Created, MessageKey = content.FileName };
@@ -1062,5 +1074,585 @@ occurred, subject to the maximum limit as specified in the Schedule to this Poli
 
             return model;
         }
+
+
+
+        public IActionResult ContractTemplate()
+        {
+            ContractModel model = GetAnpModel();
+           
+            return View(model);
+            //return content;
+        }
+        private ContractModel GetAnpModel()
+        {
+            ContractModel model = new ContractModel();
+            model.RecruitmentNo = "R05";
+            //model.cweDetails = new System.Collections.Generic.List<CweDetails>();
+            model.Allowance = 50000;
+            model.AnpTarget = 1900000;
+            model.AnpTarget = 190000000;
+            model.Designation = "Managing Partner";
+            model.Level = "Level1";
+
+            List<ANPModel> aNPModels = new List<ANPModel>();
+            ANPModel aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 21000;
+            aNPModel.CumulativeAnp = 230000;
+            aNPModel.EndingManpower = 38;
+            aNPModel.ActivityRatio = 20;
+            aNPModel.ActiveAgent = 8;
+            aNPModels.Add(aNPModel);
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+//
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            // aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            //
+            aNPModel = new ANPModel();
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+
+            aNPModels.Add(aNPModel);
+
+
+
+            model.lstANPModels = aNPModels;
+
+            return model;
+        }
     }
+
+
+
 }

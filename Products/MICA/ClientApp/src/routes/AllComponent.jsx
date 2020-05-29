@@ -145,6 +145,9 @@ const CalculationConfig = AsyncComponent(() => { return import("modules/Rating/v
 const CalculationResult = AsyncComponent(() => { return import("modules/Rating/views/CalculationResult.jsx"); });
 const CalculationDisplay = AsyncComponent(() => { return import("modules/Rating/views/CalculationDisplay.jsx"); });
 const EditCalculationConfig = AsyncComponent(() => { return import("modules/Rating/views/SearchCalculationConfig.jsx"); });
+const EllustrationConfig = AsyncComponent(() => { return import("modules/Rating/views/EllustrationConfig.jsx"); });
+const IllustrationResult = AsyncComponent(() => { return import("modules/Rating/views/IllustrationResult.jsx"); });
+
 
 /* DMS module*/
 const DmsDocument = AsyncComponent(() => { return import("modules/DMS/DmsDocument.jsx"); });
@@ -264,6 +267,8 @@ export const ComponentsList = {
     RateExecution: RateExecution,
     CalculationConfig: CalculationConfig,
     CalculationResult: CalculationResult,
+    EllustrationConfig: EllustrationConfig,
+    IllustrationResult: IllustrationResult,
     DmsDocument: DmsDocument,
     RDLCReports: RDLCReports,
     Attributes: Attributes,

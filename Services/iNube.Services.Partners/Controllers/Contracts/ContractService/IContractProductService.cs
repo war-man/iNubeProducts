@@ -20,5 +20,6 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService
         Task<ContractResponse> GetContractDetailsById(int contractId, ApiContext apiContext);
         Task<ContractResponse> GetContractByRecruitmentNo(string recruitmentNo, ApiContext apiContext);
         Task<ContractSearchResponse> SearchContract(ContractSearchDTO contractSearchDTO, ApiContext apiContext);
+        Task<ContractDTO> GetContractDetails(string recruitmentNo, ApiContext apiContext);
     }
 }

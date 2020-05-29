@@ -92,7 +92,12 @@ namespace iNube.Services.Partners.Controllers.Contracts
             var _partnerSearchDTO = await _conService.SearchContract(data, Context);
             return Ok(_partnerSearchDTO);
         }
-       
+        [HttpGet]
+        public async Task<IActionResult> GetContractDetails(string recruitmentNo)
+        {
+            var _searchResult = await _conService.GetContractDetails(recruitmentNo, Context);
+            return Ok(_searchResult);
+        }
 
 
     }

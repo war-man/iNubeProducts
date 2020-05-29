@@ -124,11 +124,22 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mot
         {
             throw new NotImplementedException();
         }
-        public async Task<object> CheckIllustration(String IllustrationConfigId, dynamic illustration_Param, ApiContext apiContext)
+        public async Task<object> CheckIllustration(String IllustrationConfigId, int From, int To, dynamic illustration_Param, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
         public async Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        //CheckCalculationRating For Mapper
+        public async Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<HandleEventConfig> GetInputOutputParam(String EventId, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

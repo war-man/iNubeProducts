@@ -404,4 +404,17 @@ namespace iNube.Services.Rating.Models
         public DateTime? ModifiedDate { get; set; }
         public decimal? EnvId { get; set; }
     }
+
+    public class HandleEventConfig
+    {
+        public HandleEventConfig()
+        {
+            ParameterList = new List<string>();
+            OutputList = new List<string>();
+            Rate = new List<string>();
+        }
+        public List<string> ParameterList { get; set; }
+        public List<string> OutputList { get; set; }
+        public List<string> Rate { get; set; }
+    }
 }

@@ -385,7 +385,21 @@ namespace inube.Services.Notification.Controllers
                 }
                 return templateData;
             }
-                return null;
+            if (request.TemplateKey == "ContractCertificate")
+            {
+                ContractModel templateData = null;
+                if (!string.IsNullOrEmpty(request.NotificationPayload))
+                    templateData = JsonConvert.DeserializeObject<ContractModel>(request.NotificationPayload);
+                else
+                    templateData = GetAnpModel();
+                if (templateData.EmailTest == null)
+                {
+                    EmailRequest emailTest = new EmailRequest() { Message = $"Dear Customer,\n\n Contract Certificate  has been sent successfully\n\n , find the document attached.\n Assuring you the best of services always.\n\n Regards,\n Team MICA ", Subject = $"Contract Certificate", To = "ashish.sinha@inubesolutions.com", IsAttachment = true };
+                    templateData.EmailTest = emailTest;
+                }
+                return templateData;
+            }
+            return null;
         }
 
         private dynamic GetTemplateModel(Models.NotificationRequest request,dynamic model)
@@ -420,6 +434,11 @@ namespace inube.Services.Notification.Controllers
             {
                 templateModel.ViewUrl = "~/views/Template/ProductApi.cshtml";
                 templateModel.FileName = model.PName + "_ProductApiKit.pdf";
+            }
+            if (request.TemplateKey == "ContractCertificate")
+            {
+                templateModel.ViewUrl = "~/views/Template/ContractTemplate.cshtml";
+                templateModel.FileName = "ContractCertificate_" + model.RecruitmentNo + ".pdf";
             }
             templateModel.AttachPDF = request.AttachPDF;
             templateModel.SendEmail = request.SendEmail;
@@ -937,6 +956,59 @@ namespace inube.Services.Notification.Controllers
             return emailTest;
         }
 
+        private ContractModel GetAnpModel()
+        {
+            ContractModel model = new ContractModel();
+            Random random = new Random();
+            model.RecruitmentNo = "R05" + random.Next();
+            //model.cweDetails = new System.Collections.Generic.List<CweDetails>();
+            model.Allowance = 50000;
+            model.AnpTarget = 1900000;
+            model.AnpTarget = 190000000;
+            model.Designation = "Managing Partner";
+            model.Level = "Level1";
+
+            List<ANPModel> aNPModels = new List<ANPModel>();
+            ANPModel aNPModel = new ANPModel();
+            aNPModel.Period = 1;
+            aNPModel.MonthlyAnp = 21000;
+            aNPModel.CumulativeAnp = 230000;
+            aNPModel.EndingManpower = 38;
+            aNPModel.ActivityRatio = 20;
+            aNPModel.ActiveAgent = 8;
+            aNPModels.Add(aNPModel);
+
+            aNPModel = new ANPModel();
+            aNPModel.Period = 2;
+            aNPModel.MonthlyAnp = 22000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 4;
+            aNPModels.Add(aNPModel);
+
+            aNPModel = new ANPModel();
+            aNPModel.Period = 3;
+            aNPModel.MonthlyAnp = 33000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 12;
+            aNPModels.Add(aNPModel);
+
+            aNPModel = new ANPModel();
+            aNPModel.Period = 4;
+            aNPModel.MonthlyAnp = 44000;
+            aNPModel.CumulativeAnp = 220000;
+            aNPModel.EndingManpower = 35;
+            aNPModel.ActivityRatio = 23;
+            aNPModel.ActiveAgent = 16;
+            aNPModels.Add(aNPModel);
+
+            model.lstANPModels = aNPModels;
+
+            return model;
+        }
 
     }
 }

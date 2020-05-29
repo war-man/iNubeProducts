@@ -180,7 +180,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                                             }
                                             else
                                             {
-                                                ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Recruitment Number is already present in database for row:" + row + "" };
+                                                ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Recruitment Number is already present in database for row:" + row + "",PropertyName=recNo };
                                                 Errors.Add(errorInfo);
                                             }
                                         }
@@ -438,8 +438,8 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             dbHelper._TimeZone = UserDateTime.KeyValue;
 
             DateTime DateTimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
-            var IsRecruitmentNotExist = _context.TblContract.Any(s => s.RecruitmentNo != contractDTO.RecruitmentNo);
-            if (IsRecruitmentNotExist)
+            var IsRecruitmentExist = _context.TblContract.Any(s => s.RecruitmentNo == contractDTO.RecruitmentNo);
+            if (!IsRecruitmentExist)
             {
 
                 TblContract contract = _mapper.Map<TblContract>(contractDTO);
@@ -464,6 +464,12 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
                 if (contractDTO.Flag)
                 {
                     await UpdateRecruitmentContract(contract.RecruitmentNo, apiContext);
+                    // Generate PDF
+                    if (contractDTO.lstIllustraionModels.Count > 0)
+                    {
+                        var model = GetAnpModel(contractDTO);
+                        await SendNotificationAsync(model, "ContractCertificate", contractDTO.RecruitmentNo, apiContext);
+                    }
                 }
                 List<string> lstParameters = new List<string>();
                 lstParameters.Add(contractDTO.ContractId.ToString());
@@ -570,6 +576,60 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             }
             return true;
         }
+        public async Task<ContractDTO> GetContractDetails(string recruitmentNo, ApiContext apiContext)
+        {
+            _context = (AVOPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
+            var contractData = _context.TblContract.Where(x => x.RecruitmentNo == recruitmentNo).Select(x => x).FirstOrDefault();
+            var _conData = _mapper.Map<ContractDTO>(contractData);
+            return _conData;
+
+        }
+
+
+        private ContractModel GetAnpModel(ContractDTO contract)
+        {
+            ContractModel model = new ContractModel();
+            model.RecruitmentNo = contract.RecruitmentNo;
+            model.Allowance = (decimal)contract.Allowance;
+            model.AnpTarget = (decimal)contract.TotalAnpTarget;
+            model.TotalCost = (decimal)contract.TotalCost;
+            model.Designation = contract.Designation;
+            model.Level ="Level "+ contract.LevelId;
+
+            List<ANPModel> aNPModels = new List<ANPModel>();
+            ANPModel aNPModel = null;
+            foreach (var item in contract.lstIllustraionModels)
+            {
+                aNPModel = new ANPModel();
+                aNPModel.MonthlyAnp = Convert.ToDecimal(item.oMonthlyANP);
+                aNPModel.CumulativeAnp = Convert.ToDecimal(item.oCummulativeANP);
+                aNPModel.EndingManpower =Math.Round( Convert.ToDecimal(item.oEndingManPower),2);
+                aNPModel.ActivityRatio = Convert.ToDecimal(item.oActivityRatio);
+                aNPModel.ActiveAgent = Convert.ToInt16(item.oActiveAgent);
+                aNPModels.Add(aNPModel);
+            }
+            model.lstANPModels.AddRange(aNPModels);
+            return model;
+        }
+
+        private async Task SendNotificationAsync(dynamic notificationModel,string TemplateKey, string IdentificationNumber, ApiContext apiContext)
+        {
+            try
+            {
+                Partners.Models.NotificationRequest request = new Partners.Models.NotificationRequest();
+                request.TemplateKey = TemplateKey;
+                request.AttachPDF = true;
+                request.StorageName = IdentificationNumber;
+                request.NotificationPayload = JsonConvert.SerializeObject(notificationModel);
+                request.SendEmail = true;
+                request.SendSms = false;
+                 var notificationResponse = await _integrationService.SendNotificationAsync(request, apiContext);
+            }
+            catch (Exception ex)
+            {
+                var msgr = ex.ToString();
+            }
+        }
     }
 }
