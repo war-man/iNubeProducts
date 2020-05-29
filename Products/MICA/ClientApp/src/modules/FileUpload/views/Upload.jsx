@@ -41,7 +41,8 @@ class Upload extends React.Component {
             pageloader: false,
             nodata: false,
             typeList: [{ "mID": 1, "mValue": "Refund Upload", "mType": "FileName" },
-                { "mID": 2, "mValue": "Monthly SI Upload ", "mType": "FileName" }],
+                { "mID": 2, "mValue": "Monthly SI Upload ", "mType": "FileName" },
+                { "mID": 3, "mValue": "Refund Report Upload ", "mType": "FileName" }],
             fields: {
                 FileName:"",
             },
@@ -114,7 +115,7 @@ class Upload extends React.Component {
                     console.log("response ", response);
 
                     if (response.status == 1) {
-                      
+
                         console.log("errorDetails", response.errorDetails);
                         //this.setState({
                         //    GridFun: true,
@@ -128,7 +129,7 @@ class Upload extends React.Component {
                         });
 
                     } else {
-                       // if (response.errorDetails.length > 0) {
+                        // if (response.errorDetails.length > 0) {
                         response.errorDetails.map((prop, index) => {
 
                             if (prop.errorDescription != undefined) {
@@ -147,11 +148,12 @@ class Upload extends React.Component {
 
 
                         this.setState({
-                            GridFun : true,
-                            errorListFun:response.errorDetails
+                            GridFun: true,
+                            errorListFun: response.errorDetails
                         });
-
-                        this.RefundTableHeader(response.errorDetails);
+                        if (response.errorDetails.length > 0) {
+                            this.RefundTableHeader(response.errorDetails);
+                        }
                         //}
                         swal({
                             text: response.responseMessage,
@@ -164,7 +166,7 @@ class Upload extends React.Component {
                 error: function () {
 
                     this.setState({
-                        GridFun : false
+                        GridFun: false
                     });
                     swal({
                         text: "File uploading unsuccessful",
@@ -173,8 +175,8 @@ class Upload extends React.Component {
                 }.bind(this)
             });
         }
-        
-        else {
+
+        else if (this.state.fields.FileName == 2) {
             $.ajax({
                 type: "POST",
                 url: `${FileUploadConfig.FileUploadConfigUrl}/api/Mica_EGI/MonthlySIUpload`,
@@ -189,39 +191,116 @@ class Upload extends React.Component {
                     xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
                 },
                 success: function (response) {
-                    console.log("response ", response,response.errors,response.status);
+                    console.log("response ", response, response.errors, response.status);
 
-                   
+
                     if (response.status == 1) {
                         this.setState({
                             mflag: true,
                             monthlyData: response.errors,
 
-                         });
-                        this.tabledata(response.errors);
-                            swal({
-                                text: response.responseMessage,
-                                icon: "success"
+                        });
+                        if (response.errors.length>0) {
+                            this.tabledata(response.errors);
+                        }
+                        swal({
+                            text: response.responseMessage,
+                            icon: "success"
                         });
 
-                    } else  {
-                            this.setState({
-                                mflag: true,
+
+                    } else {
+                        this.setState({
+                            mflag: true,
                             monthlyData: response.errors,
 
                         });
-
-                        this.tabledata(response.errors);
+                        if (response.errors.length > 0) {
+                            this.tabledata(response.errors);
+                        }
                         swal({
                             text: response.responseMessage,
                             icon: "error"
                         });
                         console.log("check", response.responseMessage);
                     }
-                    
+
                 }.bind(this),
-              
+
             });
+        } else if (this.state.fields.FileName == 3) {
+            $.ajax({
+                type: "POST",
+                url: `${FileUploadConfig.FileUploadConfigUrl}/api/Policy/RefundReportUpload`,
+               // url: `https://localhost:44351/api/Policy/RefundReportUpload`,
+                contentType: false,
+                processData: false,
+
+                data: data,
+                beforeSend: function (xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+                },
+                success: function (response) {
+                    console.log("response ", response);
+
+                    if (response.status == 1) {
+
+                        console.log("errorDetails", response.errorDetails);
+        
+                        swal({
+
+                            text: response.responseMessage,
+                            icon: "success"
+                        });
+
+                    } else {
+                        // if (response.errorDetails.length > 0) {
+                        response.errorDetails.map((prop, index) => {
+
+                            if (prop.errorDescription != undefined) {
+                                if (prop.errorDescription.length > 0) {
+                                    prop.errorDescription = prop.errorDescription.map(c => {
+                                        return (<p className="gridparagraph">{c.Details} </p>)
+                                    })
+                                }
+                            }
+                            else {
+                                return response.errorDetails[index];
+                            }
+                        }
+                        );
+
+
+
+                        this.setState({
+                            GridFun: true,
+                            errorListFun: response.errorDetails
+                        });
+                        if (response.errorDetails.length > 0) {
+                            this.RefundTableHeader(response.errorDetails);
+                        }
+                        //}
+                        swal({
+                            text: response.responseMessage,
+                            icon: "success"
+                        });
+                        console.log("check", response.responseMessage);
+                    }
+
+                }.bind(this),
+                error: function () {
+
+                    this.setState({
+                        GridFun: false
+                    });
+                    swal({
+                        text: "File uploading unsuccessful",
+                        icon: "error"
+                    });
+                }.bind(this)
+            });
+
         }
 }
 
@@ -241,7 +320,7 @@ class Upload extends React.Component {
     }
 
     tabledata = (errors) => {
-        debugger
+       // debugger
         this.state.responseErrors = errors;
         this.setState({ mflag: true });
         console.log("Monthly", this.state.monthlyData);
