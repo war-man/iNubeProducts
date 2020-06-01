@@ -51,8 +51,9 @@ namespace iNube.Services.Partners.Helpers
         {
 
             DateTime zonelocalDateTime = System.DateTime.UtcNow.AddMinutes(330);
-           
-            return zonelocalDateTime;
+
+            var IstDate = Convert.ToDateTime(zonelocalDateTime.ToString("s"));
+            return IstDate;
         }
 
     }

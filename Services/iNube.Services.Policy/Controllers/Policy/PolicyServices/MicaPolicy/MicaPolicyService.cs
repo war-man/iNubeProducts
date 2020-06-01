@@ -321,7 +321,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                   
                    DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
-                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow);
+                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow, "Issue Policy");
                     logMsg = logMsg + ",4";
                     var Amount = productDetails.PremiumAmount;
                     policyNumber = mappedPolicy.PolicyNo;
@@ -357,7 +357,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             request.AttachPDF = true;
                             //request.NotificationPayload = JsonConvert.SerializeObject(policyEmailModel);
                             request.SendEmail = true;
-                            var notificationResponse = await _integrationService.SendNotificationAsync(request, apiContext);
+                          //  var notificationResponse = await _integrationService.SendNotificationAsync(request, apiContext);
                         }
                         catch (Exception ex)
                         {
@@ -646,7 +646,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             //}
             return Errors;
         }
-        private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail,DateTime dateTime,dynamic Request=null)
+        private decimal SavePolicyDetails(PolicyDTO mappedPolicy, dynamic policyDetail,DateTime dateTime,string action,dynamic Request=null)
         {
             mappedPolicy.PolicyIssueDate = dateTime;
 
@@ -658,7 +658,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             policyRequest.PolicyRequest = policyDetail.ToString();
             policy.TblPolicyDetails.Add(policyRequest);
             _context.TblPolicy.Add(policy);
-            var action = "Create Proposal";
+            //var action = "Create Proposal";
 
             try
             {
@@ -1804,7 +1804,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
                    DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
-                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow);
+                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow, "Issue Policy");
                     logMsg = logMsg + ",4";
                     var Amount = mappedPolicy.PremiumAmount;
                     policyNumber = mappedPolicy.PolicyNo;
@@ -1988,7 +1988,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
                    DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
-                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow);
+                    PolicyId = SavePolicyDetails(mappedPolicy, policyDetail, DatetimeNow, "Issue Policy");
                     logMsg = logMsg + ",4";
                     var Amount = mappedPolicy.PremiumAmount;
                     policyNumber = mappedPolicy.PolicyNo;
@@ -4420,7 +4420,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
 
-                                PolicyId = SavePolicyDetails(mappedPolicy, ProposalDetail, DatetimeNow, RequestData);
+                                PolicyId = SavePolicyDetails(mappedPolicy, ProposalDetail, DatetimeNow, "Create Proposal", RequestData);
 
                                 //Step9:Post CD Account entries 
 
@@ -6615,7 +6615,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                        
 
-                                        PolicyId = SavePolicyDetails(mappedPolicy, policyDTO, DatetimeNow, PolicyRequest);
+                                        PolicyId = SavePolicyDetails(mappedPolicy, policyDTO, DatetimeNow, "Issue Policy", PolicyRequest);
 
                                         //Step9:Post CD Account entries 
 

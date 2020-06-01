@@ -54,13 +54,16 @@ namespace iNube.Services.Policy.Helpers
         {
 
             DateTime zonelocalDateTime = System.DateTime.UtcNow.AddMinutes(330);
-            //DateTime zonelocalDateTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, TimeZoneInfo.FindSystemTimeZoneById(userTimeZone));
-            //DateTime utcDateTimeDT = dateTime.ToUniversalTime();
-            //TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById(userTimeZone);
-            //DateTime dateTimeUTC = DateTime.UtcNow;
-            //DateTime zonelocalDateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTimeUTC, TimeZone);
-            //Console.WriteLine(zonelocalDateTime);
-            return zonelocalDateTime;
+            ////DateTime zonelocalDateTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, TimeZoneInfo.FindSystemTimeZoneById(userTimeZone));
+            ////DateTime utcDateTimeDT = dateTime.ToUniversalTime();
+            ////TimeZoneInfo TimeZone = TimeZoneInfo.FindSystemTimeZoneById(userTimeZone);
+            ////DateTime dateTimeUTC = DateTime.UtcNow;
+            ////DateTime zonelocalDateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTimeUTC, TimeZone);
+            ////Console.WriteLine(zonelocalDateTime);
+            //return zonelocalDateTime;
+
+            var IstDate = Convert.ToDateTime(zonelocalDateTime.ToString("s"));
+            return IstDate;
         }
 
     }
