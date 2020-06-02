@@ -157,7 +157,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
 
             var userdetails = (from cu in _cpcontext.TblCustomerUsers
                                join ce in _cpcontext.TblCustomerEnvironment on cu.CustomerId equals ce.CustomerId
-                               where cu.UserName == username && ce.Product == productType /*&& cu.IsActive==true*/
+                               where cu.UserName == username /*&& ce.Product == productType && cu.IsActive==true*/
                                select new UserLoginType
                                {
                                    UserType = cu.UserType,
@@ -166,6 +166,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                                    IsActive = cu.IsActive,
                                    IsFirstTimeLogin = cu.IsFirstTimeLogin,
                                    //IsFirstTimeLogin = 1,
+                                   Product = ce.Product,
                                    UserId = cu.UserId,
                                    //Dbconnection= ce.Dbconnection,
                                    //CustomerId =cu.CustomerId,
@@ -204,7 +205,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             }
         }
 
-        public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire,RequestToken request=null)
+        public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire, RequestToken request = null)
         {
             LoginResponse loginResponse = new LoginResponse();
             var dbConnection = GetEnvironmentConnection(productType, envId).Dbconnection;
@@ -221,7 +222,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 var issuer = _config["Jwt:Issuer"];
                 var audience = _config["Jwt:Audience"];
                 var expiry = isTokenExpire ? DateTime.Now.AddMinutes(180) : DateTime.Now.AddYears(3);
-                if(request != null && request.IsRefreshToken && request.RoleId=="990" && request.ClaimType=="Year")
+                if (request != null && request.IsRefreshToken && request.RoleId == "990" && request.ClaimType == "Year")
                 {
                     expiry = DateTime.Now.AddYears(3);
                 }
