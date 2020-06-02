@@ -73,7 +73,12 @@ namespace iNube.Services.Billing
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-           // app.UseCors(builder => builder.WithOrigins("http://localhost:55294"));
+            // app.UseCors(builder => builder.WithOrigins("http://localhost:55294"));
+            app.UseCors(x => x
+             .AllowAnyOrigin()
+             .AllowAnyMethod()
+             .AllowAnyHeader()
+             .AllowCredentials());
             app.UseHealthChecks("/hc", new HealthCheckOptions()
             {
                 Predicate = _ => true,
