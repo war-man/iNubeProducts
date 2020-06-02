@@ -5356,8 +5356,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             // var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
             string connectionString = dbHelper.GetEnvironmentConnectionAsync(apicontext.ProductType, Convert.ToDecimal(apicontext.ServerType)).Result;
 
-            if (GlobalVariables.PolicyData["PolicyStageStatusId"] != 9 && (DateTime)GlobalVariables.PolicyData["Policy Start Date"] <= CurrentDate.Date)
-            {
+           
                 var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from[QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + policyRequest.PolicyNumber + "'group by Month(CreatedDate) , PolicyNo";
 
 
@@ -5375,7 +5374,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         var Result = Switchds.Tables[0];
                         var Days = (Result.Rows.Count > 0) ? Result.Rows[0].ItemArray[0] : 0;
-
+                       if (GlobalVariables.PolicyData["PolicyStageStatusId"] == 9 && (DateTime)GlobalVariables.PolicyData["Policy Start Date"] >= CurrentDate.Date)
+                       {
+                        Days = 0;
+                       }
                         //Total Usage Shown
                         var usedays = Convert.ToInt32(Days);
                         // No. of days for AD
@@ -5390,7 +5392,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
 
                 }
-            }
+            
             return policyCancelResponse;
         }
 

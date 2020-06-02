@@ -7220,11 +7220,19 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                             var RequestObj = JsonConvert.DeserializeObject<dynamic>(PolicyRefundDetails.RequestObject.ToString());
                             RequestObj["PaymentInfo"][0].Amount = errorInfoDetailsInfo.AmountPaid;
-                            var SerializeObj = JsonConvert.SerializeObject(RequestObj);
-                            PolicyRefundDetails.RequestObject = JsonConvert.DeserializeObject<dynamic>(SerializeObj.ToString());
-
-                            var result = await GeneratePolicy(PolicyRefundDetails.RequestObject, apiContext);
-                            PolicyRefundDetails.Status = false;
+                          //  var SerializeObj = JsonConvert.SerializeObject(RequestObj);
+                            PolicyRefundDetails.RequestObject = RequestObj.ToString();// JsonConvert.DeserializeObject<dynamic>(SerializeObj.ToString());
+                            if (PolicyRefundDetails.TransactionType == "Policy Issuance")
+                            {
+                                var result = await GeneratePolicy(RequestObj, apiContext);
+                                PolicyRefundDetails.Status = false;
+                            }
+                            if (PolicyRefundDetails.TransactionType == "Endorsement") {
+                                var result = await PolicyEndoresemenet(RequestObj, apiContext);
+                                PolicyRefundDetails.Status = false;
+                            }
+                            _context.TblPolicyException.Update(PolicyRefundDetails);
+                            _context.SaveChanges();
                         }
                         else
                         {
@@ -7237,13 +7245,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         }
 
-                        _context.TblPolicyException.Update(PolicyRefundDetails);
+                       
                     }
-                    if (PolicyRefundDetails.TransactionType == "Endorsement")
-                    {
-
-                    }
-                        _context.SaveChanges();
+                  
+                       
                 }
                 else
                 {
