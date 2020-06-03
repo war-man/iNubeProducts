@@ -329,7 +329,7 @@ class CreateBilling extends React.Component {
                     console.log("mapval:", this.state.mapval);
                     for (let i = 0; i < len; i++) {
 
-                        console.log("mappingid", this.state.billingItem[i].eventMappingId, this.state.mapval);
+                       // console.log("mappingid", this.state.billingItem[i].eventMappingId, this.state.mapval);
                         const mappingid = this.state.billingItem[i].eventMappingId;
                         console.log("mappingid", mappingid);
                         const filtermap = this.state.mapval.filter(i => i.mID === mappingid);
@@ -429,7 +429,7 @@ class CreateBilling extends React.Component {
                                
                             } else { showList['eventtable'] = false; }
                         }
-                        else if (objval == "OneTime License Cost") {
+                        else if (objval == "MICA OneTime License Cost") {
                             showList['catddl'] = false;
                             showList['catCount'] = false;
                             showList['CountRate'] = false;
@@ -552,6 +552,7 @@ class CreateBilling extends React.Component {
 
     SetObject = ((type, event) => {
         debugger
+        this.state.eventlist = [];
         this.setState({ [event.target.name]: event.target.value });
         console.log("object:", event.target.value);
         this.state.objectVal = event.target.value;
@@ -631,7 +632,7 @@ class CreateBilling extends React.Component {
 
             });
 
-        document.getElementById("ddEvents").style.display = 'block';
+       // document.getElementById("ddEvents").style.display = 'block';
     }
 
     CollapseDropDown = (objval) => {
@@ -687,7 +688,7 @@ class CreateBilling extends React.Component {
             showList['rate'] = false;
 
         }
-        else if (objval == "OneTime License Cost") {
+        else if (objval == "MICA OneTime License Cost") {
 
             showList['rate'] = true;
 
@@ -705,9 +706,15 @@ class CreateBilling extends React.Component {
             showList['recurringRate'] = false;
 
         }
-        else if (objval == "Recurring Installment") {
+        else if (objval == "MICA Recurring Installment") {
             showList['recurring'] = true;
             showList['catddl'] = false;
+            showList['rate'] = false;
+        }
+        else if (objval == "MICA Recurring Flat Amount") {
+            showList['recurring'] = false;
+            showList['catddl'] = false;
+            showList['rate'] = true;
         }
         else {
             this.state.billingItem[this.state.billingItem.length - 2].categoryTypeId = "";
