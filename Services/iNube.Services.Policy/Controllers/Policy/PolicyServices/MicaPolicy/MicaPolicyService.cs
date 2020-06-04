@@ -7034,8 +7034,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 errorInfoDetailsInfo.TxnID = TxnID;
                 var dict = new Dictionary<string, string>();
-                dict.Add("Header", "TxnID");
-                dict.Add("Details", "TxnID can not be empty");
+                dict.Add("Header", "MICA Txn ID");
+                dict.Add("Details", "MICA Txn ID can not be empty");
                 dict1.Add(dict);
                 errorflag = true;
                 TxnNumber = i.ToString();
@@ -7054,8 +7054,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 errorflag = true;
                 var dict = new Dictionary<string, string>();
-                dict.Add("Header", "PaidAmount");
-                dict.Add("Details", $"PaidAmount can not be empty for TxnID {TxnID}");
+                dict.Add("Header", "Paid Amount");
+                dict.Add("Details", $"Paid Amount can not be empty for MICA Txn ID {TxnID}");
                 dict1.Add(dict);
             }
             else
@@ -7068,8 +7068,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 errorflag = true;
                 var dict = new Dictionary<string, string>();
-                dict.Add("Header", "PaymentReferenceId");
-                dict.Add("Details", $"PaymentReferenceId can not be null for TxnID {TxnID}");
+                dict.Add("Header", "Payment Reference ID");
+                dict.Add("Details", $"Payment Reference ID can not be null for MICA Txn ID {TxnID}");
                 dict1.Add(dict);
             }
             else
@@ -7081,8 +7081,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 errorflag = true;
                 var dict = new Dictionary<string, string>();
-                dict.Add("Header", "PaymentDate");
-                dict.Add("Details", $"PaymentDate can not be null for TxnID {TxnID}");
+                dict.Add("Header", "Payment Date");
+                dict.Add("Details", $"Payment Date can not be null for MICA Txn ID {TxnID}");
                 dict1.Add(dict);
             }
             else
@@ -7094,8 +7094,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 errorflag = true;
                 var dict = new Dictionary<string, string>();
-                dict.Add("Header", "PaymentStatus");
-                dict.Add("Details", $"Payment status can not be null for TxnID {TxnID}");
+                dict.Add("Header", "Payment Status");
+                dict.Add("Details", $"Payment Status can not be null for MICA Txn ID {TxnID}");
                 dict1.Add(dict);
             }
             else
@@ -7117,8 +7117,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 else
                 {
                     var dict = new Dictionary<string, string>();
-                    dict.Add("Header", "PaymentStatus");
-                    dict.Add("Details", $"Payment status can be only successful or failure can not be other for TxnID {TxnID}");
+                    dict.Add("Header", "Payment Status");
+                    dict.Add("Details", $"Payment Status can be only successful or failure can not be other for TxnID {TxnID}");
                     dict1.Add(dict);
                     errorInfoDetailsInfo.PaymentStatus = PaymentStatus;
                     errorflag = true;
@@ -7133,8 +7133,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 if (PolicyRefundDetails == null)
                 {
                     var dict = new Dictionary<string, string>();
-                    dict.Add("Header", "TxnID");
-                    dict.Add("Details", $"TxnID  {errorInfoDetailsInfo.TxnID} does not exist in database");
+                    dict.Add("Header", "MICA Txn ID");
+                    dict.Add("Details", $"MICA Txn ID  {errorInfoDetailsInfo.TxnID} does not exist in database");
                     dict1.Add(dict);
                     errorflag = true;
 
@@ -7143,7 +7143,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                     var dict = new Dictionary<string, string>();
                     dict.Add("Header", "RecordsUpdated");
-                    dict.Add("Details", $"For TxnID  {errorInfoDetailsInfo.TxnID} record is already updated in the database.");
+                    dict.Add("Details", $"For MICA Txn ID  {errorInfoDetailsInfo.TxnID} record is already updated in the database.");
                     dict1.Add(dict);
                     errorflag = true;
 
@@ -7163,8 +7163,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                    if (value2 > 0)
                     {
                         var dict = new Dictionary<string, string>();
-                        dict.Add("Header", "DateofPayment");
-                        dict.Add("Details", $"DateofPayment can not be the future date for TxnID  {TxnID}");
+                        dict.Add("Header", "Payment Date");
+                        dict.Add("Details", $"Payment Date can not be the future date for MICA Txn ID {TxnID}");
                         dict1.Add(dict);
                         errorflag = true;
                     }
@@ -7180,6 +7180,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     {
                         PolicyRefundDetails.TransactionDate = DatetimeNow;
                         PolicyRefundDetails.PaymentReferenceId = errorInfoDetailsInfo.PaymentReferenceId;
+                        PolicyRefundDetails.PaidAmount = errorInfoDetailsInfo.AmountPaid;
                         PolicyRefundDetails.PaymentStatus = errorInfoDetailsInfo.PaymentStatus;
                         PolicyRefundDetails.PaymentDate = errorInfoDetailsInfo.DateofPayment;
                         PolicyRefundDetails.ModifiedDate = DatetimeNow;
