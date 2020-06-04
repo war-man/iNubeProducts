@@ -6962,12 +6962,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 }
                 logx++;
                 //finding index of every column
-                var txnIDindex = FindIndex(strFilePath, "TxnID");
+                var txnIDindex = FindIndex(strFilePath, "txnID");
               
-                var PaymentReferenceIdIndex = FindIndex(strFilePath, "PaymentReferenceId");
-                var PaidAmountIndex = FindIndex(strFilePath, "PaidAmount");
-                var DateOfPaymentIndex = FindIndex(strFilePath, "PaymentDate");
-                var PaymentStatusIndex = FindIndex(strFilePath, "PaymentStatus");
+                var PaymentReferenceIdIndex = FindIndex(strFilePath, "paymentReferenceID");
+                var PaidAmountIndex = FindIndex(strFilePath, "paidAmount");
+                var DateOfPaymentIndex = FindIndex(strFilePath, "paymentDate");
+                var PaymentStatusIndex = FindIndex(strFilePath, "paymentStatus");
                 logx++;
 
                 while (!sr.EndOfStream)
