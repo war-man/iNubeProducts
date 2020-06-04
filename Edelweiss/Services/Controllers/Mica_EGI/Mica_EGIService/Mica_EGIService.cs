@@ -7207,7 +7207,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                 ErrorInfo errorInfo = new ErrorInfo();
 
-                                errorInfo.ErrorMessage = "Paid Amount is Less Than the Billed Amount";
+                                errorInfo.ErrorMessage = "Paid Amount is Less than the Difference Amount Calculated";
                                 errorInfo.ErrorCode = "MSI009";
                                 errorInfo.PropertyName = PropertyName;
                                 uploadDTO.Errors.Add(errorInfo);
@@ -7246,9 +7246,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             {
                                 ExceptionData.Status = false;
                                 ExceptionData.ModifiedDate = IndianTime;
-                                //ExceptionData.PaymentReferenceId = Convert.ToInt32(payUid);
-                               // ExceptionData.PaidAmount = payAmount;
-                                //ExceptionData.PaymentDate = paymentDate;
+                                ExceptionData.PaymentReferenceId = payUid;
+                                ExceptionData.PaidAmount = Convert.ToDecimal(payAmount);
+                                ExceptionData.PaymentDate = paymentDate;
                                 _context.TblSiexception.Update(ExceptionData);
                             }
 
@@ -7463,7 +7463,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                                 ErrorInfo errorInfo = new ErrorInfo();
 
-                                errorInfo.ErrorMessage = "Paid Amount is Less Than the Billed Amount";
+                                errorInfo.ErrorMessage = "Paid Amount is Less Than the Difference Amount Calculated";
                                 errorInfo.ErrorCode = "MSI009";
                                 errorInfo.PropertyName = PropertyName;
                                 uploadDTO.Errors.Add(errorInfo);
@@ -7505,6 +7505,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             {
                                 ExceptionData.Status = false;
                                 ExceptionData.ModifiedDate = IndianTime;
+                                ExceptionData.PaymentReferenceId = payUid;
+                                ExceptionData.PaidAmount = Convert.ToDecimal(payAmount);
+                                ExceptionData.PaymentDate = paymentDate;
                                 _context.TblSiexception.Update(ExceptionData);
                             }
 
