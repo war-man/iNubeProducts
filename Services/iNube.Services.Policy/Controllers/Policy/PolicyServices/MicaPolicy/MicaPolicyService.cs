@@ -7245,7 +7245,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
             var IssuePolicy=_context.TblPolicy.Where(s => s.PolicyStageStatusId == ModuleConstants.PolicyStageQuoteCreated && s.PolicyStartDate.Value.Date == DatetimeNow.Date && s.IsActive==true);
-            if (IssuePolicy != null)
+            if (IssuePolicy.ToList().Count>0)
             {
                 foreach (var item in IssuePolicy)
                 {
