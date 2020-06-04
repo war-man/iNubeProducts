@@ -231,8 +231,8 @@ class Upload extends React.Component {
         } else if (this.state.fields.FileName == 3) {
             $.ajax({
                 type: "POST",
-               // url: `${FileUploadConfig.FileUploadConfigUrl}/api/Policy/RefundReportUpload`,
-                url: `https://localhost:44351/api/Policy/RefundReportUpload`,
+                url: `${FileUploadConfig.FileUploadConfigUrl}/api/Policy/RefundReportUpload`,
+               // url: `https://localhost:44351/api/Policy/RefundReportUpload`,
                 contentType: false,
                 processData: false,
 
