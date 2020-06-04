@@ -85,7 +85,16 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
                             i.CustomerId = customerProvisioningDTO.CustomerId;
                             i.CreatedDate = DateTime.Now;
                             i.IsActive = true;
-                            i.Dbconnection = "Data Source=inubepeg.database.windows.net; Initial Catalog =" + item.KeyValue + "; User Id=MICAUSER; Password=MICA*user123";
+                            // i.Dbconnection = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433; Initial Catalog =" + item.KeyValue + "; User Id=admin; Password=micaadmin";
+                            if (item.KeyValue == "EdelweissTest")
+                            {
+                                i.Dbconnection = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433; Initial Catalog =" + item.KeyValue + "; User Id=admin; Password=micaadmin";
+                            }
+                            else if (item.KeyValue == "MicaDev")
+                            {
+                                i.Dbconnection = "Data Source=inubepeg.database.windows.net; Initial Catalog =" + item.KeyValue + "; User Id=MICAUSER; Password=MICA*user123";
+                            }
+
                         }
                         count++;
                     }
