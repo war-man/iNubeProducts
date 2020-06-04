@@ -6489,7 +6489,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             {
                                 var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
 
-                                if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                                if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1 && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <=1)
                                 {
 
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(policyDTO.ToString());
@@ -7184,10 +7184,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         PolicyRefundDetails.PaymentDate = errorInfoDetailsInfo.DateofPayment;
                         PolicyRefundDetails.ModifiedDate = DatetimeNow;
 
-
-                        if (PolicyRefundDetails.DifferenceAmount<= errorInfoDetailsInfo.AmountPaid)
+                       
+                        if ((PolicyRefundDetails.DifferenceAmount-errorInfoDetailsInfo.AmountPaid)>=-1 && (PolicyRefundDetails.DifferenceAmount - errorInfoDetailsInfo.AmountPaid) <= 1)
                         {
-                            PolicyRefundDetails.DifferenceAmount = errorInfoDetailsInfo.AmountPaid-PolicyRefundDetails.DifferenceAmount;
+                          //  PolicyRefundDetails.DifferenceAmount = errorInfoDetailsInfo.AmountPaid-PolicyRefundDetails.DifferenceAmount;
                             var RequestObj = JsonConvert.DeserializeObject<dynamic>(PolicyRefundDetails.RequestObject.ToString());
                             RequestObj["PaymentInfo"][0].Amount = RequestObj["PaymentInfo"][0].Amount+errorInfoDetailsInfo.AmountPaid;
                             //  var SerializeObj = JsonConvert.SerializeObject(RequestObj);
@@ -7252,10 +7252,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 }
                 _context.TblPolicy.UpdateRange(IssuePolicy);
                 _context.SaveChanges();
-                return new ResponseStatus { Status = BusinessStatus.Ok };
+                return new ResponseStatus { Status = BusinessStatus.Ok,ResponseMessage="Policy Status updated successfully" };
             }
             else {
-                return new ResponseStatus { Status = BusinessStatus.NotFound };
+                return new ResponseStatus { Status = BusinessStatus.NotFound,ResponseMessage="No Record Found" };
             }
             
         }
