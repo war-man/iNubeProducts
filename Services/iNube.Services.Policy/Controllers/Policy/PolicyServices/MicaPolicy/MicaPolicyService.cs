@@ -6862,11 +6862,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetNameValue];
 
 
-                                        int txnID = worksheet.GetColumnByName("TxnID");
-                                        int paymentReferenceId = worksheet.GetColumnByName("PaymentReferenceId");
-                                        int paidAmountId = worksheet.GetColumnByName("PaidAmount");
-                                        int paymentDateId = worksheet.GetColumnByName("PaymentDate");
-                                        int paymentStatusId = worksheet.GetColumnByName("PaymentStatus");
+                                        int txnID = worksheet.GetColumnByName("MICA Txn ID");
+                                        int paymentReferenceId = worksheet.GetColumnByName("Payment Reference ID");
+                                        int paidAmountId = worksheet.GetColumnByName("Paid Amount");
+                                        int paymentDateId = worksheet.GetColumnByName("Payment Date");
+                                        int paymentStatusId = worksheet.GetColumnByName("Payment Status");
                                      
 
                                         if (worksheet != null)
