@@ -4836,7 +4836,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         else
                                         {
 
-                                            policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStagePolicyLive;
+                                            policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStageStatusLive;
                                         }
                                         //policyUpdate.PolicyStatus = ModuleConstants.ProposalStatus;
                                        
@@ -6653,7 +6653,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
                                             policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
                                             policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
-                                            policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStagePolicyLive;
+                                            policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStageStatusLive;
 
                                             policyUpdate.IsActive = true;
 
@@ -7178,42 +7178,53 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                     if (PolicyRefundDetails.TransactionType == "Policy Issuance")
                     {
-                        PolicyRefundDetails.TransactionDate = DatetimeNow;
-                        PolicyRefundDetails.PaymentReferenceId = errorInfoDetailsInfo.PaymentReferenceId;
-                        PolicyRefundDetails.PaidAmount = errorInfoDetailsInfo.AmountPaid;
-                        PolicyRefundDetails.PaymentStatus = errorInfoDetailsInfo.PaymentStatus;
-                        PolicyRefundDetails.PaymentDate = errorInfoDetailsInfo.DateofPayment;
-                        PolicyRefundDetails.ModifiedDate = DatetimeNow;
-
-                       
-                        if ((PolicyRefundDetails.DifferenceAmount-errorInfoDetailsInfo.AmountPaid)>=-1 && (PolicyRefundDetails.DifferenceAmount - errorInfoDetailsInfo.AmountPaid) <= 1)
+                        if (PolicyRefundDetails.Status == true)
                         {
-                          //  PolicyRefundDetails.DifferenceAmount = errorInfoDetailsInfo.AmountPaid-PolicyRefundDetails.DifferenceAmount;
-                            var RequestObj = JsonConvert.DeserializeObject<dynamic>(PolicyRefundDetails.RequestObject.ToString());
-                            RequestObj["PaymentInfo"][0].Amount = RequestObj["PaymentInfo"][0].Amount+errorInfoDetailsInfo.AmountPaid;
-                            //  var SerializeObj = JsonConvert.SerializeObject(RequestObj);
-                            PolicyRefundDetails.RequestObject = RequestObj.ToString();// JsonConvert.DeserializeObject<dynamic>(SerializeObj.ToString());
-                            if (PolicyRefundDetails.TransactionType == "Policy Issuance")
+                            PolicyRefundDetails.TransactionDate = DatetimeNow;
+                            PolicyRefundDetails.PaymentReferenceId = errorInfoDetailsInfo.PaymentReferenceId;
+                            PolicyRefundDetails.PaidAmount = errorInfoDetailsInfo.AmountPaid;
+                            PolicyRefundDetails.PaymentStatus = errorInfoDetailsInfo.PaymentStatus;
+                            PolicyRefundDetails.PaymentDate = errorInfoDetailsInfo.DateofPayment;
+                            PolicyRefundDetails.ModifiedDate = DatetimeNow;
+
+
+                            if ((PolicyRefundDetails.DifferenceAmount - errorInfoDetailsInfo.AmountPaid) >= -1 && (PolicyRefundDetails.DifferenceAmount - errorInfoDetailsInfo.AmountPaid) <= 1)
                             {
-                                var result = await GeneratePolicy(RequestObj, apiContext);
-                                PolicyRefundDetails.Status = false;
+                                //  PolicyRefundDetails.DifferenceAmount = errorInfoDetailsInfo.AmountPaid-PolicyRefundDetails.DifferenceAmount;
+                                var RequestObj = JsonConvert.DeserializeObject<dynamic>(PolicyRefundDetails.RequestObject.ToString());
+                                RequestObj["PaymentInfo"][0].Amount = RequestObj["PaymentInfo"][0].Amount + errorInfoDetailsInfo.AmountPaid;
+                                //  var SerializeObj = JsonConvert.SerializeObject(RequestObj);
+                                PolicyRefundDetails.RequestObject = RequestObj.ToString();// JsonConvert.DeserializeObject<dynamic>(SerializeObj.ToString());
+                                if (PolicyRefundDetails.TransactionType == "Policy Issuance")
+                                {
+                                    var result = await GeneratePolicy(RequestObj, apiContext);
+                                    PolicyRefundDetails.Status = false;
+                                }
+                                if (PolicyRefundDetails.TransactionType == "Endorsement")
+                                {
+                                    var result = await PolicyEndoresemenet(RequestObj, apiContext);
+                                    PolicyRefundDetails.Status = false;
+                                }
+                                _context.TblPolicyException.Update(PolicyRefundDetails);
+                                _context.SaveChanges();
                             }
-                            if (PolicyRefundDetails.TransactionType == "Endorsement") {
-                                var result = await PolicyEndoresemenet(RequestObj, apiContext);
-                                PolicyRefundDetails.Status = false;
-                            }
-                            _context.TblPolicyException.Update(PolicyRefundDetails);
-                            _context.SaveChanges();
-                        }
-                        else
-                        {
-                            PolicyRefundDetails.Status = true;
-                            errorflag = true;
-                            var dict = new Dictionary<string, string>();
-                            dict.Add("Header", "PaymentInfo");
-                            dict.Add("Details", $"Calculate Premium Amount {PolicyRefundDetails.TotalPremium} differs with payment collected amount {errorInfoDetailsInfo.AmountPaid} for TxnID {TxnID}");
-                            dict1.Add(dict);
+                            else
+                            {
+                                PolicyRefundDetails.Status = true;
+                                errorflag = true;
+                                var dict = new Dictionary<string, string>();
+                                dict.Add("Header", "PaymentInfo");
+                                dict.Add("Details", $"Calculate Premium Amount {PolicyRefundDetails.TotalPremium} differs with payment collected amount {errorInfoDetailsInfo.AmountPaid} for MICA Txn ID {TxnID}");
+                                dict1.Add(dict);
 
+                            }
+                        }
+                        else {
+                            var dict = new Dictionary<string, string>();
+                            dict.Add("Header", "RecordsUpdated");
+                            dict.Add("Details", $"For MICA Txn ID  {errorInfoDetailsInfo.TxnID} record is already updated in the database.");
+                            dict1.Add(dict);
+                            errorflag = true;
                         }
 
                        

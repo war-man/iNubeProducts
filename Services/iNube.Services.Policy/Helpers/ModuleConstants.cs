@@ -26,7 +26,7 @@ namespace iNube.Services.Policy.Helpers
         public const int PolicyStageStatusApproved = 11;//policyStatus creeated
         public const int PolicyStageStatusLive = 22;//policyStatus creeated
         public const int PolicyStagePolicyIssued = 12;
-        public const int PolicyStagePolicyLive = 13;
+        public const int PolicyStageStatusRejected = 13;
         public const int PolicyStageStatusCancelled = 21;
        
     }
