@@ -6832,11 +6832,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             bool sms = true;
                             bool email = true;
 
-                            dt.Columns.Add("TxnID", typeof(string));
-                            dt.Columns.Add("PaymentReferenceId", typeof(string));
-                            dt.Columns.Add("PaidAmount", typeof(decimal));
-                            dt.Columns.Add("PaymentDate", typeof(DateTime));
-                            dt.Columns.Add("PaymentStatus", typeof(bool));
+                            dt.Columns.Add("MICA Txn ID", typeof(string));
+                            dt.Columns.Add("Payment Reference ID", typeof(string));
+                            dt.Columns.Add("Paid Amount", typeof(decimal));
+                            dt.Columns.Add("Payment Date", typeof(DateTime));
+                            dt.Columns.Add("Payment Status", typeof(bool));
 
                             ShowReportErrorInfoDetails errorInfoDetailsInfo = new ShowReportErrorInfoDetails();
 
@@ -6962,12 +6962,12 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 }
                 logx++;
                 //finding index of every column
-                var txnIDindex = FindIndex(strFilePath, "txnID");
+                var txnIDindex = FindIndex(strFilePath, "mICA Txn ID");
               
-                var PaymentReferenceIdIndex = FindIndex(strFilePath, "paymentReferenceID");
-                var PaidAmountIndex = FindIndex(strFilePath, "paidAmount");
-                var DateOfPaymentIndex = FindIndex(strFilePath, "paymentDate");
-                var PaymentStatusIndex = FindIndex(strFilePath, "paymentStatus");
+                var PaymentReferenceIdIndex = FindIndex(strFilePath, "payment Reference ID");
+                var PaidAmountIndex = FindIndex(strFilePath, "paid Amount");
+                var DateOfPaymentIndex = FindIndex(strFilePath, "payment Date");
+                var PaymentStatusIndex = FindIndex(strFilePath, "payment Status");
                 logx++;
 
                 while (!sr.EndOfStream)
