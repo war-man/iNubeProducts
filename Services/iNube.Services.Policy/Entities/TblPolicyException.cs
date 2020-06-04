@@ -29,6 +29,6 @@ namespace iNube.Services.Policy.Entities
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? Status { get; set; }
+        public decimal? DifferenceAmount { get; set; }
     }
 }
-

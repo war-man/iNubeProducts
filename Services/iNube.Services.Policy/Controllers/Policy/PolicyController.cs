@@ -711,11 +711,19 @@ namespace iNube.Services.Policy.Controllers.Policy
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> PolicyActivate(DateTime policyIssueDate)
+        [HttpGet]
+        public async Task<IActionResult> PolicyActivate()
         {
-            var response = await _policyService.PolicyActivate(policyIssueDate,Context);
-            return Ok(response);
+            var response = await _policyService.PolicyActivate(Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.NotFound:
+                    return NotFound(response);
+                default:
+                    return NotFound(response);
+            }
         }
     }
 }

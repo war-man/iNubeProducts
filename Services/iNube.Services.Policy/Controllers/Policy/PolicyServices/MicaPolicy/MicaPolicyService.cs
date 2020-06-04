@@ -1585,7 +1585,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
             finaldata.Add("Insured Ref No", DATA.CustomerId);
-            finaldata.Add("Insured Name", DATA.CoverNoteNo);
+            finaldata.Add("Insured Name", DATA.InsuredName);
             finaldata.Add("Insured Mobile No", DATA.MobileNumber);
             finaldata.Add("Insured Email", DATA.Email);
             finaldata.Add("Event Date", DATA.CreatedDate);
@@ -1618,7 +1618,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<object> FullfinalData = new List<object>();
 
             finaldata.Add("Insured Ref No", DATA.CustomerId);
-            finaldata.Add("Insured Name", DATA.CoverNoteNo);
+            finaldata.Add("Insured Name", DATA.InsuredName);
             finaldata.Add("Insured Mobile No", DATA.MobileNumber);
             finaldata.Add("Insured Email", DATA.Email);
             finaldata.Add("Event Date", DATA.CreatedDate);
@@ -1646,7 +1646,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<object> FullfinalData = new List<object>();
 
             finaldata.Add("Insured Ref No", DATA.CustomerId);
-            finaldata.Add("Insured Name", DATA.CoverNoteNo);
+            finaldata.Add("Insured Name", DATA.InsuredName);
             finaldata.Add("Insured Mobile No", DATA.MobileNumber);
             finaldata.Add("Insured Email", DATA.Email);
             finaldata.Add("Event Date", DATA.CreatedDate);
@@ -3187,6 +3187,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                 PolicyException.PbtotalPremium = paymentinfoRequest[0].Amount;
                                                 PolicyException.TransactionDate = DatetimeNow;
                                                 PolicyException.CreatedDate = DatetimeNow;
+                                                PolicyException.DifferenceAmount = CalculatePremiumResponse.TotalAmount- paymentinfoRequest[0].Amount;
                                                 var tblPolicyException = _mapper.Map<TblPolicyException>(PolicyException);
                                                 _context.TblPolicyException.Add(tblPolicyException);
                                                 _context.SaveChanges();
@@ -5613,7 +5614,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             List<object> FullfinalData = new List<object>();
 
             finaldata.Add("Insured Ref No", DATA.CustomerId);
-            finaldata.Add("Insured Name", DATA.CoverNoteNo);
+            finaldata.Add("Insured Name", DATA.InsuredName);
             finaldata.Add("Insured Mobile No", DATA.MobileNumber);
             finaldata.Add("Insured Email", DATA.Email);
             finaldata.Add("Event Date", DATA.CreatedDate);
@@ -6488,7 +6489,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             {
                                 var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
 
-                                if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                                if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
                                 {
 
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(policyDTO.ToString());
@@ -6652,7 +6653,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                             policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
                                             policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
                                             policyUpdate.PolicyStatus = ModuleConstants.PolicyStatus;
-                                            policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStagePolicyIssued;
+                                            policyUpdate.PolicyStageStatusId = ModuleConstants.PolicyStagePolicyLive;
 
                                             policyUpdate.IsActive = true;
 
@@ -6719,7 +6720,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     tblPolicyException.Adtotal = CalculatePremiumResponse.PremiumDTO.FirstOrDefault(s => s.Type == "AD").TotalAmount;
                                     tblPolicyException.TotalPremium = CalculatePremiumResponse.TotalAmount;
                                     tblPolicyException.PbtotalPremium = paymentinfoRequest[0].Amount;
-
+                                    tblPolicyException.DifferenceAmount = CalculatePremiumResponse.TotalAmount - paymentinfoRequest[0].Amount;
                                     tblPolicyException.Status = true;
                                     tblPolicyException.CreatedDate = DatetimeNow;
                                 
@@ -6830,24 +6831,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         {
                             bool sms = true;
                             bool email = true;
-                            //dt.Columns.Add("BankFileId", typeof(int));
-                            // dt.Columns.Add("Id", typeof(string));
 
-
-                            //dt.Columns.Add("PolicyNumber", typeof(string));
-                            //dt.Columns.Add("TransactionType", typeof(string));
                             dt.Columns.Add("TxnID", typeof(string));
-                            dt.Columns.Add("PaymentReferenceID", typeof(string));
+                            dt.Columns.Add("PaymentReferenceId", typeof(string));
                             dt.Columns.Add("PaidAmount", typeof(decimal));
                             dt.Columns.Add("PaymentDate", typeof(DateTime));
                             dt.Columns.Add("PaymentStatus", typeof(bool));
-                           // dt.Columns.Add("ModifiedDate", typeof(DateTime));
-                            //defining Global Variables
+
                             ShowReportErrorInfoDetails errorInfoDetailsInfo = new ShowReportErrorInfoDetails();
 
                             var TxnID = "";
-                           // var PolicyNumber = "";
-                            //var TransactionType = "";
                             var PaymentReferenceId = "";
                             var PaidAmount = "";
                             var PaymentDate = "";
@@ -6869,15 +6862,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetNameValue];
 
 
-                                        // EPPlusHelper.GetColumnByName()
                                         int txnID = worksheet.GetColumnByName("TxnID");
-                                      //  int policyNumberId = worksheet.GetColumnByName("Policy Number");
-                                      //  int transactionTypeId = worksheet.GetColumnByName("Transaction Type");
-                                        int paymentReferenceId = worksheet.GetColumnByName("PaymentReferenceID");
+                                        int paymentReferenceId = worksheet.GetColumnByName("PaymentReferenceId");
                                         int paidAmountId = worksheet.GetColumnByName("PaidAmount");
                                         int paymentDateId = worksheet.GetColumnByName("PaymentDate");
                                         int paymentStatusId = worksheet.GetColumnByName("PaymentStatus");
-                                    //    int modifiedDateId = worksheet.GetColumnByName("ModifiedDate");
                                      
 
                                         if (worksheet != null)
@@ -6890,14 +6879,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                 {
                                                     TxnID = worksheet.Cells[row, txnID].Text.ToString().Trim();
                                                 }
-                                                //if (worksheet.Cells[row, policyNumberId].Text.ToString().Trim() != null)
-                                                //{
-                                                //    PolicyNumber = worksheet.Cells[row, policyNumberId].Text.ToString().Trim();
-                                                //}
-                                                //if (worksheet.Cells[row, transactionTypeId].Text.ToString().Trim() != null)
-                                                //{
-                                                //    TransactionType = worksheet.Cells[row, transactionTypeId].Text.ToString().Trim();
-                                                //}
                                                 if (worksheet.Cells[row, paymentReferenceId].Text.ToString().Trim() != null)
                                                 {
                                                     PaymentReferenceId = worksheet.Cells[row, paymentReferenceId].Text.ToString().Trim();
@@ -6915,10 +6896,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                                 {
                                                     PaymentStatus = worksheet.Cells[row, paymentStatusId].Text.ToString().Trim();
                                                 }
-                                                //if (worksheet.Cells[row, modifiedDateId].Text.ToString().Trim() != null)
-                                                //{
-                                                //    ModifiedDate = worksheet.Cells[row, modifiedDateId].Text.ToString().Trim();
-                                                //}
+                                             
 
                                                await UpdateReportRefundDetails(errorInfoDetails, row, errorInfoDetailsInfo, TxnID, PaymentReferenceId,
                                                     PaidAmount, PaymentDate, PaymentStatus, DatetimeNow,apiContext);
@@ -6985,16 +6963,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 logx++;
                 //finding index of every column
                 var txnIDindex = FindIndex(strFilePath, "TxnID");
-                //var PolicyNumberindex = FindIndex(strFilePath, "Policy Number");
-                //var TransactionTypeIndex = FindIndex(strFilePath, "Transaction Type");
-
-                //need to put current date time
-                // var TxnDateIndex = FindIndex("endorsement Effective Date");
-                //var TotalRefundAmountIndex = FindIndex(strFilePath, "");
+              
                 var PaymentReferenceIdIndex = FindIndex(strFilePath, "PaymentReferenceId");
-                var AmountPaidIndex = FindIndex(strFilePath, "Amount Paid");
-                var DateOfPaymentIndex = FindIndex(strFilePath, "Date Of Payment");
-                var PaymentStatusIndex = FindIndex(strFilePath, "Payment Status");
+                var PaidAmountIndex = FindIndex(strFilePath, "PaidAmount");
+                var DateOfPaymentIndex = FindIndex(strFilePath, "PaymentDate");
+                var PaymentStatusIndex = FindIndex(strFilePath, "PaymentStatus");
                 logx++;
 
                 while (!sr.EndOfStream)
@@ -7023,13 +6996,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     errorInfoDetailsInfo = new ShowReportErrorInfoDetails();
 
                     var txnID = dt.Rows[i][txnIDindex].ToString().Replace("\"", "").Trim();
-                   // var PolicyNumber = dt.Rows[i][PolicyNumberindex].ToString().Replace("\"", "").Trim();
-                    //var TransactionType = dt.Rows[i][TransactionTypeIndex].ToString().Replace("\"", "").Trim();
                     var PaymentReferenceId = dt.Rows[i][PaymentReferenceIdIndex].ToString().Replace("\"", "").Trim();
-                    var AmountPaid = dt.Rows[i][AmountPaidIndex].ToString().Replace("\"", "").Trim();
+                    var PaidAmountid = dt.Rows[i][PaidAmountIndex].ToString().Replace("\"", "").Trim();
                     var PaymentStatus = dt.Rows[i][PaymentStatusIndex].ToString().Replace("\"", "").Trim();
                     var DateOfPayment = dt.Rows[i][DateOfPaymentIndex].ToString().Replace("\"", "").Trim();
-                    await UpdateReportRefundDetails(errorInfoDetails, i, errorInfoDetailsInfo, txnID, PaymentReferenceId, AmountPaid, DateOfPayment, PaymentStatus, DatetimeNow,apiContext);
+                    await UpdateReportRefundDetails(errorInfoDetails, i, errorInfoDetailsInfo, txnID, PaymentReferenceId, PaidAmountid, DateOfPayment, PaymentStatus, DatetimeNow,apiContext);
                 }
                 if (errorInfoDetails.Count > 0)
                 {
@@ -7083,8 +7054,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 errorflag = true;
                 var dict = new Dictionary<string, string>();
-                dict.Add("Header", "Amount Paid");
-                dict.Add("Details", $"Amount Paid can not be empty for TxnID {TxnID}");
+                dict.Add("Header", "PaidAmount");
+                dict.Add("Details", $"PaidAmount can not be empty for TxnID {TxnID}");
                 dict1.Add(dict);
             }
             else
@@ -7192,7 +7163,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                    if (value2 > 0)
                     {
                         var dict = new Dictionary<string, string>();
-                        dict.Add("Header", "EndorsementNumber");
+                        dict.Add("Header", "DateofPayment");
                         dict.Add("Details", $"DateofPayment can not be the future date for TxnID  {TxnID}");
                         dict1.Add(dict);
                         errorflag = true;
@@ -7210,17 +7181,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         PolicyRefundDetails.TransactionDate = DatetimeNow;
                         PolicyRefundDetails.PaymentReferenceId = errorInfoDetailsInfo.PaymentReferenceId;
                         PolicyRefundDetails.PaymentStatus = errorInfoDetailsInfo.PaymentStatus;
-                        PolicyRefundDetails.PaidAmount = errorInfoDetailsInfo.AmountPaid;
                         PolicyRefundDetails.PaymentDate = errorInfoDetailsInfo.DateofPayment;
                         PolicyRefundDetails.ModifiedDate = DatetimeNow;
 
 
-                        if (PolicyRefundDetails.TotalPremium - errorInfoDetailsInfo.AmountPaid <= 1 && PolicyRefundDetails.TotalPremium - errorInfoDetailsInfo.AmountPaid >= -1)
+                        if (PolicyRefundDetails.DifferenceAmount<= errorInfoDetailsInfo.AmountPaid)
                         {
-
+                            PolicyRefundDetails.DifferenceAmount = errorInfoDetailsInfo.AmountPaid-PolicyRefundDetails.DifferenceAmount;
                             var RequestObj = JsonConvert.DeserializeObject<dynamic>(PolicyRefundDetails.RequestObject.ToString());
-                            RequestObj["PaymentInfo"][0].Amount = errorInfoDetailsInfo.AmountPaid;
-                          //  var SerializeObj = JsonConvert.SerializeObject(RequestObj);
+                            RequestObj["PaymentInfo"][0].Amount = RequestObj["PaymentInfo"][0].Amount+errorInfoDetailsInfo.AmountPaid;
+                            //  var SerializeObj = JsonConvert.SerializeObject(RequestObj);
                             PolicyRefundDetails.RequestObject = RequestObj.ToString();// JsonConvert.DeserializeObject<dynamic>(SerializeObj.ToString());
                             if (PolicyRefundDetails.TransactionType == "Policy Issuance")
                             {
@@ -7265,17 +7235,29 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             return true;
         }
 
-        public async Task<bool> PolicyActivate(DateTime policyIssueDate,ApiContext apiContext) {
+        public async Task<ResponseStatus> PolicyActivate(ApiContext apiContext) {
 
             _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var IssuePolicy=_context.TblPolicy.Where(s => s.PolicyStageStatusId == ModuleConstants.PolicyStageQuoteCreated && s.PolicyStartDate == policyIssueDate.Date && s.IsActive==true);
-            foreach (var item in IssuePolicy) {
-                item.PolicyStageStatusId = ModuleConstants.PolicyStageStatusLive;
+            CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
+            dbHelper._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
+
+            var IssuePolicy=_context.TblPolicy.Where(s => s.PolicyStageStatusId == ModuleConstants.PolicyStageQuoteCreated && s.PolicyStartDate.Value.Date == DatetimeNow.Date && s.IsActive==true);
+            if (IssuePolicy != null)
+            {
+                foreach (var item in IssuePolicy)
+                {
+                    item.PolicyStageStatusId = ModuleConstants.PolicyStageStatusLive;
+                }
+                _context.TblPolicy.UpdateRange(IssuePolicy);
+                _context.SaveChanges();
+                return new ResponseStatus { Status = BusinessStatus.Ok };
             }
-            _context.TblPolicy.UpdateRange(IssuePolicy);
-            _context.SaveChanges();
-            return true;
+            else {
+                return new ResponseStatus { Status = BusinessStatus.NotFound };
+            }
+            
         }
 
     }

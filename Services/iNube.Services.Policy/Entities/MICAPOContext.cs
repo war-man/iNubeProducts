@@ -214,9 +214,7 @@ namespace iNube.Services.Policy.Entities
 
                 entity.Property(e => e.CoverNoteIssueDate).HasColumnType("datetime");
 
-                entity.Property(e => e.CoverNoteNo)
-                    .HasMaxLength(30)
-                    .IsUnicode(false);
+                entity.Property(e => e.CoverNoteNo).IsUnicode(false);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
@@ -238,6 +236,8 @@ namespace iNube.Services.Policy.Entities
                 entity.Property(e => e.Email)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.InsuredName).IsUnicode(false);
 
                 entity.Property(e => e.Irccode).HasColumnName("IRCCode");
 
@@ -353,6 +353,8 @@ namespace iNube.Services.Policy.Entities
                     .HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DifferenceAmount).HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.Frequency)
                     .HasMaxLength(50)

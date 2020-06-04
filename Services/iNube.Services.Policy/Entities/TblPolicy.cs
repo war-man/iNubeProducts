@@ -68,6 +68,7 @@ namespace iNube.Services.Policy.Entities
         public string CdaccountNumber { get; set; }
         public DateTime? PolicyCancelDate { get; set; }
         public int? BalanceSumInsued { get; set; }
+        public string InsuredName { get; set; }
 
         public virtual ICollection<TblEndorsementDetails> TblEndorsementDetails { get; set; }
         public virtual ICollection<TblPolicyDetails> TblPolicyDetails { get; set; }

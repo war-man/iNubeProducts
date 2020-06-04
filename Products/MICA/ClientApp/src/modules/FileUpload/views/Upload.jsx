@@ -42,7 +42,7 @@ class Upload extends React.Component {
             nodata: false,
             typeList: [{ "mID": 1, "mValue": "Refund Upload", "mType": "FileName" },
                 { "mID": 2, "mValue": "Monthly SI Upload ", "mType": "FileName" },
-                { "mID": 3, "mValue": "Refund Report Upload ", "mType": "FileName" }],
+                { "mID": 3, "mValue": "PB Exception Upload", "mType": "FileName" }],
             fields: {
                 FileName:"",
             },
@@ -231,8 +231,8 @@ class Upload extends React.Component {
         } else if (this.state.fields.FileName == 3) {
             $.ajax({
                 type: "POST",
-                url: `${FileUploadConfig.FileUploadConfigUrl}/api/Policy/RefundReportUpload`,
-               // url: `https://localhost:44351/api/Policy/RefundReportUpload`,
+               // url: `${FileUploadConfig.FileUploadConfigUrl}/api/Policy/RefundReportUpload`,
+                url: `https://localhost:44351/api/Policy/RefundReportUpload`,
                 contentType: false,
                 processData: false,
 
