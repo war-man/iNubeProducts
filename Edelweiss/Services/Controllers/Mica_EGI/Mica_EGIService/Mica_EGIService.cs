@@ -7200,7 +7200,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         if (!String.IsNullOrEmpty(payAmount))
                         {
-                            if (Convert.ToDecimal(payAmount) < checkData.TotalAmountChargeable)
+                            var ExceptionData = _context.TblSiexception.FirstOrDefault(x=>x.ReportId == checkData.ReportId);
+
+                            if (Convert.ToDecimal(payAmount) < ExceptionData.DifferenceAmount)
                             {
 
                                 ErrorInfo errorInfo = new ErrorInfo();
@@ -7227,19 +7229,26 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         if (CallMicaCd != null)
                         {
-                            TblData.PayUid = payUid;
-                            TblData.PayAmount = payAmount;
+                            var ExceptionData = _context.TblSiexception.FirstOrDefault(x => x.ReportId == TblData.ReportId);
+
+                            var OldRequest = JsonConvert.DeserializeObject<MonthlySIDTO>(ExceptionData.RequestObject);
+
+                            TblData.PayUid = OldRequest.PaymentReferenceId;
+                            TblData.PayAmount = TblData.TotalAmountChargeable.ToString();
                             TblData.PayStatus = payStatus;
-                            TblData.PaymentDate = paymentDate;
+                            TblData.PaymentDate = OldRequest.PaymentDate;
 
                             _context.TblPolicyMonthlySi.Update(TblData);
 
-                            var ExceptionData = _context.TblSiexception.FirstOrDefault(x => x.ReportId == TblData.ReportId);
+                         
 
                             if (ExceptionData != null)
                             {
                                 ExceptionData.Status = false;
                                 ExceptionData.ModifiedDate = IndianTime;
+                                //ExceptionData.PaymentReferenceId = Convert.ToInt32(payUid);
+                               // ExceptionData.PaidAmount = payAmount;
+                                //ExceptionData.PaymentDate = paymentDate;
                                 _context.TblSiexception.Update(ExceptionData);
                             }
 
@@ -7446,7 +7455,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         if (!String.IsNullOrEmpty(payAmount))
                         {
-                            if (Convert.ToDecimal(payAmount) < checkData.TotalAmountChargeable)
+
+                            var ExceptionData = _context.TblSiexception.FirstOrDefault(x => x.ReportId == checkData.ReportId);
+                            
+                            if (Convert.ToDecimal(payAmount) < ExceptionData.DifferenceAmount)
                             {
 
                                 ErrorInfo errorInfo = new ErrorInfo();
@@ -7474,15 +7486,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         if (CallMicaCd != null)
                         {
 
-                            TblData.PayUid = payUid;
-                            TblData.PayAmount = payAmount;
+                            var ExceptionData = _context.TblSiexception.FirstOrDefault(x => x.ReportId == TblData.ReportId);
+
+
+                            var OldRequest = JsonConvert.DeserializeObject<MonthlySIDTO>(ExceptionData.RequestObject);
+
+                            TblData.PayUid = OldRequest.PaymentReferenceId;
+                            TblData.PayAmount = TblData.TotalAmountChargeable.ToString();
                             TblData.PayStatus = payStatus;
-                            TblData.PaymentDate = paymentDate;
+                            TblData.PaymentDate = OldRequest.PaymentDate;
 
                             _context.TblPolicyMonthlySi.Update(TblData);
 
 
-                            var ExceptionData = _context.TblSiexception.FirstOrDefault(x => x.ReportId == TblData.ReportId);
+                        
 
                             if (ExceptionData != null)
                             {
