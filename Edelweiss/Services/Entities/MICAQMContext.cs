@@ -473,7 +473,9 @@ namespace MicaExtension_EGI.Entities
 
                 entity.Property(e => e.PaymentDate).HasColumnType("datetime");
 
-                entity.Property(e => e.PaymentReferenceId).HasColumnName("PaymentReferenceID");
+                entity.Property(e => e.PaymentReferenceId)
+                    .HasColumnName("PaymentReferenceID")
+                    .IsUnicode(false);
 
                 entity.Property(e => e.RequestAmount).HasColumnType("numeric(18, 2)");
 

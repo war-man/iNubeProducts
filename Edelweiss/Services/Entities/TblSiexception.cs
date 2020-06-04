@@ -14,7 +14,7 @@ namespace MicaExtension_EGI.Entities
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string Source { get; set; }
-        public int? PaymentReferenceId { get; set; }
+        public string PaymentReferenceId { get; set; }
         public decimal? PaidAmount { get; set; }
         public DateTime? PaymentDate { get; set; }
 
