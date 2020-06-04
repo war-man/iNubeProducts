@@ -717,7 +717,7 @@ namespace iNube.Services.Policy.Controllers.Policy
             var response = await _policyService.PolicyActivate(Context);
             switch (response.Status)
             {
-                case BusinessStatus.Created:
+                case BusinessStatus.Ok:
                     return Ok(response);
                 case BusinessStatus.NotFound:
                     return NotFound(response);
