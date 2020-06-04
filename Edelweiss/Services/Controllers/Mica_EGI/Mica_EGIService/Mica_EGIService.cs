@@ -1996,7 +1996,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             var ActiveTW = 0;
 
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
-           
+
+
+            var ActivePolicyCall = await _integrationService.PolicyActivate(context);
 
             var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
 
