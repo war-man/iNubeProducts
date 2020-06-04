@@ -55,6 +55,8 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         Task<PolicyDTO> GetPolicyByNumber(string PolicyNumber, ApiContext apiContext);
 
+        Task<ResponseStatus> PolicyActivate(ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -197,6 +199,13 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
         {
             var uri = PolicyUrl + "/api/Policy/GetPolicyByNumber?policyNumber=" + PolicyNumber;
             return await GetApiInvoke<PolicyDTO>(uri, apiContext);
+        }
+
+
+        public async Task<ResponseStatus> PolicyActivate(ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/PolicyActivate";
+            return await GetApiInvoke<ResponseStatus>(uri, apiContext);
         }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
