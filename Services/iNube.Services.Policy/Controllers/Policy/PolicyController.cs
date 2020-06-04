@@ -720,7 +720,7 @@ namespace iNube.Services.Policy.Controllers.Policy
                 case BusinessStatus.Ok:
                     return Ok(response);
                 case BusinessStatus.NotFound:
-                    return NotFound(response);
+                    return Ok(response);
                 default:
                     return NotFound(response);
             }
