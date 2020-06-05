@@ -773,7 +773,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string MasterType { get; set; }
         public int? BalanceSumInsued { get; set; }
         public DateTime? PolicyCancelDate { get; set; }
-
+        public string InsuredName { get; set; }
     }
 
     public partial class PolicyExceptionDTO

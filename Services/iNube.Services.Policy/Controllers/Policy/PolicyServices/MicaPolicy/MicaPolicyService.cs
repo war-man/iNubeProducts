@@ -512,7 +512,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             policyDTO.CreatedBy = new Guid();
             policyDTO.CreatedDate = DatetimeNow;
-            policyDTO.PolicyIssueDate = DatetimeNow;
+          
             policyDTO.IsUploadedToIcm = 0;
             policyDTO.PremiumAmount = productDTO.PremiumAmount;
             // policyDTO.MasterPolicyNo = "ABC";//ToDo service req
@@ -544,7 +544,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             dicColumns.Add("ProductID", "ProductIdPk");
             dicColumns.Add("Policy Start Date", "PolicyStartDate");
             dicColumns.Add("Policy End Date", "PolicyEndDate");
-            dicColumns.Add("Name", "CoverNoteNo");
+            dicColumns.Add("Name", "InsuredName");
             // dicColumns.Add("Proposer name", "PolicyTypeID");
             dicColumns.Add("PolicyStatusID", "PolicyStatusId");
             dicColumns.Add("Mobile Number", "MobileNumber");
@@ -773,7 +773,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             //customer
             model.customer = new Customer();
-            model.customer.ContactName = policyDTO.CoverNoteNo;
+            model.customer.ContactName = policyDTO.InsuredName;
             model.customer.PhoneNumber = policyDTO.MobileNumber;
             model.customer.EmailAddress = policyDTO.Email;
             model.customer.Address = "";
@@ -1469,7 +1469,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                PolicyId = tblPolicy.PolicyId,
                                PolicyNo = tblPolicy.PolicyNo,
                                ProductName = ProductData.SingleOrDefault(x => x.Key == tblPolicy.ProductIdPk).Value,
-                               InsuredName = tblPolicy.CoverNoteNo,
+                               InsuredName = tblPolicy.InsuredName,
                                InsuredRefNo = tblPolicy.CustomerId
                            };
                 var _data = _mapper.Map<List<PolicyDataForClaims>>(data);
@@ -1491,7 +1491,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                          PolicyNo = tblPolicy.PolicyNo,
                                          //ProductId = tblPolicy.ProductIdPk,
                                          ProductName = ProductData.SingleOrDefault(x => x.Key == tblPolicy.ProductIdPk).Value,
-                                         InsuredName = tblPolicy.CoverNoteNo,
+                                         InsuredName = tblPolicy.InsuredName,
                                          InsuredRefNo = tblPolicy.CustomerId,
                                          CreatedDate = tblPolicy.CreatedDate
                                      });
@@ -2097,7 +2097,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     InsurableItemName = InsurableItem.InsurableItem;
                     singleCover.InsurableItem = InsurableItem.InsurableItem;
                     singleCover.IdentificationNumber = policyDetail["Identification Number"];
-                    singleCover.Name = policyDTO.CoverNoteNo;
+                    singleCover.Name = policyDTO.InsuredName;
                     var CoverItem = InsurableItem.ProductCovers.FirstOrDefault();
                     if (CoverItem != null)
                     {
@@ -2269,7 +2269,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 policyInsurableDetailsDto.CoverName = CoverName;
                 policyInsurableDetailsDto.InsurableItem = InsurableItemName;
                 policyInsurableDetailsDto.IdentificationNo = policyDTO.CustomerId;
-                policyInsurableDetailsDto.Name = policyDTO.CoverNoteNo;
+                policyInsurableDetailsDto.Name = policyDTO.InsuredName;
                 policyInsurableDetailsDto.BenefitAmount = BenefitAmount;
                 policyInsurableDetailsDto.IsActive = true;
                 lstPolicyInsurableDetailsDto.Add(policyInsurableDetailsDto);
@@ -2454,7 +2454,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             else
             {
-                model.insuredDetails.InsuredContactName = policyDTO.CoverNoteNo;
+                model.insuredDetails.InsuredContactName = policyDTO.InsuredName;
             }
             model.insuredDetails.InsuredEmailAddress = policyDTO.Email;
             model.insuredDetails.InsuredPhoneNumber = policyDTO.MobileNumber;
@@ -3806,7 +3806,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
             if (productDetails != null)
             {
-                var policydata = _context.TblPolicy.Where(x => (x.IsActive == true && x.ProductIdPk == productDetails.ProductId && x.PolicyNo != null && x.PolicyStageStatusId== ModuleConstants.PolicyStageStatusLive && x.PolicyStartDate.Value.Date<= DatetimeNow.Date)).
+                var policydata = _context.TblPolicy.Where(x => (x.IsActive == true && x.ProductIdPk == productDetails.ProductId && x.PolicyNo != null && x.PolicyStatusId ==ModuleConstants.PolicyStatusActive && x.PolicyStageStatusId== ModuleConstants.PolicyStageStatusLive && x.PolicyStartDate.Value.Date<= DatetimeNow.Date)).
                     Select(s => new
                     {
                         policyid = s.PolicyId,
@@ -4842,7 +4842,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                        
                                         policyUpdate.PolicyStageId = ModuleConstants.PolicyStagePolicy;
                                         policyUpdate.PolicyStatusId = ModuleConstants.PolicyStatusActive;
-
+                                        policyUpdate.PolicyIssueDate = DatetimeNow;
 
                                         policyUpdate.IsActive = true;
                                         //string[] Separate = (policyUpdate.PolicyStartDate.ToString()).Split(' ');
