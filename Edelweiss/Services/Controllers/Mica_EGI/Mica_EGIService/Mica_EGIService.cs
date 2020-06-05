@@ -851,11 +851,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //Call the Policy Service to Get Policy Details.
                 //An Integration Call to  be Made to Verif Future Dated Policy -- For Now.
 
-                var CheckFuturePolicy = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
 
-                if (CheckFuturePolicy != null)
+                if (PolicyData != null)
                 {
-                    DateTime PolicyStartDate = Convert.ToDateTime(CheckFuturePolicy["Policy Start Date"]);
+                    DateTime PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
 
                     if(PolicyStartDate > IndianTime)
                     {
@@ -1340,9 +1340,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                     //Call the Policy Service to Get Policy Details.
-                    //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
-
-                    var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+                    //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO                    
+                    //This PolicyData Call made Global For Checking Future Policy Start Date So Moved
+                   /// var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
 
                     PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
                     var BillingFrequency = "";
@@ -1690,11 +1690,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //Call the Policy Service to Get Policy Details.
                 //An Integration Call to  be Made to Verif Future Dated Policy -- For Now.
 
-                var CheckFuturePolicy = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
 
-                if (CheckFuturePolicy != null)
+                if (PolicyData != null)
                 {
-                    DateTime PolicyStartDate = Convert.ToDateTime(CheckFuturePolicy["Policy Start Date"]);
+                    DateTime PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
 
                     if (PolicyStartDate > IndianTime)
                     {
@@ -4393,6 +4393,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return new List<RuleEngineResponse>();
 
         }
+
 
 
         public async Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string callType, ApiContext context)
