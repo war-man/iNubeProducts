@@ -5304,8 +5304,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             {
                 GlobalVariables.PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apicontext);
 
+               DateTime PolicyStartDate = (DateTime)GlobalVariables.PolicyData["Policy Start Date"];
 
-                if (GlobalVariables.PolicyData["PolicyStageStatusId"] == 9 && (DateTime)GlobalVariables.PolicyData["Policy Start Date"]> CurrentDate.Date)
+                if (GlobalVariables.PolicyData["PolicyStageStatusId"] == 9 && PolicyStartDate.Date> CurrentDate.Date)
                 {
                     applicationcancel = true;
                     policyCancelResponse.FTPremium = 0;
@@ -5376,7 +5377,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         var Result = Switchds.Tables[0];
                         var Days = (Result.Rows.Count > 0) ? Result.Rows[0].ItemArray[0] : 0;
-                       if (GlobalVariables.PolicyData["PolicyStageStatusId"] == 9 && (DateTime)GlobalVariables.PolicyData["Policy Start Date"] >= CurrentDate.Date)
+                       if (GlobalVariables.PolicyData["PolicyStageStatusId"] == 9 && GlobalVariables.PolicyStartDate.Date> CurrentDate.Date)
                        {
                         Days = 0;
                        }

@@ -3806,7 +3806,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             var productDetails = await _integrationService.GetProductDetailByCodeAsync(productCode, apiContext);
             if (productDetails != null)
             {
-                var policydata = _context.TblPolicy.Where(x => (x.IsActive == true && x.ProductIdPk == productDetails.ProductId && x.PolicyNo != null && x.PolicyStageStatusId== ModuleConstants.PolicyStageStatusLive && x.PolicyStartDate.Value.Date<= DatetimeNow)).
+                var policydata = _context.TblPolicy.Where(x => (x.IsActive == true && x.ProductIdPk == productDetails.ProductId && x.PolicyNo != null && x.PolicyStageStatusId== ModuleConstants.PolicyStageStatusLive && x.PolicyStartDate.Value.Date<= DatetimeNow.Date)).
                     Select(s => new
                     {
                         policyid = s.PolicyId,
