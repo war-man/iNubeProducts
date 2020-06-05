@@ -848,6 +848,42 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return SuccessResponse;
                 }
 
+                //Call the Policy Service to Get Policy Details.
+                //An Integration Call to  be Made to Verif Future Dated Policy -- For Now.
+
+                var CheckFuturePolicy = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+
+                if (CheckFuturePolicy != null)
+                {
+                    DateTime PolicyStartDate = Convert.ToDateTime(CheckFuturePolicy["Policy Start Date"]);
+
+                    if(PolicyStartDate > IndianTime)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        SuccessResponse.ResponseMessage = "Future Dated Policy";
+                        SuccessResponse.Status = BusinessStatus.Ok;
+                        errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is not yet Started";
+                        errorInfo.ErrorCode = "ExtCUS";
+                        errorInfo.PropertyName = "NotFound";
+                        SuccessResponse.Errors.Add(errorInfo);
+                        return SuccessResponse;
+                    }
+
+                }
+                else
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    SuccessResponse.ResponseMessage = "Policy Details Not Found";
+                    SuccessResponse.Status = BusinessStatus.Ok;
+                    errorInfo.ErrorMessage = "Policy Details Not Found";
+                    errorInfo.ErrorCode = "ExtCUS";
+                    errorInfo.PropertyName = "NotFound";
+                    SuccessResponse.Errors.Add(errorInfo);
+                    return SuccessResponse;
+                }
+
                 bool verifydata = false;
 
                 var verifyPolicy = _context.TblSchedule.Any(x => x.PolicyNo == PolicyNo);
@@ -1650,6 +1686,44 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     response.Errors.Add(errorInfo);
                     return response;
                 }
+
+                //Call the Policy Service to Get Policy Details.
+                //An Integration Call to  be Made to Verif Future Dated Policy -- For Now.
+
+                var CheckFuturePolicy = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+
+                if (CheckFuturePolicy != null)
+                {
+                    DateTime PolicyStartDate = Convert.ToDateTime(CheckFuturePolicy["Policy Start Date"]);
+
+                    if (PolicyStartDate > IndianTime)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        SuccessResponse.ResponseMessage = "Future Dated Policy";
+                        SuccessResponse.Status = BusinessStatus.Ok;
+                        errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is not yet Started";
+                        errorInfo.ErrorCode = "ExtCUS";
+                        errorInfo.PropertyName = "NotFound";
+                        SuccessResponse.Errors.Add(errorInfo);
+                        return SuccessResponse;
+                    }
+
+                }
+                else
+                {
+                    ErrorInfo errorInfo = new ErrorInfo();
+
+                    SuccessResponse.ResponseMessage = "Policy Details Not Found";
+                    SuccessResponse.Status = BusinessStatus.Ok;
+                    errorInfo.ErrorMessage = "Policy Details Not Found";
+                    errorInfo.ErrorCode = "ExtCUS";
+                    errorInfo.PropertyName = "NotFound";
+                    SuccessResponse.Errors.Add(errorInfo);
+                    return SuccessResponse;
+                }
+
+
 
                 bool verifydata = false;
 
