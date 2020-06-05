@@ -1301,7 +1301,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         var policyno = ClaimPolicyNumber.Values;
                         var policy = policyDetails.FirstOrDefault(p => p.PolicyId == item.PolicyId);
                         finance.PolicyNo = policy.PolicyNo;
-                        finance.InsuredName = policy.CoverNoteNo;
+                        finance.InsuredName = policy.InsuredName;
                         finance.InsuredRefNo = policy.CustomerId;
                         finance.ClaimNo = ClaimStatus[item.ClaimId];
                         finance.ClaimStatus = claimstatusvalue;
@@ -1461,7 +1461,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         var policyno = ClaimPolicyNumber.Values;
                         var policy = policyDetails.FirstOrDefault(p => p.PolicyId == item.PolicyId);
                         finance.PolicyNo = policy.PolicyNo;
-                        finance.InsuredName = policy.CoverNoteNo;
+                        finance.InsuredName = policy.InsuredName;
                         finance.InsuredRefNo = policy.CustomerId;
                         finance.ClaimNo = ClaimStatus[item.ClaimId];
                         finance.ClaimStatus = claimstatusvalue;
@@ -1615,7 +1615,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                         var policyno = ClaimPolicyNumber.Values;
                         var policy = policyDetails.FirstOrDefault(p => p.PolicyId == item.PolicyId);
                         finance.PolicyNo = policy.PolicyNo;
-                        finance.InsuredName = policy.CoverNoteNo;
+                        finance.InsuredName = policy.InsuredName;
                         finance.InsuredRefNo = policy.CustomerId;
                         finance.ClaimNo = ClaimStatus[item.ClaimId];
                         finance.ClaimStatus = claimstatusvalue;
@@ -2589,7 +2589,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.ClaimStatus = claimstatus.FirstOrDefault(a => a.CommonTypeId == item.ClaimStatusId).Value;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
-                    item.InsuredName = pk[0].CoverNoteNo;
+                    item.InsuredName = pk[0].InsuredName;
                     // item.CoverEvent = pk[0].CoverEvent;
                     item.CoverValue = covervalue;
                     if (insurabledata != null)
@@ -2688,7 +2688,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                     item.InsurableApprovedAmount = data1.ApprovedClaimAmounts;
                     item.PolicyNo = pk[0].PolicyNo;
                     item.InsuredReference = pk[0].CustomerId;
-                    item.InsuredName = pk[0].CoverNoteNo;
+                    item.InsuredName = pk[0].InsuredName;
                     // item.CoverEvent = pk[0].CoverEvent;
                     if (data1 != null)
                     {
