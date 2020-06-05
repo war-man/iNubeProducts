@@ -89,7 +89,8 @@ class CalculationConfig extends React.Component {
                 IsActive: "",
                 CreatedDate: "",
                 createddateParamset: "",
-                isactive: ""
+                isactive: "",
+                ConditionalParam: ""
             },
             sendingExpression: "",
             sendingArray: [],
@@ -106,13 +107,19 @@ class CalculationConfig extends React.Component {
             newExpressionData: [],
             flag: false,
             rateflag: false,
+            condnflag: false,
 
             ruleobj: [],
             countSaving: false,
+
+            ConditionalParameterAr: [],
+            newConditionalParamData: [],
+            //ConditionalParam:"",
             
 
             typeList: [{ "mID": 1, "mValue": "Rate", "mType": "RateConfig" },
-            { "mID": 2, "mValue": "Parameter", "mType": "RateConfig" }],
+                { "mID": 2, "mValue": "Parameter", "mType": "RateConfig" },
+                { "mID": 3, "mValue": "ConditionalParameter", "mType": "RateConfig" }],
         };
 
     }
@@ -126,10 +133,19 @@ class CalculationConfig extends React.Component {
         if (evt.target.value == 1) {
             this.state.flag = true;
             this.state.rateflag = false;
+            this.state.condnflag = false;
         }
-        else {
+        else if (evt.target.value == 3)
+        {
+            this.state.flag = false;
+            this.state.rateflag = false;
+            this.state.condnflag = true;
+        }
+        else
+        {
             this.state.flag = false;
             this.state.rateflag = true;
+            this.state.condnflag = false;
         }
     }
 
@@ -138,9 +154,8 @@ class CalculationConfig extends React.Component {
         let fields = this.state.fields;
         fields[evt.target.name] = evt.target.value;
         this.setState({ fields });
-
-
     };
+    
     componentDidMount() {
         fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/GetRules`, {
             method: 'GET',
@@ -156,7 +171,7 @@ class CalculationConfig extends React.Component {
                 console.log(data);
             });
     }
-    //addCalConfigParam
+    //addCalConfigParam  
     addCalConfigParam() {
         if (this.state.fields.RateConfigName != "") {
             //Showing Grid
@@ -186,6 +201,40 @@ class CalculationConfig extends React.Component {
                 this.setState({
                     newParamData: this.state.CalParameterArray.map((prop, key) => {
 
+                        return {
+                            CalConfigParam: prop.calculationConfigParamName
+                        };
+                    })
+                });
+            }
+        }
+        else {
+            swal("", "Some fields are missing", "error");
+            this.setState({ errormessage: true });
+        }
+
+    }
+    // Adding of Conditional Parameter 
+    addConditionalParameter() {
+        if (this.state.fields.RateConfigName != "") {
+            debugger
+            //Removing Space
+            this.state.fields.ConditionalParam = this.state.fields.ConditionalParam.split(' ').join('');
+            let pConditionalParameterAr = this.state.ConditionalParameterAr;
+            this.setState({ ConditionalParameterAr: pConditionalParameterAr });
+            pConditionalParameterAr.push({
+                'calculationConfigParamName': this.state.fields.ConditionalParam
+            });
+            // State Set After Selecting
+            this.setState({ ConditionalParam: '' });
+            this.state.fields.ConditionalParam = "";
+            console.log(this.state.ConditionalParameterAr, 'CalParamArray');
+            this.setState({ parameterCard: true });
+            this.setState({ flagButon: true });
+
+            if (this.state.ConditionalParameterAr.length > 0) {
+                this.setState({
+                    newConditionalParamData: this.state.ConditionalParameterAr.map((prop, key) => {
                         return {
                             CalConfigParam: prop.calculationConfigParamName
                         };
@@ -277,6 +326,16 @@ class CalculationConfig extends React.Component {
         //For Sending Array With {}
         this.state.sendingExpression = this.state.sendingExpression + "{" + parameter + "}";
         //Previous 
+        this.state.fields.Expression = this.state.fields.Expression + parameter;
+        console.log(this.state.fields.Expression, 'Expression');
+        this.setState({});
+    }
+    
+    onclickConditionalParameter(parameter) {
+        debugger
+        //For Sending Array With {}
+        this.state.sendingExpression = this.state.sendingExpression + parameter;
+        //Previous
         this.state.fields.Expression = this.state.fields.Expression + parameter;
         console.log(this.state.fields.Expression, 'Expression');
         this.setState({});
@@ -541,7 +600,20 @@ class CalculationConfig extends React.Component {
                                                 }}
                                             />
                                         </GridItem> : null}
-
+                                    {this.state.condnflag ?
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <CustomInput
+                                                labelText="Conditional Param"
+                                                id="ConditionalParam"
+                                                required={true}
+                                                value={this.state.fields.ConditionalParam}
+                                                name='ConditionalParam'
+                                                onChange={this.onInputChange}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+                                            />
+                                        </GridItem> : null}
                                     
 
                                 {this.state.rateflag ?
@@ -555,9 +627,9 @@ class CalculationConfig extends React.Component {
                                                 <AddIcon />
                                             </IconButton>
                                         </Tooltip>
-                                    </GridItem> : null}
-                                    {this.state.flag ?
+                                        </GridItem> : null}
 
+                                    {this.state.flag ?
                                     <GridItem xs={12} sm={12} md={3}>
                                         <Tooltip title="Add">
                                             <IconButton id="top-bnt" onClick={() => this.addRates()}
@@ -567,9 +639,21 @@ class CalculationConfig extends React.Component {
                                                 <AddIcon />
                                             </IconButton>
                                         </Tooltip>
-                                    </GridItem> : null}
-</GridContainer>
+                                        </GridItem> : null}
 
+                                    {this.state.condnflag ?
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <Tooltip title="Add">
+                                                <IconButton id="top-bnt" onClick={() => this.addConditionalParameter()}
+
+                                                    round
+                                                >
+                                                    <AddIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </GridItem> : null}
+
+                    </GridContainer>
                             {this.state.displayCalculationParameterGrid &&
 
                                 <GridContainer>
@@ -663,7 +747,18 @@ class CalculationConfig extends React.Component {
                                             <Chip size="small"
                                                 label="."
                                                 onClick={() => this.handleEvaluator(".")} />
-
+                                            <Chip size="small"
+                                                label="IIF"
+                                                onClick={() => this.handleEvaluator("IIF")} />
+                                            <Chip size="small"
+                                                label=","
+                                                onClick={() => this.handleEvaluator(",")} />
+                                            <Chip size="small"
+                                                label="'"
+                                                onClick={() => this.handleEvaluator("'")} />
+                                            <Chip size="small"
+                                                label="="
+                                                onClick={() => this.handleEvaluator("=")} />
                                             <Chip size="small"
                                                 label="0"
                                                 onClick={() => this.handleEvaluator("0")} />
@@ -719,11 +814,8 @@ class CalculationConfig extends React.Component {
                                                         label={item.calculationConfigParamName}
                                                         onClick={() => this.onclickParameter(item.calculationConfigParamName)} />
 
-                                                )
-                                                )
-
+                                                ))
                                                 }
-
                                             </div>
                                         </GridItem>
                                         
@@ -735,12 +827,29 @@ class CalculationConfig extends React.Component {
                                             <div className="rates-rates-bg">
                                             {this.state.multiselectArray.map((item, i) => (
 
-
                                                     <Chip size="small"
                                                         // avatar={<Avatar>M</Avatar>}
                                                         label={item.rateName}
                                                         onClick={() => this.onCLickRates(item.rateName)} />
                                                 ))}
+                                            </div>
+                                        </GridItem>
+
+                                        <GridItem xs={12} sm={4} md={6}>
+                                            <h4>
+                                                <small> Conditional Parameter </small>
+                                            </h4>
+                                            <div className="rates-parameter-bg">
+                                                {this.state.ConditionalParameterAr.map((item, i) => (
+
+                                                    <Chip size="small"
+                                                        // avatar={<Avatar>M</Avatar>}
+                                                        color="info"
+                                                        label={item.calculationConfigParamName}
+                                                        onClick={() => this.onclickConditionalParameter(item.calculationConfigParamName)} />
+
+                                                ))
+                                                }
                                             </div>
                                         </GridItem>
                                         
