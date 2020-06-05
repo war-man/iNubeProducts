@@ -4395,7 +4395,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
 
-
         public async Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string callType, ApiContext context)
         {
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
@@ -5375,6 +5374,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 applicationcancel = true;
             }
 
+
             if (!string.IsNullOrEmpty(policyRequest.PolicyNumber))
             {
                 GlobalVariables.PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policyRequest.PolicyNumber, apicontext);
@@ -5413,8 +5413,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CDBalanceDTO accountdetails = await _integrationService.GetCDAccountDetails(GlobalVariables.CdaccountNumber, "AD", apicontext);
                 if (applicationcancel)
                 {
-                    policyCancelResponse.FTPremium = FTaccountdetails.TotalAvailableBalance;
+                    if (!string.IsNullOrEmpty(policyRequest.PolicyNumber))
+                    {
+                        PolicyCancelReturnDto canceldetails = await PolicyCancellationCalculator(policyRequest.PolicyNumber, null, apicontext);
+                        policyCancelResponse.FTPremium = (-1) * canceldetails.Total;
+                    }
+                    else
+                    {
+                        policyCancelResponse.FTPremium = FTaccountdetails.TotalAvailableBalance;
+                        
+                    }
                     policyCancelResponse.ADPremium = accountdetails.TotalAvailableBalance;
+
                 }
                 else
                 {

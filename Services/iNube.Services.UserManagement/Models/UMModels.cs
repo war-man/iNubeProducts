@@ -15,6 +15,14 @@ namespace iNube.Services.UserManagement.Models
 
     }
 
+    public partial class EnvDTO
+    {
+        public int mID { get; set; }
+        public string mValue { get; set; }
+        public string mType { get; set; }
+        public string Url { get; set; }
+    }
+
     public partial class LocationDTO
     {
         public string locationType { get; set; }
@@ -200,7 +208,7 @@ namespace iNube.Services.UserManagement.Models
     {
         public UserLoginType()
         {
-            EnvironmentDTOs = new List<ddDTO>();
+            EnvironmentDTOs = new List<EnvDTO>();
         }
 
         public string UserType { get; set; }
@@ -215,8 +223,10 @@ namespace iNube.Services.UserManagement.Models
         public string UserId { get; set; }
         public string Product { get; set; }
         public bool? IsActive { get; set; }
+        public byte[] CompanyLogo { get; set; }
+        public string Url { get; set; }
 
-        public List<ddDTO> EnvironmentDTOs { get; set; }
+        public List<EnvDTO> EnvironmentDTOs { get; set; }
     }
 
     public class UserResponse : ResponseStatus
