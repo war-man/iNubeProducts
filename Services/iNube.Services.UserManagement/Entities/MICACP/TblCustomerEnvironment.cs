@@ -20,6 +20,8 @@ namespace iNube.Services.UserManagement.Entities.MICACP
         public DateTime? ModifiedDate { get; set; }
         public string Product { get; set; }
         public int? SortOrderBy { get; set; }
+        public byte[] CompanyLogo { get; set; }
+        public string Url { get; set; }
 
         public virtual ICollection<TblCustomerSettings> TblCustomerSettings { get; set; }
     }

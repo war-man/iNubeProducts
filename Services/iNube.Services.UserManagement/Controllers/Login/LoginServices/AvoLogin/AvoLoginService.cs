@@ -161,22 +161,28 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                                    UserType = cu.UserType,
                                    LoginProvider = cu.LoginProvider,
                                    UserName = cu.UserName,
+                                   IsActive = cu.IsActive,
                                    IsFirstTimeLogin = cu.IsFirstTimeLogin,
+                                   //IsFirstTimeLogin = 1,
+                                   Product = ce.Product,
+                                   CompanyLogo = ce.CompanyLogo,
                                    UserId = cu.UserId,
-                                   //Dbconnection = ce.Dbconnection,
-                                   //CustomerId = cu.CustomerId,
+                                   Url = ce.Url,
+                                   //Dbconnection= ce.Dbconnection,
+                                   //CustomerId =cu.CustomerId,
                                    EnvName = ce.EnvName,
                                    //Name = ce.Name,
                                    Id = ce.Id,
                                }).ToList();
-            List<ddDTO> environment = new List<ddDTO>();
+            List<EnvDTO> environment = new List<EnvDTO>();
 
-            ddDTO env = null;
+            EnvDTO env = null;
             foreach (var item in userdetails)
             {
-                env = new ddDTO();
+                env = new EnvDTO();
                 env.mValue = item.EnvName;
                 env.mID = Convert.ToInt32(item.Id);
+                env.Url = item.Url;
                 environment.Add(env);
             }
             var userdetail = userdetails.FirstOrDefault();
@@ -192,7 +198,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
             }
         }
 
-        public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire,RequestToken request = null)
+        public LoginResponse GenerateToken(AspNetUsersDTO user, string productType, decimal envId, bool isTokenExpire, RequestToken request = null)
         {
             LoginResponse loginResponse = new LoginResponse();
             var dbConnection = GetEnvironmentConnection(productType, envId).Dbconnection;
