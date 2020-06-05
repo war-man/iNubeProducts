@@ -939,6 +939,7 @@ namespace iNube.Services.Claims.Models
         public string CoverEvent { get; set; }
         public string CoverName { get; set; }
         public decimal? OrganizationId { get; set; }
+        public string InsuredName { get; set; }
     }
 
     #endregion
