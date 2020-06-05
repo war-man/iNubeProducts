@@ -17,6 +17,9 @@ namespace iNube.Services.UserManagement.Models
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string Product { get; set; }
+        public int? SortOrderBy { get; set; }
+        public byte[] CompanyLogo { get; set; }
+        public string Url { get; set; }
     }
 
     public class CustomerUsersDTO
