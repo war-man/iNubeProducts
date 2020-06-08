@@ -173,6 +173,9 @@ const ReportConfiguration = AsyncComponent(() => { return import("modules/Dynami
 const ReportExecution = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportExecution.jsx"); });
 const ReportUpdate = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportUpdate.jsx"); });
 
+//Wrapper API
+const WrapperAPIConfig = AsyncComponent(() => { return import("modules/WrapperAPI/views/WrapperAPIConfig.jsx"); });
+
 //File Upload
 const Upload = AsyncComponent(() => { return import("modules/FileUpload/views/Upload.jsx"); });
 
@@ -302,7 +305,7 @@ export const ComponentsList = {
     RefundUpload: RefundUpload,
     Upload: Upload,
     ApplicationCancel: ApplicationCancel,
-
+    WrapperAPI: WrapperAPIConfig,
 }
 
 export default ComponentsList
