@@ -7,6 +7,7 @@ else {
     //WrapperConfigUrl = 'https://localhost:44351';
     WrapperConfigUrl = 'https://inubeservicespolicy.azurewebsites.net';
 }
+
 export const WrapperConfig = {
     WrapperConfigUrl,
 }
