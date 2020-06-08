@@ -1519,7 +1519,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                 var policydatacount = from p in _context.TblPolicy.Where(ac => ac.CustomerId == Convert.ToInt32(pDTO.CustomerId).ToString() && ac.CreatedDate.Date >= pDTO.FromDate.Date && ac.CreatedDate.Date <= pDTO.ToDate.Date)
                                       group p by p.ProductIdPk into g
-                                      select new BillingEventDataDTO { Count = g.Count(), SumInsured = (decimal)g.Max(s => (s.PremiumAmount != null) ? s.PremiumAmount : 0), ProductId = g.Key };
+                                      select new BillingEventDataDTO { Count = g.Count(), SumInsured = (decimal)g.Sum(s => (s.SumInsured != null) ? s.SumInsured : 0), Premium = (decimal)g.Sum(s => (s.PremiumAmount != null) ? s.PremiumAmount : 0), ProductId = g.Key };
 
 
                 List<ProductDTO> list = new List<ProductDTO>();
