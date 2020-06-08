@@ -68,9 +68,9 @@ const modalSearch = {
 }
 
 const paddingCard =
-    {
-        padding: "10px",
-    }
+{
+    padding: "10px",
+}
 
 const okBtn = {
     left: "14%"
@@ -139,14 +139,14 @@ class AssignRole extends React.Component {
             panNoState: false,
             data: [],
             searchRequest:
-                {
-                    firstName: "",
-                    employeeNumber: "",
-                    emailId: "",
-                    contactNumber: "",
-                    panNo: "",
-                    partnerId: "",
-                },
+            {
+                firstName: "",
+                employeeNumber: "",
+                emailId: "",
+                contactNumber: "",
+                panNo: "",
+                partnerId: "",
+            },
             rolepermissions: {
                 "userId": "",
                 "roleId": []
@@ -155,6 +155,8 @@ class AssignRole extends React.Component {
             dynamicReport: [],
             loader: true,
             pageloader: false,
+            response: false,
+            response1: false,
             //intervalId: 0,
             //thePosition: false,
             //myRef:null
@@ -177,7 +179,7 @@ class AssignRole extends React.Component {
         }
         usrrole.roleId = [...this.state.selected];
         this.setState({ usrrole });
-        this.setState({ btnload: true });
+        this.setState({ response: true });
         fetch(`${UserConfig.UserConfigUrl}/api/Role/AssignRole`, {
             method: 'POST',
             headers: {
@@ -191,7 +193,7 @@ class AssignRole extends React.Component {
                 return response.json();
             })
             .then(data => {
-                this.setState({ btnload: false });
+                this.setState({ response: false });
                 console.log("response: ", data);
                 if (data.status == 2) {
                     swal({
@@ -756,32 +758,36 @@ class AssignRole extends React.Component {
         //
 
         //report permissions
-        for (let i = 0; i < dynamicReport.length; i++) {
-            let r = {};
-            for (let k = 0; k < RolesDTO.length; k++) {
-                if (dynamicReport[i].name == RolesDTO[k].name) {
-                    r.roleId = RolesDTO[k].id;
+        if (dynamicReport != undefined) {
+            for (let i = 0; i < dynamicReport.length; i++) {
+                let r = {};
+                for (let k = 0; k < RolesDTO.length; k++) {
+                    if (dynamicReport[i].name == RolesDTO[k].name) {
+                        r.roleId = RolesDTO[k].id;
+                    }
+                }
+                r.permissionIds = [];
+                for (let j = 0; j < dynamicReport[i].mdata.length; j++) {
+                    if (dynamicReport[i].mdata[j].status == false) {
+                        r.permissionIds = r.permissionIds.concat([dynamicReport[i].mdata[j].mID]);
+                    }
+                    r.permissionIds = this.handleSubmitForChildren(dynamicReport[i].mdata[j].children, r.permissionIds);
+                }
+                if (r.permissionIds.length > 0 || r.permissionIds.length == 0) {
+                    //r.permissionIds = r.permissionIds.concat(r.permissionIds);
+                    rp.rolePermissionIds = rp.rolePermissionIds.concat(r);
                 }
             }
-            r.permissionIds = [];
-            for (let j = 0; j < dynamicReport[i].mdata.length; j++) {
-                if (dynamicReport[i].mdata[j].status == false) {
-                    r.permissionIds = r.permissionIds.concat([dynamicReport[i].mdata[j].mID]);
-                }
-                r.permissionIds = this.handleSubmitForChildren(dynamicReport[i].mdata[j].children, r.permissionIds);
-            }
-            if (r.permissionIds.length > 0 || r.permissionIds.length == 0) {
-                //r.permissionIds = r.permissionIds.concat(r.permissionIds);
-                rp.rolePermissionIds = rp.rolePermissionIds.concat(r);
-            }
+            rp.rolePermissionIds = [...new Set(rp.rolePermissionIds)];
+            this.handleReportpermissions(rp);
         }
         //
 
         x.rolePermissionIds = [...new Set(x.rolePermissionIds)];
-        rp.rolePermissionIds = [...new Set(rp.rolePermissionIds)];
+
         console.log("report permissions: ", rp);
-        this.handleReportpermissions(rp);
-        that.setState({ btnload1: true });
+
+        that.setState({ response1: true });
         fetch(`${UserConfig.UserConfigUrl}/api/Permission/SaveRolePermissions`, {
             method: 'POST',
             headers: {
@@ -794,7 +800,7 @@ class AssignRole extends React.Component {
             console.log("response", response);
             return response.json();
         }).then(function (data) {
-            that.setState({ btnload1: false });
+            that.setState({ response1: false });
             if (data.status == 2) {
                 swal({
                     text: "Privileges assigned successfully",
@@ -1206,7 +1212,7 @@ class AssignRole extends React.Component {
                                             </GridContainer>
                                             <GridContainer lg={12} justify="center">
                                                 <GridItem xs={5} sm={3} md={3} lg={2} >
-                                                    <Button color="success" /*disabled={this.state.btnload} */ onClick={this.saveroles} round className={classes.submit}> <TranslationContainer translationKey="SaveRoles" /> </Button>
+                                                    <Button color="success" disabled={this.state.response} onClick={this.saveroles} round className={classes.submit}> <TranslationContainer translationKey="SaveRoles" /> </Button>
                                                     {/* {this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                                                 </GridItem>
                                             </GridContainer>
@@ -1225,7 +1231,7 @@ class AssignRole extends React.Component {
                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                             <CardBody>
                                                 <GridContainer justify="center" display={this.state.isButtonVisibility} >
-                                                    <Permission handleSubmit={this.handleSubmit} dynamicReport={this.state.dynamicReport} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2} reports={this.state.reports} dashboard={this.state.dashboard} /*btnload1={this.state.btnload1}*/ menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                                    <Permission handleSubmit={this.handleSubmit} response1={this.state.response1} dynamicReport={this.state.dynamicReport} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2} reports={this.state.reports} dashboard={this.state.dashboard} /*btnload1={this.state.btnload1}*/ menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
                                                 </GridContainer>
                                             </CardBody>
                                         </Animated>

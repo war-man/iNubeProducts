@@ -54,73 +54,71 @@ const style = {
 
 const OfficeProfile = (props) => {
     const officeData = props.componentData;
-  
+
     const { classes } = props;
-        console.log("office props",props);
-        return (
-            <div>
-                <Card>
-                  
-                    <CardBody>
-                        <GridContainer>
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    disabled={officeData.disabled}
-                                    labelText="Office Name"
-                                    id="officename"
-                                    name="officeName"
-                                    value={officeData.officeDTO.officeName}
-                                    onChange={(e) => officeData.SetValue("office", e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    disabled={officeData.disabled}
-                                    labelText="Office Code"
-                                    id="officeCode"
-                                    name="officeCode"
-                                    value={officeData.officeDTO.officeCode}
-                                    onChange={(e) => officeData.SetValue("office", e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    disabled={officeData.disabled}
-                                    labelText="Phone Number"
-                                    id="phoneNum"
-                                    name="officePhoneNo"
-                                    value={officeData.officeDTO.officePhoneNo}
-                                    onChange={(e) => officeData.SetValue("office", e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    disabled={officeData.disabled}
-                                    labelText="Fax Number"
-                                    id="faxNum"
-                                    name="officeFaxNo"
-                                    value={officeData.officeDTO.officeFaxNo}
-                                    onChange={(e) => officeData.SetValue("office", e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                        
-                          
-                            <GridItem xs={12} sm={4}>
-                                <MasterDropdown disabled={officeData.disabled} labelText="Select Level Applicable" value={officeData.officeDTO.officeLevelId} lstObject={officeData.list} filterName='office' model="OrganizationDTO" name='officeLevelId' onChange={(e) => officeData.SetValue('officeLevelId', e)} formControlProps={{ fullWidth: true }} />
-                            </GridItem>
-                            {/*   
+    console.log("office props", props);
+    return (
+        <div>
+            <CardBody>
+                <GridContainer>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <CustomInput
+                            disabled={officeData.disabled}
+                            labelText="Office Name"
+                            id="officename"
+                            name="officeName"
+                            value={officeData.aVOOrgOffice.officeName}
+                            onChange={(e) => officeData.SetValue("office", e)}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <CustomInput
+                            disabled={officeData.disabled}
+                            labelText="Office Code"
+                            id="officeCode"
+                            name="officeCode"
+                            value={officeData.aVOOrgOffice.officeCode}
+                            onChange={(e) => officeData.SetValue("office", e)}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <CustomInput
+                            disabled={officeData.disabled}
+                            labelText="Phone Number"
+                            id="phoneNum"
+                            name="officePhoneNo"
+                            value={officeData.aVOOrgOffice.officePhoneNo}
+                            onChange={(e) => officeData.SetValue("office", e)}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <CustomInput
+                            disabled={officeData.disabled}
+                            labelText="Fax Number"
+                            id="faxNum"
+                            name="officeFaxNo"
+                            value={officeData.aVOOrgOffice.officeFaxNo}
+                            onChange={(e) => officeData.SetValue("office", e)}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+
+
+                    {/*  <GridItem xs={12} sm={4}>
+                        <MasterDropdown disabled={officeData.disabled} labelText="Select Level Applicable" value={officeData.officeDTO.officeLevelId} lstObject={officeData.list} filterName='office' model="OrganizationDTO" name='officeLevelId' onChange={(e) => officeData.SetValue('officeLevelId', e)} formControlProps={{ fullWidth: true }} />
+                    </GridItem>*/}
+                    {/*   
                           
                             <GridItem xs={12} sm={4}>
                                 <MasterDropdown disabled={officeData.disabled} labelText="Reporting Office" id="OrganizationDTO.orgTypeId" value={officeData.officeDTO.officeReportingOfficeId} lstObject={officeData.list} filterName='office' model="OrganizationDTO" name='officeReportingOfficeId' formControlProps={{ fullWidth: true }} />   
@@ -178,16 +176,11 @@ const OfficeProfile = (props) => {
                                 </FormControl>
                             </GridItem>
                             */}
-                        </GridContainer>
-                    </CardBody>
-                </Card>
-               
-
-
-
-            </div>
-        );
-    }
+                </GridContainer>
+            </CardBody>
+        </div>
+    );
+}
 
 
 

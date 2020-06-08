@@ -30,7 +30,7 @@ import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/c
 //import CreateUser from "modules/Users/views/UserManagement/_CreateUser.jsx";
 import './style.css';
 
-import {Animated} from "react-animated-css";
+import { Animated } from "react-animated-css";
 
 const style = {
     infoText: {
@@ -87,54 +87,53 @@ const style = {
 //    border: "none",
 //    zoom: "1.15"
 //}
-
 //const btnStyle = {
 //    height: "35px",
 //    textAlign: "center"
 //}
-
 const Employee = (props) => {
-   return (
-            <div >
-                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                    <CardBody>
-                        <GridContainer>
-                                <GridItem xs={12} sm={12} md={3}>
-                           <CustomInput
-                                    success={props.employeeidState == "success"}
-                                    error={props.employeeidState == "error"}
-                                    labelText="Employee ID"
-                               id="empId"
-                               required={true}
-                                    name="employeeid"
-                                    value={props.employeeid}
-                                    onChange={(e) => props.employeeChange("number", e)}
-                                    multiline={false}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                           />
-                           
-                            </GridItem>
-                        </GridContainer>
-                        <GridContainer justify="center">
-                            <GridItem >
-                                <div>
+    return (
+        <div >
+            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                <CardBody>
+                    <GridContainer>
+                        <GridItem xs={12} sm={12} md={3}>
+                            <CustomInput
+                                //success={props.employeeidState == "success"}
+                                //error={props.employeeidState == "error"}
+                                error={props.employeeidState}
+                                labelText="Employee Code"
+                                id="empId"
+                                required={true}
+                                name="employeeid"
+                                value={props.employeeid}
+                                //onChange={(e) => props.employeeChange("number", e)}
+                                onChange={(e) => props.employeeChange(e)}
+                                multiline={false}
+                                formControlProps={{
+                                    fullWidth: true
+                                }}
+                            />
+
+                        </GridItem>
+                    </GridContainer>
+                    <GridContainer justify="center">
+                        <GridItem >
+                            <div>
                                 <Button color="success"
-                                      onClick={props.handleemployeedata}
-                                    round className={props.classes.marginRight}  id="validateBtn">
+                                    onClick={props.handleemployeedata}
+                                    round className={props.classes.marginRight} id="validateBtn">
                                     Validate
                             </Button>
-                                     
-                                </div>
-                            </GridItem>
-                        </GridContainer>
-                       
-                    </CardBody>
-                   
-              </Animated>
-            </div>
-        );
-}
 
+                            </div>
+                        </GridItem>
+                    </GridContainer>
+
+                </CardBody>
+
+            </Animated>
+        </div>
+    );
+}
 export default withStyles(style)(Employee);

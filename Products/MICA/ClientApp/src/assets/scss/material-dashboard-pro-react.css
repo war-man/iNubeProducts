@@ -2888,6 +2888,20 @@ img {
   bottom: 50%; }
 
 @media screen and (min-width: 320px) and (max-width: 568px) {
+  #Language {
+    right: 56px !important;
+    top: -5px !important; }
+  #switch-role {
+    width: 8rem !important;
+    right: 65px !important;
+    top: -27px !important; }
+  #Toggles {
+    /*right: 3rem;*/
+    top: -28px; }
+  #themes {
+    top: -52px !important; }
+  .logoClasses {
+    width: 0% !important; }
   .gridBox h4 {
     margin-left: 0px !important;
     padding-bottom: 8px;
@@ -4053,7 +4067,7 @@ img {
   font-size: 12px;
   padding: 5px;
   font-weight: 400;
-  color: #2b2b2b; }
+  color: #ff1717; }
 
 .seach-title {
   margin-top: 10px;
@@ -4283,6 +4297,19 @@ img {
     height: 45px !important; } }
 
 @media screen and (min-width: 375px) and (max-width: 900px) {
+  #Language {
+    right: 48px !important;
+    top: -5px !important; }
+  #switch-role {
+    width: 8rem !important;
+    right: 65px !important;
+    top: -4px !important; }
+  #Toggles {
+    top: -5px !important;
+    right: 18px !important; }
+  #themes {
+    top: -5px !important;
+    right: 40px !important; }
   .partner-admin {
     width: 90% !important;
     height: 51vh;
@@ -4321,8 +4348,7 @@ img {
   visibility: hidden; }
 
 #moving-tb {
-  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
-  border-bottom: #3c42f9 4px solid; }
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12); }
 
 .swal-button {
   background-color: #183a7b !important;
@@ -5024,7 +5050,9 @@ img {
   border-radius: 50px; }
 
 #Toggle {
-  box-shadow: 0 2px 2px 0 rgba(153, 153, 153, 0.14), 0 3px 1px -2px rgba(153, 153, 153, 0.2), 0 1px 5px 0 rgba(153, 153, 153, 0.12) !important; }
+  box-shadow: 0 2px 2px 0 rgba(153, 153, 153, 0.14), 0 3px 1px -2px rgba(153, 153, 153, 0.2), 0 1px 5px 0 rgba(153, 153, 153, 0.12) !important;
+  padding: 0px 0px 0px 0px !important;
+  color: #333; }
 
 #progress-bar {
   top: -2.3rem;
@@ -5072,6 +5100,181 @@ img {
 .Mui-disabled {
   color: #333c !important; }
 
+/* AVO Card Header */
+.header-color1 {
+  background: linear-gradient(60deg, #fb840a, #fb840a) !important; }
+
+.header-color2 {
+  background: linear-gradient(60deg, #363abf, #363abf) !important; }
+
+/**********/
+#switch-role {
+  right: 0.5rem; }
+
+/*
+ AVO Cal
+*/
+.bg-cal {
+  background: linear-gradient(120deg, #12206b, #152cab) !important; }
+
+#cal-heading {
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  font-weight: 500; }
+
+.pie_Chart {
+  margin-top: 15px; }
+
+.load-container {
+  position: absolute;
+  left: 50%;
+  top: 200%;
+  transform: translate(-50%, -50%); }
+
+.load span {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  background-color: #000000;
+  border-radius: 50%;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  -webkit-animation: 1.2s infinite bubble ease-in-out;
+  animation: 1.2s infinite bubble ease-in-out; }
+
+.load span:nth-child(1) {
+  background-color: #9762ff;
+  -webkit-animation-delay: 0s;
+  animation-delay: 0s; }
+
+.load span:nth-child(2) {
+  background-color: #0f0da7;
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s; }
+
+.load span:nth-child(3) {
+  background-color: #9762ff;
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s; }
+
+.load span:nth-child(4) {
+  background-color: #0f0da7;
+  -webkit-animation-delay: 0.6s;
+  animation-delay: 0.6s; }
+
+/* AVO */
+#dashboardimg {
+  width: 50px !important;
+  bottom: 10px;
+  position: relative; }
+
+/* React cal */
+.react-calendar {
+  width: auto;
+  color: #FFF;
+  border: none;
+  padding: 8px;
+  background: none; }
+
+.react-calendar,
+.react-calendar *,
+.react-calendar *:before,
+.react-calendar *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+.react-calendar button {
+  margin: 0;
+  border: 0;
+  outline: none;
+  color: #fff; }
+
+.react-calendar button:enabled:hover {
+  cursor: pointer; }
+
+.react-calendar__navigation {
+  height: 44px;
+  margin-bottom: 1em; }
+
+.react-calendar__navigation button {
+  color: #fff;
+  font-weight: 700;
+  min-width: 26px;
+  background: none;
+  border-radius: 47px; }
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background: #04156f !important; }
+
+.react-calendar__navigation button[disabled] {
+  background-color: #f0f0f0; }
+
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75em; }
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.5em; }
+
+.react-calendar__month-view__weekNumbers {
+  font-weight: bold; }
+
+.react-calendar__month-view__weekNumbers .react-calendar__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75em;
+  padding: calc(0.75em / 0.75) calc(0.5em / 0.75);
+  color: #fff; }
+
+.react-calendar__month-view__days__day--weekend {
+  color: #d10000; }
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #757575; }
+
+.react-calendar__year-view .react-calendar__tile,
+.react-calendar__decade-view .react-calendar__tile,
+.react-calendar__century-view .react-calendar__tile {
+  padding: 2em 0.5em; }
+
+.react-calendar__tile {
+  max-width: 100%;
+  text-align: center;
+  padding: 0.75em 0.5em;
+  background: none; }
+
+.react-calendar__tile:disabled {
+  background-color: #f0f0f0; }
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #8c9eff; }
+
+.react-calendar__tile--hasActive {
+  background: #76baff; }
+
+.react-calendar__tile--hasActive:enabled:hover,
+.react-calendar__tile--hasActive:enabled:focus {
+  background: #a9d4ff; }
+
+.react-calendar__tile--active {
+  background: #1087ff;
+  color: white; }
+
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+  background: #1087ff; }
+
+.react-calendar--selectRange .react-calendar__tile--hover {
+  background-color: #e6e6e6; }
+
+/********/
 .btn-file {
   position: relative;
   overflow: hidden;

@@ -113,6 +113,8 @@ class CreateRole extends React.Component {
                 "permissionIds": []
             },
             selectdreports: [],
+            response: false,
+            response1: false,
             //ReportDynamic: {
             //    DynamicPermissionId: "",
             //    DynamicId: "",
@@ -140,7 +142,7 @@ class CreateRole extends React.Component {
             role["normalizedName"] = role.name;
             this.setState({ role })
             console.log("final role", this.state.Roles);
-            this.setState({ btnload: true });
+            this.setState({ response: true });
             fetch(`${UserConfig.UserConfigUrl}/api/Role/CreateRole`, {
                 method: 'POST',
                 headers: {
@@ -151,7 +153,7 @@ class CreateRole extends React.Component {
                 body: JSON.stringify(role)
             }).then(response => response.json())
                 .then(data => {
-                    this.setState({ btnload: false });
+                    this.setState({ response: false });
                     console.log("response data", data);
                     if (data.status == 2) {
                         this.setState({ newroleid: data.id, permissionpage: true, Roles: this.state.initialRoles });
@@ -285,7 +287,7 @@ class CreateRole extends React.Component {
         let role = this.state.searchRequest;
         role.roleid = roleId;
         role.editrolename = rolename;
-        this.setState({ role, menuname: true });
+        this.setState({ role, menuname: false });
         console.log("perms: ", roleId)
         console.log("perms: ", this.state.searchRequest)
         this.handleOpen();
@@ -527,6 +529,7 @@ class CreateRole extends React.Component {
         let listData = that.state.listData;
         let dashboard = that.state.dashboard;
         let dynamicReport = that.state.dynamicReport;
+        console.log("reports: ", that.state.dynamicReport);
         console.log("new Roleid", that.state.newroleid);
         if (this.state.newroleid != "") {
             x.roleId = that.state.newroleid;
@@ -573,21 +576,23 @@ class CreateRole extends React.Component {
                 console.log("dashboards changes: ", x.permissionIds);
             }
         }
-
-        for (let i = 0; i < dynamicReport.length; i++) {
-            let y = {};
-            y.newpermissionIds = [];
-            for (let j = 0; j < dynamicReport[i].mdata.length; j++) {
-                if (dynamicReport[i].mdata[j].status == true) {
-                    y.newpermissionIds = y.newpermissionIds.concat([dynamicReport[i].mdata[j]]);
+        if (dynamicReport != undefined) {
+            for (let i = 0; i < dynamicReport.length; i++) {
+                let y = {};
+                y.newpermissionIds = [];
+                for (let j = 0; j < dynamicReport[i].mdata.length; j++) {
+                    if (dynamicReport[i].mdata[j].status == true) {
+                        y.newpermissionIds = y.newpermissionIds.concat([dynamicReport[i].mdata[j]]);
+                    }
+                    y.newpermissionIds = this.handleSubmitForChildren(dynamicReport[i].mdata[j].children, y.newpermissionIds);
                 }
-                y.newpermissionIds = this.handleSubmitForChildren(dynamicReport[i].mdata[j].children, y.newpermissionIds);
-            }
 
-            if (y.newpermissionIds.length > 0 || y.newpermissionIds.length == 0) {
-                y.newpermissionIds = [...new Set(y.newpermissionIds)];
-                rp.permissionIds = rp.permissionIds.concat(y.newpermissionIds);
+                if (y.newpermissionIds.length > 0 || y.newpermissionIds.length == 0) {
+                    y.newpermissionIds = [...new Set(y.newpermissionIds)];
+                    rp.permissionIds = rp.permissionIds.concat(y.newpermissionIds);
+                }
             }
+            this.handleReportPermissions(rp);
         }
         console.log("x.permissionIds: ", rp);
         x.permissionIds = [...new Set(x.permissionIds)];
@@ -596,8 +601,8 @@ class CreateRole extends React.Component {
         //}
         console.log("Final data", x);
 
-        that.setState({ btnload1: true });
-        this.handleReportPermissions(rp);
+        that.setState({ response1: true });
+
         fetch(`${UserConfig.UserConfigUrl}/api/Permission/AssignRolePermissions`, {
             method: 'POST',
             headers: {
@@ -611,7 +616,7 @@ class CreateRole extends React.Component {
             return response.json();
         }).then(function (data) {
             console.log("data", data);
-            that.setState({ btnload1: false });
+            that.setState({ response1: false });
             if (data.status == 2) {
                 swal({
                     text: "Privileges assigned successfully",
@@ -834,7 +839,7 @@ class CreateRole extends React.Component {
                                         </div>
                                     </GridContainer>
                                     <div id="disp" >
-                                        <Permission handleSubmit={this.handleSubmit} reports={this.state.reports} dynamicReport={this.state.dynamicReport} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ dashboard={this.state.dashboard} handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                        <Permission handleSubmit={this.handleSubmit} response1={this.state.response1} reports={this.state.reports} dynamicReport={this.state.dynamicReport} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ dashboard={this.state.dashboard} handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
                                     </div>
                                 </div>
 
@@ -854,7 +859,7 @@ class CreateRole extends React.Component {
                         </CardIcon>
                         {
                             <h4 >
-                                <small> <TranslationContainer translationKey="CreateRole" />Create Role </small>
+                                <small> <TranslationContainer translationKey="CreateRole" /> </small>
                             </h4>
                         }
                     </CardHeader>
@@ -872,7 +877,7 @@ class CreateRole extends React.Component {
                         <GridContainer justify="start">
                             <GridItem xs={12} sm={4}>
                                 <CustomInput
-                                    labelText="NameofaRole"
+                                    labelText="RoleName"
                                     name="name"
                                     required={true}
                                     value={this.state.Roles.name}
@@ -891,7 +896,7 @@ class CreateRole extends React.Component {
                                 />
                             </GridItem>*/}
                             <GridItem xs={12} sm={4}>
-                                <Button /*disabled={this.state.btnload}*/ color="success" id="top-bnt" round className={classes.marginRight} style={modalSearch} onClick={this.CreateRole}>
+                                <Button disabled={this.state.response} color="success" id="top-bnt" round className={classes.marginRight} style={modalSearch} onClick={this.CreateRole}>
                                     <TranslationContainer translationKey="Save" />
                                 </Button>
                                 {/*  {this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
@@ -964,7 +969,7 @@ class CreateRole extends React.Component {
                         </CardHeader>
                         <CardBody>
                             <GridContainer justify="center" >
-                                <Permission handleSubmit={this.handleSubmit} dashboard={this.state.dashboard} dynamicReport={this.state.dynamicReport} reports={this.state.reports} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} />
+                                <Permission handleSubmit={this.handleSubmit} response1={this.state.response1} dashboard={this.state.dashboard} dynamicReport={this.state.dynamicReport} reports={this.state.reports} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2}/*btnload1={this.state.btnload1}*/ handleDropdown={this.handleDropdown} dashboardvalue={this.state.dashboardvalue} menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} />
                             </GridContainer>
                         </CardBody>
                     </Card>

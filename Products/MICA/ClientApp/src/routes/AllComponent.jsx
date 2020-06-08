@@ -8,6 +8,7 @@ import AsyncComponent from "components/Async/AsyncComponent.jsx";
 
 /*Others Module*/
 const Dashboard = AsyncComponent(() => { return import("modules/Users/views/Dashboard.jsx"); });
+const AVODashboard = AsyncComponent(() => { return import("modules/Users/views/AVODashboard.jsx"); });
 const Uwdashboard = AsyncComponent(() => { return import("modules/Users/views/UwDashBoard.jsx"); });
 const UserDashboard = AsyncComponent(() => { return import("modules/Users/views/UserDashboard.jsx"); });
 //import Dashboard from "modules/Users/views/Dashboard.jsx";
@@ -64,10 +65,17 @@ const Partner = AsyncComponent(() => { return import("modules/Partners/Organizat
 /*Organization Module*/
 const Organization = AsyncComponent(() => { return import("modules/Partners/Organization/views/Organization.jsx"); });
 const SearchOrganization = AsyncComponent(() => { return import("modules/Partners/Organization/views/SearchOrganization.jsx"); });
+const OrgHierarchy = AsyncComponent(() => { return import("modules/Hierarchy/views/OrgHierarchy.jsx"); });
+/*People Module*/
+const People = AsyncComponent(() => { return import("modules/Hierarchy/views/People.jsx"); });
+const SearchPeople = AsyncComponent(() => { return import("modules/Hierarchy/views/SearchPeople.jsx"); });
+const PPLHierarchy = AsyncComponent(() => { return import("modules/Hierarchy/views/PPLHierarchy.jsx"); });
+const Designation = AsyncComponent(() => { return import("modules/Hierarchy/views/Designation.jsx"); });
 
 /*Office Module*/
 const Office = AsyncComponent(() => { return import("modules/Partners/Organization/views/Office.jsx"); });
 const SearchOffice = AsyncComponent(() => { return import("modules/Partners/Organization/views/SearchOffice.jsx"); });
+const OffHierarchy = AsyncComponent(() => { return import("modules/Hierarchy/views/OffHierarchy.jsx"); });
 
 /*CD Account Module*/
 const CreateCDaccount = AsyncComponent(() => { return import("modules/Partners/Accounts/Payment/views/CreateCDaccount.jsx"); });
@@ -167,6 +175,13 @@ const ModifyTreaty = AsyncComponent(() => { return import("modules/Reinsurance/v
 const DefineMapping = AsyncComponent(() => { return import("modules/Reinsurance/views/DefineMapping.jsx"); });
 const SearchMapping = AsyncComponent(() => { return import("modules/Reinsurance/views/SearchMapping.jsx"); });
 const ModifyMapping = AsyncComponent(() => { return import("modules/Reinsurance/views/ModifyMapping.jsx"); });
+const Reallocation = AsyncComponent(() => { return import("modules/Reinsurance/views/Reallocation.jsx"); });
+
+/* Coinsurance module*/
+const Coin1 = AsyncComponent(() => { return import("modules/Coinsurance/views/Coin1.jsx"); });
+const Coin2 = AsyncComponent(() => { return import("modules/Coinsurance/views/Coin2.jsx"); });
+const Coin3 = AsyncComponent(() => { return import("modules/Coinsurance/views/Coin3.jsx"); });
+//const Coin4 = AsyncComponent(() => { return import("modules/Coinsurance/views/Coin4.jsx"); });
 
 //Dynamic Reports
 const ReportConfiguration = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportConfiguration.jsx"); });
@@ -176,17 +191,54 @@ const ReportUpdate = AsyncComponent(() => { return import("modules/DynamicReport
 //Wrapper API
 const WrapperAPIConfig = AsyncComponent(() => { return import("modules/WrapperAPI/views/WrapperAPIConfig.jsx"); });
 
+//SearchLog
+const SearchLog = AsyncComponent(() => { return import("modules/SearchLog/views/SearchLog.jsx"); });
+
 //File Upload
 const Upload = AsyncComponent(() => { return import("modules/FileUpload/views/Upload.jsx"); });
-
 
 /*Allocation Module*/
 const AllocationExecution = AsyncComponent(() => { return import("modules/Allocation/views/AllocationExecution.jsx"); });
 const AllocationConfig = AsyncComponent(() => { return import("modules/Allocation/views/AllocationConfig.jsx"); });
 const AllocationRules = AsyncComponent(() => { return import("modules/Allocation/views/AllocationRules.jsx"); });
 
+//avo modules
+const Lead = AsyncComponent(() => { return import("modules/NewBusiness/Lead/Lead.jsx"); });
+const Prospect = AsyncComponent(() => { return import("modules/NewBusiness/Prospect/Prospect.jsx"); });
+const Quotation = AsyncComponent(() => { return import("modules/NewBusiness/Quotation/Quotation.jsx"); });
+//const ProspectScreen = AsyncComponent(() => { return import("modules/NewBusiness/Prospect/ProspectScreen.jsx"); });
+const Proposal = AsyncComponent(() => { return import("modules/NewBusiness/Proposal/Proposal.jsx"); });
+const ProposalIncomplete = AsyncComponent(() => { return import("modules/NewBusiness/Proposal/ProposalIncomplete.jsx"); });
+//const modifyProposal = AsyncComponent(() => { return import("modules/NewBusiness/Proposal/modifyProposal.jsx"); });
+const Tasks = AsyncComponent(() => { return import("modules/Recruitment/Tasks/SearchTask.jsx"); });
+const createSuspect = AsyncComponent(() => { return import("modules/Recruitment/createSuspect/createSuspect.jsx"); });
+const createProspect = AsyncComponent(() => { return import("modules/Recruitment/createProspect/createProspect.jsx"); });
+
+//hierarchy modules
+const Movement = AsyncComponent(() => { return import("modules/Hierarchy/views/Movement.jsx"); });
+const CreatePosition = AsyncComponent(() => { return import("modules/Hierarchy/views/CreatePosition.jsx"); });
+
+//Inbox
+const Inbox = AsyncComponent(() => { return import("modules/Hierarchy/views/Inbox.jsx"); });
+
+//Renumeration
+const CreateCommission = AsyncComponent(() => { return import("modules/Renumeration/views/CreateCommission.jsx"); });
+const CreateAllowances = AsyncComponent(() => { return import("modules/Renumeration/views/CreateAllowances.jsx"); });
+const CreateIncentive = AsyncComponent(() => { return import("modules/Renumeration/views/CreateIncentive.jsx"); });
+const ViewAllowances = AsyncComponent(() => { return import("modules/Renumeration/views/ViewAllowances.jsx"); });
+const ViewCommission = AsyncComponent(() => { return import("modules/Renumeration/views/ViewCommission.jsx"); });
+const ViewIncentive = AsyncComponent(() => { return import("modules/Renumeration/views/ViewIncentive.jsx"); });
+const Compensation = AsyncComponent(() => { return import("modules/Renumeration/views/Compensation.jsx"); });
+
+//Contract
+const GenerateContract = AsyncComponent(() => { return import("modules/Contracts/views/GenerateContract.jsx"); });
+const ManageMaster = AsyncComponent(() => { return import("modules/Contracts/views/ManageMaster.jsx"); });
+const RecruitmentUpload = AsyncComponent(() => { return import("modules/Contracts/views/RecruitmentUpload.jsx"); });
+const AVOSearchContract = AsyncComponent(() => { return import("modules/Contracts/views/AVOSearchContract.jsx"); });
+
 export const ComponentsList = {
     Uwdashboard: Uwdashboard,
+    AVODashboard: AVODashboard,
     PricingPage: PricingPage,
     LoginPage: LoginPage,
     RegisterPage: RegisterPage,
@@ -291,6 +343,7 @@ export const ComponentsList = {
     DefineMapping: DefineMapping,
     SearchMapping: SearchMapping,
     ModifyMapping: ModifyMapping,
+    Reallocation: Reallocation,
     CalculationDisplay: CalculationDisplay,
     DynamicProd: DynamicProduct,
     UserDashboard: UserDashboard,
@@ -306,6 +359,43 @@ export const ComponentsList = {
     Upload: Upload,
     ApplicationCancel: ApplicationCancel,
     WrapperAPI: WrapperAPIConfig,
+    EllustrationConfig: EllustrationConfig,
+    Coin1: Coin1,
+    Coin2: Coin2,
+    Coin3: Coin3,
+    //Coin4: Coin4,
+    SearchLog: SearchLog,
+    //AVO
+    Lead: Lead,
+    Prospect: Prospect,
+    Quotation: Quotation,
+    Proposal: Proposal,
+    ProposalIncomplete: ProposalIncomplete,
+    OrgHierarchy: OrgHierarchy,
+    OffHierarchy: OffHierarchy,
+    PPLHierarchy: PPLHierarchy,
+    Designation: Designation,
+    GenerateContract: GenerateContract,
+    Tasks: Tasks,
+    createSuspect: createSuspect,
+    createProspect: createProspect,
+    People: People,
+    Movement: Movement,
+    CreatePosition: CreatePosition,
+    //Inbox
+    Inbox: Inbox,
+    //Renumeration
+    CreateCommission: CreateCommission,
+    CreateAllowances: CreateAllowances,
+    CreateIncentive: CreateIncentive,
+    ViewAllowances: ViewAllowances,
+    ViewCommission: ViewCommission,
+    ViewIncentive: ViewIncentive,
+    Compensation: Compensation,
+    //Contract
+    ManageMaster: ManageMaster,
+    RecruitmentUpload: RecruitmentUpload,
+    AVOSearchContract: AVOSearchContract,
 }
 
 export default ComponentsList

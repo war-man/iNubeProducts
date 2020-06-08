@@ -21,10 +21,10 @@ const headerStyle = theme => ({
         borderBottom: "0",
         marginBottom: "0",
         position: "fixed",
-        width: "100%",
+        //width: "70.3rem",
         paddingTop: "10px",
         zIndex: "1029",
-        height: "3.9rem",
+        height: "3.57rem",
         color: "#555555",
         border: "0",
         boxShadow: "0 4px 8px rgba(0,0,0,.08)",
@@ -37,7 +37,7 @@ const headerStyle = theme => ({
     container: {
         ...containerFluid,
         minHeight: "50px",
-        marginTop: "-17px"
+        marginTop: "-3px"
     },
     flex: {
         flex: 1
@@ -92,7 +92,8 @@ const headerStyle = theme => ({
     },
     sidebarMiniIcon: {
         width: "20px",
-        height: "17px"
+        height: "17px",
+        color: primaryColor
     }
 });
 

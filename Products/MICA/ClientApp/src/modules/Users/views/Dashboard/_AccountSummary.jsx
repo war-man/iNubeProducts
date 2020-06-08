@@ -118,7 +118,7 @@ class AccountSummary extends React.Component {
                 this.setState({ selectedMonth: this.state.Month[i].mID })
         }
 
-        fetch(`${policyConfig.PolicyConfigUrl}/api/Policy/PolicyDashboardMaster`, {
+        fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/PolicyDashboardMaster`, {
             //  fetch(`https://localhost:44351/api/Policy/PolicyDashboardMaster`, {
             method: 'GET',
             headers: {

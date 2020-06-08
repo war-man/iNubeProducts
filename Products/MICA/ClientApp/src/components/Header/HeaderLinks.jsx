@@ -30,19 +30,19 @@ class HeaderLinks extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            redirect:false,
+            redirect: false,
             pass: "",
             open: false,
         };
         this.renderRedirect = this.renderRedirect.bind(this);
         this.handleclick = this.handleclick.bind(this);
     }
-  handleClick = () => {
-    this.setState({ open: !this.state.open });
-  };
-  handleClose = () => {
-    this.setState({ open: false });
-  };
+    handleClick = () => {
+        this.setState({ open: !this.state.open });
+    };
+    handleClose = () => {
+        this.setState({ open: false });
+    };
     renderRedirect = () => {
         if (this.state.redirect == true) {
             return <Redirect to={{
@@ -50,7 +50,7 @@ class HeaderLinks extends React.Component {
             }} />
         }
     }
-   
+
     handleclick() {
         this.setState({
             redirect: true,
@@ -58,32 +58,32 @@ class HeaderLinks extends React.Component {
         localStorage.removeItem('userId');
         localStorage.clear();
     }
-  render() {
-    const { classes, rtlActive } = this.props;
-    const { open } = this.state;
-    const searchButton =
-      classes.top +
-      " " +
-      classes.searchButton +
-      " " +
-      classNames({
-        [classes.searchRTL]: rtlActive
-      });
-    const dropdownItem = classNames(
-      classes.dropdownItem,
-      classes.primaryHover,
-      { [classes.dropdownItemRTL]: rtlActive }
-    );
-    const wrapper = classNames({
-      [classes.wrapperRTL]: rtlActive
-    });
-    const managerClasses = classNames({
-      [classes.managerClasses]: true
-    });
-      
-    return (
-      <div className={wrapper}>
-            {/* <Button
+    render() {
+        const { classes, rtlActive } = this.props;
+        const { open } = this.state;
+        const searchButton =
+            classes.top +
+            " " +
+            classes.searchButton +
+            " " +
+            classNames({
+                [classes.searchRTL]: rtlActive
+            });
+        const dropdownItem = classNames(
+            classes.dropdownItem,
+            classes.primaryHover,
+            { [classes.dropdownItemRTL]: rtlActive }
+        );
+        const wrapper = classNames({
+            [classes.wrapperRTL]: rtlActive
+        });
+        const managerClasses = classNames({
+            [classes.managerClasses]: true
+        });
+
+        return (
+            <div className={wrapper}>
+                {/* <Button
           color="transparent"
           simple
           aria-label="Dashboard"
@@ -215,7 +215,7 @@ class HeaderLinks extends React.Component {
             label: rtlActive ? classes.labelRTL : ""
           }}
             >*/}
-            {/*  <div>
+                {/*  <div>
                 {this.renderRedirect()}
                 <Button className="text-captalize" id="logout" color="rose" simple size="sl"  onClick={this.handleclick}>   
                
@@ -238,14 +238,14 @@ class HeaderLinks extends React.Component {
             </span>
           </Hidden>
         </Button>*/}
-      </div>
-    );
-  }
+            </div>
+        );
+    }
 }
 
 HeaderLinks.propTypes = {
-  classes: PropTypes.object.isRequired,
-  rtlActive: PropTypes.bool
+    classes: PropTypes.object.isRequired,
+    rtlActive: PropTypes.bool
 };
 
 export default withStyles(headerLinksStyle)(HeaderLinks);

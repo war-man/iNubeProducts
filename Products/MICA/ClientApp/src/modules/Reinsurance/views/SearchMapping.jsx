@@ -24,7 +24,12 @@ import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import { Animated } from "react-animated-css";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import ReinsuranceConfig from "modules/Reinsurance/ReinsuranceConfig.js";
+import Edit from "@material-ui/icons/Edit";
+import Delete from "@material-ui/icons/Delete";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import DefineMapping from "modules/Reinsurance/views/DefineMapping.jsx";
+import Modal from '@material-ui/core/Modal';
+import swal from 'sweetalert';
 const style = {
     infoText: {
         fontWeight: "300",
@@ -49,14 +54,18 @@ class SearchMapping extends React.Component {
         this.state = {
             yearmasterlist: [],
             newdata: [],
+            rimapId:"",
             showMapping:false,
             showRetentionflag: false,
+            SelectedId: "",
+            rimappingId:"",
             Mapping: {
                 year: "", 
                 level: "",
                 lobProductCover:""
             }
         };
+        this.handleEdit = this.handleEdit.bind(this);
     }
     onInputChange = (evt) => {
 
@@ -107,6 +116,44 @@ class SearchMapping extends React.Component {
             });
         console.log(this.state.newdata, 'New Data');
     }
+    editFunction(id, pId) {
+
+        document.getElementById("disp");
+
+        this.setState({ SelectedId: pId });
+
+    }
+    handleOpen = () => {
+        this.setState({ open: true });
+    };
+    handleClose = () => {
+        this.setState({ open: false });
+        this.onFormSubmit();
+    };
+    handleEdit = (index, id) => {
+        debugger;
+        this.editFunction(index, id);
+        console.log("id", id);
+        let edit = this.state;
+        edit.close = false;
+        edit.editModal = true;
+        edit.visibility = false;
+        edit.open = true;
+        edit.disabled = true;
+        edit.disable = true;
+        edit.close = false;
+        edit.flagUpdate = true;
+        this.setState({ edit, rimappingId: id });
+
+        //let flageUpdate = this.state.flagUpdate;
+        //this.setState({ flageUpdate: true })
+        //let flag = this.state.flag;
+
+        //this.setState({ flag: false })
+
+        console.log("edit", this.state.editModal);
+
+    };
     dataTable = (ParticipantList) => {
 
         console.log("ParticipantList", ParticipantList);
@@ -117,20 +164,49 @@ class SearchMapping extends React.Component {
                     id: key,
                     year: prop.year,
                     level: prop.level,
-                    lobProductCover: prop.lobProductCover
+                    lobProductCover: prop.lobProductCover,
                     //businesstype: prop.businessType,
                     //retentiongroup: prop.retentionGroupName,
                     //startdate: prop.effectiveFrom,
                     //enddate: prop.effectiveTo,
-                    //btn: <div><Button color="info" justIcon round simple className="edit" onClick={this.handleEdit.bind(this, key, prop.retentionGroupId)} editModal={this.state.editModal}><Edit /></Button>
-                    //    <Button color="danger" justIcon round simple className="edit" onClick={() => this.onDelete(prop.retentionGroupId)} ><Delete /></Button>
-                    //</div>
+                    btn: <div><Button color="info" justIcon round simple className="edit" onClick={this.handleEdit.bind(this, key, prop.rimappingId)} editModal={this.state.editModal}><Edit /></Button>
+                        <Button color="danger" justIcon round simple className="edit" onClick={() => this.onDelete(prop.rimappingId)} ><Delete /></Button>
+                    </div>
                 };
             })
         });
 
     }
+    onDelete = (id) => {
+        debugger
+        this.state.rimapId = id
+        console.log("rimappid",id);
+        //this.setState({ actnId: id })
+        //if (this.state.actnId == "") {
+        //    swal("", "Please select the Account to delete", "error")
+        //}
+        //else {
+
+        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/DeleteRiMapping?RimappingId=` + this.state.rimapId, {
+            method: 'delete',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(data => {
+            this.onFormSubmit();
+            swal({
+
+                text: " Mapping Deleted Successfully",
+                icon: "success"
+            });
+            });
+       
+        //}
+    }
     render() {
+        const { classes } = this.props;
         return (
             <div>
                 <Card >
@@ -196,7 +272,27 @@ class SearchMapping extends React.Component {
                             
                         </GridContainer>
                         
-                            
+                        <Modal
+                            aria-labelledby="simple-modal-title"
+                            aria-describedby="simple-modal-description"
+                            open={this.state.open}
+                            onClose={this.handleClose}>
+
+                            <div className={classes.paper} id="modal" >
+                                <h4>  <small className="center-text">   </small> </h4>
+                                <Button color="info"
+                                    round
+                                    className={classes.marginRight}
+                                    id="close-bnt"
+                                    //style={searchClose}
+                                    onClick={this.handleClose}>
+                                    &times;
+                                        </Button>
+                                <div id="disp" >
+                                    <DefineMapping SelectedId={this.state.SelectedId} editModal={this.state.editModal} flagUpdate={this.state.flagUpdate} disable={this.state.disable} handleClose={this.handleClose} open={this.state.open} close={this.state.close} disabled={this.state.disabled} btnvisibility={this.state.btnvisibility} displaybtn={!this.state.disabled} visibility={this.state.visibility} rimappingId={this.state.rimappingId}/>
+                                </div>
+                            </div>
+                        </Modal>
                     </CardBody>
                 </Card> 
                 {this.state.showMapping &&
@@ -268,17 +364,17 @@ class SearchMapping extends React.Component {
                                         //    minWidth: 50,
                                         //    resizable: false,
                                         //},
-                                        //{
-                                        //    Header: "Actions",
-                                        //    accessor: "Actions",
+                                        {
+                                            Header: "Action",
+                                            accessor: "btn",
 
-                                        //    ///style: { textAlign: "center" },
-                                        //    ///headerClassName: 'react-table-center'
-                                        //    style: { textAlign: "center" },
-                                        //    headerClassName: 'react-table-center',
-                                        //    minWidth: 50,
-                                        //    resizable: false,
-                                        //}
+                                            ///style: { textAlign: "center" },
+                                            ///headerClassName: 'react-table-center'
+                                            style: { textAlign: "center" },
+                                            headerClassName: 'react-table-center',
+                                            minWidth: 50,
+                                            resizable: false,
+                                        }
 
                                     ]}
                                     defaultPageSize={5}

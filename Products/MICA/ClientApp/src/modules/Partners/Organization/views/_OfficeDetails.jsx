@@ -29,9 +29,10 @@ import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/c
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import officedetails from "assets/img/architecture-and-city.png";
 import Icon from "@material-ui/core/Icon"
-
+import Dropdown from "components/Dropdown/Dropdown.jsx";
 //Module components
 import profileStyles from "./profileStyles.jsx";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 const style = {
     infoText: {
@@ -55,90 +56,57 @@ const style = {
 const OfficeDetails = (props) => {
     const profileData = props;
 
-  
-        const { classes } = props;
 
-        return (
-            <div>
-                <Card>
-                    <CardHeader color="rose" icon>
-                        <CardIcon color="rose">
+    const { classes } = props;
 
-                            <Icon><img id="icon" src={officedetails} /></Icon>
+    return (
+        <div>
+            <Card>
+                <CardHeader color="rose" icon>
+                    <CardIcon color="rose">
 
-                        </CardIcon>
-                        <h4 className={props.cardIconTitle}>
-                            <small> Office Details </small>
-                        </h4>
-                    </CardHeader>
-                    <CardBody>
-                        <GridContainer>
-                            <GridItem xs={12} sm={4}>
-                                <MasterDropdown disabled={props.disabled}labelText="Organization Category" id="OrganizationDTO.orgCategoryId" value={props.OrganizationDTO.orgCategoryId} lstObject={profileData.masterList} filterName='OrgCategory' model="OrganizationDTO" name='orgCategoryId' onChange={(e)=>profileData.SetValue("office",e)} formControlProps={{ fullWidth: true }} />
-                            </GridItem>
-                            <GridItem xs={12} sm={4}>
-                                <MasterDropdown disabled={props.disabled} labelText="Organization Type" id="OrganizationDTO.orgTypeId" value={props.OrganizationDTO.orgTypeId} lstObject={profileData.masterList} filterName='OrgType' model="OrganizationDTO" name='orgTypeId' onChange={(e) => profileData.SetValue("office",e)} formControlProps={{ fullWidth: true }} />
-                            </GridItem>
+                        <Icon><img id="icon" src={officedetails} /></Icon>
 
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    disabled={props.disabled}
-                                   // success={props.orgNameState === "success"}
-                                    //error={props.orgNameState === "error"}
-                                    labelText="Organization Name"
-                                    id="orgname"
-                                    value={props.OrganizationDTO.orgName}
-                                    name="orgName"
-                                    onChange={(e) => profileData.SetValue("name", e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    disabled={props.disabled}
-                                    success={props.orgWebsiteState === "success"}
-                                    error={props.orgWebsiteState === "error"}
-                                    labelText="Web Site"
-                                    id="webSite"
-                                    value={props.OrganizationDTO.orgWebsite}
-                                    name="orgWebsite"
-                                    onChange={(e) => profileData.SetValue("Url", e)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
+                    </CardIcon>
+                    <h4 className={props.cardIconTitle}>
+                        <small> <TranslationContainer translationKey="OfficeDetails" /> </small>
 
-                            <GridItem xs={12} sm={12} md={4}>
-                                <CustomInput
-                                    disabled={props.disabled}
-                                    labelText="Organization Logo"
-                                    id="orgLogo"
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
+                    </h4>
+                </CardHeader>
+                <CardBody>
+                    <GridContainer>
+                        <GridItem xs={12} sm={4} md={3}>
+                            <Dropdown
+                                required={true}
+                                labelText="Organization"
+                                lstObject={profileData.Organizations}
+                                value={profileData.aVOOrgOffice.organizationId}
+                                name='organizationId'
+                                onChange={(e) => profileData.handleOrgdata(e)}
+                                formControlProps={{ fullWidth: true }}
+                            />
+                        </GridItem>
+                        <GridItem xs={12} sm={4} md={3}>
+                            <Dropdown
+                                required={true}
+                                labelText="ReportingToOffice"
+                                lstObject={profileData.Office}
+                                value={profileData.aVOOrgOffice.officeReportingOfficeId}
+                                name='officeReportingOfficeId'
+                                onChange={(e) => profileData.handleOfficeData(e)}
+                                formControlProps={{ fullWidth: true }}
+                            />
+                        </GridItem>
 
-                            
-
-                            <GridItem xs={12} sm={4}>
-                               
-                            </GridItem>
+                    </GridContainer>
+                </CardBody>
+            </Card>
 
 
 
-                        </GridContainer>
-                    </CardBody>
-                </Card>
-
-
-
-            </div>
-        );
-    }
+        </div>
+    );
+}
 
 
 OfficeDetails.propTypes = {

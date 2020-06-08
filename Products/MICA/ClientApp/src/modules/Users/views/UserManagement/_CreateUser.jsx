@@ -190,7 +190,7 @@ const CreateUser = (props) => {
                     error={props.panNoState}
                     labelText="PAN"
                     id="panNo"
-                    required={true}
+                    //required={true}
                     value={props.UserData.panNo}
                     name="panNo"
                     onChange={(e) => props.SetValue("pan", e)}

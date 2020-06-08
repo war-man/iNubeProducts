@@ -11,6 +11,7 @@ export const TRANSLATIONS = {
         Settings: 'Settings',
         Dashboard: 'Home',
         Uwdashboard: 'Home',
+        AVODashboard: 'Home',
         UserDashboard: 'Home',
         Products: 'Products',
         Configure: 'Configure',
@@ -133,7 +134,7 @@ export const TRANSLATIONS = {
         Provision: "Provisioning Customer",
         Dynamic: "Dynamic Screen",
         DynamicForm: "Dynamic Form",
-        ModifyCOAMapping: "Modify / View COA Mapping",
+        ModifyCOAMapping: "Modify/View COA Mapping",
         Rating: "Rating",
         RateParameters: 'Rate Parameters',
         RateConfig: 'Rate Config',
@@ -157,6 +158,7 @@ export const TRANSLATIONS = {
         ModifyMapping: 'Modify Mapping',
         DynamicProduct: 'Dynamic Product',
         DynamicProd: 'Dynamic Product',
+
         //Dynamic Reports
         DynamicReports: 'Reports',
         ReportConfig: 'Report Config',
@@ -164,6 +166,7 @@ export const TRANSLATIONS = {
         ReportUpdate: 'Report Update',
 
         ClaimInbox: 'Claim Inbox',
+
         //Allocation
         Allocation: "Allocation",
         AllocationConfig: 'Allocation Config',
@@ -172,6 +175,73 @@ export const TRANSLATIONS = {
         EllustrationConfig: 'Ellustration Config',
         FileUpload: 'File Upload',
         Upload: 'Upload',
+
+        EllustrationConfig: 'Ellustration Config',
+        DynamicProd: 'Dynamic Product',
+
+        //Dynamic Reports
+        ReportConfig: 'Report Config',
+
+        //Wrapper API
+        WrapperAPI: 'Wrapper API',
+        ClaimInbox: 'Claim Inbox',
+
+        //SearchLog
+        SearchLog: 'Search Log',
+
+        //AVO menus
+        NewBusiness: "Customer Advisory",
+        Lead: "Lead",
+        Prospect: "Prospect",
+        Quotation: "Quotation",
+        Proposal: "Proposal",
+        Recruitment: "Recruitment",
+        CreateSuspect: "Create Suspect",
+        CreateProspect: "Create Prospect",
+        Tasks: "Tasks",
+        Search: "Search",
+        Hierarchy: "Hierarchy",
+        //Office: "Office",
+        Organization: "Organization",
+        Onboarding: "Onboarding",
+        Contract: "Contract",
+        Channel: "Channel",
+        Target: "Target & Performance",
+        CustomerAdvisory: "Customer Advisory",
+        Sales: "Sales",
+        Remuneration: "Remuneration",
+        People: "People",
+        Movement: "Movement",
+        //SearchOrganization: 'View / Modify Organization',
+        //SearchOffice: 'View / Modify Office',
+        CreatePosition: 'Create Position',
+        Designation: 'Designation',
+
+        //Inbox
+        Inbox: 'Inbox',
+
+        //Contract
+        ManageMaster: "Manage Master",
+        TargetMapping: "Target Mapping",
+        GenerateContract: "Generate Contract",
+        RecruitmentUpload: "Recruitment Upload",
+        SearchContract: "Search Contract",
+        OrgHierarchy: 'Organization Hierarchy',
+        OffHierarchy: 'Office Hierarchy',
+        PPLHierarchy: 'People Hierarchy',
+        CreatePosition: 'Create Position',
+        Designation: 'Designation',
+        SearchPeople: 'Search People',
+
+        //Renumeration
+        Remuneration: "Renumeration",
+        CreateCommission: "Create Commission",
+        CreateAllowances: "Create Allowances",
+        CreateIncentive: "Create Incentive",
+        ViewAllowances: "View Allowances",
+        ViewCommission: "View Commission",
+        ViewIncentive: "View Incentive",
+
         /**********************************************************************/
 
         //UserManagement
@@ -243,7 +313,7 @@ export const TRANSLATIONS = {
         SearchRole: "Search Role",
         RoleName: "Role Name",
         CreateRole: "Create Role",
-        NameofaRole: "Name of a Role",
+        RoleName: "Role Name",
         AssignPrivilegestotheRole: "Assign Privileges to the Role",
 
         //sweetalert
@@ -286,6 +356,8 @@ export const TRANSLATIONS = {
         ClaimsDashboard: "Claims Dashboard",
         ProductDashboard: "Product Dashboard",
         CDAccountDashboard: "CD Account Dashboard",
+        ListofReports: "List of Reports",
+        ListofDashboards: "List of Dashboards",
         ClickHeretoView: "Click Here to View",
         Month: "Month",
         Year: "Year",
@@ -391,6 +463,7 @@ export const TRANSLATIONS = {
         AssignedProducts: 'Assigned Products',
         Active: 'Partner is Activated',
         Deactive: 'Partner is Deactivated',
+        AgentNo: 'Agent No',
 
         //Server messages
         PartnerCodeMsg: 'Partner Code already Exist',
@@ -734,6 +807,45 @@ export const TRANSLATIONS = {
         Percentage: 'Percentage',
         Limit: 'Limit',
         ListOfRetention: 'List Of Retention',
+        //Traslation for Accounting 
+        AccountType: 'Account Type',
+        AccountName: 'Account Name',
+        AccountDescription: 'Account Description',
+        AccountCode: 'Account Code',
+        CreateAccount: 'Create Account',
+        Customer: 'Customer',
+        MICAAccountCode: 'MICA Account Code',
+        MICAAccountType: 'MICA Account Type',
+        MICAAccountName: 'MICA Account Name',
+        CustomerAccountCode: 'Customer Account Code',
+        CustomerAccountName: 'Customer Account Name',
+        CustomerAccountDescription: 'Customer Account Description',
+        CustomerName: 'Customer Name',
+        JournalEntryConfiguration: 'Journal Entry Configuration',
+        JournalName: 'Journal Name',
+        AcccountName: 'Acccount Name',
+        Module: 'Module',
+        Event: 'Event',
+        TypeofTransaction: 'Type of Transaction',
+        Value: 'Value',
+        Description: 'Description',
+        Add: 'Add',
+        SubledgerReferences: 'Subledger References',
+        SubledgerModule: 'Subledger Module',
+        ADDSUBLEDGERREFERENCE: 'ADD SUBLEDGER REFERENCE',
+        JournalEntryGrid: 'Journal Entry Grid',
+        Reports: 'Reports',
+        ViewBy: 'View By',
+        AccountDetails: 'Account Details',
+        DateFrom: 'Date From',
+        DateTo: 'Date To',
+        ChartofAccountMapping: 'CHART OF ACCOUNT MAPPING',
+        Date: 'Date',
+        TxnDescription: 'Txn Description',
+        Reference: 'Reference',
+        AmountDebit: 'Amount Debit(Dr).',
+        AmountCredit: 'Amount Credit(Cr).',
+        Currency: 'Currency',
 
         /***********************************************************************/
         //Dynamic Reports
@@ -760,12 +872,22 @@ export const TRANSLATIONS = {
 
         ProposalDetails: 'Proposal Details',
         ProposalNumber: 'Proposal Number',
-        SearchProposal:'Search Proposal',
+        SearchProposal: 'Search Proposal',
 
-        ApplicationCancel:'Application Cancellation',
+        ApplicationCancel: 'Application Cancellation',
 
         //ClaimEnquiry
-        IntimationDate: 'Intimation Date'
+        IntimationDate: 'Intimation Date',
+
+        /************************************************************************/
+        //AVO
+        //office
+        ReportingToOffice: ' Reporting To Office',
+        ProfileDetails: 'Profile Details',
+        Office: 'Office',
+        Position: 'Position',
+        PositionCreation: 'Position Creation',
+        /************************************************************************/
 
     },
     hi_IN: TRANSLATIONS_HN,

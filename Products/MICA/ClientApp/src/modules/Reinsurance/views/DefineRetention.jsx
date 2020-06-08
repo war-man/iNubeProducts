@@ -57,7 +57,10 @@ class DefineRetentions extends React.Component {
             editModal: false,
             retentionGroupNameState: false,
             percentageState: false,
-            limitState:false,
+            limitState: false,
+            showPercentage: false,
+            showlimit: false,
+            showperwithlimit: false,
             Retention: {
                 retentionGroupId: 0,
                 retentionGroupName: "",
@@ -75,14 +78,14 @@ class DefineRetentions extends React.Component {
                 modifiedDate: null,
                 modifiedBy: null,
                 isActive: null,
-                
+               
                 tblRimappingDetail: [],
             },
             DuplicateRetention: {
                 retentionGroupId: 0,
             },
         };
-        
+       
     }
     onInputChange = (type, evt) => {
         let name = evt.target.name;
@@ -98,7 +101,43 @@ class DefineRetentions extends React.Component {
         Data[evt.target.name] = evt.target.value;
         this.setState({ Data });
         console.log("Data", this.state.Retention)
-        
+        debugger
+        if (evt.target.value == "20") {
+            this.state.showPercentage = true;
+            this.state.showlimit= false;
+            this.state.showperwithlimit = false;
+            //this.setState({showPercentage})
+            //const { showConditionFrom } = this.state.showConditionFrom;
+            //this.setState({ showConditionFrom: !showConditionFrom });
+            //const { showCondition } = this.state.showCondition;
+            //this.setState({ showCondition: !showCondition, [event.target.name]: event.target.value });
+
+        }
+        else if (evt.target.value == "21") {
+            this.state.showPercentage = false;
+            this.state.showlimit = true;
+            this.state.showperwithlimit = false;
+            //this.setState({ showlimit })
+           
+            //const { showTable } = this.state.showTable;
+            //this.setState({ showTable: !showTable });
+            //const { showColumn } = this.state.showColumn;
+            //this.setState({ showColumn: !showColumn, [event.target.name]: event.target.value });
+
+        }
+        else if (evt.target.value == "22") {
+            this.state.showPercentage = true;
+            this.state.showlimit = true;
+            this.state.showperwithlimit = false;
+            //this.setState({ showPercentage })
+            //this.setState({ showlimit })
+
+            //const { showTable } = this.state.showTable;
+            //this.setState({ showTable: !showTable });
+            //const { showColumn } = this.state.showColumn;
+            //this.setState({ showColumn: !showColumn, [event.target.name]: event.target.value });
+
+        }
     }
     reset = () => {
         //Setting States After Saving
@@ -111,7 +150,7 @@ class DefineRetentions extends React.Component {
         ParticipantDto['limit'] = "";
         ParticipantDto['effectiveFrom'] = "";
         ParticipantDto['effectiveTo'] = "";
-        
+       
 
         this.setState({ ParticipantDto });
 
@@ -171,8 +210,8 @@ class DefineRetentions extends React.Component {
         }
         else {
             var mm = (today.getMonth() + 1);
-        } 
-        
+        }
+       
  
         //var date = today.getFullYear() + '-' + (today.getMonth() + 1)+ '-' + today.getDate();
         var date = dt + '/' + mm + '/' + today.getFullYear();
@@ -195,7 +234,7 @@ class DefineRetentions extends React.Component {
        
 
         console.log("submit", this.state.Retention);
-        if (this.state.Retention.year != "" && this.state.Retention.businessTypeId != "" && this.state.Retention.retentionGroupName != "" && this.state.Retention.retentionLogicId != "" && this.state.Retention.percentage != "" && this.state.Retention.limit != "" && this.state.Retention.effectiveFrom != "" && this.state.Retention.effectiveTo != "") {
+        if (this.state.Retention.year != "" && this.state.Retention.businessTypeId != "" && this.state.Retention.retentionGroupName != "" && this.state.Retention.retentionLogicId != "" &&  this.state.Retention.effectiveFrom != "" && this.state.Retention.effectiveTo != "") {
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveRetentionData`, {
             method: 'POST',
             headers: {
@@ -204,7 +243,7 @@ class DefineRetentions extends React.Component {
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
             body: JSON.stringify(this.state.Retention)
-            }).then(response => response.json()) 
+            }).then(response => response.json())
                 .then(data => {
                     if (data.status == 2) {
                         debugger;
@@ -256,13 +295,17 @@ class DefineRetentions extends React.Component {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    //'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                 },
             })
-                .then(response => response.json())
+                .then(response => response.json(this.state.Retention))
                 .then(data => {
+
+                    console.log(data, 'Mydata222')
+                    //data.effectiveFrom = new Date(this.state.Retention.effectiveFrom).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                    //data.effectiveTo = new Date(this.state.Retention.effectiveTo).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
                     this.setState({ Retention: data });
-                    console.log(data,'Mydata')
+                    console.log(data,'Mydata111')
                     console.log("Accountss data: ", data);
 
                 });
@@ -277,13 +320,16 @@ class DefineRetentions extends React.Component {
             }).then(response => response.json())
                 .then(data => {
                     this.setState({ Retention: data });
-                    console.log(data, 'MyData1');
+                    this.state.Retention.effectiveFrom = new Date(data.effectiveFrom).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                    this.state.Retention.effectiveTo = new Date(data.effectiveTo).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                    this.setState({});
+                    console.log(data, 'MyData111222');
                     console.log(this.state.Retention, 'Data1');
                 });
 
         }
 
-        
+       
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/MastertypeData`, {
             method: 'get',
             headers: {
@@ -374,7 +420,7 @@ class DefineRetentions extends React.Component {
         return (
             <div>
                 <Card >
-                    
+                   
                         <CardHeader color="rose" icon>
                             <CardIcon color="rose">
                             <Icon><img id="icon" src={retention} /></Icon>
@@ -385,7 +431,7 @@ class DefineRetentions extends React.Component {
                                 </h4>
                             }
                         </CardHeader>
-                    
+                   
                     <CardBody>
                      
                         <GridContainer>
@@ -442,35 +488,40 @@ class DefineRetentions extends React.Component {
                                     formControlProps={{ fullWidth: true }} />
 
                             </GridItem>
-
-                            <GridItem xs={12} sm={12} md={3}>
-                                <CustomInput
-                                    labelText="Percentage"
-                                    id="ContactNo"
-                                    required={true}
-                                    error={this.state.percentageState}
-                                    value={this.state.Retention.percentage}
-                                    name='percentage'
-                                    onChange={(evt) => this.onInputChange("numeric", evt)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}>
-                                <CustomInput
-                                    labelText="Limit"
-                                    id="ContactNo"
-                                    required={true}
-                                    error={this.state.limitState}
-                                    value={this.state.Retention.limit}
-                                    name='limit'
-                                    onChange={(evt) => this.onInputChange("numeric", evt)}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
+                           
+                            {this.state.showPercentage &&
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <CustomInput
+                                        labelText="Percentage"
+                                        id="ContactNo"
+                                        required={true}
+                                        error={this.state.percentageState}
+                                        value={this.state.Retention.percentage}
+                                        name='percentage'
+                                        onChange={(evt) => this.onInputChange("numeric", evt)}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </GridItem>
+                            }
+                            {this.state.showlimit &&
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <CustomInput
+                                        labelText="Limit"
+                                        id="ContactNo"
+                                        required={true}
+                                        error={this.state.limitState}
+                                        value={this.state.Retention.limit}
+                                        name='limit'
+                                        onChange={(evt) => this.onInputChange("numeric", evt)}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </GridItem>
+                            }
+                           
                             <GridItem xs={12} sm={12} md={3}>
                                 <CustomDatetime
                                     //  success={this.state.billingStartDateState === "success"}

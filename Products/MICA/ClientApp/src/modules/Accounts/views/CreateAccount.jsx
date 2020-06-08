@@ -28,7 +28,7 @@ import ExportToExcel from "components/ExcelExport/ExcelPlugin/ExportToExcel.jsx"
 //
 import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
-
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 const style = {
     infoText: {
@@ -404,7 +404,7 @@ class CreateAccount extends React.Component {
                                                 </CardIcon>
                                                 {
                                                     <h4 >
-                                                        <small> Create Account </small>
+                                                    <small><TranslationContainer translationKey="CreateAccount" />  </small>
                                                     </h4>
                                                 }
                                             </CardHeader>
@@ -421,7 +421,7 @@ class CreateAccount extends React.Component {
                                                             htmlFor="simple-select"
                                                             className={classes.selectLabel}
                                                         >
-                                                            Account Type
+                                                            <TranslationContainer translationKey="AccountType" />
                           </InputLabel>
                                                         <Select
                                                             value={this.state.fields.accountTypeId}
@@ -457,7 +457,7 @@ class CreateAccount extends React.Component {
                                                 </GridItem>
                                                 <GridItem xs={12} sm={12} md={3}>
                                                     <CustomInput
-                                                        labelText="Account Name"
+                                                        labelText="AccountName"
                                                         id="accountName"
                                                         disabled={!this.state.flagEdit}
                                                         required={true}
@@ -473,7 +473,7 @@ class CreateAccount extends React.Component {
                                                 </GridItem>
                                                 <GridItem xs={12} sm={12} md={3}>
                                                     <CustomInput
-                                                        labelText="Account Description"
+                                                        labelText="AccountDescription"
                                                         id="accountDesc"
                                                         disabled={!this.state.flagEdit}
                                                         required={true}
@@ -489,7 +489,7 @@ class CreateAccount extends React.Component {
                                                 </GridItem>
                                                 <GridItem xs={12} sm={12} md={3}>
                                                     <CustomInput
-                                                        labelText="Account Code"
+                                                        labelText="AccountCode"
                                                         id="accountCode"
                                                         disabled={true}
                                                         error={this.state.accountCodeState}
@@ -507,7 +507,7 @@ class CreateAccount extends React.Component {
                                                     <GridItem xs={5} sm={3} md={3} lg={1}>
                                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                                             <Button id="button-search-partner" color="info" round onClick={() => this.onFormSubmit()}>
-                                                                SAVE
+                                                            <TranslationContainer translationKey="Save" />
                           </Button>
                                                         </Animated>
                                                     </GridItem>
@@ -517,7 +517,7 @@ class CreateAccount extends React.Component {
                                                     <GridItem xs={5} sm={3} md={3} lg={1}>
                                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                                             <Button id="button-search-partner" color="info" round onClick={() => this.onFormUpdate()}>
-                                                                UPDATE
+                                                            <TranslationContainer translationKey="Update" />
                           </Button>
                                                         </Animated>
                                                     </GridItem>

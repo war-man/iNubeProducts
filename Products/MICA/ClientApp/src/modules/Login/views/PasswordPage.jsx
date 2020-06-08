@@ -214,14 +214,15 @@ class PasswordPage extends React.Component {
         let UserState = this.state.loginDTO;
         UserState['Username'] = UserName;
         UserState['Password'] = PassWord;
-        UserState['ProductType'] = LoginConfig.ProductType;
+        //UserState['ProductType'] = LoginConfig.ProductType;	
+        UserState['ProductType'] = localStorage.getItem('ProductType');
         //UserState['ServerType'] = this.props.location.state.servertype;
         UserState['envId'] = this.state.environmentvalue;
         this.setState({ UserState });
 
         console.log("userstate: ", UserState)
         fetch(`${LoginConfig.LoginUrl}/api/Login/Authenticate`, {
-            //fetch('https://localhost:44367/api/Login/Authenticate', {
+            //fetch(`https://localhost:44351//api/Login/Authenticate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
@@ -261,6 +262,15 @@ class PasswordPage extends React.Component {
                     localStorage.setItem('locale', 'en_US');
                     localStorage.setItem('partnerId', data.partnerId);
                     localStorage.setItem('organizationId', data.organizationId);
+                    console.log("EnvironmentValue: ", this.state.environmentvalue);
+
+                    let url = this.state.environment.filter(e => e.mID === this.state.environmentvalue)[0].url === undefined
+                        ? []
+                        : this.state.environment.filter((e) => e.mID === this.state.environmentvalue)[0].url
+                        ;
+                    localStorage.setItem('ConfigUrl', url);
+                    console.log("EnvironmentValue: ", url);
+                    console.log("EnvironmentValue: ", localStorage.getItem('ConfigUrl'));
 
                     if (data.profileImage == "" || data.profileImage == null || data.profileImage == undefined) {
                         localStorage.setItem('profilepicture', image);

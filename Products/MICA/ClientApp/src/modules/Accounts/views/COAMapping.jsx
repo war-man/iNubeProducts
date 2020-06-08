@@ -29,7 +29,7 @@ import $ from 'jquery';
 import validationPage from "./ValidationPage.jsx";
 import ExportToExcel from "components/ExcelExport/ExcelPlugin/ExportToExcel.jsx";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
-
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 
 const style = {
@@ -512,7 +512,7 @@ class COAMapping extends React.Component {
                                     </CardIcon>
                                     {
                                         <h4 >
-                                            <small> COA Mapping </small>
+                                        <small><TranslationContainer translationKey="COAMapping" /> </small>
                                         </h4>
                                     }
                                 </CardHeader>
@@ -529,7 +529,7 @@ class COAMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                Customer
+                                                <TranslationContainer translationKey="Customer" />
                           </InputLabel>
                                             <Select
                                                 value={this.state.fields.Customer}
@@ -572,7 +572,7 @@ class COAMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                MICA Account Code
+                                                <TranslationContainer translationKey="MICAAccountCode" />
                           </InputLabel>
                                             <Select
                                                 value={this.state.fields.MicaAccountCode}
@@ -608,7 +608,7 @@ class COAMapping extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomInput
-                                            labelText="MICA Account Type"
+                                            labelText="MICAAccountType"
                                             id="AccountType"
                                             disabled={true}
                                             value={this.state.fields.AccountType}
@@ -621,7 +621,7 @@ class COAMapping extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomInput
-                                            labelText="MICA Account Name"
+                                            labelText="MICAAccountName"
                                             id="Account"
                                             disabled={true}
                                             value={this.state.fields.Account}
@@ -635,7 +635,7 @@ class COAMapping extends React.Component {
 
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomInput
-                                            labelText="Customer Account Code"
+                                            labelText="CustomerAccountCode"
                                             id="AccountCode"
                                             required={true}
                                             disabled={!this.state.flagEdit}
@@ -651,7 +651,7 @@ class COAMapping extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomInput
-                                            labelText="Customer Account Name"
+                                            labelText="CustomerAccountName"
                                             id="AccountName"
                                             required={true}
                                             disabled={!this.state.flagEdit}
@@ -668,7 +668,7 @@ class COAMapping extends React.Component {
 
                                     <GridItem xs={12} sm={12} md={6}>
                                         <CustomInput
-                                            labelText="Customer Account Description"
+                                            labelText="CustomerAccountDescription"
                                             id="AccountDesc"
                                             required={true}
                                             disabled={!this.state.flagEdit}
@@ -689,7 +689,7 @@ class COAMapping extends React.Component {
                                         <GridItem xs={5} sm={3} md={3} lg={1}>
                                             <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                                 <Button id="button-search-partner" color="info" round onClick={() => this.onFormSubmit()}>
-                                                    SAVE
+                                                <TranslationContainer translationKey="Save" />
                           </Button>
                                             </Animated>
                                         </GridItem>
@@ -700,7 +700,7 @@ class COAMapping extends React.Component {
                                         <GridItem xs={5} sm={3} md={3} lg={1}>
                                             <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                                 <Button id="button-search-partner" color="info" round onClick={() => this.onFormUpdate()}>
-                                                    UPDATE
+                                                <TranslationContainer translationKey="Update" />
                           </Button>
                                             </Animated>
                                         </GridItem>

@@ -52,10 +52,12 @@ class DefineMapping extends React.Component {
         super(props);
         this.state = {
             DefineDTOTableData: [],
+            flag: true,
+            flagUpdate: false,
             DefineDTOData: [{
                 "treatyCode": "",
                 "treatydescription": "",
-                "treatygroup": "",
+                "treatyGroupId": "",
                 "treatyType": "",
                 "sequence": ""
             }],
@@ -68,14 +70,15 @@ class DefineMapping extends React.Component {
             mappingDetail: [
                 {
                     retentionGroupId: "",
+                    treatyGroupId:"",
                     sequenceNo: ""
                 }
             ],
             Mapping: {
                 year: "",
                 level: "",
-                LobProductCover: "",
-                //RetentionGroup: "",
+                lobProductCover: "",
+                retensionGroupId: "",
                 //SequenceNumber:""
                 TblRimappingDetail: []
                 
@@ -115,7 +118,7 @@ class DefineMapping extends React.Component {
                 this.AddTreatyTable();
                 console.log("Descripion1 ", this.state.treatydata, this.state.DefineDTOData);
             });
-          let c = this.state.DefineDTOData[0].treatyCode;
+        let c = this.state.DefineDTOData[index].treatyCode;
         debugger;
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/TreatyCode?treatyId=` + c, {
             method: 'get',
@@ -197,6 +200,41 @@ class DefineMapping extends React.Component {
     }
 
     componentDidMount() {
+        const props = this.props;
+        console.log("porpsdat", props)
+        console.log(props.rimappingId, 'DataID');
+        if (props.rimappingId != undefined) {
+            console.log(this.props.flagEdit, 'FlagEditProps');
+            this.setState({ flag: false, flagUpdate: this.props.flagUpdate });
+            //fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyRImapping?rimappingId=` + this.props.rimappingId, {
+            //    method: 'PUT',
+            //    headers: {
+            //        'Accept': 'application/json',
+            //        'Content-Type': 'application/json',
+            //        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            //    },
+            //})
+            //    .then(response => response.json())
+            //    .then(data => {
+            //        this.setState({ Mapping: data });
+            //        console.log(data, 'Mydata')
+            //        console.log("Accountss data: ", data);
+            //    });
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetRImappingBYId?RImappingById=` + this.props.rimappingId, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                //  body: JSON.stringify(this.state.SearchParticipant)
+            }).then(response => response.json())
+                .then(data => {
+                    this.setState({ Mapping: data });
+                    console.log(data, 'MyData1');
+                    console.log(this.state.Mapping, 'Data1');
+                });
+        }
 
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/TreatyName`, {
             method: 'get',
@@ -304,7 +342,7 @@ class DefineMapping extends React.Component {
     }
     onFormSubmit = (evt) => {
 
-        this.state.Mapping.TblRimappingDetail = this.state.mappingDetail;
+        this.state.Mapping.TblRimappingDetail = this.state.DefineDTOData;
         this.setState({});
         console.log("submit", this.state.Mapping);
 
@@ -356,9 +394,15 @@ class DefineMapping extends React.Component {
         TreatyDetails['DefineDTOData'] = this.state.DefineDTOData.concat({ treatyGroup: "", businessTypeId: "" });
 
         this.setState({ TreatyDetails });
+        let mappingdeatils = this.state;
+        mappingdeatils['DefineDTOData'] = this.state.DefineDTOData.concat({
+            "treatyGroupId": "",
+        });
+        this.setState({ mappingdeatils });
         //console.log("treatydata", this.state.treatydata[index].treatyGroup, this.state.treatydata);
         console.log("add defination", this.state.DefineDTOData);
         this.AddTreatyTable();
+
         // }
     }
     onInputBranchesChange = (event, index) => {
@@ -397,7 +441,7 @@ class DefineMapping extends React.Component {
                     SNo: key + 1,
                     Treatycode: <MasterDropdown labelText="TreatyCode" id="MaritalStatus" lstObject={this.state.treatymasterlist} filterName='TratyGroup' value={this.state.DefineDTOData[key].treatyCode} name='treatyCode' onChange={(e) => this.settreatyGroupId(e, key)} formControlProps={{ fullWidth: true }} />,
                     TreatyDescription: <CustomInput labelText="TreatyDescription" value={this.state.DefineDTOData[key].treatydescription} name="treatydescription" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
-                    Treatygroup: <MasterDropdown labelText="TreatyGroup" filterName='TreatyGroupName' lstObject={this.state.treatycodemasterlist} value={this.state.DefineDTOData[key].treatygroup} name='treatygroup' formControlProps={{ fullWidth: true }} onChange={(e) => this.settreatygroup(e, key)} />,
+                    Treatygroup: <MasterDropdown labelText="TreatyGroup" filterName='TreatyGroupName' lstObject={this.state.treatycodemasterlist} value={this.state.DefineDTOData[key].treatyGroupId} name='treatyGroupId' formControlProps={{ fullWidth: true }} onChange={(e) => this.settreatygroup(e, key)} />,
                     Treatytype: <CustomInput labelText="TreatyType" value={this.state.DefineDTOData[key].treatyType} name="treatyType" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
                     Sequence: <CustomInput labelText="Sequence" value={this.state.DefineDTOData[key].Sequence} name="Sequence" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
                     Actions: < div > <Button justIcon round simple color="info" className="add" onClick={(e) => this.AddTreatyRecord(e, key)} ><Add /> </Button >
@@ -407,6 +451,29 @@ class DefineMapping extends React.Component {
             })
         });
         //}
+    }
+    onFormModify = (id) => {
+        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyRImapping?rimappingId=` + this.props.rimappingId, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(this.state.Mapping)
+        }) //.then(response => response.json())
+            .then(data => {
+                console.log("data456", data);
+                this.setState({ treatyDTO: data });
+                swal({
+
+                    text: "Data Updated Successfully",
+                    icon: "success"
+                });
+                console.log("Treaty data:", this.state.Mapping);
+            });
+        //let flageUpdate = this.state.flagUpdate
+        //this.setState({ flageUpdate:true})
     }
 
     render() {
@@ -419,7 +486,7 @@ class DefineMapping extends React.Component {
                         </CardIcon>
                         {
                             <h4 >
-                                <small><TranslationContainer translationKey="  RIMappingSequencing " /></small>
+                                <small><TranslationContainer translationKey="RI Mapping & Sequencing" /></small>
                             </h4>
                         }
                     </CardHeader>
@@ -457,8 +524,8 @@ class DefineMapping extends React.Component {
                                 <CustomInput
                                     labelText="LOBProductCover"
                                     id="ContactNo"
-                                    value={this.state.Mapping.LobProductCover}
-                                    name='LobProductCover'
+                                    value={this.state.Mapping.lobProductCover}
+                                    name='lobProductCover'
                                     onChange={this.onInputChange}
                                     formControlProps={{
                                         fullWidth: true
@@ -493,9 +560,9 @@ class DefineMapping extends React.Component {
                                     id="ddlstatus"
                                     lstObject={this.state.masterList}
                                     filterName='TratyCode'
-                                    value={this.state.mappingDetail[0].retentionGroupId}
-                                    name='retentionGroupId'
-                                    onChange={this.onInputChange1}
+                                    value={this.state.Mapping.retensionGroupId}
+                                    name='retensionGroupId'
+                                    onChange={this.onInputChange}
                                     formControlProps={{ fullWidth: true }} />
 
                             </GridItem>
@@ -660,12 +727,19 @@ class DefineMapping extends React.Component {
 
 
                         <GridContainer justify="center">
-
-                            <GridItem >
-                                <Button id="button-search-partner" color="info" round onClick={() => this.onFormSubmit()}>
-                                    Save
+                            {this.state.flag &&
+                                <GridItem >
+                                    <Button id="button-search-partner" color="info" round onClick={() => this.onFormSubmit()}>
+                                        Save
                                     </Button>
-                            </GridItem>
+                                </GridItem>}
+
+                            {this.state.flagUpdate &&
+                                <GridItem >
+                                <center>
+                                    <Button color="info" round onClick={this.onFormModify}><TranslationContainer translationKey="Update" /></Button>
+                                </center>
+                            </GridItem>}
                         </GridContainer>
                     </CardBody>
                 </Card>

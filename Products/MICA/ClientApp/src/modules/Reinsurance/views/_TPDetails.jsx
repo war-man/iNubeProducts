@@ -27,30 +27,24 @@ const TPDetails = (props) => {
     console.log("my props", props);
 
     return (
-        <div >
-<Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-        <Card  className="TPDetails">
-            <CardBody>
 
-                                <div >
-                                    <Wizard id="proWiz"  
-                                    validate
-                                    steps={[
-                                        { stepName: <TranslationContainer translationKey="AddTreatyGroup" />, stepComponent: AddTreaty, stepId: "addtreaty", stepData: props },
-                                        { stepName: <TranslationContainer translationKey="AddTreatyParticipant" />, stepComponent: AddParticipant, stepId: "addparticipant", stepData: props },
-                                    ]}
-                                    title=""
-                                    subtitle=""
-                                // onLoadData={props.ProductDTO}
-                                    />
-                                </div>
-               
-               
-            </CardBody>
-
-            </Card>
-            </Animated>
-        </div>
+        <GridContainer justify="center">
+            <GridItem xs={12} sm={12} md={12}>
+                <Card className="TPDetails">
+                    <CardBody>
+                        <Wizard id="proWiz"
+                            validate
+                            steps={[
+                                { stepName: <TranslationContainer translationKey="AddTreatyGroup" />, stepComponent: AddTreaty, stepId: "addtreaty", stepData: props },
+                                { stepName: <TranslationContainer translationKey="AddTreatyParticipant" />, stepComponent: AddParticipant, stepId: "addparticipant", stepData: props },
+                            ]}
+                            title=""
+                            subtitle=""
+                        />
+                    </CardBody>
+                </Card>
+            </GridItem>
+        </GridContainer>
     );
 
 }

@@ -74,7 +74,7 @@ class ParticipantMaster extends React.Component {
             flagUpdate: false,
             editModal: false,
             TreatytableData: [],
-            selectedValue:false,
+            selectedValue: false,
             Brokerflag: false,
             //BrokerRadioSelect: "",
             BrokerRadio: "",
@@ -87,7 +87,7 @@ class ParticipantMaster extends React.Component {
             branchCodeState: false,
             branchNameState: false,
             BranchSpocEmailIDState: false,
-            address3State:false,
+            address3State: false,
             Branchesdto: [{
                 branchCode: " ",
                 branchName: " ",
@@ -104,12 +104,12 @@ class ParticipantMaster extends React.Component {
                 contactNo: "",
                 address1: "",
                 address2: "",
-                address3:"",
+                address3: "",
                 stateId: "",
                 countryId: "",
                 districtId: "",
                 cityId: "",
-                pincode:"",
+                pincode: "",
                 isActive: "",
                 disabled: false,
                 tblParticipantBranch: [],
@@ -146,7 +146,7 @@ class ParticipantMaster extends React.Component {
     }
 
     handleRadioChange = (event) => {
-
+        debugger
         let value = event.target.value;
         this.state.BrokerRadio = event.target.value;
         this.state.ParticipantMaster.participantTypeId = event.target.value;
@@ -161,17 +161,17 @@ class ParticipantMaster extends React.Component {
         console.log("brokerValue", this.state.Brokerflag);
     }
     handleRadioOnChange = (event) => {
-        debugger 
+        debugger
         let value = event.target.value;
         //this.state.BrokerRadio = event.target.value;
-        this.state.ParticipantMaster.isActive = event.target.value;      
+        this.state.ParticipantMaster.isActive = event.target.value;
         this.setState({ value });
         console.log("isActive", this.state.ParticipantMaster.isActive);
         if (this.state.ParticipantMaster.isActive == 'Y') {
-            this.setState({ selectedValue:false});
+            this.setState({ selectedValue: false });
         }
         if (this.state.ParticipantMaster.isActive == 'N') {
-            this.setState({ selectedValue:true});
+            this.setState({ selectedValue: true });
         }
         console.log("isActive1", this.state.ParticipantMaster.isActive);
     }
@@ -181,7 +181,7 @@ class ParticipantMaster extends React.Component {
     ViewPDFFun = () => {
         this.setState({ open: true });
     }
-    onInputChange = (type,evt) => {
+    onInputChange = (type, evt) => {
         let name = evt.target.name;
         const Data = this.state.ParticipantMaster;
         Data[evt.target.name] = evt.target.value;
@@ -214,7 +214,7 @@ class ParticipantMaster extends React.Component {
         //status['accountDescState'] = "";
         //this.setState({ status });
     }
-    onInputBranchesChange = (type,event,index) => {
+    onInputBranchesChange = (type, event, index) => {
         event.preventDefault();
         let name = event.target.name;
         let value = event.target.value;
@@ -241,18 +241,18 @@ class ParticipantMaster extends React.Component {
             'contactNo': this.state.ParticipantMaster.contactNo,
             'address1': this.state.ParticipantMaster.address1,
             'address2': this.state.ParticipantMaster.address2,
-            'address3':this.state.ParticipantMaster.address3,
+            'address3': this.state.ParticipantMaster.address3,
             'stateId': this.state.addressDTO.StateId,
             'countryId': this.state.addressDTO.CountryId,
             'districtId': this.state.addressDTO.DistrictId,
             'cityId': this.state.addressDTO.CityId,
-            'pincode':this.state.addressDTO.PincodeId,
+            'pincode': this.state.addressDTO.PincodeId,
             'isActive': this.state.ParticipantMaster.isActive,
             'tblParticipantBranch': this.state.Branchesdto
         };
         //this.state.ParticipantMaster.branches = [... this.state.ParticipantMaster, ...this.state.Branchesdto]
         console.log("Participantdata", this.state.ParticipantMaster)
-        if (this.state.ParticipantMaster.participantCode != "" && this.state.ParticipantMaster.participantName != "" && this.state.ParticipantMaster.contactNo != "" && this.state.ParticipantMaster.address1 != "" && this.state.addressDTO.CountryId != "" && this.state.addressDTO.StateId != "" && this.state.addressDTO.CityId != "" && this.state.addressDTO.DistrictId!="") {
+        if (this.state.ParticipantMaster.participantCode != "" && this.state.ParticipantMaster.participantName != "" && this.state.ParticipantMaster.contactNo != "" && this.state.ParticipantMaster.address1 != "" && this.state.addressDTO.CountryId != "" && this.state.addressDTO.StateId != "" && this.state.addressDTO.CityId != "" && this.state.addressDTO.DistrictId != "") {
             fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveParticipentData`, {
                 method: 'POST',
                 headers: {
@@ -271,7 +271,7 @@ class ParticipantMaster extends React.Component {
                             //   title: "Perfect",
 
                             //text: data.responseMessage,
-                              text: "Participant Successfully Created",
+                            text: "Participant Successfully Created",
                             icon: "success"
                         });
                         this.setState({ errormessage: false });
@@ -293,17 +293,17 @@ class ParticipantMaster extends React.Component {
                     }
                 });
         }
-     else {
-    swal("", "Some fields are missing", "error");
-    this.setState({ errormessage: true });
-}
+        else {
+            swal("", "Some fields are missing", "error");
+            this.setState({ errormessage: true });
+        }
 
     }
     AddTreatyRecord = (event, index) => {
-        
+
         //if (this.state.treatydata[index].treatyGroup !== "" && this.state.treatydata[index].businessTypeId !== "" ) {
         let TreatyDetails = this.state;
-        TreatyDetails['Branchesdto'] = this.state.Branchesdto.concat({ 
+        TreatyDetails['Branchesdto'] = this.state.Branchesdto.concat({
             branchCode: "",
             branchName: "",
             BranchSpocEmailID: ""
@@ -340,12 +340,12 @@ class ParticipantMaster extends React.Component {
                     BranchCode: <CustomInput labelText="BranchCode" id="BusinessTypeText"
                         required={true}
                         error={this.state.branchCodeState}
-                        value={this.state.Branchesdto[key].branchCode} 
+                        value={this.state.Branchesdto[key].branchCode}
                         name='branchCode'
-                        onChange={(event) => this.onInputBranchesChange("numeric",event,key)}
-                        //onChange={(evt)=>this.onInputBranchesChange(evt,key)} 
+                        onChange={(event) => this.onInputBranchesChange("numeric", event, key)}
+                        //onChange={(evt)=>this.onInputBranchesChange(evt,key)}
                         formControlProps={{ fullWidth: true }
-                    } />,
+                        } />,
                     BranchName: <CustomInput labelText="BranchName" id="BusinessTypeText"
                         required={true}
                         error={this.state.branchNameState}
@@ -354,7 +354,7 @@ class ParticipantMaster extends React.Component {
                         onChange={(event) => this.onInputBranchesChange("alphaNumeric", event, key)}
                         //onChange={(event) => this.onInputBranchesChange(event, key)}
                         formControlProps={{ fullWidth: true }
-                    } />,
+                        } />,
                     BranchSpocEmailID: <CustomInput labelText="EmailDetails" id="BusinessTypeText"
                         required={true}
                         error={this.state.BranchSpocEmailIDState}
@@ -362,7 +362,7 @@ class ParticipantMaster extends React.Component {
                         name='BranchSpocEmailID'
                         onChange={(event) => this.onInputBranchesChange("alphaNumeric", event, key)}
                         formControlProps={{ fullWidth: true }
-                    } />,
+                        } />,
 
                     Action: <div><Button justIcon round simple color="info" className="add" onClick={(e) => this.AddTreatyRecord(e, key)} ><Add /> </Button >
                         <Button justIcon round simple color="danger" className="remove" onClick={(e) => this.deleteTreatyRecord(e, key)} ><Delete /> </Button >
@@ -393,7 +393,7 @@ class ParticipantMaster extends React.Component {
     //}
     GetLocation = (type, event) => {
         debugger
-       // this.SetValue(type, event);
+        // this.SetValue(type, event);
         let reg = this.state.addressDTO;
         let name = event.target.name;
         let value = event.target.value;
@@ -411,8 +411,8 @@ class ParticipantMaster extends React.Component {
                     this.setState({ [stateName + "State"]: false });
                 } else {
                     this.setState({ [stateName + "State"]: true });
-                    }
-                    break;
+                }
+                break;
             case "string":
                 if (validationPage.verifyName(evt.target.value)) {
                     this.setState({ [stateName + "State"]: false });
@@ -434,6 +434,13 @@ class ParticipantMaster extends React.Component {
                     this.setState({ [stateName + "State"]: true });
                 }
                 break;
+            case "phoneno":
+                if (validationPage.verifyPhoneNum(evt.target.value)) {
+                    this.setState({ [stateName + "State"]: false });
+                } else {
+                    this.setState({ [stateName + "State"]: true });
+                }
+                break;
             default:
                 break;
         }
@@ -448,7 +455,7 @@ class ParticipantMaster extends React.Component {
             console.log(this.props.flagEdit, 'FlagEditProps');
             this.setState({ flag: false, flagUpdate: this.props.flagUpdate });
             fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyParticipant?ParticipantMasterId=` + this.props.participantMasterId, {
-            //fetch(`http://localhost:5000/api/ReInsurance/ModifyParticipant?ParticipantMasterId=` + this.props.participantMasterId, {
+                //fetch(`http://localhost:5000/api/ReInsurance/ModifyParticipant?ParticipantMasterId=` + this.props.participantMasterId, {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -463,9 +470,9 @@ class ParticipantMaster extends React.Component {
                     console.log("Accountss data: ", data);
 
                 });
-            
+
             fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetParticipantBYId?participantmasterID=` + this.props.participantMasterId, {
-            //fetch(`http://localhost:5000/api/ReInsurance/GetParticipantBYId?participantmasterID=` + this.props.participantMasterId, {
+                //fetch(`http://localhost:5000/api/ReInsurance/GetParticipantBYId?participantmasterID=` + this.props.participantMasterId, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -475,8 +482,26 @@ class ParticipantMaster extends React.Component {
                 body: JSON.stringify(this.state.SearchParticipant)
             }).then(response => response.json())
                 .then(data => {
-               
-                   // this.state.ParticipantMaster = data;
+                    this.state.addressDTO.CountryId = data.countryId;
+                    this.state.addressDTO.StateId = data.stateId;
+                    this.state.addressDTO.DistrictId = data.districtId;
+                    this.state.addressDTO.CityId = data.cityId;
+                    this.state.addressDTO.PincodeId = data.pincode;
+
+                    this.GetLocationService('State', data.countryId);
+                    this.GetLocationService('District', data.stateId);
+                    this.GetLocationService('City', data.districtId);
+                    this.GetLocationService('Pincode', data.cityId);
+                    debugger;
+                    let pid = data.participantTypeId;
+                    let gid = pid.toString();
+                    data.participantTypeId=gid
+
+
+                    console.log('gid1',gid)
+                    //var num = Number(this.state.ParticipantMaster.participantTypeId);
+                    // num = this.state.ParticipantMaster.participantTypeId
+                    // this.state.ParticipantMaster = data;
                     this.setState({ ParticipantMaster: data });
                     console.log(data, 'MyData2');
                     console.log(this.state.ParticipantMaster, 'Data1');
@@ -508,6 +533,8 @@ class ParticipantMaster extends React.Component {
         //this.setState({ flageUpdate:true})
     }
     GetLocationService = (type, pID) => {
+
+        console.log("type and id", type, pID);
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetLocation?locationType=` + type + `&parentID=` + pID, {
             method: 'GET',
             headers: {
@@ -544,7 +571,7 @@ class ParticipantMaster extends React.Component {
 
                     <CardBody>
                         <GridContainer xs={12} justify="center">
-                           
+
                             <GridItem xs={12} sm={12} md={5}>
 
                                 <div style={{ marginTop: "24px" }}>
@@ -579,7 +606,7 @@ class ParticipantMaster extends React.Component {
                                             label: classes.label
                                         }}
                                         label={<TranslationContainer translationKey="Reinsurer" />}
-                            />
+                                    />
 
                                     <FormControlLabel
                                         control={
@@ -609,8 +636,8 @@ class ParticipantMaster extends React.Component {
                                         classes={{
                                             label: classes.label
                                         }}
-                                        label={< TranslationContainer translationKey="Broker"/>}
-                                />
+                                        label={< TranslationContainer translationKey="Broker" />}
+                                    />
                                 </div>
                             </GridItem>
                         </GridContainer>
@@ -624,7 +651,7 @@ class ParticipantMaster extends React.Component {
                                         error={this.state.participantCodeState}
                                         value={this.state.ParticipantMaster.participantCode}
                                         name='participantCode'
-                                       onChange= {(evt) => this.onInputChange("alphaNumeric", evt)}
+                                        onChange={(evt) => this.onInputChange("alphaNumeric", evt)}
                                         //onChange={this.onInputChange}
                                         formControlProps={{
                                             fullWidth: true
@@ -653,7 +680,7 @@ class ParticipantMaster extends React.Component {
                                         error={this.state.contactNoState}
                                         value={this.state.ParticipantMaster.contactNo}
                                         name='contactNo'
-                                        onChange={(evt) => this.onInputChange("numeric", evt)}
+                                        onChange={(evt) => this.onInputChange("phoneno", evt)}
                                         formControlProps={{
                                             fullWidth: true
                                         }}
@@ -684,122 +711,123 @@ class ParticipantMaster extends React.Component {
                                 </Button>
                                             <GridContainer xl={10} justify="center">
                                                 <GridItem xs={10}>
-                                                   
-            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                <ReactTable
+
+                                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                        <ReactTable
                                                             StyleType={true}
-                                                            title={<TranslationContainer translationKey="BranchDetails" />} 
-                    data={this.state.TreatytableData}
+                                                            //title={<TranslationContainer translationKey="BranchDetails" />}
+                                                            title={"Branch Details"}
+                                                            data={this.state.TreatytableData}
 
-                    filterable
+                                                            filterable
 
-                    getTdProps={() => ({
+                                                            getTdProps={() => ({
 
-                        style: {
+                                                                style: {
 
-                            overflow: 'visible',
+                                                                    overflow: 'visible',
 
-                        },
+                                                                },
 
-                    })}
+                                                            })}
 
-                    columns={[
+                                                            columns={[
 
-                        {
+                                                                {
 
-                            Header: "SNo",
+                                                                    Header: "SNo",
 
-                            accessor: "id",
+                                                                    accessor: "id",
 
-                            headerClassName: 'react-table-center',
+                                                                    headerClassName: 'react-table-center',
 
-                            style: { textAlign: "center" },
+                                                                    style: { textAlign: "center" },
 
-                            minWidth: 20,
+                                                                    minWidth: 20,
 
-                            sortable: false,
+                                                                    sortable: false,
 
 
 
-                            //  filterable: false
+                                                                    //  filterable: false
 
-                        },
+                                                                },
 
-                        {
+                                                                {
 
 
 
-                            Header: "BranchCode",
+                                                                    Header: "BranchCode",
 
-                            accessor: "BranchCode",
+                                                                    accessor: "BranchCode",
 
-                            minWidth: 40,
+                                                                    minWidth: 40,
 
-                            // style: { textAlign: "center" },
+                                                                    // style: { textAlign: "center" },
 
-                            headerClassName: 'react-table-center'
+                                                                    headerClassName: 'react-table-center'
 
-                        },
+                                                                },
 
-                        {
+                                                                {
 
-                            Header: "BranchName",
+                                                                    Header: "BranchName",
 
-                            accessor: "BranchName",
+                                                                    accessor: "BranchName",
 
-                            minWidth: 40,
+                                                                    minWidth: 40,
 
-                            style: { textAlign: "center" },
+                                                                    style: { textAlign: "center" },
 
-                            headerClassName: 'react-table-center'
+                                                                    headerClassName: 'react-table-center'
 
-                        },
-                        {
+                                                                },
+                                                                {
 
-                            Header: "EmailDetails",
+                                                                    Header: "EmailDetails",
 
-                            accessor: "BranchSpocEmailID",
+                                                                    accessor: "BranchSpocEmailID",
 
-                            minWidth: 40,
+                                                                    minWidth: 40,
 
-                            style: { textAlign: "center" },
+                                                                    style: { textAlign: "center" },
 
-                            headerClassName: 'react-table-center'
+                                                                    headerClassName: 'react-table-center'
 
-                        },
-                        {
+                                                                },
+                                                                {
 
-                            Header: "Action",
+                                                                    Header: "Action",
 
-                            accessor: "Action",
+                                                                    accessor: "Action",
 
-                            minWidth: 40,
+                                                                    minWidth: 40,
 
-                            style: { textAlign: "center" },
+                                                                    style: { textAlign: "center" },
 
-                            headerClassName: 'react-table-center'
+                                                                    headerClassName: 'react-table-center'
 
-                        },
+                                                                },
 
-                    ]}
+                                                            ]}
 
-                    defaultPageSize={5}
+                                                            defaultPageSize={5}
 
-                    //pageSize={([TreatyData.TreatytableData.length + 2] < 5) ? [TreatyData.TreatytableData.length + 2] : 5}
+                                                            //pageSize={([TreatyData.TreatytableData.length + 2] < 5) ? [TreatyData.TreatytableData.length + 2] : 5}
 
-                    showPaginationTop={false}
+                                                            showPaginationTop={false}
 
-                    showPaginationBottom
+                                                            showPaginationBottom
 
-                    className="-striped -highlight long-tab"
+                                                            className="-striped -highlight long-tab"
 
-                //loading={this.state.newdata}
+                                                        //loading={this.state.newdata}
 
 
 
-                //   loadingText="coming"
+                                                        //   loadingText="coming"
 
-                />
+                                                        />
 
 
 
@@ -807,7 +835,7 @@ class ParticipantMaster extends React.Component {
 
 
 
-            </Animated>
+                                                    </Animated>
 
 
 
@@ -818,9 +846,9 @@ class ParticipantMaster extends React.Component {
                                             </GridContainer>
                                             <GridContainer justify="center">
                                                 <GridItem >
-                                                   
+
                                                     <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.handleClose()}> Ok  </Button>
-                                                       
+
                                                 </GridItem>
                                             </GridContainer>
                                         </div>
@@ -843,7 +871,7 @@ class ParticipantMaster extends React.Component {
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
                                         labelText="Address2"
-                                        id="address2" 
+                                        id="address2"
                                         error={this.state.address2State}
                                         value={this.state.ParticipantMaster.address2}
                                         name='address2'
@@ -869,21 +897,21 @@ class ParticipantMaster extends React.Component {
                                 <GridItem xs={12} sm={12} md={3}>
                                     <Dropdown labelText="Country" required={true} disabled={this.state.disabled} lstObject={this.state.LocationDTO.Country} value={this.state.addressDTO.CountryId} name="CountryId" onChange={(e) => this.GetLocation('State', e)} formControlProps={{ fullWidth: true }} />
                                 </GridItem>
-                              
+
                                 <GridItem xs={12} sm={12} md={3}>
                                     <Dropdown labelText="State" required={true} disabled={this.state.disabled} lstObject={this.state.LocationDTO.State} value={this.state.addressDTO.StateId} name="StateId" onChange={(e) => this.GetLocation('District', e)} formControlProps={{ fullWidth: true }} />
                                 </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}>
-                                    <Dropdown labelText="District" required={true}  disabled={this.state.disabled} lstObject={this.state.LocationDTO.District} value={this.state.addressDTO.DistrictId} name="DistrictId" onChange={(e) => this.GetLocation('City', e)} formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <Dropdown labelText="District" required={true} disabled={this.state.disabled} lstObject={this.state.LocationDTO.District} value={this.state.addressDTO.DistrictId} name="DistrictId" onChange={(e) => this.GetLocation('City', e)} formControlProps={{ fullWidth: true }} />
+                                </GridItem>
 
-                                    <GridItem xs={12} sm={12} md={3}>
+                                <GridItem xs={12} sm={12} md={3}>
                                     <Dropdown labelText="City" required={true} disabled={this.state.disabled} lstObject={this.state.LocationDTO.City} value={this.state.addressDTO.CityId} name="CityId" onChange={(e) => this.GetLocation('Pincode', e)} formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
+                                </GridItem>
 
-                                    <GridItem xs={12} sm={12} md={3}>
-                                        <Dropdown labelText="Pincode" disabled={this.state.disabled} lstObject={this.state.LocationDTO.Pincode} value={this.state.addressDTO.PincodeId} name="PincodeId" onChange={(e) => this.GetLocation('', e)} formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <Dropdown labelText="Pincode" disabled={this.state.disabled} lstObject={this.state.LocationDTO.Pincode} value={this.state.addressDTO.PincodeId} name="PincodeId" onChange={(e) => this.GetLocation('', e)} formControlProps={{ fullWidth: true }} />
+                                </GridItem>
                                 <GridItem style={{ marginTop: "1.5rem" }} xs={12} sm={12} md={6}>
                                     <label style={{ marginRight: "1rem" }}><TranslationContainer translationKey="Status" /></label>
                                     <FormControlLabel
@@ -893,7 +921,7 @@ class ParticipantMaster extends React.Component {
                                                 onChange={this.handleRadioOnChange}
                                                 //disabled={this.props.viewdisable}
                                                 value={'Y'}
-                                                
+
                                                 name="radio button demo"
                                                 aria-label="B"
                                                 icon={
@@ -915,7 +943,7 @@ class ParticipantMaster extends React.Component {
                                         classes={{
                                             label: classes.label
                                         }}
-                                        label= {<TranslationContainer translationKey="Active"/>}
+                                        label={<TranslationContainer translationKey="Active" />}
                                     />
 
                                     <FormControlLabel
@@ -946,30 +974,30 @@ class ParticipantMaster extends React.Component {
                                         classes={{
                                             label: classes.label
                                         }}
-                                        label= {<TranslationContainer translationKey="Inactive" />}
+                                        label={<TranslationContainer translationKey="Inactive" />}
                                     />
                                 </GridItem>
-                                    
 
 
-                                
-                                
 
 
-                               
+
+
+
+
 
 
                                 {this.state.flag &&
                                     <GridContainer justify="center">
                                         <GridItem xs={3} sm={3} md={3}>
-                                        <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormSubmit()}> <TranslationContainer translationKey="Save" />  </Button>
+                                            <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormSubmit()}> <TranslationContainer translationKey="Save" />  </Button>
                                         </GridItem>
 
                                     </GridContainer>}
                                 {this.state.flagUpdate &&
                                     <GridContainer justify="center">
                                         <GridItem xs={3} sm={3} md={3}>
-                                        <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormModify()} > <TranslationContainer translationKey="Update" /> </Button>
+                                            <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormModify()} > <TranslationContainer translationKey="Update" /> </Button>
 
                                         </GridItem>
 
@@ -1173,7 +1201,7 @@ class ParticipantMaster extends React.Component {
 
                                             </GridContainer>
                                             <GridContainer justify="center">
-                                                <GridItem >  
+                                                <GridItem >
                                                     <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.handleClose()} > Ok  </Button>
                                                 </GridItem>
                                             </GridContainer>
@@ -1244,7 +1272,7 @@ class ParticipantMaster extends React.Component {
                                     <FormControlLabel
                                         control={
                                             <Radio
-                                                checked={this.state.ParticipantMaster.isActive  === 'Y'}
+                                                checked={this.state.ParticipantMaster.isActive === 'Y'}
                                                 onChange={this.handleRadioOnChange}
                                                 //disabled={this.props.viewdisable}
                                                 value={'Y'}
@@ -1275,7 +1303,7 @@ class ParticipantMaster extends React.Component {
                                     <FormControlLabel
                                         control={
                                             <Radio
-                                                checked={this.state.ParticipantMaster.isActive  === 'N'}
+                                                checked={this.state.ParticipantMaster.isActive === 'N'}
                                                 onChange={this.handleRadioOnChange}
                                                 //disabled={this.props.viewdisable}
                                                 value={'N'}
@@ -1317,14 +1345,14 @@ class ParticipantMaster extends React.Component {
                                 {this.state.flag &&
                                     <GridContainer justify="center">
                                         <GridItem xs={3} sm={3} md={3}>
-                                        <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormSubmit()}> <TranslationContainer translationKey="Save" />  </Button>
+                                            <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormSubmit()}> <TranslationContainer translationKey="Save" />  </Button>
                                         </GridItem>
 
                                     </GridContainer>}
                                 {this.state.flagUpdate &&
                                     <GridContainer justify="center">
                                         <GridItem xs={3} sm={3} md={3}>
-                                        <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormModify()} > <TranslationContainer translationKey="Update" />  </Button>
+                                            <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.onFormModify()} > <TranslationContainer translationKey="Update" />  </Button>
 
                                         </GridItem>
 
@@ -1333,7 +1361,7 @@ class ParticipantMaster extends React.Component {
                             </GridContainer>
 
 
-                          
+
                         }
                     </CardBody>
                 </Card>

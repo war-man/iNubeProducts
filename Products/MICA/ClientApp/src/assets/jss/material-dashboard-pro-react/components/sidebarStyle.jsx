@@ -10,7 +10,7 @@ import {
     defaultFont,
     primaryColor,
     primaryBoxShadow,
-    infoColor, 
+    infoColor,
     lightBlue,
     successColor,
     warningColor,
@@ -35,7 +35,7 @@ const sidebarStyle = theme => ({
         top: "0",
         bottom: "0",
         left: "0",
-        top: "3.85rem",
+        //top: "3.85rem",
         zIndex: "1032",
         transitionProperty: "top, bottom, width",
         transitionDuration: ".2s, .2s, .35s",
@@ -107,7 +107,7 @@ const sidebarStyle = theme => ({
         width: drawerMiniWidth + "px!important"
     },
     logo: {
-        padding: "10px 0px",
+        //padding: "10px 0px",
         margin: "0",
         display: "block",
         position: "relative",
@@ -176,7 +176,7 @@ const sidebarStyle = theme => ({
         top: "2px"
     },
     imgNormal: {
-
+        //marginLeft: "2.7rem",
         width: "150px",
         verticalAlign: "middle",
         border: "0"
@@ -226,13 +226,23 @@ const sidebarStyle = theme => ({
         paddingLeft: "10px",
         paddingRight: "10px",
         transition: "all 300ms linear",
-        margin: "5px 15px 0", borderRadius: "3px",
+        margin: "5px 15px 0",
+        borderRadius: "3px",
         position: "relative",
         display: "block",
         padding: "5px 15px",
-        backgroundColor: "transparent", ...defaultFont, width: "auto", "&:hover": { outline: "none", backgroundColor: "rgba(200, 200, 200, 0.2)", boxShadow: "none" }, "&,&:hover,&:focus": { color: "inherit" }
+        backgroundColor: "transparent",
+        ...defaultFont,
+        width: "auto",
+        "&:hover": {
+            outline: "none",
+            backgroundColor: "rgba(200, 200, 200, 0.2)",
+            boxShadow: "none"
+        },
+        "&,&:hover,&:focus": {
+            color: "inherit"
+        }
     },
-
     itemIcon: {
         color: "inherit",
         width: "30px",
@@ -280,10 +290,10 @@ const sidebarStyle = theme => ({
     },
     collapseList: {
         marginTop: "0",
-        marginBottom: "10px",	
-        backgroundColor: "#2727276b"	
-      		
-       
+        marginBottom: "10px",
+        backgroundColor: "#2727276b"
+
+
     },
     collapseItem: {
         position: "relative",

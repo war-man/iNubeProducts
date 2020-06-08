@@ -39,7 +39,8 @@ import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import ExportToExcel from "components/ExcelExport/ExcelPlugin/ExportToExcel.jsx";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
-import data_Not_found from "assets/img/data-not-found-new.png"
+import data_Not_found from "assets/img/data-not-found-new.png";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 const style = {
     infoText: {
         fontWeight: "300",
@@ -358,7 +359,7 @@ class Reports extends React.Component {
                                     </CardIcon>
                                     {
                                         <h4 >
-                                            <small> Reports </small>
+                                            <small> <TranslationContainer translationKey="Reports" /> </small>
                                         </h4>
                                     }
                                 </CardHeader>
@@ -367,7 +368,7 @@ class Reports extends React.Component {
                                     <GridContainer>
                                         <GridItem xs={12} sm={12} md={8}>
                                             <div style={{ marginTop: "24px" }}>
-                                                <h5> <small> View By </small> </h5>
+                                                <h5> <small> <TranslationContainer translationKey="ViewBy" /> </small> </h5>
                                                 {
                                                     <FormControlLabel
                                                         control={
@@ -497,12 +498,12 @@ class Reports extends React.Component {
                                     </GridContainer>
                                     <GridContainer>
                                         <GridItem xs={4} sm={4} md={4}>
-                                            <CustomDatetime labelText="Date From" id='dtEventDate' name='FromDate' onChange={(evt) => this.onDateChange('datetime', 'FromDate', evt)} Futuredatevalidate={true} value={this.state.fields.FromDate} required={true} formControlProps={{ fullWidth: true }} />
+                                            <CustomDatetime labelText="DateFrom" id='dtEventDate' name='FromDate' onChange={(evt) => this.onDateChange('datetime', 'FromDate', evt)} Futuredatevalidate={true} value={this.state.fields.FromDate} required={true} formControlProps={{ fullWidth: true }} />
                                             {this.state.errormessage && (this.state.fields.FromDate == "") ? <p className="error">*Required field cannot be left blank</p> : null}
                                         </GridItem>
 
                                         <GridItem xs={4} sm={4} md={4}>
-                                            <CustomDatetime labelText="Date To" id='dtEventDate' name='ToDate' onChange={(evt) => this.onDateChange('datetime', 'ToDate', evt)} Futuredatevalidate={true} value={this.state.fields.ToDate} required={true} formControlProps={{ fullWidth: true }} />
+                                            <CustomDatetime labelText="DateTo" id='dtEventDate' name='ToDate' onChange={(evt) => this.onDateChange('datetime', 'ToDate', evt)} Futuredatevalidate={true} value={this.state.fields.ToDate} required={true} formControlProps={{ fullWidth: true }} />
                                             {this.state.errormessage && (this.state.fields.ToDate == "") ? <p className="error">*Required field cannot be left blank</p> : null}
                                         </GridItem>
                                     </GridContainer>
@@ -519,7 +520,7 @@ class Reports extends React.Component {
                                                         htmlFor="simple-select"
                                                         className={classes.selectLabel}
                                                     >
-                                                        Customer Name
+                                                    <TranslationContainer translationKey="CustomerName" />
                           </InputLabel>
                                                     <Select
                                                         value={this.state.fields.Customer}
@@ -561,7 +562,7 @@ class Reports extends React.Component {
                                                         htmlFor="simple-select"
                                                         className={classes.selectLabel}
                                                     >
-                                                        Account Type
+                                                    <TranslationContainer translationKey="AccountType" />
                           </InputLabel>
                                                     <Select
                                                         value={this.state.fields.AccountTypeId}
@@ -597,7 +598,7 @@ class Reports extends React.Component {
 
                                             <GridItem xs={12} sm={12} md={3}>
                                                 <CustomInput
-                                                    labelText="Account Code"
+                                                    labelText="AccountCode"
                                                     id="AccountCode"
                                                     value={this.state.fields.AccountCode}
                                                     name='AccountCode'
@@ -625,7 +626,7 @@ class Reports extends React.Component {
                                             <GridItem xs={5} sm={3} md={3} lg={1}>
                                                 <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
                                                     <Button id="top-bnt" color="info" round onClick={() => this.onFormSubmit()}>
-                                                        Search
+                                                    <TranslationContainer translationKey="Search" />
                           </Button>
                                                 </Animated>
                                             </GridItem>
@@ -654,7 +655,7 @@ class Reports extends React.Component {
 
                                                                 },
                                                                 {
-                                                                    Header: "MICA Account Code",
+                                                                    Header: "MICAAccountCode",
                                                                     accessor: "AccountCode",
                                                                     minWidth: 20,
                                                                     style: { textAlign: "center" },
@@ -663,7 +664,7 @@ class Reports extends React.Component {
 
                                                                 },
                                                                 {
-                                                                    Header: "MICA Account Name",
+                                                                    Header: "MICAAccountName",
                                                                     accessor: "AccountName",
                                                                     minWidth: 30,
                                                                     style: { textAlign: "center" },
@@ -671,7 +672,7 @@ class Reports extends React.Component {
                                                                     resizable: false,
                                                                 },
                                                                 {
-                                                                    Header: "Customer Account Code",
+                                                                    Header: "CustomerAccountCode",
                                                                     accessor: "CustomerCode",
                                                                     minWidth: 30,
                                                                     style: { textAlign: "center" },
@@ -679,7 +680,7 @@ class Reports extends React.Component {
                                                                     resizable: false,
                                                                 },
                                                                 {
-                                                                    Header: "Customer Account Name",
+                                                                    Header: "CustomerAccountName",
                                                                     accessor: "CustomerAcName",
                                                                     minWidth: 30,
                                                                     style: { textAlign: "center" },
@@ -687,7 +688,7 @@ class Reports extends React.Component {
                                                                     resizable: false,
                                                                 },
                                                                 {
-                                                                    Header: "Account Type",
+                                                                    Header: "AccountType",
                                                                     accessor: "AccountType",
                                                                     minWidth: 30,
                                                                     style: { textAlign: "center" },
@@ -695,7 +696,7 @@ class Reports extends React.Component {
                                                                     resizable: false,
                                                                 },
                                                                 {
-                                                                    Header: " Txn Description",
+                                                                    Header: "TxnDescription",
                                                                     accessor: "TxnDescription",
                                                                     minWidth: 30,
                                                                     style: { textAlign: "center" },
@@ -704,7 +705,7 @@ class Reports extends React.Component {
                                                                 },
 
                                                                 {
-                                                                    Header: " Reference",
+                                                                    Header: "Reference",
                                                                     accessor: "References",
                                                                     minWidth: 30,
                                                                     style: { textAlign: "center" },
@@ -721,7 +722,7 @@ class Reports extends React.Component {
                                                                 //},
 
                                                                 {
-                                                                    Header: "Amount Debit(Dr).",
+                                                                    Header: "AmountDebit",
                                                                     accessor: "DrAmount",
                                                                     minWidth: 20,
                                                                     //style: { textAlign: "center" },
@@ -730,7 +731,7 @@ class Reports extends React.Component {
                                                                     resizable: false,
                                                                 },
                                                                 {
-                                                                    Header: "Amount Credit(Cr).",
+                                                                    Header: "AmountCredit",
                                                                     accessor: "CrAmount",
                                                                     minWidth: 20,
                                                                     //style: { textAlign: "center" },

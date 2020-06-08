@@ -36,6 +36,7 @@ import Button from "components/CustomButtons/Button.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import headerStyle from "assets/jss/material-dashboard-pro-react/components/headerStyle.jsx";
 import LangSwitchContainer from 'components/Translation/LangSwitch/LangSwitchContainer';
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 //import SimpleDialogDemo from 'components/SpeedDial/SlideUp.jsx';
 import { relativeTimeRounding } from "moment";
 import IconButton from '@material-ui/core/IconButton';
@@ -64,6 +65,12 @@ const useStyles = withStyles({
         color: blue[600],
     },
 });
+
+const StyleButton = withStyles({
+    root: {
+        color: localStorage.getItem('primaryColor')
+    }
+})(MUIButton);
 
 function Header12({ ...props }) {
     function makeBrand() {
@@ -103,12 +110,12 @@ function Header12({ ...props }) {
     return (
         <AppBar className={classes.appBar + appBarClasses}>
             <Toolbar className={classes.container}>
-                <div className="logoClasses">
-                    <a /*href="https://micav0002.azurewebsites.net/dashboard/home"*/ className="logoNormal">
+                {/* <div className="logoClasses">
+                       <a href="https://micav0002.azurewebsites.net/dashboard/home" className="logoNormal">
                         <img src={logotext} alt="logo" className="imgNormal" width="150" height="240" />
                     </a>
                 </div>
-                {/* <Hidden smDown implementation="css">
+                 <Hidden smDown implementation="css">
                     <div className={sidebarMinimize}>
                         {props.miniActive ? (
                             <Button
@@ -138,7 +145,7 @@ function Header12({ ...props }) {
                     </Button>
                 </div>
                 <div>
-                    <MUIButton variant="outlined" color="primary" style={{ top: "-5px" }} onClick={props.handleopenDialog}>Switch Role</MUIButton>
+                    <StyleButton variant="outlined" id="switch-role" onClick={props.handleopenDialog}><TranslationContainer translationKey="Switchrole" /></StyleButton>
                     <Dialog style={{ textAlign: "center" }} onClose={props.handlecloseDialog} aria-labelledby="simple-dialog-title" open={props.opendialog} >
                         <DialogTitle id="simple-dialog-title"> <b>Switch Role</b> </DialogTitle>
                         <DialogContent dividers>
@@ -170,6 +177,7 @@ function Header12({ ...props }) {
                 <Hidden mdUp implementation="css">
                     <Button
                         round
+                        id="Toggles"
                         className={classes.appResponsive}
                         color="white"
                         justIcon

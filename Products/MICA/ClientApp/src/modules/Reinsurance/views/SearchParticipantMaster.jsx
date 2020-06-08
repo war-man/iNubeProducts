@@ -208,6 +208,7 @@ componentDidMount() {
                
                 return {
                     id: key,
+                    participantTypeId: prop.participantTypeId,
                     participantType: prop.participantType,
                     participantCode: prop.participantCode,
                     participantName: prop.participantName,
@@ -357,7 +358,7 @@ componentDidMount() {
                             <ReactTable
 
                             
-                            title={<TranslationContainer translationKey="Participantdetails" />}
+                            title={"Participant Details"}
                             data={this.state.newdata}
                                 filterable
                                 columns={[

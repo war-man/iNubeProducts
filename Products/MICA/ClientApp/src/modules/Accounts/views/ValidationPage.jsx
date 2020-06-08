@@ -34,6 +34,16 @@
             return true;
         }
         return false;
+    },
+
+    verifyPhoneNum(value) {
+        //var nameRex = /^((\+){1}91) {1}[1-9]{1}[0-9]{9}$/;
+        var nameRex = /^[0-9]{10}$/;
+        if (nameRex.test(value)) {
+            //console.log("data coming name", value);
+            return true;
+        }
+        return false;
     }
 }
 export default validationPage;
