@@ -6358,10 +6358,16 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 if(DateDifference == 15)
                 {
 
-                    ProposalCancelDTO proposalCancel = new ProposalCancelDTO();
-                    proposalCancel.ProposalNumber = item.ProposalNumber;
-                    proposalCancel.Remarks = "Auto - Proposal Cancellation";
-                    var callProposalCancel = await ProposalCancellation(proposalCancel,apiContext);
+                    var ProposalCancel = new ExpandoObject();
+                    AddProperty(ProposalCancel, "ProposalNumber", item.ProposalNumber);
+                    AddProperty(ProposalCancel, "Remarks", "Auto - Proposal Cancellation");
+                    //ProposalCancelDTO proposalCancel = new ProposalCancelDTO();
+                    //proposalCancel.ProposalNumber = item.ProposalNumber;
+                    //proposalCancel.Remarks = "Auto - Proposal Cancellation";
+
+                    var dynamicProposalCancel = JsonConvert.SerializeObject(ProposalCancel);
+                    var proposalDto = JsonConvert.DeserializeObject<dynamic>(dynamicProposalCancel.ToString());
+                    var callProposalCancel = await ProposalCancellation(proposalDto, apiContext);
                     continue;
                 }
 
