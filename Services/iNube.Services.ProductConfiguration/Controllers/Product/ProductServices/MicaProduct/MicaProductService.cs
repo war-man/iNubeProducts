@@ -343,7 +343,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 {
                     return new DocumentResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx file" };
                 }
-                
+
                 bool sms = true;
                 bool email = true;
 
@@ -683,7 +683,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                         .Include(add => add.TblInsurableRcbdetails)
                         .Include("TblInsurableRcbdetails.TblInsurableChildRcbdetails")
                        .Include("TblInsurableRcbdetails.TblCoverRcbdetails")
-                       .Include(add=>add.TblProductBasicConfiguration)
+                       .Include(add => add.TblProductBasicConfiguration)
                     .Include("TblInsurableRcbdetails.TblCoverRcbdetails.TblCoverChildRcbdetails")
 
                         .FirstOrDefault();
@@ -806,7 +806,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 item.mID = item.InputId;
                 item.disable = item.IsReqired;
                 item.mIsRequired = item.IsReqired;
-                item.selectedValue = (item.IsReqired==true) ? item.InputId.ToString() : "0";
+                item.selectedValue = (item.IsReqired == true) ? item.InputId.ToString() : "0";
                 item.mValue = masProductMaster.FirstOrDefault(p => p.Key == item.InputId).Value;
 
             }
@@ -817,7 +817,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 // item.mIsRequired = item.IsReqired;
                 //item.mValue = masProductMaster.FirstOrDefault(p => p.Key == item.InputId).Value;
 
-                foreach (var s in item.InsurableChildRcbdetail) 
+                foreach (var s in item.InsurableChildRcbdetail)
                 {
                     s.mID = s.InputId;
                     s.disable = s.IsReqired;
@@ -918,7 +918,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             if (FieldType != "")
             {
-                var Id=_context.TblmasPccommonTypes.SingleOrDefault(s=>s.Value==FieldType).CommonTypeId;
+                var Id = _context.TblmasPccommonTypes.SingleOrDefault(s => s.Value == FieldType).CommonTypeId;
                 var rcbDetails = (from rc in _context.TblProductRcbdetails
                                   join p in _context.TblmasProductMaster on rc.InputId equals p.ProductMasterId
                                   where rc.ProductId == ProductId && rc.InputType == type && p.TypeCode == Id.ToString()
@@ -1478,10 +1478,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //    var tblProduct = _context.TblProducts.FirstOrDefault(item => item.ProductCode == productCode);
 
             //var value = "";
-                              //string connectionString = "Server=inubepeg.database.windows.net;Database=MICAProd;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
-                              //using (SqlConnection connection = new SqlConnection(connectionString))
-                              //{
-                              //    // string queryForCol = "select * from[PC].[tblBenifitRangeDetails] where BenifitID IN(select BenefitID from[PC].[tblProductBenefits] where CoverID IN(select CoverID from[PC].[tblProductCovers] where insurableitemId IN(select InsurableItemId from[PC].[tblProductInsurableItems]where productid ="+ tblProduct.ProductId + ")))";
+            //string connectionString = "Server=inubepeg.database.windows.net;Database=MICAProd;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
+            //using (SqlConnection connection = new SqlConnection(connectionString))
+            //{
+            //    // string queryForCol = "select * from[PC].[tblBenifitRangeDetails] where BenifitID IN(select BenefitID from[PC].[tblProductBenefits] where CoverID IN(select CoverID from[PC].[tblProductCovers] where insurableitemId IN(select InsurableItemId from[PC].[tblProductInsurableItems]where productid ="+ tblProduct.ProductId + ")))";
 
 
             //    connection.Open();
@@ -1762,6 +1762,15 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             {
                 throw ex;
             }
+        }
+
+        public async Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var data = _context.TblDynamicProduct.Where(a => a.Type == type).ToList();
+
+            var result = _mapper.Map<List<DynamicProduct>>(data);
+            return result;
         }
     }
 }

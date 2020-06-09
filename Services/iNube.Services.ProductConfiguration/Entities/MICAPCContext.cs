@@ -18,6 +18,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual DbSet<TblBenifitRangeDetails> TblBenifitRangeDetails { get; set; }
         public virtual DbSet<TblCoverChildRcbdetails> TblCoverChildRcbdetails { get; set; }
         public virtual DbSet<TblCoverRcbdetails> TblCoverRcbdetails { get; set; }
+        public virtual DbSet<TblDynamicProduct> TblDynamicProduct { get; set; }
         public virtual DbSet<TblInsurableChildRcbdetails> TblInsurableChildRcbdetails { get; set; }
         public virtual DbSet<TblInsurableRcbdetails> TblInsurableRcbdetails { get; set; }
         public virtual DbSet<TblLeadInfo> TblLeadInfo { get; set; }
@@ -40,20 +41,20 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual DbSet<TblmasPccommonTypes> TblmasPccommonTypes { get; set; }
         public virtual DbSet<TblmasProductMaster> TblmasProductMaster { get; set; }
 
+        // Unable to generate entity type for table 'PC.prodtemp'. Please see the warning messages.
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-#pragma warning disable CS1030 // #warning directive
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
-#pragma warning restore CS1030 // #warning directive
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelweissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<TblBenifitRangeDetails>(entity =>
             {
@@ -137,6 +138,27 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .HasForeignKey(d => d.InsurableRcbdetailsId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tblCoverRCBDetails_tblInsurableRCBDetails");
+            });
+
+            modelBuilder.Entity<TblDynamicProduct>(entity =>
+            {
+                entity.ToTable("tblDynamicProduct", "PC");
+
+                entity.Property(e => e.Id).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.ComponentType).HasMaxLength(250);
+
+                entity.Property(e => e.FilterName).HasMaxLength(250);
+
+                entity.Property(e => e.LabelText).HasMaxLength(250);
+
+                entity.Property(e => e.ListObject).HasMaxLength(250);
+
+                entity.Property(e => e.Name).HasMaxLength(250);
+
+                entity.Property(e => e.Type).HasMaxLength(1);
+
+                entity.Property(e => e.Value).HasMaxLength(250);
             });
 
             modelBuilder.Entity<TblInsurableChildRcbdetails>(entity =>
