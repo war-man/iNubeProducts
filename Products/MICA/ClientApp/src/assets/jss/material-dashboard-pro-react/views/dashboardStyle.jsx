@@ -31,14 +31,16 @@ const dashboardStyle = {
         textAlign: "center"
     },
     cardCategory: {
-        color: "#333",
-        fontSize: "16px",
+        color: "#504848",
+        fontSize: "20px",
         paddingTop: "10px",
         marginBottom: "0",
         marginTop: "0",
         margin: "0",
-        //width: "13em",
-        lineHeight: "17px"
+        // width: "13em",	
+        textAlign: "left",
+        lineHeight: "27px",
+        fontWeight: "400"
     },
     cardProductDesciprion: {
         textAlign: "center",
@@ -89,7 +91,7 @@ const dashboardStyle = {
     cdBal: {
         marginLeft: "15px",
         fontWeight: "300",
-        color:"#0e0e0e"
+        color: "#0e0e0e"
     },
     cdAmt: {
         marginLeft: "300px",

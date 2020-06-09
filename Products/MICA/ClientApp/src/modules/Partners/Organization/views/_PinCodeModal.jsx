@@ -3,10 +3,28 @@ import { withStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
-//import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
+import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import Button from "components/CustomButtons/Button.jsx";
-//import profileStyles from "./profileStyles.jsx";
+import profileStyles from "./profileStyles.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
+
+const style = {
+    infoText: {
+        fontWeight: "300",
+        margin: "10px 0 30px",
+        textAlign: "center"
+    },
+    inputAdornmentIcon: {
+        color: "#555"
+    },
+    choiche: {
+        textAlign: "center",
+        cursor: "pointer",
+        marginTop: "20px"
+    },
+    ...customSelectStyle,
+    ...profileStyles
+};
 
 const modalStyles = {
     position: 'absolute',
@@ -20,9 +38,20 @@ const modalStyles = {
     paddingBottom: '5px'
 };
 
-//function rand() {
-//    return Math.round(Math.random() * 20) - 10;
-//}
+function rand() {
+    return Math.round(Math.random() * 20) - 10;
+}
+
+function getModalStyle() {
+    const top = 50 + rand();
+    const left = 50 + rand();
+
+    return {
+        top: `${top}%`,
+        left: `${left}%`,
+        transform: `translate(-${top}%, -${left}%)`,
+    };
+}
 
 const styles = theme => ({
     paper: {

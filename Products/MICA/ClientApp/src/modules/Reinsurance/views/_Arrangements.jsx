@@ -92,32 +92,51 @@ const Arrangements = (props) => {
                         formControlProps={{ fullWidth: true }} />
 
                 </GridItem>
-                <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                        labelText="Percent"
-                        id="percentage"
-                        value={props.treatydata[props.index].tblArrangement[0].percentage}
-                        name='percentage'
-                        error={props.percentageState}
-                        onChange={(e) => arrangementDetails.handleAggrement1("numeric", e)}
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                    />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={3}>
-                    <CustomInput
-                        labelText="Amount"
-                        id="amount"
-                        value={props.treatydata[props.index].tblArrangement[0].amount}
-                        name='amount'
-                        error={props.amountState}
-                        onChange={(e) => arrangementDetails.handleAggrement1("numeric", e)}
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                    />
-                </GridItem>
+                {props.showPercentage &&
+                    <GridItem xs={12} sm={12} md={3}>
+                        <CustomInput
+                            labelText="Percent"
+                            id="percentage"
+                            value={props.treatydata[props.index].tblArrangement[0].percentage}
+                            name='percentage'
+                            error={props.percentageState}
+                            onChange={(e) => arrangementDetails.handleAggrement1("numeric", e)}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
+                {props.showlimit &&
+                    <GridItem xs={12} sm={12} md={3}>
+                        <CustomInput
+                            labelText="Limit"
+                            id="amount"
+                            value={props.treatydata[props.index].tblArrangement[0].amount}
+                            name='amount'
+                            error={props.amountState}
+                            onChange={(e) => arrangementDetails.handleAggrement1("numeric", e)}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
+                {props.shownooflines &&
+                    <GridItem xs={12} sm={12} md={3}>
+                        <CustomInput
+                            labelText="No Of Lines"
+                            id="nooflines"
+                        value={props.treatydata[props.index].tblArrangement[0].noOfLines}
+                        name='noOfLines'
+                            //error={props.amountState}
+                            onChange={(e) => arrangementDetails.handleAggrement1("numeric", e)}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />
+                    </GridItem>
+                }
                 <GridItem xs={12} sm={12} md={3}>
                     <MasterDropdown
                         labelText="HigherLower"

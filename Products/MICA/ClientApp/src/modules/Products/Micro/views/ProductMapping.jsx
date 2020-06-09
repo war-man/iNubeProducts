@@ -53,11 +53,14 @@ const style = {
     ...customCheckboxRadioSwitch
 };
 
+const initialfield = {};
+
 class ProductMapping extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             masterList: [],
+            riskmasterList: [],
             newmasterList: [],
             open: false,
             dropdowns: [],
@@ -66,21 +69,25 @@ class ProductMapping extends React.Component {
             value: "",
             showtable: false,
             fields: {},
+            emptyobject: {},
             resetfields: {},
             levelCount: 0,
             masterdtolist: [],
+            riskparameter: false,
+            claimparameter: false,
             MasterDTO: {},
             selectedvalue: [],
             selectedvaluearray: [],
+            tabletype: "",
             MasterdataDTO:
-                {
-                    "MasterType": "",
-                    "TypeCode": "",
-                    "Value": "",
-                    "ParentId": 0,
-                    "IsDisable": true,
-                    "IsActive": true,
-                },
+            {
+                "MasterType": "",
+                "TypeCode": "",
+                "Value": "",
+                "ParentId": 0,
+                "IsDisable": true,
+                "IsActive": true,
+            },
             lobtable: false,
             tabledata: [],
             parentId: 0,
@@ -91,13 +98,31 @@ class ProductMapping extends React.Component {
         this.handleEntityScreen = this.handleEntityScreen.bind(this);
     }
 
+    handleReset = () => {
+        console.log("emptyobject", this.state.fields)
+        console.log("emptyobject", this.state.emptyobject)
+        this.state.fields = initialfield;
+        /*return*/ this.setState({});
+        console.log("emptyobject", this.state.fields)
+    }
+
     handleSimple = event => {
+        this.setState({ claimparameter: false, riskparameter: false });
+        this.handleReset();
         this.setState({ [event.target.name]: event.target.value });
         //console.log("value", event.target.value);
+        let type = this.state.MasterdataDTO.TypeCode;
+        type = "";
         this.setState({
-            [event.target.name]: event.target.value, masterdataType: "", tabledata: this.state.MasterDTO.LOB, lobtable: false, showtable: false,
+            [event.target.name]: event.target.value, masterdataType: "", type, tabledata: this.state.MasterDTO.LOB, lobtable: false, showtable: false,
         });
-
+        console.log("value: ", event.target.value);
+        if (event.target.value == 31) {
+            this.setState({ riskparameter: true, claimparameter: false });
+        }
+        if (event.target.value == 32) {
+            this.setState({ claimparameter: true, riskparameter: false });
+        }
         this.state.selectedvalue = [];
         this.state.selectedvaluearray = [];
         this.state.dropdowns = [];
@@ -176,7 +201,8 @@ class ProductMapping extends React.Component {
                 this.handlemasterdata();
             });
         this.state.dropdowns = [];
-        this.setState({ showtable: false, lobtable: false, masterType: "", masterdata: "", value: "" });
+        this.state.fields = {};
+        this.setState({ showtable: false, claimparameter: false, riskparameter: false, lobtable: false, masterType: "", masterdata: "", value: "" });
     }
 
     handleinputvalue = (event) => {
@@ -253,38 +279,49 @@ class ProductMapping extends React.Component {
 
     GetLevelMasterData = (type, event) => {
         this.SetValue(type, event);
-        var regex = /^[A-Za-z]+$/;
-        var isvalid = regex.test(type);
-        console.log("isvalid: ", isvalid);
-        if (isvalid == false) {
-            const valuetype = type;
-            const splitstring = valuetype.split(",");
-            console.log("array1: ", splitstring[0]);
-            console.log("array1: ", splitstring[1]);
-            for (let i = 0; i < splitstring.length; i++) {
-                this.GetMasterService(splitstring[i], event.target.value);
-            }
-        }
+        //var regex = /^[A-Za-z]+$/;
+        //var isvalid = regex.test(type);
+        //console.log("isvalid: ", isvalid);
+        //if (isvalid == false) {
+        //    const valuetype = type;
+        //    const splitstring = valuetype.split(",");
+        //    console.log("array1: ", splitstring[0]);
+        //    console.log("array1: ", splitstring[1]);
+        //    for (let i = 0; i < splitstring.length; i++) {
+        //        this.GetMasterService(splitstring[i], event.target.value);
+        //    }
+        //}
         this.setState({ lobtable: true });
 
-        if (type === "COB") {
-            this.GetMasterService('Cover', event.target.value);
-            this.GetMasterService('CoverEvent', event.target.value);
-            console.log("event", event.target.value);
-        }
-        if (type === "CoverEventFactor") {
-            this.GetMasterService('BenefitCriteria', event.target.value);
-        }
-        if (type === "InsurableCategory") {
-            this.GetMasterService('InsuranceType', event.target.value);
-            this.GetMasterService('CoverEvent', event.target.value);
-        }
-        if (type === "InsuranceType") {
-            this.GetMasterService('CoverEvent', event.target.value);
-        }
-        if (type != "") {
-            this.GetMasterService(type, event.target.value);
-        }
+        this.state.tabletype = this.state.masterList.filter(e => e.mID === this.state.value)[0].mType === undefined
+            ? []
+            : this.state.masterList.filter((e) => e.mID === this.state.value)[0].mType
+            ;
+
+        //let ptype = this.state.tabletype.split(" ").join("");         //this line remove multiple space in sentence or string
+
+        console.log("Table value: ", this.state.masterList);
+        this.GetMasterService(this.state.tabletype, event.target.value);
+
+        //this.GetMasterService('BenefitCriteria', event.target.value);
+        //if (type === "COB") {
+        //    this.GetMasterService('Cover', event.target.value);
+        //    this.GetMasterService('CoverEvent', event.target.value);
+        //    console.log("event", event.target.value);
+        //}
+        //if (type === "CoverEventFactor") {
+        //    this.GetMasterService('BenefitCriteria', event.target.value);
+        //}
+        //if (type === "InsurableCategory") {
+        //    this.GetMasterService('InsuranceType', event.target.value);
+        //    this.GetMasterService('CoverEvent', event.target.value);
+        //}
+        //if (type === "InsuranceType") {
+        //    this.GetMasterService('CoverEvent', event.target.value);
+        //}
+        //if (type != "") {
+        //    this.GetMasterService(type, event.target.value);
+        //}
         this.state.parentId = event.target.value;
         let dataArray = this.GetMasterListData(type);
         this.setState({
@@ -298,6 +335,15 @@ class ProductMapping extends React.Component {
 
     handleEntityScreen = () => {
         this.setState({ open: true });
+    }
+
+    handletypecode = (e) => {
+        let name = e.target.name;
+        let value = e.target.value;
+        let data = this.state.MasterdataDTO;
+        data[name] = value;
+
+        this.setState({ data });
     }
 
     componentDidMount = () => {
@@ -324,10 +370,22 @@ class ProductMapping extends React.Component {
                 this.setState({ master });
             });
 
-        console.log("MasterDTO: ", this.state.MasterDTO);
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetTypeCodes?isFilter=true`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({ riskmasterList: data });
+                console.log("masterlist ", data);
+            });
     }
 
     handlemasterdata = () => {
+        this.handleReset();
         fetch(`${productConfig.productConfigUrl}/api/Product/GetEntityMaster`, {
             method: 'GET',
             headers: {
@@ -342,6 +400,7 @@ class ProductMapping extends React.Component {
                 for (let i = 0; i < this.state.newmasterList.length; i++) {
                     this.state.fields[this.state.newmasterList[i].mType] = '';
                 }
+                this.setState({});
             });
     }
 
@@ -389,8 +448,8 @@ class ProductMapping extends React.Component {
 
     render() {
         const { classes } = this.props;
-        let levelcount = this.state.levelCount;
-        let lob = this.state.fields.LOB;
+        //let levelcount = this.state.levelCount;
+        //let lob = this.state.fields.LOB;
 
         return (
             <GridContainer>
@@ -491,9 +550,39 @@ class ProductMapping extends React.Component {
                                             }}
                                         />
                                     </GridItem>
-                                    <GridItem xs={12} sm={4} >
-                                        <Button color="success" id="top-bnt" round onClick={this.handleSubmit} >Submit</Button>
-                                    </GridItem>
+                                    {this.state.riskparameter ?
+                                        <GridItem xs={12} sm={4}>
+                                            <MasterDropdown
+                                                labelText="Select Risk Level"
+                                                required={true}
+                                                value={this.state.MasterdataDTO.TypeCode}
+                                                //id="MaritalStatus"
+                                                lstObject={this.state.riskmasterList}
+                                                filterName='RiskType'
+                                                name='TypeCode'
+                                                onChange={(e) => this.handletypecode(e)}
+                                                formControlProps={{ fullWidth: true }} />
+                                        </GridItem>
+                                        : null}
+                                    {this.state.claimparameter ?
+                                        <GridItem xs={12} sm={4}>
+                                            <MasterDropdown
+                                                labelText="Select Risk Level"
+                                                required={true}
+                                                value={this.state.MasterdataDTO.TypeCode}
+                                                //id="MaritalStatus"
+                                                lstObject={this.state.riskmasterList}
+                                                filterName='ClaimType'
+                                                name='TypeCode'
+                                                onChange={(e) => this.handletypecode(e)}
+                                                formControlProps={{ fullWidth: true }} />
+                                        </GridItem>
+                                        : null}
+                                    <GridContainer justify="center">
+                                        <GridItem xs={12} sm={4} >
+                                            <Button color="success" /*id="top-bnt"*/ round onClick={this.handleSubmit} >Submit</Button>
+                                        </GridItem>
+                                    </GridContainer>
                                 </GridContainer>
                             </div>
                             }
@@ -502,26 +591,28 @@ class ProductMapping extends React.Component {
                     {this.state.lobtable ?
                         <GridContainer>
                             <GridItem xs={12}>
-                                <ReactTable
-                                    title={"MasterData"}
-                                    data={this.state.tabledata}
-                                    //filterable
-                                    columns={[
-                                        {
-                                            Header: "Existing Data",
-                                            accessor: "mValue",
-                                            style: { textAlign: "left" },
-                                            headerClassName: 'react-table-center',
-                                            minWidth: 50,
-                                            resizable: false,
-                                        },
-                                    ]}
-                                    defaultPageSize={5}
-                                    showPaginationTop={false}
-                                    //pageSize={([this.state.tabledata.length + 1] < 5) ? [this.state.tabledata.length + 1] : 5}
-                                    showPaginationBottom={true}
-                                    className="-striped -highlight"
-                                />
+                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                    <ReactTable
+                                        title={"MasterData"}
+                                        data={this.state.tabledata}
+                                        //filterable
+                                        columns={[
+                                            {
+                                                Header: "Existing Data",
+                                                accessor: "mValue",
+                                                style: { textAlign: "left" },
+                                                headerClassName: 'react-table-center',
+                                                minWidth: 50,
+                                                resizable: false,
+                                            },
+                                        ]}
+                                        defaultPageSize={5}
+                                        showPaginationTop={false}
+                                        //pageSize={([this.state.tabledata.length + 1] < 5) ? [this.state.tabledata.length + 1] : 5}
+                                        showPaginationBottom={true}
+                                        className="-striped -highlight"
+                                    />
+                                </Animated>
                             </GridItem>
                         </GridContainer>
                         : null}

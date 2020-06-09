@@ -29,6 +29,11 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
 import swal from 'sweetalert';
 import partnerconfig from "modules/Partners/PartnerConfig.js";
 import $ from 'jquery';
+import { Redirect } from 'react-router-dom';
+import PositionCreation from "./_PositionCreation.jsx";
+import Dropdown from "components/Dropdown/Dropdown.jsx";
+import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
+
 const CustomTableCell = withStyles(theme => ({
     head: {
         backgroundColor: "#00acc1",
@@ -91,13 +96,14 @@ const searchClose = {
     fontSize: "larger",
     padding: "0px",
     right: '10px',
-    
+
 }
 class Profile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             masterList: [],
+            posDesigList: [],
             componentData: {
                 orgNameState: "",
                 orgName: "",
@@ -126,87 +132,14 @@ class Profile extends React.Component {
 
             },
             OfficeCode: "",
-           // officeId: "",
+            Organizations: [],
+            Office: [],
+            // officeId: "",
             open: false,
             officelist: [],
             list: [],
-            disabled: this.props.disabled,
-            officeDTO: {
-                //  "orgOfficeId": 0,
-                // "organizationId": 0,
-                "officeName": "",
-                "officeCode": "",
-                "officePhoneNo": "",
-                "officeFaxNo": "",
-                "officeLevelId": "",
-                //  "officeReportingOfficeId": 0,
-                "officeCountryId": 0,
-                "officeStateId": 0,
-                "officeDistrictId": 0,
-                "officeCityId": 0,
-                "officeAddressLine1": "",
-                "officeAddressLine2": "",
-                "officeAddressLine3": "",
-                "officePincodeId": 0,
-                "officeSpocDetails": [
-                    {
-                        //"officeSpocid": 0,
-                        "officeId": 0,
-                        "spocname": "string",
-                        "spocmobileno": "string",
-                        "spocemailId": "string",
-                        "spocdesignation": "string",
-                        "spoccountryId": 0,
-                        "spocstateId": 0,
-                        "spocdistrictId": 0,
-                        "spoccityId": 0,
-                        "spocaddressLine1": "string",
-                        "spocaddressLine2": "string",
-                        "spocaddressLine3": "string",
-                        "spocpincodeId": 0
-                    }
-                ]
-            },
+            disabled: false,
             addressDTO: {
-                "corp": {
-                    "orgAddressId": 0,
-                    "organizationId": 0,
-                    "orgAddressType": "C",
-                    "orgCountryId": "",
-                    "orgStateId": "",
-                    "orgDistrictId": "",
-                    "orgCityId": "",
-                    "orgAddressLine1": "",
-                    "orgAddressLine2": "",
-                    "orgAddressLine3": "",
-                    "orgPincodeId": ""
-                },
-                "reg": {
-                    "orgAddressId": 0,
-                    "organizationId": 0,
-                    "orgAddressType": "R",
-                    "orgCountryId": "",
-                    "orgStateId": "",
-                    "orgDistrictId": "",
-                    "orgCityId": "",
-                    "orgAddressLine1": "",
-                    "orgAddressLine2": "",
-                    "orgAddressLine3": "",
-                    "orgPincodeId": ""
-                },
-                "mail": {
-                    "orgAddressId": 0,
-                    "organizationId": 0,
-                    "orgAddressType": "M",
-                    "orgCountryId": "",
-                    "orgStateId": "",
-                    "orgDistrictId": "",
-                    "orgCityId": "",
-                    "orgAddressLine1": "",
-                    "orgAddressLine2": "",
-                    "orgAddressLine3": "",
-                    "orgPincodeId": ""
-                },
                 "spoc": {
                     //"orgSpocId": 0,
                     // "organizationId": 0,
@@ -214,27 +147,35 @@ class Profile extends React.Component {
                     "spocmobileno": "",
                     "spocemailId": "",
                     "spocdesignation": "",
-                    "spoccountryId": 0,
-                    "spocstateId": 0,
-                    "spocdistrictId": 0,
-                    "spoccityId": 0,
+                    "spoccountryId": "",
+                    "spocstateId": "",
+                    "spocdistrictId": "",
+                    "spoccityId": "",
                     "spocaddressLine1": "",
                     "spocaddressLine2": "",
                     "spocaddressLine3": "",
-                    "spocpincodeId": 0
+                    "spocpincodeId": "",
                 },
                 "off": {
-                    "officeCountryId": 0,
-                    "officeStateId": 0,
-                    "officeDistrictId": 0,
-                    "officeCityId": 0,
+                    "officeCountryId": "",
+                    "officeStateId": "",
+                    "officeDistrictId": "",
+                    "officeCityId": "",
                     "officeAddressLine1": "",
                     "officeAddressLine2": "",
                     "officeAddressLine3": "",
-                    "officePincodeId": 0
+                    "officePincodeId": ""
                 },
-                "corpSelectedValue": 1,
-                "mailSelectedValue": 4
+            },
+            Officeaddress: {
+                "officeCountryId": "",
+                "officeStateId": "",
+                "officeDistrictId": "",
+                "officeCityId": "",
+                "officeAddressLine1": "",
+                "officeAddressLine2": "",
+                "officeAddressLine3": "",
+                "officePincodeId": ""
             },
             LocationDTO: {
                 "Country": [],
@@ -243,19 +184,20 @@ class Profile extends React.Component {
                 City: [],
                 Pincode: []
             },
-
+            organizationid: "",
+            officeid: "",
             OrganizationDTO: {
-                "organizationId": 0,
-                "orgCategoryId": 0,
-                "configurationTypeId": 0,
-                "orgTypeId": 0,
+                "organizationId": "",
+                "orgCategoryId": "",
+                "configurationTypeId": "",
+                "orgTypeId": "",
                 "orgName": "",
                 "corpAddressSameAs": "",
                 "mailingAddressSameAs": "",
                 "orgWebsite": "",
                 "orgPhoneNo": "",
                 "orgFaxNo": "",
-                "orgLevels": 0,
+                "orgLevels": "",
                 "orgRegistrationNo": "",
                 "orgRegisteringAuthority": "",
                 "orgServiceTaxRegistrationNumber": "",
@@ -267,7 +209,43 @@ class Profile extends React.Component {
                 "tblOrgSpocDetails": [
 
                 ]
-            }
+            },
+            aVOOrgOffice: {
+                "organizationId": "",
+                "officeName": "",
+                "officeCode": "",
+                "officePhoneNo": "",
+                "officeFaxNo": "",
+                "officeLevelId": "",
+                "officeReportingOfficeId": "",
+                "officeCountryId": "",
+                "officeStateId": "",
+                "officeDistrictId": "",
+                "officeCityId": "",
+                "officeAddressLine1": "",
+                "officeAddressLine2": "",
+                "officeAddressLine3": "",
+                "officePincodeId": "",
+                "isActive": true,
+                "avoOfficeSpocDetails": [
+
+                ]
+            },
+            redirect: false,
+            currentStaff: "",
+            positionDTO: {
+                "empId": "",
+                "newpositioncount": "",
+                "organizationId": "",
+                "officeId": "",
+                "designationId": "",
+            },
+            Designations: [],
+            Employees: [],
+            desigleveldata: [],
+            levelobject: {},
+            tabledata: [],
+            posDesigTable: [],
         }
         this.GetLocationService = this.GetLocationService.bind(this);
         this.handleofficeSub = this.handleofficeSub.bind(this);
@@ -275,17 +253,17 @@ class Profile extends React.Component {
     };
 
     SetValue = (type, event) => {
-       // debugger;
+        // debugger;
         //  event.preventDefault();
         console.log('teset ' + event)
-        let officeDTO = this.state.officeDTO;
+        let aVOOrgOffice = this.state.aVOOrgOffice;
         let name = event.target.name;
         console.log("name", name);
         let value = event.target.value;
         console.log('teset ' + event.target.value)
-        officeDTO[name] = value;
-        this.setState({ officeDTO })
-        console.log("officeDTO", this.state.officeDTO);
+        aVOOrgOffice[name] = value;
+        this.setState({ aVOOrgOffice })
+        console.log("officeDTO", this.state.aVOOrgOffice);
         //this.change(event, name, type);
         if (name == "OfficeCode") {
             let { OfficeCode } = this.state;
@@ -305,13 +283,13 @@ class Profile extends React.Component {
     };
 
     GetLocation = (type, addType, event) => {
-     
+
         console.log("addType", addType);
         if (addType != 'spoc') {
             this.SetValue(type, event);
         }
-      
-        let reg = this.state.addressDTO[addType];
+
+        let reg = this.state.Officeaddress;
         console.log("regAdress", reg);
         console.log("regtype", addType);
         let name = event.target.name;
@@ -326,8 +304,8 @@ class Profile extends React.Component {
 
     GetLocationService = (type, pID) => {
         console.log("off");
-        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetLocation?locationType=` + type + `&parentID=` + pID, {
-       // fetch(`https://inubeservicespartners.azurewebsites.net/api/Organization/GetLocation?locationType=` + type + `&parentID=` + pID, {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetLocationAsync?locationType=` + type + `&parentID=` + pID, {
+            // fetch(`https://inubeservicespartners.azurewebsites.net/api/Organization/GetLocation?locationType=` + type + `&parentID=` + pID, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -349,113 +327,93 @@ class Profile extends React.Component {
     handleofficeSub() {
         let address = [];
         address.push(this.state.addressDTO.spoc);
-        console.log("push in adreess", address);
-        let offceDTO = this.state.officeDTO;
-        offceDTO['officeSpocDetails'] = address;
-        this.setState({ offceDTO });
-        console.log("table office", this.state.officeDTO);
-        
-            fetch(`${partnerconfig.partnerconfigUrl}/api/Office/CreateOffice`, {
-       // fetch(`https://localhost:44315/api/Office/CreateOffice`, {
+
+        let office = this.state.aVOOrgOffice;
+        office['avoOfficeSpocDetails'] = address;
+        this.setState({ office });
+        console.log("office", office);
+        console.log("office", this.state.addressDTO);
+
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/CreateOffice`, {
+            // fetch(`https://localhost:44315/api/Office/CreateOffice`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
-                body: JSON.stringify(this.state.offceDTO)
-            }).then(function (response) {
-                return response.json();
-            }).then(function (data) {
-                console.log('Response data', data);
-                if (data.status == 1) {
-                    swal({
-                        //  title: "Perfect",
-                        text: data.responseMessage,
-                        icon: "success"
-                    });
-                } else if (data.status == 8) {
-                    swal({
-                        text: data.errors[0].errorMessage,
-                        icon: "error"
-                    });
+            body: JSON.stringify(office)
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log('Response data', data);
+            if (data.status == 2) {
+                swal({
+                    //  title: "Perfect",
+                    text: data.responseMessage,
+                    icon: "success"
+                });
+                if (this.state.positionDTO.designationId != "") {
+                    this.handlePositionCreation();
                 }
-            });
-            //}).then(response => response.json())
-            //    .then(data => {
-            //      //  this.setState({ result: data });
-            //        //console.log(this.state.data, 'AlocPara');
-            //});
-
-   
-
-
-
-    //  //  fetch(`${partnerconfigUrl.partnerconfigUrl}//api/Office/CreateOffice`, {
-    //    fetch(`https://localhost:44315/api/Office/CreateOffice`, {
-    ////   fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/CreateOffice`, {
-    //        method: 'POST',
-    //        headers: {
-    //            'Accept': 'application/json',
-    //            'Content-Type': 'application/json',
-    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-    //        },
-    //       // body: JSON.stringify(data)
-    //        body: JSON.stringify(this.state.offceDTO)
-    //    }).then(function (response) {
-    //        return response.json();
-    //    }).then(function (data) {
-    //        console.log('Response data', data);
-    //            if (data.status == 1) {
-    //                swal({
-    //                  //  title: "Perfect",
-    //                    text: data.responseMessage,
-    //                    icon: "success"
-    //                });
-    //            } else if (data.status == 8) {
-    //                swal({
-    //                    text: data.errors[0].errorMessage,
-    //                    icon: "error"
-    //                });
-    //            }
-    //        });
+            }
+            else if (data.status == 7) {
+                swal({
+                    text: data.errors[0].errorMessage,
+                    icon: "error"
+                });
+            }
+        });
     }
+
+    renderRedirect = () => {
+        if (this.state.redirect == true) {
+            return <Redirect to={{
+                pathname: '/dashboard/home',
+
+            }} />
+        }
+    }
+
     searchofficebtn = () => {
         this.setState({ open: true });
 
     }
 
-    tableshow = () => {
-        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/GetOffice?OfficeCode=` + this.state.OfficeCode, {
-        //fetch(`https://localhost:44315/api/Office/GetOffice?officeID=` + this.state.officeId, {
-       // fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/GetOffice?officeID=` + this.state.officeId, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-
-                this.setState({ officelist: data });
-            });
-        console.log("officelist", this.state.officelist);
-    }
     handleClose = () => {
         this.setState({ open: false });
 
     };
-    componentDidMount() {
-        debugger
-        // $.getJSON('api/SampleData/GetDropDownFromList', function (response) {
-        //     console.log(response);
-        // });
 
-        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetMasterData?sMasterlist=OrgCategory`, {
-       // fetch(`https://localhost:44315/api/Organization/GetMasterData?sMasterlist=OrgCategory`, {
-        //fetch(`https://inubeservicespartners.azurewebsites.net/api/Organization/GetMasterData?sMasterlist=OrgCategory`, {
+    handleOfficeData = (e) => {
+        let office = this.state.aVOOrgOffice;
+        let position = this.state.positionDTO;
+        position.officeId = e.target.value;
+        let name = e.target.name;
+        let value = e.target.value;
+        office[name] = value;
+        this.setState({ office, position });
+
+
+    }
+
+    handleOrgdata = (e) => {
+        let office = this.state.aVOOrgOffice;
+        let position = this.state.positionDTO;
+        position.organizationId = e.target.value;
+        let name = e.target.name;
+        let value = e.target.value;
+        office[name] = value;
+        this.setState({ office, position });
+
+        this.setState({ organizationid: e.target.value });
+        this.handleOffice(e.target.value);
+        this.handleDesignationDD(e.target.value);
+
+    }
+
+    handleOffice = (orgid) => {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetOffbyOrgid?orgid=` + orgid, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -465,12 +423,13 @@ class Profile extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                this.setState({ masterList: data });
-                console.log("organizationId", data);
+                this.setState({ Office: data });
+                console.log("organizations: ", data);
             });
-        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/GetAllOffice`, {
-      //  fetch(`https://localhost:44315/api/Office/GetAllOffice`, {
-     //   fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/GetAllOffice`, {
+    }
+
+    componentDidMount() {
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetOrgDropdown`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -480,76 +439,213 @@ class Profile extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                console.log("recived", data);
-                this.setState({ list: data });
+                this.setState({ Organizations: data });
+                console.log("organizations: ", data);
             });
-      //  console.log("recived1", this.state.list);
 
         this.GetLocationService('Country', 0);
-        if (this.props.offdata != null) {
-            if (this.props.offdata != "") {
-                console.log("coming offdata", this.props.offdata);
-                let dataDTO = this.state;
-                console.log("orgOffice", this.props);
-                console.log("orgOfficeid", this.props.officesendlist[0]);
-                // this.props.officesendlist[0].orgOfficeId = 0;
-                this.props.officesendlist[0].officeReportingOfficeId = "";
-                console.log("orgOffice", this.props.officesendlist[0]);
-                dataDTO['officeDTO'] = this.props.officesendlist[0];
+        let self = this;
+        if (self.props.offid != null) {
+            if (self.props.offid != "") {
+                fetch(`${partnerconfig.partnerconfigUrl}/api/Office/SearchOffById?Officeid=` + self.props.offid, {
+                    //  fetch(`https://localhost:44315/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode,{
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("officedata", data);
 
-                this.setState({ dataDTO });
-                console.log("orgOfficeiddata", this.state.dataDTO);
-                let addoff = this.state.addressDTO;
-                addoff["off"] = this.props.officesendlist[0];
+                        self.setState({ aVOOrgOffice: data[0] });
+                        console.log("officedata", self.state.aVOOrgOffice)
+                        let office = self.state.aVOOrgOffice;
+                        let adddet = self.state.addressDTO;
+                        let offaddr = self.state.Officeaddress;
+                        self.handleOffice(data[0].organizationId);
+                        office.organizationId = data[0].organizationId;
+                        office.officeReportingOfficeId = data[0].officeReportingOfficeId;
+                        adddet.spoc = data[0].avoOfficeSpocDetails[0];
 
-                this.GetLocationService('State', this.props.officesendlist[0].officeCountryId);
-                this.GetLocationService('District', this.props.officesendlist[0].officeStateId);
-                this.GetLocationService('City', this.props.officesendlist[0].officeDistrictId);
-                this.GetLocationService('Pincode', this.props.officesendlist[0].officeCityId);
-                this.setState({ addoff });
+                        self.GetLocationService('State', data[0].officeCountryId);
+                        self.GetLocationService('District', data[0].officeStateId);
+                        self.GetLocationService('City', data[0].officeDistrictId);
+                        self.GetLocationService('Pincode', data[0].officeCityId);
+                        console.log("officedata", adddet);
+                        let addr = adddet['off'];
 
-                let demo = this.state.addressDTO;
-                demo.off["officeStateId"] = this.props.officesendlist[0].officeStateId;
-                this.setState({ demo });
-                console.log("demo", demo);
-
-                console.log("offorg", this.props.officesendlist[0].officeSpocDetails[0]);
-                //   this.props.officesendlist[0].tblOfficeSpocDetails[0].officeId = "";
-                // this.props.officesendlist[0].tblOfficeSpocDetails[0].officeSpocid = 0;
-                let officeSpocDetails = this.props.officesendlist[0].officeSpocDetails[0];
-
-
-                console.log("officeSpocDetails", officeSpocDetails);
-                let addressDTO = this.state.addressDTO;
-                addressDTO["spoc"] = officeSpocDetails;
-
-
-                //  this.setState({ officeDTO });
-                console.log("comingofficesendlist", this.state.officeDTO);
+                        offaddr.officeAddressLine1 = data[0].officeAddressLine1;
+                        offaddr.officeAddressLine2 = data[0].officeAddressLine2;
+                        offaddr.officeAddressLine3 = data[0].officeAddressLine3;
+                        offaddr.officeCountryId = data[0].officeCountryId;
+                        offaddr.officeStateId = data[0].officeStateId;
+                        offaddr.officeDistrictId = data[0].officeDistrictId;
+                        offaddr.officeCityId = data[0].officeCityId;
+                        offaddr.officePincodeId = data[0].officePincodeId;
+                        self.setState({ offaddr, office, adddet, disabled: this.props.disabled });
+                    });
             }
         }
+    }
+
+    onInputParamChange = (type, event) => {
+        const fields = this.state.positionDTO;
+        fields[event.target.name] = event.target.value;
+        this.setState({ fields });
+    };
+
+    handlePositionTableAssignValue = () => {
+        let array = []
+        let element = {};
+
+        array.push(element)
+        this.state.posDesigList = array;
+        this.setState({});
+        this.handlePositionTable();
+    }
+
+    handlePositionTable = () => {
+        this.setState({
+            posDesigTable: this.state.posDesigList.map(m => {
+                return {
+                    designation: <Dropdown /*required={true}*/ lstObject={this.state.Designations} value={this.state.positionDTO.designationId} name="designationId" onChange={(e) => this.handledesigchange(e)} formControlProps={{ fullWidth: true }} />,
+                    reportingTo: <Dropdown /*required={true}*/ lstObject={this.state.Employees} value={this.state.positionDTO.empId} name="empId" onChange={(e) => this.handledesigchange(e)} formControlProps={{ fullWidth: true }} />,
+                    currentStaff: <CustomInput value={this.state.currentStaff} disabled={true} name="currentStaff" formControlProps={{ fullWidth: true }} />,
+                    newPosition: <CustomInput value={this.state.positionDTO.newpositioncount} name="newpositioncount" onChange={(e) => this.handledesigchange(e)} formControlProps={{ fullWidth: true }} />,
+                };
+            })
+        });
+    }
+
+    handledesigchange = (e) => {
+        let name = e.target.name;
+        let value = e.target.value;
+        let position = this.state.positionDTO;
+        position[name] = value;
+
+        if (name == "designationId") {
+            this.handleReportingDD(this.state.positionDTO.designationId);
+        }
+        if (name == "empId") {
+            this.handleCurrentStaffCount(this.state.positionDTO.empId);
+        }
+        if (name == "newpositioncount") {
+            // this.handlePositionCreation(this.state.positionDTO.newpositioncount);
+        }
+
+        console.log("positionOnchange", this.state.positionDTO);
+        this.setState({ position });
+        this.handlePositionTable();
+    }
+
+    handleDesignationDD = (orgid) => {
+        let that = this;
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetDesignation?orgid=` + orgid, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(response => response.json())
+            .then(data => {
+                that.setState({ Designations: data[0].mdata });
+                if (this.state.Designations.length != 0) {
+                    this.handlePositionTableAssignValue();
+                }
+                console.log("deg List", that.state.Designations, data);
+            });
+    }
+
+    handleReportingDD = (desigid) => {
+        let that = this;
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetEmployee?orgid=` + that.state.positionDTO.organizationId + `&offid=` + that.state.positionDTO.officeId + `&desgiId=` + desigid, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                that.setState({ Employees: data[0].mdata });
+                this.handlePositionTable();
+                console.log("report", data, this.state.Employees);
+            });
+    }
+
+    handleCurrentStaffCount = (empid) => {
+        let that = this;
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/GetCount?empid=` + empid, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                that.setState({ currentStaff: data });
+                this.handlePositionTable();
+                console.log("report", data);
+            });
+    }
+
+    handlePositionCreation = () => {
+        console.log("checkPostion", this.state.positionDTO);
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/CreatePosition`, {
+            //fetch(`https://localhost:44315/api/Organization/CreatePosition`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(this.state.positionDTO)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status == 2) {
+                    //swal({
+                    //    text: "Positions created successfully",
+                    //    icon: "success"
+                    //})
+                    this.setState({ redirect: true });
+                    this.handlePositionTable();
+                } else {
+                    //swal({
+                    //    text: "Something went wrong",
+                    //    icon: "error"
+                    //})
+                }
+
+            });
     }
 
     render() {
         console.log("new props", this.props);
         return (
             <div>
+
                 <GridContainer>
                     <GridItem xs={12} sm={12} md={12}>
 
-                        {/* <OfficeDetails OrganizationDTO={this.state.OrganizationDTO} masterList={this.state.masterList} SetValue={this.SetValue} searchofficebtn={this.searchofficebtn} classes={this.classes} disabled={this.state.disabled}/> */}
-                        <SpocDet list={this.state.list} officeDTO={this.state.officeDTO}  LocationDTO={this.state.LocationDTO} handleRadioChange={this.handleRadioChange} masterList={this.state.masterList} SetValue={this.SetValue} classes={this.classes} GetLocation={this.GetLocation} addressDTO={this.state.addressDTO} disabled={this.state.disabled} />
-                       
-
+                        <OfficeDetails OrganizationDTO={this.state.OrganizationDTO} aVOOrgOffice={this.state.aVOOrgOffice} Office={this.state.Office} Organizations={this.state.Organizations} masterList={this.state.masterList} SetValue={this.SetValue} searchofficebtn={this.searchofficebtn} classes={this.classes} disabled={this.state.disabled} handleOfficeData={this.handleOfficeData} handleOrgdata={this.handleOrgdata} />
+                        <SpocDet list={this.state.list} aVOOrgOffice={this.state.aVOOrgOffice} LocationDTO={this.state.LocationDTO} handleRadioChange={this.handleRadioChange} masterList={this.state.masterList} SetValue={this.SetValue} classes={this.classes} GetLocation={this.GetLocation} addressDTO={this.state.addressDTO} disabled={this.state.disabled}
+                            Organizations={this.state.Organizations} Officeaddress={this.state.Officeaddress} Office={this.state.Office} handleOfficeData={this.handleOfficeData} handleOrgdata={this.handleOrgdata} onInputParamChange={this.onInputParamChange} posDesigTable={this.state.posDesigTable} />
 
                     </GridItem>
-                    <div style={{ marginLeft: '28%' }} >
-                        <Button color="info" onClick={this.handleofficeSub} id="round">Submit</Button>
-                    </div>
-                    {/*
-                    <div style={{ marginLeft: '28%' }} >
-                        <Button color="danger" id="round">Cancel</Button>
-                    </div>*/}
+                    {this.state.disabled ? null :
+                        <GridContainer justify="center">
+                            {this.renderRedirect()}
+                            <Button color="info" onClick={() => this.handleofficeSub()} id="round"> Submit</Button>
+                        </GridContainer>
+                    }
                 </GridContainer>
             </div>
         );

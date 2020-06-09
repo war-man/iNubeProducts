@@ -198,18 +198,21 @@ class SearchRetentions extends React.Component {
         console.log(this.state.newdata, 'New Data');
     }
     dataTable = (ParticipantList) => {
-        
         console.log("ParticipantList", ParticipantList);
         this.setState({
             newdata: ParticipantList.map((prop, key) => {
-
+                if (prop.effectiveFrom!=null) {
+                    let fdate = new Date(prop.effectiveFrom).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                    let edate = new Date(prop.effectiveTo).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                    this.setState({ startdate: fdate, enddate: edate });
+                }
                 return {
                     id: key,
                     year: prop.year,
                     businesstype: prop.businessType,
                     retentiongroup: prop.retentionGroupName,
-                    startdate: prop.effectiveFrom,
-                    enddate: prop.effectiveTo,
+                    startdate: this.state.startdate,
+                    enddate: this.state.enddate,
                     btn: <div><Button color="info" justIcon round simple className="edit" onClick={this.handleEdit.bind(this, key, prop.retentionGroupId)} editModal={this.state.editModal}><Edit /></Button> 
                         <Button color="danger" justIcon round simple className="edit" onClick={() => this.onDelete(prop.retentionGroupId)} ><Delete /></Button>
                         </div>
@@ -269,7 +272,7 @@ class SearchRetentions extends React.Component {
                         </CardIcon>
                         {
                             <h4 >
-                                <small> <TranslationContainer translationKey="SearchParticipant" /> </small>
+                                <small> <TranslationContainer translationKey="SearchRetention" /> </small>
                             </h4>
                         }
                     </CardHeader>
@@ -383,7 +386,7 @@ class SearchRetentions extends React.Component {
                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
 
                             <ReactTable
-                                title= {<TranslationContainer translationKey="ListOfRetention" />}
+                                title= {"List Of Retention"}
                                 data={this.state.newdata}
                                 //data={this.state.Billingdata}
                                 filterable

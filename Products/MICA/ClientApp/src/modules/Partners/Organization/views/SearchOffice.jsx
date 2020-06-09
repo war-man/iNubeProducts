@@ -34,12 +34,12 @@ import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import searchproduct from "assets/img/search-product.png";
 import Profile from "./Office.jsx";
-//import ReactTable from "react-table";
-import "react-table/react-table.css";
+import Edit from "@material-ui/icons/Edit";
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
-
-
-//import ReactTables from "./ReactTables.jsx"
+import Visibility from "@material-ui/icons/Visibility";
+import Tooltip from '@material-ui/core/Tooltip';
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import IconButton from '@material-ui/core/IconButton';
 
 import CustomRadioButton from "components/CustomRadiobutton/CustomRadiobutton.jsx";
 
@@ -124,7 +124,7 @@ class SearchOffice extends React.Component {
             officelist: [],
             officesendlist: [],
             newofficesendlist: [],
-            offdata: "",
+            offid: "",
             showtable: false,
             data: [],
             radioValue1: false,
@@ -149,156 +149,6 @@ class SearchOffice extends React.Component {
         console.log("OfficeCode ", this.state.OfficeCode);
 
     };
-    editFunction(id, oid) {
-        console.log("pid", oid);
-        console.log("officelist data", this.state.officelist);
-        var offArr = this.state.officelist;
-        var OfficeArr = [];
-        $.each(offArr, function (k, v) {
-            if (v.orgOfficeId == oid) {
-                OfficeArr.push(offArr[id]);
-            }
-        })
-        console.log("OfficeArr", OfficeArr);
-        this.setState({ officesendlist: OfficeArr });
-        this.setState({ newofficesendlist: OfficeArr });
-        console.log("before edit", this.state.newofficesendlist);
-        const Officedata = OfficeArr[0].orgOfficeId;
-        // let offdata=this.state.offdata;
-        this.setState({ offdata: Officedata });
-        console.log("officesendlist: ", this.state.officesendlist, this.state.offdata);
-
-    }
-    onChangeRadio = () => {
-
-        let radioValue1 = this.state.radioValue1;
-        let radioValue2 = this.state.radioValue2;
-
-    }
-
-    tableshow = () => {
-        this.setState({ showtable: true });
-        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode, {
-      //  fetch(`https://inubeservicespartners.azurewebsites.net/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode, {
-            //  fetch(`https://localhost:44315/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode,{
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log("officelist", data);
-                this.setState({ officelist: data });
-                this.dataTable(data);
-            });
-        console.log("officelist1", this.state.officelist);
-
-        //if (this.state.count > 0) {
-        //    this.setState({ react: true });
-        //}
-        //else {
-
-        //    this.setState({count:2})
-        //}
-    };
-
-
-    dataTable = (officelist) => {
-        console.log("officelist in react", officelist);
-        this.setState({
-            data: officelist.map((prop, key) => {
-                console.log("coming");
-                const { classes } = this.props;
-                console.log("prop data", prop);
-                console.log("send data", key);
-                return {
-                    id: key,
-                    orgOfficeId: prop.orgOfficeId,
-                    officeCode: prop.officeCode,
-                    officePhoneNo: prop.officePhoneNo,
-                    officeId: prop.officeSpocDetails[0].officeId,
-                    spocname: prop.officeSpocDetails[0].spocname,
-                    spocemailId: prop.officeSpocDetails[0].spocemailId,
-                    officeAddressLine1: prop.officeAddressLine1,
-                    radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.orgOfficeId)} />
-
-
-                    //        checkrow: (<Checkbox
-                    //           className={classes.positionAbsolute}
-                    //            tabIndex={-1}
-
-                    //            onClick={() => this.handleToggle(key, prop)}
-                    //            onChange={() => this.deleterow(key)}
-                    //            checkedIcon={<Check className={classes.checkedIcon}/>}
-                    //            icon={<Check className={classes.uncheckedIcon}  />}
-                    //           classes={{
-                    //                checked: classes.checked,
-                    //               root: classes.checkRoot
-                    //            }}
-                    //        />),
-
-                    //        id: key,
-
-                    //        name: prop[0],
-                    //         stagedata: prop[1],
-                    //        stagedetails:prop[2],
-
-
-                    //        actions: (
-                    //            // we've added some custom button actions
-                    //            <div className="actions-right">
-                    //                {/* use this button to add a like kind of action */}
-
-
-                    //                {/* use this button to add a edit kind of action */}
-
-                    //                {/* use this button to remove the data row */}
-                    //                <Button
-                    //                    justIcon
-                    //                    round
-                    //                    simple
-                    //                    onClick={() => {
-                    //                        var data = this.state.data;
-                    //                        data.find((o, i) => {
-                    //                            if (o.id === key) {
-                    //                                // here you should add some custom code so you can delete the data
-                    //                                // from this component and from your server as well
-                    //                                data.splice(i, 1);
-                    //                                return true;
-                    //                            }
-                    //                            return false;
-                    //                        });
-                    //                        this.setState({ data: data });
-                    //                    }}
-                    //                    color="danger"
-                    //                    className="remove"
-                    //                >
-
-                    //                    <Close />
-                    //                </Button>{" "}
-
-
-                    //            </div>
-
-
-                    //        )
-                };
-
-            })
-        });
-
-
-
-
-
-    }
-    handleClose = () => {
-        this.setState({ open: false });
-
-    };
     Editopen = () => {
         this.setState({ open: true });
         console.log("officesendlist: ", this.state.officesendlist);
@@ -313,36 +163,148 @@ class SearchOffice extends React.Component {
         console.log("new oficce", this.state.newofficesendlist);
         console.log("after edit officesendlist", this.state.officesendlist);
     }
+    viewFunction(id, oid) {
+        console.log("pid", oid);
+        console.log("officelist data", this.state.officelist);
+        var offArr = this.state.officelist;
+        var OfficeArr = [];
+        $.each(offArr, function (k, v) {
+            if (v.orgOfficeId == oid) {
+                OfficeArr.push(offArr[id]);
+            }
+        })
+        console.log("OfficeArrView", OfficeArr);
+        this.setState({ officesendlist: OfficeArr });
+        this.setState({ newofficesendlist: OfficeArr });
+        console.log("before view", this.state.newofficesendlist);
+        const Officedata = OfficeArr[0].orgOfficeId;
+        // let offdata=this.state.offdata;
+        this.setState({ offid: Officedata });
+        console.log("officesendlist: ", this.state.officesendlist, this.state.ofoffidfdata);
+        this.Viewopen();
+    }
+    editFunction(id, oid) {
+        console.log("pid", oid);
+        console.log("officelist data", this.state.officelist);
+        var offArr = this.state.officelist;
+        var OfficeArr = [];
+        $.each(offArr, function (k, v) {
+            if (v.orgOfficeId == oid) {
+                OfficeArr.push(offArr[id]);
+            }
+        })
+        console.log("OfficeArredit", OfficeArr);
+        this.setState({ officesendlist: OfficeArr });
+        this.setState({ newofficesendlist: OfficeArr });
+        console.log("before edit", this.state.newofficesendlist);
+        const Officedata = OfficeArr[0].orgOfficeId;
+        // let offdata=this.state.offdata;
+        this.setState({ offid: Officedata });
+        console.log("officesendlist: ", this.state.officesendlist, this.state.offid);
+        this.Editopen();
+    }
+    onChangeRadio = () => {
+
+        let radioValue1 = this.state.radioValue1;
+        let radioValue2 = this.state.radioValue2;
+
+    }
+
+    tableshow = () => {
+
+
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode, {
+            //  fetch(`https://localhost:44315/api/Office/SearchOffice?OfficeCode=` + this.state.OfficeCode,{
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("officelist", data);
+                this.setState({ officelist: data });
+                if (data.length > 0) {
+                    this.dataTable();
+                }
+            });
+        console.log("officelist1", this.state.officelist);
+    };
+
+
+    dataTable = () => {
+        this.setState({ showtable: true });
+        this.setState({
+            data: this.state.officelist.map((prop, key) => {
+                console.log("coming");
+                const { classes } = this.props;
+                return {
+                    id: key,
+                    orgOfficeId: prop.orgOfficeId,
+                    officeCode: prop.officeCode,
+                    officePhoneNo: prop.officePhoneNo,
+                    officeId: (prop.avoOfficeSpocDetails.length > 0) ? prop.avoOfficeSpocDetails[0].officeId : null,
+                    spocname: (prop.avoOfficeSpocDetails.length > 0) ? prop.avoOfficeSpocDetails[0].spocname : null,
+                    spocemailId: (prop.avoOfficeSpocDetails.length > 0) ? prop.avoOfficeSpocDetails[0].spocemailId : null,
+                    officeAddressLine1: prop.officeAddressLine1,
+                    // radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.orgOfficeId)} />
+                    actions: (
+                        <div className="actions-right">
+                            <Tooltip title={< TranslationContainer translationKey="View" />} placement="bottom" arrow>
+                                <IconButton color="info" justIcon round simple className="view" onClick={this.viewFunction.bind(this, key, prop.orgOfficeId)}
+                                ><Visibility /></IconButton>
+                            </Tooltip>
+                            <Tooltip title={< TranslationContainer translationKey="Edit" />} placement="bottom" arrow>
+                                <IconButton color="info" justIcon round simple className="edit" onClick={this.editFunction.bind(this, key, prop.orgOfficeId)}
+                                ><Edit /></IconButton>
+                            </Tooltip >
+
+                        </div>
+                    )
+                };
+
+            })
+        });
+    }
+    handleClose = () => {
+        this.setState({ open: false });
+
+    };
+
     render() {
         const { classes } = this.props;
         return (
-            <div>
-                <Card>
-                    <CardHeader color="rose" icon>
-                        <CardIcon color="rose">
-                            { /*  <FilterNone /> */}
+            <GridContainer >
+                <GridItem xs={12} sm={12} md={12}>
+                    <Card>
+                        <CardHeader color="rose" icon>
+                            <CardIcon color="rose">
+                                { /*  <FilterNone /> */}
 
-                            <Icon><img id="icon" src={searchproduct} /></Icon>
+                                <Icon><img id="icon" src={searchproduct} /></Icon>
 
-                        </CardIcon>
-                        <h4 className={this.props.cardIconTitle}>
-                            <small> Office Details </small>
-                        </h4>
-                    </CardHeader>
-                    <CardBody>
-                        <GridContainer>
+                            </CardIcon>
+                            <h4 className={this.props.cardIconTitle}>
+                                <small> <TranslationContainer translationKey="OfficeDetails" /></small>
+                            </h4>
+                        </CardHeader>
+                        <CardBody>
+                            <GridContainer>
 
-                            <GridItem xs={12} sm={12} md={4}> <CustomInput
-                                labelText="Office Code"
-                                name="OfficeCode"
-                                value={this.state.OfficeCode}
-                                onChange={(e) => this.SetValue("office", e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            {/*   <GridItem xs={12} sm={12} md={4}> <CustomInput
+                                <GridItem xs={12} sm={12} md={4}>
+                                    <CustomInput
+                                        labelText="OfficeCode"
+                                        name="OfficeCode"
+                                        value={this.state.OfficeCode}
+                                        onChange={(e) => this.SetValue("office", e)}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </GridItem>
+                                {/*   <GridItem xs={12} sm={12} md={4}> <CustomInput
                                 labelText="Organization Catagory"
                                 name="officeId"
                                 value={this.state.officeId}
@@ -392,79 +354,89 @@ class SearchOffice extends React.Component {
                                 }}
                             /> 
                             </GridItem>*/}
-                            <GridItem xs={12} sm={12} md={4}>
-                                <Button color="warning" onClick={this.tableshow} style={{ 'top': '14px' }} round>Search</Button>
+                                <GridItem xs={12} sm={12} md={4}>
+                                    <Button color="warning" onClick={this.tableshow} style={{ 'top': '14px' }} round><TranslationContainer translationKey="Search" /></Button>
 
-                            </GridItem>
-
-
-                            {this.state.showtable &&
-                                <GridContainer>
-                                    <GridItem xs={12}>
-
-
-                                        <CardBody>
-                                            <ReactTable
-                                                data={this.state.data}
-                                                filterable
-                                                columns={[
-                                                    {
-                                                        Header: "Org-Office Id",
-                                                        accessor: "orgOfficeId",
-                                                        Width: "20px"
-
-                                                    },
-                                                    {
-                                                        Header: "Office Code",
-                                                        accessor: "officeCode",
-
-                                                    },
-                                                    {
-                                                        Header: "Office Phone No",
-                                                        accessor: "officePhoneNo",
-                                                        //Width: "10px"
-                                                    },
-                                                    {
-                                                        Header: "Office Id",
-                                                        accessor: "officeId",
-                                                        //Width: "20px"
-                                                    },
-                                                    {
-                                                        Header: "Spoc-Name",
-                                                        accessor: "spocname",
-                                                        // Width: "20px"
-                                                    },
-                                                    {
-                                                        Header: "Spoc-EmailId",
-                                                        accessor: "spocemailId",
-                                                        // Width: "20px"
-                                                    },
-                                                    {
-                                                        Header: "Office Address",
-                                                        accessor: "officeAddressLine1",
-                                                        // maxWidth: "20px"
-                                                    },
-                                                    {
-                                                        Header: "",
-                                                        accessor: "radio",
-                                                        sortable: false,
-                                                        filterable: false
-                                                    },
-                                                ]}
-                                                defaultPageSize={5}
-                                                showPaginationTop={false}
-                                                showPaginationBottom
-                                                pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
-                                                showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
-                                                className="-striped -highlight"
-                                            />
-                                        </CardBody>
-
-                                    </GridItem>
+                                </GridItem>
+                            </GridContainer>
+                        </CardBody>
+                    </Card>
+                    <GridContainer>
+                        {this.state.showtable &&
+                            <GridContainer>
+                                <GridItem xs={12}>
 
 
-                                    <Paper className={classes.root} style={{ marginLeft: '75px', marginRight: '75px' }} >
-                                        {/*   <Table className={classes.table} style={{ borderRadius: '6px  ', width: '100%', margin: '0 auto' }} id="searchTable">
+                                    <CardBody>
+                                        <ReactTable
+                                            data={this.state.data}
+                                            filterable
+                                            columns={[
+                                                //{
+                                                //    Header: "Org-Office Id",
+                                                //    accessor: "orgOfficeId",
+                                                //    minWidth: 20,
+
+                                                //},
+                                                {
+                                                    Header: "Office Code",
+                                                    accessor: "officeCode",
+                                                    minWidth: 20,
+                                                },
+                                                {
+                                                    Header: "Office Phone No",
+                                                    accessor: "officePhoneNo",
+                                                    minWidth: 20,
+                                                },
+                                                {
+                                                    Header: "Office Id",
+                                                    accessor: "officeId",
+                                                    minWidth: 20,
+                                                },
+                                                {
+                                                    Header: "Spoc-Name",
+                                                    accessor: "spocname",
+                                                    minWidth: 20,
+                                                },
+                                                {
+                                                    Header: "Spoc-EmailId",
+                                                    accessor: "spocemailId",
+                                                    minWidth: 20,
+                                                },
+                                                {
+                                                    Header: "Office Address",
+                                                    accessor: "officeAddressLine1",
+                                                    minWidth: 20,
+                                                },
+                                                //{
+                                                //    Header: "",
+                                                //    accessor: "radio",
+                                                //    sortable: false,
+                                                //    filterable: false
+                                                //},
+
+                                                {
+                                                    Header: "Actions",
+                                                    accessor: "actions",
+                                                    sortable: false,
+                                                    filterable: false,
+                                                    minWidth: 20,
+                                                },
+                                            ]}
+                                            defaultPageSize={5}
+                                            showPaginationTop={false}
+                                            showPaginationBottom
+                                            pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                            showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                            className="-striped -highlight"
+                                        />
+                                    </CardBody>
+
+                                </GridItem>
+
+
+                                <Paper className={classes.root} style={{ marginLeft: '75px', marginRight: '75px' }} >
+                                    {/*   <Table className={classes.table} style={{ borderRadius: '6px  ', width: '100%', margin: '0 auto' }} id="searchTable">
                                             <TableHead>
                                                 <TableRow className="table-row" style={{ height: '20px' }}>
                                                     <CustomTableCell className="table-row">orgOffice ID</CustomTableCell>
@@ -497,9 +469,9 @@ class SearchOffice extends React.Component {
                                             </TableBody>
                                         </Table> */}
 
-                                    </Paper>
+                                </Paper>
 
-                                    {/*    <GridItem xs={6} sm={6} md={3}>
+                                {/*    <GridItem xs={6} sm={6} md={3}>
                                         <CustomRadioButton labelText="radio" value={this.state.radioValue1} onChange={this.onChangeRadio} name="pks" />
                                         <div id="right" className={classes.btnSec}>
 
@@ -516,42 +488,50 @@ class SearchOffice extends React.Component {
                                         <CustomRadioButton labelText="radio" value={this.state.radioValue2} onChange={this.onChangeRadio} name="ska" />
                                 </GridItem>*/}
 
-                                    <GridItem id="right" xs={12} sm={12} md={4}>
+                                {/*  <GridItem id="right" xs={12} sm={12} md={4}>
                                         <Button color="warning" onClick={this.Viewopen} id="round"  >VIEW</Button>
                                         <Button color="warning" onClick={this.Editopen} id="round" >EDIT</Button>
 
 
                                     </GridItem>
+                                    */}
 
 
 
+                            </GridContainer>
 
-                                </GridContainer>
+                        }
 
-                            }
-
-                        </GridContainer>
                         <Modal
                             aria-labelledby="simple-modal-title"
                             aria-describedby="simple-modal-description"
                             open={this.state.open}
-                            onClose={this.handleClose}
-                            style={newStyle}>
+                            onClose={this.handleClose}>
 
+                            <div className={classes.paper} id="modal">
+                                {/*    {this.state.viewtext ? <h4>  <small className="center-text"> <TranslationContainer translationKey="ViewUser" /></small> </h4>
+                                    :
+                                    <h4>  <small className="center-text"> <TranslationContainer translationKey="ModifyUser" /> </small> </h4>
+                                }*/}
+                                <Button color="success"
+                                    round
+                                    className={classes.marginRight}
+                                    id="close-bnt"
+                                    onClick={this.handleClose}>
+                                    &times;
+                                                        </Button>
 
-
-
-
-                            <Profile offdata={this.state.offdata} officesendlist={this.state.officesendlist} disabled={this.state.disabled} />
-
-
+                                <div id="disp" >
+                                    <Profile offid={this.state.offid} officesendlist={this.state.officesendlist} disabled={this.state.disabled} />
+                                </div>
+                            </div>
 
                         </Modal>
                         {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
-                    </CardBody>
-                </Card>
 
-            </div>
+                    </GridContainer>
+                </GridItem>
+            </GridContainer>
         );
     }
 }

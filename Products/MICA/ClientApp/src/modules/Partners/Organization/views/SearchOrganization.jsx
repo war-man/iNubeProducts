@@ -22,6 +22,7 @@ import Icon from "@material-ui/core/Icon";
 //import TableRow from '@material-ui/core/TableRow';
 //import Paper from '@material-ui/core/Paper';
 import Button from "components/CustomButtons/Button.jsx";
+import data_Not_found from "assets/img/data-not-found-new.png";
 //import Radio from "@material-ui/core/Radio";
 //import FiberManualRecord from "@material-ui/icons/FiberManualRecord";
 //import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -35,9 +36,16 @@ import swal from 'sweetalert';
 //import ReactTable from "react-table";
 import searchproduct from "assets/img/search-product.png";
 import Organization from "./Organization.jsx";
-import "react-table/react-table.css";
-import ReactTable from 'components/MuiTable/MuiTable.jsx';
+import Edit from "@material-ui/icons/Edit";
+//import view from "@material-ui/icons/view";
 
+import ReactTable from 'components/MuiTable/MuiTable.jsx';
+import { Animated } from "react-animated-css";
+import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
+import Visibility from "@material-ui/icons/Visibility";
+import Tooltip from '@material-ui/core/Tooltip';
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import IconButton from '@material-ui/core/IconButton';
 
 const styles = theme => ({
     paper: {
@@ -51,10 +59,25 @@ const styles = theme => ({
     },
 });
 
+const paddingCard =
+{
+    padding: "10px",
+};
+
 class SearchOrganization extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            //loader
+            loader: true,
+            pageloader: false,
+            nodata: false,
+            showtable: false,
+            //loader
+            isDontShowSubmit: false,
+            isShowViewModify: false,
+
+            isShowSearchOrg: true,
             editModal: false,
             selectedValue: null,
             btnvisibility: false,
@@ -67,18 +90,25 @@ class SearchOrganization extends React.Component {
 
             open: false,
             searchOrg: {
-                "organizationId": 0,
+                // "organizationId": "",
+                "organizationId": null,
                 "orgName": "",
                 "orgWebsite": "",
                 "orgPhoneNo": "",
                 "orgRegistrationNo": ""
             },
         };
+        // this.state.isDontShowSubmit = props.isShowSubmit;
+        // this.state.isDontShowSubmit = this.state.isShowSubmit;
         this.SearchOrg = this.SearchOrg.bind(this);
-        this.handleEdit = this.handleEdit.bind(this);
+        // this.handleEdit = this.handleEdit.bind(this);
         this.editFunction = this.editFunction.bind(this);
+        this.viewFunction = this.viewFunction.bind(this);
     }
-
+    searchagain = () => {
+        this.setState({ nodata: false });
+        window.scrollTo(0, 0);
+    }
     handleClose = () => {
         this.setState({ open: false });
     };
@@ -87,42 +117,35 @@ class SearchOrganization extends React.Component {
         this.setState({ selectedValue: event.target.value });
     }
 
-    handleView = () => {
-        if (this.state.orgId == "") {
-            swal("", "Please select organization to view datails", "")
-        } else {
-            this.handleOpen();
-            let view = this.state;
 
-            view.disabled = true;
-            view.editModal = true;
-            view.open = true;
-            view.btnvisibility = false;
 
-            this.setState({ view });
-        }
-    };
 
-    handleEdit = (id) => {
-        if (this.state.orgId == "") {
-            swal("", "Please select organization to edit datails", "")
-        } else {
-            this.handleOpen();
-            let edit = this.state;
+    viewFunction(id, oId) {
+        document.getElementById("disp");
 
-            edit.open = true;
-            edit.editModal = true;
-            edit.btnvisibility = true;
-            edit.disabled = false;
+        var orgArr = this.state.orglist
+        var OrgtArr = [];
+        $.each(orgArr, function (k, v) {
+            if (v.organizationId == oId) {
+                OrgtArr.push(orgArr[id]);
+            }
+        })
 
-            this.setState({ edit });
-        }
-    };
+        this.setState({ orgId: OrgtArr[0].organizationId, rowData: OrgtArr });
+        this.handleOpen();
 
-    handleOpen = () => {
-        this.setState({ open: true });
-    };
 
+        let view = this.state;
+
+        view.disabled = true;
+        view.editModal = true;
+        view.open = true;
+        view.btnvisibility = false;
+        this.setState({ isShowSearchOrg: false });
+        this.setState({ isShowViewModify: true });
+
+        this.setState({ view });
+    }
     editFunction(id, oId) {
         document.getElementById("disp");
 
@@ -133,17 +156,39 @@ class SearchOrganization extends React.Component {
                 OrgtArr.push(orgArr[id]);
             }
         })
-        //const orgptdata = OrgtArr[0].organizationId;
+
         this.setState({ orgId: OrgtArr[0].organizationId, rowData: OrgtArr });
-        //state.orgId = OrgtArr[0].organizationId;
-        //state.rowData = OrgtArr;
-        //this.setState({ state });
+        this.handleOpen();
+
+        let edit = this.state;
+
+        edit.open = true;
+        edit.editModal = true;
+        edit.btnvisibility = true;
+        edit.disabled = false;
+        this.setState({ isDontShowSubmit: true });
+        this.setState({ isShowSearchOrg: false });
+        this.setState({ isShowViewModify: true });
+
+
+
+        this.setState({ edit });
+
     }
+    handleOpen = () => {
+        this.setState({ open: true });
+    };
+
+
 
     SearchOrg() {
-        document.getElementById('searchTableSec').style.display = 'block';
-        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/SearchOrg`,
-            //fetch(`https://localhost:44315/api/Organization/SearchOrg`,
+        debugger
+       // this.state.searchOrg.organizationId
+        this.setState({ loader: false, showtable: false });
+        //  document.getElementById('searchTableSec').style.display = 'block';
+
+        //fetch(`https://localhost:44315/api/Organization/SearchOrg`,
+        fetch(`${partnerconfig.partnerconfigUrl}/api/Organization/SearchOrgAsync`,
             {
                 method: 'POST',
                 body: JSON.stringify(this.state.searchOrg),
@@ -155,25 +200,67 @@ class SearchOrganization extends React.Component {
             }
         ).then(response => response.json())
             .then(data => {
+                //  if (data.length > 0) {
                 this.setState({ orglist: data })
-                this.setState({
-                    dataLength: this.state.orglist.map((prop, key) => {
-                      //  console.log("Orgdata", dataLength);
-                        const { classes } = this.props;
-                        return {
-                            orgid: prop.organizationId,
-                            orgName: prop.orgName,
-                            orgWebsite: prop.orgWebsite,
-                            orgPhoneNo: prop.orgPhoneNo,
-                            orgRegistrationNo: prop.orgRegistrationNo,
-                            radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.organizationId)} />
-                        };
-                    })
-                    
-                });
+                console.log("dataCheck", data, this.state.orglist);
+                if (data.length > 0) {
+                    this.setState({ loader: true, showtable: true });
+                    this.tabledata();
+                    // this.setState({ loader: true });
+
+                } else {
+                    setTimeout(
+                        function () {
+                            this.setState({ loader: true, showtable: false, pageloader: true, nodata: true });
+                        }.bind(this), 2000
+                    );
+                }
             });
+
     }
 
+
+
+    //        } else {
+    //            setTimeout(
+    //    function() {
+    //                this.setState({ loader: true, showtable: false, nodata: true });
+    //            }.bind(this), 2000
+    //);
+    //            }
+
+
+    tabledata = () => {
+        this.setState({
+            loader: true
+        });
+        this.setState({
+            dataLength: this.state.orglist.map((prop, key) => {
+                //    if (dataLength > 0) {
+                console.log("Orgdata", this.state.dataLength, this.state.orglist);
+                return {
+                    orgid: prop.organizationId,
+                    orgName: prop.orgName,
+                    orgWebsite: prop.orgWebsite,
+                    orgPhoneNo: prop.orgPhoneNo,
+                    orgRegistrationNo: prop.orgRegistrationNo,
+                    //  radio: < input type="radio" name="product" onClick={this.editFunction.bind(this, key, prop.organizationId)} />,
+                    actions: (
+                        <div className="actions-right">
+                            <Tooltip title={< TranslationContainer translationKey="View" />} placement="bottom" arrow>
+                                <IconButton color="info" justIcon round simple className="view" onClick={this.viewFunction.bind(this, key, prop.organizationId)} ><Visibility /></IconButton>
+                            </Tooltip>
+                            <Tooltip title={< TranslationContainer translationKey="Edit" />} placement="bottom" arrow>
+                                <IconButton color="info" justIcon round simple className="edit" onClick={this.editFunction.bind(this, key, prop.organizationId)}><Edit /></IconButton>
+                            </Tooltip >
+
+                        </div>
+                    )
+                };
+            })
+        });
+
+    }
     SetValue = (event) => {
         event.preventDefault();
 
@@ -188,201 +275,221 @@ class SearchOrganization extends React.Component {
         const { classes } = this.props;
 
         return (
-            <Card>
-                <CardHeader color="rose" icon>
-                    <CardIcon color="rose">
-                        { /*  <FilterNone /> */}
+            <GridContainer >
+                <GridItem xs={12} sm={12} md={12}>
+                    {this.state.isShowSearchOrg &&
+                        <Card>
 
-                        <Icon><img id="icon" src={searchproduct} /></Icon>
+                            <CardHeader color="rose" icon>
+                                <CardIcon color="rose">
+                                    { /*  <FilterNone /> */}
 
-                    </CardIcon>
-                    <h4>
-                        <small> Search Organization </small>
-                    </h4>
-                </CardHeader>
-                <CardBody>
+                                    <Icon><img id="icon" src={searchproduct} /></Icon>
 
-                    <GridContainer>
-                        <GridItem>
+                                </CardIcon>
+                                <h4>
+                                <small><TranslationContainer translationKey="SearchOrganization" /> </small>
+                                </h4>
+                            </CardHeader>
 
-                            <GridContainer>
-                                <GridItem xs={12} sm={12} md={3}>
-                                    <CustomInput
-                                        labelText="Organization ID"
-                                        id="Organizationid"
-                                        value={this.state.searchOrg.organizationId}
-                                        name="organizationId"
-                                        onChange={(e) => this.SetValue(e)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={3}>
-                                    <CustomInput
-                                        labelText="Organization Name"
-                                        id="Organizationid"
-                                        value={this.state.searchOrg.orgName}
-                                        name="orgName"
-                                        onChange={(e) => this.SetValue(e)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                </GridItem >
-                                <GridItem xs={12} sm={12} md={3}>
-                                    <CustomInput
-                                        labelText="Organization Name"
-                                        id="Organizationid"
-                                        value={this.state.searchOrg.orgName}
-                                        name="orgName"
-                                        onChange={(e) => this.SetValue(e)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={3}>
-                                    <CustomInput
-                                        labelText="Organization Ph. Number"
-                                        id="Organizationid"
-                                        value={this.state.searchOrg.orgPhoneNo}
-                                        name="orgPhoneNo"
-                                        onChange={(e) => this.SetValue(e)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={3}>
-                                    <CustomInput
-                                        labelText="Organization Reg Number"
-                                        id="Organizationid"
-                                        value={this.state.searchOrg.orgRegistrationNo}
-                                        name="orgRegistrationNo"
-                                        onChange={(e) => this.SetValue(e)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={3}>
-                                    <CustomInput
-                                        labelText="Organization Website"
-                                        id="Organizationid"
-                                        value={this.state.searchOrg.orgWebsite}
-                                        name="orgWebsite"
-                                        onChange={(e) => this.SetValue(e)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                </GridItem>
+                            <CardBody>
+
+
+
                                 <GridContainer>
-                                    <GridItem className="search-bnt" xs={3} sm={3} md={3}>
-                                        <Button style={{ marginTop: "1rem" }} className={classes.marginRight}  id="button-search-partner" color="info" onClick={this.SearchOrg}>
-                                   
-                                            Search Organization
-                                </Button>
+
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <CustomInput
+                                            labelText="OrganizationID"
+                                            id="Organizationid"
+                                            value={this.state.searchOrg.organizationId}
+                                            name="organizationId"
+                                            onChange={(e) => this.SetValue(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
                                     </GridItem>
+
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <CustomInput
+                                            labelText="OrganizationName"
+                                            id="Organizationid"
+                                            value={this.state.searchOrg.orgName}
+                                            name="orgName"
+                                            onChange={(e) => this.SetValue(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <CustomInput
+                                            labelText="OrganizationPhNumber"
+                                            id="Organizationid"
+                                            value={this.state.searchOrg.orgPhoneNo}
+                                            name="orgPhoneNo"
+                                            onChange={(e) => this.SetValue(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <CustomInput
+                                            labelText="OrganizationRegNumber"
+                                            id="Organizationid"
+                                            value={this.state.searchOrg.orgRegistrationNo}
+                                            name="orgRegistrationNo"
+                                            onChange={(e) => this.SetValue(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <CustomInput
+                                            labelText="OrganizationWebsite"
+                                            id="Organizationid"
+                                            value={this.state.searchOrg.orgWebsite}
+                                            name="orgWebsite"
+                                            onChange={(e) => this.SetValue(e)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                    <GridContainer justify="center">
+                                        <GridItem>
+                                            <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={this.SearchOrg}> Search  </Button>
+
+                                        </GridItem>
+                                    </GridContainer>
+
                                 </GridContainer>
-                            </GridContainer>
-                            <GridContainer justify="center">
-                                <div id="searchTableSec" style={{ display: 'none' }}>
-                                    <br />
-                                    <GridItem xs={12}>
-                                        <CardBody>
-                                            <ReactTable
-                                                data={this.state.dataLength}
-                                                filterable
-                                                columns={[
-                                                    {
-                                                        Header: "",
-                                                        accessor: "radio",
-                                                        //style: { textAlign: "center" },
-                                                        //minWidth: 100,
-                                                        //headerClassName: 'react-table-center'
-                                                    },
-                                                    {
-                                                        Header: "Organization Id",
-                                                        accessor: "orgid",
-                                                    },
-                                                    {
-                                                        Header: "Organization Name",
-                                                        accessor: "orgName",
-                                                        //style: { textAlign: "center" },
-                                                        // minWidth: 35,
-                                                        //headerClassName: 'react-table-center'
-                                                    },
-                                                    {
-                                                        Header: "Website",
-                                                        accessor: "orgWebsite",
-                                                        //style: { textAlign: "center" },
-                                                       // minWidth: 75,
-                                                         //headerClassName: 'react-table-center'
-                                                    },
-                                                    {
-                                                        Header: "Phone Number",
-                                                        accessor: "orgPhoneNo",
-                                                        //style: { textAlign: "center" },
-                                                      //  minWidth: 35,
-                                                        //headerClassName: 'react-table-center'
-                                                    },
-                                                    {
-                                                        Header: "Registration Number",
-                                                        accessor: "orgRegistrationNo",
-                                                        //style: { textAlign: "center" },
-                                                       // minWidth: 35,
-                                                        //headerClassName: 'react-table-center'
-                                                    },
+                            </CardBody>
+                        </Card>
+                    }
+                    {this.state.isShowSearchOrg &&
+                        <GridContainer >
+                            {this.state.loader ?
 
-                                                ]}
-                                                defaultPageSize={5}
-                                                showPaginationTop={false}
-                                              pageSize={([this.state.dataLength.length + 1] < 5) ? [this.state.dataLength.length + 1] : 5}
-                                              showPaginationBottom={([this.state.dataLength.length + 1] <= 5) ? false : true}
-                                                className="-striped -highlight"
-                                            />
+                                <GridContainer >
 
-                                        </CardBody>
+                                    {this.state.showtable ?
 
-                                    </GridItem>
-                                    <div className="center-bnt">
-                                        <Button color="info" round className={classes.marginRight} onClick={this.handleView}>
-                                            View
-                                    </Button>
-                                        <Button color="info" round className={classes.marginRight} onClick={(id) => this.handleEdit(id)} editModal={this.state.editModal}>
-                                            Edit
-                                    </Button>
-                                    </div>
-                                    <Modal
-                                        aria-labelledby="simple-modal-title"
-                                        aria-describedby="simple-modal-description"
-                                        open={this.state.open}
-                                        onClose={this.handleClose}>
-                                        <div className={classes.paper} id="modal">
-                                            <h4><small className="center-text"> Modify Organization</small> </h4>
-                                            <Button color="info"
-                                                round
-                                                className={classes.marginRight}
-                                                id="close-bnt"
-                                                onClick={this.handleClose}>
-                                                &times;
-                                                        </Button>
+                                        <GridItem xs={12}>
 
-                                            <div id="disp" >
-                                                <Organization editModal={this.state.editModal} open={this.state.open} searchOrganizationId={this.state.orgId} disabled={this.state.disabled} btnvisibility={this.state.btnvisibility} />
-                                            </div>
-                                        </div>
-                                    </Modal>
-                                </div>
-                            </GridContainer>
+                                            <CardBody>
+                                                <ReactTable
+                                                    data={this.state.dataLength}
+                                                    filterable
+                                                    columns={[
+                                                        //{
+                                                        //    Header: "",
+                                                        //    accessor: "radio",
+                                                        //    //style: { textAlign: "center" },
+                                                        //    //minWidth: 100,
+                                                        //    //headerClassName: 'react-table-center'
+                                                        //},
+                                                        {
+                                                            Header: "Organization Id",
+                                                            accessor: "orgid",
+                                                        },
+                                                        {
+                                                            Header: "Organization Name",
+                                                            accessor: "orgName",
+                                                            //style: { textAlign: "center" },
+                                                            // minWidth: 35,
+                                                            //headerClassName: 'react-table-center'
+                                                        },
+                                                        {
+                                                            Header: "Website",
+                                                            accessor: "orgWebsite",
+                                                            //style: { textAlign: "center" },
+                                                            // minWidth: 75,
+                                                            //headerClassName: 'react-table-center'
+                                                        },
+                                                        {
+                                                            Header: "Phone Number",
+                                                            accessor: "orgPhoneNo",
+                                                            //style: { textAlign: "center" },
+                                                            //  minWidth: 35,
+                                                            //headerClassName: 'react-table-center'
+                                                        },
+                                                        {
+                                                            Header: "Registration Number",
+                                                            accessor: "orgRegistrationNo",
+                                                            //style: { textAlign: "center" },
+                                                            // minWidth: 35,
+                                                            //headerClassName: 'react-table-center'
+                                                        }, {
+                                                            Header: "Actions",
+                                                            accessor: "actions",
+                                                            style: { textAlign: "center" },
+                                                            headerClassName: 'react-table-center',
+                                                            minWidth: 40,
+                                                            resizable: false,
+
+                                                        }
+
+                                                    ]}
+                                                    defaultPageSize={5}
+                                                    showPaginationTop={false}
+                                                    pageSize={([this.state.dataLength.length + 1] < 5) ? [this.state.dataLength.length + 1] : 5}
+                                                    showPaginationBottom={([this.state.dataLength.length + 1] <= 5) ? false : true}
+                                                    className="-striped -highlight"
+                                                />
+
+                                            </CardBody>
+
+                                        </GridItem>
 
 
-                        </GridItem>
+
+
+                                        : <GridItem lg={12}>{
+                                            this.state.nodata ? <Card>
+                                                    <GridContainer lg={12} justify="center">
+                                                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                            <img src={data_Not_found} className="tab-data-not-found" />
+                                                        </Animated>
+                                                    </GridContainer>
+                                                    <GridContainer lg={12} justify="center">
+                                                        <GridItem xs={5} sm={3} md={3} lg={1} >
+                                                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                                <Button className="secondary-color" round onClick={() => this.searchagain()}> Try again </Button>
+                                                            </Animated>
+                                                        </GridItem>
+                                                    </GridContainer>
+                                                </Card>
+                                                : null}
+                                        </GridItem>
+                                    }
+
+                                </GridContainer>
+                                : <Card style={paddingCard}>
+                                    <TableContentLoader />
+                                </Card>
+                            }
+                        </GridContainer>
+                    }
+                    <GridContainer>
+
+                        <GridItem xs={12}>
+                            <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
+                                {this.state.isShowViewModify &&
+                                    <Organization editModal={this.state.editModal} open={this.state.open} isDontShowSubmit={this.state.isDontShowSubmit}
+                                        searchOrganizationId={this.state.orgId} disabled={this.state.disabled}
+                                        btnvisibility={this.state.btnvisibility} />}
+                            </Animated>
+
+                        </GridItem >
                     </GridContainer>
-                </CardBody>
-            </Card>
+                </GridItem >
+            </GridContainer>
+
+
         );
     }
 

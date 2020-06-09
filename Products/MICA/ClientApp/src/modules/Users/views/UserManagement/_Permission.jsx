@@ -124,11 +124,12 @@ const Permission = (props) => {
             </div>
         );
     }
-    let dynamicreportsmenu = (a3, b2, location2, c2) => {
+
+    let dynamicreportsmenu = (a2, b2, location2, c2) => {
         return (
             <div>
                 <React.Fragment>
-                    {a3.map((item, index) =>
+                    {a2.map((item, index) =>
                         <React.Fragment>
                             <ListItem className="tree-Assign-Privileges">
                                 <ListItemIcon className="checkboxPading" >
@@ -156,14 +157,13 @@ const Permission = (props) => {
                         </React.Fragment>
                     )}
                 </React.Fragment>
-            </div >
+            </div>
         );
     }
     return (
         <GridContainer>
             <GridItem xs={12} sm={12} md={12}>
                 <GridContainer>
-
                     <CardBody className="permission-card">
                         <h4 style={{ fontWeight: '400' }}> Dashoard Privileges </h4>
                         <List>
@@ -173,9 +173,10 @@ const Permission = (props) => {
                                         <ListItem className="mica-admin" >
                                             <ListItemIcon className="checkboxPading" >
                                             </ListItemIcon>
-                                            {/* {menuname ?	
-                                                <ListItemText className="checboxText" primary={item.roleName} />	
-                                                : <label><TranslationContainer translationKey="ListofDashboards" /></label>}*/}
+                                            {/*{menuname ?
+                                                <ListItemText className="checboxText" primary={item.roleName} />
+                                                : null}
+                                            {/*<label><TranslationContainer translationKey="ListofDashboards" /></label>*/}
                                             <ListItemText className="checboxText" primary={item.roleName} />
                                         </ListItem>
                                         <GridItem>
@@ -188,6 +189,7 @@ const Permission = (props) => {
                                     </GridItem>
                                 </div>
                             )}
+
                         </List>
                     </CardBody>
                 </GridContainer>{/**/}
@@ -201,10 +203,9 @@ const Permission = (props) => {
                                         <ListItem className="mica-admin" >
                                             <ListItemIcon className="checkboxPading" >
                                             </ListItemIcon>
-                                            {/*  {menuname ?	
+                                            {menuname ?
                                                 <ListItemText className="checboxText" primary={item.roleName} />
-                                                : <label><TranslationContainer translationKey="ListofMenuPermissions" /></label>}*/}
-                                            <ListItemText className="checboxText" primary={item.roleName} />
+                                                : <label><TranslationContainer translationKey="ListofMenuPermissions" /></label>}
                                         </ListItem>
                                         <GridItem>
                                             <ListItem className="partner-admin">
@@ -219,37 +220,39 @@ const Permission = (props) => {
                         </List>
                     </CardBody>
                 </GridContainer>
-                <GridContainer>
-                    <CardBody className="permission-card">
-                        <h4 style={{ fontWeight: '400' }}> Reports Privileges </h4>
-                        <List>
-                            {dynamicreports.map((item, index) =>
-                                <div className="permissiongrid" id="'+ randomID +'">
-                                    <GridItem xs={12} sm={12}>
-                                        <ListItem className="mica-admin" >
-                                            <ListItemIcon className="checkboxPading" >
-                                            </ListItemIcon>
-                                            {/*   {menuname ?	
-                                                <ListItemText className="checboxText" primary={item.roleName} />	
-                                                : <label><TranslationContainer translationKey="ListofReports" /></label>}*/}
-                                            <ListItemText className="checboxText" primary={item.name} />
-                                        </ListItem>
-                                        <GridItem>
-                                            <ListItem className="partner-admin">
-                                                <List>
-                                                    {dynamicreportsmenu(item.mdata, 0, [], index)}
-                                                </List>
+                {(dynamicreports != undefined) ?
+                    <GridContainer>
+                        <CardBody className="permission-card">
+                            <h4 style={{ fontWeight: '400' }}> Reports Privileges </h4>
+                            <List>
+                                {dynamicreports.map((item, index) =>
+                                    <div className="permissiongrid" id="'+ randomID +'">
+                                        <GridItem xs={12} sm={12}>
+                                            <ListItem className="mica-admin" >
+                                                <ListItemIcon className="checkboxPading" >
+                                                </ListItemIcon>
+                                                {menuname ?
+                                                    <ListItemText className="checboxText" primary={item.roleName} />
+                                                    : null}
+                                                {/*<label><TranslationContainer translationKey="ListofReports" /></label>}*/}
                                             </ListItem>
+                                            <GridItem>
+                                                <ListItem className="partner-admin">
+                                                    <List>
+                                                        {dynamicreportsmenu(item.mdata, 0, [], index)}
+                                                    </List>
+                                                </ListItem>
+                                            </GridItem>
                                         </GridItem>
-                                    </GridItem>
-                                </div>
-                            )}
-                        </List>
-                    </CardBody>
-                </GridContainer>
+                                    </div>
+                                )}
+                            </List>
+                        </CardBody>
+                    </GridContainer>
+                    : null}
                 <GridContainer lg={12} justify="center">
                     <GridItem xs={7} sm={3} md={3} lg={1} >
-                        <Button id="permissionbnt" /*disabled={props.btnload1}*/ onClick={props.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
+                        <Button id="permissionbnt" disabled={props.response1} onClick={props.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
                         {/*{props.btnload1 ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                     </GridItem>
                 </GridContainer>

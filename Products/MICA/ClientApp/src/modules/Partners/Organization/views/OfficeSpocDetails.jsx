@@ -52,16 +52,17 @@ const OfficeSpocDetails = (props) => {
     var addType = 'spoc';
     return (
         <GridContainer>
-            <GridItem xs={12} sm={12} md={14}>
+            <GridItem xs={12} sm={12} md={4}>
                 <CustomInput
                     disabled={spocData.disabled}
-                    success={spocData.spocnameState === "success"}
-                    error={spocData.spocnameState === "error"}
+                    //success={spocData.spocnameState === "success"}
+                    //error={spocData.spocnameState === "error"}
+                    error={spocData.spocnameState}
                     labelText="Name"
                     id="name"
                     value={spocData.addressDTO.spoc.spocname}
                     name='spocname'
-                    onChange={(e) => spocData.SetValue(addType, e)}
+                    onChange={(e) => spocData.SetValue("spoc", e)}
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -73,13 +74,14 @@ const OfficeSpocDetails = (props) => {
             <GridItem xs={12} sm={12} md={4}>
                 <CustomInput
                     disabled={spocData.disabled}
-                    success={spocData.spocdesignationState === "success"}
-                    error={spocData.spocdesignationState === "error"}
+                    //success={spocData.spocdesignationState === "success"}
+                    //error={spocData.spocdesignationState === "error"}
+                    error={spocData.spocdesignationState}
                     labelText="Designation"
                     id="designation"
                     value={spocData.addressDTO.spoc.spocdesignation}
                     name='spocdesignation'
-                    onChange={(e) => spocData.SetValue(addType, e)}
+                    onChange={(e) => spocData.SetValue("spoc", e)}
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -91,13 +93,14 @@ const OfficeSpocDetails = (props) => {
             <GridItem xs={12} sm={12} md={4}>
                 <CustomInput
                     disabled={spocData.disabled}
-                    success={spocData.spocemailIdState === "success"}
-                    error={spocData.spocemailIdState === "error"}
+                    //success={spocData.spocemailIdState === "success"}
+                    //error={spocData.spocemailIdState === "error"}
+                    error={spocData.spocemailIdState}
                     labelText="EmailId"
                     id="emailId"
                     value={spocData.addressDTO.spoc.spocemailId}
                     name='spocemailId'
-                    onChange={(e) => spocData.SetValue(addType, e)}
+                    onChange={(e) => spocData.SetValue("spoc", e)}
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -106,23 +109,24 @@ const OfficeSpocDetails = (props) => {
             <GridItem xs={12} sm={12} md={4}>
                 <CustomInput
                     disabled={spocData.disabled}
-                    success={spocData.spocmobilenoState === "success"}
-                    error={spocData.spocmobilenoState === "error"}
+                    //success={spocData.spocmobilenoState === "success"}
+                    //error={spocData.spocmobilenoState === "error"}
+                    error={spocData.spocmobilenoState}
                     labelText="MobileNumber"
                     id="mobileNumber"
                     value={spocData.addressDTO.spoc.spocmobileno}
                     name='spocmobileno'
-                    onChange={(e) => spocData.SetValue(addType, e)}
+                    onChange={(e) => spocData.SetValue("spoc", e)}
                     formControlProps={{
                         fullWidth: true
                     }}
                 />
             </GridItem>
 
-            <GridItem xs={12} sm={12} md={12}>
+            {/*<GridItem xs={12} sm={12} md={12}>
                 <RegAddress  {...props} disabled={spocData.disabled} />
             </GridItem>
-
+            */}
 
 
         </GridContainer>

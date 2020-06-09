@@ -55,230 +55,107 @@ const style = {
 };
 
 const ParticipantGrid = (props) => {
-    console.log("ppp",props);
+    console.log("ppp", props);
     let list = [];
 
-  
+
     return (
 
         <GridContainer xl={12}>
-                            <GridItem xs={12}>
-                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                    <ReactTable
-                                        StyleType={true}
-                                        data={props.participantstableData}
+            <GridItem xs={12}>
+                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                    <ReactTable
+                        data={props.newdata}
+                        filterable
+                        columns={[
+                            {
+                                Header: "#",
+                                accessor: "id",
+                                headerClassName: 'react-table-center',
+                                style: { textAlign: "center" },
+                                minWidth: 20,
+                                sortable: false,
+                            },
+                            {
+                                Header: "Reinsurer Code",
+                                accessor: "reinsurercodeId",
+                                minWidth: 40,
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "Reinsurer Name",
+                                accessor: "reinsurername",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "RI BranchCode",
+                                accessor: "ribranchcodeId",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "Broker Code",
+                                accessor: "brokercode",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "Broker Name",
+                                accessor: "brokername",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "Broker BranchCode",
+                                accessor: "bkbranchcodeId",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "Share(%)",
+                                accessor: "sharepercent",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "Brokage(%)",
+                                accessor: "brokagepercent",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "RI Commission(%)",
+                                accessor: "riCommissionpercent",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                            {
+                                Header: "Bordereaux Frequency",
+                                accessor: "bordereauxfrequencyId",
+                                minWidth: 40,
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center'
+                            },
+                        ]}
+                        defaultPageSize={5}
+                        //pageSize={([this.state.tabledata.length + 1] < 5) ? [this.state.tabledata.length + 1] : 5}
+                        showPaginationTop={false}
+                        showPaginationBottom={true}
+                        className="-striped -highlight"
+                    />
+                </Animated>
+            </GridItem>
+        </GridContainer>
 
-                                        filterable
-
-                                        getTdProps={() => ({
-
-                                            style: {
-
-                                                overflow: 'visible',
-
-                                            },
-
-                                        })}
-
-                                        columns={[
-
-                                            {
-
-                                                Header: "#",
-
-                                                accessor: "id",
-
-                                                headerClassName: 'react-table-center',
-
-                                                style: { textAlign: "center" },
-
-                                                minWidth: 20,
-
-                                                sortable: false,
-
-
-
-                                                //  filterable: false
-
-                                            },
-
-                                            {
-
-
-
-                                                Header: "Reinsurer Code",
-
-                                                accessor: "reinsurercodeId",
-
-                                                minWidth: 40,
-
-                                                // style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-
-                                            {
-
-                                                Header: "Reinsurer Name",
-
-                                                accessor: "reinsurername",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "Reinsurer Name",
-
-                                                accessor: "reinsurername",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "RI BranchCode",
-
-                                                accessor: "ribranchcodeId",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "Broker Code",
-
-                                                accessor: "brokercode",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "Broker Name",
-
-                                                accessor: "brokername",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "Broker BranchCode",
-
-                                                accessor: "bkbranchcodeId",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "Share(%)",
-
-                                                accessor: "sharepercent",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "Brokage(%)",
-
-                                                accessor: "brokagepercent",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "RI Commission(%)",
-
-                                                accessor: "riCommissionpercent",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "Bordereaux Frequency",
-
-                                                accessor: "bordereauxfrequencyId",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-                                            {
-
-                                                Header: "Action",
-
-                                                accessor: "Action",
-
-                                                minWidth: 40,
-
-                                                style: { textAlign: "center" },
-
-                                                headerClassName: 'react-table-center'
-
-                                            },
-
-                                        ]}
-
-                                        defaultPageSize={5}
-
-                                        //pageSize={([TreatyData.TreatytableData.length + 2] < 5) ? [TreatyData.TreatytableData.length + 2] : 5}
-
-                                        showPaginationTop={false}
-
-                                        showPaginationBottom
-
-                                        className="-striped -highlight long-tab"
-                                    />
-                                </Animated>
-
-                            </GridItem>
-                </GridContainer>  
-     
     );
 
 }

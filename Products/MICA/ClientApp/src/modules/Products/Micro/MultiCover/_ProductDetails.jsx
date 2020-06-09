@@ -43,6 +43,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import { primaryColor } from "../../../../assets/jss/material-dashboard-pro-react";
 
 
 function TabPanel(props) {
@@ -103,7 +104,7 @@ const MyTab = withStyles(theme => ({
     },
     selected: {
         color: "#FFFFFF",
-        backgroundColor: "#2e6e9a",
+        backgroundColor: primaryColor,
         boxShadow: "0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(0, 0, 0, 0.42)"
     }
 }))(Tab);

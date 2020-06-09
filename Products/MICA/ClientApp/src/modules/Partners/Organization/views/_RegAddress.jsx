@@ -6,15 +6,14 @@ import GridItem from "components/Grid/GridItem.jsx";
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
-//import PinCodeModal from "./_PinCodeModal";
+import PinCodeModal from "./_PinCodeModal";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import FiberManualRecord from "@material-ui/icons/FiberManualRecord";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import withStyles from "@material-ui/core/styles/withStyles";
 import $ from 'jquery';
-import CreatePartner from "./CreatePartner";
-import CommonMessage from "Messages/CommonMessage.jsx";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 
 import { Animated } from "react-animated-css";
@@ -53,7 +52,7 @@ const RegAddress = (props) => {
     const data = props.componentName;
     //console.log("peops coimng data", data);
     //console.log(regData);
-    console.log('propsR',props);
+    //console.log('props',props);
     const { classes } = props;
     var addType;
     var countryValue, stateValue, distValue, cityValue, pinCodeValue, addLine1, addLine2, addLine3;
@@ -72,8 +71,8 @@ const RegAddress = (props) => {
         District = regData.LocationDTO.District;
         City = regData.LocationDTO.City;
         Pincode = regData.LocationDTO.Pincode;
-        lblmsg = 'Corporate Address same as Registered Address';
-        countryValue = regData.addressDTO.corp.orgCountryId; 
+        lblmsg = <TranslationContainer translationKey="CorporateAddressSameasRegisteredAddress" />;
+        countryValue = regData.addressDTO.corp.orgCountryId;
         stateValue = regData.addressDTO.corp.orgStateId;
         distValue = regData.addressDTO.corp.orgDistrictId;
         cityValue = regData.addressDTO.corp.orgCityId;
@@ -118,7 +117,6 @@ const RegAddress = (props) => {
 
     else if (data == "offAddress") {
         addType = 'off';
-        //debugger
         //console.log("regdata",regData);
         Country = regData.LocationDTO.Country;
         State = regData.LocationDTO.State;
@@ -133,7 +131,7 @@ const RegAddress = (props) => {
         addLine1 = regData.addressDTO.off.officeAddressLine1;
         addLine2 = regData.addressDTO.off.officeAddressLine2;
         addLine3 = regData.addressDTO.off.officeAddressLine3;
-        console.log("value off", countryValue);
+        //console.log("value off", countryValue);
     }
     else if (data == "spocDet") {
         addType = 'spoc';
@@ -152,8 +150,7 @@ const RegAddress = (props) => {
         addLine2 = regData.addressDTO.spoc.spocaddressLine2;
         addLine3 = regData.addressDTO.spoc.spocaddressLine3;
     }
-    //else if (data == "pCorpAddress") {
-    if (data == "pCorpAddress") {
+    else if (data == "pCorpAddress") {
         addType = 'corp';
         Country = regData.LocationDTO.Country;
         State = regData.LocationDTO.State;
@@ -176,7 +173,7 @@ const RegAddress = (props) => {
         District = regData.LocationDTO.RDistrict;
         City = regData.LocationDTO.RCity;
         Pincode = regData.LocationDTO.RPincode;
-        lblmsg = 'Office Address same as Corporate Address';
+        lblmsg = <TranslationContainer translationKey="OfficeAddressSameasCorporateAddress" />;
         //console.log(regData);
         countryValue = regData.addressDTO.off.partnerCountryId;
         stateValue = regData.addressDTO.off.partnerStateId;
@@ -196,8 +193,7 @@ const RegAddress = (props) => {
         addLine1Name = 'orgAddressLine1';
         addLine2Name = 'orgAddressLine2';
         addLine3Name = 'orgAddressLine3';
-    }
-        else if (data == "spocDet") {
+    } else if (data == "spocDet") {
         countryName = 'spoccountryId';
         stateName = 'spocstateId';
         distName = 'spocdistrictId';
@@ -206,9 +202,7 @@ const RegAddress = (props) => {
         addLine1Name = 'spocaddressLine1';
         addLine2Name = 'spocaddressLine2';
         addLine3Name = 'spocaddressLine3';
-    } 
-    //else if (data == "pCorpAddress" || data == "pOffAddress") {
-    if (data == "pCorpAddress" || data == "pOffAddress") {
+    } else if (data == "pCorpAddress" || data == "pOffAddress") {
         countryName = 'partnerCountryId';
         stateName = 'partnerStateId';
         distName = 'partnerDistrictId';
@@ -217,9 +211,7 @@ const RegAddress = (props) => {
         addLine1Name = 'partnerAddressLine1';
         addLine2Name = 'partnerAddressLine2';
         addLine3Name = 'partnerAddressLine3';
-    }
-   else if (data == "offAddress") {
-   // debugger
+    } else if (data == "offAddress") {
         countryName = 'officeCountryId';
         stateName = 'officeStateId';
         distName = 'officeDistrictId';
@@ -229,22 +221,20 @@ const RegAddress = (props) => {
         addLine2Name = 'officeAddressLine2';
         addLine3Name = 'officeAddressLine3';
     }
-console.log("Cname",countryName,countryValue);
+    //console.log(countryValue);
 
     return (
-        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-            <GridContainer lg={12}>
-                {(data == "cAddress" || data == "pOffAddress") ?
-                    <GridContainer lg={12} >
 
-                        <GridItem spacing={2} xs={12} sm={12} md={12} lg={12}>
-                            <label id="radioButtonText"> {lblmsg}</label>  &nbsp;
-                      
-                    <FormControlLabel
+        <GridContainer lg={12}>
+            {(data == "cAddress" || data == "pOffAddress") ?
+                <GridItem xs={12} sm={12} md={12}>
+                    <div>
+                        <label id="radioButtonText"> {lblmsg}</label> &nbsp;
+                       <div style={radio}>
+                            <FormControlLabel
                                 control={
                                     <Radio
-                                        disabled={regData.viewEditFlag}
-                                        checked={regData.addressDTO.corpSelectedValue == "0"}
+                                        checked={regData.addressDTO.corpSelectedValue === "0"}
                                         onChange={regData.handleRadioChange}
                                         className="radioChange"
                                         value="0"
@@ -275,7 +265,6 @@ console.log("Cname",countryName,countryValue);
                             <FormControlLabel
                                 control={
                                     <Radio
-                                        disabled={regData.viewEditFlag}
                                         checked={regData.addressDTO.corpSelectedValue == "1"}
                                         onChange={regData.handleRadioChange}
                                         value="1"
@@ -302,189 +291,189 @@ console.log("Cname",countryName,countryValue);
                                 }}
                                 label="No"
                             />
-
-                        </GridItem>
-                    </GridContainer> : ""}
-                {data == "mAddress" ?
-                    <GridItem xs={12} sm={12} md={12}>
-                        <div>
-                            <label className="radioButtonText"> Mail Address Same as </label> &nbsp;
-                                    <div className={classes.mailAdd} style={radio}>
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-
-                                            checked={regData.addressDTO.mailSelectedValue == "2"}
-                                            onChange={regData.handleRadioChange}
-                                            value="2"
-                                            name="radio button demo"
-                                            aria-label="R"
-                                            icon={
-                                                <FiberManualRecord
-                                                    className={classes.radioUnchecked}
-                                                />
-                                            }
-                                            checkedIcon={
-                                                <FiberManualRecord
-                                                    className={classes.radioChecked}
-                                                />
-                                            }
-                                            classes={{
-                                                checked: classes.radio,
-                                                root: classes.radioRoot
-                                            }}
-                                        />
-                                    }
-                                    classes={{
-                                        label: classes.label
-                                    }}
-                                    label="Register"
-                                />
-
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            checked={regData.addressDTO.mailSelectedValue == "3"}
-                                            onChange={regData.handleRadioChange}
-
-                                            value="3"
-                                            name="radio button demo"
-                                            aria-label="C"
-                                            icon={
-                                                <FiberManualRecord
-                                                    className={classes.radioUnchecked}
-                                                />
-                                            }
-                                            checkedIcon={
-                                                <FiberManualRecord
-                                                    className={classes.radioChecked}
-                                                />
-                                            }
-                                            classes={{
-                                                checked: classes.radio,
-                                                root: classes.radioRoot
-                                            }}
-                                        />
-                                    }
-                                    classes={{
-                                        label: classes.label
-                                    }}
-                                    label="Corporate"
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-
-                                            checked={regData.addressDTO.mailSelectedValue == "4"}
-                                            onChange={regData.handleRadioChange}
-                                            value="4"
-                                            name="radio button demo"
-                                            aria-label="O"
-                                            icon={
-                                                <FiberManualRecord
-                                                    className={classes.radioUnchecked}
-                                                />
-                                            }
-                                            checkedIcon={
-                                                <FiberManualRecord
-                                                    className={classes.radioChecked}
-                                                />
-                                            }
-                                            classes={{
-                                                checked: classes.radio,
-                                                root: classes.radioRoot
-                                            }}
-                                        />
-                                    }
-                                    classes={{
-                                        label: classes.label
-                                    }}
-                                    label="Others"
-                                />
-                            </div>
                         </div>
-                    </GridItem> : ""}
+                    </div>
+                </GridItem> : ""}
+            {data == "mAddress" ?
+                <GridItem xs={12} sm={12} md={12}>
+                    <div>
+                        <label className="radioButtonText"> MailAddressSameas </label> &nbsp;
+                                    <div className={classes.mailAdd} style={radio}>
+                            <FormControlLabel
+                                control={
+                                    <Radio
 
-                <GridContainer id="regAddress" disabled={true}>
-                    <GridItem xs={12} sm={12} md={4}>
-                        <CustomInput
-                            disabled={regData.disabled}
-                            success={regData.orgAddressLine1State == "success"}
-                            error={regData.orgAddressLine1State == "error"}
-                            labelText="AddressLine1"
-                            id="add1"
-                            value={addLine1}
-                            required={true}
-                            name={addLine1Name}
-                            onChange={(e) => regData.GetLocation("addLineName", addType, e)}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                        <span className="error">   {regData.errormessage && (addLine1 == "") ? CommonMessage("RequiredField", []) : null}</span>
-                    </GridItem>
-                    <GridItem xs={12} sm={12} md={4}>
-                        <CustomInput
-                            disabled={regData.disabled}
-                            success={regData.orgAddressLine2State == "success"}
-                            error={regData.orgAddressLine2State == "error"}
-                            labelText="AddressLine2"
-                            id="add2"
-                            value={addLine2}
-                            name={addLine2Name}
-                            onChange={(e) => regData.GetLocation("addLineName", addType, e)}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                    </GridItem>
+                                        checked={regData.addressDTO.mailSelectedValue === "2"}
+                                        onChange={regData.handleRadioChange}
+                                        value="2"
+                                        name="radio button demo"
+                                        aria-label="R"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Register"
+                            />
 
-                    <GridItem xs={12} sm={12} md={4}>
-                        <CustomInput
-                            disabled={regData.disabled}
-                            success={regData.orgAddressLine3State == "success"}
-                            error={regData.orgAddressLine3State == "error"}
-                            labelText="AddressLine3"
-                            id="add3"
-                            value={addLine3}
-                            name={addLine3Name}
-                            onChange={(e) => regData.GetLocation("addLineName", addType, e)}
-                            formControlProps={{
-                                fullWidth: true
-                            }}
-                        />
-                    </GridItem>
+                            <FormControlLabel
+                                control={
+                                    <Radio
+                                        checked={regData.addressDTO.mailSelectedValue == "3"}
+                                        onChange={regData.handleRadioChange}
 
-                    <GridItem xs={12} sm={12} md={4}>
-                        <Dropdown labelText="Country" id="OrganizationDTO.countryId" required={true} disabled={regData.disabled} lstObject={Country} 
-                            value={countryValue} name={countryName}
-                          onChange={(e) => regData.GetLocation('State', addType, e)} formControlProps={{ fullWidth: true }} />
-                        <span className="error">   {regData.errormessage && (countryValue == "") ? CommonMessage("RequiredField", []) : null}</span>
-                    </GridItem>
+                                        value="3"
+                                        name="radio button demo"
+                                        aria-label="C"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Corporate"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Radio
 
-                    <GridItem xs={12} sm={12} md={4}>
-                        <Dropdown labelText="State" id="OrganizationDTO.stateId" required={true} disabled={regData.disabled} lstObject={State} value={stateValue} name={stateName} onChange={(e) => regData.GetLocation('District', addType, e)} formControlProps={{ fullWidth: true }} />
-                        <span className="error">   {regData.errormessage && (stateValue == "") ? CommonMessage("RequiredField", []) : null}</span>
-                    </GridItem>
+                                        checked={regData.addressDTO.mailSelectedValue == "4"}
+                                        onChange={regData.handleRadioChange}
+                                        value="4"
+                                        name="radio button demo"
+                                        aria-label="O"
+                                        icon={
+                                            <FiberManualRecord
+                                                className={classes.radioUnchecked}
+                                            />
+                                        }
+                                        checkedIcon={
+                                            <FiberManualRecord
+                                                className={classes.radioChecked}
+                                            />
+                                        }
+                                        classes={{
+                                            checked: classes.radio,
+                                            root: classes.radioRoot
+                                        }}
+                                    />
+                                }
+                                classes={{
+                                    label: classes.label
+                                }}
+                                label="Others"
+                            />
+                        </div>
+                    </div>
+                </GridItem> : ""}
 
-                    <GridItem xs={12} sm={12} md={4}>
-                        <Dropdown labelText="District" id="OrganizationDTO.districtId" required={true} disabled={regData.disabled} lstObject={District} value={distValue} name={distName}
-                            onChange={(e) => regData.GetLocation('City', addType, e)} formControlProps={{ fullWidth: true }} />
-                        <span className="error">   {regData.errormessage && (distValue == "") ? CommonMessage("RequiredField", []) : null}</span>
-                    </GridItem>
 
-                    <GridItem xs={12} sm={12} md={4}>
-                        <Dropdown labelText="City" id="OrganizationDTO.cityId" required={true} disabled={regData.disabled} lstObject={City} value={cityValue} name={cityName} onChange={(e) => regData.GetLocation('Pincode', addType, e)} formControlProps={{ fullWidth: true }} />
-                        <span className="error">   {regData.errormessage && (cityValue == "") ? CommonMessage("RequiredField", []) : null}</span>
-                    </GridItem>
+            <GridContainer id="regAddress" disabled={true}>
+                <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                        disabled={regData.disabled}
+                        //success={regData.orgAddressLine1State === "success"}
+                        //error={regData.orgAddressLine1State === "error"}
+                        error={regData.orgAddressLine1State}
+                        labelText="AddressLine1"
+                        id="add1"
+                        value={addLine1}
+                        required={true}
+                        name={addLine1Name}
+                        onChange={(e) => regData.GetLocation("addLineName", addType, e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                    {/*  <span className="error">   {regData.errormessage && (addLine1 == "") ? CommonMessage("RequiredField", []) : null}</span>*/}
+                </GridItem>
 
-                    <GridItem xs={12} sm={12} md={4}>
-                        <Dropdown labelText="Pincode" id="OrganizationDTO.pincodeId" disabled={regData.disabled} lstObject={Pincode} value={pinCodeValue} name={pinCodeName} onChange={(e) => regData.GetLocation('', addType, e)} formControlProps={{ fullWidth: true }} />
-                    </GridItem>
-                </GridContainer>
+                <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                        disabled={regData.disabled}
+                        //success={regData.orgAddressLine2State === "success"}
+                        //error={regData.orgAddressLine2State === "error"}
+                        error={regData.orgAddressLine2State}
+                        labelText="AddressLine2"
+                        id="add2"
+                        value={addLine2}
+                        name={addLine2Name}
+                        onChange={(e) => regData.GetLocation("addLineName", addType, e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                </GridItem>
 
+                <GridItem xs={12} sm={12} md={4}>
+                    <CustomInput
+                        disabled={regData.disabled}
+                        //success={regData.orgAddressLine3State === "success"}
+                        //error={regData.orgAddressLine3State === "error"}
+                        error={regData.orgAddressLine3State}
+                        labelText="AddressLine3"
+                        id="add3"
+                        value={addLine3}
+                        name={addLine3Name}
+                        onChange={(e) => regData.GetLocation("addLineName", addType, e)}
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />
+                </GridItem>
+
+                <GridItem xs={12} sm={12} md={4}>
+                    <Dropdown labelText="Country" id="OrganizationDTO.countryId" required={true} disabled={regData.disabled} lstObject={Country} value={countryValue} name={countryName} onChange={(e) => regData.GetLocation('State', addType, e)} formControlProps={{ fullWidth: true }} />
+
+                    {/*<span className="error">   {regData.errormessage && (countryValue == "") ? CommonMessage("RequiredField", []) : null}</span>*/}
+                </GridItem>
+
+                <GridItem xs={12} sm={12} md={4}>
+                    <Dropdown labelText="State" id="OrganizationDTO.stateId" required={true} disabled={regData.disabled} lstObject={State} value={stateValue} name={stateName} onChange={(e) => regData.GetLocation('District', addType, e)} formControlProps={{ fullWidth: true }} />
+                </GridItem>
+
+                <GridItem xs={12} sm={12} md={4}>
+                    <Dropdown labelText="District" id="OrganizationDTO.districtId" required={true} disabled={regData.disabled} lstObject={District} value={distValue} name={distName} onChange={(e) => regData.GetLocation('City', addType, e)} formControlProps={{ fullWidth: true }} />
+                </GridItem>
+
+                <GridItem xs={12} sm={12} md={4}>
+                    <Dropdown labelText="City" id="OrganizationDTO.cityId" required={true} disabled={regData.disabled} lstObject={City} value={cityValue} name={cityName} onChange={(e) => regData.GetLocation('Pincode', addType, e)} formControlProps={{ fullWidth: true }} />
+                </GridItem>
+
+                <GridItem xs={12} sm={12} md={4}>
+                    <Dropdown labelText="Pincode" id="OrganizationDTO.pincodeId" disabled={regData.disabled} lstObject={Pincode} value={pinCodeValue} name={pinCodeName} onChange={(e) => regData.GetLocation('', addType, e)} formControlProps={{ fullWidth: true }} />
+                </GridItem>
             </GridContainer>
-        </Animated>
+
+        </GridContainer>
+
     );
 }
 

@@ -40,6 +40,7 @@ import Switch from '@material-ui/core/Switch';
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
 import data_Not_found from "assets/img/data-not-found-new.png"
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 const style = {
     infoText: {
@@ -519,7 +520,7 @@ class ModifyAccount extends React.Component {
                             </CardIcon>
                             {
                                 <h4 >
-                                    <small> Modify/View Account </small>
+                                    <small><TranslationContainer translationKey="ModifyAccount" />  </small>
                                 </h4>
                             }
                         </CardHeader>
@@ -559,7 +560,7 @@ class ModifyAccount extends React.Component {
                                             htmlFor="simple-select"
                                             className={classes.selectLabel}
                                         >
-                                            Account Type
+                                            <TranslationContainer translationKey="AccountType" />
                           </InputLabel>
                                         <Select
                                             value={this.state.fields.AccountTypeId}
@@ -594,7 +595,7 @@ class ModifyAccount extends React.Component {
 
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
-                                        labelText="Account Code"
+                                        labelText="AccountCode"
                                         id="AccountCode"
                                         value={this.state.fields.AccountCode}
                                         error={this.state.AccountCodeState}
@@ -607,7 +608,7 @@ class ModifyAccount extends React.Component {
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
-                                        labelText="Account Name"
+                                        labelText="AccountName"
                                         id="AccountName"
                                         value={this.state.fields.AccountName}
                                         error={this.state.AccountNameState}
@@ -620,7 +621,7 @@ class ModifyAccount extends React.Component {
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
-                                        labelText="Account Description"
+                                        labelText="AccountDescription"
                                         id="AccountDesc"
                                         value={this.state.fields.AccountDesc}
                                         error={this.state.AccountDescState}
@@ -637,7 +638,8 @@ class ModifyAccount extends React.Component {
                                 <GridItem xs={5} sm={3} md={3} lg={1}>
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                         <Button id="button-search-partner" color="info" round onClick={() => this.onFormSubmit()}>
-                                            Search
+                                            
+                                            <TranslationContainer translationKey="Search" />
                           </Button>
                                     </Animated>
                                 </GridItem>
@@ -671,7 +673,7 @@ class ModifyAccount extends React.Component {
                                                     //    resizable: false,
                                                     //},
                                                     {
-                                                        Header: "Account Type",
+                                                        Header: "AccountType",
                                                         accessor: "AccountType",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },
@@ -680,7 +682,7 @@ class ModifyAccount extends React.Component {
 
                                                     },
                                                     {
-                                                        Header: "Account Code",
+                                                        Header: "AccountCode",
                                                         accessor: "AccountCode",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },
@@ -689,7 +691,7 @@ class ModifyAccount extends React.Component {
 
                                                     },
                                                     {
-                                                        Header: "Account Name",
+                                                        Header: "AccountName",
                                                         accessor: "AccountName",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },
@@ -697,7 +699,7 @@ class ModifyAccount extends React.Component {
                                                         resizable: false,
                                                     },
                                                     {
-                                                        Header: "Account Description",
+                                                        Header: "AccountDescription",
                                                         accessor: "AccountDesc",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },

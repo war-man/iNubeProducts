@@ -301,6 +301,7 @@ class MyProfile extends React.Component {
                 RCity: [],
                 RPincode: []
             },
+            response:false,
             partnervisible: true,
             radiodisable: false,
         };
@@ -801,9 +802,9 @@ class MyProfile extends React.Component {
         //this.handleDobvalidation();
         if (this.state.UserData.firstName != "" && this.state.UserData.dob != "" &&
             this.state.UserData.doj != "" && this.state.UserData.genderId != "" &&
-            this.state.UserData.email != "" && this.state.UserData.contactNumber != "" &&
-            this.state.UserData.panNo != "" && this.state.UserData.panNo != ""
-            && this.state.validdob != false && this.state.validdoj != false//) {
+            this.state.UserData.email != "" && this.state.UserData.contactNumber != ""
+            // && this.state.UserData.panNo != "" && this.state.UserData.panNo != ""
+            //&& this.state.validdob != false && this.state.validdoj != false//) {
             && this.state.firstNameState == false && this.state.contactNumberState == false
             && this.state.branchNameState == false && this.state.branchCodeState == false
             && this.state.emailState == false && this.state.panNoState == false) {
@@ -835,7 +836,7 @@ class MyProfile extends React.Component {
             userDTO['userAddress'] = useraddress;
 
             this.setState({ userDTO });
-            this.setState({ btnload: true });
+            this.setState({ response: true });
             console.log("final userdata", userDTO);
             fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/CreateProfileUser`, {
                 method: 'Post',
@@ -847,7 +848,7 @@ class MyProfile extends React.Component {
                 body: JSON.stringify(userDTO)
             }).then(response => response.json())
                 .then((data) => {
-                    this.setState({ btnload: false });
+                    this.setState({ response: false });
                     if (data.status == 2) {
                         swal({
                             text: data.responseMessage,
@@ -1131,7 +1132,7 @@ class MyProfile extends React.Component {
                                                 //error={this.state.panNoState == "error"}
                                                 error={this.state.panNoState}
                                                 labelText="PAN"
-                                                required={true}
+                                                //required={true}
                                                 id="panNo"
                                                 value={this.state.UserData.panNo}
                                                 name="panNo"
@@ -1199,7 +1200,7 @@ class MyProfile extends React.Component {
                             </Card>
                             {this.state.isButtonVisibility ?
                                 <GridContainer justify="center">
-                                    <Button round /*disabled={this.state.btnload}*/ align="center" onClick={this.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
+                                    <Button round disabled={this.state.response} align="center" onClick={this.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
                                     {/* {this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                                 </GridContainer>
                                 : null}

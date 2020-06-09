@@ -82,7 +82,7 @@ const AddParticipant = (props) => {
 
 
     //}
-    let treatyDto = props.componentData.treatyDTO.tblParticipant[0];
+    let treatyDto = props.componentData.participant;
     return (
         <div>
             <Card className="no-shadow" >
@@ -99,7 +99,7 @@ const AddParticipant = (props) => {
                              filterName='Reinsurer'
                              value={treatyDto.reInsurerId}
                                 name='reInsurerId'
-                             onChange={(e) => prop.onddChange(e, treatyDto.reinsurercodeId)}
+                                onChange={(e) => prop.onddChange(e, treatyDto.reinsurercodeId,'reInsurerId')}
                             formControlProps={{ fullWidth: true }} />
 
                     </GridItem>
@@ -108,9 +108,9 @@ const AddParticipant = (props) => {
                             <CustomInput
                                 labelText="ReinsurerName"
                                 id="ReinsurerName"
-                                value={treatyDto.reinsurername}
+                                value={props.componentData.reinsurername}
                                 name='reinsurername'
-                                onChange={prop.onInputChange}
+                                onChange={(e)=>prop.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -125,7 +125,7 @@ const AddParticipant = (props) => {
                                 filterName='BrachCode'
                                 value={treatyDto.reInsurerBranchId}
                                 name='reInsurerBranchId'
-                                onChange={(e) => prop.onddChange(e, '')}
+                                onChange={(e) => prop.onddChange(e, '', 'reInsurerBranchId')}
                                 formControlProps={{ fullWidth: true }} />
 
                         </GridItem>
@@ -140,7 +140,7 @@ const AddParticipant = (props) => {
                                 filterName='Broker'
                                 value={treatyDto.brokerId}
                                 name='brokerId'
-                                onChange={(e) => prop.onddlChange(e, '')}
+                                onChange={(e) => prop.onddlChange(e,'brokerId')}
                                 formControlProps={{ fullWidth: true }} />
 
                         </GridItem>
@@ -151,7 +151,7 @@ const AddParticipant = (props) => {
                                 id="remarks"
                                 value={treatyDto.brokername}
                                 name='brokername'
-                                onChange={prop.onInputChange}
+                                onChange={(e) => prop.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -166,7 +166,7 @@ const AddParticipant = (props) => {
                                 filterName='BrachCode'
                                 value={treatyDto.brokerBranchId}
                                 name='brokerBranchId'
-                                onChange={(e) => prop.onddlChange(e, '')}
+                                onChange={(e) => prop.onddlChange(e, 'brokerBranchId')}
                                 formControlProps={{ fullWidth: true }} />
 
                             </GridItem>
@@ -177,9 +177,9 @@ const AddParticipant = (props) => {
                             <CustomInput
                                 labelText="Share"
                                 id="remarks"
-                                value={treatyDto.sharepercent}
-                                name='sharepercent'
-                                onChange={prop.onInputChange}
+                                value={treatyDto.sharePercentage}
+                                name='sharePercentage'
+                                onChange={(e) => prop.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -190,9 +190,9 @@ const AddParticipant = (props) => {
                             <CustomInput
                                 labelText="Brokage"
                                 id="remarks"
-                                value={treatyDto.brokagepercent}
-                                name='brokagepercent'
-                                onChange={prop.onInputChange}
+                                value={treatyDto.brokeragePercentage}
+                                name='brokeragePercentage'
+                                onChange={(e) => prop.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -203,9 +203,9 @@ const AddParticipant = (props) => {
                             <CustomInput
                                 labelText="RICommision"
                                 id="remarks"
-                                value={treatyDto.riCommissionpercent}
-                                name='riCommissionpercent'
-                                onChange={prop.onInputChange}
+                                value={treatyDto.ricommissionPercentage}
+                                name='ricommissionPercentage'
+                                onChange={(e) => prop.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -220,7 +220,7 @@ const AddParticipant = (props) => {
                                 filterName='Bordereaux Frequency'
                                 value={treatyDto.bordereauxFreqId}
                                 name='bordereauxFreqId'
-                                onChange={prop.onddChange}
+                                onChange={(e) => prop.onddChange(e,'','bordereauxFreqId')}
                                 formControlProps={{ fullWidth: true }} />
 
                         </GridItem>
@@ -229,13 +229,13 @@ const AddParticipant = (props) => {
            
 
 
-                    {/*<GridContainer justify="center">
+                    <GridContainer justify="center">
                         <GridItem>
                             <center>
                                 <Button round color="rose" onClick={prop.AddParticipant}>Add Participant</Button>
                             </center>
                         </GridItem>
-                            </GridContainer>*/}
+                            </GridContainer>
                    
                 
                  </CardBody>

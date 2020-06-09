@@ -70,22 +70,36 @@ class RuleExecution extends React.Component {
     };
 
     handleState = event => {
-        fetch(`${ruleconfig.ruleEngineUrl}/RuleEngine/GetAllRulesWithParam`)
+        //fetch(`${ruleconfig.ruleEngineUrl}/RuleEngine/GetAllRulesWithParam`)
+        //    .then(response => response.json())
+        //    .then(data => {
+        //        this.setState({ Rules: data });
+        //        console.log("Rule Rules Data");
+        //        console.log(this.state.Rules);
+        //        this.setState({ Rules: this.state.Rules.filter(item => item.rule_id == event.target.value) });
+        //        var checkParam = JSON.stringify(this.state.Rules);
+        //        console.log('Check'+checkParam);
+        //        // For State Change
+        //        const fields = this.state.fields;
+        //        fields[event.target.name] = event.target.value;
+        //        this.setState({ fields });
+        //        this.setState({ [event.target.name]: event.target.value });
+        //    });
+        // new Method
+        fetch(`${ruleconfig.ruleEngineUrl}/RuleConfig/HandleRuleState?RuleId=` + event.target.value)
             .then(response => response.json())
             .then(data => {
                 this.setState({ Rules: data });
                 console.log("Rule Rules Data");
                 console.log(this.state.Rules);
-                this.setState({ Rules: this.state.Rules.filter(item => item.rule_id == event.target.value) });
                 var checkParam = JSON.stringify(this.state.Rules);
-                console.log('Check'+checkParam);
+                console.log('Check' + checkParam);
                 // For State Change
                 const fields = this.state.fields;
                 fields[event.target.name] = event.target.value;
                 this.setState({ fields });
                 this.setState({ [event.target.name]: event.target.value });
             });
-
         console.log(event.target.value);
 
 

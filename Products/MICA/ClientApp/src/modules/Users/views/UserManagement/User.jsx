@@ -42,7 +42,7 @@ import { Animated } from "react-animated-css";
 import { card } from "../../../../assets/jss/material-dashboard-pro-react";
 
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
-
+import HierarchyConfig from 'modules/Hierarchy/HierarchyConfig.js';
 const style = {
     infoText: {
         fontWeight: "300",
@@ -76,8 +76,9 @@ class User extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            redirectTo: false,
             loader: false,
-            hideexternal: false,
+            hideexternal: true,
             btnload: false,
             btnload1: false,
             radioVal: "",
@@ -150,90 +151,90 @@ class User extends React.Component {
             masterList: [],
             errormessage: false,
             UserData:
-                {
-                    "userId": "",
-                    "userName": "",
-                    "status": true,
-                    "createdBy": "",
-                    "createdDate": "",
-                    "locked": true,
-                    "lockedReason": "",
-                    "lockStartDate": "",
-                    "lockEndDate": "",
-                    "lockMechanism": true,
-                    "officeId": 0,
-                    "firstName": "",
-                    "middleName": "",
-                    "lastName": "",
-                    "employeeNumber": "",
-                    "dob": "",
-                    "doj": "",
-                    "roleId": null,
-                    "genderId": "",
-                    "email": "",
-                    "passportNumber": "",
-                    "drivingLicenceNumber": "",
-                    "contactNumber": "",
-                    "userTypeId": "",
-                    "panNo": "",
-                    "lastLoginDateTime": "",
-                    "isIos": true,
-                    "isAndroid": true,
-                    "isWindows": true,
-                    "isPasswordChanged": true,
-                    "landLineOffice": "",
-                    "landLineResidence": "",
-                    "partnerId": "",
-                    "branchName": "",
-                    "branchCode": "",
-                    "designation": "",
-                    "maritalStatusId": "",
-                    "profileImage": "",
-                    "partnerName": ""
-                },
+            {
+                "userId": "",
+                "userName": "",
+                "status": true,
+                "createdBy": "",
+                "createdDate": "",
+                "locked": true,
+                "lockedReason": "",
+                "lockStartDate": "",
+                "lockEndDate": "",
+                "lockMechanism": true,
+                "officeId": 0,
+                "firstName": "",
+                "middleName": "",
+                "lastName": "",
+                "employeeNumber": "",
+                "dob": "",
+                "doj": "",
+                "roleId": null,
+                "genderId": "",
+                "email": "",
+                "passportNumber": "",
+                "drivingLicenceNumber": "",
+                "contactNumber": "",
+                "userTypeId": "",
+                "panNo": "",
+                "lastLoginDateTime": "",
+                "isIos": true,
+                "isAndroid": true,
+                "isWindows": true,
+                "isPasswordChanged": true,
+                "landLineOffice": "",
+                "landLineResidence": "",
+                "partnerId": "",
+                "branchName": "",
+                "branchCode": "",
+                "designation": "",
+                "maritalStatusId": "",
+                "profileImage": "",
+                "partnerName": ""
+            },
             InitialUserData:
-                {
-                    "userId": "",
-                    "userName": "",
-                    "status": true,
-                    "createdBy": "",
-                    "createdDate": "",
-                    "locked": true,
-                    "lockedReason": "",
-                    "lockStartDate": "",
-                    "lockEndDate": "",
-                    "lockMechanism": true,
-                    "officeId": 0,
-                    "firstName": "",
-                    "middleName": "",
-                    "lastName": "",
-                    "employeeNumber": "",
-                    "dob": "",
-                    "doj": "",
-                    "genderId": "",
-                    "email": "",
-                    "roleId": null,
-                    "passportNumber": "",
-                    "drivingLicenceNumber": "",
-                    "contactNumber": "",
-                    "userTypeId": "",
-                    "panNo": "",
-                    "lastLoginDateTime": "",
-                    "isIos": true,
-                    "isAndroid": true,
-                    "isWindows": true,
-                    "isPasswordChanged": true,
-                    "landLineOffice": "",
-                    "landLineResidence": "",
-                    "partnerId": "",
-                    "branchName": "",
-                    "branchCode": "",
-                    "designation": "",
-                    "maritalStatusId": "",
-                    "profileImage": "",
-                    "partnerName": "",
-                    "isActive": true,
-                },
+            {
+                "userId": "",
+                "userName": "",
+                "status": true,
+                "createdBy": "",
+                "createdDate": "",
+                "locked": true,
+                "lockedReason": "",
+                "lockStartDate": "",
+                "lockEndDate": "",
+                "lockMechanism": true,
+                "officeId": 0,
+                "firstName": "",
+                "middleName": "",
+                "lastName": "",
+                "employeeNumber": "",
+                "dob": "",
+                "doj": "",
+                "genderId": "",
+                "email": "",
+                "roleId": null,
+                "passportNumber": "",
+                "drivingLicenceNumber": "",
+                "contactNumber": "",
+                "userTypeId": "",
+                "panNo": "",
+                "lastLoginDateTime": "",
+                "isIos": true,
+                "isAndroid": true,
+                "isWindows": true,
+                "isPasswordChanged": true,
+                "landLineOffice": "",
+                "landLineResidence": "",
+                "partnerId": "",
+                "branchName": "",
+                "branchCode": "",
+                "designation": "",
+                "maritalStatusId": "",
+                "profileImage": "",
+                "partnerName": "",
+                "isActive": true,
+            },
             UserAddress: {
                 "perm": {
                     "id": "",
@@ -273,6 +274,30 @@ class User extends React.Component {
                 },
                 "permSelectedValue": 1,
             },
+            perm: {
+                "id": "",
+                "userAddressType": " ",
+                "userCountryId": "",
+                "userStateId": "",
+                "userDistrictId": "",
+                "userCityId": "",
+                "userAddressLine1": "",
+                "userAddressLine2": "",
+                "userAddressLine3": "",
+                "userPincodeId": ""
+            },
+            comm: {
+                "id": "",
+                "userAddressType": " ",
+                "userCountryId": "",
+                "userStateId": "",
+                "userDistrictId": "",
+                "userCityId": "",
+                "userAddressLine1": "",
+                "userAddressLine2": "",
+                "userAddressLine3": "",
+                "userPincodeId": ""
+            },
             LocationDTO: {
                 Country: [],
                 State: [],
@@ -287,6 +312,7 @@ class User extends React.Component {
             },
             errors: {},
             fields: {},
+            response: false,
             radiodisable: false,
         };
         this.handleRadioChange = this.handleRadioChange.bind(this);
@@ -456,14 +482,14 @@ class User extends React.Component {
         //console.log("response data", localStorage.getItem('organizationId'))
         //console.log("response data", localStorage.getItem('partnerId'));
 
-        let cust = this.state.isCustomer;
-        cust.customerid = localStorage.getItem('organizationId');
-        cust.partnerid = localStorage.getItem('partnerId');
-        this.setState({ cust });
-        console.log("response data", cust);
-        if (cust.customerid == 121 && cust.partnerid == 0 || cust.partnerid != 0) {
-            this.setState({ hideexternal: true });
-        }
+        //let cust = this.state.isCustomer;
+        //cust.customerid = localStorage.getItem('organizationId');
+        //cust.partnerid = localStorage.getItem('partnerId');
+        //this.setState({ cust });
+        //console.log("response data", cust);
+        //if (cust.customerid == 121 && cust.partnerid == 0 || cust.partnerid != 0) {
+        //    this.setState({ hideexternal: true });
+        //}
 
         fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/GetMasterData?sMasterlist=abc`, {
             method: 'GET',
@@ -577,12 +603,12 @@ class User extends React.Component {
     handleSubmit() {
         if (this.state.UserData.firstName != "" && this.state.UserData.dob != "" &&
             this.state.UserData.doj != "" && this.state.UserData.genderId != "" &&
-            this.state.UserData.email != "" && this.state.UserData.contactNumber != "" &&
-            this.state.UserData.panNo != "" && this.state.UserData.panNo != ""
-            && this.state.validdob != false && this.state.validdoj != false
+            this.state.UserData.email != "" && this.state.UserData.contactNumber != ""
+            //&&this.state.UserData.panNo != "" && this.state.UserData.panNo != ""
+            //&& this.state.validdob != false && this.state.validdoj != false
             && this.state.firstNameState == false && this.state.contactNumberState == false
             && this.state.branchNameState == false && this.state.branchCodeState == false
-            && this.state.emailState == false && this.state.panNoState == false) {
+            && this.state.emailState == false /*&& this.state.panNoState == false*/) {
 
             let userdetails = this.state.UserData;
 
@@ -592,15 +618,17 @@ class User extends React.Component {
             if (this.state.radioVal == '1003') {
                 userdetails.userTypeId = '1003'
                 userdetails.partnerId = this.state.partnerid;
+                userdetails.employeeNumber = 0;
             } else {
                 userdetails.userTypeId = '1004';
                 userdetails.partnerId = 0;
+                userdetails.employeeNumber = this.state.employeeid;
             }
 
             userdetails.dob = this.newdatechange(this.state.UserData.dob);
             userdetails.doj = this.newdatechange(this.state.UserData.doj);
 
-            this.setState({ userdetails, btnload: true });
+            this.setState({ userdetails, response: true });
             let address = [];
             address.push(this.state.UserAddress.perm);
             if (this.state.UserAddress.permSelectedValue == 1) {
@@ -627,7 +655,7 @@ class User extends React.Component {
                 body: JSON.stringify(userDTO)
             }).then(response => response.json())
                 .then((data) => {
-                    this.setState({ btnload: false });
+                    this.setState({ response: false });
                     if (data.status == 2) {
                         swal({
                             text: data.responseMessage,
@@ -635,9 +663,15 @@ class User extends React.Component {
                         });
                         this.setState({
                             UName: data.users.userName,
-                            redirect: true,
                             uid: data.id,
                         })
+                        if (data.users.userDetails != null || data.users.userDetails != 0) {
+                            this.setState({ redirectTo: true })
+
+                        } else {
+                            this.setState({ redirect: true })
+                        }
+
                     }
                     else if (data.status == 8) {
                         swal({
@@ -696,11 +730,11 @@ class User extends React.Component {
         this.setState({ UserData })
         if (this.state.radioVal == "1004") {
             this.setState({
-                //empFlag: true,
+                empFlag: true,
                 partFlag: false,
-                isUser: true,
+                isUser: false,
                 visibility: false,
-                //employeeid: "",
+                employeeid: "",
                 partnerid: "",
                 fields: "",
                 errors: "",
@@ -710,10 +744,10 @@ class User extends React.Component {
         else if (this.state.radioVal == "1003") {
             this.setState({
                 partFlag: true,
-                //empFlag: false,
+                empFlag: false,
                 visibility: true,
                 isUser: false,
-                //employeeid: "",
+                employeeid: "",
                 partnerid: "",
                 emailvaidation: "",
                 UserData: this.state.InitialUserData,
@@ -757,53 +791,115 @@ class User extends React.Component {
         this.setState({ UserAddress });
     }
 
-    //handleemployeedata() {
-    //    //this.state.UserData = this.state.InitialUserData;
-    //    fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/Employee?Empid=` + this.state.employeeid, {
-    //        //fetch('https://localhost:44367/api/UserProfile/Employee?Empid='+this.state.employeeid,{
-    //        method: 'GET',
-    //        headers: {
-    //            'Accept': 'application/json',
-    //            'Content-Type': 'application/json',
-    //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-    //        },
-    //    }).then(response => {
-    //        if (response.status != 200) {
-    //            swal({
-    //                text: "Employee does not exist",
-    //                icon: "error"
-    //            });
+    handleemployeedata = () => {
+        //this.state.UserData = this.state.InitialUserData;
+        fetch(`${HierarchyConfig.HierarchyConfigURL}/api/Organization/searchpeoplebycode?empcode=` + this.state.employeeid, {
+            //fetch('https://localhost:44367/api/UserProfile/Employee?Empid='+this.state.employeeid,{
+            method: 'Post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(response => {
+            if (response.status != 200) {
+                swal({
+                    text: "Employee does not exist",
+                    icon: "error"
+                });
 
-    //            return;
-    //        }
-    //        return response.json()
-    //    }).then((data) => {
-    //        if (data != undefined) {
-    //            this.setState({
-    //                isUser: true,
-    //                UserData: data
-    //            });
-    //            let state = this.state;
-    //            state.UserData.dob = new Date(this.state.UserData.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'numeric', year: 'numeric', });
-    //            state.UserData.doj = new Date(this.state.UserData.doj).toLocaleDateString('en-IN', { day: 'numeric', month: 'numeric', year: 'numeric', });
-    //            this.setState({ state });
-    //            this.GetLocationService('State', this.state.UserData.countryId);
-    //            this.GetLocationService('District', this.state.UserData.stateId);
-    //            this.GetLocationService('City', this.state.UserData.districtId);
-    //            this.GetLocationService('Pincode', this.state.UserData.cityId);
-    //            this.emailcheck('email', this.state.UserData.email);
-    //            console.log("Userdata", this.state.UserData);
-    //        } else {
-    //            this.setState({
-    //                isUser: false,
-    //            });
-    //            swal({
-    //                text: "Employee does not exist",
-    //                icon: "error"
-    //            });
-    //        }
-    //    });
-    //}
+                return;
+            }
+            return response.json()
+        }).then((data) => {
+            console.log("ddd", data);
+            if (data != undefined) {
+                this.setState({
+                    isUser: true,
+                    //UserData: data
+                });
+                let state = this.state;
+                state.UserData.dob = new Date(data.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'numeric', year: 'numeric', });
+                state.UserData.doj = new Date(data.dateOfJoining).toLocaleDateString('en-IN', { day: 'numeric', month: 'numeric', year: 'numeric', });
+
+                state.UserData.firstName = data.firstName;
+                state.UserData.email = data.email;
+                state.UserData.contactNumber = data.phoneNumber;
+                state.UserData.middleName = data.middleName;
+                state.UserData.lastName = data.lastName;
+                state.UserData.maritalStatusId = data.maritalStatusId;
+                state.UserData.genderId = data.genderId;
+                state.UserData.branchName = data.officeName;
+                state.UserData.branchCode = data.branchCode;
+                this.setState({ state });
+                let perm = this.state.perm;
+                let comm = this.state.comm;
+                let addDTO = this.state.UserAddress;
+                if (data.avoOrgEmpAddress.length == 1) {
+                    if (data.avoOrgEmpAddress[0].empCountryId != null) {
+                        this.GetLocationService('State', 'c', data.avoOrgEmpAddress[0].empCountryId);
+                        this.GetLocationService('District', 'c', data.avoOrgEmpAddress[0].empStateId);
+                        this.GetLocationService('City', 'c', data.avoOrgEmpAddress[0].empDistrictId);
+                        this.GetLocationService('Pincode', 'c', data.avoOrgEmpAddress[0].empCityId);
+                    }
+                    perm.userCountryId = data.avoOrgEmpAddress[0].empCountryId;
+                    perm.userStateId = data.avoOrgEmpAddress[0].empStateId;
+                    perm.userDistrictId = data.avoOrgEmpAddress[0].empDistrictId;
+                    perm.userCityId = data.avoOrgEmpAddress[0].empCityId;
+                    perm.userAddressLine1 = data.avoOrgEmpAddress[0].empAddressLine1;
+                    perm.userAddressLine2 = data.avoOrgEmpAddress[0].empAddressLine2;
+                    perm.userAddressLine3 = data.avoOrgEmpAddress[0].empAddressLine3;
+                    perm.userPincodeId = data.avoOrgEmpAddress[0].empPincodeId;
+                    addDTO['perm'] = perm;
+                    addDTO['comm'] = perm;
+                    addDTO['permSelectedValue'] = 0;
+                }
+                else {
+                    perm.userCountryId = data.avoOrgEmpAddress[0].empCountryId;
+                    perm.userStateId = data.avoOrgEmpAddress[0].empStateId;
+                    perm.userDistrictId = data.avoOrgEmpAddress[0].empDistrictId;
+                    perm.userCityId = data.avoOrgEmpAddress[0].empCityId;
+                    perm.userAddressLine1 = data.avoOrgEmpAddress[0].empAddressLine1;
+                    perm.userAddressLine2 = data.avoOrgEmpAddress[0].empAddressLine2;
+                    perm.userAddressLine3 = data.avoOrgEmpAddress[0].empAddressLine3;
+                    perm.userPincodeId = data.avoOrgEmpAddress[0].empPincodeId;
+                    addDTO['perm'] = perm;
+                    if (data.avoOrgEmpAddress[0].empCountryId != null) {
+                        this.GetLocationService('State', 'perm', data.avoOrgEmpAddress[0].empCountryId);
+                        this.GetLocationService('District', 'perm', data.avoOrgEmpAddress[0].empStateId);
+                        this.GetLocationService('City', 'perm', data.avoOrgEmpAddress[0].empDistrictId);
+                        this.GetLocationService('Pincode', 'perm', data.avoOrgEmpAddress[0].empCityId);
+                    }
+                    comm.userCountryId = data.avoOrgEmpAddress[1].empCountryId;
+                    comm.userStateId = data.avoOrgEmpAddress[1].empStateId;
+                    comm.userDistrictId = data.avoOrgEmpAddress[1].empDistrictId;
+                    comm.userCityId = data.avoOrgEmpAddress[1].empCityId;
+                    comm.userAddressLine1 = data.avoOrgEmpAddress[1].empAddressLine1;
+                    comm.userAddressLine2 = data.avoOrgEmpAddress[1].empAddressLine2;
+                    comm.userAddressLine3 = data.avoOrgEmpAddress[1].empAddressLine3;
+                    comm.userPincodeId = data.avoOrgEmpAddress[1].empPincodeId;
+                    addDTO['comm'] = comm;
+                    if (data.avoOrgEmpAddress[1].empCountryId != null) {
+                        this.GetLocationService('State', 'comm', data.avoOrgEmpAddress[1].empCountryId);
+                        this.GetLocationService('District', 'comm', data.avoOrgEmpAddress[1].empStateId);
+                        this.GetLocationService('City', 'comm', data.avoOrgEmpAddress[1].empDistrictId);
+                        this.GetLocationService('Pincode', 'comm', data.avoOrgEmpAddress[1].empCityId);
+                    }
+                    addDTO['permSelectedValue'] = 1;
+                }
+                this.setState({ perm, comm, addDTO });
+                console.log("Userdata", this.state.UserData);
+            } else {
+                this.setState({
+                    isUser: false,
+                });
+                swal({
+                    text: "Employee does not exist",
+                    icon: "error"
+                });
+            }
+        });
+    }
 
     handlepartnerdata() {
         let state = this.state;
@@ -864,20 +960,20 @@ class User extends React.Component {
         }
     };
 
-    //employeeChange(type, event) {
-    //    this.setState({
-    //        [event.target.name]: event.target.value,
-    //        employeeid: event.target.value
-    //    });
-    //    let UserData = this.state.UserData;
-    //    let name = 'employeeNumber';
-    //    let value = event.target.value;
+    employeeChange = (event) => {
+        this.setState({
+            [event.target.name]: event.target.value,
+            employeeid: event.target.value
+        });
+        let UserData = this.state.UserData;
+        let name = "employeeNumber"
+        let value = event.target.value;
 
-    //    UserData[name] = value;
+        UserData[name] = value;
 
-    //    this.setState({ UserData });
-    //    this.change(event, name, type);
-    //}
+        this.setState({ UserData });
+        //this.change(event, name, type);
+    }
 
     partnerChange(type, event) {
         this.setState({
@@ -908,6 +1004,11 @@ class User extends React.Component {
                     uid: this.state.uid,
                     UName: this.state.UName
                 }
+            }} />
+        }
+        if (this.state.redirectTo == true) {
+            return <Redirect to={{
+                pathname: '/dashboard/home',
             }} />
         }
     }
@@ -996,7 +1097,7 @@ class User extends React.Component {
                                     }
                                 </GridItem>
                             </GridContainer>
-                            {this.state.empFlag ? <Employee employeeChange={this.employeeChange} employeeidState={this.state.employeeidState} handleemployeedata={this.handleemployeedata} employeeid={this.state.employeeid} /> : null}
+                            {this.state.empFlag ? <Employee employeeChange={this.employeeChange} employeeidState={this.state.employeeidState} handleemployeedata={this.handleemployeedata} employeeid={this.state.employeeid} UserData={this.state.UserData} /> : null}
                             {this.state.partFlag ? <Partner /*btnload1={this.state.btnload1} */ partnerChange={this.partnerChange} partneridState={this.state.partneridState} handlepartnerdata={this.handlepartnerdata} partnerid={this.state.partnerid} /> : null}
                             {this.state.isUser ? <CreateUser UserData={this.state.UserData} disable={this.state.disable} classes={this.classes} handleAddressRadioChange={this.handleAddressRadioChange} addressradiobutton={this.state.addressradiobutton} partnerName={this.state.partnerName} UserAddress={this.state.UserAddress} errormessage={this.state.errormessage} middleNameState={this.state.middleNameState} lastNameState={this.state.lastNameState} maritalStatusState={this.state.maritalStatusState} addressLine1State={this.state.addressLine1State} addressLine2State={this.state.addressLine2State} addressLine3State={this.state.addressLine3State} contactNumberState={this.state.contactNumberState} landLineResidenceState={this.state.landLineResidenceState} landLineOfficeState={this.state.landLineOfficeState} emailState={this.state.emailState} panNoState={this.state.panNoState} branchNameState={this.state.branchNameState} branchCodeState={this.state.branchCodeState} firstNameState={this.state.firstNameState} GetMasterData={this.GetMasterData} masterList={this.state.masterList} visibility={this.state.visibility} SetValue={this.SetValue} handleSubmit={this.handleSubmit} LocationDTO={this.state.LocationDTO} GetLocation={this.GetLocation} assignrolesubmit={this.assignrolesubmit} onDateChange={this.onDateChange} emailvaidation={this.state.emailvaidation} /> : null}
                             {this.renderRedirect()}
@@ -1017,8 +1118,8 @@ class User extends React.Component {
                 {this.state.isUser ?
                     <GridContainer justify="center">
                         <GridItem >
-                            <Button round /*disabled={this.state.btnload} */ onClick={this.handleSubmit} color="success"><TranslationContainer translationKey="Save" /></Button>
-                            {/*{this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
+                            <Button round disabled={this.state.response} onClick={this.handleSubmit} color="success">Create User</Button>
+                            {/*{this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> <TranslationContainer translationKey="Save" />: null}*/}
                         </GridItem>
                     </GridContainer>
                     : null}

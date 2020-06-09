@@ -35,7 +35,8 @@ import Visibility from "@material-ui/icons/Visibility";
 import Modal from '@material-ui/core/Modal';
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
-import data_Not_found from "assets/img/data-not-found-new.png"
+import data_Not_found from "assets/img/data-not-found-new.png";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 const style = {
     infoText: {
@@ -199,6 +200,16 @@ class TransactionMapping extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
+                if (data.length > 0) {
+                    setTimeout(
+                        function () {
+                            this.setState({ pageloader: true });
+                        }
+                            .bind(this),
+                        2000
+                    );
+                    this.setState({ isButtonVisibility: true });
+                }
                 this.setState({ AccountList: data });
                 console.log(data);
             });
@@ -213,16 +224,6 @@ class TransactionMapping extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                if (data.length > 0) {
-                    setTimeout(
-                        function () {
-                            this.setState({ pageloader: true });
-                        }
-                            .bind(this),
-                        2000
-                    );
-                    this.setState({ isButtonVisibility: true });
-                }
                 this.setState({ SubLedgersGridList: data });
                 console.log(data);
             });
@@ -660,7 +661,7 @@ class TransactionMapping extends React.Component {
                                 </CardIcon>
                                 {
                                     <h4 >
-                                        <small> Journal Entry Configuration </small>
+                                        <small><TranslationContainer translationKey="JournalEntryConfiguration" />  </small>
                                     </h4>
                                 }
                             </CardHeader>
@@ -669,7 +670,7 @@ class TransactionMapping extends React.Component {
                                 <GridContainer>
                                     <GridItem xs={12} sm={12} md={4}>
                                         <CustomInput
-                                            labelText="Journal Name"
+                                            labelText="JournalName"
                                             id="RuleName"
                                             value={this.state.fields.RuleName}
                                             name='RuleName'
@@ -693,7 +694,7 @@ class TransactionMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                Module
+                                                <TranslationContainer translationKey="Module" />
                           </InputLabel>
                                             <Select
                                                 value={this.state.fields.Object}
@@ -735,7 +736,7 @@ class TransactionMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                Event
+                                                <TranslationContainer translationKey="Event" />
                           </InputLabel>
                                             <Select
                                                 value={this.state.fields.Event}
@@ -790,7 +791,7 @@ class TransactionMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                Type of Transaction
+                                                <TranslationContainer translationKey="TypeofTransaction" />
                           </InputLabel>
                                             <Select
                                                 MenuProps={{
@@ -846,7 +847,7 @@ class TransactionMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                Account Code
+                                                <TranslationContainer translationKey="AccountCode" />
                           </InputLabel>
                                             <Select
                                                 value={this.state.fields.AccountCode}
@@ -882,7 +883,7 @@ class TransactionMapping extends React.Component {
 
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomInput
-                                            labelText="Account Type"
+                                            labelText="AccountType"
                                             id="AccountType"
                                             disabled={true}
                                             value={this.state.fields.AccountType}
@@ -895,7 +896,7 @@ class TransactionMapping extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomInput
-                                            labelText="Acccount Name"
+                                            labelText="AcccountName"
                                             id="MicaACNameShow"
                                             disabled={true}
                                             value={this.state.MicaACNameShow}
@@ -915,7 +916,7 @@ class TransactionMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                Value
+                                                <TranslationContainer translationKey="Value" />
                                 </InputLabel>
                                             <Select
                                                 value={this.state.fields.Value}
@@ -969,7 +970,7 @@ class TransactionMapping extends React.Component {
                                             <Button round onClick={() => this.addRow()}
                                                 color="info"
                                             >
-                                                ADD
+                                                <TranslationContainer translationKey="Add" />
                             </Button>
                                         </GridItem>
                                     </GridContainer>
@@ -1058,7 +1059,7 @@ class TransactionMapping extends React.Component {
                             <CardHeader color="rose" icon>
                                 {
                                     <h4 >
-                                        <small> Subledger References </small>
+                                        <small><TranslationContainer translationKey="SubledgerReferences" />  </small>
                                     </h4>
                                 }
                             </CardHeader>
@@ -1073,7 +1074,7 @@ class TransactionMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                Subledger Module
+                                                <TranslationContainer translationKey="SubledgerModule" />
                           </InputLabel>
                                             <Select
                                                 value={this.state.fields.SubLedgerObject}
@@ -1116,7 +1117,7 @@ class TransactionMapping extends React.Component {
                                                 htmlFor="simple-select"
                                                 className={classes.selectLabel}
                                             >
-                                                Subledger References
+                                                <TranslationContainer translationKey="SubledgerReferences" />
                           </InputLabel>
                                             <Select
                                                 value={this.state.fields.SubLedgerColName}
@@ -1155,7 +1156,7 @@ class TransactionMapping extends React.Component {
                                             color="info"
                                             round
                                         >
-                                            ADD SUBLEDGER REFERENCE
+                                            <TranslationContainer translationKey="ADDSUBLEDGERREFERENCE" />
                             </Button>
                                     </GridItem>
                                 </GridContainer>
@@ -1203,10 +1204,10 @@ class TransactionMapping extends React.Component {
                                     <GridItem xs={5} sm={3} md={3} lg={4}>
                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                             <Button id="push-right" color="info" round onClick={() => this.onGrid()}>
-                                                JOURNAL ENTRY GRID
+                                                <TranslationContainer translationKey="JournalEntryGrid" />
                                     </Button>
                                             <Button id="push-right" color="info" round onClick={() => this.onFormSubmit()}>
-                                                SAVE
+                                                <TranslationContainer translationKey="Save" />
                         </Button></Animated>
                                     </GridItem>
                                 </GridContainer>
@@ -1224,7 +1225,7 @@ class TransactionMapping extends React.Component {
                                                                 filterable
                                                                 columns={[
                                                                     {
-                                                                        Header: "Journal Name",
+                                                                        Header: "JournalName",
                                                                         accessor: "RuleName",
                                                                         minWidth: 30,
                                                                         style: { textAlign: "center" },
@@ -1250,7 +1251,7 @@ class TransactionMapping extends React.Component {
                                                                         resizable: false,
                                                                     },
                                                                     {
-                                                                        Header: "Type of Transaction",
+                                                                        Header: "TypeofTransaction",
                                                                         accessor: "TypeofTransaction",
                                                                         minWidth: 30,
                                                                         style: { textAlign: "center" },
@@ -1258,7 +1259,7 @@ class TransactionMapping extends React.Component {
                                                                         resizable: false,
                                                                     },
                                                                     {
-                                                                        Header: "Account Code",
+                                                                        Header: "AccountCode",
                                                                         accessor: "AccountCode",
                                                                         minWidth: 30,
                                                                         style: { textAlign: "center" },
@@ -1266,7 +1267,7 @@ class TransactionMapping extends React.Component {
                                                                         resizable: false,
                                                                     },
                                                                     {
-                                                                        Header: "Account Name",
+                                                                        Header: "AccountName",
                                                                         accessor: "AccountName",
                                                                         minWidth: 30,
                                                                         style: { textAlign: "center" },
@@ -1274,7 +1275,7 @@ class TransactionMapping extends React.Component {
                                                                         resizable: false,
                                                                     },
                                                                     {
-                                                                        Header: "Account Type",
+                                                                        Header: "AccountType",
                                                                         accessor: "AccountType",
                                                                         minWidth: 30,
                                                                         style: { textAlign: "center" },
@@ -1314,7 +1315,7 @@ class TransactionMapping extends React.Component {
                                                                     //    resizable: false,
                                                                     //},
                                                                     {
-                                                                        Header: "Subledger Reference",
+                                                                        Header: "SubledgerReferences",
                                                                         accessor: "btn",
                                                                         minwidth: 30,
                                                                         style: { textalign: "left" },

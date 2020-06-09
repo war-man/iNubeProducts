@@ -80,7 +80,7 @@ class DmsDocument extends React.Component {
         console.log("name", evt.target.name);
     };
 
-    //getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
+    getUploadParams = ({ meta }) => { return { url: 'https://httpbin.org/post' } }
 
     handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
 
@@ -359,7 +359,7 @@ class DmsDocument extends React.Component {
                             {this.state.showDropZone ?
                                 <GridItem xs={12}>
                                     <Dropzone
-                                       // getUploadParams={this.getUploadParams}
+                                        getUploadParams={this.getUploadParams}
                                         onChangeStatus={this.handleChangeStatus}
                                         onSubmit={this.uploadfile}
                                         accept="image/*,audio/*,video/*,application/pdf/*,word/*"

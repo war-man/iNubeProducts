@@ -8,8 +8,10 @@ import Icon from "@material-ui/core/Icon";
 import role from "assets/img/users.png";
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
-
+import UserConfig from 'modules/Users/UserConfig.js';
 import withStyles from "@material-ui/core/styles/withStyles";
+import GridContainer from "../../components/Grid/GridContainer";
+import GridItem from "components/Grid/GridItem.jsx";
 
 const style = {
     infoText: {
@@ -33,26 +35,56 @@ class DragNDrop extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            masterList: [],
+            dynamicdata: {
 
+            },
         };
     }
 
+
+    componentDidMount() {
+        fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/GetMasterData?sMasterlist=abc`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ masterList: data });
+                console.log("masterlist: ", this.state.masterList)
+            });
+    }
+
     render() {
+        const { classes } = this.props;
         return (
             <div>
                 <Card >
-                    <CardHeader color="rose" icon>
-                        <CardIcon color="rose">
-                            <Icon><img id="icon" src={role} /></Icon>
-                        </CardIcon>
-                        {
-                            <h4 >
-                                <small> Drag and Drop </small>
-                            </h4>
-                        }
-                    </CardHeader>
-
                     <CardBody>
+                        <GridContainer>
+                            {this.props.dynamic.map(function (item, key) {
+                                if (this.props.count - 1 != key) {
+                                    return (
+                                        <GridItem xs={12} sm={4} key={key}>
+                                            {item}
+                                        </GridItem>
+                                    );
+                                } else {
+                                    return (
+                                        <GridContainer justify="center">
+                                            {/*<GridItem xs={12} sm={4} key={key}>*/}
+                                            {item}
+                                            {/* </GridItem>*/}
+                                        </GridContainer>
+                                    );
+                                }
+                            }.bind(this))
+                            }
+                        </GridContainer>
                     </CardBody>
                 </Card>
             </div>

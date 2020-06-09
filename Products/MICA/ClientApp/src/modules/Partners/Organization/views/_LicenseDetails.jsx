@@ -1,35 +1,35 @@
 ﻿import React from "react";
 
 // @material-ui/core components
-//import withStyles from "@material-ui/core/styles/withStyles";
-//import InputLabel from "@material-ui/core/InputLabel";
-//import FormControl from "@material-ui/core/FormControl";
+import withStyles from "@material-ui/core/styles/withStyles";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
-//import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
-//import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
-//import profileStyles from "./profileStyles.jsx";
-//import Datetime from "react-datetime";
+import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
+import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
+import profileStyles from "./profileStyles.jsx";
+import Datetime from "react-datetime";
 
-//const style = {
-//    infoText: {
-//        fontWeight: "300",
-//        margin: "10px 0 30px",
-//        textAlign: "center"
-//    },
-//    inputAdornmentIcon: {
-//        color: "#555"
-//    },
-//    choiche: {
-//        textAlign: "center",
-//        cursor: "pointer",
-//        marginTop: "20px"
-//    },
-//    ...customSelectStyle,
-//    ...customCheckboxRadioSwitch,
-//    ...profileStyles
-//};
+const style = {
+    infoText: {
+        fontWeight: "300",
+        margin: "10px 0 30px",
+        textAlign: "center"
+    },
+    inputAdornmentIcon: {
+        color: "#555"
+    },
+    choiche: {
+        textAlign: "center",
+        cursor: "pointer",
+        marginTop: "20px"
+    },
+    ...customSelectStyle,
+    ...customCheckboxRadioSwitch,
+    ...profileStyles
+};
 
     const License = (props) => {
         const prop = props.componentData;
@@ -38,7 +38,7 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomInput
                         disabled={prop.disabled}
-                        labelText="Registration Number"
+                        labelText="RegistrationNumber"
                         id="regNo"
                         value={prop.OrganizationDTO.orgRegistrationNo}
                         name="orgRegistrationNo"
@@ -52,7 +52,7 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomInput
                         disabled={prop.disabled}
-                        labelText="Registering Authority"
+                        labelText="RegisteringAuthority"
                         id="regAuthority"
                         value={prop.OrganizationDTO.orgRegisteringAuthority}
                         name="orgRegisteringAuthority"
@@ -66,7 +66,7 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomInput
                         disabled={prop.disabled}
-                        labelText="Service Tax Registration Number"
+                        labelText="ServiceTaxRegistrationNo"
                         id="serviceTaxNo"
                         value={prop.OrganizationDTO.orgServiceTaxRegistrationNumber}
                         name="orgServiceTaxRegistrationNumber"
@@ -80,7 +80,7 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomInput
                         disabled={prop.disabled}
-                        labelText="PAN Number"
+                        labelText="PANNumber"
                         id="panNumber"
                         value={prop.OrganizationDTO.orgPanno}
                         name="orgPanno"
@@ -93,7 +93,7 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomInput
                         disabled={prop.disabled}
-                        labelText="TAN Number"
+                        labelText="TANNumber"
                         id="tanNumber"
                         value={prop.OrganizationDTO.orgTanno}
                         name="orgTanno"

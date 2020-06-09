@@ -53,6 +53,8 @@ class SearchTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            startdate: "",
+            enddate:"",
             show: false,
             showG: false,
             treatyId:"",
@@ -263,13 +265,17 @@ class SearchTreaty extends React.Component {
         console.log("ParticipantList", ParticipantList);
         this.setState({
             newdata: ParticipantList.map((prop, key) => {
-
+               if (prop.startDate != null) {
+                    let fdate = new Date(prop.startDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                    let edate = new Date(prop.endDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                    this.setState({ startdate: fdate, enddate: edate });
+                }
                 return {
                     id: key,
                     treatycode: prop.treatyCode,
                     treatydescription: prop.treatyDescription,
-                    startDate: prop.startDate,                  
-                    enddate: prop.endDate,
+                    startDate: this.state.startdate,                  
+                    enddate: this.state.enddate,
                     treatyYear: prop.treatyYear,
                     //stausType: prop.stausType,
                     //enddate: prop.effectiveTo,
@@ -298,6 +304,7 @@ class SearchTreaty extends React.Component {
                     </CardHeader>
 
                     <CardBody>
+                    
                         <GridContainer>
                         <GridItem xs={12} sm={12} md={3}>
                            
@@ -399,6 +406,8 @@ class SearchTreaty extends React.Component {
                                     label={<TranslationContainer translationKey="Both"/>}
                                     />                          
                             </GridItem>
+                        </GridContainer>
+                        <GridContainer>
                             <GridContainer>
                             <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
@@ -466,19 +475,7 @@ class SearchTreaty extends React.Component {
                                         onChange={this.onInputChange}
                                         formControlProps={{ fullWidth: true }} />
 
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={3}>
-                                    <MasterDropdown
-                                        labelText="Status"
-                                        id="ddlstatus"
-                                        lstObject={[]}
-                                        filterName=''
-                                        value=''
-                                        name='year'
-                                        onChange={this.onInputChange}
-                                        formControlProps={{ fullWidth: true }} />
-
-                                </GridItem>
+                                </GridItem>                                                           
                             </GridContainer>
                             <GridContainer justify="center">
                                 <GridItem xs={5} sm={12} md={3}>
@@ -488,9 +485,11 @@ class SearchTreaty extends React.Component {
                                 </GridItem>
                                 </GridContainer>
                         </GridContainer>
+
                        <GridContainer>
                             <GridItem xs={5} sm={3} md={3}>
                                 <Button 
+                                    id="round" 
                                     color="info"
                                     size="sm"
                                     onClick={this.handleAddTreaty}
@@ -499,7 +498,7 @@ class SearchTreaty extends React.Component {
                             </Button>
                             </GridItem>
                         </GridContainer>
-                        
+                       
                         <Modal
                             aria-labelledby="simple-modal-title"
                             aria-describedby="simple-modal-description"

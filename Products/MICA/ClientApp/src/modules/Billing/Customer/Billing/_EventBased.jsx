@@ -66,6 +66,28 @@ class EventBased extends React.Component {
 
     }
 
+    GetValueFactor = (objid, index) => {
+        debugger
+        fetch(`${BillingConfig.BillingConfigUrl}/api/Billing/GetValueFactor?objevemappingid=` + objid, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                const value = this.props.props.ValueFactor[index];
+
+                value['valueFactorlist'] = data;
+                this.setState({ value });
+                console.log("valuefactordata", data);
+                console.log("valueFactorlist[index]: ", this.props.props.ValueFactor[index]);
+
+            });
+
+    }
     SetCategory = ((type, event, index) => {
         debugger
         console.log("catelog index: ", index);
@@ -98,7 +120,8 @@ class EventBased extends React.Component {
             this.props.props.billingItem[index].rateTypeId = "";
             if (this.props.props.objecteventVal[0] != 2) {
                 let mappingid = this.props.props.objectVal;
-                this.props.props.GetValueFactor(mappingid, index);
+               // this.props.props.GetValueFactor(mappingid, index);
+                this.GetValueFactor(mappingid, index);
             }
             //showList['catddl'] = true;
             showList['catCount'] = true;

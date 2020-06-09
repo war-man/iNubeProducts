@@ -34,6 +34,8 @@ import Visibility from "@material-ui/icons/Visibility";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
 import data_Not_found from "assets/img/data-not-found-new.png"
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+
 
 const style = {
     infoText: {
@@ -314,7 +316,7 @@ class ModifyCOAMapping extends React.Component {
                             </CardIcon>
                             {
                                 <h4 >
-                                    <small> Modify/View COA Mapping </small>
+                                    <small> <TranslationContainer translationKey="ModifyCOAMapping" /> </small>
                                 </h4>
                             }
                         </CardHeader>
@@ -323,7 +325,7 @@ class ModifyCOAMapping extends React.Component {
                             <GridContainer>
                                 <GridItem xs={12} sm={12} md={4}>
                                     <CustomInput
-                                        labelText="Customer Name"
+                                        labelText="CustomerName"
                                         id="CustomerName"
                                         value={this.state.fields.CustomerName}
                                         name='CustomerName'
@@ -336,7 +338,7 @@ class ModifyCOAMapping extends React.Component {
                                 <GridItem xs={5} sm={3} md={3} lg={1}>
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                         <Button id="top-bnt" color="info" round onClick={() => this.onFormSubmit()}>
-                                            Search
+                                            <TranslationContainer translationKey="Search" />
                           </Button>
                                     </Animated>
                                 </GridItem>
@@ -354,7 +356,7 @@ class ModifyCOAMapping extends React.Component {
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                         <CardBody className="product-search-tab">
                                             <ReactTable
-                                                title={"Chart of Account Mapping"}
+                                                title={"CHART OF ACCOUNT MAPPING"}
                                                 data={this.state.newdata}
                                                 filterable
                                                 columns={[
@@ -369,7 +371,7 @@ class ModifyCOAMapping extends React.Component {
                                                     //    resizable: false,
                                                     //},
                                                     {
-                                                        Header: "MICA Account Code",
+                                                        Header: "MICAAccountCode",
                                                         accessor: "MicaAccountCode",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },
@@ -378,7 +380,7 @@ class ModifyCOAMapping extends React.Component {
 
                                                     },
                                                     {
-                                                        Header: "MICA Account Type",
+                                                        Header: "MICAAccountType",
                                                         accessor: "MicaAccountType",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },
@@ -387,7 +389,7 @@ class ModifyCOAMapping extends React.Component {
 
                                                     },
                                                     {
-                                                        Header: "MICA Account Name",
+                                                        Header: "MICAAccountName",
                                                         accessor: "MicaAccountName",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },
@@ -395,7 +397,7 @@ class ModifyCOAMapping extends React.Component {
                                                         resizable: false,
                                                     },
                                                     {
-                                                        Header: "Customer Account Code",
+                                                        Header: "CustomerAccountCode",
                                                         accessor: "CustomerAccountCode",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },
@@ -403,7 +405,7 @@ class ModifyCOAMapping extends React.Component {
                                                         resizable: false,
                                                     },
                                                     {
-                                                        Header: "Customer Account Name",
+                                                        Header: "CustomerAccountName",
                                                         accessor: "CustomerAccountName",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },
@@ -411,7 +413,7 @@ class ModifyCOAMapping extends React.Component {
                                                         resizable: false,
                                                     },
                                                     {
-                                                        Header: "Customer Account Description",
+                                                        Header: "CustomerAccountDescription",
                                                         accessor: "CustomerAccountDesc",
                                                         minWidth: 30,
                                                         style: { textAlign: "center" },

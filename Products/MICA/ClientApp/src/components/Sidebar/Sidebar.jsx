@@ -20,7 +20,7 @@ import { Redirect } from 'react-router-dom';
 // core components
 import HeaderLinks from "components/Header/HeaderLinks.jsx";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
-
+import ThemeSwitch from 'assets/jss/ThemeSwitch.jsx';
 import sidebarStyle from "assets/jss/material-dashboard-pro-react/components/sidebarStyle.jsx";
 
 //import avatar from "assets/img/faces/avatar.jpg";
@@ -101,6 +101,7 @@ class Sidebar extends React.Component {
     }
 
     handleclick() {
+        ThemeSwitch.resetTheme();
         this.setState({
             redirect: true,
         });
@@ -465,14 +466,17 @@ class Sidebar extends React.Component {
             });
         var brand = (
             <div className={logoClasses}>
-                {/*<a href="https://micav0002.azurewebsites.net/dashboard/home" className = { logoMini } >*/}
-                <a className={logoMini}>
+                {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
+                <a /*href="https://micav0002.azurewebsites.net/dashboard/home" */ className={logoMini}>
                     <img src={logo} alt="logo" className={classes.img} />
                 </a>
-                {/* <a href="https://micav0002.azurewebsites.net/dashboard/home" className = { logoNormal } > */}
-                <a className={logoNormal}>
+                {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
+                <a /*href="https://micav0002.azurewebsites.net/dashboard/home"*/ className={logoNormal}>
                     <img src={logoText} alt="logo" className={classes.imgNormal} />
-                </a>
+                </a >
+                {/* <a href="https://micav0002.azurewebsites.net/dashboard/home" className={logoNormal}>
+                    <img src={'data:image/png;base64,' + localStorage.getItem('CompanyLogo')} alt="logo" className={classes.imgNormal} />
+                </a >*/}
             </div >
         );
         const drawerPaper =
@@ -508,7 +512,7 @@ class Sidebar extends React.Component {
                         }}
                     >
                         {/* Logo Sidebar (sidebar-logo) */}
-                        {/* {brand} */}
+                        {brand} {/**/}
                         <SidebarWrapper
                             className={sidebarWrapper}
                             user={user}
@@ -535,7 +539,7 @@ class Sidebar extends React.Component {
                         }}
                     >
                         {/* Logo Sidebar (sidebar-logo) */}
-                        {/* {brand} */}
+                        {brand}  {/* */}
                         <SidebarWrapper
                             className={sidebarWrapper}
                             user={user}

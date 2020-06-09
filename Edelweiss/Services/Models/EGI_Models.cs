@@ -186,7 +186,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public decimal? SumInsured { get; set; }
         public string BillingFrequency { get; set; }
         public string CDAccountNumber { get; set; }
-
+        public string MobileNumber { get; set; }
     }
 
     public partial class PremiumRequestDTO
@@ -804,6 +804,50 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public bool? Status { get; set; }
     }
 
-         
+    public partial class MobileAlertRequestDTO
+    {
+        public MobileAlertRequestDTO()
+        {
+            push = new MobilePushDTO();
+        }
+
+        public string type { get; set; }
+        public MobilePushDTO push { get; set; }
+        public int snsTopicId { get; set; }
+
+    }
+
+    public partial class MobilePushDTO
+    {
+        public MobilePushDTO()
+        {
+            mobiles = new List<string>();
+        }
+
+        public string title { get; set; }
+        public string message { get; set; }
+        public List<string> mobiles { get; set; }
+        public string externalUrl { get; set; }
+        public string page { get; set; }
+        public bool android { get; set; }
+        public bool ios { get; set; }
+        public bool sendAll { get; set; }
+    }
+       
+    public partial class MobileAlertResponseDTO
+    {
+        public MobileAlertResponseDTO()
+        {
+            push = new MobilePushDTO();
+        }
+        public int id { get; set; }
+        public string type { get; set; }
+        public MobilePushDTO push { get; set; }
+        public string createdAt { get; set; }
+        public string updatedAt { get; set; }
+        public int snsTopicId { get; set; }
+
+    }
+
 }
 

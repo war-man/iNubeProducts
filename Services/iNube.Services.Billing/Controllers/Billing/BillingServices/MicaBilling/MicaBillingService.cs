@@ -1526,7 +1526,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
 
                     if (invoiceDetailDTO.EventMappingId == ModuleConstants.ProductCreation || invoiceDetailDTO.EventMappingId == ModuleConstants.PolicyCreation || invoiceDetailDTO.EventMappingId == ModuleConstants.ClaimIntimation)
                     {
-                        invoiceDetailDTO.Eventcount = billingEventDetail.Sum(e => e.Count);
+                        invoiceDetailDTO.Eventcount = (int)billingEventDetail.Sum(e => e.Count);
                     }
                     else
                         invoiceDetailDTO.Eventcount = 0;
@@ -1594,6 +1594,25 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 ExecDate.LastCycleExecDate = invoiceDto.InvoiceDate;
                 _context.TblInvoiceConfig.Update(ExecDate);//update last execution date in InvoiceConfig table
                 _context.SaveChanges();
+
+                //Update IsActive status in BillingItemDetail table for Recurring Installment so as to get each installment at once when invoice is generated multiple times.
+                foreach (var bill in main_bill)
+                {
+                    var billingItem = _context.TblBillingItemDetail.Where(b => b.BillingItemId == bill.tblbillingItem.BillingItemId);
+                    var active = _context.TblBillingItemDetail.FirstOrDefault(b => b.BillingItemId == bill.tblbillingItem.BillingItemId).IsActive;
+                    
+                    if (active == "1")
+                    {
+                        foreach (var billActive in billingItem)
+                        {
+                            billActive.IsActive = "0";
+                        }
+                    }
+                    var billData = _mapper.Map<TblBillingItemDetail>(billingItem);
+                    _context.TblBillingItemDetail.Update(billData);
+                    _context.SaveChanges();
+                }
+
                 return invoiceDto;
             }
             catch (Exception ex)
@@ -1676,15 +1695,15 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             {
                 BillingDetailsType = "Claim Intimation";
             }
-            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.OneTimeLicenseCost)
+            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.MICAOneTimeLicenseCost)
             {
                 BillingDetailsType = "Onetime License Cost";
             }
-            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.RecurringInstallment)
+            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.MICARecurringInstallment)
             {
                 BillingDetailsType = "Recurring Installment";
             }
-            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.RecurringFlatAmount)
+            else if (invoiceDetailDTO.EventMappingId == ModuleConstants.MICARecurringFlatAmount)
             {
                 BillingDetailsType = "Recurring Flat Amount";
             }
@@ -1977,13 +1996,43 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             }
 
             //For one time license cost, directly take "Rate" from "BillingItem" Table
-            if (bill.EventMappingId == ModuleConstants.OneTimeLicenseCost)
+            if (bill.EventMappingId == ModuleConstants.MICAOneTimeLicenseCost)
             {
                 invoiceItemAmount = (decimal)bill.Rate;
             }
 
+            //For Recurring Flat Amount, directly take "Rate" from "BillingItem" Table
+            if (bill.EventMappingId == ModuleConstants.MICARecurringFlatAmount)
+            {
+                invoiceItemAmount = (decimal)bill.Rate;
+            }
+
+            //For Recurring Installment, take "Rate" from "BillingItem" Table for total amount and take "Amount" from "BillingItemDetails" Table to get individual installments amount.
+            if (bill.EventMappingId == ModuleConstants.MICARecurringInstallment)
+            {
+                if (bill.BillingFrequencyId == ModuleConstants.Custom)
+                {
+                    decimal itemAmount = 0;
+                    var billingItem = _context.TblBillingItemDetail.Where(b => b.BillingItemId == bill.BillingItemId);
+                    var active = _context.TblBillingItemDetail.FirstOrDefault(b => b.BillingItemId == bill.BillingItemId).IsActive;
+                    if (active == "0")
+                    {
+                        foreach (var billAmount in billingItem)
+                        {
+                            itemAmount = (decimal)billAmount.Amount;
+                        }
+                    }
+                    invoiceItemAmount = itemAmount;
+                }
+                else if (bill.BillingFrequencyId == ModuleConstants.Monthly || bill.BillingFrequencyId == ModuleConstants.HalfYearly || bill.BillingFrequencyId == ModuleConstants.Yearly)
+                {
+                    invoiceItemAmount = (decimal)bill.Rate;
+                }
+            }
+
             return invoiceItemAmount;
         }
+
         private decimal GetFlatAmount(IEnumerable<BilingEventDataDTO> policyList, IList<RangeValue> ranges)
         {
 
@@ -1993,7 +2042,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             {
                 foreach (var r in ranges)
                 {
-                    if (Enumerable.Range(r.From, r.To).Contains(p.Count))
+                    if (Enumerable.Range(r.From, r.To).Contains(Convert.ToInt32(p.Count)))
                     {
                         total = p.Count * r.Rate;
                     }
@@ -2020,7 +2069,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 }
                 foreach (var ra in range)
                 {
-                    if (Enumerable.Range(ra.From, ra.To).Contains(pl.Count))
+                    if (Enumerable.Range(ra.From, ra.To).Contains(Convert.ToInt32(pl.Count)))
                     {
                         totalpremium = (totalpremium * ra.Rate) / 100;
                     }

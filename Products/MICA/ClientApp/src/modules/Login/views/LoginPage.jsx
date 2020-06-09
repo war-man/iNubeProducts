@@ -16,7 +16,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import swal from 'sweetalert';
-
+import ThemeSwitch from 'assets/jss/ThemeSwitch.jsx';
 // core components
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
@@ -47,7 +47,7 @@ class LoginPage extends React.Component {
             GName: '',
             submitted: false,
             exist: false,
-            inactive:false,
+            inactive: false,
             cardAnimaton: "cardHidden",
             redirect: false,
             UName: '',
@@ -73,6 +73,7 @@ class LoginPage extends React.Component {
     }
 
     componentDidMount() {
+        ThemeSwitch.resetTheme();
         this.timeOutFunction = setTimeout(
             function () {
                 this.setState({ cardAnimaton: "" });
@@ -101,13 +102,14 @@ class LoginPage extends React.Component {
 
     handleSubmit(e) {
         e.preventDefault();
-        this.setState({ exist: false,inactive:false });
+        this.setState({ exist: false, inactive: false });
         localStorage.setItem('Username', this.state.UserName);
         console.log("producttype: ", LoginConfig.ProductType);
 
         //console.log('login Clicked' + this.state.UserName);
         if (this.state.UserName != "") {
-            fetch(`${LoginConfig.LoginUrl}/api/Login/GetUserType?username=` + this.state.UserName + '&productType=' + LoginConfig.ProductType, {
+            fetch(`${LoginConfig.LoginUrl}/api/Login/GetUserType?username=` + this.state.UserName + ``, {
+                //fetch(`https://localhost:44351/api/Login/GetUserType?username=` + this.state.UserName + ``, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -118,6 +120,8 @@ class LoginPage extends React.Component {
                     console.log("response data", data);
                     if (data.status == 1) {
                         this.setState({ UserType: data.userLogin.loginProvider, count: data.userLogin.isFirstTimeLogin, userId: data.userLogin.id, environment: data.userLogin.environmentDTOs, redirect: "Pass" });
+                        localStorage.setItem('ProductType', data.userLogin.product);
+                        localStorage.setItem('CompanyLogo', data.userLogin.companyLogo);
                         //console.log("UserId: ", this.state.userId);
                         //console.log('response:', data.userLogin.loginProvider);
                         //console.log("usertype", this.state.UserType);

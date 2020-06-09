@@ -146,6 +146,7 @@ export default function SpeedDials() {
             <div className={classes.exampleWrapper}>
                 <SpeedDial
                     ariaLabel="SpeedDial"
+                    style={{ color: "primary", /*backgroundColor: localStorage.getItem('primaryColor') */ }}
                     className={classes.speedDial}
                     hidden={hidden}
                     icon={<SpeedDialIcon />}
@@ -159,7 +160,7 @@ export default function SpeedDials() {
                     onMouseEnter={pop}
                     onMouseLeave={handleClose}
                     ButtonProps={{
-                        "data-testid": "speed-dial-button"
+                        "data-testid": "speed-dial-button",
                     }}
                 >
                     <SpeedDialAction
@@ -208,7 +209,7 @@ export default function SpeedDials() {
                     </div>
                     <SpeedDialAction
                         icon={<PrintIcon />}
-                        tooltipTitle={<TranslationContainer translationKey="Print"/>}
+                        tooltipTitle={<TranslationContainer translationKey="Print" />}
                         onClick={pop}
                         ButtonProps={{ "data-testid": "speed-dial-action-settings-button" }}
                     />

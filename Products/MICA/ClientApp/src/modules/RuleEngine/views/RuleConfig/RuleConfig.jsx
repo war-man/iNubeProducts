@@ -79,6 +79,11 @@ class RuleConfig extends React.Component {
             ParamSetID: "",
             ParamSetName: [],
             IsCheck: false,
+            ruleGroupFlag: false,
+            //RuleGroup
+            conditionAttrFlag: false,
+            conditionOprFlag: false,
+            isCheckFlag: false,
             checkEvent:"",
             ConditionFromAtrrParam:[],
             ParamSetid: "",
@@ -90,7 +95,9 @@ class RuleConfig extends React.Component {
             gridRules: [],
             GridShow: [],
             GridShowData:[],
-            newdataGrid:[],
+            newdataGrid: [],
+            Rules: [],
+            ruleType: "",
             fields: {
 
                 RuleName: "",
@@ -116,18 +123,45 @@ class RuleConfig extends React.Component {
                 //For Condition Value as Parameter
                 conditionAttributesValueFrom: "",
                 conditionAttributesValueTo: "",
+                //RuleGroup
+                ruleGroupName:"",
+                
                 
             },
         };
         this.handleTags = this.handleTags.bind(this);
         this.reset = this.reset.bind(this);
     }
+    handleSimpleruleGroup = event => {
+        const fields = this.state.fields;
+        //if (this.state.ruleType != "RuleGroup") {
+        //    this.state.ruleGroupFlag = true;
+        //}
+        if (event.target.value == "RuleGroup") {
+            this.setState({
+                showTable: false, showColumn: false, showDateFrom: false, showDateTo: false, showDOBParameters: false, conditionalParamFlagFrom: false, conditionalParamFlagTo: false, showCondition: false, showConditionFrom: false, conditionAttrFlag: false, conditionOprFlag: false, isCheckFlag: false
+            });
+            this.setState({ ruleGroupFlag: true, IsCheck: false, [event.target.name]: event.target.value });
+            
+        }
+        else {
+            this.setState({
+                showTable: false, showColumn: false, showDateFrom: false, showDateTo: false, showDOBParameters: false, conditionalParamFlagFrom: false, conditionalParamFlagTo: false, showCondition: false, showConditionFrom: false, ruleGroupFlag: false,
+            });
+
+            this.setState({
+                conditionAttrFlag: true, conditionOprFlag: true, isCheckFlag: true, [event.target.name]: event.target.value });
+        }
+        
+        fields[event.target.name] = event.target.value;
+        //this.setState({ fields });
+    };
 
     handleSimple = event => {
         const fields = this.state.fields;
         fields[event.target.name] = event.target.value;
         this.setState({ fields });
-        this.setState({ [event.target.name]: event.target.value });     
+        //this.setState({ [event.target.name]: event.target.value });     
     };
     SetCheckBox = (e) => {
         debugger
@@ -267,7 +301,34 @@ class RuleConfig extends React.Component {
             this.state.fields.conditionvaluefrom = this.state.fields.conditionAttributesValueFrom;
             this.state.fields.conditionvalueto = this.state.fields.conditionAttributesValueTo;
         }
-        if (this.state.fields.RuleName != "" && this.state.fields.StartDate != "" && this.state.fields.EndDate != "" && this.state.fields.conditionAttributes != "" && this.state.fields.conditionoperator != "" && this.state.fields.RuleObj != "" && this.state.fields.ValidatorName != "" && this.state.fields.SuccessMsg != "" && this.state.fields.SuccessCode !="" && this.state.fields.FailureCode !=  "" && this.state.fields.FailureMsg !=  "") {
+        //Checking ALL Condition Attributes and RUle Group Name
+        var flagCheckAttr = false;
+        if (this.state.ruleType != "") {
+            if (this.state.fields.ruleGroupName == "") {
+                //swal({
+                //    text: "Rule Group is missing",
+                //    icon: "error"
+                //});
+            }
+            else {
+                flagCheckAttr = true;
+            }
+        }
+        else {
+            if (this.state.fields.conditionAttributes == "") {
+                swal({
+                    text: "Condition Attributes are Missing is missing",
+                    icon: "error"
+                });
+            }
+            else {
+                flagCheckAttr = true;
+            }
+        }
+        if (this.state.ruleType == "RuleGroup") {
+            this.state.fields.RuleObj = "NULL";
+        }
+        if (this.state.fields.RuleName != "" && this.state.fields.StartDate != "" && this.state.fields.EndDate != "" && this.state.fields.RuleObj != "" && this.state.fields.ValidatorName != "" && this.state.fields.SuccessMsg != "" && this.state.fields.SuccessCode != "" && this.state.fields.FailureCode != "" && this.state.fields.FailureMsg != "" && this.state.ruleType != "" ) {
             const { show } = this.state.show;
             this.setState({ show: !show });
             //Setting State after Selecting IList or Any Conditional Operator 
@@ -294,12 +355,16 @@ class RuleConfig extends React.Component {
                 'successMsg': this.state.fields.SuccessMsg,
                 'failureMsg': this.state.fields.FailureMsg,
                 'successCode': this.state.fields.SuccessCode,
-                'failureCode': this.state.fields.FailureCode
+                'failureCode': this.state.fields.FailureCode,
+                'ruleGroupName': this.state.fields.ruleGroupName
             });
             //this.state.GridShowData = this.state.tblRuleConditionArray;
             debugger
             //Filtering Parameter Details ParameterDetails
-            const parameterName = this.state.ParameterDetails.filter(it => it.paramId == this.state.fields.conditionAttributes)[0].paramName;
+            let parameterName = "";
+            if (this.state.fields.conditionAttributes != "") {
+                parameterName = this.state.ParameterDetails.filter(it => it.paramId == this.state.fields.conditionAttributes)[0].paramName;
+            }
             console.log(parameterName, 'ParameterName');
             //Addition of Parameter Just for Showing Purpose
             let pGridSow = this.state.GridShow;
@@ -323,7 +388,8 @@ class RuleConfig extends React.Component {
                     'successMsg': this.state.fields.SuccessMsg,
                     'failureMsg': this.state.fields.FailureMsg,
                     'successCode': this.state.fields.SuccessCode,
-                    'failureCode': this.state.fields.FailureCode
+                    'failureCode': this.state.fields.FailureCode,
+                    'ruleGroupName': this.state.fields.ruleGroupName
                 });
             debugger
             console.log(this.state.GridShow, 'GridShow');
@@ -349,7 +415,8 @@ class RuleConfig extends React.Component {
                             successMsg: prop.successMsg,
                             failureMsg: prop.failureMsg,
                             successCode: prop.successCode,
-                            failureCode: prop.failureCode
+                            failureCode: prop.failureCode,
+                            ruleGroupName: prop.ruleGroupName
                         };
                     })
                 });
@@ -383,6 +450,7 @@ class RuleConfig extends React.Component {
             fields['FailureCode'] = "";
             fields['conditionAttributesValueFrom'] = "";
             fields['conditionAttributesValueTo'] = "";
+            fields['ruleGroupName'] = "";
 
             this.setState({ fields });
             this.setState({ conditionalParamFlagFrom: false });
@@ -439,7 +507,7 @@ class RuleConfig extends React.Component {
         var isactive = 1;
         if (this.state.tblRuleConditionArray.length != 0) {
             var data = {
-                'ruleName': this.state.fields.RuleName, 'startDate': this.state.fields.StartDate, 'endDate': this.state.fields.EndDate, 'createdDate': date(), 'isActive': isactive, 'ruleObj': this.state.fields.RuleObj, 'tblRuleConditions': this.state.tblRuleConditionArray
+                'ruleName': this.state.fields.RuleName, 'startDate': this.state.fields.StartDate, 'endDate': this.state.fields.EndDate, 'createdDate': date(), 'isActive': isactive, 'ruleObj': this.state.fields.RuleObj, 'tblRuleConditions': this.state.tblRuleConditionArray, 'ruleType': this.state.ruleType
             };
             console.log(data, 'sendingData');
             //console.log('data' + JSON.stringify(data));
@@ -480,7 +548,7 @@ class RuleConfig extends React.Component {
         fields['RuleObj'] = "";
         this.setState({ fields });
         this.setState({
-            tblRuleConditionArray: [], show: false, showG: false,
+            tblRuleConditionArray: [], show: false, showG: false, ruleGroupFlag:false,
             ParamSetName: [],
             ParamSetid: "",
             ParamId: [],
@@ -510,6 +578,11 @@ class RuleConfig extends React.Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({ ParamSetName: data });
+            });
+        fetch(`${ruleconfig.ruleEngineUrl}/RuleConfig/GetAllRules`) 
+            .then(response => response.json())
+            .then(data => {
+                this.setState({Rules: data});
             });
 
     }
@@ -609,7 +682,62 @@ class RuleConfig extends React.Component {
                                     
                                     <GridItem xs={12} sm={12} md={3}>
                                     <CustomDatetime labelText="End Date" id='EndDate' name='StartDate' onChange={(evt) => this.onDateChange('EndDate', evt)} value={this.state.fields.EndDate} required={true} formControlProps={{ fullWidth: true }} />
-                                </GridItem>
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <FormControl
+                                            fullWidth
+                                            className={classes.selectFormControl}
+                                        >
+                                            <InputLabel
+                                                htmlFor="ruleType"
+                                                className={classes.selectLabel}
+                                            >
+                                                Rule Type
+                          </InputLabel>
+                                            <Select
+                                                MenuProps={{
+                                                    className: classes.selectMenu
+                                                }}
+                                                classes={{
+                                                    select: classes.select
+                                                }}
+                                                value={this.state.ruleType}
+                                                onChange={this.handleSimpleruleGroup}
+                                                inputProps={{
+                                                    name: "ruleType",
+                                                    id: "simple-select1"
+                                                }}
+                                            >
+                                                <MenuItem
+                                                    disabled
+                                                    classes={{
+                                                        root: classes.selectMenuItem
+                                                    }}
+                                                >
+                                                    Rule Type
+                            </MenuItem>
+                                                <MenuItem
+                                                    classes={{
+                                                        root: classes.selectMenuItem,
+                                                        selected: classes.selectMenuItemSelected
+                                                    }}
+                                                    value="RuleCondition"
+                                                >
+                                                    RuleCondition
+                            </MenuItem>
+                                                <MenuItem
+                                                    classes={{
+                                                        root: classes.selectMenuItem,
+                                                        selected: classes.selectMenuItemSelected
+                                                    }}
+                                                    value="RuleGroup"
+                                                >
+                                                    RuleGroup
+                            </MenuItem>
+
+                                            </Select>
+                                        </FormControl>
+                                    </GridItem>
 
                                 </GridContainer>
                             </CardBody>
@@ -698,227 +826,232 @@ class RuleConfig extends React.Component {
                                             }}
                                         />
                                     </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}>
-                                        <FormControl
-                                            fullWidth
-                                            className={classes.selectFormControl}
-                                        >
-                                            <InputLabel
-                                                htmlFor="simple-select"
-                                                className={classes.selectLabel}
+                                    {this.state.conditionAttrFlag &&
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <FormControl
+                                                fullWidth
+                                                className={classes.selectFormControl}
                                             >
-                                                Condition Attributes
+                                                <InputLabel
+                                                    htmlFor="simple-select"
+                                                    className={classes.selectLabel}
+                                                >
+                                                    Condition Attributes
                                             </InputLabel>
-                                            <Select
-                                                value={this.state.fields.conditionAttributes}
-                                                onChange={this.handleSimple}
+                                                <Select
+                                                    value={this.state.fields.conditionAttributes}
+                                                    onChange={this.handleSimple}
 
-                                                MenuProps={{
-                                                    className: classes.selectMenu
-                                                }}
-                                                classes={{
-                                                    select: classes.select
-                                                }}
-                                                inputProps={{
-                                                    name: "conditionAttributes",
-                                                    id: "simple-select"
-                                                }}
-                                            >
-                                                {
-                                                    this.state.ParamId.map(item =>
-                                                        <MenuItem
-                                                            value={item.paramId}
-                                                            classes={{
-                                                                root: classes.selectMenuItem,
-                                                                selected: classes.selectMenuItemSelected
-                                                            }}
-                                                        >
-                                                            {item.paramName}
-                                                        </MenuItem>
-                                                    )
-                                                }
-                                            </Select>
-                                        </FormControl>
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}>
-                                        <FormControl
-                                            fullWidth
-                                            className={classes.selectFormControl}
-                                        >
-                                            <InputLabel
-                                                htmlFor="simple-select"
-                                                className={classes.selectLabel}
-                                            >
-                                                Condition Operator
-                          </InputLabel>
-                                            <Select
-                                                MenuProps={{
-                                                    className: classes.selectMenu
-                                                }}
-                                                classes={{
-                                                    select: classes.select
-                                                }}
-                                                value={this.state.fields.conditionoperator}
-                                                onChange={this.handleSimpleConditionOp}
-                                                inputProps={{
-                                                    name: "conditionoperator",
-                                                    id: "simple-select"
-                                                }}
-                                            >
-                                                <MenuItem
-                                                    disabled
-                                                    classes={{
-                                                        root: classes.selectMenuItem
+                                                    MenuProps={{
+                                                        className: classes.selectMenu
                                                     }}
+                                                    classes={{
+                                                        select: classes.select
+                                                    }}
+                                                    inputProps={{
+                                                        name: "conditionAttributes",
+                                                        id: "simple-select"
+                                                    }}
+                                                >
+                                                    {
+                                                        this.state.ParamId.map(item =>
+                                                            <MenuItem
+                                                                value={item.paramId}
+                                                                classes={{
+                                                                    root: classes.selectMenuItem,
+                                                                    selected: classes.selectMenuItemSelected
+                                                                }}
+                                                            >
+                                                                {item.paramName}
+                                                            </MenuItem>
+                                                        )
+                                                    }
+                                                </Select>
+                                            </FormControl>
+                                        </GridItem>
+                                    }
+                                    {this.state.conditionOprFlag &&
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <FormControl
+                                                fullWidth
+                                                className={classes.selectFormControl}
+                                            >
+                                                <InputLabel
+                                                    htmlFor="simple-select"
+                                                    className={classes.selectLabel}
                                                 >
                                                     Condition Operator
-                            </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
+                          </InputLabel>
+                                                <Select
+                                                    MenuProps={{
+                                                        className: classes.selectMenu
                                                     }}
-                                                    value="="
-                                                >
-                                                    =
-                            </MenuItem>
-                                                <MenuItem
                                                     classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
+                                                        select: classes.select
                                                     }}
-                                                    value=">"
+                                                    value={this.state.fields.conditionoperator}
+                                                    onChange={this.handleSimpleConditionOp}
+                                                    inputProps={{
+                                                        name: "conditionoperator",
+                                                        id: "simple-select"
+                                                    }}
                                                 >
+                                                    <MenuItem
+                                                        disabled
+                                                        classes={{
+                                                            root: classes.selectMenuItem
+                                                        }}
                                                     >
+                                                        Condition Operator
                             </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="<"
-                                                >
-                                                    {"<"}
-                                                </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="!="
-                                                >
-                                                    !=
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="="
+                                                    >
+                                                        =
                             </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="<="
-                                                >
-                                                    {"<="}
-                                                </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value=">="
-                                                >
-                                                    >=
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value=">"
+                                                    >
+                                                        >
+                            </MenuItem>
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="<"
+                                                    >
+                                                        {"<"}
                                                     </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="InBetween"
-                                                >
-                                                    InBetween
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="!="
+                                                    >
+                                                        !=
+                            </MenuItem>
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="<="
+                                                    >
+                                                        {"<="}
                                                     </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="IsListOf"
-                                                >
-                                                    IsListOf
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value=">="
+                                                    >
+                                                        >=
                                                     </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="Validate"
-                                                >
-                                                    Validate
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="InBetween"
+                                                    >
+                                                        InBetween
                                                     </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="StartsWith"
-                                                >
-                                                    StartsWith
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="IsListOf"
+                                                    >
+                                                        IsListOf
                                                     </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="EndsWith"
-                                                >
-                                                    EndsWith
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="Validate"
+                                                    >
+                                                        Validate
                                                     </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="Substring"
-                                                >
-                                                    Substring
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="StartsWith"
+                                                    >
+                                                        StartsWith
                                                     </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="DateRange"
-                                                >
-                                                    DateRange
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="EndsWith"
+                                                    >
+                                                        EndsWith
                                                     </MenuItem>
-                                                <MenuItem
-                                                    classes={{
-                                                        root: classes.selectMenuItem,
-                                                        selected: classes.selectMenuItemSelected
-                                                    }}
-                                                    value="ValidateDOB"
-                                                >
-                                                    ValidateDOB
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="Substring"
+                                                    >
+                                                        Substring
                                                     </MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </GridItem>
-                                    
-                                    <GridItem xs={12} sm={12} md={3}>
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="DateRange"
+                                                    >
+                                                        DateRange
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        classes={{
+                                                            root: classes.selectMenuItem,
+                                                            selected: classes.selectMenuItemSelected
+                                                        }}
+                                                        value="ValidateDOB"
+                                                    >
+                                                        ValidateDOB
+                                                    </MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </GridItem>
+                                    }
+                                    {this.state.isCheckFlag &&
+                                        <GridItem xs={12} sm={12} md={3}>
 
-                                        <CustomCheckbox
-                                            name="IsCheck"
-                                            labelText="IsParameters"
-                                            value={this.state.IsCheck}
-                                            onChange={(e) => this.SetCheckBox(e)}
-                                            //disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}
-                                            checked={this.state.IsCheck}
+                                            <CustomCheckbox
+                                                name="IsCheck"
+                                                labelText="IsParameters"
+                                                value={this.state.IsCheck}
+                                                onChange={(e) => this.SetCheckBox(e)}
+                                                //disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}
+                                                checked={this.state.IsCheck}
 
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
 
-                                        />
-                                    </GridItem>
+                                            />
+                                        </GridItem>
+                                    }
                                     {this.state.conditionalParamFlagFrom &&
                                         <GridItem xs={12} sm={12} md={3}>
                                             <FormControl
@@ -1122,9 +1255,49 @@ class RuleConfig extends React.Component {
                                             </FormControl>
                                         </GridItem>
                                     }
-                                    
-                                    
-
+                                    {this.state.ruleGroupFlag &&
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <FormControl
+                                                fullWidth
+                                                className={classes.selectFormControl}
+                                            >
+                                                <InputLabel
+                                                    htmlFor="simple-select"
+                                                    className={classes.selectLabel}
+                                                >
+                                                    Rules
+                          </InputLabel>
+                                                <Select
+                                                    value={this.state.fields.ruleGroupName}
+                                                    onChange={this.handleSimple}
+                                                    MenuProps={{
+                                                        className: classes.selectMenu
+                                                    }}
+                                                    classes={{
+                                                        select: classes.select
+                                                    }}
+                                                    inputProps={{
+                                                        name: "ruleGroupName",
+                                                        id: "simple-select"
+                                                    }}
+                                                >
+                                                    {
+                                                        this.state.Rules.map(item =>
+                                                            <MenuItem
+                                                            value={item.ruleId}
+                                                                classes={{
+                                                                    root: classes.selectMenuItem,
+                                                                    selected: classes.selectMenuItemSelected
+                                                                }}
+                                                            >
+                                                                {item.ruleName}
+                                                            </MenuItem>
+                                                        )
+                                                    }
+                                                </Select>
+                                            </FormControl>
+                                        </GridItem>
+                                    }
 
                                     <GridItem xs={12} sm={12} md={3}>
                                         <FormControl
@@ -1265,6 +1438,14 @@ class RuleConfig extends React.Component {
                                             {
                                                 Header: "Condition Logical Operator",
                                                 accessor: "conditionLogicalOperator",
+                                                minwidth: 30,
+                                                style: { textalign: "left" },
+                                                headerclassname: 'react-table-center',
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "Rule Group Name",
+                                                accessor: "ruleGroupName",
                                                 minwidth: 30,
                                                 style: { textalign: "left" },
                                                 headerclassname: 'react-table-center',
