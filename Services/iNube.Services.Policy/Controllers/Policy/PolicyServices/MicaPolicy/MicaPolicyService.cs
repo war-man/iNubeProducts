@@ -2414,8 +2414,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
             dbHelper._TimeZone = UserDateTime.KeyValue;
-           DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
-
+            DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
             InsuranceCertificateModel model = new InsuranceCertificateModel();
             var ps = await _integrationService.GetCustomerById(Convert.ToDecimal(tblpolicyDTO.CustomerId), apiContext);
@@ -2452,9 +2451,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 model.insuredDetails.InsuredContactName = policyDTO.PolicyInsurableDetails.First().Name;
             }
-            else
+            if (string.IsNullOrEmpty(model.insuredDetails.InsuredContactName))
             {
-                model.insuredDetails.InsuredContactName = policyDTO.InsuredName;
+                model.insuredDetails.InsuredContactName = policyDTO.CoverNoteNo;
             }
             model.insuredDetails.InsuredEmailAddress = policyDTO.Email;
             model.insuredDetails.InsuredPhoneNumber = policyDTO.MobileNumber;
@@ -2557,7 +2556,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                         productInsurable = productDTO.ProductInsurableItems.FirstOrDefault(p => p.InsurableItem == insurabledetails.InsurableItem);
                         //lstInsurabledetails.Add(insurabledetails);
-                        if (item.Covers != null && productInsurable != null)
+                        if (item.Covers != null && productInsurable != null && item.Covers.Count > 0)
                         {
                             foreach (var insurableFieldData in item.Covers)
                             {
@@ -2579,6 +2578,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                             }
                         }
+                        else
+                        {
+
+                            foreach (var insurableFieldData in productInsurable.ProductCovers)
+                            {
+                                var CoverName = insurableFieldData.Cover;
+                                coveragedetails = new Coveragedetails();
+                                coveragedetails.CoverName = CoverName;
+                                coversDTO = productInsurable.ProductCovers.FirstOrDefault(c => c.Cover == coveragedetails.CoverName);
+                                if (coversDTO != null)
+                                {
+                                    productBenefits = coversDTO.ProductBenefits.First();
+                                    if (productBenefits != null)
+                                    {
+                                        coveragedetails.CoverEventFactor = coversDTO.CoverEventFactor;
+                                        coveragedetails.MaxBenifitCriteriaAmount = Convert.ToDecimal(productBenefits.MaxBenefitAmount);
+                                        coveragedetails.MaxBenifitCriteriaValue = Convert.ToDecimal(productBenefits.BenefitCriteriaValue).ToString();
+                                        if (coveragedetails.MaxBenifitCriteriaAmount <= 0)
+                                        {
+                                            coveragedetails.MaxBenifitCriteriaAmount = Convert.ToDecimal(productBenefits.BenefitCriteriaValue);
+                                        }
+                                        coveragedetails.BenifitCriteria = productBenefits.BenefitCriterias;
+                                        insurabledetails.coverages.Add(coveragedetails);
+                                    }
+                                }
+
+                            }
+                        }
                         if (item.RiskItems != null)
                         {
                             foreach (var insurableInsurablefields in item.RiskItems)
@@ -2586,6 +2613,31 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 insurableItemsDetails = new InsurableItemsDetails();
                                 insurableItemsDetails.Name = insurableInsurablefields["Name"];
                                 insurableItemsDetails.IdentificationNumber = insurableInsurablefields["Identification Number"];
+                                if (string.IsNullOrEmpty(insurableItemsDetails.Name))
+                                {
+                                    try
+                                    {
+                                        foreach (var kItem in insurableInsurablefields)
+                                        {
+                                            StringComparison comp = StringComparison.OrdinalIgnoreCase;
+                                            if (Convert.ToString(kItem.Name).Contains("name", comp))
+                                            {
+                                                insurableItemsDetails.Name = insurableInsurablefields[kItem.Name];
+                                            }
+                                            if (Convert.ToString(kItem.Name).Contains("number", comp))
+                                            {
+                                                insurableItemsDetails.IdentificationNumber = insurableInsurablefields[kItem.Name];
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+
+
+                                    }
+
+                                }
+
                                 insurabledetails.lstInsurableItemsDetails.Add(insurableItemsDetails);
                             }
                             insurabledetails.NumberOfItems = insurabledetails.lstInsurableItemsDetails.Count;
@@ -2668,7 +2720,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             return model;
         }
-
         //MulticoverInsurable
         public async Task<LeadInfoDTO> CustomerPolicy(int customerId, ApiContext apiContext)
         {
