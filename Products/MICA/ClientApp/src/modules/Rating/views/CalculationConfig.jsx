@@ -751,6 +751,14 @@ class CalculationConfig extends React.Component {
                                                 label="IIF"
                                                 onClick={() => this.handleEvaluator("IIF")} />
                                             <Chip size="small"
+                                                label=">"
+                                                onClick={() => this.handleEvaluator(">")} />
+                                            <Chip size="small"
+                                                label="<"
+                                                onClick={() => this.handleEvaluator("<")} />
+
+
+                                            <Chip size="small"
                                                 label=","
                                                 onClick={() => this.handleEvaluator(",")} />
                                             <Chip size="small"

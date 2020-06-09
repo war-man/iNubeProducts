@@ -5,12 +5,12 @@
     "dotnet lambda help",
     "All the command line options for the Lambda command can be specified in this file."
   ],
-  "profile": "iNube-Aws",
+  "profile": "EdelweissProductionProfile",
   "region": "ap-south-1",
   "configuration": "Release",
   "framework": "netcoreapp2.1",
   "function-runtime": "dotnetcore2.1",
   "function-memory-size": 256,
   "function-timeout": 900,
-  "function-handler": "iNube.Edelweiss.PolicyActive.AwsLambda::iNube.Edelweiss.PolicyActive.AwsLambda.Function::FunctionHandler"
+  "function-handler": "iNube.Edelweiss.CoverStatus.AwsLambda::iNube.Edelweiss.CoverStatus.AwsLambda.Function::FunctionHandler"
 }

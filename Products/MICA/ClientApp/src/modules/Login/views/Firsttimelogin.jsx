@@ -47,11 +47,14 @@ class Frsttimelogin extends React.Component {
             newPasswordState: "",
             confirmPassword: "",
             confirmPasswordState: "",
+            environmentvalue: "",
             servertype: "",
             userid: "",
             sucess: false,
             error: false,
             Password: {
+                "productType": localStorage.getItem('ProductType'),
+                "envId": 0,
                 "id": "",
                 "isChangePassword": false,
                 "newPassword": "",
@@ -188,6 +191,7 @@ class Frsttimelogin extends React.Component {
         }
         else if (this.state.Password.newPassword === this.state.Password.confirmPassword) {
             let pass = this.state.Password;
+            pass.envId = this.state.environmentvalue;
             pass.id = localStorage.getItem('userId');;
             pass.isChangePassword = true;
             this.setState({ pass });

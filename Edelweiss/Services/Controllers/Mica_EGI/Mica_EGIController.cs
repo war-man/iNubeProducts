@@ -238,5 +238,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
 
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CoverStatusScheduler ()
+        {
+            var response = await _quotationService.CoverStatusScheduler(Context);
+            return Ok(response);
+        }
     }
 }

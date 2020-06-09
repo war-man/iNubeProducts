@@ -57,6 +57,8 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         Task<ResponseStatus> PolicyActivate(ApiContext apiContext);
 
+        Task<MobileAlertResponseDTO> MobileNotification(MobileAlertRequestDTO alertRequestDTO);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -208,6 +210,18 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             return await GetApiInvoke<ResponseStatus>(uri, apiContext);
         }
 
+        public async Task<MobileAlertResponseDTO> MobileNotification(MobileAlertRequestDTO alertRequestDTO)
+        {
+            ApiContext apiContext = new ApiContext();
+            apiContext.Token = _configuration["MobileNotification:BearerToken"].ToString();
+
+            string MobileAppUrl = _configuration["MobileNotification:BaseUrl"].ToString();
+
+            var uri = MobileAppUrl;
+
+            return await ExternalPostApiInvoke<MobileAlertRequestDTO, MobileAlertResponseDTO>(uri, apiContext, alertRequestDTO);
+        }
+
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();   
@@ -357,7 +371,46 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
                 //throw;
             }
             return new List<TResponse>();
-        }       
+        }
 
+
+        private async Task<TResponse> ExternalPostApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+
+                HttpContent contentPost = null;
+                if (request != null)
+                {
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token);                    
+                    string postBody = JsonConvert.SerializeObject(request);
+                    var content = new StringContent(postBody, Encoding.UTF8, "application/json");
+                    contentPost = content;
+                }
+                using (var response = await client.PostAsync(requestUri, contentPost))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        using (var content = response.Content)
+                        {
+                            return await content.ReadAsAsync<TResponse>();
+                        }
+                    }
+                    else
+                    {
+                        return new TResponse();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return new TResponse();
+            }
+
+        }
     }
 }

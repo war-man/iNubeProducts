@@ -50,7 +50,8 @@ class ResetPassword extends React.Component {
                 newPassword: "",
                 confirmPassword: "",
                 envId: "",
-                productType: LoginConfig.ProductType
+                //productType: LoginConfig.ProductType
+                productType: localStorage.getItem('ProductType')
             },
             environmentvalue: "",
             environment: [],

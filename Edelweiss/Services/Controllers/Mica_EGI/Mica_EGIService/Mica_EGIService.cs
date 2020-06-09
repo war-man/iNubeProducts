@@ -73,6 +73,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<ResponseStatus> VehicleStatusUpdate(VehicleStatusDTO vehicleStatus, ApiContext context);
         Task<ResponseStatus> MonthlySIPayment(MonthlySIDTO monthlySIDTO, ApiContext context);
         Task<PolicyExceptionDTO> GetPolicyExceptionDetails(dynamic SourceObject, ApiContext context);
+        Task<bool> CoverStatusScheduler(ApiContext context);
 
     }
 
@@ -7693,6 +7694,158 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return policyExceptionDTO;
         }
 
+        public async Task<bool> CoverStatusScheduler(ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            var CurrentDate = IndianTime.Date;
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
+            var CurrentTimeHour = IndianTime.Hour;
+
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
+
+            var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
+
+
+            if (PolicyDetails == null || PolicyDetails.Count == 0)
+            {
+                return false;
+            }
+
+            var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
+
+            PolicyNumberList.Distinct();
+
+            foreach (var policy in PolicyNumberList)
+            {
+                var ScheduleData = _context.TblSchedule.Where(x => x.PolicyNo == policy).ToList();
+
+                foreach (var schedule in ScheduleData)
+                {
+
+                    bool? CurrentDayStat = false;
+
+                    switch (CurrentDay)
+                    {
+                        case "Monday":
+                            CurrentDayStat = schedule.Mon;
+                            break;
+
+                        case "Tuesday":
+                            CurrentDayStat = schedule.Tue;
+                            break;
+
+
+                        case "Wednesday":
+                            CurrentDayStat = schedule.Wed;
+                            break;
+
+
+                        case "Thursday":
+                            CurrentDayStat = schedule.Thu;
+                            break;
+
+
+                        case "Friday":
+                            CurrentDayStat = schedule.Fri;
+                            break;
+
+
+                        case "Saturday":
+                            CurrentDayStat = schedule.Sat;
+                            break;
+
+
+
+                        case "Sunday":
+                            CurrentDayStat = schedule.Sun;
+                            break;
+
+                    }
+
+
+
+                    if (CurrentDayStat == true)
+                    {
+                        continue;
+                    }
+                    else if(CurrentDayStat == false)
+                    {
+                        var MobileNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).MobileNumber;
+
+                        var checkManualOn = _context.TblSwitchLog.Any(x => x.PolicyNo == policy && 
+                                                                             x.VehicleNumber == schedule.VehicleRegistrationNo &&
+                                                                             x.SwitchType == "Manual" &&
+                                                                             x.SwitchStatus == true &&
+                                                                             x.CreatedDate.Value.Date == CurrentDate);
+
+                        //This Will Skip the Vehicle for Which 
+                        //Manual Switch On has Come
+                        if(checkManualOn == true)
+                        {
+                            continue;
+                        }
+
+
+                        switch (CurrentTimeHour)
+                        {
+                            case 0:
+                                MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
+                                mobileNotification.type = _configuration["MobileNotification:Type"];
+                                mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
+                                mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
+                                mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
+                                mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+
+                                mobileNotification.push.message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " isn’t covered for today. Just thought we’d let you know.";
+                                mobileNotification.push.mobiles.Add(MobileNumber);
+
+                                var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
+
+                                //Use This Will Writing RE-TRY Logic
+                                //if(MobileNotification.id == 0)
+                                //{
+                                //    //The Notification is not sent Error has occured 
+                                //}
+
+
+                                break;
+
+                            case 7:
+                                mobileNotification = new MobileAlertRequestDTO();
+                                mobileNotification.type = _configuration["MobileNotification:Type"];
+                                mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
+                                mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
+                                mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
+                                mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+
+                                mobileNotification.push.message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " still isn’t covered for today. If you’re planning to drive it, now is the time to switch ‘ON’.";
+                                mobileNotification.push.mobiles.Add(MobileNumber);
+
+                                var MobileNoti = await _integrationService.MobileNotification(mobileNotification);
+
+
+                                //Use This Will Writing RE-TRY Logic
+                                //if(MobileNoti.id == 0)
+                                //{
+                                //    //The Notification is not sent Error has occured 
+                                //}
+
+                                break;
+
+                        }
+                    }
+
+                }
+
+            }
+
+            return true;
         }
+
     }
+}
 

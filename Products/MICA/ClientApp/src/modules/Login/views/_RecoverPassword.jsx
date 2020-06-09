@@ -58,7 +58,8 @@ class RecoverPassword extends React.Component {
                 email: "",
                 userName: "",
                 envId: "",
-                productType: LoginConfig.ProductType
+                productType: localStorage.getItem('ProductType')
+                //productType: LoginConfig.ProductType
             },
             RetrievePassword: {
                 emailid: "",
@@ -69,7 +70,8 @@ class RecoverPassword extends React.Component {
                 otp: "",
                 userId: "",
                 envId: "",
-                productType: LoginConfig.ProductType
+                productType: localStorage.getItem('ProductType')
+                //productType: LoginConfig.ProductType
             },
             errormessage: false,
             errorotp: false,

@@ -38,12 +38,12 @@ If already installed check if new version is available.
 
 Execute unit tests
 ```
-    cd "iNube.Edelweiss.PolicyActive.AwsLambda/test/iNube.Edelweiss.PolicyActive.AwsLambda.Tests"
+    cd "iNube.Edelweiss.CoverStatus.AwsLambda/test/iNube.Edelweiss.CoverStatus.AwsLambda.Tests"
     dotnet test
 ```
 
 Deploy function to AWS Lambda
 ```
-    cd "iNube.Edelweiss.PolicyActive.AwsLambda/src/iNube.Edelweiss.PolicyActive.AwsLambda"
+    cd "iNube.Edelweiss.CoverStatus.AwsLambda/src/iNube.Edelweiss.CoverStatus.AwsLambda"
     dotnet lambda deploy-function
 ```
