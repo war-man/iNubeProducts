@@ -90,10 +90,10 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
                             {
                                 i.Dbconnection = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433; Initial Catalog =" + item.KeyValue + "; User Id=admin; Password=micaadmin";
                             }
-                            else if (item.KeyValue == "MicaDev")
-                            {
-                                i.Dbconnection = "Data Source=inubepeg.database.windows.net; Initial Catalog =" + item.KeyValue + "; User Id=MICAUSER; Password=MICA*user123";
-                            }
+                            //else if (item.KeyValue == "MicaDev")
+                            //{
+                            //    i.Dbconnection = "Data Source=inubepeg.database.windows.net; Initial Catalog =" + item.KeyValue + "; User Id=MICAUSER; Password=MICA*user123";
+                            //}
 
                         }
                         count++;
@@ -173,7 +173,8 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
                     //userRoles.UserId = result.users.Id;
                     userRoles.EnvId = envid.Id;
                     userRoles.UserId = result.users.Id;
-                    string[] roleid = { "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020" };
+                    //string[] roleid = { "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020" };
+                    string[] roleid = {"df7b49c8-8cf5-48c0-ba3b-2042f077a55a" };
                     userRoles.RoleId = roleid;
                     var roles = _roleService.AssignRole(userRoles, apiContext);
                 }
