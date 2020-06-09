@@ -312,6 +312,7 @@ class CreateBilling extends React.Component {
             console.log("billingconfig", this.state.billingConfigs);
             console.log("billingItem", this.state.billingItem);
             const len = this.state.billingItem.length;
+            debugger
             fetch(`${BillingConfig.BillingConfigUrl}/api/Billing/GetAllEventMapping`, {
                 method: 'GET',
                 headers: {
@@ -438,6 +439,29 @@ class CreateBilling extends React.Component {
                             showList['rate'] = true;
 
                         }
+                        else if (objval == "MICA Recurring Installment") {
+                            showList['recurring'] = true;
+                            showList['catddl'] = false;
+                            showList['rate'] = false;
+                            showList['valuefactor'] = false;
+                            if (this.state.billingItem[i].billingFrequencyId == 4) {
+                                showList['frequency'] = true;
+                                showList['recurringRate'] = true;
+                                // this.setState({ frequency: true, recurringRate: true });
+
+                            }
+                            else {
+                                showList['frequency'] = false;
+                                showList['recurringRate'] = true;
+                                // this.setState({ frequency: false });
+                            }
+                        }
+                        else if (objval == "MICA Recurring Flat Amount") {
+                            showList['recurring'] = false;
+                            showList['catddl'] = false;
+                            showList['rate'] = true;
+                            showList['valuefactor'] = false;
+                        }
                         else {
                             // this.state.billingItem[this.state.billingItem.length - 2].categoryTypeId = "";
                             // this.state.billingItem[this.state.billingItem.length - 2].rateTypeId = "";
@@ -552,7 +576,8 @@ class CreateBilling extends React.Component {
 
     SetObject = ((type, event) => {
         debugger
-        this.state.eventlist = [];
+        //this.state.eventlist = [];
+        this.state.billingEventId = "";
         this.setState({ [event.target.name]: event.target.value });
         console.log("object:", event.target.value);
         this.state.objectVal = event.target.value;
@@ -577,8 +602,6 @@ class CreateBilling extends React.Component {
 
 
         if (event.target.value == 1) {
-
-
             let filter = RateData[0].mdata.filter(item => item.mID !== 13);
             console.log("filter", filter);
             this.setState({ productRateCategory: filter });
@@ -667,6 +690,7 @@ class CreateBilling extends React.Component {
             showList['recurring'] = false;
             showList['recurringRate'] = false;
             showList['frequency'] = false;
+            showList['valuefactor'] = false;
 
         }
         else if (objval == "Policy Creation" || objval == "Claim Intimation") {
@@ -686,6 +710,7 @@ class CreateBilling extends React.Component {
             showList['catCount'] = false;
             showList['CountRate'] = false;
             showList['rate'] = false;
+            showList['valuefactor'] = false;
 
         }
         else if (objval == "MICA OneTime License Cost") {
@@ -704,17 +729,20 @@ class CreateBilling extends React.Component {
             showList['recurring'] = false;
             showList['frequency'] = false;
             showList['recurringRate'] = false;
+            showList['valuefactor'] = false;
 
         }
         else if (objval == "MICA Recurring Installment") {
             showList['recurring'] = true;
             showList['catddl'] = false;
-            showList['rate'] = false;
+            showList['rate'] = false; 
+            showList['valuefactor'] = false;
         }
         else if (objval == "MICA Recurring Flat Amount") {
             showList['recurring'] = false;
             showList['catddl'] = false;
             showList['rate'] = true;
+            showList['valuefactor'] = false;
         }
         else {
             this.state.billingItem[this.state.billingItem.length - 2].categoryTypeId = "";
