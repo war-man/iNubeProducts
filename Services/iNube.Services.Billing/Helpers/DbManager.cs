@@ -79,9 +79,9 @@ namespace iNube.Services.Billing.Helpers
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
-            string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
-
+            //DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            //string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
+            string dbConnectionString = "Data Source=micadev.coow0ess1gft.ap-south-1.rds.amazonaws.com;Initial Catalog=iNubeCommon;User Id=admin;Password=micaadmin";
             switch (product)
             {
                 case "Mica":
@@ -107,5 +107,19 @@ namespace iNube.Services.Billing.Helpers
 
             return context;
         }
+        //public static DbContext GetCPContext(string product)
+        //{
+        //    DbContext context = null;
+        //    string dbConnectionString = "Data Source=micadev.coow0ess1gft.ap-south-1.rds.amazonaws.com;Initial Catalog=iNubeCommon;User Id=admin;Password=micaadmin";
+        //    //string dbConnectionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
+
+        //    var optionsCPBuilder = new DbContextOptionsBuilder<MICACPContext>();
+        //    optionsCPBuilder.UseSqlServer(dbConnectionString);
+        //    //DbContextOptions<MICAUMContext> dbContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+        //    context = new MICACPContext(optionsCPBuilder.Options);
+
+        //    return context;
+        //}
+
     }
 }
