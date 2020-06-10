@@ -160,6 +160,7 @@ const Arrangements = (props) => {
                         formControlProps={{ fullWidth: true }} />
 
                 </GridItem>
+                {props.allocationbasisflag &&
                 <GridItem xs={12} sm={12} md={3}>
                     <MasterDropdown
                         labelText="AllocationBasis"
@@ -172,6 +173,7 @@ const Arrangements = (props) => {
                         formControlProps={{ fullWidth: true }} />
 
                 </GridItem>
+                }
                 <GridItem xs={12} sm={12} md={3}>
                     <CustomInput
                         labelText="PLA"
