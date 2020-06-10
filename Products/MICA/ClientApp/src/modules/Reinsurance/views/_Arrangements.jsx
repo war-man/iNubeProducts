@@ -25,6 +25,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import { Animated } from "react-animated-css";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import Dropdown from "components/Dropdown/Dropdown.jsx";
 
 const searchClose = {
     float: "right",
@@ -67,8 +68,7 @@ const Arrangements = (props) => {
 
             </card>
             <GridContainer>
-
-                <GridItem xs={12} sm={12} md={3}>
+                 <GridItem xs={12} sm={12} md={3}>
                     <MasterDropdown
                         labelText="Allocationon"
                         id="ddlstatus"
@@ -80,7 +80,18 @@ const Arrangements = (props) => {
                         formControlProps={{ fullWidth: true }} />
 
                 </GridItem>
-                <GridItem xs={12} sm={12} md={3}>
+              <GridItem xs={12} sm={12} md={3}>
+                    <Dropdown
+                        labelText="AllocationLogic"
+                        id="ddlstatus"
+                        lstObject={props.allocationList}
+                        filterName='AllocationLogic'
+                        value={arrangementDetails.treatydata[arrangementDetails.index].tblArrangement[0].allocationLogicId}
+                        name='allocationLogicId'
+                        onChange={(e) => arrangementDetails.handleAggrement(e)}
+                        formControlProps={{ fullWidth: true }} />
+                </GridItem>
+               {/*   <GridItem xs={12} sm={12} md={3}>
                     <MasterDropdown
                         labelText="AllocationLogic"
                         id="ddlstatus"
@@ -91,7 +102,7 @@ const Arrangements = (props) => {
                         onChange={(e) => arrangementDetails.handleAggrement(e)}
                         formControlProps={{ fullWidth: true }} />
 
-                </GridItem>
+                </GridItem>*/}
                 {props.showPercentage &&
                     <GridItem xs={12} sm={12} md={3}>
                         <CustomInput

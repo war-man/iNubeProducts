@@ -29,6 +29,7 @@ import { Animated } from "react-animated-css";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import validationPage from "modules/Accounts/views/ValidationPage.jsx";
 
+
 const searchClose = {
     float: "right",
     position: 'relative',
@@ -178,7 +179,18 @@ const TreatyDetails = (props) => {
                             }}
                         />
                     </GridItem>
-                    <GridItem xs={12} sm={12} md={3}>
+                   {/* <GridItem xs={12} sm={12} md={4}>
+                        <Dropdown
+                            //required={true}
+                            labelText="TreatyType"
+                            id="ddlstatus"
+                            lstObject={props.allocationmasList}
+                            value={props.treatyDTO.treatyTypeId}
+                            name='treatyTypeId'
+                            onChange={(evt) => props.onInputChange1(evt)}
+                            formControlProps={{ fullWidth: true }} />
+                    </GridItem>*/}
+                     <GridItem xs={12} sm={12} md={3}>
                         <MasterDropdown
                             labelText="TreatyType"
                             id="ddlstatus"

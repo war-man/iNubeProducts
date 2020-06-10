@@ -70,6 +70,8 @@ class CreateTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            allocationList:[],
+            allocationmasList:[],
             showPercentage: false,
             showlimit: false,
             showperwithlimit: false,
@@ -430,8 +432,10 @@ class CreateTreaty extends React.Component {
                 console.log("Create Treaty masterList: ", data);
                 this.setState({ masterList: data });
                 console.log("Create Treaty masterList: ", this.state.masterList);
-                let newmasterlist = data.filter((e) => e.mType === 'BusinessType')[0].mdata
-                this.setState({ newmasterList: newmasterlist });
+                let newmasterlist = data.filter((e) => e.mType === 'BusinessType')[0].mdata;
+                let allocationList = data.filter((e) => e.mType == 'AllocationLogic')[0].mdata;
+                console.log("allocationList", allocationList);
+                this.setState({ newmasterList: newmasterlist, allocationmasList: allocationList });
                 this.AddTreatyTable();
 
                 console.log("masterdata", data, this.state.treatyDTO.treatyBasisIdf);
@@ -661,6 +665,10 @@ class CreateTreaty extends React.Component {
         //this.change(evt, name, type);
     }
     onInputChange1 = (evt) => {
+        //if (evt.target.value = "4") {
+        //    this.state.AllocationList = this.state.AllocationList;
+        //} else
+       
         if (evt != null) {
             let name = evt.target.name;
             let value = evt.target.value;
@@ -671,6 +679,17 @@ class CreateTreaty extends React.Component {
             let Data = this.state.treatyDTO;
             Data['treatyBasisId'] = this.state.treatyDTO.treatyBasisId;
             this.setState({ Data });
+        }
+        debugger;
+        if (evt != null) {
+            if (evt.target.value == "4") {
+                this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue != 'Lines');
+                console.log("ddlvals", this.state.allocationList);
+            }
+            else if (evt.target.value == "5") {
+                this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue == 'Lines');
+                console.log("ddlvals", this.state.allocationList);
+            }
         }
         console.log("Data2:", this.state.treatyDTO)
     }
@@ -857,7 +876,7 @@ class CreateTreaty extends React.Component {
                 <GridContainer>
                     <GridItem xs={12} sm={12} md={12} >
                         <TreatyDetails
-                            treatyCodeState={this.state.treatyCodeState} treatyDescriptionState={this.state.treatyDescriptionState}
+                            treatyCodeState={this.state.treatyCodeState} treatyDescriptionState={this.state.treatyDescriptionState} allocationmasList={this.state.allocationmasList}
                             handleRadioChange={this.handleRadioChange} treatyDTO={this.state.treatyDTO} masterList={this.state.masterList} onInputChange={this.onInputChange} onInputChange1={this.onInputChange1} tblArrangement={this.state.tblArrangement} onddChange={this.onddChange} yearmasterList={this.state.yearmasterList} onDateChange={this.onDateChange} />
                         {this.state.showTreatyGrp && <TPDetails TreatytableData={this.state.TreatytableData} participantstableData={this.state.participantstableData} participantdata={this.state.participantdata} bkmasterList={this.state.bkmasterList} masterList={this.state.masterList} onddlChange={this.onddlChange} participant={this.state.participant} newdata={this.state.newdata}
                             onddChange={this.onddChange} onparticipantInputChange={this.onparticipantInputChange} AddParticipant={this.AddParticipant} showparticipantgrid={this.state.showparticipantgrid} treatyDTO={this.state.treatyDTO} rimasterList={this.state.rimasterList} bcmasterList={this.state.bcmasterList} bkbcmasterList={this.state.bkbcmasterList} reinsurername={this.state.reinsurername} />
@@ -893,7 +912,7 @@ class CreateTreaty extends React.Component {
                                     onClick={this.handleClose}>
                                     &times;
                                 </Button>
-                                <Arrangements handleAggrement={this.handleAggrement} handleAggrement1={this.handleAggrement1} percentageState={this.state.percentageState} amountState={this.state.amountState} plaState={this.state.plaState} claState={this.state.claState} treatydata={this.state.treatydata} index={this.state.arrViewindex} masterList={this.state.masterList} handleClose={this.handleClose} showPercentage={this.state.showPercentage} showlimit={this.state.showlimit} showperwithlimit={this.state.showperwithlimit} shownooflines={this.state.shownooflines}/>
+                                <Arrangements handleAggrement={this.handleAggrement} handleAggrement1={this.handleAggrement1} percentageState={this.state.percentageState} amountState={this.state.amountState} plaState={this.state.plaState} claState={this.state.claState} treatydata={this.state.treatydata} index={this.state.arrViewindex} masterList={this.state.masterList} handleClose={this.handleClose} showPercentage={this.state.showPercentage} showlimit={this.state.showlimit} showperwithlimit={this.state.showperwithlimit} shownooflines={this.state.shownooflines} allocationList={this.state.allocationList}/>
                             </div>
                         </Modal>
                     </GridItem>
