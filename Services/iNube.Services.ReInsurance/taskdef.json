@@ -1,0 +1,49 @@
+{
+  "family": "dev2-mica-reinsurance",
+  "taskRoleArn": "",
+  "executionRoleArn": "arn:aws:iam::820227512150:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "dev2-mica-reinsurance",
+      "image": "<IMAGE1_NAME>",
+
+      "cpu": 512,
+      "memory": 1024,
+      
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/dev2-mica-reinsurance",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "containerPort": 9014,
+          "hostPort": 9014,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true
+
+    }
+  ],
+
+
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "512",
+  "memory": "1024",
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "/ecs/dev2-mica-reinsurance",
+      "awslogs-region": "ap-south-1",
+      "awslogs-stream-prefix": "ecs"
+    }
+  }
+
+}
