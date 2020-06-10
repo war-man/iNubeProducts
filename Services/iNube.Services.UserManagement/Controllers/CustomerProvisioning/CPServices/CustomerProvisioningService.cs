@@ -67,12 +67,17 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
             // _cpcontext = (MICACPContext)(DbManager.GetContext(apiContext.ProductType, apiContext.ServerType));
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             CustomerSettingsDTO customerSettings = new CustomerSettingsDTO();
 
             var count = 0;
             foreach (var item in customerProvisioningDTO.customerSettings)
             {
-                item.CreatedDate = DateTime.Now;
+                item.CreatedDate = DateTimeNow;
                 item.CustomerId = customerProvisioningDTO.CustomerId;
 
                 if (item.Type == "Database")
@@ -83,7 +88,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
                         {
                             i.Product = apiContext.ProductType;
                             i.CustomerId = customerProvisioningDTO.CustomerId;
-                            i.CreatedDate = DateTime.Now;
+                            i.CreatedDate = DateTimeNow;
                             i.IsActive = true;
                             // i.Dbconnection = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433; Initial Catalog =" + item.KeyValue + "; User Id=admin; Password=micaadmin";
                             if (item.KeyValue == "EdelweissTest")
