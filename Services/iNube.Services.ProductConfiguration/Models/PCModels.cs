@@ -1077,7 +1077,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public string ListObject { get; set; }
         public bool? Required { get; set; }
         public bool? FutureDate { get; set; }
-        public bool? Checked { get; set; }
+        public string Checked { get; set; }
         public string Type { get; set; }
     }
 

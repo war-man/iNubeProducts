@@ -58,9 +58,10 @@ namespace iNube.Services.ProductConfiguration.Entities
 
             modelBuilder.Entity<TblBenifitRangeDetails>(entity =>
             {
-                entity.HasKey(e => e.BenefitRangeId);
+                entity.HasKey(e => e.BenefitRangeId)
+                    .HasName("PK_tblBenifitRangeDetails");
 
-                entity.ToTable("tblBenifitRangeDetails", "PC");
+                entity.ToTable("TblBenifitRangeDetails", "PC");
 
                 entity.Property(e => e.BenefitRangeId)
                     .HasColumnName("BenefitRangeID")
@@ -146,6 +147,8 @@ namespace iNube.Services.ProductConfiguration.Entities
 
                 entity.Property(e => e.Id).HasColumnType("numeric(18, 0)");
 
+                entity.Property(e => e.Checked).HasMaxLength(250);
+
                 entity.Property(e => e.ComponentType).HasMaxLength(250);
 
                 entity.Property(e => e.FilterName).HasMaxLength(250);
@@ -156,7 +159,7 @@ namespace iNube.Services.ProductConfiguration.Entities
 
                 entity.Property(e => e.Name).HasMaxLength(250);
 
-                entity.Property(e => e.Type).HasMaxLength(1);
+                entity.Property(e => e.Type).HasMaxLength(250);
 
                 entity.Property(e => e.Value).HasMaxLength(250);
             });
