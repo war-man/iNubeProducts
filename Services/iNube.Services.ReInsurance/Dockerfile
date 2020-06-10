@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
+FROM microsoft/dotnet:3.1-aspnetcore-runtime AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM microsoft/dotnet:2.2-sdk AS build
+FROM microsoft/dotnet:3.1-sdk AS build
 WORKDIR /src
 COPY ["iNube.Services.ReInsurance.csproj", "iNube.Services.ReInsurance/"]
 RUN dotnet restore "iNube.Services.ReInsurance/iNube.Services.ReInsurance.csproj"
@@ -11,7 +11,7 @@ WORKDIR "/src/iNube.Services.ReInsurance"
 RUN dotnet build "iNube.Services.ReInsurance.csproj" -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish "iNube.Services.ReInsurance.csproj" -c Release -o /app
+RUN dotnet publish "iNube.Services.ReInsurance.csproj" -c Release -o /apps
 
 FROM base AS final
 WORKDIR /app
