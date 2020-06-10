@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Components.BPM", "iNu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "iNube.Components.Workflow", "iNube.Components.Workflow\iNube.Components.Workflow.csproj", "{F4A52525-EB96-47C1-B577-B4AE900A3B4F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iNube.Components.Scheduler", "iNube.Components.Scheduler\iNube.Components.Scheduler.csproj", "{21F7400C-2F72-45CB-B4D5-F2D22D7C818B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,26 +29,15 @@ Global
 		{F4A52525-EB96-47C1-B577-B4AE900A3B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4A52525-EB96-47C1-B577-B4AE900A3B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4A52525-EB96-47C1-B577-B4AE900A3B4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21F7400C-2F72-45CB-B4D5-F2D22D7C818B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21F7400C-2F72-45CB-B4D5-F2D22D7C818B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21F7400C-2F72-45CB-B4D5-F2D22D7C818B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21F7400C-2F72-45CB-B4D5-F2D22D7C818B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68CA7EA8-2573-4101-ACE3-DB50E4750106}
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://inubetfs.visualstudio.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = iNube.Components.RuleEngine\\iNube.Components.RuleEngine.csproj
-		SccProjectName1 = iNube.Components.RuleEngine
-		SccLocalPath1 = iNube.Components.RuleEngine
-		SccProjectUniqueName2 = iNube.Components.BPM\\iNube.Components.BPM.csproj
-		SccProjectName2 = iNube.Components.BPM
-		SccLocalPath2 = iNube.Components.BPM
-		SccProjectUniqueName3 = iNube.Components.Workflow\\iNube.Components.Workflow.csproj
-		SccProjectName3 = iNube.Components.Workflow
-		SccLocalPath3 = iNube.Components.Workflow
 	EndGlobalSection
 EndGlobal
