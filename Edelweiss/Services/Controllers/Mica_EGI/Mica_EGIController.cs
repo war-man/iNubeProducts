@@ -252,5 +252,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> BalanceAlertScheduler()
+        {
+            var response = await _quotationService.BalanceAlertScheduler(Context);
+            return Ok(response);
+        }
     }
 }

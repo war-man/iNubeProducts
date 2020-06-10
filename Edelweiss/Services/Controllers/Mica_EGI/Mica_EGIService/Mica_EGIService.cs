@@ -75,7 +75,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<PolicyExceptionDTO> GetPolicyExceptionDetails(dynamic SourceObject, ApiContext context);
         Task<bool> CoverStatusScheduler(ApiContext context);
         Task<bool> RenewalScheduler(ApiContext context);
-
+        Task<bool> BalanceAlertScheduler(ApiContext context);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -7794,47 +7794,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         switch (CurrentTimeHour)
                         {
                             case 0:
-                                MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
-                                mobileNotification.type = _configuration["MobileNotification:Type"];
-                                mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
-                                mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
-                                mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
-                                mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
-
-                                mobileNotification.push.message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " isn’t covered for today. Just thought we’d let you know.";
-                                mobileNotification.push.mobiles.Add(MobileNumber);
-
-                                var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
-
-                                //Use This Will Writing RE-TRY Logic
-                                //if(MobileNotification.id == 0)
-                                //{
-                                //    //The Notification is not sent Error has occured 
-                                //}
-
-
-                                break;
+                              var Message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " isn’t covered for today. Just thought we’d let you know.";                                                         
+                              var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
+                               break;
 
                             case 7:
-                                mobileNotification = new MobileAlertRequestDTO();
-                                mobileNotification.type = _configuration["MobileNotification:Type"];
-                                mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
-                                mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
-                                mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
-                                mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
-
-                                mobileNotification.push.message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " still isn’t covered for today. If you’re planning to drive it, now is the time to switch ‘ON’.";
-                                mobileNotification.push.mobiles.Add(MobileNumber);
-
-                                var MobileNoti = await _integrationService.MobileNotification(mobileNotification);
-
-
-                                //Use This Will Writing RE-TRY Logic
-                                //if(MobileNoti.id == 0)
-                                //{
-                                //    //The Notification is not sent Error has occured 
-                                //}
-
+                                var Message1 = "Your vehicle No - " + schedule.VehicleRegistrationNo + " still isn’t covered for today. If you’re planning to drive it, now is the time to switch ‘ON’.";
+                                var MobileNoti = await MobileAppNotifyCall(MobileNumber, Message1);                              
                                 break;
 
                         }
@@ -7903,33 +7869,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;
 
-                if (CurrentDate == FifthDay)
+                if(ModDiff == 0)
                 {
-                    MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
-                    mobileNotification.type = _configuration["MobileNotification:Type"];
-                    mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
-                    mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
-                    mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
-                    mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
-
-                    mobileNotification.push.message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
-                    mobileNotification.push.mobiles.Add(MobileNumber);
-
-                    var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
-                }
-                else if(ModDiff == 0)
-                {
-                    MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
-                    mobileNotification.type = _configuration["MobileNotification:Type"];
-                    mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
-                    mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
-                    mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
-                    mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
-
-                    mobileNotification.push.message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
-                    mobileNotification.push.mobiles.Add(MobileNumber);
-
-                    var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
+                    var Message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
+                    
+                    var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
                 }
 
             }
@@ -7963,6 +7907,91 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return true;
         }
 
+        public async Task<bool> BalanceAlertScheduler(ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            var CurrentDate = IndianTime.Date;
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
+            var CurrentTimeHour = IndianTime.Hour;
+
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
+
+            var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
+
+
+            if (PolicyDetails == null || PolicyDetails.Count == 0)
+            {
+                return false;
+            }
+
+            var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
+
+            PolicyNumberList.Distinct();
+
+            foreach (var policy in PolicyNumberList)
+            {
+                var AccountNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).CDAccountNumber;
+
+                var AccountCall = await _integrationService.GetCDAccountDetails(AccountNumber,"AD",context);
+
+                if(AccountCall.Status != BusinessStatus.Ok)
+                {
+                    continue;
+                }
+
+                if(AccountCall.TotalAvailableBalance == 0)
+                {
+
+                   var DateDiff = (CurrentDate - AccountCall.TxnDateTime.Value.Date).TotalDays;
+                   var Diff = DateDiff % 2;
+
+                    if (Diff == 1)
+                    {
+                        continue;
+                    }
+
+                    var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;                   
+                    var Message = "Sorry, we’ve had to stop your cover! Your balance premium got over, and we didn’t receive your renewal payment. Please make your payment to restart your policy.";
+
+                    var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
+                }
+                else
+                {
+                    continue;
+                }
+                               
+            }
+
+            return true;
+        }
+
+        private async Task<bool> MobileAppNotifyCall(string MobileNumber,string Message)
+        {
+            MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
+            mobileNotification.type = _configuration["MobileNotification:Type"];
+            mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
+            mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
+            mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
+            mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+
+            mobileNotification.push.message = Message;
+            mobileNotification.push.mobiles.Add(MobileNumber);
+
+            var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
+
+            //Use This Will Writing RE-TRY Logic
+            //if(MobileNotification.id == 0)
+            //{
+            //    //The Notification is not sent Error has occured 
+                  //return false;
+            //}
+
+            return true;
+        }
     }
 }
 
