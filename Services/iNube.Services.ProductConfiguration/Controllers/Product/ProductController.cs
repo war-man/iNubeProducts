@@ -512,7 +512,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDynamicProduct(string type, ApiContext apiContext)
+        public async Task<IActionResult> GetDynamicProduct(string type)
         {
             var response = await _productService.GetDynamicProduct(type, Context);
             return Ok(response);
