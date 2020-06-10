@@ -7,6 +7,7 @@ using AutoMapper;
 using iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService;
 using iNube.Services.Dispatcher.Helpers;
 using iNube.Utility.Framework;
+using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +50,14 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher
         public async Task<IActionResult> DispatcherEvent(dynamic DispatcherEventObject,string EventType)
         {
             var response = await _dispatcherService.DispatcherEvent(DispatcherEventObject, EventType, Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HC()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
     }
