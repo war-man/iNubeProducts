@@ -1,4 +1,5 @@
 FROM microsoft/dotnet:3.1-aspnetcore-runtime AS base
+RUN dotnet --info
 WORKDIR /app
 EXPOSE 80
 
