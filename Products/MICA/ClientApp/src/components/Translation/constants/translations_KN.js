@@ -157,6 +157,42 @@ export const TRANSLATIONS_KN = {
     CalculationConfig: "ಲೆಕ್ಕಾಚಾರದ ಸಂರಚನೆ",
     CalculationResult: "ಲೆಕ್ಕಾಚಾರದ ಫಲಿತಾಂಶ",
     /**********************************************************************/
+    //movements
+    PolicyNumber: 'ಪಾಲಿಸಿ ಸಂಖ್ಯೆ',
+    PolicyStatus: 'ನೀತಿ ಸ್ಥಿತಿ',
+    PremiumAmount: 'ಪ್ರೀಮಿಯಂ ಮೊತ್ತ',
+    Mode: 'ಮೋಡ್',
+
+    ProposalNumber: 'ಪ್ರಸ್ತಾಪ ಸಂಖ್ಯೆ',
+    QuotationNumber: 'ಉದ್ಧರಣ ಸಂಖ್ಯೆ',
+    ProspectName: 'ನಿರೀಕ್ಷೆಯ ಹೆಸರು',
+    ContactNumber: 'ಸಂಪರ್ಕ ಸಂಖ್ಯೆ',
+    MovedTo: 'ಗೆ ಸರಿಸಲಾಗಿದೆ',
+    CityName: 'ನಗರದ ಹೆಸರು',
+    NewRecruiter: 'ಹೊಸ ನೇಮಕಾತಿ',
+    ReporteeMovement: 'ವರದಿಗಾರರ ಚಳುವಳಿ',
+    SalesTransfer: 'ಮಾರಾಟ ವರ್ಗಾವಣೆ',
+    Distribute: 'ವಿತರಿಸಿ',
+    ReporteeName: 'ವರದಿಗಾರರ ಹೆಸರು',
+    NewSupervisor: 'ಹೊಸ ಮೇಲ್ವಿಚಾರಕ',
+    ProspectMovement: 'ನಿರೀಕ್ಷಿತ ಚಳುವಳಿ',
+    QuotationMovement: 'ಉದ್ಧರಣ ಚಳುವಳಿ',
+    ProposalMovement: 'ಪ್ರಸ್ತಾಪ ಚಳುವಳಿ',
+    PolicyMovement: 'ನೀತಿ ಚಳುವಳಿ',
+    Retain: 'ಉಳಿಸಿಕೊಳ್ಳಲು',
+    RetainDistribute: 'ವಿತರಣೆಯನ್ನು ಉಳಿಸಿಕೊಳ್ಳಿ',
+    Movements: 'ಚಳುವಳಿಗಳು',
+    EmployeeCode: 'ನೌಕರರ ಕೋಡ್',
+    CurrentDesignation: 'ಪ್ರಸ್ತುತ ಹುದ್ದೆ',
+    CurrentBranch: 'ಪ್ರಸ್ತುತ ಶಾಖೆ',
+    CurrentSupervisor: 'ಪ್ರಸ್ತುತ ಮೇಲ್ವಿಚಾರಕ',
+    People: "ಜನರು",
+    Recommendation: 'ಶಿಫಾರಸು',
+    Decision: 'ನಿರ್ಧಾರ',
+    NewBranch: 'ಹೊಸ ಶಾಖೆ',
+    NewDesignation: 'ಹೊಸ ಹುದ್ದೆ',
+    Reason: 'ಕಾರಣ',
+    /**********************************************************************/
 
     //Usermanagement
     /**********************************************************************/

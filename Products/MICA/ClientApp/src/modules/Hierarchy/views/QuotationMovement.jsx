@@ -36,7 +36,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import ReactTable from "components/MuiTable/MuiTable.jsx";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
-
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 
 
@@ -136,7 +136,7 @@ class QuotationMovement extends React.Component {
                                 //    resizable: false,
                                 //},
                                 {
-                                    Header: "Quotation Number",
+                                    Header: "QuotationNumber",
                                     accessor: "QuotationNo",
                                     headerClassName: 'react-table-center',
                                     style: { textAlign: "center" },
@@ -156,7 +156,7 @@ class QuotationMovement extends React.Component {
 
                                 },
                                 {
-                                    Header: "Contact Number",
+                                    Header: "ContactNumber",
                                     accessor: "ContactNumber",
                                     headerClassName: 'react-table-center',
                                     style: { textAlign: "center" },
@@ -166,7 +166,7 @@ class QuotationMovement extends React.Component {
 
                                 },
                                 {
-                                    Header: "City Name",
+                                    Header: "CityName",
                                     accessor: "City",
                                     headerClassName: 'react-table-center',
                                     style: { textAlign: "center" },
@@ -176,7 +176,7 @@ class QuotationMovement extends React.Component {
 
                                 },
                                 {
-                                    Header: "Moved To",
+                                    Header: "MovedTo",
                                     accessor: "NewSupervisor",
                                     headerClassName: 'react-table-center',
                                     style: { textAlign: "center" },

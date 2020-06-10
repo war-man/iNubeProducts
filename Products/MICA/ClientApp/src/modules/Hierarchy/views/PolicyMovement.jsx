@@ -136,7 +136,7 @@ class PolicyMovement extends React.Component {
                                             //    resizable: false,
                                             //},
                                             {
-                                                Header: "Policy Number",
+                                                Header: "PolicyNumber",
                                                 accessor: "PolicyNumber",
                                                 headerClassName: 'react-table-center',
                                                 style: { textAlign: "center" },
@@ -146,7 +146,7 @@ class PolicyMovement extends React.Component {
 
                                             },
                                             {
-                                                Header: "Policy Status",
+                                                Header: "PolicyStatus",
                                                 accessor: "PolicyStatus",
                                                 headerClassName: 'react-table-center',
                                                 style: { textAlign: "center" },
@@ -156,7 +156,7 @@ class PolicyMovement extends React.Component {
 
                                             },
                                             {
-                                                Header: "City Name",
+                                                Header: "CityName",
                                                 accessor: "CityName",
                                                 headerClassName: 'react-table-center',
                                                 style: { textAlign: "center" },
@@ -166,7 +166,7 @@ class PolicyMovement extends React.Component {
 
                                             },
                                             {
-                                                Header: "Contact Number",
+                                                Header: "ContactNumber",
                                                 accessor: "ContactNumber",
                                                 headerClassName: 'react-table-center',
                                                 style: { textAlign: "center" },
@@ -176,7 +176,7 @@ class PolicyMovement extends React.Component {
 
                                             },
                                             {
-                                                Header: "Premium Amount",
+                                                Header: "PremiumAmount",
                                                 accessor: "PremiumAmount",
                                                 headerClassName: 'react-table-center',
                                                 style: { textAlign: "center" },
@@ -196,7 +196,7 @@ class PolicyMovement extends React.Component {
 
                                             },
                                             {
-                                                Header: "Moved To",
+                                                Header: "MovedTo",
                                                 accessor: "NewSupervisor",
                                                 headerClassName: 'react-table-center',
                                                 style: { textAlign: "center" },

@@ -40,6 +40,8 @@ import ProspectMovement from './ProspectMovement.jsx';
 import QuotationMovement from './QuotationMovement.jsx';
 import ProposalMovement from './ProposalMovement.jsx';
 import PolicyMovement from './PolicyMovement.jsx';
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+
 
 
 
@@ -96,7 +98,7 @@ class SalesTransfor extends React.Component {
                         <Accordion
                             collapses={
                                 [{
-                                    title: " Prospect Movement",
+                            title: <TranslationContainer translationKey="ProspectMovement" />, 
                             content: <ProspectMovement salestabledata={this.props.componentData.salestabledata}/>
                                 }]
                             }
@@ -111,7 +113,7 @@ class SalesTransfor extends React.Component {
                 <Accordion
                     collapses={
                         [{
-                            title: "Quotation Movement",
+                            title: <TranslationContainer translationKey="QuotationMovement" />,
                             content: <QuotationMovement quotationTbldata={this.props.componentData.quotationTbldata}/>
                         }]
                     }
@@ -126,7 +128,7 @@ class SalesTransfor extends React.Component {
                 <Accordion
                     collapses={
                         [{
-                            title: "Proposal Movement",
+                            title: <TranslationContainer translationKey="ProposalMovement" /> ,
                             content: <ProposalMovement proposalTbldata={this.props.componentData.proposalTbldata}/>
                         }]
                     }
@@ -141,7 +143,7 @@ class SalesTransfor extends React.Component {
                 <Accordion
                     collapses={
                         [{
-                            title: "Policy Movement",
+                            title: <TranslationContainer translationKey="PolicyMovement" />,
                             content: <PolicyMovement policyTbldata={this.props.componentData.policyTbldata}/>
                         }]
                     }
@@ -159,11 +161,11 @@ class SalesTransfor extends React.Component {
                     <GridContainer>
                         <GridContainer justify="center">
                         <GridItem xs={3} sm={3} md={3}>
-                            <Button color="warning" onClick={repdata.salesretainFun} round>Retain</Button>
+                            <Button color="warning" onClick={repdata.salesretainFun} round><TranslationContainer translationKey="Retain"/></Button>
 
                         </GridItem>
                         <GridItem xs={3} sm={3} md={3}>
-                            <Button color="warning" onClick={repdata.salesdistributeFun} round>Distribute</Button>
+                            <Button color="warning" onClick={repdata.salesdistributeFun} round><TranslationContainer translationKey="RetainDistribute"/></Button>
 
                         </GridItem>
                     </GridContainer>

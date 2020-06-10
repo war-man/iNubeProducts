@@ -254,7 +254,7 @@ class Promotion extends React.Component {
         console.log("ContArr", contArr);
         this.peopleInfo(contArr[0].orgEmpId);
         this.branchDD(contArr[0].positionId);
-        
+
 
         this.state.OrgId = contArr[0].organizationId;
         this.state.PosId = contArr[0].positionId;
@@ -262,7 +262,7 @@ class Promotion extends React.Component {
         this.state.StaffCode = contArr[0].staffCode
         this.reporteeFun(contArr[0].orgEmpId);
         //this.salestransforFun(contArr[0].staffCode);
-       
+
         //this.Editopen();
 
     };
@@ -307,7 +307,7 @@ class Promotion extends React.Component {
     }
     designationDD = (id) => {
 
-        fetch(`${HierarchyConfig.HierarchyConfigURL}/api/Organization/GetDesignationMovement?orgid=` + this.state.OrgId + `&pos=` + this.state.PosId +`&movementType=` + id, {
+        fetch(`${HierarchyConfig.HierarchyConfigURL}/api/Organization/GetDesignationMovement?orgid=` + this.state.OrgId + `&pos=` + this.state.PosId + `&movementType=` + id, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -335,7 +335,7 @@ class Promotion extends React.Component {
             .then(data => {
 
                 this.setState({ reporteeList: data });
-                
+
                 this.listrep();
 
                 console.log("reportee:", data);
@@ -346,7 +346,7 @@ class Promotion extends React.Component {
 
     }
     reporteeData = () => {
-        console.log("reportylist:", this.state.reporteeList );
+        console.log("reportylist:", this.state.reporteeList);
         debugger
         this.setState({
             reporteetabledata: this.state.reporteeList.reporteedata.map((prop, key) => {
@@ -355,7 +355,7 @@ class Promotion extends React.Component {
                     SNo: key + 1,
                     ReporteeName: prop.staffName,
                     NewSupervisor: <Dropdown
-                       // labelText="New SuperVisor"
+                        // labelText="New SuperVisor"
                         value={this.state.Reporteearray[key].movedTo}
                         lstObject={this.state.reporteeList.masterData}
                         name='movedTo'
@@ -383,7 +383,7 @@ class Promotion extends React.Component {
         this.reporteeData();
     }
     listrep = () => {
-        
+
         for (let i = 0; i < this.state.reporteeList.reporteedata.length; i++) {
             //this.state.MovementDetails = this.state.MovementDetails.concat({
             //    "movementFormId": 1009,
@@ -420,13 +420,13 @@ class Promotion extends React.Component {
                 this.setState({ salesList: data });
 
                 this.listprospect();
-                this.listquotation();
+               // this.listquotation();
                 this.listproposal();
                 this.listpolicy();
 
                 console.log("sales:", data);
                 if (this.state.salesList.prospect != []) {
-                    
+
                     this.prospectData();
                 }
                 if (this.state.salesList.quotationDtos[0] != null) {
@@ -461,7 +461,7 @@ class Promotion extends React.Component {
     prospectData = () => {
         var mas = this.state.reporteeList.masterData;
         console.log("saleslist:", this.state.salesList.prospect.length, mas);
-       
+
 
         debugger
         this.setState({
@@ -472,7 +472,7 @@ class Promotion extends React.Component {
                     ProspectName: prop.firstName,
                     ContactNumber: prop.mobileNo,
                     MoveTo: <Dropdown
-                       // labelText="New SuperVisor"
+                        // labelText="New SuperVisor"
                         value={this.state.prospectarray[key].movedTo}
                         lstObject={this.state.reporteeList.masterData}
                         name='movedTo'
@@ -481,12 +481,12 @@ class Promotion extends React.Component {
                             fullWidth: true
                         }}
                     />,
-                   
+
                 };
             })
         });
     }
-    
+
     Setprospect = (type, event, i) => {
         debugger
         let prospectarray = this.state.prospectarray;
@@ -516,7 +516,7 @@ class Promotion extends React.Component {
         console.log("movementdetails:", this.state.MovementDetails);
     }
     quotationData = () => {
-       
+
         console.log("saleslist:", this.state.salesList);
         debugger
         this.setState({
@@ -529,7 +529,7 @@ class Promotion extends React.Component {
                     ContactNumber: prop.contactNumner,
                     City: prop.cityName,
                     NewSupervisor: <Dropdown
-                      //  labelText="New SuperVisor"
+                        //  labelText="New SuperVisor"
                         value={this.state.quotationarray[key].movedTo}
                         lstObject={this.state.reporteeList.masterData}
                         name='movedTo'
@@ -585,7 +585,7 @@ class Promotion extends React.Component {
                     ContactNumber: prop.contactNumner,
                     City: prop.cityName,
                     NewSupervisor: <Dropdown
-                       // labelText="New SuperVisor"
+                        // labelText="New SuperVisor"
                         value={this.state.proposalarray[key].movedTo}
                         lstObject={this.state.reporteeList.masterData}
                         name='movedTo'
@@ -643,7 +643,7 @@ class Promotion extends React.Component {
                     PremiumAmount: prop.premiumAmount,
                     Mode: prop.mode,
                     NewSupervisor: <Dropdown
-                       // labelText="New SuperVisor"
+                        // labelText="New SuperVisor"
                         value={this.state.policyarray[key].movedTo}
                         lstObject={this.state.reporteeList.masterData}
                         name='movedTo'
@@ -670,8 +670,8 @@ class Promotion extends React.Component {
         this.setState({});
         this.policyData();
     }
-   
-    
+
+
     SaveData = () => {
         this.state.decisionDTO.orgEmpId = this.state.empData.orgEmpId;
         console.log("decisionDto:", this.state.decisionDTO);
@@ -683,7 +683,7 @@ class Promotion extends React.Component {
 
         }
         if (this.state.quoteFlag == true) {
-            let aaaa=[];
+            let aaaa = [];
             if (this.state.prospectarray != []) {
                 for (var i = 0; i < this.state.prospectarray.length; i++) {
                     this.state.movementdetailsarray.push(this.state.prospectarray[i]);
@@ -706,13 +706,13 @@ class Promotion extends React.Component {
             }
         }
         console.log("movements", this.state.movementdetailsarray);
-        
+
         let decisionDto = this.state.decisionDTO;
 
         decisionDto['avoMovementDetails'] = this.state.movementdetailsarray;
 
         this.setState({ decisionDTO: decisionDto });
-        
+
 
 
         console.log("decisionDTO", this.state.decisionDTO);
@@ -761,7 +761,7 @@ class Promotion extends React.Component {
         else {
             this.setState({ decflag: false });
         }
-        
+
 
     }
     Setdecisiondd = (type, event) => {
@@ -803,7 +803,7 @@ class Promotion extends React.Component {
         this.setState({ retainFlag: true });
         this.state.reporteeFlag = true;
         //this.reporteeFun(this.state.OrgEmpId);
-        
+
 
     };
     salesretainFun = () => {
@@ -814,9 +814,9 @@ class Promotion extends React.Component {
     salesdistributeFun = () => {
         this.setState({ salesFlag: true });
         this.state.quoteFlag = true;
-      //  this.salestransforFun(this.state.StaffCode);
+        //  this.salestransforFun(this.state.StaffCode);
     };
-    
+
     render() {
 
         const { classes } = this.props;
@@ -837,7 +837,7 @@ class Promotion extends React.Component {
                         </CardIcon>
                         <h4 className={this.props.cardIconTitle}>
                             {/* <small> {this.props.DetailHeading} </small> */}
-                            <small> Movements </small>
+                            <small>  <TranslationContainer translationKey="Movements" />  </small>
                         </h4>
                     </CardHeader>
                     <CardBody>
@@ -845,7 +845,7 @@ class Promotion extends React.Component {
 
                             <GridItem xs={12} sm={12} md={4}>
                                 <CustomInput
-                                    labelText="Employee Code"
+                                    labelText="EmployeeCode"
                                     name="staffCode"
                                     value={this.state.empSearchDto.staffCode}
                                     onChange={(e) => this.SetEmpId("string", e)}
@@ -856,7 +856,7 @@ class Promotion extends React.Component {
                             </GridItem>
 
                             <GridItem xs={3} sm={3} md={3}>
-                                <Button color="warning" onClick={this.tableshow} round>Search</Button>
+                                <Button color="warning" onClick={this.tableshow} round><TranslationContainer translationKey="Search" /></Button>
                             </GridItem>
                         </GridContainer>
 
@@ -879,7 +879,7 @@ class Promotion extends React.Component {
                                     //    resizable: false,
                                     //},
                                     {
-                                        Header: "Employee Code",
+                                        Header: "EmployeeCode",
                                         accessor: "EmployeeCode",
                                         headerClassName: 'react-table-center',
                                         style: { textAlign: "center" },
@@ -900,7 +900,7 @@ class Promotion extends React.Component {
                                     },
 
                                     {
-                                        Header: "Current Designation",
+                                        Header: "CurrentDesignation",
                                         accessor: "CurrentDesignation",
                                         headerClassName: 'react-table-center',
                                         style: { textAlign: "center" },
@@ -910,7 +910,7 @@ class Promotion extends React.Component {
 
                                     },
                                     {
-                                        Header: "Current Branch",
+                                        Header: "CurrentBranch",
                                         accessor: "NewBranch",
                                         headerClassName: 'react-table-center',
                                         style: { textAlign: "right" },
@@ -919,7 +919,7 @@ class Promotion extends React.Component {
                                         resizable: false,
                                     },
                                     {
-                                        Header: " Current Supervisor",
+                                        Header: "CurrentSupervisor",
                                         accessor: "createdDateTime",
                                         headerClassName: 'react-table-center',
                                         style: { textAlign: "center" },
@@ -975,12 +975,12 @@ class Promotion extends React.Component {
                    */}
                 {this.state.showDetails &&
                     <GridContainer>
-                    <MovementDetails retainFun={this.retainFun} retainFlag={this.state.retainFlag} salesFlag={this.state.salesFlag} salesretainFun={this.salesretainFun} salesdistributeFun={this.salesdistributeFun} distributeFun={this.distributeFun} decisionDTO={this.state.decisionDTO} SetDecision={this.SetDecision} Setdecisiondd={this.Setdecisiondd} personalDet={this.state.personalDet} masterList={this.props.masterList} branchList={this.state.branchList} designationList={this.state.designationList} empData={this.state.empData} reporteetabledata={this.state.reporteetabledata} salestabledata={this.state.salestabledata} quotationTbldata={this.state.quotationTbldata} proposalTbldata={this.state.proposalTbldata} policyTbldata={this.state.policyTbldata} avoOrgEmpAddress={this.state.avoOrgEmpAddress} decflag={this.state.decflag} />
+                        <MovementDetails retainFun={this.retainFun} retainFlag={this.state.retainFlag} salesFlag={this.state.salesFlag} salesretainFun={this.salesretainFun} salesdistributeFun={this.salesdistributeFun} distributeFun={this.distributeFun} decisionDTO={this.state.decisionDTO} SetDecision={this.SetDecision} Setdecisiondd={this.Setdecisiondd} personalDet={this.state.personalDet} masterList={this.props.masterList} branchList={this.state.branchList} designationList={this.state.designationList} empData={this.state.empData} reporteetabledata={this.state.reporteetabledata} salestabledata={this.state.salestabledata} quotationTbldata={this.state.quotationTbldata} proposalTbldata={this.state.proposalTbldata} policyTbldata={this.state.policyTbldata} avoOrgEmpAddress={this.state.avoOrgEmpAddress} decflag={this.state.decflag} />
                     </GridContainer>}
                 {this.state.showDetails &&
                     <GridContainer justify="center">
                         <GridItem xs={3} sm={3} md={3}>
-                        <Button color="warning" disabled={this.state.saveDisable} onClick={this.SaveData} round> Save </Button>
+                            <Button color="warning" disabled={this.state.saveDisable} onClick={this.SaveData} round><TranslationContainer translationKey="Save" />  </Button>
 
                         </GridItem>
                     </GridContainer>}

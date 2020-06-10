@@ -14,6 +14,7 @@ import CardIcon from "components/Card/CardIcon.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
@@ -136,7 +137,7 @@ class ProspectRecruitment extends React.Component {
                                             resizable: false,
                                         },
                                         {
-                                            Header: "Prospect Name",
+                                            Header: "ProspectName",
                                             accessor: "id",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },
@@ -146,7 +147,7 @@ class ProspectRecruitment extends React.Component {
 
                                         },
                                         {
-                                            Header: "Contact Number",
+                                            Header: "ContactNumber",
                                             accessor: "id",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },
@@ -156,7 +157,7 @@ class ProspectRecruitment extends React.Component {
 
                                         },
                                         {
-                                            Header: "City Name",
+                                            Header: "CityName",
                                             accessor: "claimId",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },
@@ -166,7 +167,7 @@ class ProspectRecruitment extends React.Component {
 
                                         },
 {
-                                            Header: "New Recruiter",
+                                            Header: "NewRecruiter",
                                             accessor: "claimId",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },

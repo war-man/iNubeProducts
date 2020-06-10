@@ -14,6 +14,7 @@ import CardIcon from "components/Card/CardIcon.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 import customSelectStyle from "assets/jss/material-dashboard-pro-react/customSelectStyle.jsx";
 import customCheckboxRadioSwitch from "assets/jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx";
@@ -137,7 +138,7 @@ class ProspectMovement extends React.Component {
                                         //    resizable: false,
                                         //},
                                         {
-                                            Header: "Prospect Name",
+                                            Header: "ProspectName",
                                             accessor: "ProspectName",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },
@@ -147,7 +148,7 @@ class ProspectMovement extends React.Component {
 
                                         },
                                         {
-                                            Header: "Contact Number",
+                                            Header: "ContactNumber",
                                             accessor: "ContactNumber",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },
@@ -157,7 +158,7 @@ class ProspectMovement extends React.Component {
 
                                         },
                                         {
-                                            Header: "Moved To",
+                                            Header: "MovedTo",
                                             accessor: "MoveTo",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },

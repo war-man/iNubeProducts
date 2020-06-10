@@ -22,6 +22,7 @@ import AddProduct from "modules/Partners/Partner/views/_AddProduct.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import withStyles from "@material-ui/core/styles/withStyles";
 import HierarchyConfig from "modules/Hierarchy/HierarchyConfig.js";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 
@@ -125,7 +126,7 @@ class Decision extends React.Component {
 
                     </CardIcon>  */}
                     <h4 className={this.props.cardIconTitle}>
-                        <small> Recommendation </small>
+                        <small><TranslationContainer translationKey="Recommendation"/></small>
                     </h4>
                 </CardHeader>
                 <CardBody>
@@ -177,7 +178,7 @@ class Decision extends React.Component {
                                 }}
                             /> */}
                             <Dropdown
-                                labelText="New Branch"
+                                labelText="NewBranch"
 
                                 // value={}
                                 lstObject={this.props.branchList}
@@ -193,7 +194,7 @@ class Decision extends React.Component {
                         <GridItem xs={12} sm={12} md={4}>
                             
                             <MasterDropdown
-                                labelText="New Designation"
+                                labelText="NewDesignation"
                                 value={this.props.decisionDTO.newPositionId}
                                 disabled={this.props.disabled}
                                 lstObject={this.props.designationList}

@@ -158,8 +158,43 @@ export const TRANSLATIONS = {
         ModifyMapping: 'Modify Mapping',
         DynamicProduct: 'Dynamic Product',
         DynamicProd: 'Dynamic Product',
+        /**********************************************************************/
+        //movements
+        PolicyNumber: 'Policy Number',
+        PolicyStatus: 'Policy Status',
+        PremiumAmount: 'Premium Amount',
+        Mode: 'Mode',
 
+        ProposalNumber: 'Proposal Number',
+        QuotationNumber: 'Quotation Number',
+        ProspectName: 'Prospect Name',
+        ContactNumber: 'Contact Number',
+        MovedTo: 'Moved To',
+        CityName: 'City Name',
+        NewRecruiter: 'New Recruiter',
+        ReporteeMovement: 'Reportee Movement',
+        SalesTransfer: 'Sales Transfer',
+        Distribute: 'Distribute',
+        ReporteeName: 'Reportee Name',
+        NewSupervisor: 'New Supervisor',
+        ProspectMovement: 'Prospect Movement',
+        QuotationMovement: 'Quotation Movement',
+        ProposalMovement: 'Proposal Movement',
+        PolicyMovement: 'Policy Movement',
+        Retain: 'Retain',
+        RetainDistribute: 'Retain Distribute',
+        Movements: 'Movements',
+        EmployeeCode: 'Employee Code',
+        CurrentDesignation: 'Current Designation',
+        CurrentBranch: 'Current Branch',
+        CurrentSupervisor: 'Current Supervisor',
+        Recommendation: 'Recommendation',
+        Decision: 'Decision',
+        NewBranch: 'New Branch',
+        NewDesignation: 'New Designation',
+        Reason: 'Reason',
         //Dynamic Reports
+       
         DynamicReports: 'Reports',
         ReportConfig: 'Report Config',
         ReportExecution: 'Report Generation',
@@ -248,7 +283,7 @@ export const TRANSLATIONS = {
         /**********************************************************************/
 
         //create user
-        SelectUserType: "Select User Type",
+        fUserType: "Select User Type",
         ExternalUser: "External User",
         InternalUser: "Internal User",
         FirstName: "First Name",

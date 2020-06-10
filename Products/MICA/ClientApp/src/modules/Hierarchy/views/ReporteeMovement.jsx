@@ -21,6 +21,7 @@ import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import AddProduct from "modules/Partners/Partner/views/_AddProduct.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import withStyles from "@material-ui/core/styles/withStyles";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 import ReactTable from "components/MuiTable/MuiTable.jsx";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
@@ -97,11 +98,11 @@ class ReporteeMovement extends React.Component {
             <div>
                 <GridContainer justify="center">
                     <GridItem xs={3} sm={3} md={3}>
-                        <Button color="warning" onClick={repdata.retainFun} round>Retain</Button>
+                        <Button color="warning" onClick={repdata.retainFun} round><TranslationContainer translationKey="Retain"/></Button>
 
                     </GridItem>
                     <GridItem xs={3} sm={3} md={3}>
-                        <Button color="warning" onClick={repdata.distributeFun} round>Distribute</Button>
+                        <Button color="warning" onClick={repdata.distributeFun} round><TranslationContainer translationKey="Distribute"/></Button>
 
                     </GridItem>
                 </GridContainer>
@@ -145,7 +146,7 @@ class ReporteeMovement extends React.Component {
                                             resizable: false,
                                         },
                                         {
-                                            Header: "Reportee Name",
+                                            Header: "ReporteeName",
                                             accessor: "ReporteeName",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },
@@ -155,7 +156,7 @@ class ReporteeMovement extends React.Component {
 
                                         },
                                         {
-                                            Header: "New Supervisor",
+                                            Header: "NewSupervisor",
                                             accessor: "NewSupervisor",
                                             headerClassName: 'react-table-center',
                                             style: { textAlign: "center" },

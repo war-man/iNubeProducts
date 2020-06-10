@@ -157,6 +157,42 @@
     CalculationConfig: "கணக்கீடு கட்டமைப்பு",
     CalculationResult: "கணக்கீடு முடிவு",
     /**********************************************************************/
+    //movements
+    PolicyNumber: 'கொள்கை எண்',
+    PolicyStatus: 'கொள்கை நிலை',
+    PremiumAmount: 'பிரீமியம் தொகை',
+    Mode: 'பயன்முறை',
+
+    ProposalNumber: 'முன்மொழிவு எண்',
+    QuotationNumber: 'மேற்கோள் எண்',
+    ProspectName: 'வருங்கால பெயர்',
+    ContactNumber: 'தொடர்பு எண்',
+    MovedTo: 'க்கு நகர்த்தப்பட்டது',
+    CityName: 'நகரத்தின் பெயர்',
+    NewRecruiter: 'புதிய தேர்வாளர்',
+    ReporteeMovement: 'நிருபர் இயக்கம்',
+    SalesTransfer: 'விற்பனை பரிமாற்றம்',
+    Distribute: 'விநியோகிக்கவும்',
+    ReporteeName: 'நிருபரின் பெயர்',
+    NewSupervisor: 'புதிய மேற்பார்வையாளர்',
+    ProspectMovement: 'வருங்கால இயக்கம்',
+    QuotationMovement: 'மேற்கோள் இயக்கம்',
+    ProposalMovement: 'முன்மொழிவு இயக்கம்',
+    PolicyMovement: 'கொள்கை இயக்கம்',
+    Retain: 'தக்க வைத்துக் கொள்ளுங்கள்',
+    RetainDistribute: 'விநியோகத்தைத் தக்க வைத்துக் கொள்ளுங்கள்',
+    Movements: 'இயக்கங்கள்',
+    EmployeeCode: 'பணியாளர் குறியீடு',
+    CurrentDesignation: 'தற்போதைய பதவி',
+    CurrentBranch: 'தற்போதைய கிளை',
+    CurrentSupervisor: 'தற்போதைய மேற்பார்வையாளர்',
+    People: "மக்கள்",
+    Recommendation: 'பரிந்துரை',
+    Decision: 'முடிவு',
+    NewBranch: 'புதிய கிளை',
+    NewDesignation: 'புதிய பதவி',
+    Reason: 'காரணம்',
+    /**********************************************************************/
 
     //UserManagement
     /**********************************************************************/

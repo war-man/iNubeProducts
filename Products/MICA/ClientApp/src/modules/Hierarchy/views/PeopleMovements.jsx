@@ -21,7 +21,7 @@ import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import AddProduct from "modules/Partners/Partner/views/_AddProduct.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import withStyles from "@material-ui/core/styles/withStyles";
-
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import UserAddress from "modules/Hierarchy/views/UserAddress.jsx";
 import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import UserConfig from 'modules/Users/UserConfig.js';
@@ -432,7 +432,7 @@ class PeopleMovements extends React.Component {
 
                                 {
                                     <GridItem>
-                                        <h4>People</h4>
+                                        <h4><TranslationContainer translationKey="People"/></h4>
 
                                     </GridItem>
                                 }

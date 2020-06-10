@@ -155,6 +155,42 @@
     CalculationConfig: "గణన కాన్ఫిగర్",
     CalculationResult: "గణన ఫలితం",
     /**********************************************************************/
+    //movements
+    PolicyNumber: 'పాలసీ సంఖ్య',
+    PolicyStatus: 'విధాన స్థితి',
+    PremiumAmount: 'ప్రీమియం మొత్తం',
+    Mode: 'మోడ్',
+
+    ProposalNumber: 'ప్రతిపాదన సంఖ్య',
+    QuotationNumber: 'కొటేషన్ సంఖ్య',
+    ProspectName: 'ప్రాస్పెక్ట్ పేరు',
+    ContactNumber: 'సంప్రదింపు సంఖ్య',
+    MovedTo: 'తరలించటం జరిగినది',
+    CityName: 'పట్టనం పేరు',
+    NewRecruiter: 'కొత్త రిక్రూటర్',
+    ReporteeMovement: 'రిపోర్టీ ఉద్యమం',
+    SalesTransfer: 'అమ్మకాల బదిలీ',
+    Distribute: 'పంపిణీ',
+    ReporteeName: 'రిపోర్టీ పేరు',
+    NewSupervisor: 'కొత్త సూపర్‌వైజర్',
+    ProspectMovement: 'ప్రాస్పెక్ట్ మూవ్మెంట్',
+    QuotationMovement: 'ప్రాస్పెక్ట్ మూవ్మెంట్',
+    ProposalMovement: 'ప్రతిపాదన ఉద్యమం',
+    PolicyMovement: 'పాలసీ మూవ్‌మెంట్',
+    Retain: 'నిలుపుకోండి',
+    RetainDistribute: 'రిటైన్ డిస్ట్రిబ్యూట్',
+    Movements: 'ఉద్యమాలు',
+    EmployeeCode: 'ఉద్యోగుల కోడ్',
+    CurrentDesignation: 'ప్రస్తుత హోదా',
+    CurrentBranch: 'ప్రస్తుత శాఖ',
+    CurrentSupervisor: 'ప్రస్తుత పర్యవేక్షకుడు',
+    People: "పీపుల్",
+    Recommendation: 'సిఫార్సు',
+    Decision: 'నిర్ణయం',
+    NewBranch: 'కొత్త బ్రాంచ్',
+    NewDesignation: 'కొత్త హోదా',
+    Reason: 'కారణము',
+    /**********************************************************************/
 
     //UserManagement
     /**********************************************************************/
