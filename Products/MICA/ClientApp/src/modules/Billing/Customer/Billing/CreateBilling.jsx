@@ -31,6 +31,7 @@ import validationPage from "modules/Partners/Organization/views/ValidationPage.j
 import Add from "@material-ui/icons/AddCircleOutline";
 import Delete from "@material-ui/icons/Delete";
 import ModifyEventCollapse from "./_ModefyEventCollapse";
+import AddRecurring from "./_AddRecurring";
 
 
 const style = {
@@ -105,7 +106,7 @@ class CreateBilling extends React.Component {
             recurringRate: false,
             balanceamount: 0,
             rembalance: 0,
-
+            viewRecurring: false,
 
             ContractDTO:
             {
@@ -311,7 +312,7 @@ class CreateBilling extends React.Component {
 
             console.log("billingconfig", this.state.billingConfigs);
             console.log("billingItem", this.state.billingItem);
-            const len = this.state.billingItem.length;
+            
             debugger
             fetch(`${BillingConfig.BillingConfigUrl}/api/Billing/GetAllEventMapping`, {
                 method: 'GET',
@@ -328,164 +329,205 @@ class CreateBilling extends React.Component {
 
                     this.setState({});
                     console.log("mapval:", this.state.mapval);
-                    for (let i = 0; i < len; i++) {
+                    
+                    this.viewFun();
+                    this.viewRecFun();
+                    this.setState({});
 
-                       // console.log("mappingid", this.state.billingItem[i].eventMappingId, this.state.mapval);
-                        const mappingid = this.state.billingItem[i].eventMappingId;
-                        console.log("mappingid", mappingid);
-                        const filtermap = this.state.mapval.filter(i => i.mID === mappingid);
-                        
-                        console.log("filtermap", filtermap);
-                        const objval = filtermap[0].mValue;
-                        console.log("filter.mval", filtermap[0].mValue, objval);
-                        const showList = this.state.showlistValue;
-                        const value1 = this.state.ValueFactor;
-                        debugger
-                        if (objval == "Product Creation") {
-                            //this.setState({ recurring: false });
-                            showList['recurring'] = false;
-                            showList['recurringRate'] = false;
-                           // this.setState({ recurringRate: false });
-
-
-                            showList['disableRate'] = true;
-                            if (this.state.billingItem[i].categoryTypeId != 0) {
-
-                                showList['catddl'] = true;
-                            } else { showList['catddl'] = false; }
-                            if (this.state.billingItem[i].rateCategoryId != 0) {
-                                showList['catCount'] = true;
-                            } else { showList['catCount'] = false; }
-                            if (this.state.billingItem[i].rateTypeId != 0) {
-                                showList['CountRate'] = true;
-                            } else { showList['CountRate'] = false; }
-                            if (this.state.billingItem[i].rate != 0) {
-                                showList['rate'] = true;
-                            } else { showList['rate'] = false; }
-                            
-
-                            //showList['ratedisplay'] = true;
-                            //showList['percentdisplay'] = false;
-                            debugger
-                            if (this.state.billingItem[i].tblBillingItemDetail.length > 0) {
-                                console.log("billingitemdetails:", this.state.billingItem[i].tblBillingItemDetail);
-                                this.state.billingItem[i].BillingItemDetail = this.state.billingItem[i].tblBillingItemDetail;
-                                console.log("Billingitemdetails:", this.state.billingItem[i].BillingItemDetail);
-                               
-                                for (let j = 0; j < this.state.billingItem[i].tblBillingItemDetail.length; j++)
-                                    if (this.state.billingItem[i].tblBillingItemDetail[j].amount > 0) {
-                                        showList['ratedisplay'] = true;
-                                        showList['percentdisplay'] = false;
-                                    } else {
-                                        showList['ratedisplay'] = false;
-                                        showList['percentdisplay'] = true;
-                                    }
-                                showList['eventtable'] = true;
-                              
-                            } else { showList['eventtable'] = false; }
-                            
-
-                            showList['addibtn'] = false;
-                            this.setState({});
-
-
-                        }
-                        else if (objval == "Policy Creation" || objval == "Claim Intimation") {
-
-                           // this.setState({ recurring: false });
-                            showList['recurring'] = false;
-                            showList['recurringRate'] = false;
-                            //this.setState({ recurringRate: false });
-                            if (this.state.billingItem[i].categoryTypeId != 0) {
-                                showList['catddl'] = true;
-                            } else { showList['catddl'] = false; }
-                            
-                            if (this.state.billingItem[i].rateCategoryId != 0) {
-                                showList['catCount'] = true;
-                            } else { showList['catCount'] = false; }
-                            if (this.state.billingItem[i].rateTypeId != 0) {
-                                showList['CountRate'] = true;
-                            } else { showList['CountRate'] = false; }
-                            if (this.state.billingItem[i].rate != 0) {
-                                showList['rate'] = true;
-                            } else { showList['rate'] = false; }
-                            if (this.state.billingItem[i].valueFactorId != 0) {
-                                showList['valuefactor'] = true;
-                            } else { showList['valuefactor'] = false; }
-                            debugger
-                            if (this.state.billingItem[i].tblBillingItemDetail.length > 0) {
-                                console.log("billingitemdetails:", this.state.billingItem[i].tblBillingItemDetail);
-                                this.state.billingItem[i].BillingItemDetail = this.state.billingItem[i].tblBillingItemDetail;
-                                console.log("Billingitemdetails:", this.state.billingItem[i].BillingItemDetail);
-                                for (let j = 0; j < this.state.billingItem[i].tblBillingItemDetail.length; j++)
-                                    if (this.state.billingItem[i].tblBillingItemDetail[j].amount > 0) {
-                                        showList['ratedisplay'] = true;
-                                        showList['percentdisplay'] = false;
-                                    } else {
-                                        showList['ratedisplay'] = false;
-                                        showList['percentdisplay'] = true;
-                                    }
-                                showList['eventtable'] = true;
-                              
-                               
-                            } else { showList['eventtable'] = false; }
-                        }
-                        else if (objval == "MICA OneTime License Cost") {
-                            showList['catddl'] = false;
-                            showList['catCount'] = false;
-                            showList['CountRate'] = false;
-                            showList['valuefactor'] = false;
-                            showList['eventtable'] = false;
-                            showList['rate'] = true;
-
-                        }
-                        else if (objval == "MICA Recurring Installment") {
-                            showList['recurring'] = true;
-                            showList['catddl'] = false;
-                            showList['rate'] = false;
-                            showList['valuefactor'] = false;
-                            if (this.state.billingItem[i].billingFrequencyId == 4) {
-                                showList['frequency'] = true;
-                                showList['recurringRate'] = true;
-                                // this.setState({ frequency: true, recurringRate: true });
-
-                            }
-                            else {
-                                showList['frequency'] = false;
-                                showList['recurringRate'] = true;
-                                // this.setState({ frequency: false });
-                            }
-                        }
-                        else if (objval == "MICA Recurring Flat Amount") {
-                            showList['recurring'] = false;
-                            showList['catddl'] = false;
-                            showList['rate'] = true;
-                            showList['valuefactor'] = false;
-                        }
-                        else {
-                            // this.state.billingItem[this.state.billingItem.length - 2].categoryTypeId = "";
-                            // this.state.billingItem[this.state.billingItem.length - 2].rateTypeId = "";
-                            this.setState({ showList });
-                        }
-                        this.setState({ showList });
-                        this.state.showlist.push(showList);
-                        this.state.ValueFactor.push(value1);
-                        //this.setState({ showlist[i]: showList });
-                        console.log("showlist", this.state.showlist);
-                        this.setState({ flagModify: true });
-                        this.state.addBill = this.state.addBill.concat({
-                            title: objval,
-                            content: <EventBased props={this.state} SetCategory={this.SetCategory} setBenifitValue={this.setBenifitValue} disableView={this.props.componentData.disableView} index={i} />
-                        });
-                        this.setState({});
-                        console.log("addBill", this.state.addBill);
-                    }
                 });
         }
         }
 
     }
 
+    viewFun = () => {
+        const len = this.state.billingItem.length;
+        for (let i = 0; i < len; i++) {
+
+            // console.log("mappingid", this.state.billingItem[i].eventMappingId, this.state.mapval);
+            const mappingid = this.state.billingItem[i].eventMappingId;
+            console.log("mappingid", mappingid);
+            const filtermap = this.state.mapval.filter(i => i.mID === mappingid);
+
+            console.log("filtermap", filtermap);
+            const objval = filtermap[0].mValue;
+            console.log("filter.mval", filtermap[0].mValue, objval);
+            const showList = this.state.showlistValue;
+            const value1 = this.state.ValueFactor;
+            debugger
+            if (objval == "Product Creation") {
+                //this.setState({ recurring: false });
+                showList['recurring'] = false;
+                showList['recurringRate'] = false;
+                // this.setState({ recurringRate: false });
+
+
+                showList['disableRate'] = true;
+                if (this.state.billingItem[i].categoryTypeId != 0) {
+
+                    showList['catddl'] = true;
+                } else { showList['catddl'] = false; }
+                if (this.state.billingItem[i].rateCategoryId != 0) {
+                    showList['catCount'] = true;
+                } else { showList['catCount'] = false; }
+                if (this.state.billingItem[i].rateTypeId != 0) {
+                    showList['CountRate'] = true;
+                } else { showList['CountRate'] = false; }
+                if (this.state.billingItem[i].rate != 0) {
+                    showList['rate'] = true;
+                } else { showList['rate'] = false; }
+
+
+                //showList['ratedisplay'] = true;
+                //showList['percentdisplay'] = false;
+                debugger
+                if (this.state.billingItem[i].tblBillingItemDetail.length > 0) {
+                    console.log("billingitemdetails:", this.state.billingItem[i].tblBillingItemDetail);
+                    this.state.billingItem[i].BillingItemDetail = this.state.billingItem[i].tblBillingItemDetail;
+                    console.log("Billingitemdetails:", this.state.billingItem[i].BillingItemDetail);
+
+                    for (let j = 0; j < this.state.billingItem[i].tblBillingItemDetail.length; j++)
+                        if (this.state.billingItem[i].tblBillingItemDetail[j].amount > 0) {
+                            showList['ratedisplay'] = true;
+                            showList['percentdisplay'] = false;
+                        } else {
+                            showList['ratedisplay'] = false;
+                            showList['percentdisplay'] = true;
+                        }
+                    showList['eventtable'] = true;
+
+                } else { showList['eventtable'] = false; }
+
+
+                showList['addibtn'] = false;
+                this.setState({});
+
+
+            }
+            if (objval == "Policy Creation" || objval == "Claim Intimation") {
+
+                // this.setState({ recurring: false });
+                showList['recurring'] = false;
+                showList['recurringRate'] = false;
+                //this.setState({ recurringRate: false });
+                if (this.state.billingItem[i].categoryTypeId != 0) {
+                    showList['catddl'] = true;
+                } else { showList['catddl'] = false; }
+
+                if (this.state.billingItem[i].rateCategoryId != 0) {
+                    showList['catCount'] = true;
+                } else { showList['catCount'] = false; }
+                if (this.state.billingItem[i].rateTypeId != 0) {
+                    showList['CountRate'] = true;
+                } else { showList['CountRate'] = false; }
+                if (this.state.billingItem[i].rate != 0) {
+                    showList['rate'] = true;
+                } else { showList['rate'] = false; }
+                if (this.state.billingItem[i].valueFactorId != 0) {
+                    showList['valuefactor'] = true;
+                } else { showList['valuefactor'] = false; }
+                debugger
+                if (this.state.billingItem[i].tblBillingItemDetail.length > 0) {
+                    console.log("billingitemdetails:", this.state.billingItem[i].tblBillingItemDetail);
+                    this.state.billingItem[i].BillingItemDetail = this.state.billingItem[i].tblBillingItemDetail;
+                    console.log("Billingitemdetails:", this.state.billingItem[i].BillingItemDetail);
+                    for (let j = 0; j < this.state.billingItem[i].tblBillingItemDetail.length; j++)
+                        if (this.state.billingItem[i].tblBillingItemDetail[j].amount > 0) {
+                            showList['ratedisplay'] = true;
+                            showList['percentdisplay'] = false;
+                        } else {
+                            showList['ratedisplay'] = false;
+                            showList['percentdisplay'] = true;
+                        }
+                    showList['eventtable'] = true;
+
+
+                } else { showList['eventtable'] = false; }
+            }
+            if (objval == "MICA OneTime License Cost") {
+                showList['catddl'] = false;
+                showList['catCount'] = false;
+                showList['CountRate'] = false;
+                showList['valuefactor'] = false;
+                showList['eventtable'] = false;
+                showList['rate'] = true;
+
+            }
+            if (objval == "MICA Recurring Flat Amount") {
+                showList['recurring'] = false;
+                showList['catddl'] = false;
+                showList['rate'] = true;
+                showList['valuefactor'] = false;
+            }
+            //else {
+            //    // this.state.billingItem[this.state.billingItem.length - 2].categoryTypeId = "";
+            //    // this.state.billingItem[this.state.billingItem.length - 2].rateTypeId = "";
+            //    this.setState({ showList });
+            //}
+            this.setState({ showList });
+            this.state.showlist.push(showList);
+            this.state.ValueFactor.push(value1);
+            //this.setState({ showlist[i]: showList });
+            console.log("showlist", this.state.showlist);
+            this.setState({ flagModify: true });
+            this.state.addBill = this.state.addBill.concat({
+                title: objval,
+                content: <EventBased props={this.state} SetCategory={this.SetCategory} setBenifitValue={this.setBenifitValue} disableView={this.props.componentData.disableView} index={i} />
+            });
+            // this.setState({});
+            console.log("addBill", this.state.addBill);
+        }
+    }
+    viewRecFun = () => {
+        const len = this.state.billingItem.length;
+        for (let i = 0; i < len; i++) {
+
+            // console.log("mappingid", this.state.billingItem[i].eventMappingId, this.state.mapval);
+            const mappingid = this.state.billingItem[i].eventMappingId;
+            console.log("mappingid", mappingid);
+            const filtermap = this.state.mapval.filter(i => i.mID === mappingid);
+
+            console.log("filtermap", filtermap);
+            const objval = filtermap[0].mValue;
+            console.log("filter.mval", filtermap[0].mValue, objval);
+            const showList = this.state.showlistValue;
+            const value1 = this.state.ValueFactor;
+            if (objval == "MICA Recurring Installment") {
+                showList['recurring'] = true;
+                showList['catddl'] = false;
+                showList['rate'] = false;
+                showList['valuefactor'] = false;
+                if (this.state.billingItem[i].billingFrequencyId == 4) {
+                    showList['frequency'] = true;
+                    showList['recurringRate'] = true;
+                    // this.setState({ frequency: true, recurringRate: true });
+                    this.setState({ viewRecurring: true });
+                    this.state.addRec = this.state.addRec.concat({
+                        title: objval,
+                        content: <InstallmentDetails props={this.state} frequencyIndex={i} billingItem={this.state.billingItem[i]} remainingBalance={0} />
+                    });
+                }
+                if (this.state.billingItem[i].billingFrequencyId == 5) {
+                    showList['frequency'] = false;
+                    showList['recurringRate'] = true;
+                    // this.setState({ frequency: false });
+                    this.state.addBill = this.state.addBill.concat({
+                        title: objval,
+                        content: <EventBased props={this.state} SetCategory={this.SetCategory} setBenifitValue={this.setBenifitValue} disableView={this.props.componentData.disableView} index={i} />
+                    });
+                }
+            }
+            this.setState({ showList });
+            this.state.showlist.push(showList);
+            this.state.ValueFactor.push(value1);
+            //this.setState({ showlist[i]: showList });
+            //console.log("showlist", this.state.showlist);
+            //this.setState({ flagModify: true });
+
+            //this.setState({});
+            console.log("addBill", this.state.addBill);
+        }
+    }
     //addFun = (evemapid) => {
     //    debugger
     //    fetch(`${BillingConfig.BillingConfigUrl}/api/Billing/GetEventMapping?mappingid=` + evemapid, {
@@ -1384,7 +1426,14 @@ class CreateBilling extends React.Component {
 
                              }
                     </GridContainer>
-                   
+                    
+                <GridContainer xs={12} id="ddEvents" style={{ display: 'block' }} > 
+                    {this.props.componentData.SearchFlag == true && this.state.viewRecurring == true ?
+                            <AddRecurring addRec={this.state.addRec} />
+                        :
+                        null
+                    }
+                    </GridContainer>
                     <GridContainer>
                         <ModifyEventCollapse flag={true} callfun={this.callfun} sendbillingid={this.state.sendbillingid} showlist={this.state.showlist} mobjval={this.state.mobjval} billingitem={this.state.billingitem} mindex={this.state.mindex} />
 

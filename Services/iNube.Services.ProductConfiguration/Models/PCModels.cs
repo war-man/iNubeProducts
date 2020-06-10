@@ -542,7 +542,7 @@ namespace iNube.Services.ProductConfiguration.Models
             ProductBasicConfiguration = new List<ProductBasicConfigurationDTO>();
         }
         public int ProductId { get; set; }
-        public decimal RateingId { get; set;}
+        public decimal RateingId { get; set; }
         public int? Lobid { get; set; }
         public int? Cobid { get; set; }
         public int? ProductStatusId { get; set; }
@@ -598,7 +598,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public int mID { get; set; }
         public bool? disable { get; set; }
     }
-        public partial class ProductRatingMapping
+    public partial class ProductRatingMapping
     {
         public int MappingId { get; set; }
         public string RateParameterName { get; set; }
@@ -607,7 +607,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public int? ProductId { get; set; }
         public decimal? RatingConfigId { get; set; }
 
-    
+
     }
 
 
@@ -1025,13 +1025,13 @@ namespace iNube.Services.ProductConfiguration.Models
         public decimal? PremiumAmount { get; set; }
         public double FromValue { get; set; }
         public double ToValue { get; set; }
-      
+
     }
     public partial class LGIDTO
     {
         public LGIDTO()
         {
-            CoverListValue=new  List<CoverListValue>();
+            CoverListValue = new List<CoverListValue>();
         }
         public string RefrenceNumber { get; set; }
         public string CoverName { get; set; }
@@ -1065,4 +1065,20 @@ namespace iNube.Services.ProductConfiguration.Models
         public DateTime? ModifiedDate { get; set; }
         public decimal? EnvId { get; set; }
     }
+
+    public partial class DynamicProduct
+    {
+        public decimal Id { get; set; }
+        public string ComponentType { get; set; }
+        public string LabelText { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public string FilterName { get; set; }
+        public string ListObject { get; set; }
+        public bool? Required { get; set; }
+        public bool? FutureDate { get; set; }
+        public string Checked { get; set; }
+        public string Type { get; set; }
+    }
+
 }

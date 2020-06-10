@@ -65,11 +65,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext);
         Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext);
         Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext);
+        Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext);
     }
 
     public class ProductService : IProductService
     {
-       // private readonly MICAPCContext _context;
+        // private readonly MICAPCContext _context;
         private IMapper _mapper;
         private readonly IServiceProvider _serviceProvider;
         private ILoggerManager _logger;
@@ -351,6 +352,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         public async Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext)
         {
             return await _productConfigService(apiContext.ProductType).CreateMapping(MapDto, apiContext);
+        }
+
+        public async Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).GetDynamicProduct(type, apiContext);
         }
     }
 }

@@ -987,5 +987,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -511,5 +511,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetDynamicProduct(string type)
+        {
+            var response = await _productService.GetDynamicProduct(type, Context);
+            return Ok(response);
+        }
     }
 }

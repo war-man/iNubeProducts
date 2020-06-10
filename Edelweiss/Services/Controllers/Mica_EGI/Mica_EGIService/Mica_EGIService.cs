@@ -74,6 +74,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<ResponseStatus> MonthlySIPayment(MonthlySIDTO monthlySIDTO, ApiContext context);
         Task<PolicyExceptionDTO> GetPolicyExceptionDetails(dynamic SourceObject, ApiContext context);
         Task<bool> CoverStatusScheduler(ApiContext context);
+        Task<bool> RenewalScheduler(ApiContext context);
 
     }
 
@@ -7841,6 +7842,122 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 }
 
+            }
+
+            return true;
+        }
+        
+        public async Task<bool> RenewalScheduler(ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+
+            var CurrentDate = IndianTime.Date;
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
+            var CurrentTimeHour = IndianTime.Hour;
+
+            string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
+
+            var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
+
+
+            if (PolicyDetails == null || PolicyDetails.Count == 0)
+            {
+                return false;
+            }
+
+            var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
+
+            PolicyNumberList.Distinct();
+
+            foreach (var policy in PolicyNumberList)
+            {
+                var SIData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.PolicyNo == policy);
+
+                if(SIData == null)
+                {
+                    continue;
+                }
+                  
+                //Calls a private method to verify payment is collected or not
+                var Validate = MonthlySIPaymentVerify(SIData);
+
+                if (Validate == true)
+                {
+                    continue;
+                }
+
+                var FifthDay = SIData.DueDate.Value.AddDays(5).Date;
+
+                var DateDiff = (CurrentDate - FifthDay).TotalDays;
+
+                if (DateDiff < 0)
+                {
+                    continue;
+                }
+
+                //Alerts after 2 days check if payment is not collected.
+                var ModDiff = (DateDiff % 2);
+
+                var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;
+
+                if (CurrentDate == FifthDay)
+                {
+                    MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
+                    mobileNotification.type = _configuration["MobileNotification:Type"];
+                    mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
+                    mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
+                    mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
+                    mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+
+                    mobileNotification.push.message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
+                    mobileNotification.push.mobiles.Add(MobileNumber);
+
+                    var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
+                }
+                else if(ModDiff == 0)
+                {
+                    MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
+                    mobileNotification.type = _configuration["MobileNotification:Type"];
+                    mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
+                    mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
+                    mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
+                    mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+
+                    mobileNotification.push.message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
+                    mobileNotification.push.mobiles.Add(MobileNumber);
+
+                    var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
+                }
+
+            }
+
+            return true;
+        }
+
+        private bool MonthlySIPaymentVerify(TblPolicyMonthlySi policyMonthlySi)
+        {
+            int fail = 0;
+
+            if(String.IsNullOrEmpty(policyMonthlySi.PayUid))  
+            {
+                fail++;
+            }
+
+            if(String.IsNullOrEmpty(policyMonthlySi.PayAmount))
+            {
+                fail++;
+            }
+            if (policyMonthlySi.PaymentDate == null)
+            {
+                fail++;
+            }
+
+            if(fail > 0)
+            {
+                return false;
             }
 
             return true;

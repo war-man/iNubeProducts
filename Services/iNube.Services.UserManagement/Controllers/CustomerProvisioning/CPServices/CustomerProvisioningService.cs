@@ -67,12 +67,17 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
             // _cpcontext = (MICACPContext)(DbManager.GetContext(apiContext.ProductType, apiContext.ServerType));
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DateTimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
             CustomerSettingsDTO customerSettings = new CustomerSettingsDTO();
 
             var count = 0;
             foreach (var item in customerProvisioningDTO.customerSettings)
             {
-                item.CreatedDate = DateTime.Now;
+                item.CreatedDate = DateTimeNow;
                 item.CustomerId = customerProvisioningDTO.CustomerId;
 
                 if (item.Type == "Database")
@@ -83,7 +88,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
                         {
                             i.Product = apiContext.ProductType;
                             i.CustomerId = customerProvisioningDTO.CustomerId;
-                            i.CreatedDate = DateTime.Now;
+                            i.CreatedDate = DateTimeNow;
                             i.IsActive = true;
                             // i.Dbconnection = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433; Initial Catalog =" + item.KeyValue + "; User Id=admin; Password=micaadmin";
                             if (item.KeyValue == "EdelweissTest")
@@ -161,7 +166,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             try
             {
 
-                var result =await _userService.CreateProfileUser(userDTO, apiContext);
+                var result = await _userService.CreateProfileUser(userDTO, apiContext);
                 //var envids = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).Select(x=>x);
                 if (Convert.ToInt32(result.Status) == 7)
                 {
@@ -174,7 +179,7 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
                     userRoles.EnvId = envid.Id;
                     userRoles.UserId = result.users.Id;
                     //string[] roleid = { "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020" };
-                    string[] roleid = {"df7b49c8-8cf5-48c0-ba3b-2042f077a55a" };
+                    string[] roleid = { "df7b49c8-8cf5-48c0-ba3b-2042f077a55a" };
                     userRoles.RoleId = roleid;
                     var roles = _roleService.AssignRole(userRoles, apiContext);
                 }

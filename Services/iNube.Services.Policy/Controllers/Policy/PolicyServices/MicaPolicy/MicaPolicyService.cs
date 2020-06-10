@@ -958,7 +958,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 _policy = _policy.Where(P => P.CreatedDate.Date == policysearch.EventDate);
             }
-          
+            foreach (var item in _policy) {
+                item.CoverNoteNo = item.InsuredName;
+            }
             var _policySearchDTOs = _mapper.Map<IEnumerable<PolicyDTO>>(_policy);
 
             return _policySearchDTOs;
