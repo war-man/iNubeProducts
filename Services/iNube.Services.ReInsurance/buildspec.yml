@@ -16,6 +16,7 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:rilatest Services/iNube.Services.ReInsurance
+      - echo docker info
       - docker tag $REPOSITORY_URI:rilatest $REPOSITORY_URI:$IMAGE_TAG
   post_build: 
     commands:
