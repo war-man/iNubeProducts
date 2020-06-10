@@ -332,6 +332,8 @@ class CreateBilling extends React.Component {
                     
                     this.viewFun();
                     this.viewRecFun();
+                    this.setState({});
+
                 });
         }
         }
@@ -472,7 +474,7 @@ class CreateBilling extends React.Component {
                 title: objval,
                 content: <EventBased props={this.state} SetCategory={this.SetCategory} setBenifitValue={this.setBenifitValue} disableView={this.props.componentData.disableView} index={i} />
             });
-             this.setState({});
+            // this.setState({});
             console.log("addBill", this.state.addBill);
         }
     }
@@ -519,10 +521,10 @@ class CreateBilling extends React.Component {
             this.state.showlist.push(showList);
             this.state.ValueFactor.push(value1);
             //this.setState({ showlist[i]: showList });
-            console.log("showlist", this.state.showlist);
-            this.setState({ flagModify: true });
+            //console.log("showlist", this.state.showlist);
+            //this.setState({ flagModify: true });
 
-            this.setState({});
+            //this.setState({});
             console.log("addBill", this.state.addBill);
         }
     }
