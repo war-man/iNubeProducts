@@ -1,9 +1,9 @@
-FROM microsoft/dotnet:3.1-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.2.0-aspnetcore-runtime AS base
 RUN dotnet --info
 WORKDIR /app
 EXPOSE 80
 
-FROM microsoft/dotnet:3.1-sdk AS build
+FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
 COPY ["iNube.Services.ReInsurance.csproj", "iNube.Services.ReInsurance/"]
 RUN dotnet restore "iNube.Services.ReInsurance/iNube.Services.ReInsurance.csproj"
