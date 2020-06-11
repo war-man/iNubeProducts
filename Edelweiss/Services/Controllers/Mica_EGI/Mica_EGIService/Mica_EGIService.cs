@@ -7704,6 +7704,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var CurrentDate = IndianTime.Date;
             var CurrentDay = IndianTime.DayOfWeek.ToString();
+
+            //This Hour is Used Find Out is it 12:30 AM Call OR 7AM Call
             var CurrentTimeHour = IndianTime.Hour;
 
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
@@ -7722,7 +7724,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             foreach (var policy in PolicyNumberList)
             {
+               
                 var ScheduleData = _context.TblSchedule.Where(x => x.PolicyNo == policy).ToList();
+
+                MobileAlertRequestDTO MobileRequestDTO = new MobileAlertRequestDTO();
 
                 foreach (var schedule in ScheduleData)
                 {
@@ -7773,11 +7778,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         continue;
                     }
-                    else if(CurrentDayStat == false)
-                    {
-                        var MobileNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).MobileNumber;
-
-                        var checkManualOn = _context.TblSwitchLog.Any(x => x.PolicyNo == policy && 
+                    else if (CurrentDayStat == false)
+                    {                       
+                        var checkManualOn = _context.TblSwitchLog.Any(x => x.PolicyNo == policy &&
                                                                              x.VehicleNumber == schedule.VehicleRegistrationNo &&
                                                                              x.SwitchType == "Manual" &&
                                                                              x.SwitchStatus == true &&
@@ -7785,31 +7788,48 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         //This Will Skip the Vehicle for Which 
                         //Manual Switch On has Come
-                        if(checkManualOn == true)
+                        if (checkManualOn == true)
                         {
                             continue;
                         }
+
+                        var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;
 
 
                         switch (CurrentTimeHour)
                         {
                             case 0:
-                              var Message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " isn’t covered for today. Just thought we’d let you know.";                                                         
-                              var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
-                               break;
+                                var Message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " isn’t covered for today. Just thought we’d let you know.";
+                                MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message, false);
+                                break;
 
                             case 7:
                                 var Message1 = "Your vehicle No - " + schedule.VehicleRegistrationNo + " still isn’t covered for today. If you’re planning to drive it, now is the time to switch ‘ON’.";
-                                var MobileNoti = await MobileAppNotifyCall(MobileNumber, Message1);                              
+                                MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message1, false);
                                 break;
 
-                        }
+                            default:
+                                break;
+                        }                      
                     }
+                }
+
+                if(MobileRequestDTO.type != null)
+                {
+                    var IntergrationCall = await MobileAppNotifyCall(MobileRequestDTO);
+
+
+                    //if (IntergrationCall == false)
+                    //{
+                    //    //Mobile APP - Notification Failed
+                    //    return false;
+                    //}
 
                 }
 
-            }
 
+
+            }
             return true;
         }
         
@@ -7835,8 +7855,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
             var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
-
             PolicyNumberList.Distinct();
+
+            MobileAlertRequestDTO MobileRequestDTO = new MobileAlertRequestDTO();
+
 
             foreach (var policy in PolicyNumberList)
             {
@@ -7867,16 +7889,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //Alerts after 2 days check if payment is not collected.
                 var ModDiff = (DateDiff % 2);
 
-                var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;
+                var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;            
 
-                if(ModDiff == 0)
+                if (ModDiff == 0)
                 {
                     var Message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
-                    
-                    var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
+
+                    MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message, true);
                 }
 
             }
+
+            if (MobileRequestDTO.type != null)
+            {
+                var IntergrationCall = await MobileAppNotifyCall(MobileRequestDTO);
+
+                //if (IntergrationCall == false)
+                //{
+                //    //Mobile APP - Notification Failed
+                //    return false;
+                //}
+
+            }
+
+
 
             return true;
         }
@@ -7932,6 +7968,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             PolicyNumberList.Distinct();
 
+            MobileAlertRequestDTO MobileRequestDTO = new MobileAlertRequestDTO();
+
             foreach (var policy in PolicyNumberList)
             {
                 var AccountNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).CDAccountNumber;
@@ -7957,7 +7995,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;                   
                     var Message = "Sorry, we’ve had to stop your cover! Your balance premium got over, and we didn’t receive your renewal payment. Please make your payment to restart your policy.";
 
-                    var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
+                    MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message,true);
                 }
                 else
                 {
@@ -7966,28 +8004,68 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                
             }
 
+
+             if (MobileRequestDTO.type != null)
+            {
+                var IntergrationCall = await MobileAppNotifyCall(MobileRequestDTO);
+
+                //if (IntergrationCall == false)
+                //{
+                //    //Mobile APP - Notification Failed
+                //    return false;
+                //}
+
+            }
+
+
             return true;
         }
 
-        private async Task<bool> MobileAppNotifyCall(string MobileNumber,string Message)
+        private MobileAlertRequestDTO MobileAppObject(MobileAlertRequestDTO RequestDTO,string MobileNumber,string Message,bool SameMsg)
         {
-            MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
-            mobileNotification.type = _configuration["MobileNotification:Type"];
-            mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
-            mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
-            mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
-            mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+            MobilePushDTO pushDTO = new MobilePushDTO();
 
-            mobileNotification.push.message = Message;
-            mobileNotification.push.mobiles.Add(MobileNumber);
+            RequestDTO.type = _configuration["MobileNotification:Type"];
+            RequestDTO.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
 
-            var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
+            pushDTO.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
+            pushDTO.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
+            pushDTO.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+
+            if (SameMsg == true)
+            {             
+                if(RequestDTO.push.Count > 0)
+                {
+                    RequestDTO.push.FirstOrDefault().mobiles.Add(MobileNumber);
+                }
+                else
+                {
+                    pushDTO.message = Message;
+                    pushDTO.mobiles.Add(MobileNumber);
+                    RequestDTO.push.Add(pushDTO);
+                }
+                                
+                return RequestDTO;
+            }
+
+            pushDTO.message = Message;
+            pushDTO.mobiles.Add(MobileNumber);
+
+            RequestDTO.push.Add(pushDTO);          
+
+            return RequestDTO;
+        }  
+
+        private async Task<bool> MobileAppNotifyCall (MobileAlertRequestDTO MobileRequestDTO)
+        {
+            var MobileNotification = await _integrationService.MobileNotification(MobileRequestDTO);
 
             //Use This Will Writing RE-TRY Logic
+            //If the Integration Call is Failed
             //if(MobileNotification.id == 0)
             //{
             //    //The Notification is not sent Error has occured 
-                  //return false;
+            //return false;
             //}
 
             return true;

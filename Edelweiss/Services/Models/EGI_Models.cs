@@ -808,11 +808,11 @@ namespace iNube.Services.MicaExtension_EGI.Models
     {
         public MobileAlertRequestDTO()
         {
-            push = new MobilePushDTO();
+            push = new List<MobilePushDTO>();
         }
 
         public string type { get; set; }
-        public MobilePushDTO push { get; set; }
+        public List<MobilePushDTO> push { get; set; }
         public int snsTopicId { get; set; }
 
     }
@@ -838,11 +838,11 @@ namespace iNube.Services.MicaExtension_EGI.Models
     {
         public MobileAlertResponseDTO()
         {
-            push = new MobilePushDTO();
+            push = new List<MobilePushDTO>();
         }
         public int id { get; set; }
         public string type { get; set; }
-        public MobilePushDTO push { get; set; }
+        public List<MobilePushDTO> push { get; set; }
         public string createdAt { get; set; }
         public string updatedAt { get; set; }
         public int snsTopicId { get; set; }
