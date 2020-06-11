@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.2.0-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
 RUN dotnet --info
 WORKDIR /app
 EXPOSE 80
