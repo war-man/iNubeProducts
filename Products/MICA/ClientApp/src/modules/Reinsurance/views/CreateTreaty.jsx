@@ -685,6 +685,7 @@ class CreateTreaty extends React.Component {
         if (evt != null) {
             if (evt.target.value == "4") {
                 this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue != 'Lines');
+                this.setState({ allocationbasisflag: false });
                 console.log("ddlvals", this.state.allocationList);
             }
             else if (evt.target.value == "5") {
