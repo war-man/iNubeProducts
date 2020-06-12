@@ -127,6 +127,8 @@ class ClaimIntimate extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            benAmtFlag: true,
+            riskFlag: false,
             policyflag: false,
             productflag: false,
             claimamtdisable: true,
@@ -237,6 +239,7 @@ class ClaimIntimate extends React.Component {
             datalist: [],
             PolicyData: [],
             ProductClaimData: [],
+            vehicleErrRemove: false,
             ProductClaimData1: [],
             file: null,
             dropFlag: true,
@@ -395,7 +398,7 @@ class ClaimIntimate extends React.Component {
         this.UIValidation();
         this.IsValidProductDetails();
         this.onDateValidation();
-
+        debugger;
         if (this.state.datevalidationflag === true) {
             if (this.state.validateUI === true) {
 
@@ -499,12 +502,12 @@ class ClaimIntimate extends React.Component {
                         this.setState({ insurableitemflag: true });
                         swal("", "Please select dropdown Insurable item", "error");
                     }
-                    else if (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined) {
+                    else if (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined && this.state.vehicleErrRemove === false) {
                         this.setState({ errormessage: true });
                         this.setState({ vehlocationflag: true });
                         swal("", "Please enter Vehicle location", "error");
                     }
-                    else if (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined) {
+                    else if (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined && this.state.vehicleErrRemove === false) {
                         this.setState({ errormessage: true });
                         this.setState({ vehlocStateflag: true });
                         swal("", "Please enter Vehicle location state", "error");
@@ -532,11 +535,16 @@ class ClaimIntimate extends React.Component {
     };
 
     IsValidProductDetails = () => {
-
+        debugger;
         console.log("ValidationAdditionalDetails", this.state.DetailsDTO.AdditionalDetails['Vehicle Location'])
 
         if (this.state.DetailsDTO.lossDateTime !== null && this.state.DetailsDTO.locationOfLoss !== "" && this.state.DetailsDTO.lossIntimatedBy !== "" && this.state.DetailsDTO.lossDescription !== ""
-            && this.state.DetailsDTO.causeOfLoss !== "" && this.state.DetailsDTO.insurableItems !== "" && this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] != undefined && this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] != undefined) {
+            && this.state.DetailsDTO.causeOfLoss !== "" && this.state.DetailsDTO.insurableItems !== "") {
+            if (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] != undefined && this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] != undefined && this.state.vehicleErrRemove === true) {
+                this.state.ValidationUI = true;
+            } else {
+
+            }
             this.state.ValidationUI = true;
         }
         else {
@@ -677,7 +685,7 @@ class ClaimIntimate extends React.Component {
     }
 
     handleClaimAmount = (type, event, index) => {
-
+        debugger;
         let claim = this.state.ClaimsAmountData[index];
         let name = event.target.name;
         let value = event.target.value;
@@ -695,6 +703,20 @@ class ClaimIntimate extends React.Component {
         }
         // this.state.DetailsDTO.claimAmount = amt;
         this.setState({});
+
+        if (this.state.ClaimsAmountData[index].claimAmounts > this.state.ClaimsAmountData[index].benefitAmount) {
+
+            this.state.ValidationUI = false;
+            this.state.errorstatus = true;
+            this.setState({});
+
+
+        } else {
+            this.state.ValidationUI = false;
+            this.state.errorstatus = false;
+            this.setState({});
+
+        }
 
         console.log(" ClaimIntimationDetails claimAmount ", this.state.DetailsDTO.claimAmount);
         this.claimAmountTable();
@@ -911,7 +933,7 @@ class ClaimIntimate extends React.Component {
 
         this.setState({
             TableData: this.state.ClaimsAmountData.map((prop, key) => {
-
+               
                 return {
                     insurableitemId: key + 1,
                     insurableItem: prop.insurableItem,
@@ -922,7 +944,7 @@ class ClaimIntimate extends React.Component {
                         return (<p className="gridparagraph"> {c.Header} : {c.Details} </p>)
                     }),
                     // coverValue: prop.coverValue,
-                    // benefitAmount: prop.benefitAmount,
+                    benefitAmount: prop.benefitAmount,
                     claimAmounts:
                         <GridItem xs={12} sm={12} md={12}>
                             <CustomInput
@@ -939,8 +961,8 @@ class ClaimIntimate extends React.Component {
                                 onChange={(e) => this.handleClaimAmount("claimAmounts", e, key)}
                                 formControlProps={{ fullWidth: true }} />
                             {/*     {this.state.erroramt && (this.state.ClaimsAmountData[key].claimAmounts == "") ? <p className="error">*Enter the claim amount</p> : null}*/}
-                            {/* {(this.state.ClaimsAmountData[key].claimAmounts > this.state.ClaimsAmountData[key].benefitAmount) ? <p className="error">*Claim Amount should not be greater than Benefit Amount</p> : null
-                            }*/}
+                             {(this.state.ClaimsAmountData[key].claimAmounts > this.state.ClaimsAmountData[key].benefitAmount) ? <p className="error">*Claim Amount should not be greater than Benefit Amount</p> : null
+                             }
 
 
                         </GridItem>,
@@ -1286,61 +1308,60 @@ class ClaimIntimate extends React.Component {
     }
 
     renderPage = (ProductClaimData) => {
+            if (ProductClaimData.userInputType == "String") {
 
-        if (ProductClaimData.userInputType == "String") {
+                return (
+                    <GridItem xs={12} sm={12} md={12}>
+                        <CustomInput
+                            labelText={ProductClaimData.inputType}
+                            name={ProductClaimData.inputType}
+                            required={true}
+                            onChange={(e) => this.onModelChange(e)}
+                            formControlProps={{ fullWidth: true }}
+                        />
+                        {this.state.errormessage && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined) ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {this.state.vehlocationflag && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined) ? <p className="error"> </p> : null}
+                    </GridItem>
+                );
+            }
+            else if (ProductClaimData.userInputType == "string") {
 
-            return (
-                <GridItem xs={12} sm={12} md={12}>
-                    <CustomInput
-                        labelText={ProductClaimData.inputType}
-                        name={ProductClaimData.inputType}
-                        required={true}
-                        onChange={(e) => this.onModelChange(e)}
-                        formControlProps={{ fullWidth: true }}
-                    />
-                    {this.state.errormessage && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined) ? <p className="error">*Required field cannot be left blank</p> : null}
-                    {this.state.vehlocationflag && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location'] == undefined) ? <p className="error"> </p> : null}
-                </GridItem>
-            );
-        }
-        else if (ProductClaimData.userInputType == "string") {
-
-            return (<CustomInput
-                labelText={ProductClaimData.inputType}
-                name={ProductClaimData.inputType}
-                onChange={(e) => this.onModelChange(e)}
-                formControlProps={{ fullWidth: true }}
-            />
-            );
-        }
-        else if (ProductClaimData.userInputType == "DropDown") {
-            return (
-                <Dropdown
+                return (<CustomInput
                     labelText={ProductClaimData.inputType}
                     name={ProductClaimData.inputType}
-                    lstObject={this.state.selfsurvey}
                     onChange={(e) => this.onModelChange(e)}
                     formControlProps={{ fullWidth: true }}
                 />
-
-            );
-        }
-        else if (ProductClaimData.userInputType == "Dropdown") {
-            return (
-                <GridItem xs={12} sm={12} md={12}>
+                );
+            }
+            else if (ProductClaimData.userInputType == "DropDown") {
+                return (
                     <Dropdown
                         labelText={ProductClaimData.inputType}
                         name={ProductClaimData.inputType}
-                        lstObject={this.state.stateMasterList}
-                        required={true}
+                        lstObject={this.state.selfsurvey}
                         onChange={(e) => this.onModelChange(e)}
                         formControlProps={{ fullWidth: true }}
                     />
-                    {this.state.errormessage && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined) ? <p className="error">*Required field cannot be left blank</p> : null}
-                    {this.state.vehlocStateflag && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined) ? <p className="error"> </p> : null}
-                </GridItem>
-            );
-        }
+
+                );
+            }
+            else if (ProductClaimData.userInputType == "Dropdown") {
+                return (
+                    <GridItem xs={12} sm={12} md={12}>
+                        <Dropdown
+                            labelText={ProductClaimData.inputType}
+                            name={ProductClaimData.inputType}
+                            lstObject={this.state.stateMasterList}
+                            required={true}
+                            onChange={(e) => this.onModelChange(e)}
+                            formControlProps={{ fullWidth: true }}
+                        />
+                        {this.state.errormessage && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined) ? <p className="error">*Required field cannot be left blank</p> : null}
+                        {this.state.vehlocStateflag && (this.state.DetailsDTO.AdditionalDetails['Vehicle Location State'] == undefined) ? <p className="error"> </p> : null}
+                    </GridItem>
+                );
+            }
     }
 
     onGet = () => {
@@ -1356,12 +1377,18 @@ class ClaimIntimate extends React.Component {
             .then(response => response.json())
             .then(data => {
                 console.log("getproductclaimsdetailsdata:", data);
+                debugger;
+                if (data=[]) {
+                    this.state.vehicleErrRemove = true;
+                } else {
+                    this.state.vehicleErrRemove = false;
+                    this.setState({ ProductClaimData: data });
 
-                this.setState({ ProductClaimData: data });
+                    console.log("ProductClaimData", this.state.ProductClaimData);
 
-                console.log("ProductClaimData", this.state.ProductClaimData);
+                }
 
-
+               
             });
     }
     handleDateChange = (e, name) => {
@@ -1504,8 +1531,6 @@ class ClaimIntimate extends React.Component {
                                                 resizable: false,
 
                                             },
-
-
                                             {
                                                 Header: "InsuredName",
                                                 accessor: "IN",
@@ -1523,7 +1548,6 @@ class ClaimIntimate extends React.Component {
                                                 resizable: false,
 
                                             },
-
                                             {
                                                 Header: "PolicyStartDate",
                                                 accessor: "policyStartDate",
@@ -1608,7 +1632,7 @@ class ClaimIntimate extends React.Component {
                                     insurableitemflag={this.state.insurableitemflag} handleDateChange={this.handleDateChange} errorlossloc={this.state.errorlossloc}
                                 />
 
-                                <ClaimAmount TableData={this.state.TableData} ClaimAmountSum={this.ClaimAmountSum} ClaimsAmountData={this.state.ClaimsAmountData} claimAmountState={this.state.claimAmountState} validateUI={this.state.validateUI} InsurableItemData={this.state.InsurableItemData} policyflag={this.state.policyflag}
+                                <ClaimAmount benAmtFlag={this.state.benAmtFlag} riskFlag={this.state.riskFlag} TableData={this.state.TableData} ClaimAmountSum={this.ClaimAmountSum} ClaimsAmountData={this.state.ClaimsAmountData} claimAmountState={this.state.claimAmountState} validateUI={this.state.validateUI} InsurableItemData={this.state.InsurableItemData} policyflag={this.state.policyflag}
                                     claims={this.state.claims} handleChange={this.handleChange} DetailsDTO={this.state.DetailsDTO} ClaimAmountdetailsdata={this.state.ClaimAmountdetailsdata} classes={classes}
                                     fields={this.state.fields} showInsGrid={this.state.showInsGrid} details={this.state.details} handleClaimAmount={this.handleClaimAmount} errormessage={this.state.errormessage} erroramt={this.state.erroramt} />
 

@@ -152,7 +152,7 @@ const ClaimAmount = (props) => {
                                     sortable: false,
                                     //  filterable: false
                                 },
-                                
+
                                 {
                                     Header: "IdentificationNo",
                                     accessor: "identificationNo",
@@ -172,17 +172,17 @@ const ClaimAmount = (props) => {
                                     accessor: "coverValue",
                                     minWidth: 20,
                                     setCellProps: (value) => ({ style: { textAlign: "center" } }),
-                                    headerClassName: 'react-table-center'
-
+                                    headerClassName: 'react-table-center',
+                                    show: props.riskFlag
                                 },
-                                //        {
-                                //        Header: "BenefitAmount",
-                                //    accessor: "benefitAmount",
-                                //    minWidth: 40,
-                                //            setCellProps: (value) => ({style: {textAlign: "center" } }),
-                                //    headerClassName: 'react-table-center',
-
-                                //},
+                                {
+                                    Header: "BenefitAmount",
+                                    accessor: "benefitAmount",
+                                    minWidth: 40,
+                                    setCellProps: (value) => ({ style: { textAlign: "center" } }),
+                                    headerClassName: 'react-table-center',
+                                    show: props.benAmtFlag
+                                },
                                 {
                                     Header: "ClaimAmount",
                                     accessor: "claimAmounts",

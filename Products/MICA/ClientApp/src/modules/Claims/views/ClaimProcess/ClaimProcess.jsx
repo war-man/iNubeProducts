@@ -1011,7 +1011,7 @@ class ClaimProcess extends React.Component {
     }
 
     claimDetailsfun = (id) => {
-
+        debugger;
         console.log("this.state.claimIds", this.state.claimid);
 
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/SearchClaimDetails?ClaimId=` + id, {
@@ -1025,7 +1025,7 @@ class ClaimProcess extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-
+                console.log("Claimprocessdata", data);
                 this.setState({ claimTableData: data[1] });
                 this.state.claimamt.approvedClaimAmounts = data[1][0].approvedClaimAmounts;
                 this.claimAmountTable(this.state.claimTableData);
@@ -1034,7 +1034,7 @@ class ClaimProcess extends React.Component {
                 this.state.claimDetailsData.locationOfEvent = data[0][1][1];
                 this.state.claimDetailsData.lossDescription = data[0][2][1];
                 this.state.claimDetailsData.totalClaimedAmount = data[0][3][1];
-                this.state.fields.AdditionalDetails.Performer = data[0][8][1];
+               // this.state.fields.AdditionalDetails.Performer = data[0][8][1];
 
                 //if (data[0][4][1].length != 0 && data[0][5][1].length != 0 && data[0][6][1].length != 0) {
 
@@ -1044,34 +1044,35 @@ class ClaimProcess extends React.Component {
 
                 //    this.setState({ vehicleclaim: true });
                 //}
-
-                if (data[0][4][1] != null && data[0][4][1].length > 0) {
-                    this.state.claimDetailsData.vehicleLocation = data[0][4][1];
-                    this.setState({ vehicleclaim: true });
-                }
-                else {
-                    this.setState({ vehicleclaim: false });
-                }
-                if (data[0][5][1] != null && data[0][5][1].length > 0) {
-                    this.state.claimDetailsData.vehicleLocationState = data[0][5][1];
-                    this.setState({ vehicleclaimstate: true });
-                }
-                else {
-                    this.setState({ vehicleclaimstate: false });
-                }
-                if (data[0][6][1] != null && data[0][6][1].length > 0) {
-                    this.state.claimDetailsData.driverName = data[0][6][1];
-                    this.setState({ vehicleclaimdriver: true });
-                }
-                else {
-                    this.setState({ vehicleclaimdriver: false });
-                }
-                if (data[0][7][1] != null && data[0][7][1].length > 0) {
-                    this.state.claimDetailsData.selfSurvey = data[0][7][1];
-                    this.setState({ vehicleclaimsurvey: true });
-                }
-                else {
-                    this.setState({ vehicleclaimsurvey: false });
+                if (data[0].length > 4) {
+                    if (data[0][4][1] != null && data[0][4][1].length > 0) {
+                        this.state.claimDetailsData.vehicleLocation = data[0][4][1];
+                        this.setState({ vehicleclaim: true });
+                    }
+                    else {
+                        this.setState({ vehicleclaim: false });
+                    }
+                    if (data[0][5][1] != null && data[0][5][1].length > 0) {
+                        this.state.claimDetailsData.vehicleLocationState = data[0][5][1];
+                        this.setState({ vehicleclaimstate: true });
+                    }
+                    else {
+                        this.setState({ vehicleclaimstate: false });
+                    }
+                    if (data[0][6][1] != null && data[0][6][1].length > 0) {
+                        this.state.claimDetailsData.driverName = data[0][6][1];
+                        this.setState({ vehicleclaimdriver: true });
+                    }
+                    else {
+                        this.setState({ vehicleclaimdriver: false });
+                    }
+                    if (data[0][7][1] != null && data[0][7][1].length > 0) {
+                        this.state.claimDetailsData.selfSurvey = data[0][7][1];
+                        this.setState({ vehicleclaimsurvey: true });
+                    }
+                    else {
+                        this.setState({ vehicleclaimsurvey: false });
+                    }
                 }
 
                 if (data.length > 2 && data[2].length > 0) {
