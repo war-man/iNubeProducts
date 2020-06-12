@@ -286,7 +286,9 @@ class CreateCustomer extends React.Component {
             CustNameDisable: false,
             errormessage: false,
             nameMessage: false,
+            spocemailMessage: false,
             servermessage: "",
+            spocservermessage: "",
             customerNameState: "",
             spocDobValid: false,
             spocDojValid: false,
@@ -460,6 +462,7 @@ class CreateCustomer extends React.Component {
     SetValue = ((type, event) => {
         debugger
         this.setState({ nameMessage: false });
+        this.setState({ spocemailMessage: false });
         let CustomerDto = this.state.CustomerDto;
         let name = event.target.name;
         let value = event.target.value;
@@ -490,6 +493,7 @@ class CreateCustomer extends React.Component {
                     }
                 });
         }
+        
         this.change(event, name, type);
     });
 
@@ -509,6 +513,30 @@ class CreateCustomer extends React.Component {
         let value = event.target.value;
         spocDetails[0][name] = value;
         this.setState({ spocDetails });
+
+        if (name === "emailId") {
+
+            fetch(`${BillingConfig.BillingConfigUrl}/api/Billing/SpocMailvalidation?email=` + value, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("data status", data.status);
+                    if (data.status === 9) {
+                        this.setState({ spocservermessage: data.responseMessage });
+                        this.setState({ spocemailMessage: true });
+                        this.setState({ emailIdState: "error" });
+                    } else {
+                        this.setState({ spocemailMessage: false });
+
+                    }
+                });
+        }
         this.change(event, name, type);
     });
 
@@ -1094,7 +1122,8 @@ class CreateCustomer extends React.Component {
                                 middleNameState={this.state.middleNameState} lastNameState={this.state.lastNameState} designationState={this.state.designationState} emailIdState={this.state.emailIdState}
                                 mobilenoState={this.state.mobilenoState} landLineOfficeState={this.state.landLineOfficeState} panNoState={this.state.panNoState} registrationNoState={this.state.registrationNoState}
                                 registeringAuthorityState={this.state.registeringAuthorityState} serviceTaxRegistrationNumberState={this.state.serviceTaxRegistrationNumberState} tannoState={this.state.tannoState} spocDobValid={this.state.spocDobValid}
-                                spocDojValid={this.state.spocDojValid} currentDate={this.state.currentDate} dobState={this.state.dobState} dojState={this.state.dojState} disableView={this.state.disableView} masterList={this.state.masterList} master={this.state.master} />
+                                spocDojValid={this.state.spocDojValid} currentDate={this.state.currentDate} dobState={this.state.dobState} dojState={this.state.dojState} disableView={this.state.disableView} masterList={this.state.masterList} master={this.state.master}
+                                spocservermessage={this.state.spocservermessage} spocemailMessage={this.state.spocemailMessage} />
                         </GridContainer>
 
                         {/*  <ContractCollapse ContractData={this.state.ContractObj.ContractData} onInputChange={this.onInputChange} onDateChangeContract={this.onDateChangeContract} handleModifyContract={this.handleModifyContract} add={this.state.add} InvoiceData={this.state.InvoiceData} SearchFlag={this.state.SearchFlag} errormessage={this.state.errormessage} /> */}
