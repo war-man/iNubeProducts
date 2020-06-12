@@ -135,6 +135,27 @@ namespace iNube.Services.UserManagement.Controllers.Role
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetDynamicGraphConfig()
+        {
+            var response = await _roleService.GetDynamicGraphConfig(Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public IActionResult GetDynamicGraphPermissions(string Userid, string Roleid, string itemType)
+        {
+            var response = _roleService.GetDynamicGraphPermissions(Userid, Roleid, itemType, Context);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public IActionResult SaveDynamicGraphPermission(DynamicPermissions configDTO)
+        {
+            var response = _roleService.SaveDynamicGraphPermission(configDTO, Context);
+            return Ok(response);
+        }
+
         [HttpPost]
         public IActionResult UpdateEmpRole(EmpRoleMapDTO empRole)
         {

@@ -250,6 +250,7 @@ export const TRANSLATIONS = {
         DashboardConfiguration: "Dashboard Configuration",
         ViewDashboard: "View Dashboard",
         DashboardUpdate: "Dashboard Update",
+
         /**********************************************************************/
         //people
         EducationDetails: 'Education Details',

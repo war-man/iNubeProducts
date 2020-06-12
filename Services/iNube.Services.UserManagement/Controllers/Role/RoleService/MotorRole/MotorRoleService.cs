@@ -58,5 +58,20 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MotorRole
         {
             throw new NotImplementedException();
         }
+
+        public Task<IEnumerable<DynamicResponse>> GetDynamicGraphConfig(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicGraphPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DynamicResponseResponse SaveDynamicGraphPermission(DynamicPermissions configDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
