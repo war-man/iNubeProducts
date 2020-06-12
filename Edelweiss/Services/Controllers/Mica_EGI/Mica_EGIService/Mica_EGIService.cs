@@ -5708,6 +5708,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
            
 
             DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            LoggerManager logger = new LoggerManager(_configuration);
 
             string connectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
 
@@ -5719,6 +5720,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             if (checkswitchLog)
             {
                 var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("MM/dd/yyyy") + "' and '" + ToDate.Date.ToString("MM/dd/yyyy") + "' group by PolicyNo";
+
+                logger.LogRequest(connectionString, "TotalUsage", checkswitchLog.ToString(), switchQuery, apiContext);
 
                 try
                 {
@@ -5743,7 +5746,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 catch (Exception ex)
                 {
-                    LoggerManager logger = new LoggerManager(_configuration);
                     logger.LogError(ex,"TotalUsage",apiContext);
                     return 0;
                 }
