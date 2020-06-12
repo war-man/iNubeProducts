@@ -1,5 +1,6 @@
 ﻿import React from "react";
 import FilterNone from "@material-ui/icons/FilterNone";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 // @material-ui/core components
 
@@ -250,7 +251,7 @@ class MappingDetails extends React.Component {
 
         return (
             <div>
-                <h4>Mapping Details</h4>
+                <h4><TranslationContainer translationKey="MappingDetails"/></h4>
                 <GridContainer >
                     <GridItem xs={12} sm={4}>
                         <Dropdown
@@ -268,7 +269,7 @@ class MappingDetails extends React.Component {
 
                     <GridItem xs={12} sm={4}>
                         <Dropdown
-                            labelText="office"
+                            labelText="Office"
                             id="officeId"
                             lstObject={this.props.offmasterList}
                             name='officeId'
@@ -281,7 +282,7 @@ class MappingDetails extends React.Component {
                     </GridItem>
                     <GridItem xs={12} sm={4}>
                         <Dropdown id="PositionNameid"
-                            labelText="Vacant Positions"
+                            labelText="VacantPositions"
                             lstObject={this.props.positionmasterList}
                             value={this.props.peopledetails1.deginName}
                             name='deginName'
@@ -290,7 +291,7 @@ class MappingDetails extends React.Component {
                         />
                     </GridItem>
                     <GridItem xs={12} sm={4}>
-                        <CustomInput labelText="Reporting to"
+                        <CustomInput labelText="Reportingto"
                             disabled={true}
                             id="BusinessTypeText"
                             required={true}

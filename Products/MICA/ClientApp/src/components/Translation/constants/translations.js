@@ -102,6 +102,7 @@ export const TRANSLATIONS = {
         SearchBilling: "Search Billing",
         CreateContract: "Create Contract",
         SearchContract: "Search Contract",
+
         // CreateCustomer: "Create Customer",
         SearchCustomer: "View / Modify Customer",
         GenerateInvoice: "Generate Invoice",
@@ -158,6 +159,17 @@ export const TRANSLATIONS = {
         ModifyMapping: 'Modify Mapping',
         DynamicProduct: 'Dynamic Product',
         DynamicProd: 'Dynamic Product',
+        /**********************************************************************/
+        //people
+        EducationDetails: 'Education Details',
+        MappingDetails: 'Mapping Details ',
+        VacantPositions: 'Vacant Positions',
+        Reportingto: 'Reporting to',
+        DateofAppointment: 'Date of Appointment',
+        RecruitmentNo: 'Recruitment No',
+        GradePercentage: 'Grade/Percentage',
+         Certification: 'Certification',
+        SNo: 'S No',
         /**********************************************************************/
         //movements
         PolicyNumber: 'Policy Number',
@@ -264,6 +276,7 @@ export const TRANSLATIONS = {
         OrgHierarchy: 'Organization Hierarchy',
         OffHierarchy: 'Office Hierarchy',
         PPLHierarchy: 'People Hierarchy',
+        PeopleHierarchy: 'People Hierarchy',
         CreatePosition: 'Create Position',
         Designation: 'Designation',
         SearchPeople: 'Search People',
@@ -574,7 +587,8 @@ export const TRANSLATIONS = {
         LossDescription: 'Loss Description',
         InsurableItem: 'Insurable Item',
         AccountHolderName: 'Account Holder Name',
-        AccountNo: 'Account No.',
+        NameasintheBankPassBook: 'Name as in the Bank PassBook',
+        AccountNo: 'Account No',
         BankName: 'Bank Name',
         IFSCCode: 'IFSC Code',
         BankBranchAddress: 'Bank Branch Address',

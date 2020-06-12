@@ -14,7 +14,7 @@ import "./index.css";
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -167,7 +167,7 @@ class PeopleChart extends React.Component {
                                 </CardIcon>
                                 {
                                     <h4 >
-                                        <small>People Hierarchy</small>
+                                        <small> <h4><TranslationContainer translationKey="PeopleHierarchy"/></h4></small>
                                     </h4>
                                 }
                             </CardHeader>

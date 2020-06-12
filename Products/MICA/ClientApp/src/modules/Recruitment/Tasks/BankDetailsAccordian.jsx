@@ -23,6 +23,7 @@ import Button from "components/CustomButtons/Button.jsx";
 import { cardTitle } from "assets/jss/material-dashboard-pro-react.jsx";
 import InterviewDetailsData from "./InterviewDetailsData";
 import BankDetails from "./BankDetails";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 const styles = {
     cardTitle,
@@ -70,7 +71,7 @@ class BankDetailsAccordian extends React.Component {
                                     active={0}
                                     collapses={[
                                         {
-                                            title: "Bank Details",
+                                            title: <TranslationContainer translationKey="BankDetails" />,
                                             content: <BankDetails />
                                         },
 
