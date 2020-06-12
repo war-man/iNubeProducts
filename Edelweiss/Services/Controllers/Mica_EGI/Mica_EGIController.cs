@@ -258,5 +258,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
             var response = await _quotationService.BalanceAlertScheduler(Context);
             return Ok(response);
         }
+
+        [HttpGet]
+        public  IActionResult TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate)
+        {
+            var response =  _quotationService.TotalUsage(PolicyNo, FromDate, ToDate,Context);
+            return Ok(response);
+        }
     }
 }
