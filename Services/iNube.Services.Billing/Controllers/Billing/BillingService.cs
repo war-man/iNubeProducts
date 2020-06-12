@@ -40,6 +40,7 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         Task<IEnumerable<PaymentHistoryDTO>> GetPaymentByInvoiceId(int invoiceId, ApiContext context);
         Task<IEnumerable<CustomerSearchDTO>> CustomerSearch(CustomerSearchDTO customersDTO, ApiContext context);
         Task<CustomerResponse> CustomerNamevalidation(string Name, ApiContext apiContext);
+        Task<CustomerResponse> SpocMailvalidation(string email, ApiContext apiContext);
         Task<CustomerConfigDTO> CreateCustomerConfig(CustomerConfigDTO configDTO, ApiContext Context);
         Task<CustomerConfigDTO> UploadCustConfigImage(CustomerConfigDTO contractimg, ApiContext apiContext);
         Task<PaymentDTO> UpdatePaymentStatus(PaymentDTO pay, ApiContext Context);
@@ -194,6 +195,10 @@ namespace iNube.Services.Billing.Controllers.Billing.BillingService
         public async Task<CustomerResponse> CustomerNamevalidation(string Name, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).CustomerNamevalidation(Name, apiContext);
+        }
+        public async Task<CustomerResponse> SpocMailvalidation(string email, ApiContext apiContext)
+        {
+            return await _productService(apiContext.ProductType).SpocMailvalidation(email, apiContext);
         }
         public async Task<CustomerConfigDTO> CreateCustomerConfig(CustomerConfigDTO configDTO, ApiContext Context)
         {
