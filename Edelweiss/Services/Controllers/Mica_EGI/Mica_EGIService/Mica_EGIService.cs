@@ -81,7 +81,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
     public class MicaEGIService : IMicaEGIService
     {
-        private MICAQMContext _context;
+        private MICAQMContext _context = null;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
         private readonly IEmailService _emailService;
@@ -93,7 +93,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
             _mapper = mapper;
             _appSettings = appSettings.Value;
-            _context = context;
+           // _context = context;
             _emailService = emailService;
             _integrationService = integrationService;
             _configuration = configuration;
@@ -5701,42 +5701,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate,ApiContext apiContext)
         {
-            //if (_context == null)
-            //{
+            if (_context == null)
+            {
                 _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            //}
-           
+            }
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
             LoggerManager logger = new LoggerManager(_configuration);
 
             var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
             var connectionString = dbConnectionString.Dbconnection;
-
-            //string connectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
-
-           
-            logger.LogRequest(connectionString, "TotalUsage", apiContext.ServerType, "TotalUsage", apiContext);
-
+                        
 
             var checkswitchLog = _context.TblSwitchLog.Any(x => x.PolicyNo == PolicyNo);
 
-            var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("MM/dd/yyyy") + "' and '" + ToDate.Date.ToString("MM/dd/yyyy") + "' group by PolicyNo";
-
-            logger.LogRequest(connectionString, "TotalUsage", checkswitchLog.ToString(), switchQuery, apiContext);
-
+           
+            
             if (checkswitchLog)
             {
-                
-                logger.LogRequest(connectionString, "TotalUsage", checkswitchLog.ToString(), switchQuery, apiContext);
+                var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("MM/dd/yyyy") + "' and '" + ToDate.Date.ToString("MM/dd/yyyy") + "' group by PolicyNo";
 
                 try
                 {
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        //connection.Open();
-
-                        //TBLSWITCHLOG
+                          //TBLSWITCHLOG
                         SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
                         DataSet Switchds = new DataSet();
                         SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
@@ -5759,9 +5747,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             }
             else
-            {
-                logger.LogRequest(connectionString, "TotalUsage", apiContext.ServerType, "ELSE Block", apiContext);
-
+            {                
                 return 0;
             }
         }
