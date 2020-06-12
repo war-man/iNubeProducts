@@ -182,6 +182,12 @@ namespace iNube.Services.Billing.Controllers.Billing.MotorBillingService
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task<CustomerResponse> SpocMailvalidation(string email, ApiContext apiContext)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        {
+            throw new NotImplementedException();
+        }
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<CustomerConfigDTO> CreateCustomerConfig(CustomerConfigDTO configDTO, ApiContext Context)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
