@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices;
 using iNube.Services.ReInsurance.Entities;
 using iNube.Services.ReInsurance.Helpers;
 using iNube.Services.ReInsurance.Models;
@@ -6,6 +7,8 @@ using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,36 +18,26 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 {
     public interface IReInsuranceService
     {
-        //Master data
-        List<ddDTOs> MastertypeData();
+        Task<List<ddDTOs>> MastertypeData(ApiContext apiContext);
+        Task<IEnumerable<ddDTOs>> GetLocation(string locationType, int parentID, ApiContext apiContext);
+        Task<List<yearDto>> MasterYearData(ApiContext apiContext);
 
-        //Masters for participant
+        Task<List<GroupGroupDto>> RetentionGroup(ApiContext apiContext);
 
-        //Master data
-        //List<ddDTOs> ParticipantMaster();
-        //GetLocation
-        Task<IEnumerable<ddDTOs>> GetLocation(string locationType, int parentID);
+        Task<List<GroupGroupDto>> TreatyName(ApiContext apiContext);
 
-        //GetYear MasterData
-
-        List<yearDto> MasterYearData();
-
-        List<GroupGroupDto> RetentionGroup();
-
-        List<GroupGroupDto> TreatyName();
-
-        List<GroupGroupDto> TreatyCode(decimal treatyId);
-        List<GroupGroupDto> Reinsurer();
-        List<GroupGroupDto> Broker();
-        List<GroupGroupDto> GetBrachCode(decimal participantmasteId);
+        Task<List<GroupGroupDto>> TreatyCode(decimal treatyId, ApiContext apiContext);
+        Task<List<GroupGroupDto>> Reinsurer(ApiContext apiContext);
+        Task<List<GroupGroupDto>> Broker(ApiContext apiContext);
+        Task<List<GroupGroupDto>> GetBrachCode(decimal participantmasteId, ApiContext apiContext);
 
 
 
         //Participent Master
-        Task<TransactionMapResponse> SaveParticipentData(TblParticipantMasterDto participantMasterDto);
-        Task<List<TblParticipantMasterDto>> SearchParticipant(TblParticipantMasterDto tblParticipantMasterDto);
-        Task<TransactionMapResponse> DeleteParticipant(decimal participantMasterId);
-        Task<TblParticipantMasterDto> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto);
+        Task<TransactionMapResponse> SaveParticipentData(TblParticipantMasterDto participantMasterDto, ApiContext apiContext);
+        Task<List<TblParticipantMasterDto>> SearchParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext);
+        Task<TransactionMapResponse> DeleteParticipant(decimal participantMasterId, ApiContext apiContext);
+        Task<TblParticipantMasterDto> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext);
 
         //add participant
 
@@ -59,32 +52,32 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //Retention Functions
 
-        Task<TransactionMapResponse> SaveRetentionData(TblRetentionGroupDto tblRetentionGroupDto);
-        Task<IEnumerable<TblRetentionGroupDto>> SearchRetention(TblRetentionGroupDto tblRetentionGroupDto);
-        Task<TransactionMapResponse> DeleteRetention(decimal retentionGroupId);
-        Task<TblRetentionGroupDto> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto);
+        Task<TransactionMapResponse> SaveRetentionData(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext);
+        Task<IEnumerable<TblRetentionGroupDto>> SearchRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext);
+        Task<TransactionMapResponse> DeleteRetention(decimal retentionGroupId, ApiContext apiContext);
+        Task<TblRetentionGroupDto> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext);
 
         //Treaty Functions
 
-        Task<TransactionMapResponse> SaveTreatyData(TblTreatyDto tblTreatyDto);
-        Task<IEnumerable<TblTreatyDto>> SearchTreaty(TblTreatyDto tblRetentionGroupDto);
-        Task<TransactionMapResponse> DeleteTeaty(decimal tratyId);
-        Task<TblTreatyDto> ModifyfTraty(TblTreatyDto tblRetentionGroupDto);
-        Task<IAsyncResult> AddTreatyParticipant(TblParticipantDto tblParticipantDto);
+        Task<TransactionMapResponse> SaveTreatyData(TblTreatyDto tblTreatyDto, ApiContext apiContext);
+        Task<IEnumerable<TblTreatyDto>> SearchTreaty(TblTreatyDto tblRetentionGroupDto, ApiContext apiContext);
+        Task<TransactionMapResponse> DeleteTeaty(decimal tratyId, ApiContext apiContext);
+        Task<TblTreatyDto> ModifyfTraty(TblTreatyDto tblRetentionGroupDto, ApiContext apiContext);
+        Task<IAsyncResult> AddTreatyParticipant(TblParticipantDto tblParticipantDto, ApiContext apiContext);
 
 
 
         //RI Functions
 
-        Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto);
+        Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto, ApiContext apiContext);
 
         Task<IEnumerable<RIMappingDTO>> GetDescriptionRIGrid(decimal treatyid, ApiContext apiContext);
 
         //Task<IEnumerable<RIMappingDTO>> GetTreatyTypeRIGrid(string treatycode, ApiContext apiContext);
 
-        Task<IEnumerable<TblRimappingDto>> SearchRImapping(TblRimappingDto tblRimappingDto);
-        Task<TblRimappingDto> ModifyRImapping(TblRimappingDto tblParticipantMasterDto);
-        Task<TransactionMapResponse> DeleteRiMapping(decimal RimappingId);
+        Task<IEnumerable<TblRimappingDto>> SearchRImapping(TblRimappingDto tblRimappingDto, ApiContext apiContext);
+        Task<TblRimappingDto> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext);
+        Task<TransactionMapResponse> DeleteRiMapping(decimal RimappingId, ApiContext apiContext);
 
 
         //Get elements By id for the modifications
@@ -115,7 +108,17 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         private readonly IServiceProvider _serviceProvider;
         private ILoggerManager _logger;
         private readonly IEmailService _emailService;
-        public ReInsuranceService(MICARIContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService)
+
+
+      
+        private readonly AppSettings _appSettings;
+        private readonly  IReInsuranceService _reInsuranceService;
+        private readonly IIntegrationService _integrationService;
+        private IConfiguration _configuration;
+        public DbHelper dbHelper;
+
+
+        public ReInsuranceService( IReInsuranceService reinsuranceService,MICARIContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IOptions<AppSettings> appSettings, IConfiguration configuration, IIntegrationService integrationService)
         {
 
             _mapper = mapper;
@@ -123,13 +126,19 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             _logger = logger;
             _emailService = emailService;
             _context = context;
-            // _integrationService = integrationService;
+            _reInsuranceService = reinsuranceService;
+            _configuration = configuration;
+            _appSettings = appSettings.Value;
+            dbHelper = new DbHelper(new IntegrationService(configuration));
+            _integrationService = integrationService;
         }
 
         //master data
 
-        public List<ddDTOs> MastertypeData()
+        public async Task<List<ddDTOs>> MastertypeData(ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+          
             var MasterData = _context.TblMasRicommonTypes
                                                     .Select(x => new ddDTOs
                                                     {
@@ -141,8 +150,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return MasterData;
         }
 
-        public List<GroupGroupDto> RetentionGroup()
+        public async Task<List<GroupGroupDto>> RetentionGroup(ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var MasterData = _context.TblRetentionGroup
                                                     .Select(x => new GroupGroupDto
                                                     {
@@ -154,8 +165,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return MasterData;
         }
         //TreatyCode
-        public List<GroupGroupDto> TreatyName()
+        public async Task<List<GroupGroupDto>> TreatyName(ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var MasterData = _context.TblTreaty
                                                     .Select(x => new GroupGroupDto
                                                     {
@@ -167,8 +180,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return MasterData;
         }
         //TreatyGroup
-        public List<GroupGroupDto> TreatyCode(decimal treatyId)
+        public async Task<List<GroupGroupDto>> TreatyCode(decimal treatyId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var MasterData = _context.TblTreatyGroup.Where(s => s.TreatyId == treatyId)
                                                     .Select(x => new GroupGroupDto
                                                     {
@@ -182,8 +197,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //Broker master data for the Add participant
 
-        public List<GroupGroupDto> Reinsurer()
+        public async Task<List<GroupGroupDto>> Reinsurer(ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var MasterData = _context.TblParticipantMaster.Where(s => s.ParticipantTypeId == 8)
                                                     .Select(x => new GroupGroupDto
                                                     {
@@ -194,8 +211,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                                                     }).ToList();
             return MasterData;
         }
-        public List<GroupGroupDto> Broker()
+        public async Task<List<GroupGroupDto>> Broker(ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var MasterData = _context.TblParticipantMaster.Where(s => s.ParticipantTypeId == 9)
                                                     .Select(x => new GroupGroupDto
                                                     {
@@ -209,8 +228,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //GetBranchCode for the addparticipantPage
 
-        public List<GroupGroupDto> GetBrachCode(decimal ParticipantMasterId)
+        public async Task<List<GroupGroupDto>> GetBrachCode(decimal ParticipantMasterId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var MasterData = _context.TblParticipantBranch.Where(s => s.ParticipantMasterId == ParticipantMasterId)
                                                     .Select(x => new GroupGroupDto
                                                     {
@@ -229,9 +250,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //Get Location
 
-        public async Task<IEnumerable<ddDTOs>> GetLocation(string locationType, int parentID)
+        public async Task<IEnumerable<ddDTOs>> GetLocation(string locationType, int parentID, ApiContext apiContext)
         {
             //  _context = (MICAPRContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             IEnumerable<ddDTOs> ddDTOs;
 
@@ -287,8 +309,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         }
 
         //GetMasterYear
-        public List<yearDto> MasterYearData()
+        public async Task<List<yearDto>> MasterYearData(ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             var MasterData = _context.TblMasYear
                                                     .Select(x => new yearDto
                                                     {
@@ -301,8 +325,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         }
 
         //delete Participant
-        public async Task<TransactionMapResponse> DeleteParticipant(decimal participantMasterId)
+        public async Task<TransactionMapResponse> DeleteParticipant(decimal participantMasterId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             try
             {
                 var delete_caoMap = _context.TblParticipantMaster.Find(participantMasterId);
@@ -320,8 +346,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         }
 
         //modifyParticipant
-        public async Task<TblParticipantMasterDto> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto)
+        public async Task<TblParticipantMasterDto> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var tbl_participant = _mapper.Map<TblParticipantMaster>(tblParticipantMasterDto);
             var tbl_particiant = _context.TblParticipantMaster.Find(tbl_participant.ParticipantMasterId);
@@ -353,8 +381,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return accountDTO;
         }
 
-        public async Task<TransactionMapResponse> SaveParticipentData(TblParticipantMasterDto participantMasterDto)
+        public async Task<TransactionMapResponse> SaveParticipentData(TblParticipantMasterDto participantMasterDto, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var data = _mapper.Map<TblParticipantMaster>(participantMasterDto);
             try
@@ -371,14 +400,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         }
         //search Participant data
 
-        public async Task<List<TblParticipantMasterDto>> SearchParticipant(TblParticipantMasterDto tblParticipantMasterDto)
+        public async Task<List<TblParticipantMasterDto>> SearchParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext)
         {
-           
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+
 
 
             try
             {
-                var msterdata = MastertypeData();
+                var msterdata = await MastertypeData(apiContext);
                 IEnumerable<TblParticipantMasterDto> scontract = null;
                 TblParticipantMasterDto scontract1 = new TblParticipantMasterDto() ;
                 List<TblParticipantMasterDto> scontract2 = new List<TblParticipantMasterDto>();
@@ -451,8 +482,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //save retention
 
-        public async Task<TransactionMapResponse> SaveRetentionData(TblRetentionGroupDto tblRetentionGroupDto)
+        public async Task<TransactionMapResponse> SaveRetentionData(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var data = _mapper.Map<TblRetentionGroup>(tblRetentionGroupDto);
             try
@@ -470,10 +502,12 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //Search Retention
 
-        public async Task<IEnumerable<TblRetentionGroupDto>> SearchRetention(TblRetentionGroupDto tblRetentionGroupDto)
+        public async Task<IEnumerable<TblRetentionGroupDto>> SearchRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext)
         {
-            var msterdata = MastertypeData();
-            var yeardata = MasterYearData();
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var msterdata = await MastertypeData(apiContext);
+            var yeardata =await MasterYearData(apiContext);
 
 
             try
@@ -536,8 +570,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //Delete Retention
 
-        public async Task<TransactionMapResponse> DeleteRetention(decimal retentionGroupId)
+        public async Task<TransactionMapResponse> DeleteRetention(decimal retentionGroupId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             try
             {
                 var delete_caoMap = _context.TblRetentionGroup.Find(retentionGroupId);
@@ -556,8 +592,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //modifyRetention
 
-        public async Task<TblRetentionGroupDto> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto)
+        public async Task<TblRetentionGroupDto> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var tbl_participant = _mapper.Map<TblRetentionGroupDto>(tblRetentionGroupDto);
             var tbl_particiant = _context.TblRetentionGroup.Find(tbl_participant.RetentionGroupId);
@@ -581,8 +619,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //Treaty
         //Save Treaty
-        public async Task<TransactionMapResponse> SaveTreatyData(TblTreatyDto tblTreatyDto)
+        public async Task<TransactionMapResponse> SaveTreatyData(TblTreatyDto tblTreatyDto, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             try
             {
                 var data = _mapper.Map<TblTreaty>(tblTreatyDto);
@@ -600,10 +640,12 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //Search Treaty
 
-        public async Task<IEnumerable<TblTreatyDto>> SearchTreaty(TblTreatyDto tblTreatyDto)
+        public async Task<IEnumerable<TblTreatyDto>> SearchTreaty(TblTreatyDto tblTreatyDto, ApiContext apiContext)
         {
-            var msterdata = MastertypeData();
-            var yeardata = MasterYearData();
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var msterdata = await MastertypeData(apiContext);
+            var yeardata = await MasterYearData(apiContext);
 
 
             try
@@ -669,8 +711,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //delete Treaty
 
-      public async  Task<TransactionMapResponse> DeleteTeaty(decimal tratyId)
+      public async  Task<TransactionMapResponse> DeleteTeaty(decimal tratyId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             try
             {
                 
@@ -690,8 +734,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //modify TreatyData
 
-        public async Task<TblTreatyDto> ModifyfTraty(TblTreatyDto tblTreatyDto)
+        public async Task<TblTreatyDto> ModifyfTraty(TblTreatyDto tblTreatyDto, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var tbl_treaty = _mapper.Map<TblTreatyDto>(tblTreatyDto);
             var tbl_traty = _context.TblTreaty.Find(tbl_treaty.TreatyId);
@@ -718,8 +764,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         }
 
         //AddTreatyParticipant 
-        public async Task<IAsyncResult> AddTreatyParticipant(TblParticipantDto tblParticipantDto)
+        public async Task<IAsyncResult> AddTreatyParticipant(TblParticipantDto tblParticipantDto, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var data = _mapper.Map<TblParticipant>(tblParticipantDto);
             try
@@ -746,7 +793,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         //Get Grid of RI screen 
         public async Task<IEnumerable<RIMappingDTO>> GetDescriptionRIGrid(decimal treatyid, ApiContext apiContext)
         {
-            var msterdata = MastertypeData();
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var msterdata =await MastertypeData(apiContext);
             try
             {
                 var coaMapppingDto = from tblTreaty in _context.TblTreaty.Where(s => s.TreatyId == treatyid)
@@ -772,7 +821,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         //Get Participant Name(RI or Broker)
         public async Task<IEnumerable<TblParticipantMasterDto>> GetName(decimal participantMasterId, ApiContext apiContext)
         {
-            var msterdata = MastertypeData();
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var msterdata = MastertypeData(apiContext);
             try
             {
                 var coaMapppingDto = from tblparticipant in _context.TblParticipantMaster.Where(s => s.ParticipantMasterId == participantMasterId)
@@ -794,11 +845,12 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return null;
         }
 
-        public async Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto)
+        public async Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto,ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //taking id 20 for retention group and 21 for treaty
-            foreach(var d in tblRimappingDto.TblRimappingDetail)
+            foreach (var d in tblRimappingDto.TblRimappingDetail)
             {
                 if(d.RetentionGroupId!=null)
                 {
@@ -830,10 +882,12 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //search RI mapping
 
-        public async Task<IEnumerable<TblRimappingDto>> SearchRImapping(TblRimappingDto tblRimappingDto)
+        public async Task<IEnumerable<TblRimappingDto>> SearchRImapping(TblRimappingDto tblRimappingDto, ApiContext apiContext)
         {
             //var msterdata = MastertypeData();
-            var yeardata = MasterYearData();
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var yeardata = await MasterYearData(apiContext);
 
 
             try
@@ -882,8 +936,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         //Delete RI mapping
         //modify Ri
 
-        public async Task<TblRimappingDto> ModifyRImapping(TblRimappingDto tblParticipantMasterDto)
+        public async Task<TblRimappingDto> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var tbl_Rimaping = _mapper.Map<TblRimapping>(tblParticipantMasterDto);
             var tbl_particiant = _context.TblRimapping.Find(tbl_Rimaping.RimappingId);
@@ -901,8 +957,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         }
 
 
-        public async Task<TransactionMapResponse> DeleteRiMapping(decimal RimappingId)
+        public async Task<TransactionMapResponse> DeleteRiMapping(decimal RimappingId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             try
             {
                 var delete_caoMap = _context.TblRimapping.Find(RimappingId);
@@ -922,6 +980,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         //GetElements by id
         public async Task<TblRetentionGroupDto> GetRetentionGroupById(decimal retentionGroupId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
 
             var tblRetentionGroup = _context.TblRetentionGroup.Find(retentionGroupId);
             if (tblRetentionGroup != null)
@@ -938,6 +998,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         public async Task<TblTreatyDto> GetTreatyById(decimal treatyId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var tbltreaty = _context.TblTreaty.Find(treatyId);
             if (tbltreaty != null)
@@ -952,6 +1013,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         public async Task<TblParticipantMasterDto> GetParticipantBYId(decimal participantMasterId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
             try
             {
                 var tblparticipant = _context.TblParticipantMaster.Find(participantMasterId);
@@ -969,6 +1032,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         public async Task<TblRimappingDto> GetRImappingBYId(decimal RImappingId, ApiContext apiContext)
         {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             try
             {
