@@ -5619,6 +5619,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             ToDate = CDToDate,
                         };
 
+                        var AccountNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).CDAccountNumber;
+
+                        var AccountData = await _integrationService.GetCDAccountDetails(AccountNumber, "AD", context);
+
+                        if (AccountData.Status != BusinessStatus.Ok)
+                        {
+                            continue;
+                        }
+
                         //Step-3 Get Entire Policy Details
                         var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, context);
 
@@ -5682,7 +5691,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             //Rule
                             endorsementCalDTO.dictionary_rule.AD = monthlySiDTO.PerDayPremium.ToString();
-                            endorsementCalDTO.dictionary_rule.ADDAYS = DaysChargeable.ToString();
+                            endorsementCalDTO.dictionary_rule.ADDAYS = "60";
                             endorsementCalDTO.dictionary_rule.FT = "0";
                             endorsementCalDTO.dictionary_rule.FTDAYS = "0";
 
@@ -5692,15 +5701,50 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             if (CalculatePremium.Count > 0)
                             {
-                                monthlySiDTO.PremiumChargeable = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
 
-                                monthlySiDTO.GstOnPremiumChargeable = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue) + Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+                                var AD60TxnAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
 
-                                monthlySiDTO.TotalAmountChargeable = Convert.ToDecimal(monthlySiDTO.PremiumChargeable + monthlySiDTO.GstOnPremiumChargeable);
+                                var AD60FTTaxAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+                                var AD60TTTaxAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+                                var AD60TaxAmount = AD60FTTaxAmount + AD60TTTaxAmount;
+
+                                var AD60Total = AD60TxnAmount + AD60TaxAmount;
+
+                                monthlySiDTO.PremiumChargeable = AD60TxnAmount - AccountData.TxnAmountBalance;
+
+                                monthlySiDTO.GstOnPremiumChargeable = AD60TaxAmount - AccountData.TaxAmountBalance;
+
+                                monthlySiDTO.TotalAmountChargeable = AD60Total - AccountData.TotalAvailableBalance;
 
                                 monthlySiDTO.Amount = monthlySiDTO.TotalAmountChargeable;
 
-                                
+
+                                if(monthlySiDTO.TotalAmountChargeable < 0)
+                                {
+                                    continue;
+                                }
+
+                                var FSTaxType = CalculatePremium.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+
+                                var NewTaxAmount = monthlySiDTO.GstOnPremiumChargeable / 2;
+
+                                if (FSTaxType == "IGST")
+                                {
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue = monthlySiDTO.GstOnPremiumChargeable.ToString();
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue = "0";
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue = monthlySiDTO.PremiumChargeable.ToString();
+                                }
+                                else
+                                {
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue = NewTaxAmount.ToString();
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue = NewTaxAmount.ToString();
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue = monthlySiDTO.PremiumChargeable.ToString();
+                                }
+
+                               
+
                                 Guid guid = Guid.NewGuid();
                                 monthlySiDTO.Txnid = guid.ToString();
 
