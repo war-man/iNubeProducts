@@ -96,6 +96,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         Task<TblRimappingDto> GetRImappingBYId(decimal RImappingID, ApiContext apiContext);
         Task<object> GetAllocationByPolicyNo(string policyNo, ApiContext apiContext);
         Task<RiallocationDto> ModifyReAllocation(RiallocationDto riallocationDto, ApiContext apiContext);
+        Task<IActionResult> Calulationddata(CalulationDto calulationDto, ApiContext apiContext);
 
 
     }
@@ -1112,6 +1113,97 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var riallocation = _mapper.Map<RiallocationDto>(tblAllocation);
             return riallocation;
         }
+
+        public async Task<IActionResult> Calulationddata(CalulationDto calulationDto, ApiContext apiContext)
+        {
+            //Year,Level,Product is used for pulling the data for treaty
+            //use of Premium and SI
+
+            //Policy Or Sometihng id need to take
+            Mapping mapping = new Mapping();
+            List<Map> maps = new List<Map>();
+
+            Map map = new Map();
+
+            mapping.PolicyNo = calulationDto.PolicyNo;
+            mapping.Premium = calulationDto.PremiumAmount;
+            mapping.AllocationAmmount = calulationDto.SumInsured;
+            mapping.Level = calulationDto.level;
+            mapping.Year = calulationDto.Year;
+            mapping.ProductName = calulationDto.ProductName;
+
+
+            //step1
+            var tblRiMapping = _context.TblRimapping.Where(a => a.Year == calulationDto.Year && a.Level == calulationDto.level && a.LobProductCover == calulationDto.ProductName).FirstOrDefault();
+            var RIMappingDTO = _mapper.Map<TblRimappingDto>(tblRiMapping);
+
+            //step2
+            var RImappingDetails = _context.TblRimappingDetail.Where(a => a.RimappingId == RIMappingDTO.RimappingId).ToList();
+            var LstRImappingDetails = _mapper.Map<List<TblRimappingDetailDto>>(RImappingDetails);
+
+            //step3
+            var retentionGroups =  _context.TblRetentionGroup.Where(a => a.RetentionGroupId == RIMappingDTO.RetentionGroupId).FirstOrDefault();
+            var retensionDto = _mapper.Map<TblRetentionGroupDto>(retentionGroups);
+
+            map.Type = "Retension";
+            map.AllocationMethodId = Convert.ToInt32(retensionDto.RetentionLogicId);
+            map.Percentage = Convert.ToDecimal(retensionDto.Percentage);
+            map.Limit = Convert.ToDecimal(retensionDto.Limit);
+            maps.Add(map);
+
+            // Treaty data need to be filled
+
+            var treatyData = _context.TblTreatyGroup.ToList();   //getting all child data;
+            var treatyDataLst = _mapper.Map<List<TblTreatyGroupDto>>(treatyData);
+
+            foreach (var item in LstRImappingDetails)
+            {
+                foreach (var treatyitem in treatyDataLst)
+                {
+                    if (item.TreatyGroupId == treatyitem.TreatyGroupId)
+                    {
+                        var tratyparntdata = _context.TblTreaty.Find(treatyitem.TreatyId);
+                        var trtdata = _mapper.Map<TblTreatyDto>(tratyparntdata);
+                        var Arrangementdata = _context.TblArrangement.Find(treatyitem.TreatyId);
+                        var arrangementsvalue = _mapper.Map<TblArrangementDto>(Arrangementdata);
+                        //treatytypeid ->5 means Surplus and 4 means Quotashare
+                        if (trtdata.TreatyTypeId == 5)
+                        {
+                            map = new Map();
+                            // surPlus.Percent = trtdata.pe;
+                            map.Type = trtdata.TreatyTypeId.ToString();
+                            map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                            map.AllocationMethodId = Convert.ToInt32(arrangementsvalue.AllocationLogicId);
+                            map.AllocationBasisId = Convert.ToInt32(arrangementsvalue.AllocationBasisId);
+                            map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                            map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                            maps.Add(map);
+                        }
+                        if (trtdata.TreatyTypeId == 4)
+                        {
+                            map = new Map();
+                            // surPlus.Percent = trtdata.pe;
+                            map.Type = trtdata.TreatyTypeId.ToString();
+                            map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                            map.AllocationMethodId = Convert.ToInt32(arrangementsvalue.AllocationLogicId);
+                            map.AllocationBasisId = Convert.ToInt32(arrangementsvalue.AllocationBasisId);
+                            map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                            map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                            maps.Add(map);
+                        }
+
+                    }
+                    mapping.maps = maps;
+
+                }
+            }
+
+
+            var test = mapping;
+
+            return null;
+        }
+
     }
 
 }

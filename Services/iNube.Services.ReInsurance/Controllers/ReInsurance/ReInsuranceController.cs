@@ -608,5 +608,12 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return Ok();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Calulationddata(CalulationDto calulationDto)
+        {
+            var search = await _reInsuranceService.Calulationddata(calulationDto, Context);
+            return Ok(search);
+        }
+
     }
 }
