@@ -43,7 +43,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
 
 
-        [AllowAnonymous]
+       
 
         [HttpGet]
 
@@ -64,7 +64,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         //RetentionGroupMaster for RI Screen
 
-        [AllowAnonymous]
+       
 
         [HttpGet]
 
@@ -84,7 +84,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
 
         //TreatyCode
-        [AllowAnonymous]
+       
 
         [HttpGet]
 
@@ -104,7 +104,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
 
         //TratyCode
-        [AllowAnonymous]
+     
 
         [HttpGet]
 
@@ -126,7 +126,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         //  AddParticipant in Treaty Screen
         //TratyCode
-        [AllowAnonymous]
+        
 
         [HttpGet]
         public async Task<IActionResult> Reinsurer()
@@ -144,7 +144,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
         //In Add Participnat master data for broker
         //TratyCode
-        [AllowAnonymous]
+       
 
         [HttpGet]
         public async Task<IActionResult> Broker()
@@ -198,7 +198,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         //GetmasterYear data
 
-        [AllowAnonymous]
+       
 
         [HttpGet]
 
@@ -217,7 +217,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
 
         // GET loction
-        [AllowAnonymous]
+       
         [HttpGet]
         public async Task<IActionResult> GetLocation(string locationType, int parentID)
         {
@@ -225,7 +225,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return Ok(locationData);
         }
 
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult> SaveParticipentData([FromBody] TblParticipantMasterDto participantMasterDto)
         {
@@ -249,14 +249,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         }
 
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult> SearchParticipant(TblParticipantMasterDto tblParticipantMasterDto)
         {
             var search = await _reInsuranceService.SearchParticipant(tblParticipantMasterDto,Context);
             return Ok(search);
         }
-        [AllowAnonymous]
+       
         [HttpDelete]
         public async Task<IActionResult> DeleteParticipant(decimal participantMasterId)
         {
@@ -273,7 +273,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
                     return Forbid();
             }
         }
-        [AllowAnonymous]
+       
         [HttpPut]
         public async Task<IActionResult> ModifyParticipant(decimal ParticipantMasterId, TblParticipantMasterDto tblParticipantMasterDto)
         {
@@ -287,7 +287,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
      
 
         //Retention Controller
-        [AllowAnonymous]
+        
         [HttpPost]
         public async Task<IActionResult> SaveRetentionData(TblRetentionGroupDto tblRetentionGroupDto)
         {
@@ -312,7 +312,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         }
 
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult> SearchRetention(TblRetentionGroupDto tblRetentionGroupDto)
         {
@@ -321,7 +321,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
         //Delete Retention
 
-        [AllowAnonymous]
+        
         [HttpDelete]
         public async Task<IActionResult> DeleteRetention(decimal retentionGroupId)
         {
@@ -341,7 +341,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         //ModifyRetention
 
-        [AllowAnonymous]
+       
         [HttpPut]
         public async Task<IActionResult> ModifyfRetention(decimal retentionGID, TblRetentionGroupDto tblRetentionGroupDto)
         {
@@ -351,7 +351,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
 
         //Treaty 
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult> SaveTreatyData([FromBody]TblTreatyDto tblTreatyDto)
         {
@@ -374,7 +374,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
 
         //search Treaty
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult> SearchTreaty(TblTreatyDto tblTreatyDto)
         {
@@ -382,7 +382,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return Ok(search);
         }
         //delete trety
-        [AllowAnonymous]
+      
         [HttpDelete]
         public async Task<IActionResult> DeleteTeaty(decimal tratyId)
         {
@@ -402,7 +402,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         //ModifyTreaty 
 
-        [AllowAnonymous]
+      
         [HttpPut]
         public async Task<IActionResult> ModifyfTraty(decimal treatyId, TblTreatyDto tblTreatyDto)
         {
@@ -412,7 +412,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
 
 
-        [AllowAnonymous]
+       
         [HttpPut]
         public async Task<IActionResult> ModifyRImapping(decimal rimappingId, TblRimappingDto tblTreatyDto)
         {
@@ -423,7 +423,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         //AddTreatyParticipant(TblParticipantDto tblParticipantDto)
 
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult>  AddTreatyParticipant(TblParticipantDto tblParticipantDto)
         {
@@ -444,7 +444,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         //RI mapping
 
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult> SaveRIMapping(TblRimappingDto tblRimappingDto)
         {
@@ -466,7 +466,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
         }
 
-        [AllowAnonymous]
+       
         [HttpGet]
         public async Task<IActionResult> GetDescriptionRIGrid(decimal treatyid)
         {
@@ -483,7 +483,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return Ok(accountCoaMappingDtos);
         }
 
-        [AllowAnonymous]
+       
 
         [HttpGet]
 
@@ -511,7 +511,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         //    return Ok(accountCoaMappingDtos);
         //}
 
-        [AllowAnonymous]
+       
         [HttpPost]
         public async Task<IActionResult> SearchRImapping(TblRimappingDto tblRimappingDto)
         {
@@ -519,7 +519,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return Ok(search);
         }
 
-        [AllowAnonymous]
+       
         [HttpDelete]
         public async Task<IActionResult> DeleteRiMapping(decimal RimappingId)
         {
@@ -538,7 +538,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
 
         //get by for modification
-        [AllowAnonymous]
+        
         [HttpGet]
         public async Task<IActionResult> GetRetentionGroupById(decimal retentionGroupId)
         {
@@ -550,7 +550,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return NotFound();
         }
 
-        [AllowAnonymous]
+       
         [HttpGet]
         public async Task<IActionResult> GetTreatyById(decimal treatyId)
         {
@@ -562,7 +562,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return NotFound();
         }
 
-        [AllowAnonymous]
+       
         [HttpGet]
         public async Task<IActionResult> GetParticipantBYId(decimal participantmasterID)
         {
@@ -574,7 +574,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return NotFound();
         }
 
-        [AllowAnonymous]
+       
         [HttpGet]
         public async Task<IActionResult> GetRImappingBYId(decimal RImappingById)
         {
@@ -586,10 +586,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return NotFound();
         }
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult HC()
         {
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllocationByPolicyNo(string PolicyNo)
+        {
+            var response = await _reInsuranceService.GetAllocationByPolicyNo(PolicyNo, Context);
             return Ok(response);
         }
 

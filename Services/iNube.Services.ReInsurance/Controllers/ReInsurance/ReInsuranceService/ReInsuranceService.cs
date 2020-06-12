@@ -9,6 +9,7 @@ using iNube.Utility.Framework.Notification;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,6 +94,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         Task<TblParticipantMasterDto> GetParticipantBYId(decimal participantMasterId, ApiContext apiContext);
 
         Task<TblRimappingDto> GetRImappingBYId(decimal RImappingID, ApiContext apiContext);
+        Task<object> GetAllocationByPolicyNo(string policyNo, ApiContext apiContext);
 
 
     }
@@ -1049,6 +1051,26 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             }
             return null;
         }
+        public async Task<object> GetAllocationByPolicyNo(string policyNo, ApiContext apiContext)
+        {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+
+            try
+            {
+                var tblRiAllocationdata = _context.TblRiallocation.Where(a=>a.PolicyNo==policyNo).FirstOrDefault();
+                var json = JsonConvert.DeserializeObject<object>(tblRiAllocationdata.AllocationDetails.ToString());
+                return json;
+
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
+        }
+
+
 
 
     }
