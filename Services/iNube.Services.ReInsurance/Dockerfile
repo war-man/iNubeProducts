@@ -17,4 +17,4 @@ RUN dotnet publish "iNube.Services.ReInsurance.csproj" -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "iNube.Services.ReInsurance.dll"]
+ENTRYPOINT ["dotnet", "iNube.Services.ReInsurance.dll"] 
