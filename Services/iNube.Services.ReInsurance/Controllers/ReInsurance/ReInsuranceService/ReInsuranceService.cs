@@ -112,13 +112,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
       
         private readonly AppSettings _appSettings;
-        private readonly  IReInsuranceService _reInsuranceService;
+        //private readonly  IReInsuranceService _reInsuranceService;
         private readonly IIntegrationService _integrationService;
         private IConfiguration _configuration;
         public DbHelper dbHelper;
 
 
-        public ReInsuranceService( IReInsuranceService reinsuranceService,MICARIContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IOptions<AppSettings> appSettings, IConfiguration configuration, IIntegrationService integrationService)
+        public ReInsuranceService( MICARIContext context, IMapper mapper, IServiceProvider serviceProvider, ILoggerManager logger, IEmailService emailService, IOptions<AppSettings> appSettings, IConfiguration configuration, IIntegrationService integrationService)
         {
 
             _mapper = mapper;
@@ -126,7 +126,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             _logger = logger;
             _emailService = emailService;
             _context = context;
-            _reInsuranceService = reinsuranceService;
+           // _reInsuranceService = reinsuranceService;
             _configuration = configuration;
             _appSettings = appSettings.Value;
             dbHelper = new DbHelper(new IntegrationService(configuration));
