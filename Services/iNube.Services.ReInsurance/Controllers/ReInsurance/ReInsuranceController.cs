@@ -586,6 +586,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return NotFound();
         }
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult HC()
         {
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
