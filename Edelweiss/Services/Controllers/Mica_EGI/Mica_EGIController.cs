@@ -260,9 +260,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI
         }
 
         [HttpGet]
-        public  IActionResult TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate)
+        public  async Task<IActionResult> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate)
         {
-            var response =  _quotationService.TotalUsage(PolicyNo, FromDate, ToDate,Context);
+            var response = await _quotationService.TotalUsage(PolicyNo, FromDate, ToDate,Context);
             return Ok(response);
         }
     }

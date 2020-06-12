@@ -76,7 +76,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> CoverStatusScheduler(ApiContext context);
         Task<bool> RenewalScheduler(ApiContext context);
         Task<bool> BalanceAlertScheduler(ApiContext context);
-        int TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate, ApiContext apiContext);
+        Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate, ApiContext apiContext);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -5512,7 +5512,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         //Step-3 Get Entire Policy Details
                         var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, context);
 
-                        int DaysChargeable = TotalUsage(policy, CDFromDate, CDToDate,context);
+                        int DaysChargeable = await TotalUsage(policy, CDFromDate, CDToDate,context);
 
                         if (CDDetails.Count() > 0)
                         {
@@ -5699,8 +5699,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        public int TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate,ApiContext apiContext)
+        public async Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate,ApiContext apiContext)
         {
+            if (_context == null)
+            {
+                _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+           
 
             DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
 
@@ -5719,7 +5724,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        connection.Open();
+                        //connection.Open();
 
                         //TBLSWITCHLOG
                         SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
@@ -5738,6 +5743,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 catch (Exception ex)
                 {
+                    LoggerManager logger = new LoggerManager(_configuration);
+                    logger.LogError(ex,"TotalUsage",apiContext);
                     return 0;
                 }
 
