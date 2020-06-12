@@ -5701,26 +5701,33 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate,ApiContext apiContext)
         {
-            if (_context == null)
-            {
+            //if (_context == null)
+            //{
                 _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            }
+            //}
            
 
             DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
             LoggerManager logger = new LoggerManager(_configuration);
 
-            string connectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
+            var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+            var connectionString = dbConnectionString.Dbconnection;
 
-           // var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
+            //string connectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
+
+           
+            logger.LogRequest(connectionString, "TotalUsage", apiContext.ServerType, "TotalUsage", apiContext);
+
 
             var checkswitchLog = _context.TblSwitchLog.Any(x => x.PolicyNo == PolicyNo);
 
+            var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("MM/dd/yyyy") + "' and '" + ToDate.Date.ToString("MM/dd/yyyy") + "' group by PolicyNo";
+
+            logger.LogRequest(connectionString, "TotalUsage", checkswitchLog.ToString(), switchQuery, apiContext);
 
             if (checkswitchLog)
             {
-                var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("MM/dd/yyyy") + "' and '" + ToDate.Date.ToString("MM/dd/yyyy") + "' group by PolicyNo";
-
+                
                 logger.LogRequest(connectionString, "TotalUsage", checkswitchLog.ToString(), switchQuery, apiContext);
 
                 try
@@ -5753,6 +5760,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             else
             {
+                logger.LogRequest(connectionString, "TotalUsage", apiContext.ServerType, "ELSE Block", apiContext);
+
                 return 0;
             }
         }
