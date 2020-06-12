@@ -95,6 +95,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         Task<TblRimappingDto> GetRImappingBYId(decimal RImappingID, ApiContext apiContext);
         Task<object> GetAllocationByPolicyNo(string policyNo, ApiContext apiContext);
+        Task<RiallocationDto> ModifyReAllocation(RiallocationDto riallocationDto, ApiContext apiContext);
 
 
     }
@@ -1070,9 +1071,47 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         }
 
+        public async Task<RiallocationDto> ModifyReAllocation(RiallocationDto riallocationDto, ApiContext apiContext)
+        {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var tblAllocationDto = _mapper.Map<RiallocationDto>(riallocationDto);
+            var tblAllocation = _context.TblRiallocation.Where(a => a.AllocationId == riallocationDto.AllocationId).
+                FirstOrDefault();
 
+            if (tblAllocation == null)
+                throw new AppException("Account Not Found");
+            var allocationHistorydata = tblAllocation.AllocationDetails;
+            var mappingId = tblAllocation.MappingId;
+            var allocatioinLevel = tblAllocation.AllocationLevel;
+            var allocationId = tblAllocation.AllocationId;
+            var policyNo = tblAllocation.PolicyNo;
+            var itemName = tblAllocation.ItemId;
+            var allocationAmount = tblAllocation.AllocationAmount;
+            var allocationPremium = tblAllocation.Premium;
+            var transectiondate = DateTime.Now;
 
+            tblAllocation.AllocationAmount = tblAllocationDto.AllocationAmount;
+           // tblAllocation.PolicyNo = tblAllocationDto.PolicyNo;
+            tblAllocation.AllocationDetails = tblAllocationDto.AllocationDetails;
+           // tblAllocation.AllocationLevel = tblAllocationDto.AllocationLevel;
+            tblAllocation.Premium = tblAllocationDto.Premium;
 
+            _context.TblRiallocation.Update(tblAllocation);
+
+            TblRiallocationHistory tblRiallocationHistory = new TblRiallocationHistory();
+            tblRiallocationHistory.Premium = allocationPremium;
+            tblRiallocationHistory.AloocationDetails = allocationHistorydata;
+            tblRiallocationHistory.MaapingId = mappingId;
+            tblRiallocationHistory.AllocationLevel = allocatioinLevel;
+            tblRiallocationHistory.AllocationLevel = allocatioinLevel;
+            tblRiallocationHistory.AllocationAmount = allocationAmount;
+            tblRiallocationHistory.Premium = allocationPremium;
+            tblRiallocationHistory.TransectionDate = transectiondate;
+            _context.TblRiallocationHistory.Add(tblRiallocationHistory);
+            _context.SaveChanges();
+            var riallocation = _mapper.Map<RiallocationDto>(tblAllocation);
+            return riallocation;
+        }
     }
 
 }

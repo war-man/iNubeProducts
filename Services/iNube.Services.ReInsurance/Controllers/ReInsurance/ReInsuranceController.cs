@@ -599,5 +599,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return Ok(response);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> ModifyReAllocation(decimal AllocationId, RiallocationDto riallocationDto)
+        {
+            riallocationDto.AllocationId = AllocationId;
+            await _reInsuranceService.ModifyReAllocation(riallocationDto, Context);
+            return Ok();
+        }
+
     }
 }
