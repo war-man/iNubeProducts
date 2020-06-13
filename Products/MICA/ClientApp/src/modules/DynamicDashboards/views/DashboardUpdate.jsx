@@ -107,7 +107,7 @@ class DashboardUpdate extends React.Component {
 
     componentDidMount() {
 
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/GetReportConfigName`, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetReportConfigName`, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -122,7 +122,7 @@ class DashboardUpdate extends React.Component {
             });
         console.log("data", this.state.mList);
 
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/GetMaster`, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetMaster`, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -156,7 +156,7 @@ class DashboardUpdate extends React.Component {
 
         this.setState({ displayReportObejectGrid: true });
 
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/GetParameterDetails?ReportConfigId=` + event.target.value, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameterDetails?ReportConfigId=` + event.target.value, {
        // fetch(`https://localhost:44351/api/Graph/GetParameterDetails` + event.target.value, {
             method: 'GET',
             headers: {
@@ -237,7 +237,7 @@ class DashboardUpdate extends React.Component {
     onDelete = (id) => {
         debugger;
         console.log(id, "id");
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/DeleteParameter?ReportConfigParamId=` + id, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/DeleteParameter?ReportConfigParamId=` + id, {
             method: 'delete',
             headers: {
                 'Accept': 'application/json',
@@ -289,7 +289,7 @@ class DashboardUpdate extends React.Component {
                 'TblreportConfigParam': sendArray,
             };
 
-            fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/UpdateReport?ReportConfigId=` + this.state.ReportConfigDto.ReportName, {
+            fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/UpdateReport?ReportConfigId=` + this.state.ReportConfigDto.ReportName, {
                 method: 'put',
                 headers: {
                     'Accept': 'application/json',
