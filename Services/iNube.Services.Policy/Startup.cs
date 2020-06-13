@@ -1,8 +1,11 @@
 ﻿using System;
-using System.Text;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using HealthChecks.UI.Client;
+using iNube.Services.Policy.Controllers.DynamicGraph;
+using iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.AvoGraph;
+using iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph;
+using iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MotorGraph;
 using iNube.Services.Policy.Controllers.DynamicReports;
 using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
 using iNube.Services.Policy.Controllers.DynamicReports.ReportServices.AvoReport;
@@ -19,20 +22,13 @@ using iNube.Services.Policy.Entities.DynamicReportEntities;
 using iNube.Services.Policy.Helpers;
 using iNube.Utility.Framework.Extensions;
 using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
-using iNube.Utility.Framework.Filters.Attribute;
 using iNube.Utility.Framework.LogPrivider.LogService;
-using iNube.Utility.Framework.Notification;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace iNube.Services.Policy
 {
@@ -112,7 +108,7 @@ namespace iNube.Services.Policy
                 c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
                 c.RoutePrefix = Configuration["Swagger:Url"].ToString();
             });
-           
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -159,7 +155,6 @@ namespace iNube.Services.Policy
             services.AddTransient<MicaReportService>();
             services.AddTransient<MotorReportService>();
             services.AddTransient<AvoReportService>();
-
             services.AddTransient<Func<string, IReportProductService>>(serviceProvider => pkey =>
             {
                 switch (pkey)
@@ -175,7 +170,29 @@ namespace iNube.Services.Policy
 
                 }
             });
+            services.AddScoped<IGraphService, GraphService>();
+            services.AddScoped<IDBIntegrationService, DBIntegrationService>();
 
+            services.AddTransient<MicaGraphService>();
+            services.AddTransient<MotorGraphService>();
+            services.AddTransient<AvoGraphService>();
+            services.AddTransient<Func<string, IGraphProductService>>(serviceProvider => gkey =>
+            {
+                switch (gkey)
+                {
+                    case "Mica":
+                        return serviceProvider.GetService<MicaGraphService>();
+                    case "Motor":
+                        return serviceProvider.GetService<MotorGraphService>();
+                    case "Avo":
+                        return serviceProvider.GetService<AvoGraphService>();
+                    default:
+                        return serviceProvider.GetService<MicaGraphService>();
+
+                }
+            });
+
+         
             services.AddScoped<IPolicyService, PolicyService>();
             services.AddScoped<IIntegrationService, IntegrationService>();
 
@@ -184,6 +201,8 @@ namespace iNube.Services.Policy
 
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IRPIntegrationService, RPIntegrationService>();
+
+
 
         }
     }
