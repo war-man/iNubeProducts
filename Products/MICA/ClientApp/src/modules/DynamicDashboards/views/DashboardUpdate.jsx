@@ -147,6 +147,7 @@ class DashboardUpdate extends React.Component {
     }
 
     handleParameterCheck = event => {
+        debugger;
         const ReportConfigDto = this.state.ReportConfigDto;
         ReportConfigDto[event.target.name] = event.target.value;
         this.setState({ ReportConfigDto });
@@ -156,6 +157,7 @@ class DashboardUpdate extends React.Component {
         this.setState({ displayReportObejectGrid: true });
 
         fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/GetParameterDetails?ReportConfigId=` + event.target.value, {
+       // fetch(`https://localhost:44351/api/Graph/GetParameterDetails` + event.target.value, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

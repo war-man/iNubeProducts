@@ -31,6 +31,7 @@ import TranslationContainer from "components/Translation/TranslationContainer.js
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 import DashboardConfig from "modules/DynamicDashboards/DashboardConfig.js";
 import UserConfig from 'modules/Users/UserConfig.js';
+import Chart from "react-google-charts";
 
 const paddingCard =
 {
@@ -41,6 +42,7 @@ class ViewDashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            showgraph:false,
             loader: true,
             pageloader: false,
             nodata: false,
@@ -54,6 +56,9 @@ class ViewDashboard extends React.Component {
             },
             paramList: [],
             otFlag: false,
+            graphData: [
+                ['Task', 'PolicyCount per Day']
+            ],
             result: [],
             flagParam: false,
             fields: [],
@@ -69,6 +74,14 @@ class ViewDashboard extends React.Component {
                 paramList: [],
             },
             displayparameter: {},
+            SpecificData: [['Task', 'Hours per Day'],
+            ['A', 13,],
+            ['B', 2],
+            ['C', 2],
+            ['D', 2],
+            ['E', 7],
+            ['F', 7]
+            ]
         };
     }
 
@@ -103,7 +116,8 @@ class ViewDashboard extends React.Component {
         userid = localStorage.getItem('userId');
         roleid = localStorage.getItem('roleId');
         console.log("login: ", userid, roleid);
-        fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Report", {
+       fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph", {
+        //fetch(`https://localhost:44351/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph", {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -115,7 +129,7 @@ class ViewDashboard extends React.Component {
             .then(data => {
                 console.log("masterList: ", data);
                 this.setState({ masterList: data });
-                this.state.reportName = this.state.masterList.filter(x => x.mType == "Report");
+                this.state.reportName = this.state.masterList.filter(x => x.mType == "Graph");
                 console.log("list1: ", this.state.reportName);
             });
 
@@ -182,6 +196,7 @@ class ViewDashboard extends React.Component {
     };
 
     handleParameterCheck = event => {
+        debugger;
         let param = this.state.paramList;
         let parameter = this.state.parameterList;
         let rparam = this.state.reportparameters;
@@ -206,6 +221,7 @@ class ViewDashboard extends React.Component {
 
         this.setState({ flagParam: true, tableFlag: false });
         fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/GetParameters?ReportConfigId=` + event.target.value, {
+       // fetch(` https://localhost:44351/api/Graph/GetParameters?ReportConfigId=` + event.target.value, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -220,6 +236,75 @@ class ViewDashboard extends React.Component {
                 this.setState({ otFlag: true });
             });
     }
+
+    MonthWise = (event) => {
+
+        this.setState({ [event.target.name]: event.target.value });
+        let month = event.target.value;
+
+        let data = this.state.StackData;
+
+        console.log("PolicyData", data);
+
+        let index = [];
+        let Final = [];
+        const ProdArray = [];
+        const CountArray = [];
+
+        for (var i = 1; i < data.length; i++) {
+
+            if (data[i][0] == month) {
+
+                let ARRAY1 = data[0];
+
+                let ARRAY2 = data[i];
+
+                for (var i = 0; i < ARRAY1.length; i++) {
+
+                    if (ARRAY2[i] != 0) {
+                        index.push(i);
+                    }
+
+                }
+
+                console.log("index", index);
+
+                for (var j = 0; j < index.length; j++) {
+
+                    ProdArray.push(ARRAY1[index[j]]);
+
+                    CountArray.push(ARRAY2[index[j]]);
+
+                }
+
+                Final.push(ProdArray);
+                Final.push(CountArray);
+                console.log("FinalArray", Final.length);
+                this.setState({ NEWSTACKDATA: Final });
+
+
+
+
+            }
+
+
+        }
+
+        if (Final.length <= 0) {
+            swal({
+                text: "There are No Records for selected Month: " + month,
+                icon: "error"
+            });
+
+        }
+
+        console.log("MonthWiseData", Final);
+
+
+
+    }
+
+
 
     queryExecution = event => {
         let check = this.state.CheckCondition;
@@ -255,7 +340,8 @@ class ViewDashboard extends React.Component {
         console.log("rparameter: ", this.state.reportparameters);
         this.setState({ loader: false });
 
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/QueryExecution`, {
+       fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/QueryExecution`, {
+       // fetch(`https://localhost:44351/api/Graph/QueryExecution`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json',
@@ -267,6 +353,14 @@ class ViewDashboard extends React.Component {
             .then(data => {
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
+                this.state.result.map(m => {
+                    let arr = [];
+                    arr.push(m.column2);
+                    arr.push(m.column1);
+                    this.state.graphData.push(arr);
+                    console.log("graphdata", this.state.graphData, arr);
+                });
+                this.setState({showgraph:true})
                 //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {
                     this.setState({ tableFlag: false, flagParam: false, loader: false });
@@ -309,7 +403,7 @@ class ViewDashboard extends React.Component {
     }
 
     tabledata = () => {
-        this.setState({ tableFlag: true, loader: true });
+        this.setState({ tableFlag: false, loader: true });
         console.log("prop data", this.state.result);
         this.setState({
             TableDataList: Object.keys(this.state.result[0]).map((prop, key) => {
@@ -471,6 +565,33 @@ class ViewDashboard extends React.Component {
                     this.state.loader ?
 
                         <GridContainer xl={12}>
+                            {this.state.showgraph && <Chart
+                                width={1000}
+                                height={400}
+                                chartType="ColumnChart"
+                                // loader={<div>Loading Chart</div>}
+
+
+
+                                data={this.state.graphData}
+                                options={{
+                                    title: 'Policy Count ',
+                                    chartArea: { width: '62%', height: '70%' },
+                                    hAxis: {
+                                        title: 'Date',
+                                        //minValue: 0,
+                                    },
+                                    vAxis: {
+                                        title: '', //This is for Y axis Labeling 
+                                    },
+                                    animation: {
+                                        startup: true,
+                                        easing: 'linear',
+                                        duration: 1500,
+                                    },
+                                }}
+                                legendToggle
+                            />}
                             {this.state.tableFlag ?
                                 <GridItem lg={12}>
                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>

@@ -73,6 +73,7 @@ class DashboardConfiguration extends React.Component {
 
     componentDidMount() {
         fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/GetMaster`, {
+       // fetch(`https://localhost:44351/api/Graph/GetMaster?lMasterlist=abc&isFilter=true`, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -226,7 +227,8 @@ class DashboardConfiguration extends React.Component {
                 'query': this.state.QueryDto.Query,
                 'TblreportConfigParam': sendArray,
             };
-            fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/SaveConfigParameters`, {
+            //fetch(`${DashboardConfig.DashboardConfigUrl}/api/Report/SaveConfigParameters`, {
+            fetch(`https://localhost:44351/api/Graph/SaveConfigParameters`, {
                 method: 'post',
                 headers: {
                     'Accept': 'application/json',
