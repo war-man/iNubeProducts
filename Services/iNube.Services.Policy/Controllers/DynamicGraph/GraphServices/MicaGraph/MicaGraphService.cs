@@ -7,16 +7,15 @@ using Microsoft.Extensions.Configuration;
 
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
+using iNube.Services.Policy.Controllers.DynamicGraph.IntegrationServices;
 using iNube.Services.Policy.Models;
 //using iNube.Services.UserManagement.Helpers;
-using iNube.Services.Policy.Helpers.DynamicReportHelpers;
-using iNube.Services.Policy.Entities.DynamicReportEntities;
+using iNube.Services.Policy.Helpers.DynamicDBHelpers;
+using iNube.Services.Policy.Entities.DynamicGraphEntities;
 using System.Data.SqlClient;
 using System.Data;
 using System.Data.Common;
 using iNube.Services.DynamicGraph.model;
-using iNube.Services.Policy.Entities.DynamicGraphEntities;
 
 namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
 {
@@ -158,7 +157,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
                     SqlDataAdapter adapter = new SqlDataAdapter(command);
                     adapter.Fill(ds, "Query");
                     connection.Close();
-                    return ds.Tables[0];
+                    var data= ds.Tables[0];
+                    List<object> ReturnData = new List<object>();
+                    return data;
                 }
             }
             catch (Exception ex)
@@ -167,7 +168,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             }
         }
 
-        public async Task<IEnumerable<ddlDTOs>> GetReportNameForPermissions(ApiContext apiContext)
+        public async Task<IEnumerable<ddlDTOs>> GetGraphNameForPermissions(ApiContext apiContext)
         {
             _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddlDTOs> obj;
@@ -218,8 +219,8 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
 
             try
             {
-                var report = _mapper.Map<TblReportConfig>(reportConfigDTO);
-                var configData = _context.TblDashboardConfig.Find(report.ReportConfigId);
+                var report = _mapper.Map<TblDashboardConfig>(reportConfigDTO);
+                var configData = _context.TblDashboardConfig.Find(report.DashboardConfigId);
 
                 if (configData == null)
                 {

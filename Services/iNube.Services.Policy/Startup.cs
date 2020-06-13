@@ -6,6 +6,7 @@ using iNube.Services.Policy.Controllers.DynamicGraph;
 using iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.AvoGraph;
 using iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph;
 using iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MotorGraph;
+using iNube.Services.Policy.Controllers.DynamicGraph.IntegrationServices;
 using iNube.Services.Policy.Controllers.DynamicReports;
 using iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices;
 using iNube.Services.Policy.Controllers.DynamicReports.ReportServices.AvoReport;
@@ -18,6 +19,7 @@ using iNube.Services.Policy.Controllers.Proposal.ProposalService;
 using iNube.Services.Policy.Entities;
 using iNube.Services.Policy.Entities.AVO.DynamicReportEntities;
 using iNube.Services.Policy.Entities.AvoEntities;
+using iNube.Services.Policy.Entities.DynamicGraphEntities;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
 using iNube.Services.Policy.Helpers;
 using iNube.Utility.Framework.Extensions;
@@ -49,6 +51,8 @@ namespace iNube.Services.Policy
 
             services.AddDbContext<MICARPContext>();
             services.AddDbContext<AVORPContext>();
+
+            services.AddDbContext<MICADBContext>();
 
             //var connectionstring = Configuration.GetConnectionString("PCConnection");
 
@@ -170,8 +174,7 @@ namespace iNube.Services.Policy
 
                 }
             });
-            services.AddScoped<IGraphService, GraphService>();
-            services.AddScoped<IDBIntegrationService, DBIntegrationService>();
+           
 
             services.AddTransient<MicaGraphService>();
             services.AddTransient<MotorGraphService>();
@@ -191,8 +194,8 @@ namespace iNube.Services.Policy
 
                 }
             });
+          
 
-         
             services.AddScoped<IPolicyService, PolicyService>();
             services.AddScoped<IIntegrationService, IntegrationService>();
 
@@ -201,6 +204,9 @@ namespace iNube.Services.Policy
 
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IRPIntegrationService, RPIntegrationService>();
+
+            services.AddScoped<IGraphService, GraphService>();
+            services.AddScoped<IDBIntegrationService, DBIntegrationService>();
 
 
 

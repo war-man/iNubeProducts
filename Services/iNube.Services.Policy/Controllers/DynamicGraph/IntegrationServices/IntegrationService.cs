@@ -1,4 +1,4 @@
-﻿using iNube.Services.DynamicReports.model;
+﻿using iNube.Services.DynamicGraph.model;
 using iNube.Utility.Framework.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -10,11 +10,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices
+namespace iNube.Services.Policy.Controllers.DynamicGraph.IntegrationServices
 {
     public interface IDBIntegrationService
     {
-        Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
+        Task<EnvironmentsResponse> GetEnvironmentConnection(string product, decimal EnvId);
     }
 
     public class DBIntegrationService : IDBIntegrationService
@@ -40,10 +40,10 @@ namespace iNube.Services.Policy.Controllers.DynamicReports.IntegrationServices
 
         }
 
-        public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
+        public async Task<EnvironmentsResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
             var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
-            return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+            return await GetApiInvoke<EnvironmentsResponse>(uri, new ApiContext());
         }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()

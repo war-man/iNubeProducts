@@ -69,7 +69,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
         public async Task<IEnumerable<ddlDTOs>> GetReportNameForPermissions(ApiContext apiContext)
         {
-            return await _productService(apiContext.ProductType).GetReportNameForPermissions(apiContext);
+            return await _productService(apiContext.ProductType).GetGraphNameForPermissions(apiContext);
         }
         public async Task<IEnumerable<DashboardConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext)
         {

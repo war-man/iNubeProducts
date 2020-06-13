@@ -41,7 +41,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MotorGrap
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ddlDTOs>> GetReportNameForPermissions(ApiContext apiContext)
+        public Task<IEnumerable<ddlDTOs>> GetGraphNameForPermissions(ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

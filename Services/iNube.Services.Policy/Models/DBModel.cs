@@ -22,7 +22,7 @@ namespace iNube.Services.DynamicGraph.model
     {
         public DashboardConfigDTO()
         {
-            TblReportConfigParam = new HashSet<DashboardConfigParamDTO>();
+            TblDashboardConfigParam = new HashSet<DashboardConfigParamDTO>();
         }
 
         public int ReportConfigId { get; set; }
@@ -33,7 +33,7 @@ namespace iNube.Services.DynamicGraph.model
         public bool? IsActive { get; set; }
         public DateTime? ModifiedDate { get; set; }
 
-        public virtual ICollection<DashboardConfigParamDTO> TblReportConfigParam { get; set; }
+        public virtual ICollection<DashboardConfigParamDTO> TblDashboardConfigParam { get; set; }
     }
 
     public partial class DashboardConfigParamDTO
