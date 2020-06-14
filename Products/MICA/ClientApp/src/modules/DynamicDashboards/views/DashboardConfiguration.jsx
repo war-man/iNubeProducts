@@ -274,7 +274,7 @@ class DashboardConfiguration extends React.Component {
                             </CardIcon>
                             {
                                 <h4 >
-                                    <small> <TranslationContainer translationKey="ReportConfiguration" /> </small>
+                                    <small> <TranslationContainer translationKey="DashboardConfiguration" /> </small>
                                 </h4>
                             }
                         </CardHeader>

@@ -334,7 +334,7 @@ class DashboardUpdate extends React.Component {
                             </CardIcon>
                             {
                                 <h4 >
-                                    <small> <TranslationContainer translationKey="ReportUpdate" /> </small>
+                                    <small> <TranslationContainer translationKey="DashboardUpdate" /> </small>
                                 </h4>
                             }
                         </CardHeader>

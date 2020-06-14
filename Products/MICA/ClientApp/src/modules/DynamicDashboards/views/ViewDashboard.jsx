@@ -442,7 +442,7 @@ class ViewDashboard extends React.Component {
                                 </CardIcon>
                                 {
                                     <h4 >
-                                        <small> <TranslationContainer translationKey="Reports" /> </small>
+                                        <small> <TranslationContainer translationKey="ViewDashboard" /> </small>
                                     </h4>
                                 }
                             </CardHeader>
