@@ -1,7 +1,7 @@
 //let env = "EdelweissProd";
 //let env = "Production";
 let env = "Dev";
-//let env = "Local";
+//let env = "Local"; 
 //let env = "UAT"; 
 let Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
 let partnerconfigUrl = Baseurl;
@@ -20,7 +20,6 @@ let RDLCConfigUrl = Baseurl;
 let ReinsuranceConfigUrl = Baseurl;
 let ExtensionUrl = Baseurl;
 let NotificationUrl = Baseurl;
-
 
 if (env === "EdelweissProd") {
     Baseurl = 'https://egiswitchapi.edelweissinsurance.com';

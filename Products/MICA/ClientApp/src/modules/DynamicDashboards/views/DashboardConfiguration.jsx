@@ -228,7 +228,7 @@ class DashboardConfiguration extends React.Component {
                 'DashboardConfigParamDTO': sendArray,
             };
           fetch (`${DashboardConfig.DashboardConfigUrl}/api/Graph/SaveConfigParameters`, {
-            // fetch(`https://localhost:44351/api/Graph/SaveConfigParameters`, {
+             //fetch(`https://localhost:44351/api/Graph/SaveConfigParameters`, {
                 method: 'post',
                 headers: {
                     'Accept': 'application/json',

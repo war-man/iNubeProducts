@@ -36,7 +36,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MotorGrap
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ddlDTOs>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
+        public Task<IEnumerable<ddlDTOs>> GetGraphConfigName(string lMasterlist, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -56,7 +56,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MotorGrap
             throw new NotImplementedException();
         }
 
-        public Task<DashboardConfigDTO> UpdateReport(DashboardConfigDTO reportConfigDTO, ApiContext apiContext)
+        public Task<DashboardConfigDTO> UpdateDashboard(DashboardConfigDTO reportConfigDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

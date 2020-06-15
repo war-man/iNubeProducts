@@ -16,14 +16,14 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
     {
         Task<IEnumerable<ddlDTOs>> GetMaster(string lMasterlist, ApiContext apiContext);
         Task<DashboardConfigResonse> SaveConfigParameters(DashboardConfigDTO reportConfigDTO, ApiContext apiContext);
-        Task<IEnumerable<ddlDTOs>> GetReportConfigName(string lMasterlist, ApiContext apiContext);
+        Task<IEnumerable<ddlDTOs>> GetGraphConfigName(string lMasterlist, ApiContext apiContext);
         Task<IEnumerable<DashboardParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext);
         Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
         Task<DataTable> QueryExecution(QueryDTOs queryDTO, ApiContext apiContext);
-        Task<IEnumerable<ddlDTOs>> GetReportNameForPermissions(ApiContext apiContext);
+        Task<IEnumerable<ddlDTOs>> GetGraphNameForPermissions(ApiContext apiContext);
         Task<IEnumerable<DashboardConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext);
         void DeleteParameter(int ReportConfigParamId, ApiContext apiContext);
-        Task<DashboardConfigDTO> UpdateReport(DashboardConfigDTO reportConfigDTO, ApiContext apiContext);
+        Task<DashboardConfigDTO> UpdateDashboard(DashboardConfigDTO reportConfigDTO, ApiContext apiContext);
     }
 
     public class GraphService : IGraphService
@@ -51,9 +51,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         {
             return await _productService(apiContext.ProductType).SaveConfigParameters(reportConfigDTO, apiContext);
         }
-        public async Task<IEnumerable<ddlDTOs>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
+        public async Task<IEnumerable<ddlDTOs>> GetGraphConfigName(string lMasterlist, ApiContext apiContext)
         {
-            return await _productService(apiContext.ProductType).GetReportConfigName(lMasterlist, apiContext);
+            return await _productService(apiContext.ProductType).GetGraphConfigName(lMasterlist, apiContext);
         }
         public async Task<IEnumerable<DashboardParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
         {
@@ -67,7 +67,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         {
             return await _productService(apiContext.ProductType).QueryExecution(queryDTO,apiContext);
         }
-        public async Task<IEnumerable<ddlDTOs>> GetReportNameForPermissions(ApiContext apiContext)
+        public async Task<IEnumerable<ddlDTOs>> GetGraphNameForPermissions(ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).GetGraphNameForPermissions(apiContext);
         }
@@ -79,9 +79,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         {
              _productService(apiContext.ProductType).DeleteParameter(ReportConfigParamId, apiContext);
         }
-        public async Task<DashboardConfigDTO> UpdateReport(DashboardConfigDTO reportConfigDTO, ApiContext apiContext)
+        public async Task<DashboardConfigDTO> UpdateDashboard(DashboardConfigDTO reportConfigDTO, ApiContext apiContext)
         {
-            return await _productService(apiContext.ProductType).UpdateReport(reportConfigDTO, apiContext);
+            return await _productService(apiContext.ProductType).UpdateDashboard(reportConfigDTO, apiContext);
         }
     }
 }
