@@ -21,7 +21,6 @@ let ReinsuranceConfigUrl = Baseurl;
 let ExtensionUrl = Baseurl;
 let NotificationUrl = Baseurl;
 
-
 if (env === "EdelweissProd") {
     Baseurl = 'https://egiswitchapi.edelweissinsurance.com';
     partnerconfigUrl = Baseurl;
