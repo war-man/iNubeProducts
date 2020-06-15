@@ -129,6 +129,10 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Avo
         {
             throw new NotImplementedException();
         }
+        public async Task<object> CheckIllustrationRI(String IllustrationConfigId, int From, int To, dynamic illustration_Param, bool ArrayType, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
         public async Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext)
         {
             throw new NotImplementedException();

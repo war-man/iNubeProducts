@@ -77,7 +77,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mot
             throw new NotImplementedException();
         }
         
- public async Task<IEnumerable<ddDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
+        public async Task<IEnumerable<ddDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -125,6 +125,10 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mot
             throw new NotImplementedException();
         }
         public async Task<object> CheckIllustration(String IllustrationConfigId, int From, int To, dynamic illustration_Param, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<object> CheckIllustrationRI(String IllustrationConfigId, int From, int To, dynamic illustration_Param, bool ArrayType, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
