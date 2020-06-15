@@ -569,9 +569,22 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             _tblCustomer.ConfigurationTypeId = 3;
             _tblCustomer.CorpAddressSameAs = "R";
             _tblCustomer.MailingAddressSameAs = "C";
+            foreach (var c in _tblCustomer.TblContract)
+            {
+                foreach (var b in c.TblBillingConfig)
+                {
+                    foreach (var i in b.TblBillingItem)
+                    {
+                        foreach (var id in i.TblBillingItemDetail)
+                        {
+                            id.IsActive = Convert.ToString(1);
+                        }
+                    }
+                }
+            }
             // EventRequest.Logo = ;
             //EventRequest.Levels = ;
-           
+
             //InvoiceConfigDTO invoice = new InvoiceConfigDTO();
             //invoice = Customerdto.Contract.TblInvoiceConfig;
 
