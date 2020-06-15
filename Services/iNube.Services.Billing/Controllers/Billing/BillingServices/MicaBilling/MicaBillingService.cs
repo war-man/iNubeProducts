@@ -799,6 +799,21 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             }
         }
 
+        public async Task<CustomerResponse> SpocMailvalidation(string email, ApiContext apiContext)
+        {
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var data = _context.TblCustSpocDetails.Any(e => e.EmailId == email);
+
+            if (data == true)
+            {
+                return new CustomerResponse() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Spoc Email {email} already Exists" };
+            }
+            else
+            {
+                return new CustomerResponse() { Status = BusinessStatus.Ok, ResponseMessage = $"ok " };
+            }
+        }
+
         public async Task<CustomerConfigDTO> CreateCustomerConfig(CustomerConfigDTO configDTO, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));

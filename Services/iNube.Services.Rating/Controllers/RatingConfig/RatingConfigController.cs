@@ -139,6 +139,13 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
             return Ok(response);
         }
 
+        [HttpPost("CheckIllustrationRI/{IllustrationId}")]
+        public async Task<IActionResult> CheckIllustrationRI(String IllustrationId, int From, int To, dynamic dynamic_param,bool ArrayType)
+        {
+            var response = await _rateService.CheckIllustrationRI(IllustrationId, From, To, dynamic_param, ArrayType, Context);
+            return Ok(response);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetParameter()
         {

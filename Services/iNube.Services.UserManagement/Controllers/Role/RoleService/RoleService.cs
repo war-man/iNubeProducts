@@ -23,6 +23,9 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
         Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext);
         IEnumerable<DynamicPermissionsDTO> GetDynamicPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext);
         DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext);
+        Task<IEnumerable<DynamicResponse>> GetDynamicGraphConfig(ApiContext apiContext);
+        IEnumerable<DynamicPermissionsDTO> GetDynamicGraphPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext);
+        DynamicResponseResponse SaveDynamicGraphPermission(DynamicPermissions configDTO, ApiContext apiContext);
     }
     public class RoleService : IRoleService
     {
@@ -157,6 +160,21 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService
         public DynamicResponseResponse SaveDynamicPermission(DynamicPermissions configDTO, ApiContext apiContext)
         {
             return _roleService(apiContext.ProductType).SaveDynamicPermission(configDTO, apiContext);
+        }
+
+        public async Task<IEnumerable<DynamicResponse>> GetDynamicGraphConfig(ApiContext apiContext)
+        {
+            return await _roleService(apiContext.ProductType).GetDynamicGraphConfig(apiContext);
+        }
+
+        public IEnumerable<DynamicPermissionsDTO> GetDynamicGraphPermissions(string Userid, string Roleid, string itemType, ApiContext apiContext)
+        {
+            return _roleService(apiContext.ProductType).GetDynamicGraphPermissions(Userid, Roleid, itemType, apiContext);
+        }
+
+        public DynamicResponseResponse SaveDynamicGraphPermission(DynamicPermissions configDTO, ApiContext apiContext)
+        {
+            return _roleService(apiContext.ProductType).SaveDynamicGraphPermission(configDTO, apiContext);
         }
     }
 }

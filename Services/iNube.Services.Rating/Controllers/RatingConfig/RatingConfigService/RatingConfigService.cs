@@ -40,6 +40,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<CalConfigResponse> EditCalConfigRules(CalculationConfigDTO calConfigDto, ApiContext apiContext);
         Task<IList<HandleEventIllustration>> GetHandleEventsIllustration(String EventIllutrationId, ApiContext apiContext);
         Task<object> CheckIllustration(String IllustrationConfigId, int From, int To, dynamic illustration_Param, ApiContext apiContext);
+        Task<object> CheckIllustrationRI(String IllustrationConfigId, int From, int To, dynamic illustration_Param,bool ArrayType, ApiContext apiContext);
         Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext);
         Task<HandleEventConfig> GetInputOutputParam(String EventId, ApiContext apiContext);
         Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext);
@@ -175,6 +176,10 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         public async Task<object> CheckIllustration(String IllustrationConfigId, int From, int To, dynamic illustration_Param, ApiContext apiContext)
         {
             return await _ratesService(apiContext.ProductType).CheckIllustration(IllustrationConfigId, From, To, illustration_Param, apiContext);
+        }
+        public async Task<object> CheckIllustrationRI(String IllustrationConfigId, int From, int To, object illustration_Param, bool ArrayType, ApiContext apiContext)
+        {
+            return await _ratesService(apiContext.ProductType).CheckIllustrationRI(IllustrationConfigId, From, To, illustration_Param, ArrayType, apiContext);
         }
         public async Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext)
         {

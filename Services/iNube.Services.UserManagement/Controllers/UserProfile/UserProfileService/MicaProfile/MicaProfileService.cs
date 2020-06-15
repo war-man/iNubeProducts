@@ -288,6 +288,19 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
                 _users = _users.Where(u => u.ContactNumber == searchRequest.ContactNumber);
             }
             var _usersDTOs = _mapper.Map<List<UserDetailsDTO>>(_users);
+            var userdata = _context.AspNetUsers.Select(a => a).ToList();
+            foreach (var item in _usersDTOs)
+            {
+                var result = userdata.FirstOrDefault(a => a.Id == item.UserId).AccessFailedCount;
+                if (result > 5)
+                {
+                    item.Userlocked = true;
+                }
+                if (result < 5)
+                {
+                    item.Userlocked = false;
+                }
+            }
             return _usersDTOs;
         }
 

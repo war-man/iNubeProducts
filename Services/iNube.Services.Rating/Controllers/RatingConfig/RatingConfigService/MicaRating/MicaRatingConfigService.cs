@@ -169,7 +169,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                                 ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName.Remove(it.RatingParamName.Length - 1) == spl.ToString()).RatingParameterId;//add
                                                 ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
                                             }
-                                            catch(Exception ex)
+                                            catch (Exception ex)
                                             {
                                                 ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName == spl.ToString()).RatingParameterId;//add
                                                 ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
@@ -206,23 +206,25 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 }
                 //if
             }
-            else {
-                try { 
-                var dto = _mapper.Map<TblRating>(ratingDto);
-                // dto.DynamicList.push();
-                //dto[0]. = ratingDto[0].RatingRules[0].RatingRuleConditions;
-                //dto.RateObj = _context.TblParameterSet.First(x => x.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)).ParameterSetName;
-                _context.TblRating.Add(dto);
-                _context.SaveChanges();
-                var acntDTO = _mapper.Map<RatingDTO>(dto);
-                return new RatingRulesResponse { Status = BusinessStatus.Created, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
-            }
-                catch (Exception ex)
+            else
             {
+                try
+                {
+                    var dto = _mapper.Map<TblRating>(ratingDto);
+                    // dto.DynamicList.push();
+                    //dto[0]. = ratingDto[0].RatingRules[0].RatingRuleConditions;
+                    //dto.RateObj = _context.TblParameterSet.First(x => x.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)).ParameterSetName;
+                    _context.TblRating.Add(dto);
+                    _context.SaveChanges();
+                    var acntDTO = _mapper.Map<RatingDTO>(dto);
+                    return new RatingRulesResponse { Status = BusinessStatus.Created, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
+                }
+                catch (Exception ex)
+                {
+
+                }
 
             }
-
-        }
 
             return null;
         }
@@ -352,8 +354,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
         public async Task<ResponseStatus> CheckRuleSets(String RuleId, dynamic dictionary_rule, ApiContext apiContext)
         {
             ResponseStatus response = new ResponseStatus();
-            if(_context == null)
-            { 
+            if (_context == null)
+            {
                 _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             }
             string[] words = RuleId.Split(',');
@@ -378,10 +380,10 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                  ParamName = tblparameter.ParameterName,
                                  IsRange = tblparamsetdetails.RangeType
                              }).ToList();
-            
+
             //Storing Value in Dictionary
             Dictionary<string, string> dict = new Dictionary<string, string>();
-            
+
             if (main_rule.Count() == 0)
             {
                 try
@@ -447,7 +449,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
                 }
             }
-            
+
             else
             {
                 //Check Param to Check Parameter 
@@ -478,49 +480,49 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 count = dict.Count;
                 foreach (var itemdict in dict)
                 {
-                    var itemParamRange = main_rule.FirstOrDefault(r=> r.ParamName== itemdict.Key);
+                    var itemParamRange = main_rule.FirstOrDefault(r => r.ParamName == itemdict.Key);
                     //foreach (var itemParamRange in main_rule)
                     //{
-                        //if (itemdict.Key == itemParamRange.ParamName)
-                        //{
-                            if (itemParamRange.IsRange == "Yes")
-                            {
-                                if (checkCount < count - 1)
-                                {
-                                    paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " " + "and" + " ";
-                                }
-                                else
-                                {
-                                    paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " ";
-                                }
-                                checkCount = checkCount + 1;
-                                condition = String.Concat(condition, paramvalue);
-                            }
-                            else
-                            {
-                                //Change to Down
-                                //checkCount = checkCount + 1;
-                                // + " " + "and" + " "
-                                if (checkCount < count - 1)
-                                {
-                                    paramvalue = itemdict.Key + "From" + '=' + '\'' + '\'' + itemdict.Value + '\'' + '\'' + " " + "and" + " ";
-                                }
-                                else
-                                {
-                                    paramvalue = itemdict.Key + "From" + '=' + '\'' + '\'' + itemdict.Value + '\'' + '\'';
-                                }
-                                checkCount = checkCount + 1;
-                                condition = String.Concat(condition, paramvalue);
-                            }
+                    //if (itemdict.Key == itemParamRange.ParamName)
+                    //{
+                    if (itemParamRange.IsRange == "Yes")
+                    {
+                        if (checkCount < count - 1)
+                        {
+                            paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " " + "and" + " ";
+                        }
+                        else
+                        {
+                            paramvalue = itemdict.Value + " " + "between" + " " + "CONVERT(numeric," + itemdict.Key + "From" + ")" + " " + "and" + " " + "CONVERT(numeric," + itemdict.Key + "To" + ")" + " ";
+                        }
+                        checkCount = checkCount + 1;
+                        condition = String.Concat(condition, paramvalue);
+                    }
+                    else
+                    {
+                        //Change to Down
+                        //checkCount = checkCount + 1;
+                        // + " " + "and" + " "
+                        if (checkCount < count - 1)
+                        {
+                            paramvalue = itemdict.Key + "From" + '=' + '\'' + '\'' + itemdict.Value + '\'' + '\'' + " " + "and" + " ";
+                        }
+                        else
+                        {
+                            paramvalue = itemdict.Key + "From" + '=' + '\'' + '\'' + itemdict.Value + '\'' + '\'';
+                        }
+                        checkCount = checkCount + 1;
+                        condition = String.Concat(condition, paramvalue);
+                    }
                     //    }
                     //}
                 }
 
-                
+
                 condition = condition.Trim('"');
                 //Main
                 int countMainRule = 0;
-                foreach (var rule in main_rule.Where(r=> r.IsParameter== true))
+                foreach (var rule in main_rule.Where(r => r.IsParameter == true))
                 {
                     if (countMainRule == 0)
                     {
@@ -568,54 +570,54 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 _logger.LogRequest("Rating", "Rating", response.ToString(), "_context---Before", new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
 
-            if (_context == null)
-            {
-                _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            }
+                if (_context == null)
+                {
+                    _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+                }
 
                 _logger.LogRequest("Rating", "Rating", _context.ToString(), "_context---After", new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
 
-                var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId)).OrderBy(it =>it.Steps);
-            //For ODSI RUles
-            var CalculationConigParam = _context.TblCalculationConfigParam.Where(item => item.Type == "Rate" && item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId));
+                var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId)).OrderBy(it => it.Steps);
+                //For ODSI RUles
+                var CalculationConigParam = _context.TblCalculationConfigParam.Where(item => item.Type == "Rate" && item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId));
 
-            var ConfigParamName = "";
-            var ConfigId = "";
-            Dictionary<string, object> rate = new Dictionary<string, object>();
-            //Sending of Particular Array for for Rate Execution
+                var ConfigParamName = "";
+                var ConfigId = "";
+                Dictionary<string, object> rate = new Dictionary<string, object>();
+                //Sending of Particular Array for for Rate Execution
 
 
-            Dictionary<string, object> dictSendingValue = new Dictionary<string, object>();
-            bool isPrefix=false;
-            if(CalculationConigParam.Count() > 1)
-            {
-                isPrefix = true;
-            }
-            var ratingNameList = CalculationConigParam.Select(r => r.CalculationConfigParamName).ToArray();
-            //var ratingList = _context.TblRating.Where(item => ratingNameList.Contains(item.RateName));
-
-            var ruleParameterss = (from tblRate in _context.TblRating.Where(c => ratingNameList.Contains(c.RateName))
-                                   join tblRateRule in _context.TblRatingRules on tblRate.RatingId equals tblRateRule.RatingId
-                                   join tblRateConditions in _context.TblRatingRuleConditions on tblRateRule.RatingRuleId equals tblRateConditions.RatingRuleId
-                                   join tblParameter in _context.TblRatingParameters on tblRateConditions.RatingParameters equals tblParameter.ParametersId
-                                   select new
-                                   {
-                                       RateId = tblRate.RatingId,
-                                       RatingName=tblRate.RateName,
-                                       RateParameter = tblParameter.ParameterName
-                                   }).ToList();
-            string ratingId = "";
-            foreach (var calParam in CalculationConigParam)
-            {
-                ConfigParamName = calParam.CalculationConfigParamName;//rating name
-                var ruleParameters = ruleParameterss.Where(item => item.RatingName == ConfigParamName).ToList();
-                if (ruleParameters.Count> 0)
+                Dictionary<string, object> dictSendingValue = new Dictionary<string, object>();
+                bool isPrefix = false;
+                if (CalculationConigParam.Count() > 1)
                 {
-                    
-                    //Add into dictionary here only 
-                    //try
-                    //{
+                    isPrefix = true;
+                }
+                var ratingNameList = CalculationConigParam.Select(r => r.CalculationConfigParamName).ToArray();
+                //var ratingList = _context.TblRating.Where(item => ratingNameList.Contains(item.RateName));
+
+                var ruleParameterss = (from tblRate in _context.TblRating.Where(c => ratingNameList.Contains(c.RateName))
+                                       join tblRateRule in _context.TblRatingRules on tblRate.RatingId equals tblRateRule.RatingId
+                                       join tblRateConditions in _context.TblRatingRuleConditions on tblRateRule.RatingRuleId equals tblRateConditions.RatingRuleId
+                                       join tblParameter in _context.TblRatingParameters on tblRateConditions.RatingParameters equals tblParameter.ParametersId
+                                       select new
+                                       {
+                                           RateId = tblRate.RatingId,
+                                           RatingName = tblRate.RateName,
+                                           RateParameter = tblParameter.ParameterName
+                                       }).ToList();
+                string ratingId = "";
+                foreach (var calParam in CalculationConigParam)
+                {
+                    ConfigParamName = calParam.CalculationConfigParamName;//rating name
+                    var ruleParameters = ruleParameterss.Where(item => item.RatingName == ConfigParamName).ToList();
+                    if (ruleParameters.Count > 0)
+                    {
+
+                        //Add into dictionary here only 
+                        //try
+                        //{
                         dynamic sendRate = new ExpandoObject();
                         foreach (var sendDicItem in ruleParameters)
                         {
@@ -624,8 +626,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                             {
                                 paramName = sendDicItem.RatingName + "_" + paramName;
                             }
-                                var value = dynamic.dictionary_rate[paramName];
-                                AddProperty(sendRate, sendDicItem.RateParameter, value.ToString());
+                            var value = dynamic.dictionary_rate[paramName];
+                            AddProperty(sendRate, sendDicItem.RateParameter, value.ToString());
                             ratingId = sendDicItem.RateId.ToString();
                         }
                         //Previous Code
@@ -637,17 +639,17 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                         {
                             rate.Add(ConfigParamName, rateresponse.ResponseMessage);
                         }
-                    //}
-                    //catch(Exception ex)
-                    //{
-                    //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
-                    //    return errorResponse;
-                    //}
-                }
-                else
-                {
-                    //try
-                    //{
+                        //}
+                        //catch(Exception ex)
+                        //{
+                        //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+                        //    return errorResponse;
+                        //}
+                    }
+                    else
+                    {
+                        //try
+                        //{
                         dynamic sendRate = new ExpandoObject();
                         var rating = _context.TblRating.FirstOrDefault(item => item.RateName == ConfigParamName);
                         ratingId = rating.RatingId.ToString();
@@ -658,68 +660,57 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                         {
                             rate.Add(ConfigParamName, rateresponse.ResponseMessage);
                         }
-                    //}
-                    //catch(Exception ex)
-                    //{
-                    //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
-                    //    return errorResponse;
-                    //}
+                        //}
+                        //catch(Exception ex)
+                        //{
+                        //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+                        //    return errorResponse;
+                        //}
+                    }
                 }
-            }
 
-            //Convert Json in Dictionary 
-            string json = Convert.ToString(dynamic.dictionary_rule);
-            Dictionary<string, object> json_Dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                //Convert Json in Dictionary 
+                string json = Convert.ToString(dynamic.dictionary_rule);
+                Dictionary<string, object> json_Dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
-            string json_rate = Convert.ToString(dynamic.dictionary_rate);
-            Dictionary<string, object> jsonRate_Dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json_rate);
+                string json_rate = Convert.ToString(dynamic.dictionary_rate);
+                Dictionary<string, object> jsonRate_Dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json_rate);
 
-           
-            foreach (var dict in jsonRate_Dictionary)
-            {
-                json_Dictionary.Add(dict.Key, dict.Value);
-                calcultion.Add(new CalculationResult { Entity = dict.Key, EValue = dict.Value.ToString() });
-            }
-            //try
-            //{
+
+                foreach (var dict in jsonRate_Dictionary)
+                {
+                    json_Dictionary.Add(dict.Key, dict.Value);
+                    calcultion.Add(new CalculationResult { Entity = dict.Key, EValue = dict.Value.ToString() });
+                }
+                //try
+                //{
                 foreach (var dictrate in rate)
                 {
                     json_Dictionary.Add(dictrate.Key, dictrate.Value);
                     calcultion.Add(new CalculationResult { Entity = dictrate.Key, EValue = dictrate.Value.ToString() });
                 }
-            //}
-            //catch(Exception ex)
-            //{
-            //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
-            //    return errorResponse;
-            //}
+                //}
+                //catch(Exception ex)
+                //{
+                //    errorResponse.ResponseMessage = "Incorrect Input Rate Parameter";
+                //    return errorResponse;
+                //}
 
-            var expression = "";
-            var resultExpression = "";
-            
-            //try
-            //{
+                var expression = "";
+                var resultExpression = "";
+
+                //try
+                //{
                 foreach (var rateitem in Expression)
                 {
-                    
+
                     expression = rateitem.ExpressionValue;
                     resultExpression = Replace(expression, json_Dictionary);
-                    // For Evaluation {{AllocationMethod}BalanceAmount} Expression and used Catch  
-                    var ExcepExpression = resultExpression;
-                    try
-                    {
-                        double result = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
-                        calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = result.ToString() });
-                        json_Dictionary.Add(rateitem.ExpressionResult, result.ToString());
-                    }
-                    catch(Exception ex)
-                    {
-                        resultExpression = Replace(ExcepExpression, json_Dictionary);
-                        double result = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
-                        calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = result.ToString() });
-                        json_Dictionary.Add(rateitem.ExpressionResult, result.ToString());
-                    }
-                    
+                    double result = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
+                    calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = result.ToString() });
+                    json_Dictionary.Add(rateitem.ExpressionResult, result.ToString());
+
+
                     //calcultion.Add(new CalculationResult { Entity = rateitem.ExpressionResult, EValue = (Math.Round((Convert.ToDecimal(result)), 2)).ToString("0.00")
                     //{
                     //    json_Dictionary.Add(tr.Entity, tr.EValue);
@@ -729,14 +720,14 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     //    calcultion.Add(new CalculationResult { Entity = returnVal.Key, EValue = returnVal.Value.ToString() });
                     //}
                 }
-            //}
-            //catch(Exception ex)
-            //{
-            //    //calcultion.Add(new CalculationResult { Entity = "Error", EValue = "Incorrect Input Parameter" });
-            //    //return calcultion.ToList();
-            //    errorResponse.ResponseMessage = "Incorrect Input Parameter";
-            //    return errorResponse;
-            //}
+                //}
+                //catch(Exception ex)
+                //{
+                //    //calcultion.Add(new CalculationResult { Entity = "Error", EValue = "Incorrect Input Parameter" });
+                //    //return calcultion.ToList();
+                //    errorResponse.ResponseMessage = "Incorrect Input Parameter";
+                //    return errorResponse;
+                //}
 
                 //Dictionary<string, string> myResult = new Dictionary<string, string>();
                 //foreach (var dicItem in calcultion)
@@ -912,8 +903,171 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 }
                 return MyResultList;
             }
-            catch(Exception ex)
-            { 
+            catch (Exception ex)
+            {
+            }
+
+            return null;
+        }
+
+        public async Task<object> CheckIllustrationRI(String IllustrationConfigId, int From, int To, dynamic illustration_Param, bool ArrayType, ApiContext apiContext)
+        {
+            if (_context == null)
+            {
+                _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+
+            try
+            {
+                //_context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+                var illustrationDetails = _context.TblIllustrationConfig.Where(i => i.IllustrationConfigId == Convert.ToDecimal(IllustrationConfigId)).Include(add => add.TblIllustrationConfigParam).Include(add => add.TblIllustrationMapping);
+                Dictionary<string, dynamic> dictResult = new Dictionary<string, dynamic>();
+                List<Dictionary<string, dynamic>> MyResultList = new List<Dictionary<string, dynamic>>();
+                var calConfig = from tblcalConfig in _context.TblCalculationConfig
+                                select new
+                                {
+                                    CalculationConfigId = tblcalConfig.CalculationConfigId,
+                                    CalculationConfigName = tblcalConfig.CalculationConfigName
+                                };
+                foreach (var item in illustrationDetails)
+                {
+                    string calculationConfigId = "";
+                    foreach (var it in item.TblIllustrationConfigParam)
+                    {
+                        foreach (var c in calConfig)
+                        {
+                            if (c.CalculationConfigName == it.IllustrationConfigParamName)
+                            {
+                                calculationConfigId = c.CalculationConfigId.ToString();
+                            }
+                        }
+                    }
+                    //int flag = 0;
+                    JObject parent = new JObject();
+                    JObject child1 = new JObject();
+                    JObject child2 = new JObject();
+                    //JObject child2 = new JObject();
+                    for (int i = From; i <= To; i++)
+                    {
+                        //if(flag ==0)
+                        //{
+                        int check = 0;
+                        int checkRate = 0;
+                        foreach (var ad in item.TblIllustrationConfigParam)
+                        {
+                            if (ad.Type == "Param")
+                            {
+                                if (check == 0)
+                                {
+                                    var value = illustration_Param[i - 1][ad.IllustrationConfigParamName];
+                                    child1 = new JObject(
+                                            new JProperty(ad.IllustrationConfigParamName, value));
+                                    check++;
+                                }
+                                else
+                                {
+                                    var value = illustration_Param[i - 1][ad.IllustrationConfigParamName];
+                                    child1.Add(new JProperty(ad.IllustrationConfigParamName, value));
+                                }
+                            }
+                            if (ad.Type == "Rate")
+                            {
+                                if (checkRate == 0)
+                                {
+                                    var value = illustration_Param[i - 1][ad.IllustrationConfigParamName];
+                                    child2 = new JObject(
+                                            new JProperty(ad.IllustrationConfigParamName, value));
+                                    checkRate++;
+                                }
+                                else
+                                {
+                                    var value = illustration_Param[i - 1][ad.IllustrationConfigParamName];
+                                    child2.Add(new JProperty(ad.IllustrationConfigParamName, value));
+                                }
+                            }
+                        }
+                        parent = new JObject(
+                                       new JProperty("dictionary_rule", child1));
+                        parent.Add(new JProperty("dictionary_rate", child2));
+                        var SendJSON = JsonConvert.SerializeObject(parent);
+                        dynamic jsonApi = JsonConvert.DeserializeObject<dynamic>(SendJSON.ToString());
+
+                        var result = await _integrationService.RatingCall(calculationConfigId, jsonApi, apiContext);
+                        //var result = await CheckCalculationRate(calculationConfigId, jsonApi, apiContext);
+                        Dictionary<string, dynamic> d = new Dictionary<string, dynamic>();
+
+
+                        //foreach (var st in result)
+                        //{
+                        //    foreach (var it in item.TblIllustrationConfigParam)
+                        //    {
+                        //        if(st.entity == it.IllustrationConfigParamName)
+                        //        {
+                        //            dictResult.Add(it.IllustrationConfigParamName +i, st.eValue);
+                        //        try
+                        //        {
+                        //            d.Add(it.IllustrationConfigParamName, st.eValue);
+                        //        }
+                        //        catch(Exception ex)
+                        //        {
+
+                        //        }
+
+                        //        }
+                        //    }
+                        //}
+                        //MyResultList.Add(d);
+                        d.Add("Period", i);
+                        foreach (var st in result)
+                        {
+                            foreach (var c in item.TblIllustrationMapping)
+                            {
+                                if (st.entity == c.IllustrationOutputParam)
+                                {
+                                    try
+                                    {
+                                        illustration_Param[i][c.IllustrationInputParam] = st.eValue;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        // In array we are mapping it to the next one so , if its last one so mapping is not required to next 
+                                        illustration_Param[i - 1][c.IllustrationInputParam] = st.eValue;
+                                    }
+                                }
+                            }
+                            foreach (var cd in item.TblIllustrationConfigParam)
+                            {
+                                if (st.entity == cd.IllustrationConfigParamName)
+                                {
+                                    d.Add(cd.IllustrationConfigParamName, st.eValue);
+                                }
+                            }
+                        }
+                        MyResultList.Add(d);
+                        // IF want to return from Input 
+                        //foreach(var cd in item.TblIllustrationConfigParam)
+                        //{
+                        //    var value = illustration_Param[cd.IllustrationConfigParamName];
+                        //    if (value != null)
+                        //    {
+                        //        d.Add(cd.IllustrationConfigParamName, value);
+                        //    }
+                        //}
+
+
+                        //foreach (var c in item.TblIllustrationMapping)
+                        //
+                        //    illustration_Param[c.IllustrationInputParam] = dictResult[c.IllustrationOutputParam + i];
+                        //}
+
+                        //}
+
+                    }
+                }
+                return MyResultList;
+            }
+            catch (Exception ex)
+            {
             }
 
             return null;
@@ -981,7 +1135,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             });
         }
         //For Year Calculation (Ellustration)
-        public static List<IllustrationModel> CalYear(Dictionary<string,object> json, long Year, Dictionary<string, string> mappingDict)
+        public static List<IllustrationModel> CalYear(Dictionary<string, object> json, long Year, Dictionary<string, string> mappingDict)
         {
             Dictionary<string, object> resultValue = new Dictionary<string, object>();
             List<IllustrationModel> illModel = new List<IllustrationModel>();
@@ -993,14 +1147,14 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 {
                     resultExpression = Replace(yearExpression, json);
                     double calResult = Convert.ToDouble(new DataTable().Compute(resultExpression, null));
-                    resultValue.Add("Balance"+i, Math.Round((Convert.ToDecimal(calResult)), 2).ToString());
+                    resultValue.Add("Balance" + i, Math.Round((Convert.ToDecimal(calResult)), 2).ToString());
                     foreach (var it in json)
                     {
-                        resultValue.Add(it.Key+i, Math.Round((Convert.ToDecimal(it.Value)), 2).ToString());
+                        resultValue.Add(it.Key + i, Math.Round((Convert.ToDecimal(it.Value)), 2).ToString());
                     }
-                    foreach(var item in mappingDict)
+                    foreach (var item in mappingDict)
                     {
-                        if(item.Key != item.Value)
+                        if (item.Key != item.Value)
                         {
                             json[item.Key] = resultValue[item.Value + i];
                         }
@@ -1013,7 +1167,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                 {
                     dt.Add(it.Key, it.Value.ToString());
                 }
-                
+
                 int count = resultValue.Count();
                 for (int j = 1; j <= count / 5; j++)
                 {

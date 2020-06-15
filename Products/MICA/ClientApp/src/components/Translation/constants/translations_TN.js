@@ -157,6 +157,22 @@
     CalculationConfig: "கணக்கீடு கட்டமைப்பு",
     CalculationResult: "கணக்கீடு முடிவு",
     /**********************************************************************/
+    //people
+    PeopleHierarchy: 'மக்கள் வரிசைமுறை',
+    EducationDetails: 'கல்வி விவரங்கள்',
+    MappingDetails: 'மேப்பிங் விவரங்கள் ',
+    VacantPositions: 'காலியான நிலைகள்',
+    Reportingto: 'புகாரளித்தல்',
+    GradePercentage: 'தரம் /சதவீதம்',
+    Certification: 'சான்றிதழ்',
+    SNo: 'எஸ் இல்லை',
+    DateofAppointment: 'நியமனம் தேதி',
+    RecruitmentNo: 'ஆட்சேர்ப்பு எண்',
+    BankDetails: 'வங்கி விவரங்கள்',
+    BankName: 'வங்கி பெயர்',
+    BranchName: 'கிளை பெயர்',
+    NameasintheBankPassBook: 'வங்கி பாஸ்புக்கில் உள்ள பெயர்',
+    /**********************************************************************/
     //movements
     PolicyNumber: 'கொள்கை எண்',
     PolicyStatus: 'கொள்கை நிலை',

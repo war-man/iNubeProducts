@@ -22,7 +22,7 @@ import CardBody from "components/Card/CardBody.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import { cardTitle } from "assets/jss/material-dashboard-pro-react.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
-
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
 import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 
@@ -84,11 +84,11 @@ class BankDetails extends React.Component {
                     <GridItem xs={12} sm={12} md={12}>
                         <Card>
                             <CardBody>
-                                <h3><b>Bank Details</b></h3>
+                                <h3><b><TranslationContainer translationKey="BankDetails"/></b></h3>
                                 <GridContainer>
                                     <GridItem xs={12} sm={12} md={4}>
                                         <CustomInput
-                                            labelText="Bank Name"
+                                            labelText="BankName"
                                             id="ApplicationNoId"
                                             //name="passportNo"
                                             //value={this.state.LeadDTO[0].passportNo}
@@ -101,7 +101,7 @@ class BankDetails extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={4}>
                                         <CustomInput
-                                            labelText="Branch Name"
+                                            labelText="BranchName"
                                             id="ApplicationNoId"
                                             //name="passportNo"
                                             //value={this.state.LeadDTO[0].passportNo}
@@ -114,7 +114,7 @@ class BankDetails extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={4}>
                                         <CustomInput
-                                            labelText="Branch Code"
+                                            labelText="BranchCode"
                                             id="ApplicationNoId"
                                             //name="passportNo"
                                             //value={this.state.LeadDTO[0].passportNo}
@@ -127,7 +127,7 @@ class BankDetails extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={4}>
                                         <CustomInput
-                                            labelText="Account No"
+                                            labelText="AccountNo"
                                             id="ApplicationNoId"
                                             //name="passportNo"
                                             //value={this.state.LeadDTO[0].passportNo}
@@ -140,7 +140,7 @@ class BankDetails extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={6}>
                                         <CustomInput
-                                            labelText="Name as in the Bank Pass Book"
+                                            labelText="NameasintheBankPassBook"
                                             id="ApplicationNoId"
                                             //name="passportNo"
                                             //value={this.state.LeadDTO[0].passportNo}
@@ -155,7 +155,7 @@ class BankDetails extends React.Component {
                                 <GridContainer justify='center' >
                                     <GridItem xs={12} sm={12} md={4}>
                                         <Button id="submitBtn" color="info" round className={classes.marginRight} onClick={this.handleCreateSuspectdata} >
-                                            Save
+                                            <TranslationContainer translationKey="Save"/> 
                                                </Button>
                                     </GridItem>
                                 </GridContainer>

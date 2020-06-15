@@ -1019,7 +1019,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             DynamicReportResponse dynamicrpt = new DynamicReportResponse();
             foreach (var item in reportDTO.RoleId)
             {
-                var reports = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid))
+                var reports = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid) && a.DynamicType == "Report")
                 .Select(b => b).ToList();
 
                 DynamicResponse dynamic = new DynamicResponse();
@@ -1152,6 +1152,149 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             }
             _context.SaveChanges();
             return new UserReportPermissionResponse { Status = BusinessStatus.Created, ResponseMessage = $"Report permissions assigned successfully!!" };
+        }
+
+        public DynamicGraphResponse GetGraphOnRoles(UserRoleGraphDTO graphDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+            var ruleNames = _context.AspNetRoles.Where(r => graphDTO.RoleId.Contains(r.Id)).ToList();
+
+            DynamicGraphResponse dynamicrpt = new DynamicGraphResponse();
+            foreach (var item in graphDTO.RoleId)
+            {
+                var graph = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid) && a.DynamicType == "Graph")
+                .Select(b => b).ToList();
+
+                DynamicResponse dynamic = new DynamicResponse();
+                List<RPermissionDTO> list = new List<RPermissionDTO>();
+                var result = graph.Select(c => new RPermissionDTO
+                {
+                    mID = Convert.ToInt32(c.DynamicId),
+                    mValue = c.DynamicName,
+                    Label = c.DynamicName,
+                    Collapse = "false",
+                    Status = true,
+                    Children = list,
+                    Roleid = c.Roleid,
+                    Userid = c.Userid,
+                    UserorRole = c.UserorRole,
+                    mType = c.DynamicType,
+                    RoleName = ruleNames.FirstOrDefault(r => r.Id == item).Name
+                }).ToList();
+
+                var usergraphs = result.Where(a => item.Contains(a.Roleid) && a.Userid == graphDTO.UserId && a.UserorRole == "User")
+                .Select(b => b).ToList();
+
+                if (usergraphs.Any())
+                {
+                    foreach (var item1 in usergraphs)
+                    {
+                        var rpermission = result.FirstOrDefault(a => a.mID == item1.mID/*&& a.Roleid == item.RoleId*/);
+                        if (rpermission != null)
+                        {
+                            rpermission.Status = false;
+                        }
+                    }
+                }
+
+                if (result.Count != 0)
+                {
+                    dynamic.name = ruleNames.FirstOrDefault(r => r.Id == item).Name;
+                    dynamic.mdata.AddRange(result);
+                    dynamicrpt.DynamicResponse.Add(dynamic);
+                }
+            }
+            return dynamicrpt;
+        }
+
+        public async Task<DynamicGraphResponse> GetGraphByRole(RoleGraphDTO graphDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+
+            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Graph");
+            var rresponse = await _integrationService.GetGraphNameForPermissionsDetails(data.Url, apiContext);
+            var ruleNames = _context.AspNetRoles.FirstOrDefault(r => r.Id == graphDTO.RoleId);
+            DynamicGraphResponse dynamicrpt = new DynamicGraphResponse();
+            DynamicResponse respon = new DynamicResponse();
+            List<RPermissionDTO> list = new List<RPermissionDTO>();
+            var resddto = rresponse.Select(a => new RPermissionDTO
+            {
+                mID = a.mID,
+                mValue = a.mValue,
+                Label = a.mValue,
+                Collapse = "false",
+                Status = false,
+                Children = list,
+                mType = data.ItemType,
+            }).ToList();
+
+            var response = _context.TblDynamicPermissions.Where(a => a.Roleid == graphDTO.RoleId && a.UserorRole == "Role").Select(b => b).ToList();
+            if (response.Any())
+            {
+                foreach (var item1 in response)
+                {
+                    var rpermission = resddto.FirstOrDefault(a => a.mID == item1.DynamicId/*&& a.Roleid == item.RoleId*/);
+                    if (rpermission != null)
+                    {
+                        rpermission.Status = true;
+                    }
+                }
+            }
+            respon.name = ruleNames.Name;
+            respon.mdata.AddRange(resddto);
+            dynamicrpt.DynamicResponse.Add(respon);
+            //DynamicResponse dynamic = new DynamicResponse();
+            //List<RPermissionDTO> list = new List<RPermissionDTO>();
+            return dynamicrpt;
+        }
+
+        public async Task<UserGraphPermissionResponse> SaveAssignGraphs(UserRoleGraphsDTO graphDTO, ApiContext apiContext)
+        {
+            _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+
+            CustomerSettingsDTO UserDateTime = DbManager.GetCustomerSettings("TimeZone", apiContext);
+            DbManager._TimeZone = UserDateTime.KeyValue;
+            DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
+
+            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Graph");
+            var rresponse = await _integrationService.GetGraphNameForPermissionsDetails(data.Url, apiContext);
+
+            TblDynamicPermissions reportPermissions = null;
+            foreach (var item in graphDTO.RolePermissionIds)
+            {
+                var newPermission = item.PermissionIds.ToList();
+                var existingPerm = _context.TblDynamicPermissions.Where(t => t.Userid == graphDTO.UserId && t.UserorRole == "User" && t.Roleid == item.RoleId).ToList();
+                //Delete which are not in current permissions--
+                var delPermission = existingPerm.Where(m => !item.PermissionIds.Contains((int)m.DynamicId)).ToList();
+                foreach (var perm in delPermission)
+                {
+                    _context.Remove(perm);
+                    existingPerm.Remove(perm);
+                }
+                var includedPermission = existingPerm.Where(m => item.PermissionIds.Contains((int)m.DynamicId)).ToList();
+                foreach (var incPerm in includedPermission)
+                {
+                    newPermission.Remove((int)incPerm.DynamicId);
+                }
+                //Add new record
+                foreach (var permissionId in newPermission)
+                {
+                    reportPermissions = new TblDynamicPermissions();
+                    reportPermissions.Userid = graphDTO.UserId;
+                    reportPermissions.DynamicId = permissionId;
+                    reportPermissions.IsActive = true;
+                    reportPermissions.DynamicType = data.ItemType;
+                    reportPermissions.DynamicName = rresponse.FirstOrDefault(a => a.mID == permissionId).mValue;
+                    reportPermissions.Roleid = item.RoleId;
+                    reportPermissions.UserorRole = "User";
+                    reportPermissions.CreatedBy = apiContext.UserId;
+                    reportPermissions.CreatedDate = DatetimeNow;
+
+                    _context.TblDynamicPermissions.Add(reportPermissions);
+                }
+            }
+            _context.SaveChanges();
+            return new UserGraphPermissionResponse { Status = BusinessStatus.Created, ResponseMessage = $"Graph permissions assigned successfully!!" };
         }
         #endregion
     }

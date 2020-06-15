@@ -1024,31 +1024,35 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
 
             var _tblclaims = _mapper.Map<TblClaims>(claims);
 
-            var StrStateId = claims.AdditionalDetails["Vehicle Location State"].ToString();
-            int StateId = Convert.ToInt32(StrStateId);
-            var statecode = await GetStateAbbrevation(StateId, apiContext);
-            AllocDTO alloc = new AllocDTO();
-            alloc.State = statecode;
-            string EventId = "1";
-            var allocationdata = await _integrationService.CheckRuleSets(EventId, alloc, apiContext);
-
-            var allocationdetails = JsonConvert.SerializeObject(allocationdata);
-            // var allocdata = JsonConvert.DeserializeObject<dynamic>(json);
-            TblClaimAllocationDetails _claimAllocationDetailsDTO = new TblClaimAllocationDetails();
-
-            foreach (var item in allocationdata)
+            var abc = Convert.ToString(claims.AdditionalDetails);
+            //(Newtonsoft.Json.Linq.JContainer)
+            if (((Newtonsoft.Json.Linq.JContainer)claims.AdditionalDetails).Count != 0)
             {
-                _claimAllocationDetailsDTO = new TblClaimAllocationDetails();
-                _claimAllocationDetailsDTO.AllocatedTo = item["Claim Manager"];
-                _claimAllocationDetailsDTO.EmailId = item["Mail Id"];
-                _claimAllocationDetailsDTO.MobileNumber = item["Contact Number"];
-                _claimAllocationDetailsDTO.AllocationType = "Individual";
-                //_claimAllocationDetailsDTO.ClaimId = _tblclaims.ClaimId;
-                _claimAllocationDetailsDTO.AllocationDetails = allocationdetails;
-                //_context.TblClaimAllocationDetails.Add(_claimAllocationDetailsDTO);
-                _tblclaims.TblClaimAllocationDetails.Add(_claimAllocationDetailsDTO);
-            }
+                var StrStateId = claims.AdditionalDetails["Vehicle Location State"].ToString();
+                int StateId = Convert.ToInt32(StrStateId);
+                var statecode = await GetStateAbbrevation(StateId, apiContext);
+                AllocDTO alloc = new AllocDTO();
+                alloc.State = statecode;
+                string EventId = "1";
+                var allocationdata = await _integrationService.CheckRuleSets(EventId, alloc, apiContext);
 
+                var allocationdetails = JsonConvert.SerializeObject(allocationdata);
+                // var allocdata = JsonConvert.DeserializeObject<dynamic>(json);
+                TblClaimAllocationDetails _claimAllocationDetailsDTO = new TblClaimAllocationDetails();
+
+                foreach (var item in allocationdata)
+                {
+                    _claimAllocationDetailsDTO = new TblClaimAllocationDetails();
+                    _claimAllocationDetailsDTO.AllocatedTo = item["Claim Manager"];
+                    _claimAllocationDetailsDTO.EmailId = item["Mail Id"];
+                    _claimAllocationDetailsDTO.MobileNumber = item["Contact Number"];
+                    _claimAllocationDetailsDTO.AllocationType = "Individual";
+                    //_claimAllocationDetailsDTO.ClaimId = _tblclaims.ClaimId;
+                    _claimAllocationDetailsDTO.AllocationDetails = allocationdetails;
+                    //_context.TblClaimAllocationDetails.Add(_claimAllocationDetailsDTO);
+                    _tblclaims.TblClaimAllocationDetails.Add(_claimAllocationDetailsDTO);
+                }
+            }
             _context.TblClaims.Add(_tblclaims);
             _context.SaveChanges();
             var _claimsDTOs = _mapper.Map<ClaimResponses>(_tblclaims);
@@ -1076,14 +1080,14 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             }
 
 
-            if (!string.IsNullOrEmpty(_claimAllocationDetailsDTO.EmailId))
-            {
-                EmailTest manangerEmail = new EmailTest();
-                manangerEmail.To = _claimAllocationDetailsDTO.EmailId;
-                manangerEmail.Subject = "Claim Number " + claims.ClaimNumber + "  is allocated to you on " + claims.CreatedDate.Value.ToShortDateString();
-                manangerEmail.Message = " Dear Sir/Madam " + " \n\n Vehicle Number " + vehiclenumber + " is damaged on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n\n Thanks ";
-                await SendEmailAsync(manangerEmail, apiContext);
-            }
+            //if (!string.IsNullOrEmpty(_claimAllocationDetailsDTO.EmailId))
+            //{
+            //    EmailTest manangerEmail = new EmailTest();
+            //    manangerEmail.To = _claimAllocationDetailsDTO.EmailId;
+            //    manangerEmail.Subject = "Claim Number " + claims.ClaimNumber + "  is allocated to you on " + claims.CreatedDate.Value.ToShortDateString();
+            //    manangerEmail.Message = " Dear Sir/Madam " + " \n\n Vehicle Number " + vehiclenumber + " is damaged on " + claims.CreatedDate + " at location " + claims.AdditionalDetails["Vehicle Location"] + " . " + " A Claim is registered with Claim Number " + claims.ClaimNumber + " and allocated to you for futher process. " + " \n\n Thanks ";
+            //    await SendEmailAsync(manangerEmail, apiContext);
+            //}
             //Models.SMSRequest request = new Models.SMSRequest();
             //request.RecipientNumber = "8197521528";
             //request.SMSMessage = "Hi rashmi";
@@ -1120,7 +1124,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
             var ClaimNumber = GetClaimNumber(0, Convert.ToDecimal(claims.ProductIdPk));
             ClaimsDTO _claims = new ClaimsDTO();
 
-            claims.ClaimStatusId = 33;
+            claims.ClaimStatusId = ModuleConstants.ClaimIntimation;
             claims.ClaimNumber = ClaimNumber;
             claims.CreatedDate = DateTimeNow;
             claims.CreatedBy = apiContext.UserId;
@@ -2240,7 +2244,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.ClaimService.MicaPro
                 //finaldata.Add("Bank Address", bank.BankBranchAddress);
 
 
-                if (!string.IsNullOrEmpty(DATA.ClaimFields))
+                if (!string.IsNullOrEmpty(DATA.ClaimFields) && DATA.ClaimFields != "{}")
                 {
                     var json = JsonConvert.DeserializeObject<dynamic>(DATA.ClaimFields);
 

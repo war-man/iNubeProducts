@@ -24,7 +24,7 @@ const BankDetails = (props) => {
             <GridContainer>
                 <GridItem xs={12} sm={4} md={4}>
                     <CustomInput
-                        labelText="Bank Name"
+                        labelText="BankName"
                         required={true}
                         id="bankname"
                         value={props.componentData.peopledetails1.avoOrgEmployee.bankName}
@@ -37,7 +37,7 @@ const BankDetails = (props) => {
                 </GridItem>
                 <GridItem xs={12} sm={4} md={4}>
                     <CustomInput
-                        labelText="Branch Name"
+                        labelText="BranchName"
                         required={true}
                         id="branchname"
                         value={props.componentData.peopledetails1.avoOrgEmployee.branchName}
@@ -50,7 +50,7 @@ const BankDetails = (props) => {
                 </GridItem>
                 <GridItem xs={12} sm={4} md={4}>
                     <CustomInput
-                        labelText="Account Number"
+                        labelText="AccountNo"
                         required={true}
                         id="AC No"
                         inputType="number"

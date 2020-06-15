@@ -58,7 +58,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 }
                 else
                 {
-                    user.AccessFailedCount = 0;
+                    //user.AccessFailedCount = 0;
                 }
             }
             _context.SaveChanges();

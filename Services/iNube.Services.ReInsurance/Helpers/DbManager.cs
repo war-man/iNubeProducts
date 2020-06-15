@@ -1,7 +1,10 @@
 ﻿
 //using iNube.Services.Accounting.Controllers.AccountConfig.IntegrationServices;
 //using iNube.Services.Accounting.Entities;
+using iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices;
+using iNube.Services.ReInsurance.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -72,20 +75,20 @@ namespace iNube.Services.ReInsurance.Helpers
             return dbConnectionString;
         }
 
-        public static async Task<DbContext> GetContextAsync(string product, string connectionKey)
+        public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
             DbContext context = null;
-            //DbHelper dbHelper = new DbHelper(new IntegrationService());
-            //string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
 
             switch (product)
             {
                 case "Mica":
-                 //   var optionsBuilder = new DbContextOptionsBuilder<MICAACContext>();
-                   // optionsBuilder.UseSqlServer(dbConnectionString);
+                    var optionsBuilder = new DbContextOptionsBuilder<MICARIContext>();
+                    optionsBuilder.UseSqlServer(dbConnectionString);
                     //DbContextOptions<MICAUMContext> dbContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                   // context = new MICAACContext(optionsBuilder.Options);
+                    context = new MICARIContext(optionsBuilder.Options);
                     break;
                 //case "Avo":
                 //    DbContextOptions<> dbAvoContextOption = (DbContextOptions<AVOCMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
@@ -95,10 +98,10 @@ namespace iNube.Services.ReInsurance.Helpers
                 //    dbConnectionString = DbConnectionManager.GetConnectionString("Prod");
                 //    break;AVOCMContext
                 default:
-                   // var optionsBuilderDefault = new DbContextOptionsBuilder<MICAACContext>();
-                   // optionsBuilderDefault.UseSqlServer(dbConnectionString);
-                   // DbContextOptions<MICAUMContext> dbDefaultContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
-                   // context = new MICAACContext(optionsBuilderDefault.Options);
+                    var optionsBuilderDefault = new DbContextOptionsBuilder<MICARIContext>();
+                    optionsBuilderDefault.UseSqlServer(dbConnectionString);
+                    // DbContextOptions<MICAUMContext> dbDefaultContextOption = (DbContextOptions<MICAUMContext>)SqlServerDbContextOptionsExtensions.UseSqlServer(new DbContextOptionsBuilder(), dbConnectionString).Options;
+                    context = new MICARIContext(optionsBuilderDefault.Options);
                     break;
             }
 

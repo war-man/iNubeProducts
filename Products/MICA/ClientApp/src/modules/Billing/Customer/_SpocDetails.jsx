@@ -156,6 +156,7 @@ const SpocDetails = (props) => {
                         }}
                     />
                     {prop.errormessage && (prop.spocDetails[0].emailId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                    {prop.spocemailMessage && <p className="error">{prop.spocservermessage}</p>}
                 </GridItem>
                 <GridItem xs={12} sm={12} md={4}>
                     <CustomInput

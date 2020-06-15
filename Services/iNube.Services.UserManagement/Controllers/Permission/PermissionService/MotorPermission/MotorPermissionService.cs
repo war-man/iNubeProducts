@@ -108,5 +108,20 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             throw new NotImplementedException();
         }
+
+        public DynamicGraphResponse GetGraphOnRoles(UserRoleGraphDTO reportDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<DynamicGraphResponse> GetGraphByRole(RoleGraphDTO reportDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<UserGraphPermissionResponse> SaveAssignGraphs(UserRoleGraphsDTO reportDTO, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

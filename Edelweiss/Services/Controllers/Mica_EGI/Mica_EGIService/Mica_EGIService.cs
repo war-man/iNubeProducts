@@ -76,11 +76,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> CoverStatusScheduler(ApiContext context);
         Task<bool> RenewalScheduler(ApiContext context);
         Task<bool> BalanceAlertScheduler(ApiContext context);
+        Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate, ApiContext apiContext);
     }
 
     public class MicaEGIService : IMicaEGIService
     {
-        private MICAQMContext _context;
+        private MICAQMContext _context = null;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
         private readonly IEmailService _emailService;
@@ -92,7 +93,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         {
             _mapper = mapper;
             _appSettings = appSettings.Value;
-            _context = context;
+           // _context = context;
             _emailService = emailService;
             _integrationService = integrationService;
             _configuration = configuration;
@@ -3905,103 +3906,98 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             int successcount = 0;
             int failcount = 0;
 
+            //  RuleThreeDTO ruleThreeDTO = new RuleThreeDTO();
+
             switch (TxnType)
             {
                 case "Proposal":
+                    RuleOneDTO ruleOneDTO = new RuleOneDTO();
+                    ruleOneDTO.RuleName = "30016";//RuleId Give by Dinkar
+                    ruleOneDTO.DriverAge = SourceObject["driverAge"];
+                    ruleOneDTO.NoofVehicles = Convert.ToString(Convert.ToInt32(SourceObject["noOfPC"]) + Convert.ToInt32(SourceObject["noOfTW"]));
+                    ruleOneDTO.NoofDrivers = Convert.ToString(Convert.ToInt32(SourceObject["additionalDriver"]) + 1);
 
-                    List<RuleEngineResponse> callGenricMapper = GenericMapper(SourceObject);
-                    var GenMapperFinal = callGenricMapper.FirstOrDefault(x => x.ValidatorName == "Generic Final Result").Outcome;
+                    dynamic RuleEngine;
 
-                    //RuleOneDTO ruleOneDTO = new RuleOneDTO();
-                    //ruleOneDTO.RuleName = "30016";//RuleId Give by Dinkar
-                    //ruleOneDTO.DriverAge = SourceObject["driverAge"];
-                    //ruleOneDTO.NoofVehicles = Convert.ToString(Convert.ToInt32(SourceObject["noOfPC"]) + Convert.ToInt32(SourceObject["noOfTW"]));
-                    //ruleOneDTO.NoofDrivers = Convert.ToString(Convert.ToInt32(SourceObject["additionalDriver"]) + 1);
-
-                    //dynamic RuleEngine;
-
-                    List<RuleEngineResponse> engineResponses = new List<RuleEngineResponse>();
-                    RuleEngineResponse RuleObject;
-
-                    engineResponses.AddRange(callGenricMapper);
-
+                    List<RuleEngineResponse> engineResponses;
                     try
                     {
+                        RuleEngine = await _integrationService.RuleEngine(ruleOneDTO, context);
+                        engineResponses = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(RuleEngine.ToString());
 
-                        //RuleEngine = await _integrationService.RuleEngine(ruleOneDTO, context);
-                        //engineResponses = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(RuleEngine.ToString());
+                        // bool res = IntegrationValidation(engineResponses, "List", "ValidatorName");
 
-                        if (GenMapperFinal == "Success")
+                        RuleEngineResponse resobj = new RuleEngineResponse();
+                        if (SourceObject["driverExp"] < 1)
                         {
 
-                            RuleObject = new RuleEngineResponse();
-                            RuleObject.ValidatorName = "Final Result";
-                            RuleObject.Outcome = "Success";
-                            RuleObject.Message = "Genric Validation";
-                            RuleObject.Code = "GENEXP";
-
-                            engineResponses.Add(RuleObject);
-
-                        }
-                        else
-                        {
-                            //engineResponses.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
-
-                            RuleObject = new RuleEngineResponse();
-                            RuleObject.ValidatorName = "Final Result";
-                            RuleObject.Outcome = "Fail";
-                            RuleObject.Message = "Genric Validation";
-                            RuleObject.Code = "GENEXP";
-
-                            engineResponses.Add(RuleObject);
-
-                        }
-
-
-                        DateTime Startdate = Convert.ToDateTime(SourceObject["Policy Start Date"]);
-
-                        if (Startdate.Date < Currentdate.Date)
-                        {
-                            RuleObject = new RuleEngineResponse();
-
-                            RuleObject.ValidatorName = "Policy Start Date";
-                            RuleObject.Outcome = "Fail";
-                            RuleObject.Message = "Policy Start Date Cannot be Older than current date";
-                            RuleObject.Code = "EXP005";
+                            resobj.ValidatorName = "driverExp";
+                            resobj.Outcome = "Fail";
+                            resobj.Message = "Driver Experience is less than one year";
+                            resobj.Code = "EXP001";
                             engineResponses.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
                         }
                         else
                         {
-                            RuleObject = new RuleEngineResponse();
 
-                            RuleObject.ValidatorName = "Policy Start Date";
-                            RuleObject.Outcome = "Success";
-                            RuleObject.Message = "Validation done for Policy Start Date";
-                            RuleObject.Code = "EXP005";
+                            resobj.ValidatorName = "driverExp";
+                            resobj.Outcome = "Success";
+                            resobj.Message = "Validation done for driver experiance greater than one year";
+                            resobj.Code = "EXP002";
 
                         }
+                        engineResponses.Add(resobj);
+                        RuleEngineResponse resobj1 = new RuleEngineResponse();
+                        if (Convert.ToInt32(SourceObject["driverExp"]) > Convert.ToInt32(SourceObject["driverAge"]) - 18)
+                        {
+                            resobj1.ValidatorName = "driverExp";
+                            resobj1.Outcome = "Fail";
+                            resobj1.Message = "Driver Experience is greater than driver age -18";
+                            resobj1.Code = "EXP003";
+                            engineResponses.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+                        }
+                        else
+                        {
+                            resobj1.ValidatorName = "driverExp";
+                            resobj1.Outcome = "Success";
+                            resobj1.Message = "Validation done for driver experiance";
+                            resobj1.Code = "EXP004";
 
-                        engineResponses.Add(RuleObject);
+                        }
+                        engineResponses.Add(resobj1);
+
                     }
-                    catch
+                    catch (Exception Ex)
                     {
-                        return new List<RuleEngineResponse>();
+                        throw Ex;
                     }
 
                     return engineResponses;
 
 
                 case "Policy":
+                    //RuleThreeDTO ruleThreeDTO = new RuleThreeDTO();
+                    //ruleThreeDTO.RuleName = "30021";
+                    //ruleThreeDTO.DriverDocumentPage = SourceObject[""];
+                    //ruleThreeDTO.RCCopy = SourceObject[""];
+                    //ruleThreeDTO.DriverLicence = SourceObject[""];
+                    //ruleThreeDTO.UnderBodyImage = SourceObject[""];
+                    //ruleThreeDTO.WindScreenGlassImage = SourceObject[""];
+
+
+                    //  dynamic RuleEngine;
 
                     List<RuleEngineResponse> engineResponse = new List<RuleEngineResponse>();
-                    //var policyDataMapper = GenericMapper(SourceObject);
-                    // engineResponse.AddRange(policyDataMapper);
                     try
                     {
+                        // RuleEngine = await _integrationService.RuleEngine(ruleTwoDTO, context);
+                        // engineResponses = JsonConvert.DeserializeObject<List<RuleEngineResponse>>(RuleEngine.ToString());
+
 
                         DateTime Startdate = Convert.ToDateTime(SourceObject["Policy Start Date"]);
                         DateTime Enddate = Convert.ToDateTime(SourceObject["Policy End Date"]);
-
+                        //int successcount = 0;
+                        //int failcount = 0;
 
                         if (Enddate > Startdate)
                         {
@@ -4020,7 +4016,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             resobj.ValidatorName = "Policy Start Date";
                             resobj.Outcome = "Fail";
                             resobj.Message = "Start date is greater than End date";
-                            resobj.Code = "EXPO001";
+                            resobj.Code = "EXPO002";
                             engineResponse.Add(resobj);
                             failcount++;
                         }
@@ -4030,7 +4026,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             resobj.ValidatorName = "Policy Start Date";
                             resobj.Outcome = "Success";
                             resobj.Message = "Validation done for Policy Start Date";
-                            resobj.Code = "EXPO002";
+                            resobj.Code = "EXPO003";
 
                             engineResponse.Add(resobj);
                             successcount++;
@@ -4041,7 +4037,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             resobj.ValidatorName = "Policy Start Date";
                             resobj.Outcome = "Fail";
                             resobj.Message = "Start date is not greater then current date";
-                            resobj.Code = "EXPO002";
+                            resobj.Code = "EXPO004";
                             engineResponse.Add(resobj);
                             failcount++;
                         }
@@ -4052,7 +4048,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             resobj.ValidatorName = "Policy Start Date";
                             resobj.Outcome = "Success";
                             resobj.Message = "Validation done for Policy Start Date";
-                            resobj.Code = "EXPO003";
+                            resobj.Code = "EXPO005";
 
                             engineResponse.Add(resobj);
                             successcount++;
@@ -4063,17 +4059,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             resobj.ValidatorName = "Policy Start Date";
                             resobj.Outcome = "Fail";
                             resobj.Message = "Start date is not within one month";
-                            resobj.Code = "EXPO003";
+                            resobj.Code = "EXPO006";
                             engineResponse.Add(resobj);
                             failcount++;
                         }
+
+
                         if (Enddate.Date == Startdate.Date.AddDays(364))
                         {
                             RuleEngineResponse res1obj = new RuleEngineResponse();
                             res1obj.ValidatorName = "Policy End Date";
                             res1obj.Outcome = "Success";
                             res1obj.Message = "Validation done for Policy End Date";
-                            res1obj.Code = "EXPO004";
+                            res1obj.Code = "EXPO007";
 
                             engineResponse.Add(res1obj);
                             successcount++;
@@ -4084,13 +4082,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res1obj.ValidatorName = "Policy End Date";
                             res1obj.Outcome = "Fail";
                             res1obj.Message = "End date is not equal to 364 days from Start date";
-                            res1obj.Code = "EXPO004";
+                            res1obj.Code = "EXPO008";
 
                             engineResponse.Add(res1obj);
                             failcount++;
                         }
-
-
                         var Endtime = Enddate.ToString("HH:mm");
                         string tm = "23:59";
                         if (Endtime == tm)
@@ -4099,7 +4095,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res3obj.ValidatorName = "Policy End Time";
                             res3obj.Outcome = "Success";
                             res3obj.Message = "Validation done for Policy End Date";
-                            res3obj.Code = "EXPO006";
+                            res3obj.Code = "EXPO009";
 
                             engineResponse.Add(res3obj);
                             successcount++;
@@ -4110,7 +4106,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res3obj.ValidatorName = "Policy End Time";
                             res3obj.Outcome = "Fail";
                             res3obj.Message = "Policy End time is not valid";
-                            res3obj.Code = "EXPO006";
+                            res3obj.Code = "EXPO010";
 
                             engineResponse.Add(res3obj);
                             failcount++;
@@ -4122,7 +4118,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Fail";
                             res4obj.Message = "One or More conditions failed";
-                            res4obj.Code = "EXPO007";
+                            res4obj.Code = "EXPO011";
                             engineResponse.Add(res4obj);
                         }
                         else
@@ -4131,14 +4127,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Success";
                             res4obj.Message = "Conditions Successful";
-                            res4obj.Code = "EXPO007";
+                            res4obj.Code = "EXPO012";
                             engineResponse.Add(res4obj);
 
                         }
                     }
-                    catch
+                    catch (Exception Ex)
                     {
-                        return new List<RuleEngineResponse>();
+                        throw Ex;
                     }
 
                     return engineResponse;
@@ -4146,153 +4142,37 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //PolicyBazaar Related Validation            
                 case "PolicyCreation":
+                    return GenericMapper(SourceObject);
+
+                // case "EndorsementAdd":
+
+                //    case "EndorsementDel":
 
 
-                    List<RuleEngineResponse> policyMapper = GenericMapper(SourceObject);
-                    var MapperFinal = policyMapper.FirstOrDefault(x => x.ValidatorName == "Generic Final Result").Outcome;
-
-                    List<RuleEngineResponse> engineResponse1 = new List<RuleEngineResponse>();
-                    engineResponse1.AddRange(policyMapper);
-                    try
-                    {
-
-                        if (MapperFinal == "Success")
-                        {
-
-                            RuleObject = new RuleEngineResponse();
-                            RuleObject.ValidatorName = "Final Result";
-                            RuleObject.Outcome = "Success";
-                            RuleObject.Message = "Genric Validation";
-                            RuleObject.Code = "GENEXP";
-
-                            engineResponse1.Add(RuleObject);
-
-                        }
-                        else
-                        {
-
-                            RuleObject = new RuleEngineResponse();
-                            RuleObject.ValidatorName = "Final Result";
-                            RuleObject.Outcome = "Fail";
-                            RuleObject.Message = "Genric Validation";
-                            RuleObject.Code = "GENEXP";
-
-                            engineResponse1.Add(RuleObject);
-
-                        }
+                //   return CdModel;
 
 
-                        DateTime Startdate = Convert.ToDateTime(SourceObject["Policy Start Date"]);
-                        DateTime Enddate = Convert.ToDateTime(SourceObject["Policy End Date"]);
 
-                        if (Enddate.Date == Startdate.Date.AddDays(364))
-                        {
-                            RuleEngineResponse res1obj = new RuleEngineResponse();
-                            res1obj.ValidatorName = "Policy Period";
-                            res1obj.Outcome = "Success";
-                            res1obj.Message = "Validation done for policy period should be one year";
-                            res1obj.Code = "GEPO004";
+                //case "SwitchOnOff":
 
-                            engineResponse1.Add(res1obj);
-                            successcount++;
-                        }
-                        else
-                        {
-                            RuleEngineResponse res1obj = new RuleEngineResponse();
-                            res1obj.ValidatorName = "Policy Period";
-                            res1obj.Outcome = "Fail";
-                            res1obj.Message = "Policy period should be one year";
-                            res1obj.Code = "GEPO004";
+                //    return CdModel;
 
-                            engineResponse1.Add(res1obj);
-                            failcount++;
-                        }
-                        if (failcount > 0)
-                        {
-                            engineResponse1.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
-                        }
+                //case "Schedule":
 
-                    }
-                    catch
-                    {
-                        return new List<RuleEngineResponse>();
-                    }
-                    return engineResponse1;
-
-                case "EndorsementAdd":
-
-                    List<RuleEngineResponse> engineResponse2 = new List<RuleEngineResponse>();
-
-                    var VehicleObj = SourceObject[0]["Data"]["InsurableItem"][1];
-                    var VehiclRiskData = VehicleObj["RiskItems"];
-                    var endorsementData = SourceObject[1]["Data"]["InsurableItem"][0];
-                    var endorseRiskItems = endorsementData["RiskItems"];
-
-                    foreach (var item in endorseRiskItems)
-                    {
-                        var enIdentificationNo = item["Identification Number"];
-
-
-                        foreach (var veh in VehiclRiskData)
-                        {
-                            var PoliIdentiNo = veh["Identification Number"];
-
-                            if (PoliIdentiNo == enIdentificationNo)
-                            {
-                                RuleEngineResponse resobj = new RuleEngineResponse();
-                                resobj.ValidatorName = "Identification Number";
-                                resobj.Outcome = "Fail";
-                                resobj.Message = "Vehicle identification number should be unique";
-                                resobj.Code = "POE002";
-                                engineResponse2.Add(resobj);
-                                failcount++;
-                            }
-                            else
-                            {
-                                RuleEngineResponse resobj = new RuleEngineResponse();
-                                resobj.ValidatorName = "Identification Number";
-                                resobj.Outcome = "Success";
-                                resobj.Message = "Validation done for Vehicle identification number should be unique";
-                                resobj.Code = "POE002";
-                                engineResponse2.Add(resobj);
-                                successcount++;
-                            }
-
-                        }
-
-                    }
-                    if (failcount > 0)
-                    {
-                        RuleEngineResponse res4obj = new RuleEngineResponse();
-                        res4obj.ValidatorName = "Final Result";
-                        res4obj.Outcome = "Fail";
-                        res4obj.Message = "One or More conditions failed";
-                        res4obj.Code = "POE004";
-                        engineResponse2.Add(res4obj);
-                    }
-                    else
-                    {
-                        RuleEngineResponse res4obj = new RuleEngineResponse();
-                        res4obj.ValidatorName = "Final Result";
-                        res4obj.Outcome = "Success";
-                        res4obj.Message = "Conditions Successful";
-                        res4obj.Code = "POE005";
-                        engineResponse2.Add(res4obj);
-
-                    }
-
-                    return engineResponse2;
-
+                //    return CdModel;
 
                 case "Claim":
 
                     var claiminsurable = SourceObject["ClaimInsurable"];
                     var policyno = SourceObject["PolicyNumber"].ToString();
+                    //  var lossdatetime = SourceObject["lossDateTime"].ToString();
 
                     DateTime lossdatetime = Convert.ToDateTime(SourceObject["lossDateTime"]);
-
+                    //var month = lossdatetime.Month;
                     var month = lossdatetime.ToString("MMMM");
                     List<RuleEngineResponse> engineResponse3 = new List<RuleEngineResponse>();
+                    //int successcount = 0;
+                    //int failcount = 0;
 
                     try
                     {
@@ -4384,9 +4264,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         }
                     }
-                    catch
+                    catch (Exception Ex)
                     {
-                        return new List<RuleEngineResponse>();
+                        throw Ex;
                     }
 
                     return engineResponse3;
@@ -4395,7 +4275,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return new List<RuleEngineResponse>();
 
         }
-
 
         public async Task<dynamic> EndorsementPremium(EndorsementPremiumDTO endorsementPremium, dynamic PolicyObject, string callType, ApiContext context)
         {
@@ -5540,7 +5419,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();     
-            DateTime PolicyStartDate, NextMonth, CDFromDate, CDToDate;
+            DateTime PolicyStartDate, PolicyEndDate, NextMonth, CDFromDate, CDToDate;
 
             //Step-1:Get All Active Policy's 
             var PolicyDetails = await _integrationService.GetPolicyList(ProductCode, context);
@@ -5579,6 +5458,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 {
 
                     PolicyStartDate = Convert.ToDateTime(PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).PolicyStartDate);
+                    PolicyEndDate = Convert.ToDateTime(PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).PolicyEndDate);
+
 
                     var checkLastBilling = _context.TblPolicyMonthlySi.LastOrDefault(x => x.PolicyNo == policy);
 
@@ -5619,12 +5500,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             ToDate = CDToDate,
                         };
 
+                        var AccountNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).CDAccountNumber;
+
+                        var AccountData = await _integrationService.GetCDAccountDetails(AccountNumber, "AD", context);
+
+                        if (AccountData.Status != BusinessStatus.Ok)
+                        {
+                            continue;
+                        }
+
                         //Step-3 Get Entire Policy Details
                         var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, context);
 
-                        int DaysChargeable = TotalUsage(policy, CDFromDate, CDToDate,context);
+                        int DaysChargeable = await TotalUsage(policy, CDFromDate, CDToDate,context);
 
-                        if (CDDetails.Count() > 0 && DaysChargeable > 0)
+                        if (CDDetails.Count() > 0)
                         {
 
                             decimal ADRatePerDay = 0;
@@ -5672,6 +5562,26 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                     ADRatePerDay = 0;
                             }
 
+                            if(DaysChargeable < 0)
+                            {
+                                //AdPerDay
+                                monthlySiDTO.PerDayPremium = 0;                               
+                                monthlySiDTO.PremiumChargeable = 0;
+                                monthlySiDTO.GstOnPremiumChargeable = 0;
+                                monthlySiDTO.TotalAmountChargeable = 0;
+                                monthlySiDTO.Amount = 0;
+
+                                Guid guid = Guid.NewGuid();
+                                monthlySiDTO.Txnid = guid.ToString();
+
+                                _context.TblPolicyMonthlySi.Add(monthlySiDTO);
+                                _context.SaveChanges();
+
+                                //Skip this Policy Because Usage Days is Zero
+                                continue;
+                            }
+
+
                             //AdPerDay
                             monthlySiDTO.PerDayPremium = ADRatePerDay;
 
@@ -5682,7 +5592,18 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             //Rule
                             endorsementCalDTO.dictionary_rule.AD = monthlySiDTO.PerDayPremium.ToString();
-                            endorsementCalDTO.dictionary_rule.ADDAYS = DaysChargeable.ToString();
+
+                            var RemainingDays = (PolicyEndDate.Date - CurrentDate.Date).TotalDays + 1;
+
+                            if (RemainingDays < 60)
+                            {
+                                endorsementCalDTO.dictionary_rule.ADDAYS = RemainingDays.ToString();
+                            }
+                            else
+                            {
+                                endorsementCalDTO.dictionary_rule.ADDAYS = "60";
+                            }                         
+                                                       
                             endorsementCalDTO.dictionary_rule.FT = "0";
                             endorsementCalDTO.dictionary_rule.FTDAYS = "0";
 
@@ -5692,15 +5613,50 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             if (CalculatePremium.Count > 0)
                             {
-                                monthlySiDTO.PremiumChargeable = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
 
-                                monthlySiDTO.GstOnPremiumChargeable = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue) + Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+                                var AD60TxnAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
 
-                                monthlySiDTO.TotalAmountChargeable = Convert.ToDecimal(monthlySiDTO.PremiumChargeable + monthlySiDTO.GstOnPremiumChargeable);
+                                var AD60FTTaxAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+                                var AD60TTTaxAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+                                var AD60TaxAmount = AD60FTTaxAmount + AD60TTTaxAmount;
+
+                                var AD60Total = AD60TxnAmount + AD60TaxAmount;
+
+                                monthlySiDTO.PremiumChargeable = AD60TxnAmount - AccountData.TxnAmountBalance;
+
+                                monthlySiDTO.GstOnPremiumChargeable = AD60TaxAmount - AccountData.TaxAmountBalance;
+
+                                monthlySiDTO.TotalAmountChargeable = AD60Total - AccountData.TotalAvailableBalance;
 
                                 monthlySiDTO.Amount = monthlySiDTO.TotalAmountChargeable;
 
-                                
+
+                                if(monthlySiDTO.TotalAmountChargeable < 0)
+                                {
+                                    continue;
+                                }
+
+                                var FSTaxType = CalculatePremium.FirstOrDefault(x => x.Entity == "FSTTAX_TAXTYPE").EValue;
+
+                                var NewTaxAmount = monthlySiDTO.GstOnPremiumChargeable / 2;
+
+                                if (FSTaxType == "IGST")
+                                {
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue = monthlySiDTO.GstOnPremiumChargeable.ToString();
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue = "0";
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue = monthlySiDTO.PremiumChargeable.ToString();
+                                }
+                                else
+                                {
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue = NewTaxAmount.ToString();
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue = NewTaxAmount.ToString();
+                                    CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue = monthlySiDTO.PremiumChargeable.ToString();
+                                }
+
+                               
+
                                 Guid guid = Guid.NewGuid();
                                 monthlySiDTO.Txnid = guid.ToString();
 
@@ -5724,9 +5680,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 continue;
                             }
 
-
-
-
                         }
                         else
                         {
@@ -5746,29 +5699,32 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        private int TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate,ApiContext apiContext)
+        public async Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate,ApiContext apiContext)
         {
+            if (_context == null)
+            {
+                _context = (MICAQMContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            LoggerManager logger = new LoggerManager(_configuration);
 
-            string connectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
-
-           // var connectionString = _configuration["ConnectionStrings:Mica_EGIConnection"];
+            var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+            var connectionString = dbConnectionString.Dbconnection;
+                        
 
             var checkswitchLog = _context.TblSwitchLog.Any(x => x.PolicyNo == PolicyNo);
 
-
+           
+            
             if (checkswitchLog)
             {
-                var switchQuery = "select count(distinct Cast(CreatedDate as Date)),Month(CreatedDate),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("MM/dd/yyyy") + "' and '" + ToDate.Date.ToString("MM/dd/yyyy") + "' group by Month(CreatedDate) , PolicyNo";
+                var switchQuery = "select count(distinct Cast(CreatedDate as Date)),PolicyNo from [QM].[tblSwitchLog] where SwitchStatus = 1 and PolicyNo ='" + PolicyNo + "'and Cast(CreatedDate as Date) BETWEEN '" + FromDate.Date.ToString("MM/dd/yyyy") + "' and '" + ToDate.Date.ToString("MM/dd/yyyy") + "' group by PolicyNo";
 
                 try
                 {
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        connection.Open();
-
-                        //TBLSWITCHLOG
+                          //TBLSWITCHLOG
                         SqlCommand Switchcommand = new SqlCommand(switchQuery, connection);
                         DataSet Switchds = new DataSet();
                         SqlDataAdapter switchadapter = new SqlDataAdapter(Switchcommand);
@@ -5785,12 +5741,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 catch (Exception ex)
                 {
+                    logger.LogError(ex,"TotalUsage",apiContext);
                     return 0;
                 }
 
             }
             else
-            {
+            {                
                 return 0;
             }
         }
@@ -6719,7 +6676,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return response;
         }
 
-
         private List<RuleEngineResponse> GenericMapper(dynamic SourceObject)
         {
             int successcount = 0;
@@ -6731,18 +6687,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             List<RuleEngineResponse> engineResponse = new List<RuleEngineResponse>();
             try
             {
-
                 foreach (var item in DriverRiskItem)
                 {
                     var driverExp = item["Driving Experience"];
-                    var driverAge = item["Age"];
-                    var drvIdentificationNo = item["Identification Number"];
                     if (driverExp >= 1)
                     {
                         RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Primary Driver Experience";
+                        resobj.ValidatorName = "Driving Experience";
                         resobj.Outcome = "Success";
-                        resobj.Message = "Validation done for primary driver experience cannot be less than one year";
+                        resobj.Message = "Validation done for driver experience cannot be less than one year";
                         resobj.Code = "GEPO001";
                         engineResponse.Add(resobj);
                         successcount++;
@@ -6751,100 +6704,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     else
                     {
                         RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Primary Driver Experience";
+                        resobj.ValidatorName = "Driving Experience";
                         resobj.Outcome = "Fail";
-                        resobj.Message = "Primary Driver Experience cannot be less than one year";
+                        resobj.Message = "Driver Experience cannot be less than one year";
                         resobj.Code = "GEPO001";
                         engineResponse.Add(resobj);
                         failcount++;
 
                     }
-                    if (driverExp == SourceObject["driverExp"])
-                    {
-                        RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Comparing Driver Experience";
-                        resobj.Outcome = "Success";
-                        resobj.Message = "Validation done for driver experience ";
-                        resobj.Code = "GEPO017";
-                        engineResponse.Add(resobj);
-                        successcount++;
-                    }
-                    else
-                    {
-                        RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Comparing Driver Experience";
-                        resobj.Outcome = "Fail";
-                        resobj.Message = "Primary driver driving experience and base level driver experience should be same";
-                        resobj.Code = "GEPO017";
-                        engineResponse.Add(resobj);
-                        failcount++;
-
-                    }
-
-                    if (driverAge == SourceObject["driverAge"])
-                    {
-                        RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Comparing Driver Age";
-                        resobj.Outcome = "Success";
-                        resobj.Message = "Validation done for driver age ";
-                        resobj.Code = "GEPO018";
-                        engineResponse.Add(resobj);
-                        successcount++;
-                    }
-                    else
-                    {
-                        RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Comparing Driver Age";
-                        resobj.Outcome = "Fail";
-                        resobj.Message = "Primary driver age and base level driver age must be same";
-                        resobj.Code = "GEPO018";
-                        engineResponse.Add(resobj);
-                        failcount++;
-
-                    }
-                    if (Convert.ToInt32(driverExp) > Convert.ToInt32(driverAge) - 18)
-                    {
-                        RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Primary level driver experience";
-                        resobj.Outcome = "Fail";
-                        resobj.Message = "Years of primary driver driving experience cannot be greater than the difference in current age and 18";
-                        resobj.Code = "GEPO019";
-                        engineResponse.Add(resobj);
-                        failcount++;
-                    }
-                    else
-                    {
-                        RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "Primary level driver experience";
-                        resobj.Outcome = "Success";
-                        resobj.Message = "Validation done for driver experience";
-                        resobj.Code = "GEPO019";
-                        engineResponse.Add(resobj);
-                        successcount++;
-                    }
-
-                    if (driverAge >= 18)
-                    {
-                        RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "driverAge";
-                        resobj.Outcome = "Success";
-                        resobj.Message = "Validation done for age of primary driver cannot be less than 18 years";
-                        resobj.Code = "GEPO020";
-                        engineResponse.Add(resobj);
-                        successcount++;
-
-                    }
-                    else
-                    {
-                        RuleEngineResponse resobj = new RuleEngineResponse();
-                        resobj.ValidatorName = "driverAge";
-                        resobj.Outcome = "Fail";
-                        resobj.Message = "Age of primary driver cannot be less than 18 years";
-                        resobj.Code = "GEPO020";
-                        engineResponse.Add(resobj);
-                        failcount++;
-                    }
-
                 }
 
                 if (Convert.ToInt32(SourceObject["driverExp"]) > Convert.ToInt32(SourceObject["driverAge"]) - 18)
@@ -6867,7 +6734,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     engineResponse.Add(resobj);
                     successcount++;
                 }
-
                 if (SourceObject["noOfPC"] == 1)
                 {
                     if (SourceObject["si"] <= 2000000)
@@ -6983,6 +6849,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     resobj.Code = "GEPO010";
                     engineResponse.Add(resobj);
                     failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
 
                 }
                 if (SourceObject["additionalDriver"] >= 0 && SourceObject["additionalDriver"] <= 2)
@@ -7025,6 +6892,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     resobj.Code = "GEPO012";
                     engineResponse.Add(resobj);
                     failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
 
                 }
                 if (SourceObject["driverAge"] >= 18)
@@ -7047,6 +6915,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     resobj.Code = "GEPO014";
                     engineResponse.Add(resobj);
                     failcount++;
+                    //engineResponse.FirstOrDefault(x => x.ValidatorName == "Final Result").Outcome = "Fail";
+
                 }
                 foreach (var item in VehicleRiskItem)
                 {
@@ -7073,50 +6943,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         failcount++;
 
                     }
-
                 }
-                if (SourceObject["driverExp"] >= 1)
-                {
-                    RuleEngineResponse resobj = new RuleEngineResponse();
-                    resobj.ValidatorName = "Driving Experience";
-                    resobj.Outcome = "Success";
-                    resobj.Message = "Validation done for driver experience cannot be less than one year";
-                    resobj.Code = "GEPO016";
-                    engineResponse.Add(resobj);
-                    successcount++;
 
-                }
-                else
-                {
-                    RuleEngineResponse resobj = new RuleEngineResponse();
-                    resobj.ValidatorName = "Driving Experience";
-                    resobj.Outcome = "Fail";
-                    resobj.Message = "Driver Experience cannot be less than one year";
-                    resobj.Code = "GEPO016";
-                    engineResponse.Add(resobj);
-                    failcount++;
-
-                }
 
                 if (failcount > 0)
                 {
                     RuleEngineResponse res4obj = new RuleEngineResponse();
-                    res4obj.ValidatorName = "Generic Final Result";
+                    res4obj.ValidatorName = "Final Result";
                     res4obj.Outcome = "Fail";
                     res4obj.Message = "One or More conditions failed";
-                    res4obj.Code = "GEPO021";
+                    res4obj.Code = "GEPO016";
                     engineResponse.Add(res4obj);
                 }
                 else
                 {
                     RuleEngineResponse res4obj = new RuleEngineResponse();
-                    res4obj.ValidatorName = "Generic Final Result";
+                    res4obj.ValidatorName = "Final Result";
                     res4obj.Outcome = "Success";
                     res4obj.Message = "Conditions Successful";
-                    res4obj.Code = "GEPO022";
+                    res4obj.Code = "GEPO017";
                     engineResponse.Add(res4obj);
 
                 }
+
+
             }
             catch
             {
@@ -7126,7 +6976,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return engineResponse;
 
         }
-
 
         private async Task<MonthlySIUploadDTO> CSVUpload (string strFilePath, ApiContext context)
         {
@@ -7704,6 +7553,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var CurrentDate = IndianTime.Date;
             var CurrentDay = IndianTime.DayOfWeek.ToString();
+
+            //This Hour is Used Find Out is it 12:30 AM Call OR 7AM Call
             var CurrentTimeHour = IndianTime.Hour;
 
             string ProductCode = _configuration["Mica_ApiContext:ProductCode"].ToString();
@@ -7722,7 +7573,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             foreach (var policy in PolicyNumberList)
             {
+               
                 var ScheduleData = _context.TblSchedule.Where(x => x.PolicyNo == policy).ToList();
+
+                MobileAlertRequestDTO MobileRequestDTO = new MobileAlertRequestDTO();
 
                 foreach (var schedule in ScheduleData)
                 {
@@ -7773,11 +7627,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         continue;
                     }
-                    else if(CurrentDayStat == false)
-                    {
-                        var MobileNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).MobileNumber;
-
-                        var checkManualOn = _context.TblSwitchLog.Any(x => x.PolicyNo == policy && 
+                    else if (CurrentDayStat == false)
+                    {                       
+                        var checkManualOn = _context.TblSwitchLog.Any(x => x.PolicyNo == policy &&
                                                                              x.VehicleNumber == schedule.VehicleRegistrationNo &&
                                                                              x.SwitchType == "Manual" &&
                                                                              x.SwitchStatus == true &&
@@ -7785,31 +7637,48 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         //This Will Skip the Vehicle for Which 
                         //Manual Switch On has Come
-                        if(checkManualOn == true)
+                        if (checkManualOn == true)
                         {
                             continue;
                         }
+
+                        var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;
 
 
                         switch (CurrentTimeHour)
                         {
                             case 0:
-                              var Message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " isn’t covered for today. Just thought we’d let you know.";                                                         
-                              var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
-                               break;
+                                var Message = "Your vehicle No - " + schedule.VehicleRegistrationNo + " isn’t covered for today. Just thought we’d let you know.";
+                                MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message, false);
+                                break;
 
                             case 7:
                                 var Message1 = "Your vehicle No - " + schedule.VehicleRegistrationNo + " still isn’t covered for today. If you’re planning to drive it, now is the time to switch ‘ON’.";
-                                var MobileNoti = await MobileAppNotifyCall(MobileNumber, Message1);                              
+                                MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message1, false);
                                 break;
 
-                        }
+                            default:
+                                break;
+                        }                      
                     }
+                }
+
+                if(MobileRequestDTO.type != null)
+                {
+                    var IntergrationCall = await MobileAppNotifyCall(MobileRequestDTO);
+
+
+                    //if (IntergrationCall == false)
+                    //{
+                    //    //Mobile APP - Notification Failed
+                    //    return false;
+                    //}
 
                 }
 
-            }
 
+
+            }
             return true;
         }
         
@@ -7835,8 +7704,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
 
             var PolicyNumberList = PolicyDetails.Select(x => x.PolicyNumber).ToList();
-
             PolicyNumberList.Distinct();
+
+            MobileAlertRequestDTO MobileRequestDTO = new MobileAlertRequestDTO();
+
 
             foreach (var policy in PolicyNumberList)
             {
@@ -7867,16 +7738,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //Alerts after 2 days check if payment is not collected.
                 var ModDiff = (DateDiff % 2);
 
-                var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;
+                var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;            
 
-                if(ModDiff == 0)
+                if (ModDiff == 0)
                 {
                     var Message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
-                    
-                    var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
+
+                    MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message, true);
                 }
 
             }
+
+            if (MobileRequestDTO.type != null)
+            {
+                var IntergrationCall = await MobileAppNotifyCall(MobileRequestDTO);
+
+                //if (IntergrationCall == false)
+                //{
+                //    //Mobile APP - Notification Failed
+                //    return false;
+                //}
+
+            }
+
+
 
             return true;
         }
@@ -7932,6 +7817,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             PolicyNumberList.Distinct();
 
+            MobileAlertRequestDTO MobileRequestDTO = new MobileAlertRequestDTO();
+
             foreach (var policy in PolicyNumberList)
             {
                 var AccountNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).CDAccountNumber;
@@ -7957,7 +7844,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;                   
                     var Message = "Sorry, we’ve had to stop your cover! Your balance premium got over, and we didn’t receive your renewal payment. Please make your payment to restart your policy.";
 
-                    var MobileNotification = await MobileAppNotifyCall(MobileNumber, Message);
+                    MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message,true);
                 }
                 else
                 {
@@ -7966,32 +7853,73 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                
             }
 
+
+             if (MobileRequestDTO.type != null)
+            {
+                var IntergrationCall = await MobileAppNotifyCall(MobileRequestDTO);
+
+                //if (IntergrationCall == false)
+                //{
+                //    //Mobile APP - Notification Failed
+                //    return false;
+                //}
+
+            }
+
+
             return true;
         }
 
-        private async Task<bool> MobileAppNotifyCall(string MobileNumber,string Message)
+        private MobileAlertRequestDTO MobileAppObject(MobileAlertRequestDTO RequestDTO,string MobileNumber,string Message,bool SameMsg)
         {
-            MobileAlertRequestDTO mobileNotification = new MobileAlertRequestDTO();
-            mobileNotification.type = _configuration["MobileNotification:Type"];
-            mobileNotification.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
-            mobileNotification.push.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
-            mobileNotification.push.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
-            mobileNotification.push.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+            MobilePushDTO pushDTO = new MobilePushDTO();
 
-            mobileNotification.push.message = Message;
-            mobileNotification.push.mobiles.Add(MobileNumber);
+            RequestDTO.type = _configuration["MobileNotification:Type"];
+            RequestDTO.snsTopicId = Convert.ToInt32(_configuration["MobileNotification:SnsTopicId"]);
 
-            var MobileNotification = await _integrationService.MobileNotification(mobileNotification);
+            pushDTO.android = Convert.ToBoolean(_configuration["MobileNotification:Android"]);
+            pushDTO.ios = Convert.ToBoolean(_configuration["MobileNotification:Ios"]);
+            pushDTO.sendAll = Convert.ToBoolean(_configuration["MobileNotification:SendAll"]);
+
+            if (SameMsg == true)
+            {             
+                if(RequestDTO.push.Count > 0)
+                {
+                    RequestDTO.push.FirstOrDefault().mobiles.Add(MobileNumber);
+                }
+                else
+                {
+                    pushDTO.message = Message;
+                    pushDTO.mobiles.Add(MobileNumber);
+                    RequestDTO.push.Add(pushDTO);
+                }
+                                
+                return RequestDTO;
+            }
+
+            pushDTO.message = Message;
+            pushDTO.mobiles.Add(MobileNumber);
+
+            RequestDTO.push.Add(pushDTO);          
+
+            return RequestDTO;
+        }  
+
+        private async Task<bool> MobileAppNotifyCall (MobileAlertRequestDTO MobileRequestDTO)
+        {
+            var MobileNotification = await _integrationService.MobileNotification(MobileRequestDTO);
 
             //Use This Will Writing RE-TRY Logic
+            //If the Integration Call is Failed
             //if(MobileNotification.id == 0)
             //{
             //    //The Notification is not sent Error has occured 
-                  //return false;
+            //return false;
             //}
 
             return true;
         }
+              
     }
 }
 

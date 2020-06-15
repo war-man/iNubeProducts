@@ -36,16 +36,14 @@ namespace iNube.Services.ReInsurance
         {
 
             services.AddDbContext<MICARIContext>();
+            var micaconnectionstring = Configuration.GetConnectionString("RIConnection");
+            //services.AddDbContext<MICAACContext>(x => x.UseSqlServer(micaconnectionstring));
 
-            var connectionstring = Configuration.GetConnectionString("RIConnection");
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
-            //Module service
             ConfigureModuleService(services);
-
-            //Common Service
             services.InitializedCommonServices(Configuration);
 
             services.AddMvc()
@@ -53,14 +51,36 @@ namespace iNube.Services.ReInsurance
            {
                options.RegisterValidatorsFromAssemblyContaining<Startup>();
            });
-
-
-            var appSettings = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettings);
-
-
-            services.AddHealthChecks().AddSqlServer(connectionstring);
+            services.AddHealthChecks().AddSqlServer(micaconnectionstring);
             services.AddAutoMapper(typeof(Startup));
+
+
+
+
+            // var connectionstring = Configuration.GetConnectionString("RIConnection");
+
+            // var appSettingsSection = Configuration.GetSection("AppSettings");
+            // services.Configure<AppSettings>(appSettingsSection);
+
+            // //Module service
+            // ConfigureModuleService(services);
+
+            // //Common Service
+            // services.InitializedCommonServices(Configuration);
+
+            // services.AddMvc()
+            //.AddFluentValidation(options =>
+            //{
+            //    options.RegisterValidatorsFromAssemblyContaining<Startup>();
+            //});
+
+
+            // var appSettings = Configuration.GetSection("AppSettings");
+            // services.Configure<AppSettings>(appSettings);
+
+
+            // services.AddHealthChecks().AddSqlServer(connectionstring);
+            // services.AddAutoMapper(typeof(Startup));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -86,8 +106,27 @@ namespace iNube.Services.ReInsurance
         {
             // configure DI for application services
             // services.AddTransient<IValidator<RIModels>, CreateProductRequestValidator>();
+            //services.AddTransient<IEmailService, EmailService>();
+            //services.AddTransient<MicaAccountConfigService>();
+            //services.AddTransient<MotorAccountConfigService>();
+            //services.AddTransient<AvoAccountConfigService>();
+            //services.AddTransient<Func<string, IAccountingConfigService>>(serviceProvider => lkey =>
+            //{
+            //    switch (lkey)
+            //    {
+            //        case "Mica":
+            //            return serviceProvider.GetService<MicaAccountConfigService>();
+            //        case "Motor":
+            //            return serviceProvider.GetService<MotorAccountConfigService>();
+            //        case "Avo":
+            //            return serviceProvider.GetService<AvoAccountConfigService>();
+            //        default:
+            //            return serviceProvider.GetService<MicaAccountConfigService>();
+
+            //    }
+            //});
             services.AddScoped<IReInsuranceService, ReInsuranceService>();
-            //services.AddScoped<IIntegrationService, IntegrationService>();
+            services.AddScoped<IIntegrationService, IntegrationService>();
 
 
         }

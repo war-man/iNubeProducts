@@ -46,14 +46,19 @@ const Permission = (props) => {
     let dashboard = props.dashboard;
     let reports = props.reports;
     let dynamicreports = props.dynamicReport;
+    let dynamicgraphs = props.dynamicGraph;
     console.log("props.dynamicReport: ", props.dynamicReport);
+    console.log("props.dynamicReport: ", props.dynamicGraph);
     console.log("props.dynamicReport: ", dynamicreports);
+    console.log("props.dynamicReport: ", dynamicgraphs);
     let testCheck = props.testCheck;
     let changeCollapse = props.changeCollapse;
     let testCheck1 = props.testCheck1;
     let changeCollapse1 = props.changeCollapse1;
     let testCheck2 = props.testCheck2;
+    let testCheck3 = props.testCheck3;
     let changeCollapse2 = props.changeCollapse2;
+
     let permissions = (a, b, location, c) => {
         return (
             <div>
@@ -89,6 +94,7 @@ const Permission = (props) => {
             </div>
         );
     }
+
     let dashboardmenu = (a1, b1, location1, c1) => {
         return (
             <div>
@@ -160,6 +166,43 @@ const Permission = (props) => {
             </div>
         );
     }
+
+    let dynamicgraphsmenu = (a3, b3, location3, c3) => {
+        return (
+            <div>
+                <React.Fragment>
+                    {a3.map((item, index) =>
+                        <React.Fragment>
+                            <ListItem className="tree-Assign-Privileges">
+                                <ListItemIcon className="checkboxPading" >
+                                    <CustomCheckbox
+                                        value={item.status}
+                                        onChange={(e) => { testCheck3(index, location3, c3, e) }}
+                                        checked={item.status}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </ListItemIcon>
+                                <ListItemText className="checkboxText" primary={item.label} /*onClick={() => { changeCollapse2(index, location2, c2) }}*/ />
+                            </ListItem>
+                            {
+                                (item.children.length == 0) ? "" :
+                                    <Collapse in={!item.collapse} unmountOnExit>
+                                        <ListItem>
+                                            <List className="list-padding">
+                                                {dynamicgraphsmenu(item.children, b3 + 1, location3.concat([index]), c3)}
+                                            </List>
+                                        </ListItem>
+                                    </Collapse>
+                            }
+                        </React.Fragment>
+                    )}
+                </React.Fragment>
+            </div>
+        );
+    }
+
     return (
         <GridContainer>
             <GridItem xs={12} sm={12} md={12}>
@@ -232,14 +275,45 @@ const Permission = (props) => {
                                                 <ListItemIcon className="checkboxPading" >
                                                 </ListItemIcon>
                                                 {menuname ?
-                                                    <ListItemText className="checboxText" primary={item.roleName} />
-                                                    : null}
-                                                {/*<label><TranslationContainer translationKey="ListofReports" /></label>}*/}
+                                                    <ListItemText className="checboxText" primary={item.name} />
+                                                    :
+                                                    <label><TranslationContainer translationKey="ListofReports" /></label>}
                                             </ListItem>
                                             <GridItem>
                                                 <ListItem className="partner-admin">
                                                     <List>
                                                         {dynamicreportsmenu(item.mdata, 0, [], index)}
+                                                    </List>
+                                                </ListItem>
+                                            </GridItem>
+                                        </GridItem>
+                                    </div>
+                                )}
+                            </List>
+                        </CardBody>
+                    </GridContainer>
+                    : null}
+
+                {(dynamicgraphs != undefined) ?
+                    <GridContainer>
+                        <CardBody className="permission-card">
+                            <h4 style={{ fontWeight: '400' }}> Graphs Privileges </h4>
+                            <List>
+                                {dynamicgraphs.map((item, index) =>
+                                    <div className="permissiongrid" id="'+ randomID +'">
+                                        <GridItem xs={12} sm={12}>
+                                            <ListItem className="mica-admin" >
+                                                <ListItemIcon className="checkboxPading" >
+                                                </ListItemIcon>
+                                                {menuname ?
+                                                    <ListItemText className="checboxText" primary={item.name} />
+                                                    :
+                                                    < label > <TranslationContainer translationKey="ListofGraphs" /></label>}
+                                            </ListItem>
+                                            <GridItem>
+                                                <ListItem className="partner-admin">
+                                                    <List>
+                                                        {dynamicgraphsmenu(item.mdata, 0, [], index)}
                                                     </List>
                                                 </ListItem>
                                             </GridItem>

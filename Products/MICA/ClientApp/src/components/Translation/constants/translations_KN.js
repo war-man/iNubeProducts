@@ -157,6 +157,22 @@ export const TRANSLATIONS_KN = {
     CalculationConfig: "ಲೆಕ್ಕಾಚಾರದ ಸಂರಚನೆ",
     CalculationResult: "ಲೆಕ್ಕಾಚಾರದ ಫಲಿತಾಂಶ",
     /**********************************************************************/
+    //people
+    PeopleHierarchy: 'ಜನರು ಶ್ರೇಣಿ',
+    EducationDetails: 'ಶಿಕ್ಷಣ ವಿವರಗಳು',
+    MappingDetails: 'ಮ್ಯಾಪಿಂಗ್ ವಿವರಗಳು',
+    VacantPositions: 'ಖಾಲಿ ಸ್ಥಾನಗಳು',
+    Reportingto: 'ವರದಿ',
+    GradePercentage: 'ಗ್ರೇಡ್/ಶೇಕಡಾವಾರು',
+    Certification: 'ಪ್ರಮಾಣೀಕರಣ',
+    SNo: 'ಎಸ್ ಇಲ್ಲ',
+    DateofAppointment: 'ನೇಮಕಾತಿ ದಿನಾಂಕ',
+    RecruitmentNo: 'ನೇಮಕಾತಿ ಸಂಖ್ಯೆ',
+    BankDetails: 'ಬ್ಯಾಂಕ್ ವಿವರಗಳು',
+    BankName: 'ಬ್ಯಾಂಕ್ ಹೆಸರು',
+    BranchName: 'ಶಾಖೆಯ ಹೆಸರು',
+    NameasintheBankPassBook: 'ಬ್ಯಾಂಕ್ ಪಾಸ್‌ಬುಕ್‌ನಲ್ಲಿರುವಂತೆ ಹೆಸರು',
+    /**********************************************************************/
     //movements
     PolicyNumber: 'ಪಾಲಿಸಿ ಸಂಖ್ಯೆ',
     PolicyStatus: 'ನೀತಿ ಸ್ಥಿತಿ',

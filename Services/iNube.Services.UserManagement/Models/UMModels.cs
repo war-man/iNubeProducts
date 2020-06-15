@@ -329,6 +329,7 @@ namespace iNube.Services.UserManagement.Models
         public string ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? IsActive { get; set; }
+        public bool Userlocked { get; set; }
     }
 
     public partial class ImageDTO
@@ -813,8 +814,24 @@ namespace iNube.Services.UserManagement.Models
         public List<DynamicResponse> DynamicResponse { get; set; }
     }
 
+    public partial class DynamicGraphResponse
+    {
+        public DynamicGraphResponse()
+        {
+            DynamicResponse = new List<DynamicResponse>();
+        }
+
+        public List<DynamicResponse> DynamicResponse { get; set; }
+    }
 
     public partial class UserRoleReportDTO
+    {
+        public string UserId { get; set; }
+        public string[] RoleId { get; set; }
+        public decimal EnvId { get; set; }
+    }
+
+    public partial class UserRoleGraphDTO
     {
         public string UserId { get; set; }
         public string[] RoleId { get; set; }
@@ -831,7 +848,23 @@ namespace iNube.Services.UserManagement.Models
         public List<RolesReportDTO> RolePermissionIds { get; set; }
     }
 
+    public partial class UserRoleGraphsDTO
+    {
+        public UserRoleGraphsDTO()
+        {
+            RolePermissionIds = new List<RolesGraphDTO>();
+        }
+        public string UserId { get; set; }
+        public List<RolesGraphDTO> RolePermissionIds { get; set; }
+    }
+
     public partial class RolesReportDTO
+    {
+        public string RoleId { get; set; }
+        public int[] PermissionIds { get; set; }
+    }
+
+    public partial class RolesGraphDTO
     {
         public string RoleId { get; set; }
         public int[] PermissionIds { get; set; }
@@ -844,7 +877,19 @@ namespace iNube.Services.UserManagement.Models
         public decimal EnvId { get; set; }
     }
 
+    public partial class RoleGraphDTO
+    {
+        public string UserId { get; set; }
+        public string RoleId { get; set; }
+        public decimal EnvId { get; set; }
+    }
+
     public class UserReportPermissionResponse : ResponseStatus
+    {
+        public DynamicPermissionsDTO reportperm { get; set; }
+    }
+
+    public class UserGraphPermissionResponse : ResponseStatus
     {
         public DynamicPermissionsDTO reportperm { get; set; }
     }
