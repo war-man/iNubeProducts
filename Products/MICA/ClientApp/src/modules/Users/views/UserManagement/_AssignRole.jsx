@@ -153,6 +153,7 @@ class AssignRole extends React.Component {
             },
             reports: [],
             dynamicReport: [],
+            dynamicGraph: [],
             loader: true,
             pageloader: false,
             response: false,
@@ -286,6 +287,21 @@ class AssignRole extends React.Component {
                 .then(data => {
                     this.setState({ dynamicReport: data.dynamicResponse });
                     console.log("reports: ", this.state.dynamicReport);
+                });
+
+            fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetGraphOnRoles`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(permissions)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({ dynamicGraph: data.dynamicResponse });
+                    console.log("reports: ", this.state.dynamicGraph);
                 });
 
 
@@ -432,6 +448,22 @@ class AssignRole extends React.Component {
             this.setState({ responses });
         } else {
             responses = [...this.state.dynamicReport[c].mdata];
+            responses[index].status = !responses[index].status;
+            this.setState({ responses });
+            this.setChildren(responses[index]['children'], responses[index].status);
+        }
+        event.preventDefault();
+        console.log("selected data: ", responses);
+    }
+
+    testCheck3 = (index, location, c, event) => {
+        let responses = [...this.state.dynamicGraph[c].mdata];
+        if (location.length > 0) {
+            responses = [...this.state.dynamicGraph[c].mdata];
+            responses[location[0]]['children'][index]['status'] = !responses[location[0]]['children'][index]['status'];
+            this.setState({ responses });
+        } else {
+            responses = [...this.state.dynamicGraph[c].mdata];
             responses[index].status = !responses[index].status;
             this.setState({ responses });
             this.setChildren(responses[index]['children'], responses[index].status);
@@ -679,6 +711,20 @@ class AssignRole extends React.Component {
                     console.log("reports: ", this.state.dynamicReport);
                 });
 
+            fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetGraphOnRoles`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(permissions)
+            }).then(response => response.json())
+                .then(data => {
+                    this.setState({ dynamicGraph: data.dynamicResponse });
+                    console.log("reports: ", this.state.dynamicGraph);
+                });
+
         } else {
             this.setState({ perFlag: false });
         }
@@ -702,19 +748,24 @@ class AssignRole extends React.Component {
         const that = this;
         let x = {};
         let rp = {};
+        let gp = {};
         let listData = this.state.listData;
         let dashboard = this.state.dashboard;
         let reports = this.state.reports;
         let dynamicReport = this.state.dynamicReport;
+        let dynamicGraph = this.state.dynamicGraph;
         if (this.state.cuserid != "") {
             x.userId = this.state.cuserid;
             rp.userId = this.state.cuserid;
+            gp.userId = this.state.cuserid;
         } else {
             x.userId = this.state.userId;
             rp.userId = this.state.userId;
+            gp.userId = this.state.userId;
         }
         x.rolePermissionIds = [];
         rp.rolePermissionIds = [];
+        gp.rolePermissionIds = [];
 
         let RolesDTO = this.state.RolesDTO;//for converting rolename to roleid
         //menu and dashboard permissions
@@ -783,6 +834,32 @@ class AssignRole extends React.Component {
         }
         //
 
+        //graph permissions
+        if (dynamicGraph != undefined) {
+            for (let i = 0; i < dynamicGraph.length; i++) {
+                let g = {};
+                for (let k = 0; k < RolesDTO.length; k++) {
+                    if (dynamicGraph[i].name == RolesDTO[k].name) {
+                        g.roleId = RolesDTO[k].id;
+                    }
+                }
+                g.permissionIds = [];
+                for (let j = 0; j < dynamicGraph[i].mdata.length; j++) {
+                    if (dynamicGraph[i].mdata[j].status == false) {
+                        g.permissionIds = g.permissionIds.concat([dynamicGraph[i].mdata[j].mID]);
+                    }
+                    g.permissionIds = this.handleSubmitForChildren(dynamicGraph[i].mdata[j].children, g.permissionIds);
+                }
+                if (g.permissionIds.length > 0 || g.permissionIds.length == 0) {
+                    //r.permissionIds = r.permissionIds.concat(r.permissionIds);
+                    gp.rolePermissionIds = gp.rolePermissionIds.concat(g);
+                }
+            }
+            gp.rolePermissionIds = [...new Set(gp.rolePermissionIds)];
+            this.handleGraphpermissions(gp);
+        }
+        //
+
         x.rolePermissionIds = [...new Set(x.rolePermissionIds)];
 
         console.log("report permissions: ", rp);
@@ -838,6 +915,47 @@ class AssignRole extends React.Component {
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
             body: JSON.stringify(reports)
+        }).then(function (response) {
+            console.log("response", response);
+            return response.json();
+        }).then(function (data) {
+            //that.setState({ btnload1: false });
+            //    if (data.status == 2) {
+            //        swal({
+            //            text: "Privileges assigned successfully",
+            //            icon: "success"
+            //        });
+            //        that.setState({ redirect: true });
+            console.log("data: ", data);
+            //    }
+            //    else if (data.status == 8) {
+            //        swal({
+            //            //title: "Error",
+            //            text: data.errors[0].errorMessage,
+            //            icon: "error"
+            //        });
+            //    }
+            //    else if (data.status == 400) {
+            //        swal({
+            //            //title: "Sorry",
+            //            text: "Please try again",
+            //            icon: "error"
+            //        });
+            //    }
+            //    else {
+            //    }
+        });
+    }
+
+    handleGraphpermissions = (graphs) => {
+        fetch(`${UserConfig.UserConfigUrl}/api/Permission/SaveAssignGraphs`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(graphs)
         }).then(function (response) {
             console.log("response", response);
             return response.json();
@@ -1231,7 +1349,7 @@ class AssignRole extends React.Component {
                                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                                             <CardBody>
                                                 <GridContainer justify="center" display={this.state.isButtonVisibility} >
-                                                    <Permission handleSubmit={this.handleSubmit} response1={this.state.response1} dynamicReport={this.state.dynamicReport} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2} reports={this.state.reports} dashboard={this.state.dashboard} /*btnload1={this.state.btnload1}*/ menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
+                                                    <Permission handleSubmit={this.handleSubmit} response1={this.state.response1} dynamicReport={this.state.dynamicReport} dynamicGraph={this.state.dynamicGraph} changeCollapse2={this.changeCollapse2} testCheck2={this.testCheck2} testCheck3={this.testCheck3} reports={this.state.reports} dashboard={this.state.dashboard} /*btnload1={this.state.btnload1}*/ menuname={this.state.menuname} listData={this.state.listData} changeCollapse={this.changeCollapse} testCheck={this.testCheck} changeCollapse1={this.changeCollapse1} testCheck1={this.testCheck1} MasPermissionDTO={this.state.MasPermissionDTO} savepermission={this.savepermission} MasPermissionDTO={this.state.MasPermissionDTO} />
                                                 </GridContainer>
                                             </CardBody>
                                         </Animated>
