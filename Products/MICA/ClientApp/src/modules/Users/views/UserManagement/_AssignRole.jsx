@@ -356,41 +356,42 @@ class AssignRole extends React.Component {
         this.state.selected = [];
         this.setState({ search: false, });
         let request = this.state.searchRequest;
-        if (request.firstName != "" || request.employeeNumber != "" ||
-            request.emailId != "" || request.contactNumber != "" ||
-            request.panNo != "" || request.partnerId != ""
-        ) {
-            this.setState({ loader: false });
-            fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/SearchUser`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify(this.state.searchRequest),
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
-                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                    },
-                }
-            ).then(response => response.json())
-                .then(data => {
-                    this.setState({ userdetails: data, showpage: false, perFlag: false });
+        //if (request.firstName != "" || request.employeeNumber != "" ||
+        //    request.emailId != "" || request.contactNumber != "" ||
+        //    request.panNo != "" || request.partnerId != ""
+        //) {
+        this.setState({ loader: false });
+        fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/SearchUser`,
+            {
+                method: 'POST',
+                body: JSON.stringify(request),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            }
+        ).then(response => response.json())
+            .then(data => {
+                this.setState({ userdetails: data, showpage: false, perFlag: false });
 
-                    this.setState({ showusertable: false, loader: false });
-                    if (this.state.userdetails.length > 0) {
-                        this.tabledata();
-                    } else {
-                        setTimeout(
-                            function () {
-                                this.setState({ loader: true, showusertable: false, nodata: true });
-                            }.bind(this), 2000
-                        );
-                    }
-                });
-        } else {
-            swal({
-                text: "Please enter any one search parameter",
-                icon: "error"
+                this.setState({ showusertable: false, loader: false });
+                if (this.state.userdetails.length > 0) {
+                    this.tabledata();
+                } else {
+                    setTimeout(
+                        function () {
+                            this.setState({ loader: true, showusertable: false, nodata: true });
+                        }.bind(this), 2000
+                    );
+                }
             });
-        }
+        //} else {
+        //    swal({
+        //        text: "Please enter any one search parameter",
+        //        icon: "error"
+        //    });
+        //}
 
     }
 
@@ -949,6 +950,7 @@ class AssignRole extends React.Component {
 
     handleGraphpermissions = (graphs) => {
         fetch(`${UserConfig.UserConfigUrl}/api/Permission/SaveAssignGraphs`, {
+            //fetch(`https://localhost:44351/api/Permission/SaveAssignGraphs`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

@@ -767,7 +767,7 @@ class CreateRole extends React.Component {
 
     handleGraphPermissions = (graphs) => {
         let that = this;
-        fetch(`${UserConfig.UserConfigUrl}/api/Role/SaveAssignGraphs`, {
+        fetch(`${UserConfig.UserConfigUrl}/api/Role/SaveDynamicGraphPermission`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
