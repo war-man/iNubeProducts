@@ -114,7 +114,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         [HttpPut]
         public async Task<IActionResult> UpdateReport(int ReportConfigId, DashboardConfigDTO reportConfigDTO)
         {
-            reportConfigDTO.ReportConfigId = ReportConfigId;
+            reportConfigDTO.DashboardConfigId = ReportConfigId;
             await _graphService.UpdateReport(reportConfigDTO, Context);
             return Ok();
 

@@ -15,8 +15,17 @@ namespace iNube.Services.Policy.Helpers.DynamicDBHelpers
         public AutoMapperProfile()
         {
             CreateMap<DashboardConfigDTO, TblDashboardConfig>().ReverseMap();
+            CreateMap<DashboardConfigDTO, TblDashboardConfig>();
+            //.ForMember(dest => dest.TblDashboardConfigParam, opt => opt.MapFrom(src => src.DashboardConfigParamDTO)).ReverseMap();
+
+
             CreateMap<DashboardConfigDTO, TblDashboardConfig>()
-                .ForMember(dest => dest.TblDashboardConfigParam, opt => opt.MapFrom(src => src.TblDashboardConfigParam)).ReverseMap();
+                   .ForMember(dest => dest.TblDashboardConfigParam, opt => opt.MapFrom(src => src.DashboardConfigParamDTO)).ReverseMap();
+
+
+            CreateMap<DashboardConfigParamDTO, TblDashboardConfigParam>().ReverseMap();
+            CreateMap<DashboardConfigParamDTO, TblDashboardConfigParam>();
+
         }
     }
 }

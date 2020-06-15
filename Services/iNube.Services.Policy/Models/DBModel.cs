@@ -22,28 +22,28 @@ namespace iNube.Services.DynamicGraph.model
     {
         public DashboardConfigDTO()
         {
-            TblDashboardConfigParam = new HashSet<DashboardConfigParamDTO>();
+            DashboardConfigParamDTO = new HashSet<DashboardConfigParamDTO>();
         }
 
-        public int ReportConfigId { get; set; }
-        public string ReportConfigName { get; set; }
+        public int DashboardConfigId { get; set; }
+        public string DashboardConfigName { get; set; }
         public string Dbschema { get; set; }
         public string Query { get; set; }
         public DateTime? CreatedDate { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? ModifiedDate { get; set; }
 
-        public virtual ICollection<DashboardConfigParamDTO> TblDashboardConfigParam { get; set; }
+        public virtual ICollection<DashboardConfigParamDTO> DashboardConfigParamDTO { get; set; }
     }
 
     public partial class DashboardConfigParamDTO
     {
-        public int ReportConfigParamId { get; set; }
+        public int DashboardConfigParamId { get; set; }
         public string ParameterName { get; set; }
         public string RangeType { get; set; }
         public string DataType { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public int ReportConfigId { get; set; }
+        public int DashboardConfigId { get; set; }
 
         public virtual DashboardConfigDTO ReportConfig { get; set; }
     }

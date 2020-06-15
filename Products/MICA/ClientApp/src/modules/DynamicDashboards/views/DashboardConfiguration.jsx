@@ -72,8 +72,8 @@ class DashboardConfiguration extends React.Component {
     }
 
     componentDidMount() {
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetMaster`, {
-        //fetch(`https://localhost:44351/api/Graph/GetMaster?lMasterlist=abc&isFilter=true`, {
+       fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetMaster`, {
+        // fetch(`https://localhost:44351/api/Graph/GetMaster?lMasterlist=abc&isFilter=true`, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -219,16 +219,16 @@ class DashboardConfiguration extends React.Component {
         if (this.state.ReportObjParam.length > 0) {
             let isActive = 1;
             var data = {
-                'reportConfigName': this.state.ReportConfigDto.ReportName,
+                'dashboardConfigName': this.state.ReportConfigDto.ReportName,
                 'dbschema': this.state.ReportConfigDto.DBSchemaId,
                 'isActive': isActive,
                 'createdDate': date(),
                 // 'query': this.state.QueryDto.Select +" "+ this.state.QueryDto.Parameter +" "+ this.state.QueryDto.From +" "+ this.state.QueryDto.Table,
                 'query': this.state.QueryDto.Query,
-                'TblreportConfigParam': sendArray,
+                'DashboardConfigParamDTO': sendArray,
             };
-            (`${DashboardConfig.DashboardConfigUrl}/api/Graph/SaveConfigParameters`, {
-           //fetch fetch(`https://localhost:44351/api/Graph/SaveConfigParameters`, {
+          fetch (`${DashboardConfig.DashboardConfigUrl}/api/Graph/SaveConfigParameters`, {
+            // fetch(`https://localhost:44351/api/Graph/SaveConfigParameters`, {
                 method: 'post',
                 headers: {
                     'Accept': 'application/json',

@@ -289,7 +289,8 @@ class DashboardUpdate extends React.Component {
                 'TblreportConfigParam': sendArray,
             };
 
-            fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/UpdateReport?ReportConfigId=` + this.state.ReportConfigDto.ReportName, {
+             fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/UpdateReport?ReportConfigId=` + this.state.ReportConfigDto.ReportName, {
+           //fetch(`https://localhost:44351/api/Graph/UpdateReport?ReportConfigId=` + this.state.ReportConfigDto.ReportName, {
                 method: 'put',
                 headers: {
                     'Accept': 'application/json',

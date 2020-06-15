@@ -49,13 +49,13 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             return ddDTOs;
         }
 
-        public async Task<DashboardConfigResonse> SaveConfigParameters(DashboardConfigDTO reportConfigDTO, ApiContext apiContext)
+        public async Task<DashboardConfigResonse> SaveConfigParameters(DashboardConfigDTO dashboardConfigDTO, ApiContext apiContext)
         {
             try
             {
                 _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-                var dto = _mapper.Map<TblDashboardConfig>(reportConfigDTO);
+                var dto = _mapper.Map<TblDashboardConfig>(dashboardConfigDTO);
                 _context.TblDashboardConfig.Add(dto);
                 _context.SaveChanges();
                 var paramDto = _mapper.Map<DashboardConfigDTO>(dto);
@@ -195,8 +195,8 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
                                       ParameterName = tblconfigParam.ParameterName,
                                       RangeType = tblconfigParam.RangeType,
                                       DataType = tblconfigParam.DataType,
-                                      ReportConfigParamId = tblconfigParam.DashboardConfigParamId,
-                                      ReportConfigId = (int)tblconfigParam.DashboardConfigId
+                                      DashboardConfigParamId = tblconfigParam.DashboardConfigParamId,
+                                      DashboardConfigId = (int)tblconfigParam.DashboardConfigId
                                   };
             var _reportparamList = _mapper.Map<IEnumerable<DashboardConfigParamDTO>>(reportparamList);
             return _reportparamList;
