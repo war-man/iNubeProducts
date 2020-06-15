@@ -46,12 +46,12 @@ const UserAddress = (props) => {
                                 )
                             },
                             {
-                                tabButton: "Bank Details",
+                                tabButton: < TranslationContainer translationKey="BankDetails" />,
                                 tabIcon: Add,
                                 tabContent: (
                                     <Wizard
                                         validate steps={[
-                                            { stepName: "Bank Details", stepComponent: BankDetails, stepId: "Bankdetails", stepData: props },
+                                            { stepName:< TranslationContainer translationKey = "BankDetails"/>, stepComponent: BankDetails, stepId: "Bankdetails", stepData: props },
                                         ]}
                                         title=""
                                         subtitle=""
@@ -59,7 +59,7 @@ const UserAddress = (props) => {
                                 )
                             },
                             {
-                                tabButton: "Education Details",
+                                tabButton: < TranslationContainer translationKey="EducationDetails" />,
                                 tabIcon: Add,
                                 tabContent: <EducationDetails tableData={props.tableData} educationdata={props.avoOrgEmpEducation}/>
                             }

@@ -155,6 +155,22 @@
     CalculationConfig: "గణన కాన్ఫిగర్",
     CalculationResult: "గణన ఫలితం",
     /**********************************************************************/
+    //people
+    PeopleHierarchy: 'ప్రజలు సోపానక్రమం',
+    EducationDetails: 'విద్య వివరాలు',
+    MappingDetails: 'మ్యాపింగ్ వివరాలు',
+    VacantPositions: 'ఖాళీ స్థానాలు',
+    Reportingto: 'కు నివేదిస్తోంది',
+    GradePercentage: 'గ్రేడ్ /శాతం',
+    Certification: 'సర్టిఫికేషన్',
+    SNo: 'ఎస్ నం',
+    DateofAppointment: 'నియామక తేదీ',
+    RecruitmentNo: 'నియామక సంఖ్య',
+    BankDetails: 'బ్యాంక్ వివరములు',
+    BankName: 'బ్యాంక్ పేరు',
+    BranchName: 'శాఖ పేరు',
+    NameasintheBankPassBook: 'బ్యాంక్ పాస్‌బుక్‌లో ఉన్నట్లు పేరు',
+    /**********************************************************************/
     //movements
     PolicyNumber: 'పాలసీ సంఖ్య',
     PolicyStatus: 'విధాన స్థితి',

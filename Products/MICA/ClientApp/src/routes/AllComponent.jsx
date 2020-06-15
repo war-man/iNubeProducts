@@ -188,6 +188,11 @@ const ReportConfiguration = AsyncComponent(() => { return import("modules/Dynami
 const ReportExecution = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportExecution.jsx"); });
 const ReportUpdate = AsyncComponent(() => { return import("modules/DynamicReports/views/ReportUpdate.jsx"); });
 
+//Dynamic Reports
+const DashboardConfiguration = AsyncComponent(() => { return import("modules/DynamicDashboards/views/DashboardConfiguration.jsx"); });
+const ViewDashboard = AsyncComponent(() => { return import("modules/DynamicDashboards/views/ViewDashboard.jsx"); });
+const DashboardUpdate = AsyncComponent(() => { return import("modules/DynamicDashboards/views/DashboardUpdate.jsx"); });
+
 //Wrapper API
 const WrapperAPIConfig = AsyncComponent(() => { return import("modules/WrapperAPI/views/WrapperAPIConfig.jsx"); });
 
@@ -396,6 +401,11 @@ export const ComponentsList = {
     ManageMaster: ManageMaster,
     RecruitmentUpload: RecruitmentUpload,
     AVOSearchContract: AVOSearchContract,
+
+    //DynamicDashboards
+    DashboardConfiguration: DashboardConfiguration,
+    ViewDashboard: ViewDashboard,
+    DashboardUpdate: DashboardUpdate,
 }
 
-export default ComponentsList
+export default ComponentsList;

@@ -261,5 +261,27 @@ namespace iNube.Services.UserManagement.Controllers.Permission
             var response = await _permissionService.SaveAssignReports(reportDTO, Context);
             return Ok(response);
         }
+
+        [HttpPost]
+        public IActionResult GetGraphOnRoles(UserRoleGraphDTO graphDTO)
+        {
+            var reports = _permissionService.GetGraphOnRoles(graphDTO, Context);
+            return Ok(reports);
+        }
+
+        //fetching reports based on role
+        [HttpPost]
+        public async Task<IActionResult> GetGraphByRole(RoleGraphDTO graphDTO)
+        {
+            var response = await _permissionService.GetGraphByRole(graphDTO, Context);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveAssignGraphs(UserRoleGraphsDTO graphDTO)
+        {
+            var response = await _permissionService.SaveAssignGraphs(graphDTO, Context);
+            return Ok(response);
+        }
     }
 }

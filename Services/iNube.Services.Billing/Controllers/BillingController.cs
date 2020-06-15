@@ -284,6 +284,28 @@ namespace iNube.Services.Billing.Controllers.Billing
 
 
         }
+        [HttpGet]
+        public async Task<IActionResult> SpocMailvalidation(String email)
+        {
+            var response = await _billingService.SpocMailvalidation(email, Context);
+
+            switch (response.Status)
+            {
+                case BusinessStatus.InputValidationFailed:
+                    return Ok(response);
+                case BusinessStatus.Created:
+                    return Ok(response);
+                case BusinessStatus.UnAuthorized:
+                    return Unauthorized();
+                case BusinessStatus.Ok:
+                    return Ok(response);
+                default:
+                    return Forbid();
+            }
+
+
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateCustomerConfig(CustomerConfigDTO configDTO)
         {

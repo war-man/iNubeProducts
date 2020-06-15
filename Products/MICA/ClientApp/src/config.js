@@ -2,8 +2,7 @@
 //let env = "Production";
 let env = "Dev";
 //let env = "Local";
-//let env = "UAT";  
- 
+//let env = "UAT"; 
 let Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
 let partnerconfigUrl = Baseurl;
 let productConfigUrl = Baseurl;
@@ -14,13 +13,14 @@ let BillingConfigUrl = Baseurl;
 let policyconfigUrl = Baseurl;
 let claimConfigUrl = Baseurl;
 let rateConfigUrl = Baseurl;
-let ReportConfigUrl = Baseurl; 
+let ReportConfigUrl = Baseurl;
+let DashboardConfigUrl = Baseurl;
 let dynamicPagesConfigUrl = Baseurl;
 let RDLCConfigUrl = Baseurl;
 let ReinsuranceConfigUrl = Baseurl;
 let ExtensionUrl = Baseurl;
 let NotificationUrl = Baseurl;
- 
+
 
 if (env === "EdelweissProd") {
     Baseurl = 'https://egiswitchapi.edelweissinsurance.com';
@@ -34,6 +34,7 @@ if (env === "EdelweissProd") {
     claimConfigUrl = Baseurl;
     rateConfigUrl = Baseurl;
     ReportConfigUrl = Baseurl;
+    DashboardConfigUrl = Baseurl;
     dynamicPagesConfigUrl = Baseurl;
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
@@ -54,10 +55,11 @@ if (env === "Local") {
     claimConfigUrl = 'https://localhost:44344';
     dynamicPagesConfigUrl = 'http://localhost:52166';
     rateConfigUrl = 'http://localhost:58593';
+    DashboardConfigUrl = 'http://localhost:58593';
     RDLCConfigUrl = 'https://inubeservicesnotification.azurewebsites.net';
     ReinsuranceConfigUrl = 'http://localhost:5000';
     ExtensionUrl = "http://localhost:63630";
-    NotificationUrl ="http://localhost:53000";
+    NotificationUrl = "http://localhost:53000";
 }
 if (env === "Dev") {
     Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
@@ -71,6 +73,7 @@ if (env === "Dev") {
     claimConfigUrl = Baseurl;
     rateConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
     ReportConfigUrl = Baseurl;
+    DashboardConfigUrl = Baseurl;
     dynamicPagesConfigUrl = Baseurl;
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
@@ -89,6 +92,7 @@ if (env === "Production") {
     claimConfigUrl = Baseurl;
     rateConfigUrl = Baseurl;
     ReportConfigUrl = Baseurl;
+    DashboardConfigUrl = Baseurl;
     dynamicPagesConfigUrl = Baseurl;
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
@@ -107,6 +111,7 @@ if (env === "UAT") {
     claimConfigUrl = Baseurl;
     rateConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
     ReportConfigUrl = Baseurl;
+    DashboardConfigUrl = Baseurl;
     dynamicPagesConfigUrl = Baseurl;
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
@@ -133,12 +138,13 @@ export const config = {
     RDLCConfigUrl: RDLCConfigUrl,
     ReinsuranceConfigUrl: ReinsuranceConfigUrl,
     ReportConfigUrl: ReportConfigUrl,
+    DashboardConfigUrl: DashboardConfigUrl,
     ExtensionUrl: ExtensionUrl,
     NotificationUrl: NotificationUrl,
 
     apiUrl: '',
     localUrl: '',
-   
+
     rulelocalUrl: '',
     localRuleUrl: '',
 

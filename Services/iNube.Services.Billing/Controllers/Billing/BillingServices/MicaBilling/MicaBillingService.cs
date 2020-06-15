@@ -799,6 +799,21 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             }
         }
 
+        public async Task<CustomerResponse> SpocMailvalidation(string email, ApiContext apiContext)
+        {
+            _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            var data = _context.TblCustSpocDetails.Any(e => e.EmailId == email);
+
+            if (data == true)
+            {
+                return new CustomerResponse() { Status = BusinessStatus.InputValidationFailed, ResponseMessage = $"Spoc Email {email} already Exists" };
+            }
+            else
+            {
+                return new CustomerResponse() { Status = BusinessStatus.Ok, ResponseMessage = $"ok " };
+            }
+        }
+
         public async Task<CustomerConfigDTO> CreateCustomerConfig(CustomerConfigDTO configDTO, ApiContext apiContext)
         {
             _context = (MICABIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1681,6 +1696,7 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
         public string InvoiceItemDescription(InvoiceDetailDTO invoiceDetailDTO)
         {
             // _context = (MICABIContext)DbManager.GetContext(context.ProductType, context.ServerType);
+
             string BillingDetailsType = "";
 
             if (invoiceDetailDTO.EventMappingId == ModuleConstants.ProductCreation)
@@ -1810,29 +1826,43 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
             InvoiceItemsDetails invoiceItemsDetailsModel = null;
 
             int NumbIncrement = 0;
-            foreach (var item in invoiceDto.InvoiceDetails)
-            {
-                invoiceItemsDetailsModel = new InvoiceItemsDetails();
-                if (item.Eventcount > 0)
+            //check if invoice exists for the customer or not
+            //bool flag true
+
+            //To display One time license cost only in 1st invoice of a customer
+            var conid = (from a in _context.TblContract
+                        join b in _context.TblInvoice on a.ContractId equals b.ContractId
+                        select a).ToList();
+           
+                foreach (var item in invoiceDto.InvoiceDetails)
                 {
-                    invoiceItemsDetailsModel.EventCount = item.Eventcount;
+                    if (item.EventMappingId == ModuleConstants.MICAOneTimeLicenseCost && conid.Count>0)
+                    {
+                        continue;
+                    }
+
+                    invoiceItemsDetailsModel = new InvoiceItemsDetails();
+                    if (item.Eventcount > 0)
+                    {
+                        invoiceItemsDetailsModel.EventCount = item.Eventcount;
+                    }
+                    else
+                        invoiceItemsDetailsModel.EventCount = 1;
+                    invoiceItemsDetailsModel.ItemDescription1 = InvoiceItemDescription(item);
+                    invoiceItemsDetailsModel.ItemDescription2 = "";
+                    invoiceItemsDetailsModel.ItemDescription3 = "";
+                    invoiceItemsDetailsModel.ItemDescription4 = "";
+                    invoiceItemsDetailsModel.HSN = "";
+                    // invoiceItemsDetailsModel.GST = invoiceDto.GstPercent.ToString();
+                    invoiceItemsDetailsModel.Amount = item.Value.ToString();
+                    if (item.Value > 0)
+                    {
+                        ++NumbIncrement;
+                        invoiceItemsDetailsModel.SlNo = NumbIncrement;
+                        invoiceModel.Invoices.Add(invoiceItemsDetailsModel);
+                    }
                 }
-                else
-                    invoiceItemsDetailsModel.EventCount = 1;
-                invoiceItemsDetailsModel.ItemDescription1 = InvoiceItemDescription(item);
-                invoiceItemsDetailsModel.ItemDescription2 = "";
-                invoiceItemsDetailsModel.ItemDescription3 = "";
-                invoiceItemsDetailsModel.ItemDescription4 = "";
-                invoiceItemsDetailsModel.HSN = "";
-                // invoiceItemsDetailsModel.GST = invoiceDto.GstPercent.ToString();
-                invoiceItemsDetailsModel.Amount = item.Value.ToString();
-                if (item.Value > 0)
-                {
-                    ++NumbIncrement;
-                    invoiceItemsDetailsModel.SlNo = NumbIncrement;
-                    invoiceModel.Invoices.Add(invoiceItemsDetailsModel);
-                }
-            }
+           
 
             //for Tax
             //++NumbIncrement;

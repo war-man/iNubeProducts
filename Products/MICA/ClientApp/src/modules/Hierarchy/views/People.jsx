@@ -37,6 +37,7 @@ import MappingDetails from "modules/Hierarchy/views/MappingDetails.jsx";
 import swal from 'sweetalert';
 import Add from "@material-ui/icons/AddCircleOutline";
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 
 
 
@@ -995,7 +996,7 @@ class People extends React.Component {
                                 </CardIcon>
                                 {
                                     <GridItem>
-                                        <h4><small>People</small></h4>
+                                    <h4><small><TranslationContainer translationKey="People"/></small></h4>
                                     </GridItem>
                                 }
                             </CardHeader>
@@ -1003,7 +1004,7 @@ class People extends React.Component {
                                 <GridContainer lg={12} className="myprofile-component">
                                     <GridItem xs={12} sm={4} md={3}>
                                         <CustomInput
-                                            labelText="Employee Code"
+                                            labelText="EmployeeCode"
                                             required={true}
                                             //id="staffCode"
                                             name='staffCode'
@@ -1230,7 +1231,7 @@ class People extends React.Component {
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomDatetime style="ddl"
                                             //disabled={this.state.disabled}
-                                            labelText="Date of Appointment"
+                                            labelText="DateofAppointment"
                                             id='AppointmentmentId'
                                             required={true}
                                             name='appointmentDate'
@@ -1243,7 +1244,7 @@ class People extends React.Component {
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomDatetime style="ddl"
                                         //disabled={this.state.disabled}
-                                        labelText="Recruitment No"
+                                        labelText="RecruitmentNo"
                                         id='recruitmentNo'
                                         //required={true}
                                         name='recruitmentNo'
@@ -1346,13 +1347,13 @@ class People extends React.Component {
                         </Card>
                     {this.state.flagsave &&
                         <GridContainer justify="center">
-                            <Button round /*disabled={this.state.btnload}*/ align="center" color="success" onClick={this.handleSubmit}>Submit</Button>
+                        <Button round /*disabled={this.state.btnload}*/ align="center" color="success" onClick={this.handleSubmit}><TranslationContainer translationKey="Submit"/></Button>
                             {/* {this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                         </GridContainer>}
                     {this.state.flagUpdate &&
                         <GridContainer justify="center">
                            
-                        <Button round /*disabled={this.state.btnload}*/ align="center" color="success" onClick={this.handleUpdate} >Update</Button>
+                        <Button round /*disabled={this.state.btnload}*/ align="center" color="success" onClick={this.handleUpdate} ><TranslationContainer translationKey="Update"/></Button>
 
                             
 

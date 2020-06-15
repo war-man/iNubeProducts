@@ -157,6 +157,22 @@ export const TRANSLATIONS_HN = {
     CalculationConfig: "गणना विन्यास",
     CalculationResult: "गणना परिणाम",
     /**********************************************************************/
+    //people
+    PeopleHierarchy: 'लोग पदानुक्रम',
+    EducationDetails: 'शिक्षा विवरण',
+    MappingDetails: 'मानचित्रण विवरण',
+    VacantPositions: 'खाली स्थान',
+    Reportingto: 'को रिपोर्ट करेंगे',
+    GradePercentage: 'ग्रेड/प्रतिशत',
+    Certification: 'प्रमाणीकरण',
+    SNo: 'एस नहीं',
+    DateofAppointment: 'अपॉइंटमेंट की तिथि',
+    RecruitmentNo: 'भर्ती नं',
+    BankDetails: 'बैंक विवरण',
+    BankName: 'बैंक का नाम',
+    BranchName: 'शाखा का नाम',
+    NameasintheBankPassBook: 'बैंक पासबुक में नाम',
+    /**********************************************************************/
     //movements
     PolicyNumber: 'पॉलिसी क्रमांक',
     PolicyStatus: 'नीति की स्थिति',

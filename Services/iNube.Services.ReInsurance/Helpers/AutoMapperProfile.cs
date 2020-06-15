@@ -42,6 +42,16 @@ namespace iNube.Services.ReInsurance.Helpers
             CreateMap<TblParticipant, TblParticipantDto>();
             CreateMap<TblParticipantDto, TblParticipant>();
 
+
+
+            CreateMap<RiallocationDto, TblRiallocation>().ReverseMap();
+            CreateMap<TblRiallocation, RiallocationDto>().ReverseMap();
+
+            CreateMap<RiallocationDto, TblRiallocation>()
+                   .ForMember(dest => dest.TblRiallocationHistory, opt => opt.MapFrom(src => src.RiallocationHistory)).ReverseMap();
+
+            CreateMap<RiallocationHistoryDto, TblRiallocationHistory>();
+            CreateMap<TblRiallocationHistory, RiallocationHistoryDto>();
             //CreateMap<TblAccountType, AccountTypeDto>();
             //CreateMap<AccountTypeDto, TblAccountType>();
 

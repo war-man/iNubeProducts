@@ -3,7 +3,7 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM microsoft/dotnet:2.2-sdk AS build
+FROM microsoft/dotnet:2.2-sdk AS build 
 WORKDIR /src
 COPY ["iNube.Services.Rating.csproj", "iNube.Services.Rating/"]
 RUN dotnet restore "iNube.Services.Rating/iNube.Services.Rating.csproj"

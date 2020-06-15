@@ -10,6 +10,36 @@ namespace iNube.Services.ReInsurance.Models
     //{
 
     //}
+    public partial class CalulationDto
+    {
+        public int Year { get; set; }
+        public string level { get; set; }
+        public string ProductName { get; set; }
+        public decimal SumInsured { get; set; }
+        public decimal PremiumAmount { get; set; }
+        public string PolicyNo { get; set; }
+
+    }
+
+    public class Mapping
+    {
+        public decimal AllocationAmmount { get; set; }
+        public decimal Premium { get; set; }
+        public string PolicyNo { get; set; }
+        public int Year { get; set; }
+        public string ProductName { get; set; }
+        public string Level { get; set; }
+        public List<Map> maps { get; set; }
+    }
+    public class Map
+    {
+        public string Type { get; set; }
+        public int AllocationBasisId { get; set; }
+        public int AllocationMethodId { get; set; }
+        public decimal Percentage { get; set; }
+        public decimal Limit { get; set; }
+        public int SequenceNo { get; set; }
+    }
     public partial class TblArrangementDto
     {
         public decimal ArrangementId { get; set; }
@@ -195,7 +225,6 @@ namespace iNube.Services.ReInsurance.Models
         {
             TblRimappingDetail = new HashSet<TblRimappingDetailDto>();
         }
-
         public decimal RimappingId { get; set; }
         public int? Year { get; set; }
         public int? Year1 { get; set; }
@@ -207,6 +236,7 @@ namespace iNube.Services.ReInsurance.Models
         public DateTime? ModifiedDate { get; set; }
         public Guid? ModifiedBy { get; set; }
         public string IsActive { get; set; }
+        public int? RetentionGroupId { get; set; }
 
         public virtual ICollection<TblRimappingDetailDto> TblRimappingDetail { get; set; }
     }
@@ -419,5 +449,61 @@ namespace iNube.Services.ReInsurance.Models
     public class TransactionMapResponse : ResponseStatus
     {
         public TblTreatyDto CreateTrans { get; set; }
+    }
+    public class EnvironmentResponse : ResponseStatus
+    {
+        public string Dbconnection { get; set; }
+    }
+    public partial class CustomerSettingsDTO
+    {
+        public decimal Id { get; set; }
+        public decimal? CustomerId { get; set; }
+        public string Type { get; set; }
+        public string Key { get; set; }
+        public string KeyValue { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public decimal? EnvId { get; set; }
+    }
+    public partial class RiallocationDto
+    {
+        public RiallocationDto()
+        {
+            RiallocationHistory = new HashSet<RiallocationHistoryDto>();
+        }
+
+        public decimal AllocationId { get; set; }
+        public string AllocationLevel { get; set; }
+        public int? ItemId { get; set; }
+        public decimal? AllocationAmount { get; set; }
+        public decimal? Premium { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public Guid? ModifiedBy { get; set; }
+        public string IsActive { get; set; }
+        public string IsApproved { get; set; }
+        public Guid? ApprovedBy { get; set; }
+        public int? MappingId { get; set; }
+        public string AllocationDetails { get; set; }
+        public string PolicyNo { get; set; }
+
+        public virtual ICollection<RiallocationHistoryDto> RiallocationHistory { get; set; }
+    }
+    public partial class RiallocationHistoryDto
+    {
+        public decimal AllocationHistoryid { get; set; }
+        public decimal? AllocationId { get; set; }
+        public int? MaapingId { get; set; }
+        public string PolicyNo { get; set; }
+        public string AllocationLevel { get; set; }
+        public string ItemName { get; set; }
+        public decimal? AllocationAmount { get; set; }
+        public decimal? Premium { get; set; }
+        public string AloocationDetails { get; set; }
+        public DateTime? TransectionDate { get; set; }
+
+       // public virtual TblRiallocation Allocation { get; set; }
     }
 }

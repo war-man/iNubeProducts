@@ -1,6 +1,7 @@
 ﻿
 using iNube.Services.ReInsurance.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,46 +16,36 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
     {
 
         //Task<IEnumerable<ProductMasterddDTOs>> GetProductMasterAsync(ApiContext apiContext);
-     
+        Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
+        Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
-        readonly string productUrl = "https://inubeservicesproductconfiguration.azurewebsites.net";
-       //readonly string productUrl = "https://localhost:44347";
-		//readonly string productUrl = "http://mica-inube-product-service.mica-internal.:9007";
-        
-		readonly string claimUrl = "https://inubeservicesclaims.azurewebsites.net";
-        //readonly string claimUrl = "https://localhost:44344";
-		// readonly string claimUrl = "http://mica-inube-claim-service.mica-internal.:9002";
+        private IConfiguration _configuration;
+        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, ExtensionUrl;
+        public IntegrationService(IConfiguration configuration)
+        {
 
-        readonly string policyUrl = "https://inubeservicespolicy.azurewebsites.net";
-        //readonly string policyUrl = "https://localhost:44351";
-		// readonly string policyUrl = "http://mica-inube-policy-service.mica-internal.:9006";
-
-        string notificationUrl = "https://inubeservicesnotification.azurewebsites.net";
-        //string notificationUrl = "http://localhost:53000";
-		//readonly string notificationUrl = "http://mica-inube-notification-service.mica-internal.:9004";
-		
-
-        readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-        //readonly string partnerUrl = "https://localhost:44315";
-		//readonly string partnerUrl = "http://mica-inube-partner-service.mica-internal.:9005";
-
-        //readonly string UsermanangementUrl = "https://localhost:44367";
-        readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-        //readonly string UsermanangementUrl = "http://mica-inube-user-service.mica-internal.:9009";
-
-        //public async Task<IEnumerable<ProductMasterddDTOs>> GetProductMasterAsync(ApiContext apiContext)
-        //{
-        //    //token issue it will come from ui
-        //    var uri = "https://inubeservicesproductconfiguration.azurewebsites.net/api/Product/GetMasterData?isFilter=true";// productUrl + "/api/Product/GetMasterData?sMasterlist=Product&isFilter=true";
-        //    //var uri ="https://localhost:44347/api/Product/GetMasterData?sMasterlist=Product&isFilter=false";
-        //    var productList = await GetListApiInvoke<ProductMasterddDTOs>(uri, apiContext);
-        //    return productList;
-        //}
+            _configuration = configuration;
+            PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
+            BillingUrl = _configuration["Integration_Url:Billing:BillingUrl"];
+            ClaimUrl = _configuration["Integration_Url:Claim:ClaimUrl"];
+            NotificationUrl = _configuration["Integration_Url:Notification:NotificationUrl"];
+            PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
+            ProductUrl = _configuration["Integration_Url:Product:ProductUrl"];
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
+            RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
+            ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
+        }
 
 
-
+        public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
+        {
+            var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
+            return await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
+        }
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();
@@ -63,7 +54,6 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                 client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
-
             using (var response = await client.GetAsync(url))
             using (var content = response.Content)
             {
@@ -78,30 +68,51 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
             }
             return new TResponse();
         }
-        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url) where TResponse : new()
+        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-
-            HttpClient client = new HttpClient();
-            //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            //client.BaseAddress = new Uri(url);
-            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-            using (var response = await client.GetAsync(url))
-            using (var content = response.Content)
+            try
             {
-                if (response.IsSuccessStatusCode)
+
+
+                HttpClient client = new HttpClient();
+                //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                //client.BaseAddress = new Uri(url);
+                if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
-                    if (serviceResponse != null)
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
+                using (var response = await client.GetAsync(url))
+                using (var content = response.Content)
+                {
+                    if (response.IsSuccessStatusCode)
                     {
-                        return serviceResponse;
+                        var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
+                        if (serviceResponse != null)
+                        {
+                            return serviceResponse;
+                        }
                     }
                 }
-            }
 
+
+            }
+            catch (Exception)
+            {
+
+                //throw;
+            }
             return new List<TResponse>();
         }
+        public async Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext)
+        {
 
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerSettings?customerid=" + apiContext.OrgId + "&type=" + TimeZone;//+"&envid="+apiContext.ServerType;
+
+            return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+
+        }
         private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
         {
             try
@@ -129,7 +140,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return new TResponse();
@@ -152,7 +163,6 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                 {
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     string postBody = JsonConvert.SerializeObject(request);
-                    //dynamic dynamicObject = JsonConvert.DeserializeObject(postBody);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
@@ -164,48 +174,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                     }
                 }
             }
-            catch (Exception ex)
+
+            catch (Exception)
             {
 
                 return new List<TResponse>();
             }
 
-        }
-        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
-        {
-            try
-            {
-
-
-                HttpClient client = new HttpClient();
-                //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                if (!string.IsNullOrEmpty(apiContext.Token))
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
-                }
-                using (var response = await client.GetAsync(url))
-                using (var content = response.Content)
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
-                        if (serviceResponse != null)
-                        {
-                            return serviceResponse;
-                        }
-                    }
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-
-                //throw;
-            }
-            return new List<TResponse>();
         }
 
     }

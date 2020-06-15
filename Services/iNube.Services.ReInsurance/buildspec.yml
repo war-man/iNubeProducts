@@ -11,13 +11,15 @@ phases:
       - REPOSITORY_URI=820227512150.dkr.ecr.ap-south-1.amazonaws.com/micacontainerregistry
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
-  build:
+  build: 
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
+      - docker info
       - docker build -t $REPOSITORY_URI:rilatest Services/iNube.Services.ReInsurance
+
       - docker tag $REPOSITORY_URI:rilatest $REPOSITORY_URI:$IMAGE_TAG
-  post_build:
+  post_build: 
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
@@ -29,7 +31,7 @@ phases:
       - cat productionimagedefinition.json
       - cat imageDetail.json
     
- 
+  
 artifacts:
     files:
     - Services/iNube.Services.ReInsurance/appspec.yml

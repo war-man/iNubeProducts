@@ -70,6 +70,7 @@ class CreateTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            allocationbasisflag:false,
             allocationList:[],
             allocationmasList:[],
             showPercentage: false,
@@ -684,10 +685,12 @@ class CreateTreaty extends React.Component {
         if (evt != null) {
             if (evt.target.value == "4") {
                 this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue != 'Lines');
+                this.setState({ allocationbasisflag: false });
                 console.log("ddlvals", this.state.allocationList);
             }
             else if (evt.target.value == "5") {
                 this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue == 'Lines');
+                this.setState({ allocationbasisflag: true });
                 console.log("ddlvals", this.state.allocationList);
             }
         }
@@ -912,7 +915,7 @@ class CreateTreaty extends React.Component {
                                     onClick={this.handleClose}>
                                     &times;
                                 </Button>
-                                <Arrangements handleAggrement={this.handleAggrement} handleAggrement1={this.handleAggrement1} percentageState={this.state.percentageState} amountState={this.state.amountState} plaState={this.state.plaState} claState={this.state.claState} treatydata={this.state.treatydata} index={this.state.arrViewindex} masterList={this.state.masterList} handleClose={this.handleClose} showPercentage={this.state.showPercentage} showlimit={this.state.showlimit} showperwithlimit={this.state.showperwithlimit} shownooflines={this.state.shownooflines} allocationList={this.state.allocationList}/>
+                                <Arrangements handleAggrement={this.handleAggrement} handleAggrement1={this.handleAggrement1} percentageState={this.state.percentageState} amountState={this.state.amountState} plaState={this.state.plaState} claState={this.state.claState} treatydata={this.state.treatydata} index={this.state.arrViewindex} masterList={this.state.masterList} handleClose={this.handleClose} showPercentage={this.state.showPercentage} showlimit={this.state.showlimit} showperwithlimit={this.state.showperwithlimit} shownooflines={this.state.shownooflines} allocationList={this.state.allocationList} allocationbasisflag={this.state.allocationbasisflag}/>
                             </div>
                         </Modal>
                     </GridItem>

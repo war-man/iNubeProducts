@@ -27,6 +27,8 @@ namespace iNube.Services.ReInsurance.Entities
         public virtual DbSet<TblParticipantBranch> TblParticipantBranch { get; set; }
         public virtual DbSet<TblParticipantMaster> TblParticipantMaster { get; set; }
         public virtual DbSet<TblRetentionGroup> TblRetentionGroup { get; set; }
+        public virtual DbSet<TblRiallocation> TblRiallocation { get; set; }
+        public virtual DbSet<TblRiallocationHistory> TblRiallocationHistory { get; set; }
         public virtual DbSet<TblRimapping> TblRimapping { get; set; }
         public virtual DbSet<TblRimappingDetail> TblRimappingDetail { get; set; }
         public virtual DbSet<TblTreaty> TblTreaty { get; set; }
@@ -37,13 +39,13 @@ namespace iNube.Services.ReInsurance.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;");
+                optionsBuilder.UseSqlServer("Server=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=EdelWeissTest;User ID=admin;Password=micaadmin;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblArrangement>(entity =>
             {
@@ -507,6 +509,87 @@ namespace iNube.Services.ReInsurance.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.RetentionLogicId).HasColumnName("RetentionLogicID");
+            });
+
+            modelBuilder.Entity<TblRiallocation>(entity =>
+            {
+                entity.HasKey(e => e.AllocationId);
+
+                entity.ToTable("TblRIAllocation", "RI");
+
+                entity.Property(e => e.AllocationId)
+                    .HasColumnName("AllocationID")
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AllocationAmount).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.AllocationDetails).IsUnicode(false);
+
+                entity.Property(e => e.AllocationLevel)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.IsActive)
+                    .HasMaxLength(1)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsApproved)
+                    .HasMaxLength(1)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PolicyNo)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Premium).HasColumnType("decimal(18, 0)");
+            });
+
+            modelBuilder.Entity<TblRiallocationHistory>(entity =>
+            {
+                entity.HasKey(e => e.AllocationHistoryid);
+
+                entity.ToTable("TblRIAllocationHistory", "RI");
+
+                entity.Property(e => e.AllocationHistoryid)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.AllocationAmount).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.AllocationId).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.AllocationLevel)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AloocationDetails).HasMaxLength(1);
+
+                entity.Property(e => e.ItemName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MaapingId).HasColumnName("maapingId");
+
+                entity.Property(e => e.PolicyNo)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Premium).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.TransectionDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Allocation)
+                    .WithMany(p => p.TblRiallocationHistory)
+                    .HasForeignKey(d => d.AllocationId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_TblRiMappingDetails");
             });
 
             modelBuilder.Entity<TblRimapping>(entity =>

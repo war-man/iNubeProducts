@@ -19,6 +19,7 @@ namespace iNube.Services.ReInsurance.Entities
         public DateTime? ModifiedDate { get; set; }
         public Guid? ModifiedBy { get; set; }
         public string IsActive { get; set; }
+        public int? RetentionGroupId { get; set; }
 
         public virtual ICollection<TblRimappingDetail> TblRimappingDetail { get; set; }
     }

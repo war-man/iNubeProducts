@@ -10,7 +10,7 @@ import Info from "@material-ui/icons/Info";
 import LocationOn from "@material-ui/icons/LocationOn";
 import Gavel from "@material-ui/icons/Gavel";
 import HelpOutline from "@material-ui/icons/HelpOutline";
-
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 // core components
 import GridContainer from "components/Grid/GridContainer.jsx";  
 import GridItem from "components/Grid/GridItem.jsx";
@@ -69,7 +69,7 @@ class EducationDetailsAccordian extends React.Component {
                                     active={0}
                                     collapses={[
                                         {
-                                            title: "Education Details",
+                                            title: <TranslationContainer translationKey="EducationDetails" />,
                                             content: <EducationDetails />
                                         },
                                       

@@ -7,3 +7,4 @@ Resources:
         LoadBalancerInfo:
           ContainerName: "dev2-mica-reinsurance"
           ContainerPort: 9014
+           

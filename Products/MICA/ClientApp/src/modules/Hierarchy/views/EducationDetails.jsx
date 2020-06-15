@@ -41,7 +41,7 @@ const EducationDetails = (props) => {
 
                         {
 
-                            Header: "S No",
+                            Header: "SNo",
 
                             accessor: "id",
 
@@ -89,7 +89,7 @@ const EducationDetails = (props) => {
 
                         },
                         {
-                            Header: "Grade/Percentage",
+                            Header: "GradePercentage",
 
                             accessor: "Grade",
 
@@ -102,7 +102,7 @@ const EducationDetails = (props) => {
                         },
                         {
 
-                            Header: "Actions",
+                            Header: "Action",
 
                             accessor: "Action",
 
