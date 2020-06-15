@@ -91,7 +91,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetReportNameForPermissions()
+        public async Task<IActionResult> GetGraphNameForPermissions()
         {
             var objectval = await _graphService.GetGraphNameForPermissions(Context);
             return Ok(objectval);
