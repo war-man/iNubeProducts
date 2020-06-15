@@ -381,7 +381,7 @@ class ViewDashboard extends React.Component {
                 else {
                     setTimeout(
                         function () {
-                            this.setState({ loader: true, tableFlag: false, nodata: true });
+                            this.setState({ loader: true, tableFlag: false, nodata: false });
                         }.bind(this), 2000
                     );
                 }
