@@ -262,7 +262,6 @@ class DashboardConfiguration extends React.Component {
             this.setState({ errormessage: true });
         }
     }
-
     render() {
         return (
             <div>

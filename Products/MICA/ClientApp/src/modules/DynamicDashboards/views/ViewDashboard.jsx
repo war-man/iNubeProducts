@@ -429,7 +429,6 @@ class ViewDashboard extends React.Component {
             return dateObj.day + '/' + dateObj.month + '/' + dateObj.year;
         }
     }
-
     render() {
         return (
             <div>

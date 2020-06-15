@@ -322,7 +322,6 @@ class DashboardUpdate extends React.Component {
                 });
         }
     }
-
     render() {
         return (
             <div>

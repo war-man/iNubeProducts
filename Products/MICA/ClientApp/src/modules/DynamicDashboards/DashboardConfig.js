@@ -7,5 +7,4 @@ let DashboardConfigUrl = config.DashboardConfigUrl;
 export const DashboardConfig = {
     DashboardConfigUrl,
 }
-
 export default DashboardConfig;
