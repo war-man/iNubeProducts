@@ -114,6 +114,7 @@ namespace iNube.Services.UserManagement.Controllers.Role
             return Ok(masterdata);
         }
 
+        //Dynamic Report
         [HttpGet]
         public async Task<IActionResult> GetDynamicConfig()
         {
@@ -121,6 +122,7 @@ namespace iNube.Services.UserManagement.Controllers.Role
             return Ok(response);
         }
 
+        //Dynamic Report
         [HttpGet]
         public IActionResult GetDynamicPermissions(string Userid, string Roleid, string itemType)
         {
@@ -128,6 +130,7 @@ namespace iNube.Services.UserManagement.Controllers.Role
             return Ok(response);
         }
 
+        //Dynamic Report
         [HttpPost]
         public IActionResult SaveDynamicPermission(DynamicPermissions configDTO)
         {
@@ -135,6 +138,7 @@ namespace iNube.Services.UserManagement.Controllers.Role
             return Ok(response);
         }
 
+        //Dynamic Graph
         [HttpGet]
         public async Task<IActionResult> GetDynamicGraphConfig()
         {
@@ -142,6 +146,7 @@ namespace iNube.Services.UserManagement.Controllers.Role
             return Ok(response);
         }
 
+        //Dynamic Graph
         [HttpGet]
         public IActionResult GetDynamicGraphPermissions(string Userid, string Roleid, string itemType)
         {
@@ -149,6 +154,7 @@ namespace iNube.Services.UserManagement.Controllers.Role
             return Ok(response);
         }
 
+        //Dynamic Graph
         [HttpPost]
         public IActionResult SaveDynamicGraphPermission(DynamicPermissions configDTO)
         {

@@ -1211,7 +1211,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
         {
             _context = (MICAUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
 
-            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Report");
+            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Graph");
             var rresponse = await _integrationService.GetReportNameForPermissionsDetails(data.Url, apiContext);
             var ruleNames = _context.AspNetRoles.FirstOrDefault(r => r.Id == reportDTO.RoleId);
             DynamicGraphResponse dynamicrpt = new DynamicGraphResponse();
@@ -1256,7 +1256,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             DbManager._TimeZone = UserDateTime.KeyValue;
             DateTime DatetimeNow = DbManager.GetDateTimeByZone(DbManager._TimeZone);
 
-            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Report");
+            var data = _context.TblDynamicConfig.FirstOrDefault(a => a.ItemType == "Graph");
             var rresponse = await _integrationService.GetReportNameForPermissionsDetails(data.Url, apiContext);
 
             TblDynamicPermissions reportPermissions = null;

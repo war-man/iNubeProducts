@@ -487,7 +487,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             List<DynamicResponse> result = new List<DynamicResponse>();
             foreach (var item in data)
             {
-                var response = await _integrationService.GetReportNameForPermissionsDetails(item.Url, apiContext);
+                var response = await _integrationService.GetGraphNameForPermissionsDetails(item.Url, apiContext);
                 DynamicResponse respon = new DynamicResponse();
                 respon.name = item.ItemType;
                 List<RPermissionDTO> rperm = new List<RPermissionDTO>();
