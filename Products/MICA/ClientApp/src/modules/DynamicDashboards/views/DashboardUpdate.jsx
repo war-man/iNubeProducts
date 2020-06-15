@@ -107,7 +107,7 @@ class DashboardUpdate extends React.Component {
 
     componentDidMount() {
 
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetGraphConfigName`, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetDashboardConfigName`, {
             method: 'get',
             headers: {
                 'Accept': 'application/json',
@@ -156,7 +156,7 @@ class DashboardUpdate extends React.Component {
 
         this.setState({ displayReportObejectGrid: true });
 
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameterDetails?DashboardConfigId=` + event.target.value, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameterDetails?dashboardConfigId=` + event.target.value, {
        // fetch(`https://localhost:44351/api/Graph/GetParameterDetails` + event.target.value, {
             method: 'GET',
             headers: {
@@ -283,14 +283,14 @@ class DashboardUpdate extends React.Component {
         if (this.state.parameterList.length > 0) {
             let isActive = 1;
             var data = {
-                'DashboardConfigId': this.state.ReportConfigDto.ReportName,
+                'dashboardConfigId': this.state.ReportConfigDto.ReportName,
                 'isActive': isActive,
                 'query': this.state.QueryDto.Query,
-                'TblreportConfigParam': sendArray,
+                'dashboardConfigParamDTO': sendArray,
             };
 
             fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/UpdateGraph?DashboardConfigId=` + this.state.ReportConfigDto.ReportName, {
-            // fetch(`https://localhost:44351/api/Graph/UpdateReport?ReportConfigId=` + this.state.ReportConfigDto.ReportName, {
+          //  fetch(`https://localhost:44351/api/Graph/UpdateGraph?DashboardConfigId=` + this.state.ReportConfigDto.ReportName, {
                 method: 'put',
                 headers: {
                     'Accept': 'application/json',

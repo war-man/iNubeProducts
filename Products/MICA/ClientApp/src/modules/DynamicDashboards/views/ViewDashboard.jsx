@@ -71,7 +71,7 @@ class ViewDashboard extends React.Component {
             fromDate: "",
             toDate: "",
             requestData: {
-                DashboardConfigId: "",
+                dashboardConfigId: "",
                 paramList: [],
             },
             displayparameter: {},
@@ -197,10 +197,17 @@ class ViewDashboard extends React.Component {
     };
 
     handleParameterCheck = event => {
+        debugger;
         let param = this.state.paramList;
         let parameter = this.state.parameterList;
         let rparam = this.state.reportparameters;
         let array = [];
+        //for (let i = 1; i < this.state.graphData.length; i++) {
+        //    this.state.graphData[i] = [];
+        //    console.log("gdata",this.state.graphData)
+        //}
+       
+        console.log("gdata", this.state.graphData);
         param = array;
         rparam = array;
         parameter = array;
@@ -220,8 +227,8 @@ class ViewDashboard extends React.Component {
         console.log(ReportConfigDto[event.target.name], event.target.value, "reportdto");
 
         this.setState({ flagParam: true, tableFlag: false });
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameters?ReportConfigId=` + event.target.value, {
-       // fetch(` https://localhost:44351/api/Graph/GetParameters?ReportConfigId=` + event.target.value, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
+       // fetch(` https://localhost:44351/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -333,7 +340,7 @@ class ViewDashboard extends React.Component {
         console.log("rparameter: ", this.state.CheckCondition);
         param = pArray;
         let request = this.state.requestData;
-        request.DashboardConfigId = this.state.ReportConfigDto.ReportName;
+        request.dashboardConfigId = this.state.ReportConfigDto.ReportName;
         request.paramList = [...param];
 
         this.setState({ request });
@@ -351,16 +358,19 @@ class ViewDashboard extends React.Component {
             body: JSON.stringify(request)
         }).then(response => response.json())
             .then(data => {
+                this.state.graphData = [];
+                this.state.graphData[0] = ['Task', 'PolicyCount per Day'];
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
-                this.state.result.map(m => {
-                    let arr = [];
-                    arr.push(m.column2);
-                    arr.push(m.column1);
-                    this.state.graphData.push(arr);
-                    console.log("graphdata", this.state.graphData, arr);
-                    });
-                this.setState({showgraph:true})
+               
+                    this.state.result.map(m => {
+                        let arr = [];
+                        arr.push(m.column2);
+                        arr.push(m.column1);
+                        this.state.graphData.push(arr);
+                        console.log("graphdata", this.state.graphData, arr);
+                });
+                    this.setState({ showgraph: true })
                 //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {
                     this.setState({ tableFlag: false, flagParam: false, loader: false });

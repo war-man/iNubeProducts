@@ -65,9 +65,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetParameters(int ReportConfigId)
+        public async Task<IActionResult> GetParameters(int dashboardConfigId)
         {
-            var eventDetails = await _graphService.GetParameters(ReportConfigId, Context);
+            var eventDetails = await _graphService.GetParameters(dashboardConfigId, Context);
             return Ok(eventDetails);
         }
 
@@ -112,9 +112,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGraph(int ReportConfigId, DashboardConfigDTO reportConfigDTO)
+        public async Task<IActionResult> UpdateGraph(int dashboardConfigId, DashboardConfigDTO reportConfigDTO)
         {
-            reportConfigDTO.DashboardConfigId = ReportConfigId;
+            reportConfigDTO.DashboardConfigId = dashboardConfigId;
             await _graphService.UpdateDashboard(reportConfigDTO, Context);
             return Ok();
 
