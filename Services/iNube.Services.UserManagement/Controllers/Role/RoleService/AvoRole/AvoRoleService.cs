@@ -385,7 +385,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         public async Task<IEnumerable<DynamicResponse>> GetDynamicConfig(ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var data = _context.TblDynamicConfig.OrderByDescending(a => a.CreatedDate).ToList();
+            var data = _context.TblDynamicConfig.Where(a => a.ItemType == "Report").OrderByDescending(a => a.CreatedDate).ToList();
             List<DynamicResponse> result = new List<DynamicResponse>();
             foreach (var item in data)
             {
@@ -484,7 +484,7 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
         public async Task<IEnumerable<DynamicResponse>> GetDynamicGraphConfig(ApiContext apiContext)
         {
             _context = (AVOUMContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            var data = _context.TblDynamicConfig.OrderByDescending(a => a.CreatedDate).ToList();
+            var data = _context.TblDynamicConfig.Where(a => a.ItemType == "Graph").OrderByDescending(a => a.CreatedDate).ToList();
             List<DynamicResponse> result = new List<DynamicResponse>();
             foreach (var item in data)
             {

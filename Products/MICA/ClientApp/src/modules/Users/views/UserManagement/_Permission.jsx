@@ -276,8 +276,8 @@ const Permission = (props) => {
                                                 </ListItemIcon>
                                                 {menuname ?
                                                     <ListItemText className="checboxText" primary={item.name} />
-                                                    : null}
-                                                {/*<label><TranslationContainer translationKey="ListofReports" /></label>}*/}
+                                                    :
+                                                    <label><TranslationContainer translationKey="ListofReports" /></label>}
                                             </ListItem>
                                             <GridItem>
                                                 <ListItem className="partner-admin">
@@ -307,8 +307,8 @@ const Permission = (props) => {
                                                 </ListItemIcon>
                                                 {menuname ?
                                                     <ListItemText className="checboxText" primary={item.name} />
-                                                    : null}
-                                                {/*<label><TranslationContainer translationKey="ListofReports" /></label>}*/}
+                                                    :
+                                                    < label > <TranslationContainer translationKey="ListofGraphs" /></label>}
                                             </ListItem>
                                             <GridItem>
                                                 <ListItem className="partner-admin">

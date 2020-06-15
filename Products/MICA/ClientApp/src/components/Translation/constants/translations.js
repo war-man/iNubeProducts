@@ -411,6 +411,7 @@ export const TRANSLATIONS = {
         ProductDashboard: "Product Dashboard",
         CDAccountDashboard: "CD Account Dashboard",
         ListofReports: "List of Reports",
+        ListofGraphs: "List of Graphs",
         ListofDashboards: "List of Dashboards",
         ClickHeretoView: "Click Here to View",
         Month: "Month",

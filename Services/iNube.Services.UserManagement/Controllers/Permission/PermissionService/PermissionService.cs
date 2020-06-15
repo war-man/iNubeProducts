@@ -31,9 +31,9 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
         DynamicReportResponse GetReportOnRoles(UserRoleReportDTO reportDTO, ApiContext apiContext);
         Task<DynamicReportResponse> GetReportByRole(RoleReportDTO reportDTO, ApiContext apiContext);
         Task<UserReportPermissionResponse> SaveAssignReports(UserRoleReportsDTO reportDTO, ApiContext apiContext);
-        DynamicGraphResponse GetGraphOnRoles(UserRoleGraphDTO reportDTO, ApiContext apiContext);
-        Task<DynamicGraphResponse> GetGraphByRole(RoleGraphDTO reportDTO, ApiContext apiContext);
-        Task<UserGraphPermissionResponse> SaveAssignGraphs(UserRoleGraphsDTO reportDTO, ApiContext apiContext);
+        DynamicGraphResponse GetGraphOnRoles(UserRoleGraphDTO graphDTO, ApiContext apiContext);
+        Task<DynamicGraphResponse> GetGraphByRole(RoleGraphDTO graphDTO, ApiContext apiContext);
+        Task<UserGraphPermissionResponse> SaveAssignGraphs(UserRoleGraphsDTO graphDTO, ApiContext apiContext);
     }
 
     public class PermissionService : IPermissionService
@@ -209,19 +209,19 @@ namespace iNube.Services.UserManagement.Controllers.Permission.PermissionService
             return await _permissionService(apiContext.ProductType).GetReportByRole(reportDTO, apiContext);
         }
 
-        public DynamicGraphResponse GetGraphOnRoles(UserRoleGraphDTO reportDTO, ApiContext apiContext)
+        public DynamicGraphResponse GetGraphOnRoles(UserRoleGraphDTO graphDTO, ApiContext apiContext)
         {
-            return _permissionService(apiContext.ProductType).GetGraphOnRoles(reportDTO, apiContext);
+            return _permissionService(apiContext.ProductType).GetGraphOnRoles(graphDTO, apiContext);
         }
 
-        public async Task<UserGraphPermissionResponse> SaveAssignGraphs(UserRoleGraphsDTO reportDTO, ApiContext apiContext)
+        public async Task<UserGraphPermissionResponse> SaveAssignGraphs(UserRoleGraphsDTO graphDTO, ApiContext apiContext)
         {
-            return await _permissionService(apiContext.ProductType).SaveAssignGraphs(reportDTO, apiContext);
+            return await _permissionService(apiContext.ProductType).SaveAssignGraphs(graphDTO, apiContext);
         }
 
-        public async Task<DynamicGraphResponse> GetGraphByRole(RoleGraphDTO reportDTO, ApiContext apiContext)
+        public async Task<DynamicGraphResponse> GetGraphByRole(RoleGraphDTO graphDTO, ApiContext apiContext)
         {
-            return await _permissionService(apiContext.ProductType).GetGraphByRole(reportDTO, apiContext);
+            return await _permissionService(apiContext.ProductType).GetGraphByRole(graphDTO, apiContext);
         }
     }
 }
