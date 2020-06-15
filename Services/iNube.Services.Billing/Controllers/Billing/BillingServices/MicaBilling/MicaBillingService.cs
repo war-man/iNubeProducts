@@ -1596,22 +1596,22 @@ namespace iNube.Services.Billing.Controllers.Billing.MicaBillingService
                 _context.SaveChanges();
 
                 //Update IsActive status in BillingItemDetail table for Recurring Installment so as to get each installment at once when invoice is generated multiple times.
-                foreach (var bill in main_bill)
-                {
-                    var billingItem = _context.TblBillingItemDetail.Where(b => b.BillingItemId == bill.tblbillingItem.BillingItemId);
-                    var active = _context.TblBillingItemDetail.FirstOrDefault(b => b.BillingItemId == bill.tblbillingItem.BillingItemId).IsActive;
+                //foreach (var bill in main_bill)
+                //{
+                //    var billingItem = _context.TblBillingItemDetail.Where(b => b.BillingItemId == bill.tblbillingItem.BillingItemId);
+                //    var active = _context.TblBillingItemDetail.FirstOrDefault(b => b.BillingItemId == bill.tblbillingItem.BillingItemId).IsActive;
                     
-                    if (active == "1")
-                    {
-                        foreach (var billActive in billingItem)
-                        {
-                            billActive.IsActive = "0";
-                        }
-                    }
-                    var billData = _mapper.Map<TblBillingItemDetail>(billingItem);
-                    _context.TblBillingItemDetail.Update(billData);
-                    _context.SaveChanges();
-                }
+                //    if (active == "1")
+                //    {
+                //        foreach (var billActive in billingItem)
+                //        {
+                //            billActive.IsActive = "0";
+                //        }
+                //    }
+                //    var billData = _mapper.Map<TblBillingItemDetail>(billingItem);
+                //    _context.TblBillingItemDetail.Update(billData);
+                //    _context.SaveChanges();
+                //}
 
                 return invoiceDto;
             }

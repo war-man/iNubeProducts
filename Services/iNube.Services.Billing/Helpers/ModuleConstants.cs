@@ -32,7 +32,7 @@ namespace iNube.Services.Billing.Helpers
         public const int Quarterly = 30;
         public const int BiWeekly = 31;
         public const int BiMonthly = 32;
-        public const int HalfYearly = 0;
-        public const int Yearly = 0;
+        public const int HalfYearly = 42;
+        public const int Yearly = 43;
     }
 }
