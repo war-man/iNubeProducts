@@ -67,7 +67,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             }
         }
 
-        public async Task<IEnumerable<ddlDTOs>> GetReportConfigName(string lMasterlist, ApiContext apiContext)
+        public async Task<IEnumerable<ddlDTOs>> GetGraphConfigName(string lMasterlist, ApiContext apiContext)
         {
             _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             IEnumerable<ddlDTOs> obj;
@@ -82,14 +82,14 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             return obj;
         }
 
-        public async Task<IEnumerable<DashboardParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext)
+        public async Task<IEnumerable<DashboardParamsDTO>> GetParameters(int dashboardConfigId, ApiContext apiContext)
         {
             _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             // HandleEvent objEvent = new HandleEvent();
 
-            var reportparamList = from tblreportConfig in _context.TblDashboardConfig
-                                  join tblconfigParam in _context.TblDashboardConfigParam on tblreportConfig.DashboardConfigId equals tblconfigParam.DashboardConfigId
-                                  where tblreportConfig.DashboardConfigId == ReportConfigId
+            var dashboardparamList = from tbldashboardConfig in _context.TblDashboardConfig
+                                  join tblconfigParam in _context.TblDashboardConfigParam on tbldashboardConfig.DashboardConfigId equals tblconfigParam.DashboardConfigId
+                                  where tbldashboardConfig.DashboardConfigId == dashboardConfigId
                                   select new DashboardConfigParamDTO
                                   {
                                       ParameterName = tblconfigParam.ParameterName,
@@ -99,7 +99,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             //List<ReportParamsDTO> AddparamList = new List<ReportParamsDTO>();
             List<DashboardParamsDTO> lstParams = new List<DashboardParamsDTO>();
             DashboardParamsDTO param = null;
-            foreach (var i in reportparamList)
+            foreach (var i in dashboardparamList)
             {
                 param = new DashboardParamsDTO();
                 if (i.RangeType == "Yes")
@@ -123,11 +123,11 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             return lstParams;
         }
 
-        public async Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext)
+        public async Task<string> GetQueryById(int dashboardConfigId, ApiContext apiContext)
         {
             _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var queryData = _context.TblDashboardConfig.SingleOrDefault(x => x.DashboardConfigId == ReportConfigId).Query;
+            var queryData = _context.TblDashboardConfig.SingleOrDefault(x => x.DashboardConfigId == dashboardConfigId).Query;
             return queryData;
         }
 
@@ -138,7 +138,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             //var connectionString = _configuration.GetConnectionString("PCConnection");
             var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
             var connectionString = dbConnectionString.Dbconnection;
-            var query = await GetQueryById(queryDTO.ReportConfigId, apiContext);
+            var query = await GetQueryById(queryDTO.dashboardConfigId, apiContext);
             //var query = "select * from [CM].[tblClaimInsurable] where ClaimId=@ClaimId and Name=@Name";
             // var query = "select * from [CM].[tblClaimInsurable] where ClaimId='335' ";
             try
@@ -183,13 +183,13 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             return obj;
         }
 
-        public async Task<IEnumerable<DashboardConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext)
+        public async Task<IEnumerable<DashboardConfigParamDTO>> GetParameterDetails(int dashboardConfigId, ApiContext apiContext)
         {
             _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var reportparamList = from tblreportConfig in _context.TblDashboardConfig
-                                  join tblconfigParam in _context.TblDashboardConfigParam on tblreportConfig.DashboardConfigId equals tblconfigParam.DashboardConfigId
-                                  where tblreportConfig.DashboardConfigId == ReportConfigId
+            var dashboardparamList = from tbldashboardConfig in _context.TblDashboardConfig
+                                  join tblconfigParam in _context.TblDashboardConfigParam on tbldashboardConfig.DashboardConfigId equals tblconfigParam.DashboardConfigId
+                                  where tbldashboardConfig.DashboardConfigId == dashboardConfigId
                                   select new DashboardConfigParamDTO
                                   {
                                       ParameterName = tblconfigParam.ParameterName,
@@ -198,14 +198,14 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
                                       DashboardConfigParamId = tblconfigParam.DashboardConfigParamId,
                                       DashboardConfigId = (int)tblconfigParam.DashboardConfigId
                                   };
-            var _reportparamList = _mapper.Map<IEnumerable<DashboardConfigParamDTO>>(reportparamList);
-            return _reportparamList;
+            var _dashboardparamList = _mapper.Map<IEnumerable<DashboardConfigParamDTO>>(dashboardparamList);
+            return _dashboardparamList;
         }
 
-        public async void DeleteParameter(int ReportConfigParamId, ApiContext apiContext)
+        public async void DeleteParameter(int dashboardConfigParamId, ApiContext apiContext)
         {
             _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var delete_param = _context.TblDashboardConfigParam.Find(ReportConfigParamId);
+            var delete_param = _context.TblDashboardConfigParam.Find(dashboardConfigParamId);
             if (delete_param != null)
             {
                 _context.TblDashboardConfigParam.Remove(delete_param);
@@ -213,20 +213,20 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             }
         }
 
-        public async Task<DashboardConfigDTO> UpdateReport(DashboardConfigDTO reportConfigDTO, ApiContext apiContext)
+        public async Task<DashboardConfigDTO> UpdateDashboard(DashboardConfigDTO dashboardConfigDTO, ApiContext apiContext)
         {
             _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             try
             {
-                var report = _mapper.Map<TblDashboardConfig>(reportConfigDTO);
+                var report = _mapper.Map<TblDashboardConfig>(dashboardConfigDTO);
                 var configData = _context.TblDashboardConfig.Find(report.DashboardConfigId);
 
                 if (configData == null)
                 {
                     throw new ApplicationException("Record Not Found");
                 }
-                configData.Query = reportConfigDTO.Query;
+                configData.Query = dashboardConfigDTO.Query;
                 configData.ModifiedDate = DateTime.Now;
                 configData.IsActive = true;
                 //configData.TblReportConfigParam = reportConfigDTO.TblReportConfigParam;

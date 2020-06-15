@@ -50,6 +50,7 @@ class ViewDashboard extends React.Component {
             ReportConfigDto: {
                 ReportName: "",
             },
+            duplicategraphData:[],
             parameterList: [],
             CheckCondition: {
                 //paramList:[],
@@ -70,7 +71,7 @@ class ViewDashboard extends React.Component {
             fromDate: "",
             toDate: "",
             requestData: {
-                ReportConfigId: "",
+                DashboardConfigId: "",
                 paramList: [],
             },
             displayparameter: {},
@@ -196,7 +197,6 @@ class ViewDashboard extends React.Component {
     };
 
     handleParameterCheck = event => {
-        debugger;
         let param = this.state.paramList;
         let parameter = this.state.parameterList;
         let rparam = this.state.reportparameters;
@@ -307,6 +307,7 @@ class ViewDashboard extends React.Component {
 
 
     queryExecution = event => {
+        debugger;
         let check = this.state.CheckCondition;
         this.setState({ paramList: [] });
         let param = this.state.paramList;
@@ -332,16 +333,15 @@ class ViewDashboard extends React.Component {
         console.log("rparameter: ", this.state.CheckCondition);
         param = pArray;
         let request = this.state.requestData;
-        request.ReportConfigId = this.state.ReportConfigDto.ReportName;
+        request.DashboardConfigId = this.state.ReportConfigDto.ReportName;
         request.paramList = [...param];
 
         this.setState({ request });
 
         console.log("rparameter: ", this.state.reportparameters);
         this.setState({ loader: false });
-
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/QueryExecution`, {
-       // fetch(`https://localhost:44351/api/Graph/QueryExecution`, {
+       fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/QueryExecution`, {
+       //  fetch(`https://localhost:44351/api/Graph/QueryExecution`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json',
@@ -359,7 +359,7 @@ class ViewDashboard extends React.Component {
                     arr.push(m.column1);
                     this.state.graphData.push(arr);
                     console.log("graphdata", this.state.graphData, arr);
-                });
+                    });
                 this.setState({showgraph:true})
                 //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {

@@ -69,7 +69,7 @@ namespace iNube.Services.DynamicGraph.model
         {
             paramList = new List<DbParams>();
         }
-        public int ReportConfigId { get; set; }
+        public int dashboardConfigId { get; set; }
         public List<DbParams> paramList { get; set; }
     }
 

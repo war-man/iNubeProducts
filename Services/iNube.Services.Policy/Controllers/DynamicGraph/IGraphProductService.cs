@@ -12,13 +12,13 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
     {
         Task<IEnumerable<ddlDTOs>> GetMaster(string lMasterlist, ApiContext apiContext);
         Task<DashboardConfigResonse> SaveConfigParameters(DashboardConfigDTO reportConfigDTO, ApiContext apiContext);
-        Task<IEnumerable<ddlDTOs>> GetReportConfigName(string lMasterlist, ApiContext apiContext);
+        Task<IEnumerable<ddlDTOs>> GetGraphConfigName(string lMasterlist, ApiContext apiContext);
         Task<IEnumerable<DashboardParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext);
         Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
         Task<DataTable> QueryExecution(QueryDTOs queryDTO, ApiContext apiContext);
         Task<IEnumerable<ddlDTOs>> GetGraphNameForPermissions(ApiContext apiContext);
         Task<IEnumerable<DashboardConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext);
         void DeleteParameter(int ReportConfigParamId, ApiContext apiContext);
-        Task<DashboardConfigDTO> UpdateReport(DashboardConfigDTO reportConfigDTO, ApiContext apiContext);
+        Task<DashboardConfigDTO> UpdateDashboard(DashboardConfigDTO reportConfigDTO, ApiContext apiContext);
     }
 }

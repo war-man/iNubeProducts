@@ -41,9 +41,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveConfigParameters([FromBody]DashboardConfigDTO reportConfigDTO)
+        public async Task<IActionResult> SaveConfigParameters([FromBody]DashboardConfigDTO dashboardConfigDTO)
         {
-            var response = await _graphService.SaveConfigParameters(reportConfigDTO, Context);
+            var response = await _graphService.SaveConfigParameters(dashboardConfigDTO, Context);
             switch (response.Status)
             {
                 case BusinessStatus.InputValidationFailed:
@@ -58,9 +58,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetReportConfigName(string lMasterlist, bool isFilter = true)
+        public async Task<IActionResult> GetDashboardConfigName(string lMasterlist, bool isFilter = true)
         {
-            var objectval = await _graphService.GetReportConfigName(lMasterlist, Context);
+            var objectval = await _graphService.GetGraphConfigName(lMasterlist, Context);
             return Ok(objectval);
         }
 
@@ -93,7 +93,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         [HttpGet]
         public async Task<IActionResult> GetReportNameForPermissions()
         {
-            var objectval = await _graphService.GetReportNameForPermissions(Context);
+            var objectval = await _graphService.GetGraphNameForPermissions(Context);
             return Ok(objectval);
         }
 
@@ -112,10 +112,10 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateReport(int ReportConfigId, DashboardConfigDTO reportConfigDTO)
+        public async Task<IActionResult> UpdateGraph(int ReportConfigId, DashboardConfigDTO reportConfigDTO)
         {
             reportConfigDTO.DashboardConfigId = ReportConfigId;
-            await _graphService.UpdateReport(reportConfigDTO, Context);
+            await _graphService.UpdateDashboard(reportConfigDTO, Context);
             return Ok();
 
         }
