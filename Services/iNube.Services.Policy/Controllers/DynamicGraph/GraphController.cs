@@ -98,9 +98,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetParameterDetails(int ReportConfigId)
+        public async Task<IActionResult> GetParameterDetails(int dashboardConfigId)
         {
-            var eventDetails = await _graphService.GetParameterDetails(ReportConfigId, Context);
+            var eventDetails = await _graphService.GetParameterDetails(dashboardConfigId, Context);
             return Ok(eventDetails);
         }
 

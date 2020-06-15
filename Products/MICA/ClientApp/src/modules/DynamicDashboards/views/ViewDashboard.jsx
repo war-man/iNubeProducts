@@ -226,7 +226,7 @@ class ViewDashboard extends React.Component {
         this.setState({ [event.target.name]: event.target.value });
         console.log(ReportConfigDto[event.target.name], event.target.value, "reportdto");
 
-        this.setState({ flagParam: true, tableFlag: false });
+        this.setState({ flagParam: true, tableFlag: false, showgraph:false });
         fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
        // fetch(` https://localhost:44351/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
             method: 'GET',
@@ -348,7 +348,7 @@ class ViewDashboard extends React.Component {
         console.log("rparameter: ", this.state.reportparameters);
         this.setState({ loader: false });
        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/QueryExecution`, {
-       //  fetch(`https://localhost:44351/api/Graph/QueryExecution`, {
+        // fetch(`https://localhost:44351/api/Graph/QueryExecution`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json',
