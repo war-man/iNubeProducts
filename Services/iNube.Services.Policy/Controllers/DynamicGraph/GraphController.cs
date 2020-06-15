@@ -105,17 +105,17 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         }
 
         [HttpDelete]
-        public IActionResult DeleteParameter(int ReportConfigParamId)
+        public IActionResult DeleteParameter(int dashboardConfigParamId)
         {
-            _graphService.DeleteParameter(ReportConfigParamId, Context);
+            _graphService.DeleteParameter(dashboardConfigParamId, Context);
             return Ok();
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateGraph(int dashboardConfigId, DashboardConfigDTO reportConfigDTO)
+        public async Task<IActionResult> UpdateGraph(int dashboardConfigId, DashboardConfigDTO dashboardConfigDTO)
         {
-            reportConfigDTO.DashboardConfigId = dashboardConfigId;
-            await _graphService.UpdateDashboard(reportConfigDTO, Context);
+            dashboardConfigDTO.DashboardConfigId = dashboardConfigId;
+            await _graphService.UpdateDashboard(dashboardConfigDTO, Context);
             return Ok();
 
         }

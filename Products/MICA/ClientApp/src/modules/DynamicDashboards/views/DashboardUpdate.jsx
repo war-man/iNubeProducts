@@ -155,9 +155,9 @@ class DashboardUpdate extends React.Component {
         console.log(ReportConfigDto[event.target.name], event.target.value, "reportdto");
 
         this.setState({ displayReportObejectGrid: true });
-
+        debugger;
         fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameterDetails?dashboardConfigId=` + event.target.value, {
-       // fetch(`https://localhost:44351/api/Graph/GetParameterDetails` + event.target.value, {
+        //fetch(`https://localhost:44351/api/Graph/GetParameterDetails?dashboardConfigId=` + event.target.value, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -174,7 +174,7 @@ class DashboardUpdate extends React.Component {
                 } else {
                     setTimeout(
                         function () {
-                            this.setState({ loader: true, searchTableSec: false, nodata: true });
+                            this.setState({ loader: true, searchTableSec: false, nodata: false });
                         }.bind(this), 2000
                     );
                 }
@@ -183,9 +183,12 @@ class DashboardUpdate extends React.Component {
     }
 
     tabledata = () => {
-        this.setState({ searchTableSec: true, loader: true });
+        debugger
+            this.setState({ searchTableSec: true, loader: true});
+       
         this.setState({
             parameterListDetails: this.state.parameterList.map((prop, key) => {
+                console.log("prop", prop);
                 return {
                     SNo: key + 1,
                     ParameterName: prop.parameterName,
@@ -193,7 +196,7 @@ class DashboardUpdate extends React.Component {
                     DataType: prop.dataType,
                     btn: <div>
                         {/* <Button color="info" justIcon round simple className="edit" onClick={this.handleEdit.bind(this, key, prop.invoiceId)}><Edit /></Button>*/}
-                        <Button color="danger" justIcon round simple className="edit" onClick={this.onDelete.bind(this,prop.reportConfigParamId)} > <Delete /></Button>
+                        <Button color="danger" justIcon round simple className="edit" onClick={this.onDelete.bind(this, prop.dashboardConfigParamId)} > <Delete /></Button>
 
                     </div>
                 };
@@ -237,7 +240,9 @@ class DashboardUpdate extends React.Component {
     onDelete = (id) => {
         debugger;
         console.log(id, "id");
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/DeleteParameter?ReportConfigParamId=` + id, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/DeleteParameter?dashboardConfigParamId=` + id, {
+        //fetch(` https://localhost:44351/api/Graph/DeleteParameter?dashboardConfigParamId=` + id, {
+           
             method: 'delete',
             headers: {
                 'Accept': 'application/json',
@@ -252,7 +257,7 @@ class DashboardUpdate extends React.Component {
             } else {
                 setTimeout(
                     function () {
-                        this.setState({ loader: true, searchTableSec: false, nodata: true });
+                        this.setState({ loader: true, searchTableSec: false, nodata: false });
                     }.bind(this), 2000
                 );
             }
@@ -288,9 +293,9 @@ class DashboardUpdate extends React.Component {
                 'query': this.state.QueryDto.Query,
                 'dashboardConfigParamDTO': sendArray,
             };
-
+            debugger;
             fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/UpdateGraph?DashboardConfigId=` + this.state.ReportConfigDto.ReportName, {
-          //  fetch(`https://localhost:44351/api/Graph/UpdateGraph?DashboardConfigId=` + this.state.ReportConfigDto.ReportName, {
+            //fetch(`https://localhost:44351/api/Graph/UpdateGraph?DashboardConfigId=` + this.state.ReportConfigDto.ReportName, {
                 method: 'put',
                 headers: {
                     'Accept': 'application/json',
