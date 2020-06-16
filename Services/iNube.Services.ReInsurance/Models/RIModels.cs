@@ -522,6 +522,14 @@ namespace iNube.Services.ReInsurance.Models
         public string Name { get; set; }
         
     }
+    public class ValidationResponse : ResponseStatus
+    {
+        public ValidationResponse()
+        {
+            // ErrorDetails = new HashSet<ShowErrorInfoDetails>();
+        }
+        //  public virtual ICollection<ShowErrorInfoDetails> ErrorDetails { get; set; }
+    }
 
 
 }

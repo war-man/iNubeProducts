@@ -626,5 +626,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return NotFound();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> TreatyCodeAndGroupValidation(string codeName,string type)
+        {
+            var response = await _reInsuranceService.TreatyCodeAndGroupValidation(codeName, type, Context);
+            return Ok(response);
+           
+        }
+
     }
 }

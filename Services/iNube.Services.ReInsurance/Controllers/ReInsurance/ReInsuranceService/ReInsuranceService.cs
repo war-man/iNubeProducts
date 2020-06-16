@@ -98,6 +98,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         Task<RiallocationDto> ModifyReAllocation(RiallocationDto riallocationDto, ApiContext apiContext);
         Task<IActionResult> Calulationddata(CalulationDto calulationDto, ApiContext apiContext);
         Task<IEnumerable<TblParticipantMasterDto>> GetParticipantNameByCode(string participantcode, ApiContext apiContext);
+        Task<ValidationResponse> TreatyCodeAndGroupValidation(string codeName, string type, ApiContext apiContext);
 
 
     }
@@ -206,7 +207,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var MasterData = _context.TblParticipantMaster.Where(s => s.ParticipantTypeId == 8)
+            var MasterData = _context.TblParticipantMaster.Where(s => s.ParticipantTypeId == 8 && (s.IsActive!="N" && s.IsActive!="n") )
                                                     .Select(x => new GroupGroupDto
                                                     {
                                                         mID = x.ParticipantMasterId,
@@ -220,7 +221,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var MasterData = _context.TblParticipantMaster.Where(s => s.ParticipantTypeId == 9)
+            var MasterData = _context.TblParticipantMaster.Where(s => s.ParticipantTypeId == 9 && (s.IsActive != "N" && s.IsActive != "n"))
                                                     .Select(x => new GroupGroupDto
                                                     {
                                                         mID = x.ParticipantMasterId,
@@ -1343,6 +1344,31 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return null;
         }
 
+        public async Task<ValidationResponse> TreatyCodeAndGroupValidation(string codeName, string type, ApiContext apiContext)
+        {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            if (type == "TreatyCode")
+            {
+                var lsttreatyCode = _context.TblTreaty.Select(s => s.TreatyCode).ToList();
+                if(lsttreatyCode.Contains(codeName)==true)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty Code " + codeName +" can not be dublicated" };
+                    Errors.Add(errorInfo);
+                }
+            }
+            if (type == "GroupName")
+            {
+                var lstTratyGroupName = _context.TblTreatyGroup.Select(s => s.TreatyGroupName).ToList();
+                if (lstTratyGroupName.Contains(codeName) == true)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty GroupName " + codeName + " can not be dublicated" };
+                    Errors.Add(errorInfo);
+                }
+            }
+            return new ValidationResponse { Status = BusinessStatus.Error, Errors = Errors};
+        }
     }
 
 }
