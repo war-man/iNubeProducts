@@ -756,7 +756,12 @@ class CalculationConfig extends React.Component {
                                             <Chip size="small"
                                                 label="<"
                                                 onClick={() => this.handleEvaluator("<")} />
-
+                                            <Chip size="small"
+                                                label="<"
+                                                onClick={() => this.handleEvaluator("AND")} />
+                                            <Chip size="small"
+                                                label="<"
+                                                onClick={() => this.handleEvaluator("OR")} />
 
                                             <Chip size="small"
                                                 label=","
