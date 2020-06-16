@@ -615,5 +615,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
             return Ok(search);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetParticipantNameByCode(string participantcode)
+        {
+            var response = await _reInsuranceService.GetParticipantNameByCode(participantcode, Context);
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return NotFound();
+        }
+
     }
 }

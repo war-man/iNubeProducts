@@ -19,11 +19,12 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
 
+
     }
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, ExtensionUrl;
+        readonly string PolicyUrl, BillingUrl, RatingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl, ExtensionUrl;
         public IntegrationService(IConfiguration configuration)
         {
 
@@ -38,9 +39,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
             AccountingUrl = _configuration["Integration_Url:Accounting:AccountingUrl"];
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
+            RatingUrl= _configuration["Integration_Url:Rating:RatingUrl"];
         }
 
+        //Rating Call
 
+        //public async Task<dynamic> RatingCall(List<Map> data, ApiContext apiContext)
+        //{
+        //    var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/" + id;
+        //    return await PostApiInvoke<dynamic, object>(uri, apiContext, data);
+        //}
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
             var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;

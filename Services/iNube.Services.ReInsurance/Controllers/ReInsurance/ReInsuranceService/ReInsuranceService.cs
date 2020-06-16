@@ -97,6 +97,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         Task<object> GetAllocationByPolicyNo(string policyNo, ApiContext apiContext);
         Task<RiallocationDto> ModifyReAllocation(RiallocationDto riallocationDto, ApiContext apiContext);
         Task<IActionResult> Calulationddata(CalulationDto calulationDto, ApiContext apiContext);
+        Task<IEnumerable<TblParticipantMasterDto>> GetParticipantNameByCode(string participantcode, ApiContext apiContext);
 
 
     }
@@ -1053,6 +1054,23 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             }
             return null;
         }
+        public async Task<IEnumerable<TblParticipantMasterDto>> GetParticipantNameByCode(string participantcode, ApiContext apiContext)
+        {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            try
+            {
+                var participantMasDTO = _context.TblParticipantMaster.Where(x => x.ParticipantCode == participantcode).ToList();
+                var participantMasterDTO = _mapper.Map<IEnumerable<TblParticipantMasterDto>>(participantMasDTO);
+                return participantMasterDTO;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
+        //Get Participant Name(RI or Broker)
         public async Task<object> GetAllocationByPolicyNo(string policyNo, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1142,13 +1160,35 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var LstRImappingDetails = _mapper.Map<List<TblRimappingDetailDto>>(RImappingDetails);
 
             //step3
-            var retentionGroups =  _context.TblRetentionGroup.Where(a => a.RetentionGroupId == RIMappingDTO.RetentionGroupId).FirstOrDefault();
+            var retentionGroups = _context.TblRetentionGroup.Where(a => a.RetentionGroupId == RIMappingDTO.RetentionGroupId).FirstOrDefault();
             var retensionDto = _mapper.Map<TblRetentionGroupDto>(retentionGroups);
 
-            map.Type = "Retension";
-            map.AllocationMethodId = Convert.ToInt32(retensionDto.RetentionLogicId);
-            map.Percentage = Convert.ToDecimal(retensionDto.Percentage);
-            map.Limit = Convert.ToDecimal(retensionDto.Limit);
+            map.Type = "Retention";
+            if (Convert.ToInt32(retensionDto.RetentionLogicId) == 20)
+            {
+                map.AllocationMethod = "Percentage";
+                map.Percentage = Convert.ToInt32(retensionDto.Percentage);
+            }
+            else if (Convert.ToInt32(retensionDto.RetentionLogicId) == 21)
+            {
+                map.AllocationMethod = "Limit";
+                map.Limit = Convert.ToDecimal(retensionDto.Limit);
+
+            }
+            else if (Convert.ToInt32(retensionDto.RetentionLogicId) == 22)
+            {
+                map.AllocationMethod = "Percentage with Limit";
+                map.Limit = Convert.ToDecimal(retensionDto.Limit);
+                map.Percentage = Convert.ToInt32(retensionDto.Percentage);
+            }
+            else {
+                map.AllocationMethod = "Lines";
+            }
+           
+           
+            map.AllocationBasis = calulationDto.SumInsured ;
+            map.Balance = calulationDto.SumInsured;
+           
             maps.Add(map);
 
             // Treaty data need to be filled
@@ -1171,24 +1211,116 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                         {
                             map = new Map();
                             // surPlus.Percent = trtdata.pe;
-                            map.Type = trtdata.TreatyTypeId.ToString();
-                            map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
-                            map.AllocationMethodId = Convert.ToInt32(arrangementsvalue.AllocationLogicId);
-                            map.AllocationBasisId = Convert.ToInt32(arrangementsvalue.AllocationBasisId);
-                            map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
-                            map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                            map.Type = "Surplus";
+                            // map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                            // map.Limit= Convert.ToInt32(arrangementsvalue.li)
+                            if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 20)
+                            {
+                                map.AllocationMethod = "Percentage";
+                                map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                            }
+                           else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
+                            {
+                                map.AllocationMethod = "Limit";
+                                map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                            }
+                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
+                            {
+                                map.AllocationMethod = "PercentageWithLimit";
+                                map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                                map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                            }
+                            else
+                            {
+                                map.AllocationMethod = "NoOfLines";
+                            }
+
+                            map.AllocationBasis = calulationDto.SumInsured;
+                            // Convert.ToDecimal(arrangementsvalue.Amount);
+                            map.Balance = calulationDto.SumInsured;
+                            if (arrangementsvalue.HigherOrLowerId==24)
+                            {
+                                map.HL ="H";
+                            }
+                            else
+                            {
+                                map.HL = "L";
+                            }
+                            map.NoOfLines = Convert.ToInt16(arrangementsvalue.NoOfLines);
+                            if(arrangementsvalue.AllocationBasisId==26)
+                            {
+                                map.AllocatedBasedOn = "Sum Insured";
+
+                            }
+                            else if (arrangementsvalue.AllocationBasisId == 27)
+                            {
+                                map.AllocatedBasedOn = "Retention";
+
+                            }
+                            else
+                            {
+                                map.AllocatedBasedOn = "Retention + QS";
+                            }
+                           
+
+
+                            // map.High
                             maps.Add(map);
                         }
                         if (trtdata.TreatyTypeId == 4)
                         {
                             map = new Map();
                             // surPlus.Percent = trtdata.pe;
-                            map.Type = trtdata.TreatyTypeId.ToString();
-                            map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
-                            map.AllocationMethodId = Convert.ToInt32(arrangementsvalue.AllocationLogicId);
-                            map.AllocationBasisId = Convert.ToInt32(arrangementsvalue.AllocationBasisId);
-                            map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
-                            map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                            map.Type = "QS";
+                            if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 20)
+                            {
+                                map.AllocationMethod = "Percentage";
+                                map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                            }
+                           else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
+                            {
+                                map.AllocationMethod = "Limit";
+                                map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                            }
+                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
+                            {
+                                map.AllocationMethod = "PercentageWithLimit";
+                                map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                                map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                            }
+                            else
+                            {
+                                map.AllocationMethod = "NoOfLines";
+                            }
+
+                            map.AllocationBasis = calulationDto.SumInsured;
+                            // Convert.ToDecimal(arrangementsvalue.Amount);
+                            map.Balance = calulationDto.SumInsured;
+                            if (arrangementsvalue.HigherOrLowerId == 24)
+                            {
+                                map.HL = "H";
+                            }
+                            else
+                            {
+                                map.HL = "L";
+                            }
+                            map.NoOfLines = Convert.ToInt16(arrangementsvalue.NoOfLines);
+                            if (arrangementsvalue.AllocationBasisId == 26)
+                            {
+                                map.AllocatedBasedOn = "Sum Insured";
+
+                            }
+                            else if (arrangementsvalue.AllocationBasisId == 27)
+                            {
+                                map.AllocatedBasedOn = "Retention";
+
+                            }
+                            else
+                            {
+                                map.AllocatedBasedOn = "Retention + QS";
+                            }
+
+
                             maps.Add(map);
                         }
 
@@ -1198,8 +1330,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 }
             }
 
+            List<Map> list = new List<Map>();
 
             var test = mapping;
+            list = test.maps;
 
             return null;
         }

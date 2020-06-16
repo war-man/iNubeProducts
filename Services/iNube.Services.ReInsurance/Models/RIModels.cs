@@ -33,12 +33,20 @@ namespace iNube.Services.ReInsurance.Models
     }
     public class Map
     {
-        public string Type { get; set; }
-        public int AllocationBasisId { get; set; }
-        public int AllocationMethodId { get; set; }
-        public decimal Percentage { get; set; }
+        public decimal AllocatedRetention { get; set; }
         public decimal Limit { get; set; }
-        public int SequenceNo { get; set; }
+        public string HL { get; set; }
+        public string Type { get; set; }
+        public int Percentage { get; set; }
+       // public int High { get; set; }
+        public string AllocationMethod { get; set; }
+        public decimal Balance { get; set; }
+        public decimal AllocationBasis { get; set; }
+        public decimal TotalAllocation { get; set; }
+        public decimal AllocatedQS { get; set; }
+        public string AllocatedBasedOn { get; set; }
+        public int NoOfLines { get; set; }
+
     }
     public partial class TblArrangementDto
     {
@@ -506,4 +514,14 @@ namespace iNube.Services.ReInsurance.Models
 
        // public virtual TblRiallocation Allocation { get; set; }
     }
+    public class ReallocatedDTO
+    {
+        public int MappingId { get; set; }
+        public int Year { get; set; }
+        public string Level { get; set; }
+        public string Name { get; set; }
+        
+    }
+
+
 }
