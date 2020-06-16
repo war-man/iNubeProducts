@@ -18,6 +18,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
         //Task<IEnumerable<ProductMasterddDTOs>> GetProductMasterAsync(ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
+        Task<List<Map>> AllocationCalulation(List<Map> request, int from, int To, ApiContext apiContext);
 
 
     }
@@ -44,11 +45,45 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
 
         //Rating Call
 
-        //public async Task<dynamic> RatingCall(List<Map> data, ApiContext apiContext)
-        //{
-        //    var uri = RatingUrl + "/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/" + id;
-        //    return await PostApiInvoke<dynamic, object>(uri, apiContext, data);
-        //}
+        public async Task<List<Map>> AllocationCalulation(List<Map> request, int from,int To, ApiContext apiContext)
+        {
+             var requestUri = RatingUrl + "/api/RatingConfig/CheckIllustrationRI/CheckIllustrationRI/15?From="+ from + "&To="+To+"&ArrayType=true";
+            //var uri = "https://localhost:44364/api/RatingConfig/CheckIllustrationRI/CheckIllustrationRI/15?From=1&To=3&ArrayType=true";
+
+            try
+            {
+                HttpClient client = new HttpClient();
+                HttpContent contentPost = null;
+                if (!string.IsNullOrEmpty(apiContext.Token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                }
+                if (request != null)
+                {
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    string postBody = JsonConvert.SerializeObject(request);
+                    var content = new StringContent(postBody, Encoding.UTF8, "application/json");
+                    contentPost = content;
+                }
+                using (var response = await client.PostAsync(requestUri, contentPost))
+                {
+                    using (var content = response.Content)
+                    {
+                        return await content.ReadAsAsync<List<Map>>();
+                    }
+                }
+            }
+
+            catch (Exception)
+            {
+
+                return new List<Map>();
+            }
+
+
+            // return await PostListApiInvoke<dynamic, ResponseStatus>(uri, apiContext, maps);
+        }
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
             var uri = UserUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;

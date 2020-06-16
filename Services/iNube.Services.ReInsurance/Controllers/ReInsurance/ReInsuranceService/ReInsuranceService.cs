@@ -1136,6 +1136,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         {
             //Year,Level,Product is used for pulling the data for treaty
             //use of Premium and SI
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //Policy Or Sometihng id need to take
             Mapping mapping = new Mapping();
@@ -1334,6 +1335,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             var test = mapping;
             list = test.maps;
+          //  var MAPList=JsonConvert.DeserializeObject<List<Map>>(list.ToString);
+           var from = 1;
+            var To = list.Count;
+            var data = _integrationService.AllocationCalulation(list,from, To,apiContext);
 
             return null;
         }
