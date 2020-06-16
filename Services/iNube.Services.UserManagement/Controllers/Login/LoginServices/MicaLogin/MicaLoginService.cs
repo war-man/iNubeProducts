@@ -157,7 +157,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
 
             var userdetails = (from cu in _cpcontext.TblCustomerUsers
                                join ce in _cpcontext.TblCustomerEnvironment on cu.CustomerId equals ce.CustomerId
-                               where cu.UserName == username /*&& ce.Product == productType && cu.IsActive==true*/
+                               where cu.UserName == username && ce.IsActive==true /*&& ce.Product == productType && cu.IsActive==true*/
                                select new UserLoginType
                                {
                                    UserType = cu.UserType,
