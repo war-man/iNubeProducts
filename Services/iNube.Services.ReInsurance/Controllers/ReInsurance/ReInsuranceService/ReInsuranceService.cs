@@ -364,6 +364,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             if (tbl_particiant == null)
                 throw new AppException("Account Not Found");
             // update user properties
+            tbl_particiant.ModifiedDate = DateTime.Now;
             tbl_particiant.ParticipantTypeId = tblParticipantMasterDto.ParticipantTypeId;
             tbl_particiant.ParticipantCode = tblParticipantMasterDto.ParticipantCode;
             tbl_particiant.ParticipantName = tblParticipantMasterDto.ParticipantName;
@@ -391,7 +392,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TransactionMapResponse> SaveParticipentData(TblParticipantMasterDto participantMasterDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
+            participantMasterDto.CreatedDate = DateTime.Now;
             var data = _mapper.Map<TblParticipantMaster>(participantMasterDto);
             try
             {
@@ -492,7 +493,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TransactionMapResponse> SaveRetentionData(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
+            tblRetentionGroupDto.CreatedDate = DateTime.Now;
             var data = _mapper.Map<TblRetentionGroup>(tblRetentionGroupDto);
             try
             {
@@ -610,6 +611,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             if (tbl_particiant == null)
                 throw new AppException("Account Not Found");
             // update user properties
+            tbl_particiant.ModifiedDate = DateTime.Now;
             tbl_particiant.Year = tblRetentionGroupDto.Year;
             tbl_particiant.BusinessTypeId = tblRetentionGroupDto.BusinessTypeId;
             tbl_particiant.RetentionGroupName = tblRetentionGroupDto.RetentionGroupName;
@@ -629,7 +631,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TransactionMapResponse> SaveTreatyData(TblTreatyDto tblTreatyDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
+            tblTreatyDto.CreatedDate = DateTime.Now;
             try
             {
                 var data = _mapper.Map<TblTreaty>(tblTreatyDto);
@@ -752,6 +754,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             if (tbl_traty == null)
                 throw new AppException("Account Not Found");
             // update user properties
+            tbl_traty.ModifiedDate = DateTime.Now;
             tbl_traty.TreatyCode = tblTreatyDto.TreatyCode;
             tbl_traty.TreatyDescription = tblTreatyDto.TreatyDescription;
             tbl_traty.TreatyTypeId = tblTreatyDto.TreatyTypeId;
@@ -855,7 +858,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto,ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
+            tblRimappingDto.CreatedDate = DateTime.Now;
             //taking id 20 for retention group and 21 for treaty
             foreach (var d in tblRimappingDto.TblRimappingDetail)
             {
@@ -954,6 +957,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             if (tbl_particiant == null)
                 throw new AppException("Account Not Found");
             // update user properties
+            tbl_particiant.ModifiedDate = DateTime.Now;
             tbl_particiant.Year = tblParticipantMasterDto.Year;
             tbl_particiant.Level = tblParticipantMasterDto.Level;
             tbl_particiant.LobProductCover = tblParticipantMasterDto.LobProductCover;
