@@ -70,6 +70,7 @@ class CreateTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+
             allocationbasisflag:false,
             allocationList:[],
             allocationmasList:[],
@@ -126,6 +127,7 @@ class CreateTreaty extends React.Component {
             },
             participant: {
                 "reInsurerId": "",
+                "brokername":"",
                 "reInsurerBranchId": "",
                 "brokerId": "",
                 "brokerBranchId": "",
@@ -608,6 +610,7 @@ class CreateTreaty extends React.Component {
         this.state.treatyDTO.tblParticipant.push(this.state.participant);
         this.state.participant = {
             "reInsurerId": "",
+            "brokername":"",
             "reInsurerBranchId": "",
             "brokerId": "",
             "brokerBranchId": "",
@@ -809,12 +812,34 @@ class CreateTreaty extends React.Component {
                     this.setState({ bkbcmasterList: data });
 
                     console.log("bkbcmasterList", this.state.bkbcmasterList);
+                    debugger
+                 
                 });
         }
         if (name == 'brokerBranchId' && this.state.bkbcmasterList!=null) {
             this.state.bkbranchCode = this.state.bkbcmasterList[0].mdata.filter(x => x.mID == evt.target.value)[0].mValue;
         }
-       
+        if (evt.target.name == 'brokerId') {
+
+            let bkbCode = this.state.bkmasterList[0].mdata.filter(x => x.mID == evt.target.value)[0].mValue;
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetParticipantNameByCode?participantcode=` + bkbCode, {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("dataList: ", data);
+                    if (data != null) {
+                        this.state.participant.brokername = data[0].participantName;
+                    }
+                    this.setState({});
+                });
+        }
+        console.log("this.state.brokername", this.state.participant.brokername);
     }
     handleSaveTreaty = () => {
         for (var i = 0; i <= this.state.datename.length - 1; i++) {
@@ -853,6 +878,7 @@ class CreateTreaty extends React.Component {
                     reinsurercodeId: prop.reInsurerId,
                     //this.state.ddllist.filter(x => x.reinsurercodeId == ParticipantList[key].reinsurercodeId)[0].mValue,
                     reinsurername: prop.reinsurername,
+                    brokername: prop.brokername,
                     //this.state.reinsurername,
                     ribranchcodeId: prop.reInsurerBranchId,
                         //this.state.ribranchCode,

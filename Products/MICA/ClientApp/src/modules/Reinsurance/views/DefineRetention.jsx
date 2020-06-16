@@ -295,7 +295,7 @@ class DefineRetentions extends React.Component {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    //'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
                 },
             })
                 .then(response => response.json(this.state.Retention))
@@ -393,7 +393,14 @@ class DefineRetentions extends React.Component {
         console.log("Retentions ss", this.state.Retention)
     }
     onFormModify = (id) => {
-
+        let efffrom = this.state.Retention.effectiveFrom;
+        let effto = this.state.Retention.effectiveTo;
+        if (this.state.Retention.effectiveFrom != "") {
+            this.state.Retention.effectiveFrom = this.datechange(this.state.Retention.effectiveFrom);
+        }
+        if (this.state.Retention.effectiveTo != "") {
+            this.state.Retention.effectiveTo = this.datechange(this.state.Retention.effectiveTo);
+        }
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyfRetention?retentionGID=` + this.props.retentionGroupId, {
             method: 'PUT',
             headers: {
@@ -411,6 +418,9 @@ class DefineRetentions extends React.Component {
             });
         //let flageUpdate = this.state.flagUpdate
         //this.setState({ flageUpdate:true})
+
+        this.state.Retention.effectiveFrom = efffrom;
+        this.state.Retention.effectiveTo = effto;
     }
     render() {
         //let updateflag = this.props.flagUpdate

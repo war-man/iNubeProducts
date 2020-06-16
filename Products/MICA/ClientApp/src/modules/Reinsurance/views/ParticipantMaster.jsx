@@ -339,7 +339,7 @@ class ParticipantMaster extends React.Component {
 
                     BranchCode: <CustomInput labelText="BranchCode" id="BusinessTypeText"
                         required={true}
-                        error={this.state.branchCodeState}
+                      //  error={this.state.branchCodeState}
                         value={this.state.Branchesdto[key].branchCode}
                         name='branchCode'
                         onChange={(event) => this.onInputBranchesChange("numeric", event, key)}

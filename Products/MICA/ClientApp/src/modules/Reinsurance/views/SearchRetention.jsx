@@ -187,7 +187,7 @@ class SearchRetentions extends React.Component {
         }).then(response => response.json())
             .then(sdata => {
                 //this.state.searchData = sdata;
-                console.log(sdata, 'SearchData Fields ')
+                console.log(sdata, 'SearchData Fields ')          
                 if (sdata.length > 0) {
                     this.dataTable(sdata);
                     console.log(this.state.newdata, 'New Data123');
