@@ -713,6 +713,7 @@ class AssignRole extends React.Component {
                 });
 
             fetch(`${UserConfig.UserConfigUrl}/api/Permission/GetGraphOnRoles`, {
+                //fetch(`https://localhost:44351/api/Permission/GetGraphOnRoles`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

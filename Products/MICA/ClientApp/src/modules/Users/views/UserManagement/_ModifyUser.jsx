@@ -44,9 +44,9 @@ const styles = theme => ({
 });
 
 const paddingCard =
-    {
-        padding: "10px",
-    };
+{
+    padding: "10px",
+};
 
 const AntSwitch = withStyles(theme => ({
     root: {
@@ -120,110 +120,110 @@ class ModifyUser extends React.Component {
             masterList: [],
             display: false,
             UserData:
-                {
-                    "userId": "",
-                    "userName": "",
-                    "status": true,
-                    "createdBy": "",
-                    "createdDate": "",
-                    "locked": true,
-                    "lockedReason": "",
-                    "lockStartDate": "",
-                    "lockEndDate": "",
-                    "lockMechanism": true,
-                    "officeId": 0,
-                    "firstName": "",
-                    "middleName": "",
-                    "lastName": "",
-                    "countryId": "",
-                    "stateId": "",
-                    "districtId": "",
-                    "cityId": "",
-                    "addressLine1": "",
-                    "addressLine2": "",
-                    "addressLine3": "",
-                    "pincodeId": "",
-                    "employeeNumber": "",
-                    "dob": "",
-                    "doj": "",
-                    "genderId": "",
-                    "email": "",
-                    "passportNumber": "",
-                    "drivingLicenceNumber": "",
-                    "contactNumber": "",
-                    "userTypeId": "",
-                    "panNo": "",
-                    "lastLoginDateTime": "",
-                    "isIos": true,
-                    "isAndroid": true,
-                    "isWindows": true,
-                    "isPasswordChanged": true,
-                    "landLineOffice": "",
-                    "landLineResidence": "",
-                    "partnerId": "",
-                    "branchName": "",
-                    "branchCode": "",
-                    "designation": "",
-                    "maritalStatusId": ""
-                },
+            {
+                "userId": "",
+                "userName": "",
+                "status": true,
+                "createdBy": "",
+                "createdDate": "",
+                "locked": true,
+                "lockedReason": "",
+                "lockStartDate": "",
+                "lockEndDate": "",
+                "lockMechanism": true,
+                "officeId": 0,
+                "firstName": "",
+                "middleName": "",
+                "lastName": "",
+                "countryId": "",
+                "stateId": "",
+                "districtId": "",
+                "cityId": "",
+                "addressLine1": "",
+                "addressLine2": "",
+                "addressLine3": "",
+                "pincodeId": "",
+                "employeeNumber": "",
+                "dob": "",
+                "doj": "",
+                "genderId": "",
+                "email": "",
+                "passportNumber": "",
+                "drivingLicenceNumber": "",
+                "contactNumber": "",
+                "userTypeId": "",
+                "panNo": "",
+                "lastLoginDateTime": "",
+                "isIos": true,
+                "isAndroid": true,
+                "isWindows": true,
+                "isPasswordChanged": true,
+                "landLineOffice": "",
+                "landLineResidence": "",
+                "partnerId": "",
+                "branchName": "",
+                "branchCode": "",
+                "designation": "",
+                "maritalStatusId": ""
+            },
             resetUserData:
-                {
-                    "userId": "",
-                    "userName": "",
-                    "status": true,
-                    "createdBy": "",
-                    "createdDate": "",
-                    "locked": true,
-                    "lockedReason": "",
-                    "lockStartDate": "",
-                    "lockEndDate": "",
-                    "lockMechanism": true,
-                    "officeId": 0,
-                    "firstName": "",
-                    "middleName": "",
-                    "lastName": "",
-                    "countryId": "",
-                    "stateId": "",
-                    "districtId": "",
-                    "cityId": "",
-                    "addressLine1": "",
-                    "addressLine2": "",
-                    "addressLine3": "",
-                    "pincodeId": "",
-                    "employeeNumber": "",
-                    "dob": "",
-                    "doj": "",
-                    "genderId": "",
-                    "email": "",
-                    "passportNumber": "",
-                    "drivingLicenceNumber": "",
-                    "contactNumber": "",
-                    "userTypeId": "",
-                    "panNo": "",
-                    "lastLoginDateTime": "",
-                    "isIos": true,
-                    "isAndroid": true,
-                    "isWindows": true,
-                    "isPasswordChanged": true,
-                    "landLineOffice": "",
-                    "landLineResidence": "",
-                    "partnerId": "",
-                    "branchName": "",
-                    "branchCode": "",
-                    "designation": "",
-                    "maritalStatusId": ""
-                },
+            {
+                "userId": "",
+                "userName": "",
+                "status": true,
+                "createdBy": "",
+                "createdDate": "",
+                "locked": true,
+                "lockedReason": "",
+                "lockStartDate": "",
+                "lockEndDate": "",
+                "lockMechanism": true,
+                "officeId": 0,
+                "firstName": "",
+                "middleName": "",
+                "lastName": "",
+                "countryId": "",
+                "stateId": "",
+                "districtId": "",
+                "cityId": "",
+                "addressLine1": "",
+                "addressLine2": "",
+                "addressLine3": "",
+                "pincodeId": "",
+                "employeeNumber": "",
+                "dob": "",
+                "doj": "",
+                "genderId": "",
+                "email": "",
+                "passportNumber": "",
+                "drivingLicenceNumber": "",
+                "contactNumber": "",
+                "userTypeId": "",
+                "panNo": "",
+                "lastLoginDateTime": "",
+                "isIos": true,
+                "isAndroid": true,
+                "isWindows": true,
+                "isPasswordChanged": true,
+                "landLineOffice": "",
+                "landLineResidence": "",
+                "partnerId": "",
+                "branchName": "",
+                "branchCode": "",
+                "designation": "",
+                "maritalStatusId": ""
+            },
             radiodisable: false,
             searchRequest:
-                {
-                    firstName: "",
-                    employeeNumber: "",
-                    emailId: "",
-                    contactNumber: "",
-                    panNo: "",
-                    partnerId: "",
-                    status: "",
-                }
+            {
+                firstName: "",
+                employeeNumber: "",
+                emailId: "",
+                contactNumber: "",
+                panNo: "",
+                partnerId: "",
+                status: "",
+            }
         };
         this.showUserTable = this.showUserTable.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
@@ -356,6 +356,35 @@ class ModifyUser extends React.Component {
         this.SetValue(type, event);
     }
 
+    UserUnlock = (status, id) => {
+        this.setState({ userId: id });
+        fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/UnlockUser?userid=` + id, {
+            method: 'Get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        }).then(data => {
+            console.log("")
+            this.showUserTable();
+            if (status == true) {
+                swal({
+                    text: "User is Unlocked",
+                    icon: "success"
+                });
+            }
+            //else {
+            //    swal({
+            //        text: "User is activated",
+            //        icon: "success"
+            //    });
+            //}
+        });
+
+        // }
+    }
+
     UserDelete = (status, id) => {
         this.setState({ userId: id });
         fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/DeleteUserById?Id=` + id, {
@@ -391,19 +420,19 @@ class ModifyUser extends React.Component {
             request.emailId != "" || request.contactNumber != "" ||
             request.panNo != "" || request.partnerId != "" || request.status != ""
         ) {
-            this.setState({ loader: false, load: true});
+            this.setState({ loader: false, load: true });
             fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/SearchUser`, {
                 method: 'POST',
-                body: JSON.stringify(request),
                 headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                }
-            }
-            ).then(response => response.json())
+                },
+                body: JSON.stringify(request)
+            }).then(response => response.json())
                 .then(data => {
                     this.setState({ userdetails: data, UserData: data });
-                    console.log("details: ", this.state.userdetails);
+                    console.log("details: ", data, this.state.userdetails);
                     this.setState({ showtable: false, loader: false });
                     if (this.state.userdetails.length > 0) {
                         this.tabledata();
@@ -456,6 +485,22 @@ class ModifyUser extends React.Component {
                                 (
                                     < Tooltip title={< TranslationContainer translationKey="Activate" />} placement="bottom" arrow >
                                         <Switch checked={prop.isActive} color="primary" onClick={() => this.UserDelete(prop.isActive, prop.userId)} />
+                                    </Tooltip >
+                                )
+                        }
+                    </div>,
+                    unlock: <div>
+                        {
+                            (prop.userlocked == true) ?
+                                (
+                                    < Tooltip title={< TranslationContainer translationKey="unlockuser" />} placement="bottom" arrow >
+                                        <Switch checked={prop.userlocked} color="primary" onClick={() => this.UserUnlock(prop.userlocked, prop.userId)} />
+                                    </Tooltip >
+                                )
+                                :
+                                (
+                                    < Tooltip title={< TranslationContainer translationKey="lockuser" />} placement="bottom" arrow >
+                                        <Switch checked={prop.userlocked} disabled={true} color="primary" onClick={() => this.UserDelete(prop.userlocked, prop.userId)} />
                                     </Tooltip >
                                 )
                         }
@@ -680,7 +725,7 @@ class ModifyUser extends React.Component {
                                             <GridContainer lg={12} justify="center">
                                                 <GridItem xs={5} sm={3} md={3} lg={1} >
                                                     <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                        <Button color="success"/* disabled={this.state.load} */round onClick={this.showUserTable}> <TranslationContainer translationKey="Search" /> </Button>
+                                                        <Button color="success"/* disabled={this.state.load} */ round onClick={this.showUserTable}> <TranslationContainer translationKey="Search" /> </Button>
                                                         {/* {this.state.load ? <CircularProgress id="progress-bar" size={25} /> : null}*/}
                                                     </Animated>
                                                 </GridItem>
@@ -774,6 +819,14 @@ class ModifyUser extends React.Component {
                                             {
                                                 Header: "Status",
                                                 accessor: "status",
+                                                minwidth: 30,
+                                                style: { textalign: "left" },
+                                                headerclassname: 'react-table-center',
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "User Lock",
+                                                accessor: "unlock",
                                                 minwidth: 30,
                                                 style: { textalign: "left" },
                                                 headerclassname: 'react-table-center',

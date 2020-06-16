@@ -1019,7 +1019,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             DynamicReportResponse dynamicrpt = new DynamicReportResponse();
             foreach (var item in reportDTO.RoleId)
             {
-                var reports = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid) && a.DynamicType == "Report")
+                var reports = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid) && a.DynamicType == "Report" && a.UserorRole == "Role")
                 .Select(b => b).ToList();
 
                 DynamicResponse dynamic = new DynamicResponse();
@@ -1039,14 +1039,14 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                     RoleName = ruleNames.FirstOrDefault(r => r.Id == item).Name
                 }).ToList();
 
-                var userreports = result.Where(a => item.Contains(a.Roleid) && a.Userid == reportDTO.UserId && a.UserorRole == "User")
+                var userreports = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid) && a.Userid == reportDTO.UserId && a.UserorRole == "User")
                 .Select(b => b).ToList();
 
                 if (userreports.Any())
                 {
                     foreach (var item1 in userreports)
                     {
-                        var rpermission = result.FirstOrDefault(a => a.mID == item1.mID/*&& a.Roleid == item.RoleId*/);
+                        var rpermission = result.FirstOrDefault(a => a.mID == item1.DynamicId/*&& a.Roleid == item.RoleId*/);
                         if (rpermission != null)
                         {
                             rpermission.Status = false;
@@ -1162,7 +1162,7 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
             DynamicGraphResponse dynamicrpt = new DynamicGraphResponse();
             foreach (var item in graphDTO.RoleId)
             {
-                var graph = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid) && a.DynamicType == "Graph")
+                var graph = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid) && a.DynamicType == "Graph" && a.UserorRole == "Role")
                 .Select(b => b).ToList();
 
                 DynamicResponse dynamic = new DynamicResponse();
@@ -1182,14 +1182,14 @@ namespace iNube.Services.UserManagement.Controllers.Controllers.Permission.Permi
                     RoleName = ruleNames.FirstOrDefault(r => r.Id == item).Name
                 }).ToList();
 
-                var usergraphs = result.Where(a => item.Contains(a.Roleid) && a.Userid == graphDTO.UserId && a.UserorRole == "User")
+                var usergraphs = _context.TblDynamicPermissions.Where(a => item.Contains(a.Roleid) && a.Userid == graphDTO.UserId && a.UserorRole == "User")
                 .Select(b => b).ToList();
 
                 if (usergraphs.Any())
                 {
                     foreach (var item1 in usergraphs)
                     {
-                        var rpermission = result.FirstOrDefault(a => a.mID == item1.mID/*&& a.Roleid == item.RoleId*/);
+                        var rpermission = result.FirstOrDefault(a => a.mID == item1.DynamicId /*&& a.Roleid == item.RoleId*/);
                         if (rpermission != null)
                         {
                             rpermission.Status = false;

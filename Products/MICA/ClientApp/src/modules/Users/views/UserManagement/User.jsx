@@ -315,12 +315,6 @@ class User extends React.Component {
             response: false,
             radiodisable: false,
         };
-        this.handleRadioChange = this.handleRadioChange.bind(this);
-        this.partnerChange = this.partnerChange.bind(this);
-        this.handlepartnerdata = this.handlepartnerdata.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleDateValidation = this.handleDateValidation.bind(this);
-        this.handleDobvalidation = this.handleDobvalidation.bind(this);
     }
 
     SetValue = (type, event) => {
@@ -545,7 +539,7 @@ class User extends React.Component {
         return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
     }
 
-    handleDateValidation() {
+    handleDateValidation = () => {
         //function fn_DateCompare(DateA, DateB) {     // this function is good for dates > 01/01/1970
 
         const userdob = this.state.UserData.dob;
@@ -580,7 +574,7 @@ class User extends React.Component {
         }
     }
 
-    handleDobvalidation() {
+    handleDobvalidation = () => {
         var today = new Date();
         var birthDate = new Date(this.state.UserData.dob);
         var calculatedage = today.getFullYear() - birthDate.getFullYear();
@@ -600,7 +594,7 @@ class User extends React.Component {
         }
     }
 
-    handleSubmit() {
+    handleAvoSubmit = () => {
         if (this.state.UserData.firstName != "" && this.state.UserData.dob != "" &&
             this.state.UserData.doj != "" && this.state.UserData.genderId != "" &&
             this.state.UserData.email != "" && this.state.UserData.contactNumber != ""
@@ -711,6 +705,127 @@ class User extends React.Component {
         }
     }
 
+    handleUserCreation = () => {
+        let producttype = localStorage.getItem('ProductType');
+        if (producttype == "Mica") {
+            this.handleMicaSubmit();
+        }
+        if (producttype == "Avo") {
+            this.handleAvoSubmit()
+        }
+    }
+
+    handleMicaSubmit = () => {
+        if (this.state.UserData.firstName != "" && this.state.UserData.dob != "" &&
+            this.state.UserData.doj != "" && this.state.UserData.genderId != "" &&
+            this.state.UserData.email != "" && this.state.UserData.contactNumber != ""
+            //&&this.state.UserData.panNo != "" && this.state.UserData.panNo != ""
+            //&& this.state.validdob != false && this.state.validdoj != false
+            && this.state.firstNameState == false && this.state.contactNumberState == false
+            && this.state.branchNameState == false && this.state.branchCodeState == false
+            && this.state.emailState == false /*&& this.state.panNoState == false*/) {
+
+            let userdetails = this.state.UserData;
+
+            let pks = this.state.UserData.dob;
+            let dks = this.state.UserData.doj;
+
+            if (this.state.radioVal == '1003') {
+                userdetails.userTypeId = '1003'
+                userdetails.partnerId = this.state.partnerid;
+                userdetails.employeeNumber = 0;
+            } else {
+                userdetails.userTypeId = '1004';
+                userdetails.partnerId = 0;
+                userdetails.employeeNumber = 0;
+            }
+
+            userdetails.dob = this.newdatechange(this.state.UserData.dob);
+            userdetails.doj = this.newdatechange(this.state.UserData.doj);
+
+            this.setState({ userdetails, response: true });
+            let address = [];
+            address.push(this.state.UserAddress.perm);
+            if (this.state.UserAddress.permSelectedValue == 1) {
+                address.push(this.state.UserAddress.comm);
+            }
+
+            let UserDataDTO = this.state.user;
+            UserDataDTO['userAddress'] = address;
+            this.setState({ UserDataDTO });
+
+            let userDTO = this.state.user;
+            if (this.state.user.userDetails.length == 0) {
+                userDTO['userDetails'].push(userdetails);
+            }
+            console.log("user", this.state.user);
+            fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/CreateProfileUser`, {
+                //fetch('https://localhost:44351/api/UserProfile/CreateProfileUser', {
+                method: 'Post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(userDTO)
+            }).then(response => response.json())
+                .then((data) => {
+                    this.setState({ response: false });
+                    if (data.status == 2) {
+                        swal({
+                            text: data.responseMessage,
+                            icon: "success"
+                        });
+                        this.setState({
+                            UName: data.users.userName,
+                            uid: data.id,
+                        })
+                        //if (data.users.userDetails != null || data.users.userDetails != 0) {
+                        //    this.setState({ redirectTo: true })
+
+                        //} else {
+                        this.setState({ redirect: true })
+                        //}
+
+                    }
+                    else if (data.status == 8) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    }
+                    else if (data.status == 400) {
+                        swal({
+                            text: "Some fields are missing",
+                            icon: "error"
+                        });
+                        //this.setState({ UserData: this.state.InitialUserData });
+                    }
+                    else {
+                        swal({
+                            text: "User already exists",
+                            icon: "error"
+                        });
+                    }
+                    console.log("response", data);
+                });
+            console.log("id", this.state.uid);
+            console.log("uname", this.state.UName);
+            let state = this.state;
+            state.UserData.dob = pks;
+            state.UserData.doj = dks;
+            this.setState({ state });
+        }
+        else {
+            swal({
+                text: "Some fields are missing or Please check the data you entered",
+                icon: "error"
+            });
+
+            this.setState({ errormessage: true });
+        }
+    }
+
     handleSimple = event => {
         this.setState({ [event.target.name]: event.target.value });
     };
@@ -719,7 +834,8 @@ class User extends React.Component {
         this.setState({ [name]: event.target.checked });
     };
 
-    handleRadioChange(e) {
+    handleRadioChange = (e) => {
+        let producttype = localStorage.getItem('ProductType');
         this.state.radioVal = e.target.value;
         this.setState({ selectedValue: e.target.value })
         let UserData = this.state.UserData;
@@ -729,17 +845,32 @@ class User extends React.Component {
         UserData[name] = value;
         this.setState({ UserData })
         if (this.state.radioVal == "1004") {
-            this.setState({
-                empFlag: true,
-                partFlag: false,
-                isUser: false,
-                visibility: false,
-                employeeid: "",
-                partnerid: "",
-                fields: "",
-                errors: "",
-            })
-            console.log("usertype", this.state.UserData.userTypeId)
+            if (producttype == "Mica") {
+                this.setState({
+                    empFlag: false,
+                    partFlag: false,
+                    isUser: true,
+                    visibility: false,
+                    employeeid: "",
+                    partnerid: "",
+                    fields: "",
+                    errors: "",
+                })
+                console.log("usertype", this.state.UserData.userTypeId)
+            }
+            if (producttype == "Avo") {
+                this.setState({
+                    empFlag: true,
+                    partFlag: false,
+                    isUser: false,
+                    visibility: false,
+                    employeeid: "",
+                    partnerid: "",
+                    fields: "",
+                    errors: "",
+                })
+                console.log("usertype", this.state.UserData.userTypeId)
+            }
         }
         else if (this.state.radioVal == "1003") {
             this.setState({
@@ -901,7 +1032,7 @@ class User extends React.Component {
         });
     }
 
-    handlepartnerdata() {
+    handlepartnerdata = () => {
         let state = this.state;
         state.emailvaidation = "";
         state.emailState = "";
@@ -1099,8 +1230,8 @@ class User extends React.Component {
                             </GridContainer>
                             {this.state.empFlag ? <Employee employeeChange={this.employeeChange} employeeidState={this.state.employeeidState} handleemployeedata={this.handleemployeedata} employeeid={this.state.employeeid} UserData={this.state.UserData} /> : null}
                             {this.state.partFlag ? <Partner /*btnload1={this.state.btnload1} */ partnerChange={this.partnerChange} partneridState={this.state.partneridState} handlepartnerdata={this.handlepartnerdata} partnerid={this.state.partnerid} /> : null}
-                            {this.state.isUser ? <CreateUser UserData={this.state.UserData} disable={this.state.disable} classes={this.classes} handleAddressRadioChange={this.handleAddressRadioChange} addressradiobutton={this.state.addressradiobutton} partnerName={this.state.partnerName} UserAddress={this.state.UserAddress} errormessage={this.state.errormessage} middleNameState={this.state.middleNameState} lastNameState={this.state.lastNameState} maritalStatusState={this.state.maritalStatusState} addressLine1State={this.state.addressLine1State} addressLine2State={this.state.addressLine2State} addressLine3State={this.state.addressLine3State} contactNumberState={this.state.contactNumberState} landLineResidenceState={this.state.landLineResidenceState} landLineOfficeState={this.state.landLineOfficeState} emailState={this.state.emailState} panNoState={this.state.panNoState} branchNameState={this.state.branchNameState} branchCodeState={this.state.branchCodeState} firstNameState={this.state.firstNameState} GetMasterData={this.GetMasterData} masterList={this.state.masterList} visibility={this.state.visibility} SetValue={this.SetValue} handleSubmit={this.handleSubmit} LocationDTO={this.state.LocationDTO} GetLocation={this.GetLocation} assignrolesubmit={this.assignrolesubmit} onDateChange={this.onDateChange} emailvaidation={this.state.emailvaidation} /> : null}
-                            {this.renderRedirect()}
+                            {this.state.isUser ? <CreateUser UserData={this.state.UserData} disable={this.state.disable} classes={this.classes} handleAddressRadioChange={this.handleAddressRadioChange} addressradiobutton={this.state.addressradiobutton} partnerName={this.state.partnerName} UserAddress={this.state.UserAddress} errormessage={this.state.errormessage} middleNameState={this.state.middleNameState} lastNameState={this.state.lastNameState} maritalStatusState={this.state.maritalStatusState} addressLine1State={this.state.addressLine1State} addressLine2State={this.state.addressLine2State} addressLine3State={this.state.addressLine3State} contactNumberState={this.state.contactNumberState} landLineResidenceState={this.state.landLineResidenceState} landLineOfficeState={this.state.landLineOfficeState} emailState={this.state.emailState} panNoState={this.state.panNoState} branchNameState={this.state.branchNameState} branchCodeState={this.state.branchCodeState} firstNameState={this.state.firstNameState} GetMasterData={this.GetMasterData} masterList={this.state.masterList} visibility={this.state.visibility} SetValue={this.SetValue} LocationDTO={this.state.LocationDTO} GetLocation={this.GetLocation} assignrolesubmit={this.assignrolesubmit} onDateChange={this.onDateChange} emailvaidation={this.state.emailvaidation} /> : null}
+
                         </CardBody>
                     </Card>
                     : <PageContentLoader />
@@ -1118,7 +1249,8 @@ class User extends React.Component {
                 {this.state.isUser ?
                     <GridContainer justify="center">
                         <GridItem >
-                            <Button round disabled={this.state.response} onClick={this.handleSubmit} color="success">Create User</Button>
+                            {this.renderRedirect()}
+                            <Button round disabled={this.state.response} onClick={this.handleUserCreation} color="success">Create User</Button>
                             {/*{this.state.btnload ? <CircularProgress id="progress-bar" size={25} /> <TranslationContainer translationKey="Save" />: null}*/}
                         </GridItem>
                     </GridContainer>
