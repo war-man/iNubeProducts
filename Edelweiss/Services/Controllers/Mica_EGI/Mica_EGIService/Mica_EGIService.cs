@@ -3862,8 +3862,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 taxAmountDTO.Tax.Add(taxTypeDTO);
 
 
-                //FT
-                FTPremiumDTO.Type = "FT";
+                //FT -- Changed it to AD - As per Ravi Sir
+                FTPremiumDTO.Type = "AD";
                 FTPremiumDTO.TxnAmount = (Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "FTPREM").EValue)) * (-1);
                 FTPremiumDTO.TotalAmount = FTPremiumDTO.TxnAmount + TotalTax;
                 FTPremiumDTO.TaxAmount = taxAmountDTO;
