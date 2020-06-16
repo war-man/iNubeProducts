@@ -32,7 +32,9 @@ import { Animated } from "react-animated-css";
 import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FiberManualRecord from "@material-ui/icons/FiberManualRecord";
-import ReactTable from "react-table";
+//import ReactTable from "react-table";
+import ReactTable from "components/MuiTable/MuiTable.jsx";
+
 
 //import './style.css';
 
