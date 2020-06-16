@@ -126,10 +126,11 @@ class RateParameters extends React.Component {
             //var data = {
             //    'parameterName': this.state.RateParameterArray[0].parameterName, 'parameterType': this.state.RateParameterArray[0].parameterType, 'parameterMasterLink': this.state.RateParameterArray[0].parameterMasterLink, 'createdDate': this.state.RateParameterArray[0].createdDate, 'isActive': this.state.RateParameterArray[0].isActive,
             //};
+        var ParamName = this.state.fields.ParamName.replace(/\s/g, "");
         if (this.state.fields.ParamName != "" && this.state.fields.ParamType !="" ) {
             var isActive = 1;
             var data = {
-                'parameterName': this.state.fields.ParamName, 'parameterType': this.state.fields.ParamType, 'parameterMasterLink': this.state.fields.ParamMasterLink, 'createdDate': date(), 'isActive': isActive,
+                'parameterName': ParamName, 'parameterType': this.state.fields.ParamType, 'parameterMasterLink': this.state.fields.ParamMasterLink, 'createdDate': date(), 'isActive': isActive,
             };
             fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateParameter`, {
                     method: 'post',
