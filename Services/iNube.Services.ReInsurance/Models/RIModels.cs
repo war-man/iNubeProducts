@@ -68,7 +68,7 @@ namespace iNube.Services.ReInsurance.Models
         public Guid? ModifiedBy { get; set; }
         public string IsActive { get; set; }
 
-        public virtual TblTreatyGroupDto TreatyGroup { get; set; }
+       // public virtual TblTreatyGroupDto TreatyGroup { get; set; }
     }
     public partial class TblMasRicommonTypesDto
     {
@@ -100,7 +100,7 @@ namespace iNube.Services.ReInsurance.Models
         public virtual TblParticipantBranchDto BrokerBranch { get; set; }
         public virtual TblParticipantMasterDto ReInsurer { get; set; }
         public virtual TblParticipantBranchDto ReInsurerBranch { get; set; }
-        public virtual TblTreatyDto Treaty { get; set; }
+       // public virtual TblTreatyDto Treaty { get; set; }
     }
     public partial class TblParticipantBranchDto
     {
@@ -262,9 +262,9 @@ namespace iNube.Services.ReInsurance.Models
         public string IsActive { get; set; }
         public int? RimappingTypeId { get; set; }
 
-        public virtual TblRetentionGroupDto RetentionGroup { get; set; }
-        public virtual TblRimappingDto Rimapping { get; set; }
-        public virtual TblTreatyGroupDto TreatyGroup { get; set; }
+       // public virtual TblRetentionGroupDto RetentionGroup { get; set; }
+      //  public virtual TblRimappingDto Rimapping { get; set; }
+       // public virtual TblTreatyGroupDto TreatyGroup { get; set; }
     }
     public partial class TblTreatyDto : ResponseStatus
     {
@@ -320,7 +320,7 @@ namespace iNube.Services.ReInsurance.Models
         public Guid? ModifiedBy { get; set; }
         public string IsActive { get; set; }
 
-        public virtual TblTreatyDto Treaty { get; set; }
+       // public virtual TblTreatyDto Treaty { get; set; }
         public virtual ICollection<TblArrangementDto> TblArrangement { get; set; }
         public virtual ICollection<TblRimappingDetailDto> TblRimappingDetail { get; set; }
     }

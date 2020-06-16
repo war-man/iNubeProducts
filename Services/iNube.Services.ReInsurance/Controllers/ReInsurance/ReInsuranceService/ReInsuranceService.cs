@@ -7,6 +7,7 @@ using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -1005,8 +1006,11 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TblTreatyDto> GetTreatyById(decimal treatyId, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            var tbltreaty = _context.TblTreaty.Find(treatyId);
+            //treatyId
+            var tbltreaty = _context.TblTreaty.Where(s => s.TreatyId == treatyId).Include(add => add.TblParticipant)
+                .Include(add => add.TblTreatyGroup)
+                .Include("TblTreatyGroup.TblArrangement").FirstOrDefault();
+            
             if (tbltreaty != null)
             {
                 var tblTratyDTO = _mapper.Map<TblTreatyDto>(tbltreaty);
@@ -1023,7 +1027,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             try
             {
-                var tblparticipant = _context.TblParticipantMaster.Find(participantMasterId);
+               // Find(participantMasterId)
+                var tblparticipant = _context.TblParticipantMaster.Where(s=>s.ParticipantMasterId== participantMasterId).Include(add=>add.TblParticipantBranch).FirstOrDefault();
                 if (tblparticipant != null)
                 {
                     var participantMasterDTO = _mapper.Map<TblParticipantMasterDto>(tblparticipant);
@@ -1042,7 +1047,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             try
             {
-                var tblRImapping = _context.TblRimapping.Find(RImappingId);
+                var tblRImapping = _context.TblRimapping.
+                    Where(s => s.RimappingId == RImappingId).Include(add => add.TblRimappingDetail)
+                    .FirstOrDefault();
                 if (tblRImapping != null)
                 {
                     var RImappingrDTO = _mapper.Map<TblRimappingDto>(tblRImapping);

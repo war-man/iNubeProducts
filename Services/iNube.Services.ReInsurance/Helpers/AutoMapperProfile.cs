@@ -14,13 +14,40 @@ namespace iNube.Services.ReInsurance.Helpers
             CreateMap<TblParticipantMaster, TblParticipantMasterDto>();
             CreateMap<TblParticipantMasterDto, TblParticipantMaster>();
 
+            CreateMap<TblParticipantMasterDto, TblParticipantMaster>()
+                  .ForMember(dest => dest.TblParticipantBranch, opt => opt.MapFrom(src => src.TblParticipantBranch)).ReverseMap();
+
+
             CreateMap<TblParticipantBranch, TblParticipantBranchDto>();
             CreateMap<TblParticipantBranchDto, TblParticipantBranch>();
 
             CreateMap<TblRetentionGroup, TblRetentionGroupDto>();
             CreateMap<TblRetentionGroupDto, TblRetentionGroup>();
+
             CreateMap<TblTreaty, TblTreatyDto>();
             CreateMap<TblTreatyDto, TblTreaty>();
+
+            CreateMap<TblTreatyDto, TblTreaty>()
+                 .ForMember(dest => dest.TblTreatyGroup, opt => opt.MapFrom(src => src.TblTreatyGroup)).ReverseMap();
+
+            CreateMap<TblTreatyDto, TblTreaty>()
+                .ForMember(dest => dest.TblParticipant, opt => opt.MapFrom(src => src.TblParticipant)).ReverseMap();
+
+            CreateMap<TblTreatyGroup, TblTreatyGroupDto>();
+            CreateMap<TblTreatyGroupDto, TblTreatyGroup>();
+
+            CreateMap<TblArrangement, TblArrangementDto>();
+            CreateMap<TblArrangement, TblArrangementDto>();
+
+            CreateMap<TblTreatyGroupDto, TblTreatyGroup>()
+                .ForMember(dest => dest.TblArrangement, opt => opt.MapFrom(src => src.TblArrangement)).ReverseMap();
+
+
+
+
+
+            CreateMap<TblRimapping, TblRimappingDto>();
+            CreateMap<TblRimappingDto, TblRimapping>();
 
             CreateMap<TblRimappingDetail, TblRimappingDetailDto>();
             CreateMap<TblRimappingDetailDto, TblRimappingDetail>();
@@ -28,8 +55,7 @@ namespace iNube.Services.ReInsurance.Helpers
             //       .ForMember(dest => dest.RimappingTypeId, opt => opt.MapFrom(src => src.RimappingTypeId))
             //.ReverseMap();
 
-            CreateMap<TblRimapping, TblRimappingDto>();
-            CreateMap<TblRimappingDto, TblRimapping>();
+          
             //CreateMap<TblRimappingDto, TblRimapping>()
             // .ForMember(dest => dest.TblRimappingDetail, opt => opt.MapFrom(src => src.TblRimappingDetail))
             //.ReverseMap();
