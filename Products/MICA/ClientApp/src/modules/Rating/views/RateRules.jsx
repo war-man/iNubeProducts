@@ -104,6 +104,7 @@ class RateRules extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            viewdisable:false,
             RateRuleData:[],
             count: 0,
             copyrate: {},
@@ -349,10 +350,15 @@ class RateRules extends React.Component {
         this.state.RateObjNew['Action'] = <Button color="info" disabled={this.state.viewdisable} justIcon round simple className="add" onClick={(e) => this.addrowBtn(e, index)}><Add /></Button>
         this.state.TableList.push(this.state.RateObjNew);
         this.state.TableDbSave.push(this.state.RateClassObj);
-        console.log("RateObjNew", this.state.RateObjNew, this.state.TableList.length, index);
+      
+        console.log("RateObjNew", this.state.TableList, this.state.RateObjNew, this.state.TableList.length, index);
         console.log("RateConcatT", this.state.TableDbSave);
-     
-            
+      
+        for (var i = 0; i < this.state.TableList.length-1; i++) {
+            this.state.TableList[i]['Action'] = <Button color="info" disabled={true} justIcon round simple className="add" onClick={(e) => this.addrowBtn(e, i)}><Add /></Button>
+
+        }
+        console.log("RateObjNew1", this.state.TableList)
        
 
     }
@@ -374,6 +380,7 @@ class RateRules extends React.Component {
     //add button 
     addrowBtn = (event, index) => {
         let numIndex = Number(index) + 1;
+       
         this.commonFunRate(numIndex, "");
         console.log("tableindex", index, numIndex, this.state.TableList, this.state.TableDataList);
         this.setState({});
@@ -417,9 +424,11 @@ class RateRules extends React.Component {
         //singleValueIsParameter = [];
     }
     handleRateSave = (event) => {
+        debugger
         if (this.state.IsParameterGrid==true) {
             this.state.fields[0].rate = "";
         }
+
         this.state.fields[0].dynamicList.push(this.state.TableDbSave);
     //   this.state.fields[0].dynamicList=this.state.TableDbSave;
         console.log("fields", this.state.fields);
@@ -446,7 +455,7 @@ class RateRules extends React.Component {
                 'createdDate': date(),  //'isActive': isActive, 'parameterSetDetails': sendArray,
 
             };
-            
+                 console.log(data, 'Data');
             fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CreateRateRulesSet`, {
                 method: 'post',
                 headers: {
@@ -689,7 +698,7 @@ class RateRules extends React.Component {
                                     columns={this.state.TableDataList}
                                   
 
-                                    defaultPageSize={5}
+                                    defaultPageSize={100}
                                     showPaginationTop={false}
                                   
                                 showPaginationBottom

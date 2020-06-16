@@ -44,6 +44,7 @@ export default function EditReactTable({ ...props }) {
         columns,
         title,
         StyleType,
+        defaultPageSize
     } = props;
 
     console.log("DataType", props);
@@ -113,6 +114,7 @@ export default function EditReactTable({ ...props }) {
                     filterType: 'dropdown',
                     responsive: 'stacked',
                     selectableRows: false,
+                    rowsPerPage: defaultPageSize
                     /* customToolbar: () => {
                         return <CustomToolbar />;
                     }*/
