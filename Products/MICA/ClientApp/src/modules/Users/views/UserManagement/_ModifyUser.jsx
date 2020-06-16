@@ -825,7 +825,7 @@ class ModifyUser extends React.Component {
                                                 resizable: false,
                                             },
                                             {
-                                                Header: "User Lock",
+                                                Header: "Locked users",
                                                 accessor: "unlock",
                                                 minwidth: 30,
                                                 style: { textalign: "left" },

@@ -121,7 +121,8 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(productType);
             EmailTest emailTest = new EmailTest();
-            var _aspUsers = _cpcontext.TblCustomerUsers.SingleOrDefault(x => x.Email == emailId);
+            var _aspUsers = _cpcontext.TblCustomerUsers.FirstOrDefault(x => x.Email == emailId);
+
             if (_aspUsers != null)
             {
                 string username = _aspUsers.UserName;
@@ -129,7 +130,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
                 emailTest.Subject = "MICA Username";
                 emailTest.Message = "Dear User,\n" + "      " + "\n" + "      Your Username: " + username + "      " + "\n" + "\nThanks & Regards:\n" + "      " + "MICA Team";
                 await SendEmailAsync(emailTest);
-                return _aspUsers.UserName;
+                return username;
             }
             else
             {
@@ -157,7 +158,7 @@ namespace iNube.Services.UserManagement.Controllers.Login.LoginServices.MicaLogi
 
             var userdetails = (from cu in _cpcontext.TblCustomerUsers
                                join ce in _cpcontext.TblCustomerEnvironment on cu.CustomerId equals ce.CustomerId
-                               where cu.UserName == username && ce.IsActive==true /*&& ce.Product == productType && cu.IsActive==true*/
+                               where cu.UserName == username && ce.IsActive == true /*&& ce.Product == productType && cu.IsActive==true*/
                                select new UserLoginType
                                {
                                    UserType = cu.UserType,

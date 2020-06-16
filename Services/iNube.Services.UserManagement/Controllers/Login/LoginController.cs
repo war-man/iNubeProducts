@@ -135,9 +135,9 @@ namespace iNube.Services.UserManagement.Controllers.Login
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult GetUserName(string email, string productType)
+        public async Task<IActionResult> GetUserName(string email, string productType)
         {
-            var response = _loginService.ForgetUserNameAsync(email, productType);
+            var response =await _loginService.ForgetUserNameAsync(email, productType);
             return Ok(response);
         }
 

@@ -352,6 +352,8 @@ export const TRANSLATIONS = {
         ViewUser: "View User",
         PartnerID: "Partner ID",
         Validate: "Validate",
+        unlockuser: "Unlock User",
+        lockuser: "Lock User",
 
         //useraddress
         Address: "Address",

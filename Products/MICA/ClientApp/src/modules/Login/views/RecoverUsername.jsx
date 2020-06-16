@@ -86,16 +86,21 @@ class RecoverUsername extends React.Component {
         this.setState({ redirectto: true });
     }
 
-    handleSubmit(e) {
+    handleSubmit = () => {
         if (this.state.email == "") {
             this.setState({ errormessage: true });
             console.log("blank email", this.state.errormessage)
         } else if (this.state.email != "") {
-            fetch(`${LoginConfig.UserConfigUrl}/api/Login/GetUserName?email=` + this.state.email + `&productType=` + LoginConfig.ProductType)
-                .then(response => { return response.json() })
+            fetch(`${LoginConfig.UserConfigUrl}/api/Login/GetUserName?email=` + this.state.email + `&productType=` + LoginConfig.ProductType, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }).then(response => response.json())
                 .then(data => {
                     if (data) {
-                        //console.log("response", data)
+                        console.log("response: ", data)
                         if (data.result == null) {
                             this.setState({ errordisplay: true });
                         } else {
@@ -142,7 +147,7 @@ class RecoverUsername extends React.Component {
                                         </div>
                                         <div>
                                             {this.renderRedirect()}
-                                            <Button color="info" simple size="lg" onClick={this.handleSubmit} > Submit </Button>
+                                            <Button color="info" simple size="lg" onClick={() => this.handleSubmit()} > Submit </Button>
                                         </div>
                                     </GridContainer>
                                 </div>
