@@ -101,7 +101,7 @@ class RecoverUsername extends React.Component {
                 .then(data => {
                     if (data) {
                         console.log("response: ", data)
-                        if (data.result == null) {
+                        if (data == null && data == "") {
                             this.setState({ errordisplay: true });
                         } else {
                             swal({
