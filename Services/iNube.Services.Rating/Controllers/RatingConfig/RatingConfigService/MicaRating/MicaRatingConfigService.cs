@@ -1940,8 +1940,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             ratingdto.RateName = RateName;
             ratingdto.RateObj = RateObj;
             ratingdto.IsParameter = true;
-            DateTime now = DateTime.Now;
-            ratingdto.CreatedDate = now;
+            //DateTime now = DateTime.Now;
+            ratingdto.CreatedDate = Convert.ToDateTime(StartDate);
             ratingdto.IsActive = true;
             ratingdto.Rate = "";
             ratingdto.RateType = "";
