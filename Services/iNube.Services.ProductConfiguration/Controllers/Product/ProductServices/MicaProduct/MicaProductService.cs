@@ -42,7 +42,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _emailService = emailService;
             _integrationService = integrationService;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration)); ;
+            dbHelper = new DbHelper(new IntegrationService(configuration));
         }
 
         public async Task<ProductResponse> Create(ProductDTO productDTO, ApiContext apiContext)
@@ -1762,6 +1762,56 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             {
                 throw ex;
             }
+        }
+
+        public async Task<IEnumerable<MasDTO>> GetPSDMasterData(string masterlist, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var result = _context.TblmasDynamic.Where(a => a.FieldType == masterlist)
+                .Select(b => new MasDTO
+                {
+                    mID = b.Id,
+                    mValue = b.Value,
+                    mType = b.FieldType,
+                }).ToList();
+            return result;
+        }
+
+        public async Task<DynamicEntityDTO> SaveEntities(DynamicEntityDTO dynamicEntity, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = _mapper.Map<TblDynamicEntity>(dynamicEntity);
+            _context.TblDynamicEntity.Add(data);
+            _context.SaveChanges();
+
+            var _result = _mapper.Map<DynamicEntityDTO>(data);
+            return _result;
+        }
+
+        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntities(string type, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = _context.TblDynamicEntity.Select(a => a).ToList();
+
+            if (!string.IsNullOrEmpty(type))
+            {
+                data = data.Where(a => a.Type == type).Select(a => a).ToList();
+            }
+
+            var result = _mapper.Map<List<DynamicEntityDTO>>(data);
+            return result;
+        }
+
+        public async Task<DynamicEntityDTO> SearchEntitiesByType(string type, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = _context.TblDynamicEntity.Where(a => a.Type == type).Select(a => a);
+            var result = _mapper.Map<DynamicEntityDTO>(data);
+            return result;
         }
 
         public async Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext)

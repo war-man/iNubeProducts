@@ -988,6 +988,26 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
+        public async Task<IEnumerable<MasDTO>> GetPSDMasterData(string masterlist, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<DynamicEntityDTO> SaveEntities(DynamicEntityDTO dynamicEntity, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntities(string type, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<DynamicEntityDTO> SearchEntitiesByType(string type, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext)
         {
             throw new NotImplementedException();

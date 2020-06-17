@@ -65,6 +65,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext);
         Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext);
         Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetPSDMasterData(string masterlist, ApiContext apiContext);
+        Task<DynamicEntityDTO> SaveEntities(DynamicEntityDTO dynamicEntity, ApiContext apiContext);
+        Task<IEnumerable<DynamicEntityDTO>> SearchEntities(string type, ApiContext apiContext);
+        Task<DynamicEntityDTO> SearchEntitiesByType(string type, ApiContext apiContext);
         Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext);
     }
 
@@ -352,6 +356,26 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         public async Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext)
         {
             return await _productConfigService(apiContext.ProductType).CreateMapping(MapDto, apiContext);
+        }
+
+        public async Task<IEnumerable<MasDTO>> GetPSDMasterData(string masterlist, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).GetPSDMasterData(masterlist, apiContext);
+        }
+
+        public async Task<DynamicEntityDTO> SaveEntities(DynamicEntityDTO dynamicEntity, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).SaveEntities(dynamicEntity, apiContext);
+        }
+
+        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntities(string type, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).SearchEntities(type, apiContext);
+        }
+
+        public async Task<DynamicEntityDTO> SearchEntitiesByType(string type, ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).SearchEntitiesByType(type, apiContext);
         }
 
         public async Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext)

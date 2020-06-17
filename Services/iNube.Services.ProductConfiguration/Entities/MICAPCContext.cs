@@ -18,6 +18,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual DbSet<TblBenifitRangeDetails> TblBenifitRangeDetails { get; set; }
         public virtual DbSet<TblCoverChildRcbdetails> TblCoverChildRcbdetails { get; set; }
         public virtual DbSet<TblCoverRcbdetails> TblCoverRcbdetails { get; set; }
+        public virtual DbSet<TblDynamicEntity> TblDynamicEntity { get; set; }
         public virtual DbSet<TblDynamicProduct> TblDynamicProduct { get; set; }
         public virtual DbSet<TblInsurableChildRcbdetails> TblInsurableChildRcbdetails { get; set; }
         public virtual DbSet<TblInsurableRcbdetails> TblInsurableRcbdetails { get; set; }
@@ -37,6 +38,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public virtual DbSet<TblProducts> TblProducts { get; set; }
         public virtual DbSet<TblPromo> TblPromo { get; set; }
         public virtual DbSet<TblmasClausesWarrentiesExclusions> TblmasClausesWarrentiesExclusions { get; set; }
+        public virtual DbSet<TblmasDynamic> TblmasDynamic { get; set; }
         public virtual DbSet<TblmasMapping> TblmasMapping { get; set; }
         public virtual DbSet<TblmasPccommonTypes> TblmasPccommonTypes { get; set; }
         public virtual DbSet<TblmasProductMaster> TblmasProductMaster { get; set; }
@@ -139,6 +141,42 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .HasForeignKey(d => d.InsurableRcbdetailsId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tblCoverRCBDetails_tblInsurableRCBDetails");
+            });
+
+            modelBuilder.Entity<TblDynamicEntity>(entity =>
+            {
+                entity.ToTable("tblDynamicEntity", "PC");
+
+                entity.Property(e => e.Id).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.Checked).HasMaxLength(250);
+
+                entity.Property(e => e.CreatedBy).HasMaxLength(250);
+
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.EntityLevel).HasMaxLength(50);
+
+                entity.Property(e => e.FieldType).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.FilterName).HasMaxLength(250);
+
+                entity.Property(e => e.LabelText).HasMaxLength(250);
+
+                entity.Property(e => e.ListObject).HasMaxLength(250);
+
+                entity.Property(e => e.Name).HasMaxLength(250);
+
+                entity.Property(e => e.ParentId).HasMaxLength(40);
+
+                entity.Property(e => e.Type).HasMaxLength(1);
+
+                entity.Property(e => e.Value).HasMaxLength(250);
+
+                entity.HasOne(d => d.FieldTypeNavigation)
+                    .WithMany(p => p.TblDynamicEntity)
+                    .HasForeignKey(d => d.FieldType)
+                    .HasConstraintName("FK_tblDynamicEntity_tblmasDynamic");
             });
 
             modelBuilder.Entity<TblDynamicProduct>(entity =>
@@ -764,6 +802,17 @@ namespace iNube.Services.ProductConfiguration.Entities
                     .WithMany(p => p.TblmasClausesWarrentiesExclusionsSubLevel)
                     .HasForeignKey(d => d.SubLevelId)
                     .HasConstraintName("FK_tblmasClausesWarrentiesExclusionsSubLevel_tblmasProductMaster");
+            });
+
+            modelBuilder.Entity<TblmasDynamic>(entity =>
+            {
+                entity.ToTable("tblmasDynamic", "PC");
+
+                entity.Property(e => e.Id).HasColumnType("numeric(18, 0)");
+
+                entity.Property(e => e.FieldType).HasMaxLength(250);
+
+                entity.Property(e => e.Value).HasMaxLength(50);
             });
 
             modelBuilder.Entity<TblmasMapping>(entity =>

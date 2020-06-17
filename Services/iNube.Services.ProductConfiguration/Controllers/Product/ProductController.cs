@@ -504,10 +504,30 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public IActionResult HC()
+        public async Task<IActionResult> GetPSDMasterData(string masterlist)
         {
-            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            var response = await _productService.GetPSDMasterData(masterlist, Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SaveEntities(DynamicEntityDTO dynamicEntity)
+        {
+            var response = await _productService.SaveEntities(dynamicEntity, Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchEntities(string type)
+        {
+            var response = await _productService.SearchEntities(type, Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchEntitiesByType(string type)
+        {
+            var response = await _productService.SearchEntitiesByType(type, Context);
             return Ok(response);
         }
 
@@ -517,5 +537,16 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             var response = await _productService.GetDynamicProduct(type, Context);
             return Ok(response);
         }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HC()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
+
+
     }
 }

@@ -450,7 +450,10 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
             TblDynamicPermissions dynamicPermissions = null;
             foreach (var item in data)
             {
-                _context.TblDynamicPermissions.Remove(item);
+                if (item.DynamicType == "Report")
+                {
+                    _context.TblDynamicPermissions.Remove(item);
+                }
             }
 
             DynamicPermissionsDTO permissionsDTO = new DynamicPermissionsDTO();
@@ -547,9 +550,14 @@ namespace iNube.Services.UserManagement.Controllers.Role.RoleService.MicaRole
 
 
             TblDynamicPermissions dynamicPermissions = null;
+            var permissions = configDTO.PermissionIds;
+
             foreach (var item in data)
             {
-                _context.TblDynamicPermissions.Remove(item);
+                if (item.DynamicType == "Graph")
+                {
+                    _context.TblDynamicPermissions.Remove(item);
+                }
             }
 
             DynamicPermissionsDTO permissionsDTO = new DynamicPermissionsDTO();

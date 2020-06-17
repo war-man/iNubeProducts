@@ -20,7 +20,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<TblProductChannels> ChannelDetails(decimal ChannelId, ApiContext apiContext);
         Task<TblProductClausesWarrentiesExclusions> ClaimsDetails(decimal Cweid, ApiContext apiContext);
         Task<TblProductRcbdetails> RiskDetails(decimal RcbdetailsId, ApiContext apiContext);
-        Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type,string FieldType, ApiContext apiContext);
+        Task<IEnumerable<ProductRcbdetailsDTO>> RCBDetails(decimal ProductId, string type, string FieldType, ApiContext apiContext);
         void Delete(int ProductID, ApiContext apiContext);
         Task<ProductResponse> ProductCodevalidation(string code, ApiContext apiContext);
         Task<ProductDTO> ModifyProducts(ProductDTO objProduct, ApiContext apiContext);
@@ -38,8 +38,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal ProductId, string type, ApiContext apiContext);
         Task<ProductDTO> GetProductByCode(string ProductCode, ApiContext apiContext);
         Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
-        Task<DocumentResponse> Docupload(string productcode,string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
-        Task<DocumentResponse> PromoDocupload(string productcode, string productId,HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<DocumentResponse> Docupload(string productcode, string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
+        Task<DocumentResponse> PromoDocupload(string productcode, string productId, HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext);
         Task<List<LeadInfoDTO>> BulkSMS(ApiContext apiContext);
         Task<LeadInfoDTO> GetLeadInfo(int LeadID, ApiContext apiContext);
         Task<ProductResponse> ProductNamevalidation(string name, ApiContext apiContext);
@@ -48,9 +48,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<dynamic> GetProductRateConfig(int productid, ApiContext apiContext);
         Task<List<ProductRatingMapping>> GetProductRateMapping(int productid, ApiContext apiContext);
         //Task<LGIDTO> BenefitValueLGIAsync(LGIDTO product, ApiContext apiContext);
-        Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext);
         Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext);
         Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetPSDMasterData(string masterlist, ApiContext apiContext);
+        Task<DynamicEntityDTO> SaveEntities(DynamicEntityDTO dynamicEntity, ApiContext apiContext);
+        Task<IEnumerable<DynamicEntityDTO>> SearchEntities(string type, ApiContext apiContext);
+        Task<DynamicEntityDTO> SearchEntitiesByType(string type, ApiContext apiContext);
         Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext);
     }
 }
