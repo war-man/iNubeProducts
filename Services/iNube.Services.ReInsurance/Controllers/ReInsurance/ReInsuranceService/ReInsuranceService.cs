@@ -39,7 +39,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         Task<TransactionMapResponse> SaveParticipentData(TblParticipantMasterDto participantMasterDto, ApiContext apiContext);
         Task<List<TblParticipantMasterDto>> SearchParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext);
         Task<TransactionMapResponse> DeleteParticipant(decimal participantMasterId, ApiContext apiContext);
-        Task<TblParticipantMasterDto> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext);
+        Task<ParticpantResponse> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext);
 
         //add participant
 
@@ -57,14 +57,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         Task<TransactionMapResponse> SaveRetentionData(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext);
         Task<IEnumerable<TblRetentionGroupDto>> SearchRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext);
         Task<TransactionMapResponse> DeleteRetention(decimal retentionGroupId, ApiContext apiContext);
-        Task<TblRetentionGroupDto> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext);
+        Task<RetentionResponse> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext);
 
         //Treaty Functions
 
         Task<TransactionMapResponse> SaveTreatyData(TblTreatyDto tblTreatyDto, ApiContext apiContext);
         Task<IEnumerable<TblTreatyDto>> SearchTreaty(TblTreatyDto tblRetentionGroupDto, ApiContext apiContext);
         Task<TransactionMapResponse> DeleteTeaty(decimal tratyId, ApiContext apiContext);
-        Task<TblTreatyDto> ModifyfTraty(TblTreatyDto tblRetentionGroupDto, ApiContext apiContext);
+        Task<TreatyResponse> ModifyfTraty(TblTreatyDto tblRetentionGroupDto, ApiContext apiContext);
         Task<IAsyncResult> AddTreatyParticipant(TblParticipantDto tblParticipantDto, ApiContext apiContext);
 
 
@@ -353,7 +353,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         }
 
         //modifyParticipant
-        public async Task<TblParticipantMasterDto> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext)
+        public async Task<ParticpantResponse> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -386,7 +386,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             _context.TblParticipantMaster.Update(tbl_particiant);
             _context.SaveChanges();
             var accountDTO = _mapper.Map<TblParticipantMasterDto>(tbl_particiant);
-            return accountDTO;
+            // return accountDTO;
+            return new ParticpantResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Participant updated  sucessfully ",participantMasterDto= accountDTO };
         }
 
         public async Task<TransactionMapResponse> SaveParticipentData(TblParticipantMasterDto participantMasterDto, ApiContext apiContext)
@@ -600,7 +601,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //modifyRetention
 
-        public async Task<TblRetentionGroupDto> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext)
+        public async Task<RetentionResponse> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -623,7 +624,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             _context.TblRetentionGroup.Update(tbl_particiant);
             _context.SaveChanges();
             var accountDTO = _mapper.Map<TblRetentionGroupDto>(tbl_particiant);
-            return accountDTO;
+            //  return accountDTO;
+            return new RetentionResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Retention updated  sucessfully ",retentionGroupDto= accountDTO };
         }
 
         //Treaty
@@ -743,7 +745,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //modify TreatyData
 
-        public async Task<TblTreatyDto> ModifyfTraty(TblTreatyDto tblTreatyDto, ApiContext apiContext)
+        public async Task<TreatyResponse> ModifyfTraty(TblTreatyDto tblTreatyDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -770,7 +772,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             _context.TblTreaty.Update(tbl_traty);
             _context.SaveChanges();
             var accountDTO = _mapper.Map<TblTreatyDto>(tbl_traty);
-            return accountDTO;
+
+            //return accountDTO;
+            return new TreatyResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Treaty updated  sucessfully ",treatyDto= accountDTO };
         }
 
         //AddTreatyParticipant 
@@ -946,7 +950,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         //Delete RI mapping
         //modify Ri
 
-        public async Task<TblRimappingDto> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext)
+        public async Task<TblRimappingResponse> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -964,7 +968,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             _context.TblRimapping.Update(tbl_particiant);
             _context.SaveChanges();
             var accountDTO = _mapper.Map<TblRimappingDto>(tbl_particiant);
-            return accountDTO;
+            //  return accountDTO;
+            return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"RI Mapping Updated  sucessfully ",RimappingDto= accountDTO };
         }
 
 

@@ -627,7 +627,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         }
 
         [HttpGet]
-        public async Task<IActionResult> TreatyCodeAndGroupValidation(string codeName,string type)
+        public async Task<IActionResult> RIValidations(string codeName,string type)
         {
             var response = await _reInsuranceService.TreatyCodeAndGroupValidation(codeName, type, Context);
             return Ok(response);

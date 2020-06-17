@@ -124,7 +124,7 @@ namespace iNube.Services.ReInsurance.Models
         public virtual ICollection<TblParticipantDto> TblParticipantBrokerBranch { get; set; }
         public virtual ICollection<TblParticipantDto> TblParticipantReInsurerBranch { get; set; }
     }
-    public partial class TblParticipantMasterDto
+    public partial class TblParticipantMasterDto: ResponseStatus
     {
         public TblParticipantMasterDto()
         {
@@ -198,7 +198,7 @@ namespace iNube.Services.ReInsurance.Models
         public string mType { get; set; }
 
     }
-    public partial class TblRetentionGroupDto
+    public partial class TblRetentionGroupDto: ResponseStatus
     {
         public TblRetentionGroupDto()
         {
@@ -227,6 +227,24 @@ namespace iNube.Services.ReInsurance.Models
 
         public virtual ICollection<TblRimappingDetailDto> TblRimappingDetail { get; set; }
     }
+    public partial class TblRimappingResponse:ResponseStatus
+    {
+        public TblRimappingDto RimappingDto { get; set; }
+    }
+    public partial class ParticpantResponse : ResponseStatus
+    {
+        public TblParticipantMasterDto participantMasterDto { get; set; }
+    }
+    public partial class TreatyResponse : ResponseStatus
+    {
+        public TblTreatyDto treatyDto { get; set; }
+    }
+
+    public partial class RetentionResponse : ResponseStatus
+    {
+        public TblRetentionGroupDto retentionGroupDto { get; set; }
+    }
+
     public partial class TblRimappingDto
     {
         public TblRimappingDto()
@@ -474,7 +492,7 @@ namespace iNube.Services.ReInsurance.Models
         public DateTime? ModifiedDate { get; set; }
         public decimal? EnvId { get; set; }
     }
-    public partial class RiallocationDto
+    public partial class RiallocationDto: ResponseStatus
     {
         public RiallocationDto()
         {
