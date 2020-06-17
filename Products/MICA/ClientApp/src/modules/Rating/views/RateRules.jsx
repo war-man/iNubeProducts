@@ -41,6 +41,8 @@ import TableContentLoader from "components/Loaders/TableContentLoader.jsx";
 import PageContentLoader from "components/Loaders/PageContentLoader.jsx";
 import data_Not_found from "assets/img/data-not-found-new.png";
 import validationPage from "modules/Partners/Organization/views/ValidationPage.jsx";
+import Dropzone from 'react-dropzone-uploader';
+import Dropdown from "components/Dropdown/Dropdown.jsx";
 
 const style = {
     infoText: {
@@ -69,7 +71,6 @@ const searchClose = {
     fontSize: "larger",
     padding: "0px",
     right: '10px',
-
 }
 const dateStyle = {
     width: "max-content",
@@ -104,6 +105,7 @@ class RateRules extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            ShowGrid:false,
             viewdisable:false,
             RateRuleData:[],
             count: 0,
@@ -114,6 +116,8 @@ class RateRules extends React.Component {
             //  date: date,
             IsParameterGrid: false,
             IsParameterRate: true,
+            IsDropZone: false,
+
             RateRule: [],
             productRateObj: [],
             RateObjNew: {},
@@ -138,11 +142,14 @@ class RateRules extends React.Component {
                 isParameter: "",
                
                 dynamicList: [],
+                UploadType:""
               
             }], rateNameState: "",
             StartDateState: "",
             EndDateState: "",
             rateTypeState: "",
+            Type: false,
+            ExcelTypeButtonflag: false,
 
 
             //EmptyFieldz: [{
@@ -161,6 +168,8 @@ class RateRules extends React.Component {
             pageloader: false,
             nodata: false,
             loader: true,
+            typeList: [{ "mID": "Excel", "mValue": "Excel", "mType": "Excel" },
+                { "mID": "Grid", "mValue": "Grid", "mType": "Grid" }],
 
 
         };
@@ -209,7 +218,19 @@ class RateRules extends React.Component {
             }.bind(this), 2000
         );
     }
+    onInputTypeChange = (event) => {
+        debugger
+        const fields = this.state.fields;
+        fields[0][event.target.name] = event.target.value;
+        if (event.target.value != "Excel") {
+            this.state.ExcelTypeButtonflag = true;
+        }
+        else {
+            this.state.ExcelTypeButtonflag = false;
+        }
+        this.setState({ fields });
 
+    };
     onInputChange = (type,event) => {
         const fields = this.state.fields;
         fields[0][event.target.name] = event.target.value;
@@ -217,6 +238,9 @@ class RateRules extends React.Component {
         this.change(event, event.target.name, type);
 
     };
+    GridFun = () => {
+        this.setState({ ShowGrid:false});
+    }
 
     onDateChange = (formate, name, event,type) => {
         const { validdate } = this.state.fields;
@@ -295,19 +319,21 @@ class RateRules extends React.Component {
         this.setState({ fields });
         //Filter through Element 
         this.state.RateRule = this.state.RateRuleData.filter(item => item.parameterSetID == event.target.value);
-      this.setState({});
-     //   this.setState({ RateRule: Rule });
+        this.setState({});
+        //this.setState({ RateRule: Rule });
         this.setState({ parameterId: event.target.value });
-      
+        this.state.Type = true;
         //radioChange
              if (this.state.RateRule.length > 0) {
                  console.log("abcd", this.state.RateRule)
             this.state.IsParameterGrid = true;
-           this.state.IsParameterRate = false;
+                 this.state.IsParameterRate = false;
+                 this.state.IsDropZone = true;
                  this.commonFunRate(0, event.target.value);
                  this.setState({});
                  
-        } else {
+             } else {
+                 this.setState({ IsDropZone: false });
                  this.setState({ IsParameterGrid: false });
                  this.setState({ IsParameterRate: true });
         }
@@ -419,7 +445,7 @@ class RateRules extends React.Component {
 
         this.setState({ state });
         console.log("dynamicList", this.state.fields[0].dynamicList);
-        this.setState({ IsParameterRate: true });
+        this.setState({ IsParameterRate: false });
         this.setState({ IsParameterGrid: false });
         //singleValueIsParameter = [];
     }
@@ -517,6 +543,51 @@ class RateRules extends React.Component {
         console.log("Table2", this.state.TableList, this.state.TableDataList);
     }
 
+     handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
+
+     handleSubmit = (files) => {
+        console.log("SubmitData", files.map(f => f.meta))
+        var data = new FormData();
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                data.append(files[i].file.name, files[i].file);
+
+            }
+         }
+
+         let that = this;
+         $.ajax({
+            type: "POST",
+            url: `${RateConfig.rateConfigUrl}/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
+            //url: `https://localhost:44364/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
+
+            contentType: false,
+            processData: false,
+
+            data: data,
+            beforeSend: function (xhr) {
+                /* Authorization header */
+                xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+            },
+            success: function (response) {
+                console.log("response ", response.responseMessage);
+                swal({
+                    text: response.responseMessage,
+                    icon: "success"
+                });
+            },
+             error: function () {
+                 that.GridFun(false);
+                swal({
+                    text: "File uploading unsuccessful",
+                    icon: "error"
+                });
+            }
+        });
+
+
+    }
+
 
     render() {
         const { classes } = this.props;
@@ -601,14 +672,14 @@ class RateRules extends React.Component {
 
 
                                         <CustomDatetime
-                                             success={this.state.StartDateState === "success"}
-                                              error={this.state.StartDateState === "error"}
+                                            success={this.state.StartDateState === "success"}
+                                            error={this.state.StartDateState === "error"}
                                             required={true}
                                             onFocus={this.state.onClick}
                                             labelText="Start Date"
                                             id='startDate'
                                             name='startDate'
-                                        onChange={(event) => this.onDateChange('datetime', 'startDate', event)}
+                                            onChange={(event) => this.onDateChange('datetime', 'startDate', event)}
                                             value={this.state.fields[0].startDate}
                                             formControlProps={{ fullWidth: true }} />
 
@@ -628,8 +699,22 @@ class RateRules extends React.Component {
                                             value={this.state.fields[0].endDate}
                                             formControlProps={{ fullWidth: true }} />
 
+                                </GridItem>
+                                {this.state.Type &&
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <Dropdown
+                                            labelText="Upload Type"
+                                            id="UploadType"
+                                            value={this.state.fields[0].UploadType}
+                                            lstObject={this.state.typeList}
+                                            name='UploadType'
+                                            onChange={this.onInputTypeChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
                                     </GridItem>
-
+                                }
                                 {
                                 //    <GridItem xs={12} sm={12} md={3}>
                                 //    <CustomInput
@@ -649,6 +734,7 @@ class RateRules extends React.Component {
                                 //</GridItem>
                                 }
 
+
                                 {this.state.IsParameterRate &&
                                   
                                         <GridItem xs={12} sm={12} md={3}>
@@ -663,8 +749,8 @@ class RateRules extends React.Component {
                                                 }}
                                         />
                                     </GridItem>
-                                   
                                 }
+
                                 {this.state.IsParameterRate &&
                                     <GridContainer justify="center">
                                     <GridItem xs={12} sm={12} md={3}>
@@ -688,7 +774,8 @@ class RateRules extends React.Component {
 
                 {this.state.IsParameterGrid &&
                     <GridContainer xl={12}>
-                        <GridItem xs={12}>
+                    <GridItem xs={12}>
+                        
                             <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
 
                                 <ReactTable
@@ -706,15 +793,25 @@ class RateRules extends React.Component {
                                 />
 
                         </Animated>
-                        <GridContainer justify="center">
+                    
+                        
+                            <Dropzone
+                                maxFiles={1}
+                                onChangeStatus={this.handleChangeStatus}
+                                onSubmit={this.handleSubmit}
+                            />
+                        {
+                            //this.state.ExcelTypeButtonflag &&
+                            //<GridContainer justify="center">
+                            //    <Button style={{ marginTop: "1rem" }} onClick={() => this.handleRateSave()}
+                            //        color="info"
+                            //        round
+                            //    >
+                            //        SAVE
+                            //    </Button>
 
-                        <Button style={{ marginTop: "1rem" }} onClick={() => this.handleRateSave()}
-                            color="info"
-                            round
-                        >
-                            SAVE
-                                </Button>
-                        </GridContainer>
+                            //</GridContainer>
+                        }
                     </GridItem>
                     {/* : <GridItem lg={12}>
                         {this.state.IsParameterGrid &&
@@ -736,8 +833,21 @@ class RateRules extends React.Component {
 
                     </GridItem>*/}
 
-                        }
+                        
 
+                    </GridContainer>
+                }
+                {this.state.ExcelTypeButtonflag &&
+                    <GridContainer lg={12} justify="center">
+                        <GridItem xs={5} sm={3} md={3} lg={1}>
+                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                            <Button style={{ marginTop: "1rem" }} onClick={() => this.handleRateSave()}
+                                color="info"
+                                round>
+                                SAVE
+                                </Button>
+                            </Animated>
+                        </GridItem>
                     </GridContainer>
                 }
              
