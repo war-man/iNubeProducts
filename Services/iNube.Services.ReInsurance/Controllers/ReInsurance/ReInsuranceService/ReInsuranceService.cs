@@ -405,7 +405,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
                 // throw;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $" Participant Created sucessfully " };
+            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $" Participant Created sucessfully With ParticipantCode "+ data .ParticipantCode};
         }
         //search Participant data
 
@@ -506,7 +506,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
                 // throw;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $" Retention Created sucessfully " };
+            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $" Retention Created sucessfully with Retetion GroupName "+ data.RetentionGroupName };
         }
 
         //Search Retention
@@ -646,7 +646,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
                 // throw;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Treaty Created sucessfully " };
+            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Treaty Created sucessfully with Treaty Code: "+ tblTreatyDto.TreatyCode };
         }
 
         //Search Treaty
@@ -891,7 +891,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
                 // throw;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Details Saved sucessfully " };
+            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Details Saved sucessfully" };
         }
 
         //search RI mapping
@@ -1185,27 +1185,27 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             if (Convert.ToInt32(retensionDto.RetentionLogicId) == 20)
             {
                 map.AllocationMethod = "Percentage";
-                map.Percentage = Convert.ToInt32(retensionDto.Percentage);
+                map.Percentage = retensionDto.Percentage.ToString();
             }
             else if (Convert.ToInt32(retensionDto.RetentionLogicId) == 21)
             {
                 map.AllocationMethod = "Limit";
-                map.Limit = Convert.ToDecimal(retensionDto.Limit);
+                map.Limit = retensionDto.Limit.ToString();
 
             }
             else if (Convert.ToInt32(retensionDto.RetentionLogicId) == 22)
             {
                 map.AllocationMethod = "Percentage with Limit";
-                map.Limit = Convert.ToDecimal(retensionDto.Limit);
-                map.Percentage = Convert.ToInt32(retensionDto.Percentage);
+                map.Limit = retensionDto.Limit.ToString();
+                map.Percentage = retensionDto.Percentage.ToString();
             }
             else {
                 map.AllocationMethod = "Lines";
             }
            
            
-            map.AllocationBasis = calulationDto.SumInsured ;
-            map.Balance = calulationDto.SumInsured;
+            map.AllocationBasis = calulationDto.SumInsured.ToString() ;
+            map.Balance = calulationDto.SumInsured.ToString();
            
             maps.Add(map);
 
@@ -1235,27 +1235,27 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 20)
                             {
                                 map.AllocationMethod = "Percentage";
-                                map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                                map.Percentage = arrangementsvalue.Percentage.ToString();
                             }
                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
                             {
                                 map.AllocationMethod = "Limit";
-                                map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                                map.Limit = arrangementsvalue.Amount.ToString();
                             }
                             else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
                             {
                                 map.AllocationMethod = "PercentageWithLimit";
-                                map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
-                                map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                                map.Percentage = arrangementsvalue.Percentage.ToString();
+                                map.Limit = arrangementsvalue.Amount.ToString();
                             }
                             else
                             {
                                 map.AllocationMethod = "NoOfLines";
                             }
 
-                            map.AllocationBasis = calulationDto.SumInsured;
+                            map.AllocationBasis = calulationDto.SumInsured.ToString();
                             // Convert.ToDecimal(arrangementsvalue.Amount);
-                            map.Balance = calulationDto.SumInsured;
+                            map.Balance = calulationDto.SumInsured.ToString();
                             if (arrangementsvalue.HigherOrLowerId==24)
                             {
                                 map.HL ="H";
@@ -1264,7 +1264,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             {
                                 map.HL = "L";
                             }
-                            map.NoOfLines = Convert.ToInt16(arrangementsvalue.NoOfLines);
+                            map.NoOfLines = arrangementsvalue.NoOfLines.ToString();
                             if(arrangementsvalue.AllocationBasisId==26)
                             {
                                 map.AllocatedBasedOn = "Sum Insured";
@@ -1293,27 +1293,27 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 20)
                             {
                                 map.AllocationMethod = "Percentage";
-                                map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                                map.Percentage = arrangementsvalue.Percentage.ToString();
                             }
                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
                             {
                                 map.AllocationMethod = "Limit";
-                                map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                                map.Limit = arrangementsvalue.Amount.ToString();
                             }
                             else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
                             {
                                 map.AllocationMethod = "PercentageWithLimit";
-                                map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
-                                map.Limit = Convert.ToDecimal(arrangementsvalue.Amount);
+                                map.Percentage = arrangementsvalue.Percentage.ToString();
+                                map.Limit = arrangementsvalue.Amount.ToString();
                             }
                             else
                             {
                                 map.AllocationMethod = "NoOfLines";
                             }
 
-                            map.AllocationBasis = calulationDto.SumInsured;
+                            map.AllocationBasis = calulationDto.SumInsured.ToString();
                             // Convert.ToDecimal(arrangementsvalue.Amount);
-                            map.Balance = calulationDto.SumInsured;
+                            map.Balance = calulationDto.SumInsured.ToString();
                             if (arrangementsvalue.HigherOrLowerId == 24)
                             {
                                 map.HL = "H";
@@ -1322,7 +1322,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             {
                                 map.HL = "L";
                             }
-                            map.NoOfLines = Convert.ToInt16(arrangementsvalue.NoOfLines);
+                            map.NoOfLines = arrangementsvalue.NoOfLines.ToString();
                             if (arrangementsvalue.AllocationBasisId == 26)
                             {
                                 map.AllocatedBasedOn = "Sum Insured";
