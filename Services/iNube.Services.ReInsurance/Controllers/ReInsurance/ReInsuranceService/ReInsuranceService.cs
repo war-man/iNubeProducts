@@ -78,7 +78,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         //Task<IEnumerable<RIMappingDTO>> GetTreatyTypeRIGrid(string treatycode, ApiContext apiContext);
 
         Task<IEnumerable<TblRimappingDto>> SearchRImapping(TblRimappingDto tblRimappingDto, ApiContext apiContext);
-        Task<TblRimappingDto> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext);
+        Task<TblRimappingResponse> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext);
         Task<TransactionMapResponse> DeleteRiMapping(decimal RimappingId, ApiContext apiContext);
 
 
