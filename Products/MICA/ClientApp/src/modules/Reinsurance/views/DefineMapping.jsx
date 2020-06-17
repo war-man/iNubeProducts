@@ -536,13 +536,7 @@ class DefineMapping extends React.Component {
 
                             </GridItem>
                         </GridContainer>
-                        <GridContainer justify="center">
-                            <GridItem>
-                                <Button id="button-search-partner" color="info" round>
-                                    <TranslationContainer translationKey="Map" /> 
-                                    </Button>
-                            </GridItem>
-                        </GridContainer>
+                         
                         <GridContainer>
                             <CardHeader color="info" icon >
 

@@ -68,18 +68,20 @@ const Arrangements = (props) => {
 
             </card>
             <GridContainer>
-                 <GridItem xs={12} sm={12} md={3}>
-                    <MasterDropdown
-                        labelText="Allocationon"
-                        id="ddlstatus"
-                        lstObject={props.masterList}
-                        filterName='AllocationOn'
-                        value={arrangementDetails.treatydata[arrangementDetails.index].tblArrangement[0].allocationOnId}
-                        name='allocationOnId'
-                        onChange={(e) => arrangementDetails.handleAggrement(e)}
-                        formControlProps={{ fullWidth: true }} />
+                {props.allocationOnflag && 
+                    <GridItem xs={12} sm={12} md={3}>
+                        <MasterDropdown
+                            labelText="Allocationon"
+                            id="ddlstatus"
+                            lstObject={props.masterList}
+                            filterName='AllocationOn'
+                            value={arrangementDetails.treatydata[arrangementDetails.index].tblArrangement[0].allocationOnId}
+                            name='allocationOnId'
+                            onChange={(e) => arrangementDetails.handleAggrement(e)}
+                            formControlProps={{ fullWidth: true }} />
 
-                </GridItem>
+                    </GridItem>
+                }
               <GridItem xs={12} sm={12} md={3}>
                     <Dropdown
                         labelText="AllocationLogic"
@@ -148,24 +150,27 @@ const Arrangements = (props) => {
                         />
                     </GridItem>
                 }
-                <GridItem xs={12} sm={12} md={3}>
-                    <MasterDropdown
-                        labelText="HigherLower"
-                        id="ddlstatus"
-                        lstObject={props.masterList}
-                        filterName='HigherLower'
-                        value={arrangementDetails.treatydata[arrangementDetails.index].tblArrangement[0].higherOrLowerId}
-                        name='higherOrLowerId'
-                        onChange={(e) => arrangementDetails.handleAggrement(e)}
-                        formControlProps={{ fullWidth: true }} />
+                {props.higherflag && 
+                    <GridItem xs={12} sm={12} md={3}>
+                        <MasterDropdown
+                            labelText="HigherLower"
+                            id="ddlstatus"
+                            lstObject={props.masterList}
+                            filterName='HigherLower'
+                            value={arrangementDetails.treatydata[arrangementDetails.index].tblArrangement[0].higherOrLowerId}
+                            name='higherOrLowerId'
+                            onChange={(e) => arrangementDetails.handleAggrement(e)}
+                            formControlProps={{ fullWidth: true }} />
 
-                </GridItem>
+                    </GridItem>
+                }
                 {props.allocationbasisflag &&
+             
                 <GridItem xs={12} sm={12} md={3}>
-                    <MasterDropdown
+                    <Dropdown
                         labelText="AllocationBasis"
                         id="ddlstatus"
-                        lstObject={props.masterList}
+                        lstObject={props.surpluslist}
                         filterName='AllocationBasis'
                         value={arrangementDetails.treatydata[arrangementDetails.index].tblArrangement[0].allocationBasisId}
                         name='allocationBasisId'
