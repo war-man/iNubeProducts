@@ -301,6 +301,7 @@ class DefineRetentions extends React.Component {
                 .then(response => response.json(this.state.Retention))
                 .then(data => {
 
+                   
                     console.log(data, 'Mydata222')
                     //data.effectiveFrom = new Date(this.state.Retention.effectiveFrom).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
                     //data.effectiveTo = new Date(this.state.Retention.effectiveTo).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
@@ -409,8 +410,13 @@ class DefineRetentions extends React.Component {
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
             body: JSON.stringify(this.state.Retention)
-        }) //.then(response => response.json())
+        }) .then(response => response.json())
             .then(data => {
+                swal({
+                    text: data.responseMessage,
+                    //text: "data saved successfully",
+                    icon: "success"
+                });
                 this.setState({ Retention: data });
                 console.log(data, 'Mydata')
                 console.log("Accountss data: ", data);

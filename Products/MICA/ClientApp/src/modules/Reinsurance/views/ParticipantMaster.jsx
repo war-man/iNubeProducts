@@ -70,6 +70,8 @@ class ParticipantMaster extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            branchCodeflag: false,
+            branchCodemassage: "",
             flag: true,
             flagUpdate: false,
             editModal: false,
@@ -214,6 +216,29 @@ class ParticipantMaster extends React.Component {
         //status['accountDescState'] = "";
         //this.setState({ status });
     }
+    onBlur = (index) => {
+        
+            debugger
+            //fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph",
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + this.state.Branchesdto[index].branchCode + '&type=' + "ParticipantBranchCode", {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status == 7) {
+                        this.setState({ branchCodeflag: true, branchCodemassage: data.responseMessage });
+                    } else {
+                        this.setState({ branchCodeflag: false, branchCodemassage: "" });
+                    }
+                });
+            console.log("data", this.state.masterList);
+        }
+    
     onInputBranchesChange = (type, event, index) => {
         event.preventDefault();
         let name = event.target.name;
@@ -229,6 +254,7 @@ class ParticipantMaster extends React.Component {
         this.setState({ treatydata });
         this.AddTreatyTable();
         this.change(event, name, type);
+        
     }
     onFormSubmit = (evt) => {
         this.state.ParticipantMaster.tblParticipantBranch = this.state.Branchesdto;
@@ -270,8 +296,8 @@ class ParticipantMaster extends React.Component {
 
                             //   title: "Perfect",
 
-                            //text: data.responseMessage,
-                            text: "Participant Successfully Created",
+                            text: data.responseMessage,
+                            //text: "Participant Successfully Created",
                             icon: "success"
                         });
                         this.setState({ errormessage: false });
@@ -337,15 +363,17 @@ class ParticipantMaster extends React.Component {
                 return {
                     id: key + 1,
 
-                    BranchCode: <CustomInput labelText="BranchCode" id="BusinessTypeText"
+                    BranchCode: <div><CustomInput labelText="BranchCode" id="BusinessTypeText"
                         required={true}
                       //  error={this.state.branchCodeState}
                         value={this.state.Branchesdto[key].branchCode}
                         name='branchCode'
                         onChange={(event) => this.onInputBranchesChange("numeric", event, key)}
+
+                        onBlur={()=>this.onBlur(key)}
                         //onChange={(evt)=>this.onInputBranchesChange(evt,key)}
                         formControlProps={{ fullWidth: true }
-                        } />,
+                        } />{this.state.branchCodeflag && <p className="error">{this.state.branchCodemassage} </p>}</div>,
                     BranchName: <CustomInput labelText="BranchName" id="BusinessTypeText"
                         required={true}
                         error={this.state.branchNameState}
@@ -522,11 +550,19 @@ class ParticipantMaster extends React.Component {
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
             body: JSON.stringify(this.state.ParticipantMaster)
-        }) //.then(response => response.json())
+        }) .then(response => response.json())
             .then(data => {
+                
+                swal({
+                    text: data.responseMessage,
+                    //text: "data saved successfully",
+                    icon: "success"
+                });
+                console.log("Accountss data1: ", data);
+                this.reset();
                 this.setState({ ParticipantMaster: data });
-                console.log(data, 'Mydata')
-                console.log("Accountss data: ", data);
+               
+                //console.log("Accountss data: ", data);
 
             });
         //let flageUpdate = this.state.flagUpdate

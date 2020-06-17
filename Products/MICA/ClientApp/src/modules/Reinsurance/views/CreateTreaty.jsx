@@ -70,8 +70,11 @@ class CreateTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
-            allocationbasisflag:false,
+            surplusmaslist:[],
+            allocationbasisflag: false,
+            surpluslist:[],
+            allocationOnflag: false,
+            higherflag: false,
             allocationList:[],
             allocationmasList:[],
             showPercentage: false,
@@ -437,6 +440,7 @@ class CreateTreaty extends React.Component {
                 console.log("Create Treaty masterList: ", this.state.masterList);
                 let newmasterlist = data.filter((e) => e.mType === 'BusinessType')[0].mdata;
                 let allocationList = data.filter((e) => e.mType == 'AllocationLogic')[0].mdata;
+                this.state.surplusmaslist = data.filter((e) => e.mType == 'AllocationBasis')[0].mdata;
                 console.log("allocationList", allocationList);
                 this.setState({ newmasterList: newmasterlist, allocationmasList: allocationList });
                 this.AddTreatyTable();
@@ -688,12 +692,15 @@ class CreateTreaty extends React.Component {
         if (evt != null) {
             if (evt.target.value == "4") {
                 this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue != 'Lines');
-                this.setState({ allocationbasisflag: false });
+
+                this.setState({ allocationbasisflag: false, allocationOnflag: true, higherflag:true});
                 console.log("ddlvals", this.state.allocationList);
             }
             else if (evt.target.value == "5") {
                 this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue == 'Lines');
-                this.setState({ allocationbasisflag: true });
+                this.state.surpluslist = this.state.surplusmaslist.filter(m => m.mValue != 'Sum Insured');
+
+                this.setState({ allocationbasisflag: true, allocationOnflag: false, higherflag:false });
                 console.log("ddlvals", this.state.allocationList);
             }
         }
@@ -941,7 +948,7 @@ class CreateTreaty extends React.Component {
                                     onClick={this.handleClose}>
                                     &times;
                                 </Button>
-                                <Arrangements handleAggrement={this.handleAggrement} handleAggrement1={this.handleAggrement1} percentageState={this.state.percentageState} amountState={this.state.amountState} plaState={this.state.plaState} claState={this.state.claState} treatydata={this.state.treatydata} index={this.state.arrViewindex} masterList={this.state.masterList} handleClose={this.handleClose} showPercentage={this.state.showPercentage} showlimit={this.state.showlimit} showperwithlimit={this.state.showperwithlimit} shownooflines={this.state.shownooflines} allocationList={this.state.allocationList} allocationbasisflag={this.state.allocationbasisflag}/>
+                                <Arrangements handleAggrement={this.handleAggrement} handleAggrement1={this.handleAggrement1} percentageState={this.state.percentageState} amountState={this.state.amountState} plaState={this.state.plaState} claState={this.state.claState} treatydata={this.state.treatydata} index={this.state.arrViewindex} masterList={this.state.masterList} handleClose={this.handleClose} showPercentage={this.state.showPercentage} showlimit={this.state.showlimit} showperwithlimit={this.state.showperwithlimit} shownooflines={this.state.shownooflines} allocationList={this.state.allocationList} allocationbasisflag={this.state.allocationbasisflag} allocationOnflag={this.state.allocationOnflag} higherflag={this.state.higherflag} surpluslist={this.state.surpluslist}/>
                             </div>
                         </Modal>
                     </GridItem>
