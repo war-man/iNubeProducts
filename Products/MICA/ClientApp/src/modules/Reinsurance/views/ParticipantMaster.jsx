@@ -220,7 +220,7 @@ class ParticipantMaster extends React.Component {
         
             debugger
             //fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph",
-            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + this.state.Branchesdto[index].branchCode + '&type=' + "ParticipantBranchCode", {
+        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + this.state.Branchesdto[index].branchCode + '&type=' + "ParticipantBranchCode", {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',
@@ -230,16 +230,18 @@ class ParticipantMaster extends React.Component {
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status == 7) {
+                    if (data.status == 9) {
                         this.setState({ branchCodeflag: true, branchCodemassage: data.responseMessage });
                     } else {
                         this.setState({ branchCodeflag: false, branchCodemassage: "" });
                     }
+                    this.AddTreatyTable();
                 });
             console.log("data", this.state.masterList);
         }
     
     onInputBranchesChange = (type, event, index) => {
+        debugger
         event.preventDefault();
         let name = event.target.name;
         let value = event.target.value;
@@ -250,7 +252,7 @@ class ParticipantMaster extends React.Component {
         let treatydata = this.state.Branchesdto;
 
         treatydata[index][name] = value;
-
+        console.log(treatydata, 'data1');
         this.setState({ treatydata });
         this.AddTreatyTable();
         this.change(event, name, type);
@@ -373,7 +375,7 @@ class ParticipantMaster extends React.Component {
                         onBlur={()=>this.onBlur(key)}
                         //onChange={(evt)=>this.onInputBranchesChange(evt,key)}
                         formControlProps={{ fullWidth: true }
-                        } />{this.state.branchCodeflag && <p className="error">{this.state.branchCodemassage} </p>}</div>,
+                        } />{this.state.branchCodeflag &&( <p className="error">{this.state.branchCodemassage} </p>)}</div>,
                     BranchName: <CustomInput labelText="BranchName" id="BusinessTypeText"
                         required={true}
                         error={this.state.branchNameState}
