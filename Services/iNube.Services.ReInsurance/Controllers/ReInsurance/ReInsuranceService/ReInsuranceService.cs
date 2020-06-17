@@ -1364,14 +1364,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            //List<ErrorInfo> Errors = new List<ErrorInfo>();
+            ValidationResponse validationResponse = new ValidationResponse();
             if (type == "TreatyCode")
             {
                 var lsttreatyCode = _context.TblTreaty.Select(s => s.TreatyCode).ToList();
                 if(lsttreatyCode.Contains(codeName)==true)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty Code " + codeName +" can not be dublicated" };
-                    Errors.Add(errorInfo);
+                    validationResponse.ResponseMessage = $"Treaty Code " + codeName + " can not be dublicated";
+                    //ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty Code " + codeName +" can not be dublicated" };
+                    // Errors.Add(errorInfo);
                 }
             }
             if (type == "GroupName")
@@ -1379,8 +1381,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstTratyGroupName = _context.TblTreatyGroup.Select(s => s.TreatyGroupName).ToList();
                 if (lstTratyGroupName.Contains(codeName) == true)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty GroupName " + codeName + " can not be dublicated" };
-                    Errors.Add(errorInfo);
+                    validationResponse.ResponseMessage = $"Treaty GroupName " + codeName + " can not be dublicated";
+
+                    //ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty GroupName " + codeName + " can not be dublicated" };
+                    // Errors.Add(errorInfo);
                 }
             }
             if (type == "ParticipantCode")
@@ -1388,8 +1392,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstParticipanctCode = _context.TblParticipantMaster.Select(s => s.ParticipantCode).ToList();
                 if (lstParticipanctCode.Contains(codeName) == true)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant Code " + codeName + " can not be dublicated" };
-                    Errors.Add(errorInfo);
+                    validationResponse.ResponseMessage = $"Participant Code " + codeName + " can not be dublicated";
+
+                    //    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant Code " + codeName + " can not be dublicated" };
+                    //  Errors.Add(errorInfo);
                 }
             }
             if (type == "ParticipantBranchCode")
@@ -1397,8 +1403,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstParticipanctBranchCode = _context.TblParticipantBranch.Select(s => s.BranchCode).ToList();
                 if (lstParticipanctBranchCode.Contains(codeName) == true)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant BranchCode " + codeName + " can not be dublicated" };
-                    Errors.Add(errorInfo);
+                    validationResponse.ResponseMessage = $"Participant BranchCode " + codeName + " can not be dublicated";
+
+                    // ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant BranchCode " + codeName + " can not be dublicated" };
+                    //Errors.Add(errorInfo);
                 }
             }
             if (type == "RetentionGroupName")
@@ -1406,12 +1414,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstRetentionGroupName = _context.TblRetentionGroup.Select(s => s.RetentionGroupName).ToList();
                 if (lstRetentionGroupName.Contains(codeName) == true)
                 {
-                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Retention GroupName " + codeName + " can not be dublicated" };
-                    Errors.Add(errorInfo);
+                    validationResponse.ResponseMessage = $"Retention GroupName " + codeName + " can not be dublicated";
+
+                    // ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Retention GroupName " + codeName + " can not be dublicated" };
+                    // Errors.Add(errorInfo);
                 }
             }
 
-            return new ValidationResponse { Status = BusinessStatus.Error, Errors = Errors};
+            return new ValidationResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage=validationResponse.ResponseMessage};
         }
     }
 
