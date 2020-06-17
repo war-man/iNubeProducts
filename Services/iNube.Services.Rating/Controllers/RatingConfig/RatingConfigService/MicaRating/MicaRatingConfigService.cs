@@ -22,6 +22,10 @@ using Microsoft.Extensions.Configuration;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using System.Reflection;
 using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.IntegrationServices;
+using Microsoft.AspNetCore.Http;
+using System.Threading;
+using System.Net.Http.Headers;
+using OfficeOpenXml;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.MicaRating
 {
@@ -1920,6 +1924,213 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             }
 
             return finalResultDict;
+        }
+
+        //Rate Data Upload 
+        public async Task<FileUploadResponse> RateUpload(HttpRequest httpRequest, CancellationToken cancellationToken, string RateName, string RateObj, string StartDate, string Enddate, ApiContext apiContext)
+        {
+            if (_context == null)
+            {
+                _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+            string filePath = "";
+            var name = _context.TblParameterSet.Where(x => x.ParameterSetId == Convert.ToInt32(RateObj)).Select(x => x.ParameterSetName).Single();
+            //var name = RateObj;
+            RatingDTO ratingdto = new RatingDTO();
+            ratingdto.RateName = RateName;
+            ratingdto.RateObj = RateObj;
+            ratingdto.IsParameter = true;
+            DateTime now = DateTime.Now;
+            ratingdto.CreatedDate = now;
+            ratingdto.IsActive = true;
+            ratingdto.Rate = "";
+            ratingdto.RateType = "";
+            DateTime sDate = Convert.ToDateTime(StartDate);
+            ratingdto.StartDate = sDate;
+            DateTime eDate = Convert.ToDateTime(Enddate);
+            ratingdto.EndDate = eDate;
+
+            var parameterDetails = (from tblRateSet in _context.TblParameterSet
+                                    join tblSetDetails in _context.TblParameterSetDetails on tblRateSet.ParameterSetId equals tblSetDetails.ParameterSetId
+                                    join tblParamerer in _context.TblRatingParameters on tblSetDetails.ParametersId equals tblParamerer.ParametersId
+                                    where tblRateSet.ParameterSetName == name
+                                    // where tblRateSet.ParameterSetId == Convert.ToInt32(ratingDto.RateObj)
+                                    select new ParameterLt
+                                    {
+                                        RatingParameterId = tblParamerer.ParametersId,
+                                        RatingParamName = tblParamerer.ParameterName,
+                                        RangeType = tblSetDetails.RangeType
+                                    }).ToList();
+            int step1 = 0;
+            try
+            {
+                // Have to uncomment 
+                var files = httpRequest.Form.Files;
+                DataTable dt = new DataTable();
+                if (_context == null)
+                {
+                    _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+                }
+
+                foreach (var file in files)
+                {
+                    step1++;
+
+                    if (file == null || file.Length <= 0)
+                    {
+                        return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"formfile is empty" };
+                    }
+                    var filename = ContentDispositionHeaderValue
+                                       .Parse(file.ContentDisposition)
+                                       .FileName
+                                       .Trim('"');
+                    var path = Path.Combine("", filename);
+                    filePath = Path.GetFullPath(path);
+                    //filePath = @"C:\Users\dinkar.kumar\Downloads\Check.xls";
+
+                    using (FileStream fs = System.IO.File.Create(filePath))
+                    {
+                        file.CopyTo(fs);
+                        fs.Flush();
+                    }
+
+                    step1++;
+
+                    var sheetName = System.IO.Path.GetFileNameWithoutExtension(path).ToString();
+
+                    var fileExt = Path.GetExtension(file.FileName);
+
+
+                    if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var sheetNameValue = "";
+                        using (var stream = new MemoryStream())
+                        {
+                            await file.CopyToAsync(stream, cancellationToken);
+                            try
+                            {
+                                using (var package = new ExcelPackage(stream))
+                                {
+                                    foreach (var sheetName1 in package.Workbook.Worksheets)
+                                    {
+                                        sheetNameValue = sheetName1.Name;
+                                    }
+                                    ExcelWorksheet worksheet = package.Workbook.Worksheets[sheetNameValue];
+                                    Dictionary<string, dynamic> dictExParam = new Dictionary<string, dynamic>();
+                                    foreach (var item in parameterDetails)
+                                    {
+                                        if (item.RangeType == "Yes")
+                                        {
+                                            var itemdataTo = item.RatingParamName + " From";
+                                            var dataTo = worksheet
+                                                  .Cells["1:1"]
+                                                  .First(c => c.Value.ToString() == itemdataTo)
+                                                  .Start
+                                                  .Column;
+                                            dictExParam.Add(itemdataTo, dataTo);
+
+                                            var itemdataFrom = item.RatingParamName + " To";
+                                            var dataFrom = worksheet
+                                                  .Cells["1:1"]
+                                                  .First(c => c.Value.ToString() == itemdataFrom)
+                                                  .Start
+                                                  .Column;
+                                            dictExParam.Add(itemdataFrom, dataFrom);
+                                        }
+                                        else 
+                                        {
+                                            var itemdata = item.RatingParamName;
+                                            var data = worksheet
+                                                  .Cells["1:1"]
+                                                  .First(c => c.Value.ToString() == itemdata)
+                                                  .Start
+                                                  .Column;
+                                            dictExParam.Add(itemdata, data);
+                                        }
+                                    }
+                                    var itemdatart = "Rate";
+                                    var datart = worksheet
+                                          .Cells["1:1"]
+                                          .First(c => c.Value.ToString() == itemdatart)
+                                          .Start
+                                          .Column;
+                                    dictExParam.Add(itemdatart, datart);
+
+                                    if (worksheet != null)
+                                    {
+                                        var rowCount = worksheet.Dimension.Rows;
+                                        for (int row = 2; row <= rowCount; row++)
+                                        {
+                                            RatingRulesDTO ratingRulesDTO = new RatingRulesDTO();
+                                            foreach (var dtex in dictExParam)
+                                            {
+                                                var data = worksheet.Cells[row, dtex.Value].Text.ToString().Trim();
+                                                if (dtex.Key == "Rate")
+                                                {
+                                                    ratingRulesDTO.Rate = data;
+                                                }
+
+                                                else
+                                                {
+                                                    RatingRuleConditionsDTO ruleConditionsDTO = new RatingRuleConditionsDTO();
+                                                    var str = dtex.Key.ToString();
+                                                    var result = str.Substring(str.Length - 2);
+                                                    if (result == "To")
+                                                    {
+                                                        ruleConditionsDTO.ConditionValueTo = data.ToString();
+                                                    }
+                                                    else
+                                                    {
+                                                        ruleConditionsDTO.ConditionValueFrom = data.ToString();
+                                                    }
+                                                    var spl = dtex.Key.Split(' ')[0];
+                                                    try
+                                                    {
+                                                        ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName.Remove(it.RatingParamName.Length - 1) == spl.ToString()).RatingParameterId;//add
+                                                        ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        ruleConditionsDTO.RatingParameters = parameterDetails.First(it => it.RatingParamName == spl.ToString()).RatingParameterId;//add
+                                                        ratingRulesDTO.RatingRuleConditions.Add(ruleConditionsDTO);
+                                                    }
+                                                }
+                                                ratingdto.RatingRules.Add(ratingRulesDTO);
+                                            }
+                                        }
+                                    }
+
+                                    var dto = _mapper.Map<TblRating>(ratingdto);
+                                    // dto.DynamicList.push();
+                                    //dto[0]. = ratingDto[0].RatingRules[0].RatingRuleConditions;
+                                    dto.RateObj = _context.TblParameterSet.First(x => x.ParameterSetId == Convert.ToInt32(ratingdto.RateObj)).ParameterSetName;
+                                    _context.TblRating.Add(dto);
+                                    _context.SaveChanges();
+                                    var acntDTO = _mapper.Map<RatingDTO>(dto);
+                                    return new FileUploadResponse { Status = BusinessStatus.Created, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                var error = ex.ToString();
+                                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter", MessageKey = step1.ToString() };
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Invalid file, please upload .xlsx/csv file" };
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document upload error!" + ex.ToString(), MessageKey = step1.ToString() + " " + filePath };
+            }
+
+            return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document upload successfully! for Rating Config Name: {RateName}" };
         }
     }
 }

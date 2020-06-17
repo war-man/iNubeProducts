@@ -56,6 +56,12 @@ namespace iNube.Services.Rating.Models
         public decimal RatingParameterId { get; set; }
         public string RatingParamName { get; set; }
     }
+    public class ParameterLt
+    {
+        public decimal RatingParameterId { get; set; }
+        public string RatingParamName { get; set; }
+        public string RangeType { get; set; }
+    }
 
     public  class RatingDTO
     {
@@ -177,6 +183,11 @@ namespace iNube.Services.Rating.Models
     public class CalculationResultResponse : ResponseStatus
     {
         public CalculationResultDTO CalculationResultDTO { get; set; }
+    }
+    //For Rate Upload 
+    public class FileUploadResponse : ResponseStatus
+    {
+        public RatingRulesDTO createRules { get; set; }
     }
 
     public class GetParamSetDetailDTO

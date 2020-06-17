@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService;
@@ -324,6 +325,14 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
         public async Task<IActionResult> CheckCalculationRatingMapping(String CalcualtionId, [FromBody]DynamicData dynamic)
         {
             var response = await _rateService.CheckCalculationRatingMapping(CalcualtionId, dynamic, Context);
+            return Ok(response);
+        }
+
+        //For Excel Upload 
+        [HttpPost]
+        public async Task<IActionResult> RateUpload(CancellationToken cancellationToken,string RateName,string RateObj,string StartDate,string Enddate)
+        {
+            var response = await _rateService.RateUpload(Request, cancellationToken, RateName,RateObj,StartDate,Enddate, Context);
             return Ok(response);
         }
 

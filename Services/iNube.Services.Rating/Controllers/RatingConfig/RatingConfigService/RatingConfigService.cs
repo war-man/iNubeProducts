@@ -3,10 +3,12 @@ using iNube.Services.Rating.Entities;
 using iNube.Services.Rating.Helpers;
 using iNube.Services.Rating.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
@@ -44,6 +46,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<IEnumerable<IllustrationConfigDTO>> GetIllustrationConfig(ApiContext apiContext);
         Task<HandleEventConfig> GetInputOutputParam(String EventId, ApiContext apiContext);
         Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext);
+        //For Rates Rules
+        Task<FileUploadResponse> RateUpload(HttpRequest httpRequest, CancellationToken cancellationToken, string RateName, string RateObj, string StartDate, string Enddate, ApiContext apiContext);
     }
 
     public class RatingConfigService : IRateConfigService
@@ -192,6 +196,11 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         public async Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext)
         {
             return await _ratesService(apiContext.ProductType).CheckCalculationRatingMapping(CalculationConfigId, dynamic, apiContext);
+        }
+        //For Rate Upload
+        public async Task<FileUploadResponse> RateUpload(HttpRequest httpRequest, CancellationToken cancellationToken, string RateName, string RateObj, string StartDate, string Enddate, ApiContext apiContext)
+        {
+            return await _ratesService(apiContext.ProductType).RateUpload(httpRequest, cancellationToken, RateName, RateObj, StartDate, Enddate, apiContext);
         }
     }
 }

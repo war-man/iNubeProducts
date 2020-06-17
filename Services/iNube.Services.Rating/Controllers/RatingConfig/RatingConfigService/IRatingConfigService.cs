@@ -1,8 +1,10 @@
 ﻿using iNube.Services.Rating.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
@@ -45,8 +47,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<object> CheckIllustrationRI(String IllustrationConfigId, int From, int To, dynamic illustration_Param, bool ArrayType, ApiContext apiContext);
         //For CheckRatingCalaulationMapping 
         Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext);
-
-
-
+        //Rate Rules
+        Task<FileUploadResponse> RateUpload(HttpRequest httpRequest, CancellationToken cancellationToken, string RateName, string RateObj, string StartDate, string Enddate, ApiContext apiContext);
+        
     }
 }
