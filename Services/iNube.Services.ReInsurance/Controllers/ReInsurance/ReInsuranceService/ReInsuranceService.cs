@@ -1378,6 +1378,34 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     Errors.Add(errorInfo);
                 }
             }
+            if (type == "ParticipantCode")
+            {
+                var lstParticipanctCode = _context.TblParticipantMaster.Select(s => s.ParticipantCode).ToList();
+                if (lstParticipanctCode.Contains(codeName) == true)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant Code " + codeName + " can not be dublicated" };
+                    Errors.Add(errorInfo);
+                }
+            }
+            if (type == "ParticipantBranchCode")
+            {
+                var lstParticipanctBranchCode = _context.TblParticipantBranch.Select(s => s.BranchCode).ToList();
+                if (lstParticipanctBranchCode.Contains(codeName) == true)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant BranchCode " + codeName + " can not be dublicated" };
+                    Errors.Add(errorInfo);
+                }
+            }
+            if (type == "RetentionGroupName")
+            {
+                var lstRetentionGroupName = _context.TblRetentionGroup.Select(s => s.RetentionGroupName).ToList();
+                if (lstRetentionGroupName.Contains(codeName) == true)
+                {
+                    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Retention GroupName " + codeName + " can not be dublicated" };
+                    Errors.Add(errorInfo);
+                }
+            }
+
             return new ValidationResponse { Status = BusinessStatus.Error, Errors = Errors};
         }
     }
