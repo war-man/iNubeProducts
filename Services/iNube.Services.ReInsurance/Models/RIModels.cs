@@ -44,8 +44,8 @@ namespace iNube.Services.ReInsurance.Models
         public string AllocationBasis { get; set; }
         public string TotalAllocation { get; set; }
         public string AllocatedQS { get; set; }
-        public string AllocatedBasedOn { get; set; }
-        public string NoOfLines { get; set; }
+        public string AllocationBasedOn { get; set; }
+        public string NoofLines { get; set; }
 
     }
     public partial class TblArrangementDto
@@ -534,12 +534,52 @@ namespace iNube.Services.ReInsurance.Models
     }
     public class ReallocatedDTO
     {
+        public ReallocatedDTO()
+        {
+            mapDetails = new List<MapDetails>();
+        }
         public int MappingId { get; set; }
         public int Year { get; set; }
         public string Level { get; set; }
         public string Name { get; set; }
-        
+        public decimal AllocationAmount { get; set; }
+        public decimal PremiumAmount { get; set; }
+        public string PolicyNumber { get; set; }
+
+        public List<MapDetails> mapDetails { get; set; }
+
     }
+    public class MapDetails
+    {
+        public MapDetails()
+        {
+            participants = new List<Participant>();
+        }
+    public string Type { get; set; }
+    public decimal Percentage { get; set; }
+    public decimal Limit { get; set; }
+    public string AllocationBasis { get; set; }
+    public int NoOfLines { get; set; }
+    public decimal AllocatedAmount { get; set; }
+    public decimal AllocatedPremium { get; set; }
+    public List<Participant> participants { get; set; }
+
+    }
+    public class Participant
+    {
+        public int ParticipantId { get; set; }
+        public string Branch { get; set; }
+        public decimal Share { get; set; }
+        public decimal CommissionRate { get; set; }
+        public decimal BrokerageRate { get; set; }
+        public decimal Commission { get; set; }
+        public decimal Brokerage { get; set; } //i think it has to be calulated from the rate
+        public decimal AllocatedAmount { get; set; }
+        public decimal AllocatedPremium { get; set; }
+
+    }
+
+
     public class ValidationResponse : ResponseStatus
     {
         public ValidationResponse()
@@ -548,6 +588,25 @@ namespace iNube.Services.ReInsurance.Models
         }
         //  public virtual ICollection<ShowErrorInfoDetails> ErrorDetails { get; set; }
     }
+
+    public class RatingResponse
+    {
+        public int Period { get; set; }
+        public string PercentageAmount { get;set;}
+        public string RetentionProvAmount { get; set; }
+        public string RetentionAmount { get; set; }
+        public string QSProvAmount { get; set; }
+        public string QSAmount { get; set; }
+        public string SurplusProvAmount { get; set; }
+        public string OAllocatedRetention { get; set; }
+        public string OAllocatedQS { get; set; }
+        public string OTotalAllocated { get; set; }
+       
+        
+
+
+    }
+
 
 
 }

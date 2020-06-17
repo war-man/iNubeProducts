@@ -18,7 +18,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
         //Task<IEnumerable<ProductMasterddDTOs>> GetProductMasterAsync(ApiContext apiContext);
         Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
-        Task<List<Map>> AllocationCalulation(List<Map> request, int from, int To, ApiContext apiContext);
+        Task<IEnumerable<RatingResponse>> AllocationCalulation(List<Map> request, int from, int To, ApiContext apiContext);
 
 
     }
@@ -45,7 +45,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
 
         //Rating Call
 
-        public async Task<List<Map>> AllocationCalulation(List<Map> request, int from,int To, ApiContext apiContext)
+        public async Task<IEnumerable<RatingResponse>> AllocationCalulation(List<Map> request, int from,int To, ApiContext apiContext)
         {
              var requestUri = RatingUrl + "/api/RatingConfig/CheckIllustrationRI/CheckIllustrationRI/15?From="+ from + "&To="+To+"&ArrayType=true";
             //var uri = "https://localhost:44364/api/RatingConfig/CheckIllustrationRI/CheckIllustrationRI/15?From=1&To=3&ArrayType=true";
@@ -70,7 +70,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
                 {
                     using (var content = response.Content)
                     {
-                        return await content.ReadAsAsync<List<Map>>();
+                        return await content.ReadAsAsync <IEnumerable < RatingResponse >> ();
                     }
                 }
             }
@@ -78,7 +78,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.IntegrationServices
             catch (Exception)
             {
 
-                return new List<Map>();
+                return new List< RatingResponse > ();
             }
 
 

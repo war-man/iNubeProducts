@@ -1155,6 +1155,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             //use of Premium and SI
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
+
+            ReallocatedDTO reallocatedDTO = new ReallocatedDTO();
+            MapDetails mapDetails = new MapDetails();
+            List<MapDetails> mapDetails1 = new List<MapDetails>();
+            Participant participant = new Participant();
+            List<Participant> participants = new List<Participant>();
+
             //Policy Or Sometihng id need to take
             Mapping mapping = new Mapping();
             List<Map> maps = new List<Map>();
@@ -1197,18 +1204,47 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             {
                 map.AllocationMethod = "Percentage with Limit";
                 map.Limit = retensionDto.Limit.ToString();
-                map.Percentage = retensionDto.Percentage.ToString();
+                if (retensionDto.Percentage.ToString() != "")
+                {
+                    map.Percentage = retensionDto.Percentage.ToString();
+                }
+                else
+                {
+                    map.Percentage = "0";
+                }
             }
-            else {
+            else
+            {
                 map.AllocationMethod = "Lines";
             }
-           
-           
-            map.AllocationBasis = calulationDto.SumInsured.ToString() ;
+            map.AllocationBasis = calulationDto.SumInsured.ToString();
             map.Balance = calulationDto.SumInsured.ToString();
-           
-            maps.Add(map);
 
+            map.AllocatedRetention = "0";
+            map.AllocatedQS = "0";
+            map.TotalAllocation = "0";
+            map.AllocationBasedOn = "";
+            map.NoofLines = "0";
+            map.HL = "";
+
+            //This is Extra only for testing Purpuse
+            map.Percentage = "0";
+
+
+
+
+
+            maps.Add(map);
+            //doing for mapping
+
+            mapDetails.Type = map.Type;
+            mapDetails.Percentage = Convert.ToInt32(map.Percentage);
+            mapDetails.Limit = Convert.ToInt32(map.Limit);
+            mapDetails.AllocationBasis = map.AllocationBasis;
+            mapDetails.NoOfLines = Convert.ToInt32(map.NoofLines);
+            mapDetails.AllocatedAmount = 0;//need to get it from integration call value
+            mapDetails.AllocatedPremium = 0;////need to get it from integration call value
+            mapDetails1.Add(mapDetails);
             // Treaty data need to be filled
 
             var treatyData = _context.TblTreatyGroup.ToList();   //getting all child data;
@@ -1236,11 +1272,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             {
                                 map.AllocationMethod = "Percentage";
                                 map.Percentage = arrangementsvalue.Percentage.ToString();
+                                map.Limit = "0";
                             }
-                           else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
+                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
                             {
                                 map.AllocationMethod = "Limit";
                                 map.Limit = arrangementsvalue.Amount.ToString();
+                                map.Percentage = "0";
                             }
                             else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
                             {
@@ -1251,39 +1289,80 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             else
                             {
                                 map.AllocationMethod = "NoOfLines";
+                                map.Percentage = "0";
+                                map.Limit = "0";
                             }
 
                             map.AllocationBasis = calulationDto.SumInsured.ToString();
                             // Convert.ToDecimal(arrangementsvalue.Amount);
                             map.Balance = calulationDto.SumInsured.ToString();
-                            if (arrangementsvalue.HigherOrLowerId==24)
+                            if (arrangementsvalue.HigherOrLowerId == 24)
                             {
-                                map.HL ="H";
+                                map.HL = "H";
                             }
                             else
                             {
                                 map.HL = "L";
                             }
-                            map.NoOfLines = arrangementsvalue.NoOfLines.ToString();
-                            if(arrangementsvalue.AllocationBasisId==26)
+                            map.NoofLines = arrangementsvalue.NoOfLines.ToString();
+                            if (arrangementsvalue.AllocationBasisId == 26)
                             {
-                                map.AllocatedBasedOn = "Sum Insured";
+                                map.AllocationBasedOn = "Sum Insured";
 
                             }
                             else if (arrangementsvalue.AllocationBasisId == 27)
                             {
-                                map.AllocatedBasedOn = "Retention";
+                                map.AllocationBasedOn = "Retention";
 
                             }
                             else
                             {
-                                map.AllocatedBasedOn = "Retention + QS";
+                                map.AllocationBasedOn = "Retention + QS";
                             }
-                           
 
+                            map.AllocatedRetention = "0";
+                            map.AllocatedQS = "0";
+                            map.TotalAllocation = "0";
 
                             // map.High
                             maps.Add(map);
+
+                            mapDetails.Type = map.Type;
+                            mapDetails.Percentage = Convert.ToInt32(map.Percentage);
+                            mapDetails.Limit = Convert.ToInt32(map.Limit);
+                            mapDetails.AllocationBasis = map.AllocationBasis;
+                            mapDetails.NoOfLines = Convert.ToInt32(map.NoofLines);
+                            mapDetails.AllocatedAmount = 0;//need to get it from integration call value
+                            mapDetails.AllocatedPremium = 0;////need to get it from integration call value
+                            mapDetails1.Add(mapDetails);
+
+
+
+                            var tblparticipnatList = _context.TblParticipant.Where(s => s.TreatyId == trtdata.TreatyId).ToList();
+                            foreach (var item1 in tblparticipnatList)
+                            {
+                                participant = new Participant();
+                                participant.ParticipantId = Convert.ToInt32(item1.ParticipantId);
+                                //doubt for below line
+                                participant.Branch = _context.TblParticipantBranch.Where(s => s.BranchId == item1.ReInsurerBranchId).Select(s => s.BranchCode).FirstOrDefault();
+                                participant.Branch = _context.TblParticipantBranch.Where(s => s.BranchId == item1.ReInsurerBranchId).Select(s => s.BranchCode).FirstOrDefault();
+                                participant.Share = Convert.ToDecimal(item1.SharePercentage);
+                                participant.CommissionRate = Convert.ToDecimal(item1.RicommissionPercentage);
+                                participant.BrokerageRate = Convert.ToDecimal(item1.BrokeragePercentage);
+                                //  participant.Commission= item1.   I think need to be calculated
+                                participant.AllocatedAmount = 0;//need to ask the calculation
+                                participant.AllocatedPremium = 0;//need to ask the caluation
+                                participants.Add(participant);
+
+
+                            }
+                            mapDetails.participants = participants;
+                            mapDetails1.Add(mapDetails);
+
+
+
+
+
                         }
                         if (trtdata.TreatyTypeId == 4)
                         {
@@ -1295,7 +1374,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                                 map.AllocationMethod = "Percentage";
                                 map.Percentage = arrangementsvalue.Percentage.ToString();
                             }
-                           else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
+                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
                             {
                                 map.AllocationMethod = "Limit";
                                 map.Limit = arrangementsvalue.Amount.ToString();
@@ -1322,24 +1401,61 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             {
                                 map.HL = "L";
                             }
-                            map.NoOfLines = arrangementsvalue.NoOfLines.ToString();
+                            map.NoofLines = arrangementsvalue.NoOfLines.ToString();
                             if (arrangementsvalue.AllocationBasisId == 26)
                             {
-                                map.AllocatedBasedOn = "Sum Insured";
+                                map.AllocationBasedOn = "Sum Insured";
 
                             }
                             else if (arrangementsvalue.AllocationBasisId == 27)
                             {
-                                map.AllocatedBasedOn = "Retention";
+                                map.AllocationBasedOn = "Retention";
 
                             }
                             else
                             {
-                                map.AllocatedBasedOn = "Retention + QS";
+                                map.AllocationBasedOn = "Retention + QS";
                             }
 
 
+
+
+                            map.AllocatedRetention = "0";
+                            map.AllocatedQS = "0";
+                            map.TotalAllocation = "0";
+
                             maps.Add(map);
+
+                            mapDetails.Type = map.Type;
+                            mapDetails.Percentage = Convert.ToInt32(map.Percentage);
+                            mapDetails.Limit = Convert.ToInt32(map.Limit);
+                            mapDetails.AllocationBasis = map.AllocationBasis;
+                            mapDetails.NoOfLines = Convert.ToInt32(map.NoofLines);
+                            mapDetails.AllocatedAmount = 0;//need to get it from integration call value
+                            mapDetails.AllocatedPremium = 0;////need to get it from integration call value
+                            mapDetails1.Add(mapDetails);
+
+                            var tblparticipnatList = _context.TblParticipant.Where(s => s.TreatyId == trtdata.TreatyId).ToList();
+                            foreach (var item1 in tblparticipnatList)
+                            {
+                                participant = new Participant();
+                                participant.ParticipantId = Convert.ToInt32(item1.ParticipantId);
+                                //doubt for below line
+                                participant.Branch = _context.TblParticipantBranch.Where(s => s.BranchId == item1.ReInsurerBranchId).Select(s => s.BranchCode).FirstOrDefault();
+                                participant.Branch = _context.TblParticipantBranch.Where(s => s.BranchId == item1.ReInsurerBranchId).Select(s => s.BranchCode).FirstOrDefault();
+                                participant.Share = Convert.ToDecimal(item1.SharePercentage);
+                                participant.CommissionRate = Convert.ToDecimal(item1.RicommissionPercentage);
+                                participant.BrokerageRate = Convert.ToDecimal(item1.BrokeragePercentage);
+                                //  participant.Commission= item1.   I think need to be calculated
+                                participant.AllocatedAmount = 0;//need to ask the calculation
+                                participant.AllocatedPremium = 0;//need to ask the caluation
+                                participants.Add(participant);
+
+
+                            }
+                            mapDetails.participants = participants;
+                            mapDetails1.Add(mapDetails);
+
                         }
 
                     }
@@ -1352,10 +1468,30 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             var test = mapping;
             list = test.maps;
-          //  var MAPList=JsonConvert.DeserializeObject<List<Map>>(list.ToString);
-           var from = 1;
+            //  var MAPList=JsonConvert.DeserializeObject<List<Map>>(list.ToString);
+            var from = 1;
             var To = list.Count;
-            var data = _integrationService.AllocationCalulation(list,from, To,apiContext);
+            var data = await _integrationService.AllocationCalulation(list, from, To, apiContext);
+
+            var listdata = data.ToList();
+            var filterData = listdata.Where(s => s.Period == 1).Select(s => s.RetentionAmount).ToList();
+            var data1 = filterData[0].ToString();
+
+            //Preparing Json 
+            reallocatedDTO.MappingId = Convert.ToInt32(RIMappingDTO.RimappingId);
+            reallocatedDTO.Year = calulationDto.Year;
+            reallocatedDTO.Level = calulationDto.level;
+            reallocatedDTO.AllocationAmount = calulationDto.SumInsured;
+            reallocatedDTO.PremiumAmount = calulationDto.PremiumAmount;
+            reallocatedDTO.PolicyNumber = calulationDto.PolicyNo;
+            reallocatedDTO.Name = "";//i think i have to call policy to get the cover details
+
+
+
+            reallocatedDTO.mapDetails = mapDetails1;
+
+            var test1 = reallocatedDTO;
+
 
             return null;
         }
