@@ -380,7 +380,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             tbl_particiant.CreatedBy = tblParticipantMasterDto.CreatedBy;
             tbl_particiant.CreatedDate = tblParticipantMasterDto.CreatedDate;
-            tbl_particiant.ModifiedDate = tblParticipantMasterDto.ModifiedDate;
+           
             tbl_particiant.ModifiedBy = tblParticipantMasterDto.ModifiedBy;
             tbl_particiant.IsActive = tblParticipantMasterDto.IsActive;
             _context.TblParticipantMaster.Update(tbl_particiant);

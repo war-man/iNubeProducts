@@ -278,8 +278,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         public async Task<IActionResult> ModifyParticipant(decimal ParticipantMasterId, TblParticipantMasterDto tblParticipantMasterDto)
         {
             tblParticipantMasterDto.ParticipantMasterId = ParticipantMasterId;
-            await _reInsuranceService.ModifyParticipant(tblParticipantMasterDto,Context);
-            return Ok();
+           var res=await _reInsuranceService.ModifyParticipant(tblParticipantMasterDto,Context);
+            return Ok(res);
         }
 
         //get participant by ID
@@ -346,8 +346,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         public async Task<IActionResult> ModifyfRetention(decimal retentionGID, TblRetentionGroupDto tblRetentionGroupDto)
         {
             tblRetentionGroupDto.RetentionGroupId = retentionGID;
-            await _reInsuranceService.ModifyfRetention(tblRetentionGroupDto,Context);
-            return Ok();
+            var res=await _reInsuranceService.ModifyfRetention(tblRetentionGroupDto,Context);
+            return Ok(res);
         }
 
         //Treaty 
@@ -407,8 +407,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         public async Task<IActionResult> ModifyfTraty(decimal treatyId, TblTreatyDto tblTreatyDto)
         {
             tblTreatyDto.TreatyId = treatyId;
-            await _reInsuranceService.ModifyfTraty(tblTreatyDto,Context);
-            return Ok();
+           var res= await _reInsuranceService.ModifyfTraty(tblTreatyDto,Context);
+            return Ok(res);
         }
 
 
@@ -417,8 +417,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
         public async Task<IActionResult> ModifyRImapping(decimal rimappingId, TblRimappingDto tblTreatyDto)
         {
             tblTreatyDto.RimappingId = rimappingId;
-            await _reInsuranceService.ModifyRImapping(tblTreatyDto,Context);
-            return Ok();
+           var res= await _reInsuranceService.ModifyRImapping(tblTreatyDto,Context);
+            return Ok(res);
         }
 
         //AddTreatyParticipant(TblParticipantDto tblParticipantDto)
