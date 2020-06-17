@@ -2113,7 +2113,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                             catch (Exception ex)
                             {
                                 var error = ex.ToString();
-                                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, please the values and re-enter", MessageKey = step1.ToString() };
+                                return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Value entered is invalid, Please re-enter", MessageKey = step1.ToString() };
                             }
                         }
 
