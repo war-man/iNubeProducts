@@ -4042,7 +4042,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             failcount++;
                         }
 
-                        if (Startdate.Date <= (Currentdate.Date.AddDays(30)))
+                        if (Startdate.Date <= (Currentdate.Date.AddDays(60)))
                         {
                             RuleEngineResponse resobj = new RuleEngineResponse();
                             resobj.ValidatorName = "Policy Start Date";
@@ -4058,7 +4058,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             RuleEngineResponse resobj = new RuleEngineResponse();
                             resobj.ValidatorName = "Policy Start Date";
                             resobj.Outcome = "Fail";
-                            resobj.Message = "Start date is not within one month";
+                            resobj.Message = "Start date is not within two month";
                             resobj.Code = "EXPO006";
                             engineResponse.Add(resobj);
                             failcount++;
@@ -5490,13 +5490,22 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
                     else
                     {
+
+                        //This is to Created Date if Policy Start Date is Future Data
+                        //If This Integration Call Fails & If Created Date Does Not Come it will go to catch block
+                        var TblPolicyData = await _integrationService.GetPolicyByNumber(policy, context);
+
                         //This Policy Number has the Reporting Date today
                         //so Insert the Monthly SI billing details.
-
+                        //Created Date is always sent to handle future policy start dates 
+                        //and any other case bcz we will get the entire policy transaction.
+                        //Based on that i should arrive at latest AD Per Day Rate
+                        //If This Integration Call Fails & If Created Date Does Not Come 
+                        //it will go to Catch block - Where This Policy will be skipped.
                         CDDetailsRequestDTO detailsRequestDTO = new CDDetailsRequestDTO
                         {
                             PolicyNumber = policy,
-                            FromDate = CDFromDate,
+                            FromDate = TblPolicyData.CreatedDate.Date,
                             ToDate = CDToDate,
                         };
 
@@ -5508,6 +5517,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         {
                             continue;
                         }
+                                                                      
 
                         //Step-3 Get Entire Policy Details
                         var CDDetails = await _integrationService.GetCDMapperDetails(detailsRequestDTO, context);
@@ -5562,7 +5572,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                     ADRatePerDay = 0;
                             }
 
-                            if(DaysChargeable < 0)
+                            if(DaysChargeable <= 0)
                             {
                                 //AdPerDay
                                 monthlySiDTO.PerDayPremium = 0;                               
@@ -5633,8 +5643,21 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 monthlySiDTO.Amount = monthlySiDTO.TotalAmountChargeable;
 
 
-                                if(monthlySiDTO.TotalAmountChargeable < 0)
+                                if(monthlySiDTO.TotalAmountChargeable <= 0)
                                 {
+                                    //AdPerDay
+                                    monthlySiDTO.PerDayPremium = 0;
+                                    monthlySiDTO.PremiumChargeable = 0;
+                                    monthlySiDTO.GstOnPremiumChargeable = 0;
+                                    monthlySiDTO.TotalAmountChargeable = 0;
+                                    monthlySiDTO.Amount = 0;
+
+                                    Guid guid1 = Guid.NewGuid();
+                                    monthlySiDTO.Txnid = guid1.ToString();
+
+                                    _context.TblPolicyMonthlySi.Add(monthlySiDTO);
+                                    _context.SaveChanges();
+
                                     continue;
                                 }
 
@@ -6055,6 +6078,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                                         }
                                                     }
 
+                                                    //If Number of Usage Days is zero OR Endorsement - Vehicle Deltion has happened
+                                                    //SO We will be having the amount so no SI for the month
+                                                    if (checkData.TotalAmountChargeable == 0)
+                                                    {
+                                                        ErrorInfo errorInfo = new ErrorInfo();
+
+                                                        errorInfo.ErrorMessage = "Billed Amount is Zero No Due for the current period";
+                                                        errorInfo.ErrorCode = "MSI009";
+                                                        errorInfo.PropertyName = PropertyName;
+                                                        uploadDTO.Errors.Add(errorInfo);
+                                                        errorflag = true;
+                                                    }
+
                                                 }
 
 
@@ -6318,7 +6354,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 errorInfo.PropertyName = PropertyName;
                                 uploadDTO.Errors.Add(errorInfo);
                                 errorflag = true;
-                            }
+                            }                           
+                        }
+
+                        //If Number of Usage Days is zero OR Endorsement - Vehicle Deltion has happened
+                        //SO We will be having the amount so no SI for the month
+                        if (checkData.TotalAmountChargeable == 0)
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            errorInfo.ErrorMessage = "Billed Amount is Zero No Due for the current period";
+                            errorInfo.ErrorCode = "MSI009";
+                            errorInfo.PropertyName = PropertyName;
+                            uploadDTO.Errors.Add(errorInfo);
+                            errorflag = true;
                         }
 
                     }
@@ -7154,6 +7203,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             }
                         }
 
+                        //If Number of Usage Days is zero OR Endorsement - Vehicle Deltion has happened
+                        //SO We will be having the amount so no SI for the month
+                        if (checkData.TotalAmountChargeable == 0)
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            errorInfo.ErrorMessage = "Billed Amount is Zero No Due for the current period";
+                            errorInfo.ErrorCode = "MSI009";
+                            errorInfo.PropertyName = PropertyName;
+                            uploadDTO.Errors.Add(errorInfo);
+                            errorflag = true;
+                        }
+
                     }
 
 
@@ -7408,6 +7470,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 uploadDTO.Errors.Add(errorInfo);
                                 errorflag = true;
                             }
+                        }
+
+                        //If Number of Usage Days is zero OR Endorsement - Vehicle Deltion has happened
+                        //SO We will be having the amount so no SI for the month
+                        if (checkData.TotalAmountChargeable == 0)
+                        {
+                            ErrorInfo errorInfo = new ErrorInfo();
+
+                            errorInfo.ErrorMessage = "Billed Amount is Zero No Due for the current period";
+                            errorInfo.ErrorCode = "MSI009";
+                            errorInfo.PropertyName = PropertyName;
+                            uploadDTO.Errors.Add(errorInfo);
+                            errorflag = true;
                         }
 
                     }
