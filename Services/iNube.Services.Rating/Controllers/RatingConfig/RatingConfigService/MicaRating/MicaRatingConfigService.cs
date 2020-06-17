@@ -1941,14 +1941,14 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             ratingdto.RateObj = RateObj;
             ratingdto.IsParameter = true;
             //DateTime now = DateTime.Now;
-            ratingdto.CreatedDate = Convert.ToDateTime(StartDate);
+            //ratingdto.CreatedDate = Convert.ToDateTime(StartDate);
             ratingdto.IsActive = true;
             ratingdto.Rate = "";
             ratingdto.RateType = "";
-            DateTime sDate = Convert.ToDateTime(StartDate);
-            ratingdto.StartDate = sDate;
-            DateTime eDate = Convert.ToDateTime(Enddate);
-            ratingdto.EndDate = eDate;
+            //DateTime sDate = Convert.ToDateTime(StartDate);
+            //ratingdto.StartDate = sDate;
+            //DateTime eDate = Convert.ToDateTime(Enddate);
+            //ratingdto.EndDate = eDate;
 
             var parameterDetails = (from tblRateSet in _context.TblParameterSet
                                     join tblSetDetails in _context.TblParameterSetDetails on tblRateSet.ParameterSetId equals tblSetDetails.ParameterSetId
