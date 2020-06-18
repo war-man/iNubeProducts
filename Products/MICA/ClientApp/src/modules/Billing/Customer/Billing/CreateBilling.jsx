@@ -785,6 +785,8 @@ class CreateBilling extends React.Component {
             showList['catddl'] = false;
             showList['rate'] = true;
             showList['valuefactor'] = false;
+            showList['frequency'] = false;
+            showList['recurringRate'] = false;
         }
         else {
             this.state.billingItem[this.state.billingItem.length - 2].categoryTypeId = "";
