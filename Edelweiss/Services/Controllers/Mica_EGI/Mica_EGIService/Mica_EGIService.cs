@@ -4360,7 +4360,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Fail";
                             res4obj.Message = "One or More conditions failed";
-                            res4obj.Code = "EXPO011";
+                            res4obj.Code = "EXPB005";
                             engineResponse1.Add(res4obj);
                         }
                         else
@@ -4369,7 +4369,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Success";
                             res4obj.Message = "Conditions Successful";
-                            res4obj.Code = "EXPO012";
+                            res4obj.Code = "EXPB06";
                             engineResponse1.Add(res4obj);
 
                         }
