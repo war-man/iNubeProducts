@@ -704,12 +704,7 @@ class CalculationConfig extends React.Component {
                                 {/* calculator */}
 
                                 <GridContainer xs={12} sm={12} md={12} xl={12} >
-
-
-
-
                                     <GridItem xs={12} sm={4} md={4}>
-
                                         <h4><small>Expression Operator</small></h4>
                                         <div className="rates-expression-bg">
 
@@ -757,10 +752,10 @@ class CalculationConfig extends React.Component {
                                                 label="<"
                                                 onClick={() => this.handleEvaluator("<")} />
                                             <Chip size="small"
-                                                label="<"
+                                                label="AND"
                                                 onClick={() => this.handleEvaluator("AND")} />
                                             <Chip size="small"
-                                                label="<"
+                                                label="OR"
                                                 onClick={() => this.handleEvaluator("OR")} />
 
                                             <Chip size="small"
@@ -880,6 +875,7 @@ class CalculationConfig extends React.Component {
                                         <CustomInput labelText=""
                                             value={this.state.fields.Expression}
                                             disabled={true}
+                                            multiline={true}
                                             name='Expression'
                                             onChange={this.onInputChange}
                                             formControlProps={{ fullWidth: true }} />
