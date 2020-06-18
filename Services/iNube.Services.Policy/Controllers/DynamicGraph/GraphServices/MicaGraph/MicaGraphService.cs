@@ -241,5 +241,16 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
                 throw ex;
             }
         }
+        public async Task<labelsDTO> GetLabels(int dashboardConfigId, ApiContext apiContext)
+        {
+            _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+           
+            var axeslabels = _context.TblDashboardConfigParam.Where(a => a.DashboardConfigId == dashboardConfigId).FirstOrDefault();
+            labelsDTO labelsDTO = new labelsDTO();
+            labelsDTO.Xaxis = axeslabels.XaxisLable;
+            labelsDTO.Yaxis = axeslabels.YaxisLable;
+            var labels = _mapper.Map<labelsDTO>(labelsDTO);
+            return labels;
+        }
     }
 }

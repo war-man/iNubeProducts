@@ -11,7 +11,8 @@ namespace iNube.Services.Policy.Entities.DynamicGraphEntities
         public string DataType { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? DashboardConfigId { get; set; }
-
+        public string XaxisLable { get; set; }
+        public string YaxisLable { get; set; }
         public virtual TblDashboardConfig DashboardConfig { get; set; }
     }
 }

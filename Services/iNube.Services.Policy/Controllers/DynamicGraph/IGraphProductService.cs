@@ -20,5 +20,6 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         Task<IEnumerable<DashboardConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext);
         void DeleteParameter(int ReportConfigParamId, ApiContext apiContext);
         Task<DashboardConfigDTO> UpdateDashboard(DashboardConfigDTO reportConfigDTO, ApiContext apiContext);
+        Task<labelsDTO> GetLabels(int DashboardConfigParamId, ApiContext apiContext);
     }
 }

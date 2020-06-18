@@ -44,8 +44,15 @@ namespace iNube.Services.DynamicGraph.model
         public string DataType { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int DashboardConfigId { get; set; }
+        public string XaxisLable { get; set; }
+        public string YaxisLable { get; set; }
 
         public virtual DashboardConfigDTO ReportConfig { get; set; }
+    }
+    public class labelsDTO
+    {
+        public string Xaxis{ get; set; }
+        public string Yaxis { get; set; }
     }
 
     public partial class dbmastersDTO

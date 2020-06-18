@@ -65,6 +65,14 @@ namespace iNube.Services.Policy.Entities.DynamicGraphEntities
 
                 entity.Property(e => e.RangeType).HasMaxLength(50);
 
+                entity.Property(e => e.XaxisLable)
+                    .HasColumnName("XAxisLable")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.YaxisLable)
+                    .HasColumnName("YAxisLable")
+                    .HasMaxLength(20);
+
                 entity.HasOne(d => d.DashboardConfig)
                     .WithMany(p => p.TblDashboardConfigParam)
                     .HasForeignKey(d => d.DashboardConfigId)

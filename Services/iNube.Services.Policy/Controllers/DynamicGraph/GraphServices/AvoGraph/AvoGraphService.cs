@@ -68,5 +68,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.AvoGraph
         {
             throw new NotImplementedException();
         }
+        public async Task<labelsDTO> GetLabels(int DashboardConfigParamId, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
