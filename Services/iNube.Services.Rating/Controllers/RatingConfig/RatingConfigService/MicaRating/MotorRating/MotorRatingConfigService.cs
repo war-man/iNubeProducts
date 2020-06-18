@@ -153,5 +153,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mot
         {
             throw new NotImplementedException();
         }
+        public async Task<RatingGridDTO> GetRateRulesGrid(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

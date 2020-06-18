@@ -367,7 +367,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                              join tblratingcondition in _context.TblRatingRules on tblrate.RatingId equals tblratingcondition.RatingId
                              join tblrulecondition in _context.TblRatingRuleConditions on tblratingcondition.RatingRuleId equals tblrulecondition.RatingRuleId
                              join tblparameter in _context.TblRatingParameters on tblrulecondition.RatingParameters equals tblparameter.ParametersId
-                             join tblparamsetdetails in _context.TblParameterSetDetails on tblparameter.ParametersId equals tblparamsetdetails.ParametersId
+                             join tblparamsetdetails in _context.TblParameterSetDetails on tblparameter.ParametersId equals tblparamsetdetails.ParametersId  
                              //where tblrules.RuleName == RuleName
                              // where words.Contains(tblrate.RatingId.ToString())
                              select new
@@ -2000,6 +2000,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
                     var fileExt = Path.GetExtension(file.FileName);
 
+                    //For Display Grid
+                    List<Dictionary<string, dynamic>> dictObj = new List<Dictionary<string, dynamic>>();
+                    
 
                     if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
                     {
@@ -2061,10 +2064,17 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                         var rowCount = worksheet.Dimension.Rows;
                                         for (int row = 2; row <= rowCount; row++)
                                         {
+                                            // Fro Grid 
+                                            Dictionary<string, dynamic> objdct = new Dictionary<string, dynamic>();
+
                                             RatingRulesDTO ratingRulesDTO = new RatingRulesDTO();
                                             foreach (var dtex in dictExParam)
                                             {
                                                 var data = worksheet.Cells[row, dtex.Value].Text.ToString().Trim();
+                                                // For DIsplaying into Grid
+                                                var strGrid = dtex.Key.ToString();
+                                                objdct.Add(strGrid, data);
+
                                                 if (dtex.Key == "Rate")
                                                 {
                                                     ratingRulesDTO.Rate = data;
@@ -2097,6 +2107,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                                 }
                                                 ratingdto.RatingRules.Add(ratingRulesDTO);
                                             }
+                                            //For Grid Display 
+                                            dictObj.Add(objdct);
                                         }
                                     }
 
@@ -2107,7 +2119,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                     _context.TblRating.Add(dto);
                                     _context.SaveChanges();
                                     var acntDTO = _mapper.Map<RatingDTO>(dto);
-                                    return new FileUploadResponse { Status = BusinessStatus.Created, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
+                                    
+                                    return new FileUploadResponse { Status = BusinessStatus.Created,gridList=dictObj, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
                                 }
                             }
                             catch (Exception ex)
@@ -2131,6 +2144,28 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             }
 
             return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document upload successfully! for Rating Config Name: {RateName}" };
+        }
+
+        public async Task<RatingGridDTO> GetRateRulesGrid(ApiContext apiContext)
+        {
+            if (_context == null)
+            {
+                _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            }
+            //_context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+
+            try
+            {
+                var data = _context.TblRating.Include(add => add.TblRatingRules).Include("TblRatingRules.TblRatingRuleConditions").LastOrDefault();
+                
+                //foreach(var item in data)
+                //{ }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

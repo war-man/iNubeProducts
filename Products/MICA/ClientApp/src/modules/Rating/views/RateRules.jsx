@@ -43,6 +43,12 @@ import data_Not_found from "assets/img/data-not-found-new.png";
 import validationPage from "modules/Partners/Organization/views/ValidationPage.jsx";
 import Dropzone from 'react-dropzone-uploader';
 import Dropdown from "components/Dropdown/Dropdown.jsx";
+import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+
+const paddingCard =
+{
+    padding: "10px",
+}
 
 const style = {
     infoText: {
@@ -105,6 +111,14 @@ class RateRules extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            //Grid Loader
+            result: [],
+            //resultDetails:[],
+            //Loader
+            loader: true,
+            pageloader: false,
+            nodata: false,
+
             ShowGrid:false,
             viewdisable:false,
             RateRuleData:[],
@@ -575,6 +589,21 @@ class RateRules extends React.Component {
                     text: response.responseMessage,
                     icon: "success"
                 });
+                that.setState({ result: response.gridList });
+
+                console.log(that.state.result, 'Result');
+                if (that.state.result.length > 0) {
+                    that.tabledata(response.gridList);
+                    //this.reset();
+                }
+                else {
+                    setTimeout(
+                        function () {
+                            that.setState({ loader: true, searchTableSec: false, nodata: true });
+                        }.bind(that), 2000
+                    );
+                }
+
             },
              error: function () {
                  that.GridFun(false);
@@ -587,6 +616,23 @@ class RateRules extends React.Component {
 
 
     }
+
+    tabledata = (data) => {
+        debugger;
+        console.log(this.state.result, 'result');
+        this.setState({
+            resultDetails: Object.keys(data[0]).map((prop, key) => {
+                return {
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                    accessor: prop,
+                };
+
+            })
+        });
+        console.log("table data", this.state.resultDetails);
+        this.setState({ searchTableSec: true, loader: true });
+    }
+
 
 
     render() {
@@ -850,7 +896,53 @@ class RateRules extends React.Component {
                         </GridItem>
                     </GridContainer>
                 }
-             
+
+                {this.state.loader ?
+                    <GridContainer xl={12}>
+                        {this.state.searchTableSec ?
+
+                            < GridItem lg={12}>
+                                <ReactTable
+                                    title={<h5><TranslationContainer translationKey={"Rates"} /></h5>}
+                                    resultDetails
+                                    data={this.state.result}
+                                    filterable
+                                    columns={this.state.resultDetails}
+                                    defaultPageSize={4}
+                                    pageSize={([this.state.result.length + 1] < 4) ? [this.state.result.length + 1] : 4}
+                                    showPaginationTop={false}
+                                    //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                    showPaginationBottom={true}
+                                    className="-striped -highlight discription-tab"
+
+                                />
+                            </GridItem>
+                            : <GridItem lg={12}>{
+                                this.state.nodata ?
+                                    <Card>
+                                        <GridContainer lg={12} justify="center">
+                                            <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                <img src={data_Not_found} className="tab-data-not-found" />
+                                            </Animated>
+                                        </GridContainer>
+                                        <GridContainer lg={12} justify="center">
+                                            <GridItem xs={5} sm={3} md={3} lg={1} >
+                                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                    <Button className="secondary-color" round onClick={() => this.searchagain()}> Try again </Button>
+                                                </Animated>
+                                            </GridItem>
+                                        </GridContainer>
+                                    </Card>
+                                    : null
+                            }
+                            </GridItem>
+                        }
+                    </GridContainer>
+                    :
+                    <Card style={paddingCard}>
+                        <TableContentLoader />
+                    </Card>
+                }
 
             </div>
         );

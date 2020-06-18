@@ -335,7 +335,12 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
             var response = await _rateService.RateUpload(Request, cancellationToken, RateName,RateObj,StartDate,Enddate, Context);
             return Ok(response);
         }
-
+        [HttpGet]
+        public async Task<IActionResult> GetRateRulesGrid()
+        {
+            var response = await _rateService.GetRateRulesGrid(Context);
+            return Ok(response);
+        }
         [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
