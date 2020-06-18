@@ -219,6 +219,13 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
             var uri = MobileAppUrl;
 
+            LoggerManager logger = new LoggerManager(_configuration);
+
+            var request = JsonConvert.SerializeObject(alertRequestDTO);
+
+            logger.LogRequest(request, "MobileAppNotifyCall", "Mobile Call", uri, apiContext);
+
+
             return await ExternalPostApiInvoke<MobileAlertRequestDTO, MobileAlertResponseDTO>(uri, apiContext, alertRequestDTO);
         }
 
@@ -392,6 +399,14 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
                 }
                 using (var response = await client.PostAsync(requestUri, contentPost))
                 {
+                    LoggerManager logger = new LoggerManager(_configuration);
+
+                    var data = JsonConvert.SerializeObject(response);
+                    var data2 = JsonConvert.SerializeObject(contentPost);
+
+                    logger.LogRequest(data, data2, "Mobile Call", response.IsSuccessStatusCode.ToString(), apiContext);
+
+
                     if (response.IsSuccessStatusCode)
                     {
                         using (var content = response.Content)

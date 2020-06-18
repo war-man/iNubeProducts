@@ -8263,7 +8263,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 break;
 
                             default:
+                                var Message2 = "Your vehicle No - " + schedule.VehicleRegistrationNo + " still isn’t covered for today. If you’re planning to drive it, now is the time to switch ‘ON’.";
+                                MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message2, false);
                                 break;
+                                
                         }                      
                     }
                 }
@@ -8341,16 +8344,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
                 //Alerts after 2 days check if payment is not collected.
-                var ModDiff = (DateDiff % 2);
+                //var ModDiff = (DateDiff % 2);
 
                 var MobileNumber = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).MobileNumber;            
 
-                if (ModDiff == 0)
-                {
-                    var Message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
+                //if (ModDiff == 0)
+                //{
+                   var Message = "Your renewal payment didn’t come through. Please check and update your payment details to enjoy your policy’s cover non-stop.";
 
                     MobileRequestDTO = MobileAppObject(MobileRequestDTO, MobileNumber, Message, true);
-                }
+                //}
 
             }
 
