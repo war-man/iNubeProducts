@@ -356,38 +356,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<ParticpantResponse> ModifyParticipant(TblParticipantMasterDto tblParticipantMasterDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var tbl_participant = _mapper.Map<TblParticipantMaster>(tblParticipantMasterDto);
-            var tbl_particiant = _context.TblParticipantMaster.Find(tbl_participant.ParticipantMasterId);
-
-            if (tbl_particiant == null)
-                throw new AppException("Account Not Found");
-            // update user properties
-            tbl_particiant.ModifiedDate = DateTime.Now;
-            tbl_particiant.ParticipantTypeId = tblParticipantMasterDto.ParticipantTypeId;
-            tbl_particiant.ParticipantCode = tblParticipantMasterDto.ParticipantCode;
-            tbl_particiant.ParticipantName = tblParticipantMasterDto.ParticipantName;
-            tbl_particiant.ContactNo = tblParticipantMasterDto.ContactNo;
-            tbl_particiant.Address1 = tblParticipantMasterDto.Address1;
-            tbl_particiant.Address2 = tblParticipantMasterDto.Address2;
-            tbl_particiant.Address3 = tblParticipantMasterDto.Address3;
-            tbl_particiant.CountryId = tblParticipantMasterDto.CountryId;
-
-            tbl_particiant.StateId = tblParticipantMasterDto.StateId;
-            tbl_particiant.Pincode = tblParticipantMasterDto.Pincode;
+            _context.TblParticipantMaster.Update(tbl_participant);
 
 
-            tbl_particiant.CreatedBy = tblParticipantMasterDto.CreatedBy;
-            tbl_particiant.CreatedDate = tblParticipantMasterDto.CreatedDate;
-           
-            tbl_particiant.ModifiedBy = tblParticipantMasterDto.ModifiedBy;
-            tbl_particiant.IsActive = tblParticipantMasterDto.IsActive;
-            _context.TblParticipantMaster.Update(tbl_particiant);
             _context.SaveChanges();
-            var accountDTO = _mapper.Map<TblParticipantMasterDto>(tbl_particiant);
+          //  var accountDTO = _mapper.Map<TblParticipantMasterDto>(tbl_particiant);
             // return accountDTO;
-            return new ParticpantResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Participant updated  sucessfully ",participantMasterDto= accountDTO };
+            return new ParticpantResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Participant updated  sucessfully ",participantMasterDto= tblParticipantMasterDto };
         }
 
         public async Task<TransactionMapResponse> SaveParticipentData(TblParticipantMasterDto participantMasterDto, ApiContext apiContext)
@@ -604,28 +580,11 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<RetentionResponse> ModifyfRetention(TblRetentionGroupDto tblRetentionGroupDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            var tbl_participant = _mapper.Map<TblRetentionGroupDto>(tblRetentionGroupDto);
-            var tbl_particiant = _context.TblRetentionGroup.Find(tbl_participant.RetentionGroupId);
-
-            if (tbl_particiant == null)
-                throw new AppException("Account Not Found");
-            // update user properties
-            tbl_particiant.ModifiedDate = DateTime.Now;
-            tbl_particiant.Year = tblRetentionGroupDto.Year;
-            tbl_particiant.BusinessTypeId = tblRetentionGroupDto.BusinessTypeId;
-            tbl_particiant.RetentionGroupName = tblRetentionGroupDto.RetentionGroupName;
-            tbl_particiant.RetentionLogicId = tblRetentionGroupDto.RetentionLogicId;
-            tbl_particiant.Percentage = tblRetentionGroupDto.Percentage;
-            tbl_particiant.Limit = tblRetentionGroupDto.Limit;
-            tbl_particiant.EffectiveFrom = tblRetentionGroupDto.EffectiveFrom;
-            tbl_particiant.EffectiveTo = tblRetentionGroupDto.EffectiveTo;
-            _context.TblRetentionGroup.Update(tbl_particiant);
+            var tbl_RetentionGroupDto = _mapper.Map<TblRetentionGroup>(tblRetentionGroupDto);
+            _context.TblRetentionGroup.Update(tbl_RetentionGroupDto);
             _context.SaveChanges();
-            var accountDTO = _mapper.Map<TblRetentionGroupDto>(tbl_particiant);
-            //  return accountDTO;
-            return new RetentionResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Retention updated  sucessfully ",retentionGroupDto= accountDTO };
+
+            return new RetentionResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Retention updated  sucessfully ",retentionGroupDto= tblRetentionGroupDto };
         }
 
         //Treaty
@@ -748,33 +707,10 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TreatyResponse> ModifyfTraty(TblTreatyDto tblTreatyDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-            var tbl_treaty = _mapper.Map<TblTreatyDto>(tblTreatyDto);
-            var tbl_traty = _context.TblTreaty.Find(tbl_treaty.TreatyId);
-
-            if (tbl_traty == null)
-                throw new AppException("Account Not Found");
-            // update user properties
-            tbl_traty.ModifiedDate = DateTime.Now;
-            tbl_traty.TreatyCode = tblTreatyDto.TreatyCode;
-            tbl_traty.TreatyDescription = tblTreatyDto.TreatyDescription;
-            tbl_traty.TreatyTypeId = tblTreatyDto.TreatyTypeId;
-            tbl_traty.StartDate = tblTreatyDto.StartDate;
-            tbl_traty.EndDate = tblTreatyDto.EndDate;
-            tbl_traty.TreatyYearId = tblTreatyDto.TreatyYearId;
-            tbl_traty.TreatyBasisId = tblTreatyDto.TreatyBasisId;
-            tbl_traty.AccountingToId = tblTreatyDto.AccountingToId;
-            tbl_traty.CurrencyId = tblTreatyDto.CurrencyId;
-            tbl_traty.BorderauxFreqId = tblTreatyDto.BorderauxFreqId;
-            tbl_traty.Remarks = tblTreatyDto.Remarks;
-
-            _context.TblTreaty.Update(tbl_traty);
+            var tbl_treaty = _mapper.Map<TblTreaty>(tblTreatyDto);
+            _context.TblTreaty.Update(tbl_treaty);
             _context.SaveChanges();
-            var accountDTO = _mapper.Map<TblTreatyDto>(tbl_traty);
-
-            //return accountDTO;
-            return new TreatyResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Treaty updated  sucessfully ",treatyDto= accountDTO };
+            return new TreatyResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Treaty updated  sucessfully ",treatyDto= tblTreatyDto };
         }
 
         //AddTreatyParticipant 
@@ -953,23 +889,11 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TblRimappingResponse> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-
-            // _context = (MICAACContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             var tbl_Rimaping = _mapper.Map<TblRimapping>(tblParticipantMasterDto);
-            var tbl_particiant = _context.TblRimapping.Find(tbl_Rimaping.RimappingId);
-
-            if (tbl_particiant == null)
-                throw new AppException("Account Not Found");
-            // update user properties
-            tbl_particiant.ModifiedDate = DateTime.Now;
-            tbl_particiant.Year = tblParticipantMasterDto.Year;
-            tbl_particiant.Level = tblParticipantMasterDto.Level;
-            tbl_particiant.LobProductCover = tblParticipantMasterDto.LobProductCover;
-            _context.TblRimapping.Update(tbl_particiant);
+            _context.TblRimapping.Update(tbl_Rimaping);
             _context.SaveChanges();
-            var accountDTO = _mapper.Map<TblRimappingDto>(tbl_particiant);
-            //  return accountDTO;
-            return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"RI Mapping Updated  sucessfully ",RimappingDto= accountDTO };
+            return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Treaty updated  sucessfully ", RimappingDto = tblParticipantMasterDto };
+
         }
 
 
