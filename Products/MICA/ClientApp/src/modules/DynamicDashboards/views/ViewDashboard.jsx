@@ -263,7 +263,7 @@ class ViewDashboard extends React.Component {
             .then(data => {
                 this.state.labels.xaxis = data.xaxis;
                 this.state.labels.yaxis = data.yaxis;
-                console.log("labels: ", this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1));
+                //console.log("labels: ", this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1));
             });
 
     }
@@ -384,11 +384,18 @@ class ViewDashboard extends React.Component {
            .then(data => {
                debugger;
                this.state.graphData = [];
-               let strLength = this.state.labels.xaxis.length;
-               if (this.state.labels.xaxis.charAt(strLength-1) == 's') {
-                   this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
+               if (this.state.labels.xaxis != null && this.state.labels.xaxis != null) {
+                   let strLength = this.state.labels.xaxis.length;
+                   if (this.state.labels.xaxis.charAt(strLength - 1)=='s') {
+                       this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
+                   }
                } else {
-                   this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+                   if (this.state.labels.yaxis != null && this.state.labels.xaxis != null) {
+                       this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+                   } else {
+                       this.state.graphData[0] = ['Task', ''];
+                   }
+                   
                }
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
@@ -492,7 +499,7 @@ class ViewDashboard extends React.Component {
 
                                         <GridItem xs={12} sm={12} md={3}>
                                             <Dropdown
-                                                labelText="ReportName"
+                                                labelText="GraphName"
                                                 id="ReportConfigDto.ReportName"
                                                 value={this.state.ReportConfigDto.ReportName}
                                                 lstObject={this.state.reportName}
@@ -623,6 +630,7 @@ class ViewDashboard extends React.Component {
                                     vAxis: {
                                         title: this.state.labels.yaxis //This is for Y axis Labeling 
                                     },
+                                    isStacked: true,
                                     animation: {
                                         startup: true,
                                         easing: 'linear',
