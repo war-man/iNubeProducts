@@ -65,17 +65,10 @@ const ParticipantGrid = (props) => {
             <GridItem xs={12}>
                 <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
                     <ReactTable
+                        title={"Treaty Participant"}
                         data={props.newdata}
                         filterable
                         columns={[
-                            {
-                                Header: "#",
-                                accessor: "id",
-                                headerClassName: 'react-table-center',
-                                style: { textAlign: "center" },
-                                minWidth: 20,
-                                sortable: false,
-                            },
                             {
                                 Header: "Reinsurer Code",
                                 accessor: "reinsurercodeId",

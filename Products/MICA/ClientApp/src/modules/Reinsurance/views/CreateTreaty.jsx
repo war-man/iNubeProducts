@@ -70,7 +70,10 @@ class CreateTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            surplusmaslist:[],
+            surplusmaslist: [],
+            Treatyflag: false,
+            Treatymassage: "",
+            higherlowerflag:false,
             allocationbasisflag: false,
             surpluslist:[],
             allocationOnflag: false,
@@ -518,6 +521,7 @@ class CreateTreaty extends React.Component {
             this.state.showlimit = true;
             this.state.showperwithlimit = false;
             this.state.shownooflines = false;
+            this.state.higherflag = false;
             //this.setState({ showlimit })
 
             //const { showTable } = this.state.showTable;
@@ -531,6 +535,7 @@ class CreateTreaty extends React.Component {
             this.state.showlimit = true;
             this.state.showperwithlimit = false;
             this.state.shownooflines = false;
+            this.state.higherflag = true;
             //this.setState({ showPercentage })
             //this.setState({ showlimit })
 
@@ -545,6 +550,7 @@ class CreateTreaty extends React.Component {
             this.state.showlimit = false;
             this.state.showperwithlimit = false;
             this.state.shownooflines = true;
+            this.state.higherflag = false;
             //this.setState({ showPercentage })
             //this.setState({ showlimit })
 
@@ -693,7 +699,7 @@ class CreateTreaty extends React.Component {
             if (evt.target.value == "4") {
                 this.state.allocationList = this.state.allocationmasList.filter(m => m.mValue != 'Lines');
 
-                this.setState({ allocationbasisflag: false, allocationOnflag: true, higherflag:true});
+                this.setState({ allocationbasisflag: false, allocationOnflag: true, higherflag:false});
                 console.log("ddlvals", this.state.allocationList);
             }
             else if (evt.target.value == "5") {
@@ -879,12 +885,12 @@ class CreateTreaty extends React.Component {
         let ParticipantList = this.state.treatyDTO.tblParticipant;
         this.setState({
             newdata: ParticipantList.map((prop, key) => {
-                console.log("trtprop", prop, ParticipantList, this.state.ddllist);
+                console.log("trtprop", prop, ParticipantList, this.state.ddllist, this.state.reinsurername);
                 return {
                     id: key,
                     reinsurercodeId: prop.reInsurerId,
                     //this.state.ddllist.filter(x => x.reinsurercodeId == ParticipantList[key].reinsurercodeId)[0].mValue,
-                    reinsurername: prop.reinsurername,
+                    reinsurername: this.state.reinsurername,
                     brokername: prop.brokername,
                     //this.state.reinsurername,
                     ribranchcodeId: prop.reInsurerBranchId,
@@ -905,6 +911,29 @@ class CreateTreaty extends React.Component {
       
 
     }
+    onBlur = () => {
+
+        debugger
+        //fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph",
+        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + this.state.treatyDTO.treatyCode + '&type=' + "TreatyCode", {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status == 9) {
+                    this.setState({ Treatyflag: true, Treatymassage: data.responseMessage });
+                } else {
+                    this.setState({ Treatyflag: false, Treatymassage: "" });
+                }
+                //this.AddTreatyTable();
+            });
+        console.log("data", this.state.masterList);
+    }
     render() {
         const { classes } = this.props;
         return (
@@ -912,8 +941,8 @@ class CreateTreaty extends React.Component {
                 <GridContainer>
                     <GridItem xs={12} sm={12} md={12} >
                         <TreatyDetails
-                            treatyCodeState={this.state.treatyCodeState} treatyDescriptionState={this.state.treatyDescriptionState} allocationmasList={this.state.allocationmasList}
-                            handleRadioChange={this.handleRadioChange} treatyDTO={this.state.treatyDTO} masterList={this.state.masterList} onInputChange={this.onInputChange} onInputChange1={this.onInputChange1} tblArrangement={this.state.tblArrangement} onddChange={this.onddChange} yearmasterList={this.state.yearmasterList} onDateChange={this.onDateChange} />
+                            treatyCodeState={this.state.treatyCodeState} Treatyflag={this.state.Treatyflag} Treatymassage={this.state.Treatymassage} treatyDescriptionState={this.state.treatyDescriptionState} allocationmasList={this.state.allocationmasList}
+                            handleRadioChange={this.handleRadioChange} treatyDTO={this.state.treatyDTO} masterList={this.state.masterList} onInputChange={this.onInputChange} onInputChange1={this.onInputChange1} onBlur={this.onBlur} tblArrangement={this.state.tblArrangement} onddChange={this.onddChange} yearmasterList={this.state.yearmasterList} onDateChange={this.onDateChange} />
                         {this.state.showTreatyGrp && <TPDetails TreatytableData={this.state.TreatytableData} participantstableData={this.state.participantstableData} participantdata={this.state.participantdata} bkmasterList={this.state.bkmasterList} masterList={this.state.masterList} onddlChange={this.onddlChange} participant={this.state.participant} newdata={this.state.newdata}
                             onddChange={this.onddChange} onparticipantInputChange={this.onparticipantInputChange} AddParticipant={this.AddParticipant} showparticipantgrid={this.state.showparticipantgrid} treatyDTO={this.state.treatyDTO} rimasterList={this.state.rimasterList} bcmasterList={this.state.bcmasterList} bkbcmasterList={this.state.bkbcmasterList} reinsurername={this.state.reinsurername} />
 

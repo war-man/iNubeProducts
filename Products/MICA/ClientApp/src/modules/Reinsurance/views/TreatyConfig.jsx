@@ -156,6 +156,7 @@ const TreatyDetails = (props) => {
                             required={true}
                             error={props.treatyCodeState}
                             value={props.treatyDTO.treatyCode}
+                            onBlur={() => props.onBlur()}
                             name='treatyCode'
                             //onChange={e => props.onInputChange(e)}
                             onChange={evt => props.onInputChange("alphaNumeric", evt)}
@@ -163,6 +164,7 @@ const TreatyDetails = (props) => {
                                 fullWidth: true
                             }}
                         />
+                        {props.Treatyflag && (<p className="error">{props.Treatymassage} </p>)}
                     </GridItem>
                     <GridItem xs={12} sm={12} md={3}>
                         <CustomInput
