@@ -88,34 +88,29 @@ class ViewDashboard extends React.Component {
             ['D', 2],
             ['E', 7],
             ['F', 7]
-            ]
+            ],
+            fields: {
+                ChartType: "ColumnChart",
+            },
+            typeList: [{ "mID": 1, "mValue": "ScatterChart", "mType": "ChartType" },
+                { "mID": 2, "mValue": "LineChart ", "mType": "ChartType" },
+                { "mID": 3, "mValue": "ColumnChart", "mType": "ChartType" },
+                { "mID": 4, "mValue": "PieChart", "mType": "ChartType" }],
+            CTypes: "",
+            piedata: [
+                ['Task', 'Hours per Day'],
+                ['Work', 11],
+                ['Eat', 2],
+                ['Commute', 2],
+                ['Watch TV', 2],
+                ['Sleep', 7]
+            ],
+            ChartName: "",
+
         };
     }
 
     componentDidMount() {
-
-        {/* fetch(`${ReportConfig.ReportConfigUrl}/api/Report/GetReportConfigName`, {
-            method: 'get',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log("masterList: ", data);
-                this.setState({ masterList: data });
-            });
-        console.log("data", this.state.masterList);
-
-        setTimeout(
-            function () {
-                this.setState({ pageloader: true });
-            }
-                .bind(this),
-            2000
-        );*/}
 
         /////////////////From UserManagement //////////////////////////
         let userid = "";
@@ -158,6 +153,23 @@ class ViewDashboard extends React.Component {
 
     };
 
+    onInputChartChange = (evt) => {
+
+        console.log('Event', evt, evt.target.name, evt.target.value);
+        const fields = this.state.fields;
+        fields[evt.target.name] = evt.target.value;
+        this.setState({ fields });
+
+        //For Charts change
+        console.log("dd value", evt.target.name);
+        this.state.CTypes = evt.target.value;
+       
+        //var cont = this.state.typeList.filter(x => x.mID == this.state.CTypes);
+        //var cName= cont[0].mValue;;
+        //this.setState({ ChartName: cName }); 
+        //console.log("dd name", cont, this.state.ChartName);
+    }
+
     onInputParamListChange = (evt) => {
         var fields = this.state.CheckCondition;
         fields[evt.target.name] = evt.target.value;
@@ -171,7 +183,7 @@ class ViewDashboard extends React.Component {
     };
 
     onDateChange = (formate, name, event) => {
-        debugger;
+        
         var today = event.toDate();
         if (today.getDate() < 10) {
             var dt = '0' + today.getDate();
@@ -521,6 +533,7 @@ class ViewDashboard extends React.Component {
         }
     }
     render() {
+        console.log(this.state.ChartName, "CName");
         return (
             <div>
                 {
@@ -651,133 +664,203 @@ class ViewDashboard extends React.Component {
                         </GridItem>
                     </Card>
                     : null}
-                {
-                    this.state.loader ?
 
-                        <GridContainer xl={12}>
+             
+                    {
+                        this.state.loader ?
 
-                            {this.state.showgraph &&
-                                <Chart
-                                    width={800}
-                                    height={400}
-                                    chartType="ScatterChart"
-                                    // loader={<div>Loading Chart</div>}
-
-                                    data={this.state.graphData}
-                                    options={{
-                                        title: this.state.title,
-                                        chartArea: { width: '62%', height: '70%' },
-                                        hAxis: {
-                                            title: this.state.labels.xaxis,
-                                            //minValue: 0,
-                                        },
-                                        vAxis: {
-                                            title: this.state.labels.yaxis //This is for Y axis Labeling 
-                                        },
-                                        is3d: true,
-                                        //legend: 'none',
-                                        trendlines: { 0: {} },    // Draw a trendline for data series 0.
-                                        animation: {
-                                            startup: true,
-                                            easing: 'linear',
-                                            duration: 1500,
-                                        },
-                                    }}
-                                    legendToggle
-                                />}
-
-                            {this.state.showgraph &&
-                                <Chart
-                                    width={800}
-                                    height={400}
-                                    chartType="LineChart"
-                                    // loader={<div>Loading Chart</div>}
-
-                                    data={this.state.graphData}
-                                    options={{
-                                        title: this.state.title,
-                                        chartArea: { width: '62%', height: '70%' },
-                                        hAxis: {
-                                            title: this.state.labels.xaxis,
-                                            //minValue: 0,
-                                        },
-                                        vAxis: {
-                                            title: this.state.labels.yaxis //This is for Y axis Labeling 
-                                        },
-                                        is3d: true,
-                                        animation: {
-                                            startup: true,
-                                            easing: 'linear',
-                                            duration: 1500,
-                                        },
-                                    }}
-                                    legendToggle
-                                />}
+                            <GridContainer xl={12}>
 
 
-                            {this.state.showgraph && <Chart
-                                width={800}
-                                height={400}
-                                chartType="ColumnChart"
-                                // loader={<div>Loading Chart</div>}
-
-                                data={this.state.graphData}
-                                options={{
-                                    title: this.state.title,
-                                    chartArea: { width: '62%', height: '70%' },
-                                    hAxis: {
-                                        title: this.state.labels.xaxis,
-                                        //minValue: 0,
-                                    },
-                                    vAxis: {
-                                        title: this.state.labels.yaxis //This is for Y axis Labeling 
-                                    },
-                                    isStacked: true,
-                                    animation: {
-                                        startup: true,
-                                        easing: 'linear',
-                                        duration: 1500,
-                                    },
-                                }}
-                                legendToggle
-                            />}
-                            {this.state.tableFlag ?
-                                <GridItem lg={12}>
-                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                        <ReactTable
-                                            data={this.state.result}
-                                            filterable
-                                            columns={this.state.TableDataList}
-                                            defaultPageSize={5}
-                                            showPaginationTop={false}
-                                            showPaginationBottom
-                                            className="-striped -highlight discription-tab"
+                                {this.state.showgraph &&
+                                    <GridItem xs={12} sm={6} md={3}>
+                                        <Dropdown
+                                            labelText="Chart Type"
+                                            id="ChartType"
+                                            value={this.state.fields}
+                                            lstObject={this.state.typeList}
+                                            name='ChartType'
+                                            onChange={this.onInputChartChange}
+                                            // onChange={this.handleSubmit}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
                                         />
-                                    </Animated>
-                                </GridItem>
-                                : <GridItem lg={12}>
-                                    {this.state.nodata ?
-                                        <Card>
-                                            <GridContainer lg={12} justify="center">
-                                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                    <img src={data_Not_found} className="tab-data-not-found" />
-                                                </Animated>
-                                            </GridContainer>
-                                            <GridContainer lg={12} justify="center">
-                                                <GridItem xs={5} sm={3} md={3} lg={1} >
-                                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                                        <Button className="secondary-color" round onClick={() => this.searchagain()}> Try again </Button>
-                                                    </Animated>
-                                                </GridItem>
-                                            </GridContainer>
-                                        </Card>
-                                        : null}
-                                </GridItem>}
+                                    </GridItem>
+                                }
 
-                        </GridContainer>
-                        : <Card style={paddingCard}>
-                            <TableContentLoader />
-                        </Card>}
+                                {(this.state.CTypes == 4) &&
+                                    <GridContainer>
+                                        {this.state.showgraph && <Chart
+                                            width={800}
+                                            height={400}
+                                            chartType="PieChart"
+                                            // loader={<div>Loading Chart</div>}
+
+                                            data={this.state.graphData}
+                                            options={{
+                                                title: this.state.title,
+                                                chartArea: { width: '62%', height: '70%' },
+                                                hAxis: {
+                                                    title: this.state.labels.xaxis,
+                                                    //minValue: 0,
+                                                },
+                                                vAxis: {
+                                                    title: this.state.labels.yaxis //This is for Y axis Labeling 
+                                                },
+                                                is3D: true,
+                                                animation: {
+                                                    startup: true,
+                                                    easing: 'linear',
+                                                    duration: 1500,
+                                                },
+                                            }}
+                                            legendToggle
+                                        />}
+                                    </GridContainer>
+                                }
+
+                                {(this.state.CTypes == 1) &&
+                                    <GridContainer>
+                                        {
+                                            this.state.showgraph &&
+                                            <Chart
+                                                width={800}
+                                                height={400}
+                                                chartType="ScatterChart"
+                                                // loader={<div>Loading Chart</div>}
+
+                                                data={this.state.graphData}
+                                                options={{
+                                                    title: this.state.title,
+                                                    chartArea: { width: '62%', height: '70%' },
+                                                    hAxis: {
+                                                        title: this.state.labels.xaxis,
+                                                        //minValue: 0,
+                                                    },
+                                                    vAxis: {
+                                                        title: this.state.labels.yaxis //This is for Y axis Labeling 
+                                                    },
+                                                    is3d: true,
+                                                    //legend: 'none',
+                                                    trendlines: { 0: {} },    // Draw a trendline for data series 0.
+                                                    animation: {
+                                                        startup: true,
+                                                        easing: 'linear',
+                                                        duration: 1500,
+                                                    },
+                                                }}
+                                                legendToggle
+                                            />
+                                        }
+                                    </GridContainer>
+                                }
+                                {(this.state.CTypes == 2) &&
+                                    <GridContainer>
+                                        {this.state.showgraph &&
+                                            <Chart
+                                                width={800}
+                                                height={400}
+                                                chartType="LineChart"
+                                                // loader={<div>Loading Chart</div>}
+
+                                                data={this.state.graphData}
+                                                options={{
+                                                    title: this.state.title,
+                                                    chartArea: { width: '62%', height: '70%' },
+                                                    hAxis: {
+                                                        title: this.state.labels.xaxis,
+                                                        //minValue: 0,
+                                                    },
+                                                    vAxis: {
+                                                        title: this.state.labels.yaxis //This is for Y axis Labeling 
+                                                    },
+                                                    is3d: true,
+                                                    curveType: 'function',
+                                                    //legend: { position: 'bottom' },
+                                                    animation: {
+                                                        startup: true,
+                                                        easing: 'linear',
+                                                        duration: 1500,
+                                                    },
+                                                }}
+                                                legendToggle
+                                            />}
+                                    </GridContainer>
+                                }
+
+                                {(this.state.CTypes == 3) &&
+                                    <GridContainer>
+                                        {this.state.showgraph && <Chart
+                                            width={800}
+                                            height={400}
+                                            chartType="ColumnChart"
+                                            // loader={<div>Loading Chart</div>}
+
+                                            data={this.state.graphData}
+                                            options={{
+                                                title: this.state.title,
+                                                chartArea: { width: '62%', height: '70%' },
+                                                hAxis: {
+                                                    title: this.state.labels.xaxis,
+                                                    //minValue: 0,
+                                                },
+                                                vAxis: {
+                                                    title: this.state.labels.yaxis //This is for Y axis Labeling 
+                                                },
+                                                bar: { groupWidth: "95%" },
+                                                isStacked: true,
+                                                animation: {
+                                                    startup: true,
+                                                    easing: 'linear',
+                                                    duration: 1500,
+                                                },
+                                            }}
+                                            legendToggle
+                                        />}
+                                    </GridContainer>
+                                }
+
+                                {this.state.tableFlag ?
+                                    <GridItem lg={12}>
+                                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                            <ReactTable
+                                                data={this.state.result}
+                                                filterable
+                                                columns={this.state.TableDataList}
+                                                defaultPageSize={5}
+                                                showPaginationTop={false}
+                                                showPaginationBottom
+                                                className="-striped -highlight discription-tab"
+                                            />
+                                        </Animated>
+                                    </GridItem>
+                                    : <GridItem lg={12}>
+                                        {this.state.nodata ?
+                                            <Card>
+                                                <GridContainer lg={12} justify="center">
+                                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                        <img src={data_Not_found} className="tab-data-not-found" />
+                                                    </Animated>
+                                                </GridContainer>
+                                                <GridContainer lg={12} justify="center">
+                                                    <GridItem xs={5} sm={3} md={3} lg={1} >
+                                                        <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                                            <Button className="secondary-color" round onClick={() => this.searchagain()}> Try again </Button>
+                                                        </Animated>
+                                                    </GridItem>
+                                                </GridContainer>
+                                            </Card>
+                                            : null}
+                                    </GridItem>}
+
+                            </GridContainer>
+                            : <Card style={paddingCard}>
+                                <TableContentLoader />
+                            </Card>
+
+                    }
+
 
             </div>
 
