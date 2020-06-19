@@ -42,6 +42,11 @@ class ViewDashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            labels: {
+                xaxis: "",
+                yaxis:""
+            },
+            title: "",
             showgraph:false,
             loader: true,
             pageloader: false,
@@ -58,7 +63,7 @@ class ViewDashboard extends React.Component {
             paramList: [],
             otFlag: false,
             graphData: [
-                ['Task', 'PolicyCount per Day']
+                ['Task', '']
             ],
             result: [],
             flagParam: false,
@@ -198,6 +203,8 @@ class ViewDashboard extends React.Component {
 
     handleParameterCheck = event => {
         debugger;
+        this.state.title = this.state.reportName.filter(a => a.mID == event.target.value)[0].mValue;
+        console.log("title", this.state.title);
         let param = this.state.paramList;
         let parameter = this.state.parameterList;
         let rparam = this.state.reportparameters;
@@ -242,6 +249,23 @@ class ViewDashboard extends React.Component {
                 console.log("rparameter: ", data);
                 this.setState({ otFlag: true });
             });
+        console.log("ReportName", this.state.ReportConfigDto.ReportName);
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetLabels?DashboardConfigParamId=` + event.target.value, {
+        //fetch(`https://localhost:44351/api/Graph/GetLabels?DashboardConfigParamId=` + event.target.value, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.state.labels.xaxis = data.xaxis;
+                this.state.labels.yaxis = data.yaxis;
+                console.log("labels: ", this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1));
+            });
+
     }
 
     MonthWise = (event) => {
@@ -357,9 +381,15 @@ class ViewDashboard extends React.Component {
             },
             body: JSON.stringify(request)
         }).then(response => response.json())
-            .then(data => {
-                this.state.graphData = [];
-                this.state.graphData[0] = ['Task', 'PolicyCount per Day'];
+           .then(data => {
+               debugger;
+               this.state.graphData = [];
+               let strLength = this.state.labels.xaxis.length;
+               if (this.state.labels.xaxis.charAt(strLength-1) == 's') {
+                   this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
+               } else {
+                   this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+               }
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
                
@@ -575,7 +605,7 @@ class ViewDashboard extends React.Component {
 
                         <GridContainer xl={12}>
                             {this.state.showgraph && <Chart
-                                width={1000}
+                                width={800}
                                 height={400}
                                 chartType="ColumnChart"
                                 // loader={<div>Loading Chart</div>}
@@ -584,14 +614,14 @@ class ViewDashboard extends React.Component {
 
                                 data={this.state.graphData}
                                 options={{
-                                    title: 'Policy Count ',
+                                    title: this.state.title,
                                     chartArea: { width: '62%', height: '70%' },
                                     hAxis: {
-                                        title: 'Date',
+                                        title: this.state.labels.xaxis,
                                         //minValue: 0,
                                     },
                                     vAxis: {
-                                        title: '', //This is for Y axis Labeling 
+                                        title: this.state.labels.yaxis //This is for Y axis Labeling 
                                     },
                                     animation: {
                                         startup: true,
