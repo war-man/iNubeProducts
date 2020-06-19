@@ -32,6 +32,7 @@ import Dropdown from "components/Dropdown/Dropdown.jsx";
 import DashboardConfig from "modules/DynamicDashboards/DashboardConfig.js";
 import UserConfig from 'modules/Users/UserConfig.js';
 import Chart from "react-google-charts";
+import { format } from "util";
 
 const paddingCard =
 {
@@ -44,10 +45,10 @@ class ViewDashboard extends React.Component {
         this.state = {
             labels: {
                 xaxis: "",
-                yaxis:""
+                yaxis: ""
             },
             title: "",
-            showgraph:false,
+            showgraph: false,
             loader: true,
             pageloader: false,
             nodata: false,
@@ -55,7 +56,7 @@ class ViewDashboard extends React.Component {
             ReportConfigDto: {
                 ReportName: "",
             },
-            duplicategraphData:[],
+            duplicategraphData: [],
             parameterList: [],
             CheckCondition: {
                 //paramList:[],
@@ -122,8 +123,8 @@ class ViewDashboard extends React.Component {
         userid = localStorage.getItem('userId');
         roleid = localStorage.getItem('roleId');
         console.log("login: ", userid, roleid);
-       fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph", {
-        //fetch(`https://localhost:44351/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph", {
+        fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph", {
+            //fetch(`https://localhost:44351/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph", {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -170,6 +171,7 @@ class ViewDashboard extends React.Component {
     };
 
     onDateChange = (formate, name, event) => {
+        debugger;
         var today = event.toDate();
         if (today.getDate() < 10) {
             var dt = '0' + today.getDate();
@@ -213,7 +215,7 @@ class ViewDashboard extends React.Component {
         //    this.state.graphData[i] = [];
         //    console.log("gdata",this.state.graphData)
         //}
-       
+
         console.log("gdata", this.state.graphData);
         param = array;
         rparam = array;
@@ -233,9 +235,9 @@ class ViewDashboard extends React.Component {
         this.setState({ [event.target.name]: event.target.value });
         console.log(ReportConfigDto[event.target.name], event.target.value, "reportdto");
 
-        this.setState({ flagParam: true, tableFlag: false, showgraph:false });
+        this.setState({ flagParam: true, tableFlag: false, showgraph: false });
         fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
-       // fetch(` https://localhost:44351/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
+            // fetch(` https://localhost:44351/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -251,7 +253,7 @@ class ViewDashboard extends React.Component {
             });
         console.log("ReportName", this.state.ReportConfigDto.ReportName);
         fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetLabels?DashboardConfigParamId=` + event.target.value, {
-        //fetch(`https://localhost:44351/api/Graph/GetLabels?DashboardConfigParamId=` + event.target.value, {
+            //fetch(`https://localhost:44351/api/Graph/GetLabels?DashboardConfigParamId=` + event.target.value, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -371,8 +373,8 @@ class ViewDashboard extends React.Component {
 
         console.log("rparameter: ", this.state.reportparameters);
         this.setState({ loader: false });
-       fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/QueryExecution`, {
-        // fetch(`https://localhost:44351/api/Graph/QueryExecution`, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/QueryExecution`, {
+            // fetch(`https://localhost:44351/api/Graph/QueryExecution`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json',
@@ -381,35 +383,65 @@ class ViewDashboard extends React.Component {
             },
             body: JSON.stringify(request)
         }).then(response => response.json())
-           .then(data => {
-               debugger;
-               this.state.graphData = [];
-               if (this.state.labels.xaxis != null && this.state.labels.xaxis != null) {
-                   let strLength = this.state.labels.xaxis.length;
-                   if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
-                       this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
-                   } else {
-                       this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                   }
-               } else {
-                   if (this.state.labels.yaxis != null && this.state.labels.xaxis != null) {
-                       this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                   } else {
-                       this.state.graphData[0] = ['Task', ''];
-                   }
-                   
-               }
+            .then(data => {
+                debugger;
+                this.state.graphData = [];
+                if (this.state.labels.xaxis != null && this.state.labels.xaxis != null) {
+                    let strLength = this.state.labels.xaxis.length;
+                    if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
+                        this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
+                    } else {
+                        this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+                    }
+                } else {
+                    if (this.state.labels.yaxis != null && this.state.labels.xaxis != null) {
+                        this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+                    } else {
+                        this.state.graphData[0] = ['Task', ''];
+                    }
+
+                }
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
-               
-                    this.state.result.map(m => {
-                        let arr = [];
-                        arr.push(m.column2);
-                        arr.push(m.column1);
-                        this.state.graphData.push(arr);
-                        console.log("graphdata", this.state.graphData, arr);
+
+                this.state.result.map(m => {
+                    let arr = [];
+                    //let date= this.datechange(m.column1);
+                    //var today = new Date(m.column2);
+                    //if (today.getDate() < 10) {
+                    //    var dt = '0' + today.getDate();
+                    //}
+                    //else {
+                    //    var dt = today.getDate();
+                    //}
+                    //if (today.getMonth() < 10) {
+                    //    var mm = '0' + (today.getMonth() + 1)
+                    //}
+                    //else {
+                    //    var mm = (today.getMonth() + 1);
+                    //}
+                    //var date = today.getFullYear() + '-' + mm + '-' + dt;
+                    //debugger;
+                    //if (date != "NaN-NaN-NaN") {
+                    //    var formatteddate = this.datechange1(date);
+                    //    arr.push(formatteddate);
+                    //    arr.push(m.column1);
+                    //} else {
+                    //    arr.push(m.column2);
+                    //    arr.push(m.column1);
+                    //}
+                    let splitdate = m.column2.toString().split('-');
+                    if (splitdate.length >= 2) {
+                        if (m.column2 != undefined) {
+                            m.column2 = new Date(m.column2).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                        }
+                    } 
+                    arr.push(m.column2);
+                    arr.push(m.column1);
+                    this.state.graphData.push(arr);
+                    console.log("graphdata", this.state.graphData, arr);
                 });
-                    this.setState({ showgraph: true })
+                this.setState({ showgraph: true })
                 //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {
                     this.setState({ tableFlag: false, flagParam: false, loader: false });
@@ -470,7 +502,17 @@ class ViewDashboard extends React.Component {
         this.setState({ nodata: false });
         window.scrollTo(0, 0);
     }
+    datechange1 = (date) => {
+        debugger;
+        if (date != undefined) {
+            const _date = date.split('-');
+            const dateObj = { month: _date[1], year: _date[0], day: _date[2] };
+
+            return dateObj.day + '/' + dateObj.month + '/' + dateObj.year;
+        }
+    }
     datechange = (date) => {
+        debugger;
         if (date != undefined) {
             const _date = date.split('-');
             const dateObj = { month: _date[1], year: _date[0], day: _date[2] };
