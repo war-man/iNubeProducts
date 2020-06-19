@@ -4353,7 +4353,77 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             }
                         }
 
-
+                        if (vehicleCount == 2)
+                        {
+                            var vehicleid1 = VehicleRiskItem[0]["InspectionId"];
+                            var vehicleid2 = VehicleRiskItem[1]["InspectionId"];
+                            if (vehicleid1 != vehicleid2)
+                            {
+                                RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                ruleEngine.ValidatorName = "Inspection Id";
+                                ruleEngine.Outcome = "Success";
+                                ruleEngine.Message = "Validation done for Inspection id";
+                                ruleEngine.Code = "EXPB004";
+                                engineResponse1.Add(ruleEngine);
+                                successcount++;
+                            }
+                            else
+                            {
+                                RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                ruleEngine.ValidatorName = "Inspection Id";
+                                ruleEngine.Outcome = "Fail";
+                                ruleEngine.Message = "The Inspection id must be unique for each vehicle";
+                                ruleEngine.Code = "EXPB004";
+                                engineResponse1.Add(ruleEngine);
+                                failcount++;
+                            }
+                        }
+                        if (vehicleCount == 3)
+                        {
+                            var vehicleid1 = VehicleRiskItem[0]["InspectionId"];
+                            var vehicleid2 = VehicleRiskItem[1]["InspectionId"];
+                            var vehicleid3 = VehicleRiskItem[2]["InspectionId"];
+                            if (vehicleid1 == vehicleid2)
+                            {
+                                RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                ruleEngine.ValidatorName = "Inspection Id";
+                                ruleEngine.Outcome = "Fail";
+                                ruleEngine.Message = "The Inspection id must be unique for each vehicle";
+                                ruleEngine.Code = "EXPB004";
+                                engineResponse1.Add(ruleEngine);
+                                failcount++;
+                            }
+                            if (vehicleid1 == vehicleid3)
+                            {
+                                RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                ruleEngine.ValidatorName = "Inspection Id";
+                                ruleEngine.Outcome = "Fail";
+                                ruleEngine.Message = "The Inspection id must be unique for each vehicle";
+                                ruleEngine.Code = "EXPB004";
+                                engineResponse1.Add(ruleEngine);
+                                failcount++;
+                            }
+                            if (vehicleid2 == vehicleid3)
+                            {
+                                RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                ruleEngine.ValidatorName = "Inspection Id";
+                                ruleEngine.Outcome = "Fail";
+                                ruleEngine.Message = "The Inspection id must be unique for each vehicle";
+                                ruleEngine.Code = "EXPB004";
+                                engineResponse1.Add(ruleEngine);
+                                failcount++;
+                            }
+                            else
+                            {
+                                RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                ruleEngine.ValidatorName = "Inspection Id";
+                                ruleEngine.Outcome = "Success";
+                                ruleEngine.Message = "Validation done for Inspection id";
+                                ruleEngine.Code = "EXPB004";
+                                engineResponse1.Add(ruleEngine);
+                                successcount++;
+                            }
+                        }
                         if (failcount > 0)
                         {
                             RuleEngineResponse res4obj = new RuleEngineResponse();
