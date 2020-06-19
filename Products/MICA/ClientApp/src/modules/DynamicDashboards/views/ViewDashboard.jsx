@@ -655,13 +655,71 @@ class ViewDashboard extends React.Component {
                     this.state.loader ?
 
                         <GridContainer xl={12}>
+
+                            {this.state.showgraph &&
+                                <Chart
+                                    width={800}
+                                    height={400}
+                                    chartType="ScatterChart"
+                                    // loader={<div>Loading Chart</div>}
+
+                                    data={this.state.graphData}
+                                    options={{
+                                        title: this.state.title,
+                                        chartArea: { width: '62%', height: '70%' },
+                                        hAxis: {
+                                            title: this.state.labels.xaxis,
+                                            //minValue: 0,
+                                        },
+                                        vAxis: {
+                                            title: this.state.labels.yaxis //This is for Y axis Labeling 
+                                        },
+                                        is3d: true,
+                                        //legend: 'none',
+                                        trendlines: { 0: {} },    // Draw a trendline for data series 0.
+                                        animation: {
+                                            startup: true,
+                                            easing: 'linear',
+                                            duration: 1500,
+                                        },
+                                    }}
+                                    legendToggle
+                                />}
+
+                            {this.state.showgraph &&
+                                <Chart
+                                    width={800}
+                                    height={400}
+                                    chartType="LineChart"
+                                    // loader={<div>Loading Chart</div>}
+
+                                    data={this.state.graphData}
+                                    options={{
+                                        title: this.state.title,
+                                        chartArea: { width: '62%', height: '70%' },
+                                        hAxis: {
+                                            title: this.state.labels.xaxis,
+                                            //minValue: 0,
+                                        },
+                                        vAxis: {
+                                            title: this.state.labels.yaxis //This is for Y axis Labeling 
+                                        },
+                                        is3d: true,
+                                        animation: {
+                                            startup: true,
+                                            easing: 'linear',
+                                            duration: 1500,
+                                        },
+                                    }}
+                                    legendToggle
+                                />}
+
+
                             {this.state.showgraph && <Chart
                                 width={800}
                                 height={400}
                                 chartType="ColumnChart"
                                 // loader={<div>Loading Chart</div>}
-
-
 
                                 data={this.state.graphData}
                                 options={{
