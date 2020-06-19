@@ -386,8 +386,10 @@ class ViewDashboard extends React.Component {
                this.state.graphData = [];
                if (this.state.labels.xaxis != null && this.state.labels.xaxis != null) {
                    let strLength = this.state.labels.xaxis.length;
-                   if (this.state.labels.xaxis.charAt(strLength - 1)=='s') {
+                   if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
                        this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
+                   } else {
+                       this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
                    }
                } else {
                    if (this.state.labels.yaxis != null && this.state.labels.xaxis != null) {

@@ -39,9 +39,6 @@ if (env === "EdelweissProd") {
     ExtensionUrl = Baseurl;
     NotificationUrl = Baseurl;
 }
-
-
-
 if (env === "Local") {
     partnerconfigUrl = 'https://localhost:44315';
     productConfigUrl = 'https://localhost:44347';
