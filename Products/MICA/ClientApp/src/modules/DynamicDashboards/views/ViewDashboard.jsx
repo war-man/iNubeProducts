@@ -702,6 +702,7 @@ class ViewDashboard extends React.Component {
                             <Chart
                                 width={1000}
                                 height={500}
+                                key={this.state.ChartName}
                                 chartType={this.state.ChartName}
                                 loader={<div>Loading Chart</div>}
                                 data={this.state.graphData}
