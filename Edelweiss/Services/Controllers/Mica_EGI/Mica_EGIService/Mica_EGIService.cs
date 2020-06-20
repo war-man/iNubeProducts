@@ -7271,40 +7271,25 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
 
                 //Driver
-                if (AdditionalDriver > 0 && AdditionalDriver <= 2)
+                if (AdditionalDriver >= 3)
+                {
+                    ruleEngine = new RuleEngineResponse();
+                    ruleEngine.ValidatorName = "additionalDriver";
+                    ruleEngine.Outcome = "Fail";
+                    ruleEngine.Message = "Number of additional drivers cannot be more than 2.";
+                    ruleEngine.Code = "GEPO011";
+                    engineResponse.Add(ruleEngine);
+                    failcount++;
+                }
+                else
                 {
                     ruleEngine = new RuleEngineResponse();
                     ruleEngine.ValidatorName = "additionalDriver";
                     ruleEngine.Outcome = "Success";
-                    ruleEngine.Message = "Validation done for number of additional drivers cannot be more than 2";
+                    ruleEngine.Message = "Validation done for number of additional drivers.";
                     ruleEngine.Code = "GEPO011";
                     engineResponse.Add(ruleEngine);
-                    successcount++;
-                }
-                else
-                {
-                    if (AdditionalDriver == 0)
-                    {
-                        ruleEngine = new RuleEngineResponse();
-                        ruleEngine.ValidatorName = "additionalDriver";
-                        ruleEngine.Outcome = "Fail";
-                        ruleEngine.Message = "Enter a value in additional driver.";
-                        ruleEngine.Code = "GEPO011";
-                        engineResponse.Add(ruleEngine);
-                        failcount++;
-                    }
-                    else
-                    {
-                        ruleEngine = new RuleEngineResponse();
-                        ruleEngine.ValidatorName = "additionalDriver";
-                        ruleEngine.Outcome = "Fail";
-                        ruleEngine.Message = "Number of additional drivers cannot be more than 2";
-                        ruleEngine.Code = "GEPO011";
-                        engineResponse.Add(ruleEngine);
-                        failcount++;
-                    }
-
-
+                    failcount++;
                 }
 
                 //Payment 
