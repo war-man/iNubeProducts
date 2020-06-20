@@ -95,7 +95,12 @@ class ViewDashboard extends React.Component {
             typeList: [{ "mID": 1, "mValue": "ScatterChart", "mType": "ChartType" },
                 { "mID": 2, "mValue": "LineChart", "mType": "ChartType" },
                 { "mID": 3, "mValue": "ColumnChart", "mType": "ChartType" },
-                { "mID": 4, "mValue": "PieChart", "mType": "ChartType" }],
+                { "mID": 4, "mValue": "PieChart", "mType": "ChartType" },
+                { "mID": 5, "mValue": "Table", "mType": "ChartType" },
+                { "mID": 6, "mValue": "SteppedAreaChart", "mType": "ChartType" },
+                { "mID": 7, "mValue": "BarChart", "mType": "ChartType" }
+
+            ],
             CTypes: "",
             piedata: [
                 ['Task', 'Hours per Day'],
@@ -252,7 +257,7 @@ class ViewDashboard extends React.Component {
         this.setState({ [event.target.name]: event.target.value });
         console.log(ReportConfigDto[event.target.name], event.target.value, "reportdto");
 
-        this.setState({ flagParam: true, tableFlag: false, showgraph: false, showdd:false,loader:true});
+        this.setState({ flagParam: true, tableFlag: false, showgraph: false, showdd:false});
         fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
             // fetch(` https://localhost:44351/api/Graph/GetParameters?dashboardConfigId=` + event.target.value, {
             method: 'GET',
@@ -695,11 +700,19 @@ class ViewDashboard extends React.Component {
                         {this.state.showgraph &&
                             
                             <Chart
-                                width={800}
-                                height={400}
+                                width={1000}
+                                height={500}
                                 chartType={this.state.ChartName}
-                                //loader={<div>Loading Chart</div>}
+                                loader={<div>Loading Chart</div>}
                                 data={this.state.graphData}
+
+                                formatters={[
+                                    {
+                                        type: 'ArrowFormat',
+                                        column: 1,
+                                    },
+                                ]}
+
                                 options={{
                                     title: this.state.title,
                                     chartArea: { width: '62%', height: '70%' },
@@ -707,7 +720,16 @@ class ViewDashboard extends React.Component {
                                     vAxis: { title: this.state.labels.yaxis },//This is for Y axis Labeling
                                     bar: { groupWidth: "95%" },
                                     isStacked: true,
-                                    is3D:true,
+                                    is3D: true,
+                                    showRowNumber: true,
+                                    allowHtml: true,
+                                    showRowNumber: true,
+                                    intervals: { lineWidth: 1, barWidth: 1, style: 'boxes' },
+
+                                    gantt: {
+                                        trackHeight: 30,
+                                    },
+
                                     animation: {
                                         startup: true,
                                         easing: 'linear',
@@ -715,6 +737,7 @@ class ViewDashboard extends React.Component {
                                     },
                                 }}
                                 legendToggle
+                                rootProps={{ 'data-testid': '1' }}
                             />}
                         </GridContainer>
                         </CardBody>
