@@ -510,7 +510,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             return Ok(response);
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> SaveEntities(DynamicEntityDTO dynamicEntity)
         {
             var response = await _productService.SaveEntities(dynamicEntity, Context);
