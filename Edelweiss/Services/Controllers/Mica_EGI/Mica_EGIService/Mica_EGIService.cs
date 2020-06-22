@@ -7466,7 +7466,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     ruleEngine.Message = "Validation done for number of additional drivers.";
                     ruleEngine.Code = "GEPO011";
                     engineResponse.Add(ruleEngine);
-                    failcount++;
+                    successcount++;
                 }
 
                 //Payment 
