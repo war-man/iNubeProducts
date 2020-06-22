@@ -1084,7 +1084,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             MapDetails mapDetails = new MapDetails();
             List<MapDetails> mapDetails1 = new List<MapDetails>();
             Participant participant = new Participant();
-            List<Participant> participants = new List<Participant>();
+           // List<Participant> participants = new List<Participant>();
 
             //Policy Or Sometihng id need to take
             Mapping mapping = new Mapping();
@@ -1112,7 +1112,9 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var retentionGroups = _context.TblRetentionGroup.Where(a => a.RetentionGroupId == RIMappingDTO.RetentionGroupId).FirstOrDefault();
             var retensionDto = _mapper.Map<TblRetentionGroupDto>(retentionGroups);
 
+          
             map.Type = "Retention";
+           
             if (Convert.ToInt32(retensionDto.RetentionLogicId) == 20)
             {
                 map.AllocationMethod = "Percentage";
@@ -1150,6 +1152,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             map.AllocationBasedOn = "";
             map.NoofLines = "0";
             map.HL = "";
+            map.Premium = Convert.ToInt32(calulationDto.PremiumAmount);
+
 
             //This is Extra only for testing Purpuse
             map.Percentage = "0";
@@ -1161,13 +1165,22 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             maps.Add(map);
             //doing for mapping
 
-            mapDetails.Type = map.Type;
-            mapDetails.Percentage = Convert.ToInt32(map.Percentage);
-            mapDetails.Limit = Convert.ToInt32(map.Limit);
-            mapDetails.AllocationBasis = map.AllocationBasis;
-            mapDetails.NoOfLines = Convert.ToInt32(map.NoofLines);
-            mapDetails.AllocatedAmount = 0;//need to get it from integration call value
-            mapDetails.AllocatedPremium = 0;////need to get it from integration call value
+
+            var retType = map.Type;
+            var retPercentage= Convert.ToInt32(map.Percentage);
+            var retLimit = Convert.ToInt32(map.Limit);
+            var retAllocationBasis = map.AllocationBasis;
+            var retNoOfLines = Convert.ToInt32(map.NoofLines);
+            var retAllocatedAmount = 0;
+            var retAllocatedPremium = 0; 
+
+            mapDetails.Type = retType;
+            mapDetails.Percentage = retPercentage;
+            mapDetails.Limit = retLimit;
+            mapDetails.AllocationBasis = retAllocationBasis;
+            mapDetails.NoOfLines = retNoOfLines;
+            mapDetails.AllocatedAmount = retAllocatedAmount;//need to get it from integration call value
+            mapDetails.AllocatedPremium = retAllocatedPremium;////need to get it from integration call value
             mapDetails1.Add(mapDetails);
             // Treaty data need to be filled
 
@@ -1176,20 +1189,23 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             foreach (var item in LstRImappingDetails)
             {
+                List<Participant> participants = new List<Participant>();
                 foreach (var treatyitem in treatyDataLst)
                 {
                     if (item.TreatyGroupId == treatyitem.TreatyGroupId)
                     {
                         var tratyparntdata = _context.TblTreaty.Find(treatyitem.TreatyId);
                         var trtdata = _mapper.Map<TblTreatyDto>(tratyparntdata);
-                        var Arrangementdata = _context.TblArrangement.Find(treatyitem.TreatyId);
+                        var Arrangementdata = _context.TblArrangement.Where(a=>a.TreatyGroupId== item.TreatyGroupId).FirstOrDefault();
                         var arrangementsvalue = _mapper.Map<TblArrangementDto>(Arrangementdata);
                         //treatytypeid ->5 means Surplus and 4 means Quotashare
                         if (trtdata.TreatyTypeId == 5)
                         {
                             map = new Map();
+                            mapDetails = new MapDetails();
                             // surPlus.Percent = trtdata.pe;
                             map.Type = "Surplus";
+                            map.Premium = Convert.ToInt32(calulationDto.PremiumAmount);
                             // map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
                             // map.Limit= Convert.ToInt32(arrangementsvalue.li)
                             if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 20)
@@ -1251,14 +1267,22 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             // map.High
                             maps.Add(map);
 
-                            mapDetails.Type = map.Type;
-                            mapDetails.Percentage = Convert.ToInt32(map.Percentage);
-                            mapDetails.Limit = Convert.ToInt32(map.Limit);
-                            mapDetails.AllocationBasis = map.AllocationBasis;
-                            mapDetails.NoOfLines = Convert.ToInt32(map.NoofLines);
-                            mapDetails.AllocatedAmount = 0;//need to get it from integration call value
-                            mapDetails.AllocatedPremium = 0;////need to get it from integration call value
-                            mapDetails1.Add(mapDetails);
+                            var surplusType = map.Type;
+                            var surplusPercentage = Convert.ToInt32(map.Percentage);
+                            var surplusLimit = Convert.ToInt32(map.Limit);
+                            var surplusAllocationBasis = map.AllocationBasis;
+                            var surplusNoOfLines = Convert.ToInt32(map.NoofLines);
+                            var surplusAllocatedAmount = 0;
+                            var surplusAllocatedPremium = 0;
+
+                            mapDetails.Type = surplusType;
+                            mapDetails.Percentage = surplusPercentage;
+                            mapDetails.Limit = surplusLimit;
+                            mapDetails.AllocationBasis = surplusAllocationBasis;
+                            mapDetails.NoOfLines = surplusNoOfLines;
+                            mapDetails.AllocatedAmount = surplusAllocatedAmount;//need to get it from integration call value
+                            mapDetails.AllocatedPremium = surplusAllocatedPremium;////need to get it from integration call value
+                          //  mapDetails1.Add(mapDetails);
 
 
 
@@ -1277,22 +1301,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                                 participant.AllocatedAmount = 0;//need to ask the calculation
                                 participant.AllocatedPremium = 0;//need to ask the caluation
                                 participants.Add(participant);
-
-
                             }
-                            mapDetails.participants = participants;
-                            mapDetails1.Add(mapDetails);
-
-
-
-
 
                         }
                         if (trtdata.TreatyTypeId == 4)
                         {
                             map = new Map();
+                            mapDetails = new MapDetails();
                             // surPlus.Percent = trtdata.pe;
                             map.Type = "QS";
+                            map.Premium = Convert.ToInt32(calulationDto.PremiumAmount);
                             if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 20)
                             {
                                 map.AllocationMethod = "Percentage";
@@ -1340,25 +1358,29 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             {
                                 map.AllocationBasedOn = "Retention + QS";
                             }
-
-
-
-
                             map.AllocatedRetention = "0";
                             map.AllocatedQS = "0";
                             map.TotalAllocation = "0";
 
                             maps.Add(map);
 
-                            mapDetails.Type = map.Type;
-                            mapDetails.Percentage = Convert.ToInt32(map.Percentage);
-                            mapDetails.Limit = Convert.ToInt32(map.Limit);
-                            mapDetails.AllocationBasis = map.AllocationBasis;
-                            mapDetails.NoOfLines = Convert.ToInt32(map.NoofLines);
-                            mapDetails.AllocatedAmount = 0;//need to get it from integration call value
-                            mapDetails.AllocatedPremium = 0;////need to get it from integration call value
-                            mapDetails1.Add(mapDetails);
 
+                            var QuotaType = map.Type;
+                            var QuotaPercentage = Convert.ToInt32(map.Percentage);
+                            var QuotaLimit = Convert.ToInt32(map.Limit);
+                            var QuotaAllocationBasis = map.AllocationBasis;
+                            var QuotaNoOfLines = "0";
+                            var QuotaAllocatedAmount = 0;
+                            var QuotaAllocatedPremium = 0;
+
+                            mapDetails.Type = QuotaType;
+                            mapDetails.Percentage = QuotaPercentage;
+                            mapDetails.Limit = QuotaLimit;
+                            mapDetails.AllocationBasis = QuotaAllocationBasis;
+                            mapDetails.NoOfLines = Convert.ToInt32(QuotaNoOfLines);
+                            mapDetails.AllocatedAmount = QuotaAllocatedAmount;//need to get it from integration call value
+                            mapDetails.AllocatedPremium = QuotaAllocatedPremium;////need to get it from integration call value
+                          //  mapDetails1.Add(mapDetails);
                             var tblparticipnatList = _context.TblParticipant.Where(s => s.TreatyId == trtdata.TreatyId).ToList();
                             foreach (var item1 in tblparticipnatList)
                             {
@@ -1377,16 +1399,26 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
 
                             }
-                            mapDetails.participants = participants;
-                            mapDetails1.Add(mapDetails);
+                          
+                           // mapDetails1.Add(mapDetails);
+                           // mapDetails.participants = participants;
 
                         }
-
+            
                     }
                     mapping.maps = maps;
 
                 }
+                mapDetails.participants=participants;
+
+                //  mapDetails.participants = participants;
+
+
+
+                mapDetails1.Add(mapDetails);
             }
+
+            var c = mapDetails1;
 
             List<Map> list = new List<Map>();
 
@@ -1398,8 +1430,57 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var data = await _integrationService.AllocationCalulation(list, from, To, apiContext);
 
             var listdata = data.ToList();
-            var filterData = listdata.Where(s => s.Period == 1).Select(s => s.RetentionAmount).ToList();
-            var data1 = filterData[0].ToString();
+            //var filterData = listdata.Where(s => s.Period == 1).Select(s => s.RetentionAmount).ToList();
+            //var data1 = filterData[0].ToString();
+
+            var count = 1;
+          foreach(var item in c)
+            {
+                if(item.Type=="Retention")
+                {
+                    var filterData = listdata.Where(s => s.Period == count).Select(s => s.RetentionAmount).ToList();
+                    var data1 = filterData[0].ToString();
+                    item.AllocatedAmount = Convert.ToDecimal(data1);
+
+                    //assigning for the premium
+
+                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OPremium).ToList();
+                    var Premiumdata1 = PreimunData[0].ToString();
+                    item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
+
+                }
+                if (item.Type == "QS")
+                {
+                    var qsdata= listdata.Where(s => s.Period == count).Select(s => s.QSAmount).ToList();
+                    var qsvalue = qsdata[0].ToString();
+                    item.AllocatedAmount = Convert.ToDecimal(qsvalue);
+
+
+                    //assigning Preimum
+
+                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OPremium).ToList();
+                    var Premiumdata1 = PreimunData[0].ToString();
+                    item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
+                }
+                if (item.Type == "Surplus")
+                {
+                    var qsdata = listdata.Where(s => s.Period == count).Select(s => s.SurplusProvAmount).ToList();
+                    var qsvalue = qsdata[0].ToString();
+                    item.AllocatedAmount = Convert.ToDecimal(qsvalue);
+
+
+
+                    //Premium Allocation
+
+                    var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OPremium).ToList();
+                    var Premiumdata1 = PreimunData[0].ToString();
+                    item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
+                }
+                count++;
+            }
+
+
+            var d = c;
 
             //Preparing Json 
             reallocatedDTO.MappingId = Convert.ToInt32(RIMappingDTO.RimappingId);
@@ -1408,14 +1489,38 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             reallocatedDTO.AllocationAmount = calulationDto.SumInsured;
             reallocatedDTO.PremiumAmount = calulationDto.PremiumAmount;
             reallocatedDTO.PolicyNumber = calulationDto.PolicyNo;
-            reallocatedDTO.Name = "";//i think i have to call policy to get the cover details
+            reallocatedDTO.Name = "0";//i think i have to call policy to get the cover details
 
 
+            reallocatedDTO.mapDetails = d;
 
-            reallocatedDTO.mapDetails = mapDetails1;
 
+          
             var test1 = reallocatedDTO;
 
+            //  var json=  JsonConvert.DeserializeObject<object>(test1);
+            try
+            {
+                TblRiallocation tblRiallocation = new TblRiallocation();
+
+                tblRiallocation.AllocationLevel = test1.Level;
+                tblRiallocation.ItemId = Convert.ToInt32(test1.Name);
+                tblRiallocation.AllocationAmount = test1.AllocationAmount;
+                tblRiallocation.Premium = test1.PremiumAmount;
+
+                string output = JsonConvert.SerializeObject(test1);
+                tblRiallocation.AllocationDetails = output;
+                tblRiallocation.PolicyNo = test1.PolicyNumber;
+                tblRiallocation.MappingId = test1.MappingId;
+
+                _context.TblRiallocation.Add(tblRiallocation);
+
+                _context.SaveChanges();
+            }
+            catch(Exception e)
+            {
+
+            }
 
             return null;
         }
