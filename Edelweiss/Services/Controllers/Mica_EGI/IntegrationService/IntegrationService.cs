@@ -33,7 +33,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
 
         //NEW CD METHOD
-        Task<dynamic> MasterCDACC(ExtCDDTO extCDDTO, ApiContext apiContext);
+        Task<MasterCDDTO> MasterCDACC(ExtCDDTO extCDDTO, ApiContext apiContext);
         Task<CDDailyDTO> GetDailyAccountDetails(string PolicyNo,int Month,int Year,ApiContext apiContext);
 
         //NEW Internal Policy Method for Account Number
@@ -148,16 +148,42 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
             return await PostApiInvoke<dynamic, dynamic>(uri, apiContext, dynamicData);
         }
 
-        public async Task<dynamic> MasterCDACC(ExtCDDTO extCDDTO, ApiContext apiContext)
+        public async Task<MasterCDDTO> MasterCDACC(ExtCDDTO extCDDTO, ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Accounts/MasterCDACC";
-            return await PostApiInvoke<ExtCDDTO, dynamic>(uri, apiContext, extCDDTO);
+            var FinalResult = await PostApiInvoke<ExtCDDTO, MasterCDDTO>(uri, apiContext, extCDDTO);
+
+            if (FinalResult.Status == BusinessStatus.Created)
+            {
+                return FinalResult;
+            }
+            else
+            {
+                return null;
+            }
+
         }
 
         public async Task<dynamic> InternalGetPolicyDetailsByNumber(string PolicyNo, ApiContext apiContext)
         {
-            var uri = PolicyUrl + "/api/Policy/InternalGetPolicyDetailsByNumber?policyNumber=" + PolicyNo;
-            return await GetApiInvoke<dynamic>(uri, apiContext);
+            try
+            {
+                var uri = PolicyUrl + "/api/Policy/InternalGetPolicyDetailsByNumber?policyNumber=" + PolicyNo;
+                var finalresult = await GetApiInvoke<dynamic>(uri, apiContext);
+
+                if (finalresult.ToString() == "System.Object")
+                {
+                    return null;
+                }
+                else
+                {
+                    return finalresult;
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
          public async Task<dynamic> InternalGetProposalDetailsByNumber(string proposalNumber, ApiContext apiContext)
         {
@@ -249,7 +275,7 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
                     {
                         return serviceResponse;
                     }
-                }
+                }                             
             }
             return new TResponse();
         }

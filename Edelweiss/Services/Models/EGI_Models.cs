@@ -849,5 +849,28 @@ namespace iNube.Services.MicaExtension_EGI.Models
 
     }
 
+    public class MasterCDDTO
+    {
+
+        public MasterCDDTO()
+        {
+            CdTransactionsDTO = new List<MasterCdTransactionsDTO>();
+
+        }
+        public string AccountNo { get; set; }
+        public List<MasterCdTransactionsDTO> CdTransactionsDTO { get; set; }
+        public BusinessStatus Status { get; set; }
+        public string ResponseMessage { get; set; }
+        public List<ErrorInfo> ErrorInfo { get; set; }
+    }
+
+    public class MasterCdTransactionsDTO
+    {
+        public decimal ProductId { get; set; }
+        public string TxnType { get; set; }
+        public decimal Amount { get; set; }
+        public string PaymentReferenceNo { get; set; }
+
+    }
 }
 

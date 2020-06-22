@@ -320,6 +320,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 if (carCheck == false)
                 {
+                    var validation = await PolicyVehicleCheck(scheduleDTO.PolicyNo, scheduleDTO.VehicleRegistrationNo,context);
+
+                    if(validation.Status != BusinessStatus.Ok)
+                    {
+                        response.ResponseMessage = validation.ResponseMessage;
+                        response.Status = validation.Status;
+                        response.Errors = validation.Errors;
+                        return response;
+                    }
+
                     DateTime indianTime = System.DateTime.UtcNow.AddMinutes(330);
                     mapData.CreatedDate = indianTime;
                     mapData.ModifyCount = 0;
@@ -1037,7 +1047,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             response.ResponseMessage = "The Switch is Already AUTO ON";
                             response.Status = BusinessStatus.Ok;
-                            errorInfo.ErrorMessage = "The Vehicle Number:  " + VehicleRegistrationNo + "  is already Auto ON Due to Schedule";
+                            errorInfo.ErrorMessage = "The Switch is already ON you cannot ON it again";
                             errorInfo.ErrorCode = "ExtSWT010";
                             errorInfo.PropertyName = "AUTOSwitchON";
                             response.Errors.Add(errorInfo);
@@ -1204,7 +1214,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             response.ResponseMessage = "The Switch is Already AUTO ON";
                             response.Status = BusinessStatus.Ok;
-                            errorInfo.ErrorMessage = "The Vehicle Number:  " + VehicleRegistrationNo + "  is already Auto ON Due to Schedule";
+                            errorInfo.ErrorMessage = "The Switch is already ON you cannot ON it again";
                             errorInfo.ErrorCode = "ExtSWT010";
                             errorInfo.PropertyName = "AUTOSwitchON";
                             response.Errors.Add(errorInfo);
@@ -2030,8 +2040,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     response.ResponseMessage = "The Switch Cannot be Off for the Day as Premium is Charged";
                     response.Status = BusinessStatus.Ok;
-                    errorInfo.ErrorMessage = "The Vehicle Number: " + VehicleRegistrationNo + " Cannot be Switched OFF Now";
-                    errorInfo.ErrorCode = "ExtSWT007";
+                    errorInfo.ErrorMessage = "The Switch Cannot be Off for the Day as Premium is Charged";
+                    errorInfo.ErrorCode = "ExtSWT005";
                     errorInfo.PropertyName = "NoSwitchOff";
                     response.Errors.Add(errorInfo);
 
@@ -6961,7 +6971,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var DifferenceAmount = monthlySIDTO.PaidAmount - MonthlySIData.TotalAmountChargeable;
 
-                if (DifferenceAmount >= -1)
+                if (DifferenceAmount >= -1 && DifferenceAmount<=1)
                 {                 
 
                     var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(MonthlySIData.PremiumDetails);
@@ -7021,10 +7031,10 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             }
             else
             {
-                response.ResponseMessage = "Invalid Policy Number";
+                response.ResponseMessage = "Due date for the provided policy number is yet to be generated.";
                 response.Id = monthlySIDTO.PolicyNumber;       
                 response.Status = BusinessStatus.NotFound;
-                errorInfo.ErrorMessage = "Policy Number Not Found";
+                errorInfo.ErrorMessage = "Due date for the provided policy number is yet to be generated.";
                 errorInfo.ErrorCode = "MSI002";
                 errorInfo.PropertyName = "PolicyNumber";
                 response.Errors.Add(errorInfo);
@@ -8582,7 +8592,70 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return true;
         }
-              
+
+        private async Task<ResponseStatus> PolicyVehicleCheck(string PolicyNumber, string VehicleNumber, ApiContext apiContext)
+        {
+            ResponseStatus response = new ResponseStatus();
+            ErrorInfo errorInfo = new ErrorInfo();
+           
+            try
+            {
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, apiContext);
+
+                if (PolicyData != null)
+                {
+                    var VehicleRiskItem = PolicyData["InsurableItem"][1]["RiskItems"];
+
+                    List<string> VehicleNoList = new List<string>();
+
+                    foreach (var item in VehicleRiskItem)
+                    {
+                        string Vehicle = item["Vehicle Number"].ToString();
+                        VehicleNoList.Add(Vehicle);
+                    }
+
+                    var CheckVehicle = VehicleNoList.Contains(VehicleNumber);
+
+                    if(CheckVehicle == true)
+                    {
+                        response.Status = BusinessStatus.Ok;
+                    }
+                    else
+                    {
+                        response.ResponseMessage = "Provided vehicle number doesn’t exist in the policy.";
+                        response.Status = BusinessStatus.PreConditionFailed;
+                        errorInfo.ErrorMessage = "Provided vehicle number doesn’t exist in the policy.";
+                        errorInfo.ErrorCode = "EXTCUS003";
+                        errorInfo.PropertyName = "VehicleNumber";
+                        response.Errors.Add(errorInfo);
+                    }
+
+                }
+                else
+                {
+                    response.ResponseMessage = "Policy number is invalid.";
+                    response.Status = BusinessStatus.PreConditionFailed;
+                    errorInfo.ErrorMessage = "Policy number is invalid.";
+                    errorInfo.ErrorCode = "EXTCUS002";
+                    errorInfo.PropertyName = "PolicyNumber";
+                    response.Errors.Add(errorInfo);
+                    return response;
+                }
+            }
+            catch(Exception ex)
+            {
+                response.ResponseMessage = "Policy number is invalid.";
+                response.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Policy number is invalid.";
+                errorInfo.ErrorCode = "EXTCUS002";
+                errorInfo.PropertyName = "PolicyNumber";
+                response.Errors.Add(errorInfo);
+                return response;
+            }
+
+            return response;
+
+        }
     }
 }
 
