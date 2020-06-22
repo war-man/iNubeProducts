@@ -6,7 +6,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Icon from "@material-ui/core/Icon";
 import Chart from "react-google-charts";
 // @material-ui/icons
-//import Calendar from 'react-calendar';
+import Calendar from 'react-calendar';
 // core components
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
@@ -671,9 +671,9 @@ class AVODashboard extends React.Component {
                                 </h3>
                             </CardHeader>
 
-                            {/* <CardBody>
+                            <CardBody>
                                 <Calendar />
-                            </CardBody>*/}
+                            </CardBody>
                         </Card>
 
                         <Card>

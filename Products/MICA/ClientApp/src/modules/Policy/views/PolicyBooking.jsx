@@ -193,8 +193,7 @@ class PolicyBooking extends React.Component {
             body: JSON.stringify(this.state.fields)
         }).then(function (response) {
             return response.json();
-            }).then(data => {
-                console.log("data", data);
+        }).then(data => {
             if (data.status == 2) {
 
                 swal({

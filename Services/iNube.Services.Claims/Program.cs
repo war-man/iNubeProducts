@@ -18,41 +18,19 @@ namespace iNube.Services.Claims
         }
 
         //public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        //  WebHost.CreateDefaultBuilder(args)
-        //    .UseStartup<Startup>();
-        //For AWS : uncomment these below lines and comment the lines 20 to 23
-        //public static IWebHostBuilder CreateWebHostBuilder(string[] args)
-        //     {
-        //         var config = new ConfigurationBuilder()
-        //             .SetBasePath(Directory.GetCurrentDirectory())
-        //             .AddJsonFile("appsettings.json", optional: false)
-        //             .Build();
-        //         return WebHost.CreateDefaultBuilder(args)
-        //             .UseKestrel(options => options.AddServerHeader = false)
-        //             .UseUrls($"http://*:{config.GetValue<int>("Host:Port")}")
-        //             .UseStartup<Startup>();
-        //     }
-
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
-
+          //  WebHost.CreateDefaultBuilder(args)
+            //    .UseStartup<Startup>();
+		//For AWS : uncomment these below lines and comment the lines 20 to 23
+		 public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-
-
-
             var config = new ConfigurationBuilder()
-
-               .SetBasePath(Directory.GetCurrentDirectory())
-
-               .AddJsonFile("appsettings.json", optional: false)
-
-               .Build();
-
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
             return WebHost.CreateDefaultBuilder(args)
-
+                .UseKestrel(options => options.AddServerHeader = false)
                 .UseUrls($"http://*:{config.GetValue<int>("Host:Port")}")
-
                 .UseStartup<Startup>();
-
         }
     }
 }
