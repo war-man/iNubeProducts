@@ -68,6 +68,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             }
 
         }
+
         public async Task<TblProducts> ReUpdateProductModel(TblProducts objProductmodel, ApiContext apiContext)
         {
 
@@ -135,7 +136,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return objProductmodel;
 
         }
-
 
         //For invoice generation-- displaying line item details in email pdf
         public async Task<BillingEventResponseDTO> BillingEventResponse(Models.BillingEventRequest pDTO, ApiContext apiContext)
@@ -321,6 +321,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             var productDTOs = _mapper.Map<IList<ProductDTO>>(products_list);
             return productDTOs;
         }
+
         //Excel upload
         public async Task<DocumentResponse> Documentupload(HttpRequest httpRequest, CancellationToken cancellationToken, ApiContext apiContext)
         {
@@ -537,6 +538,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //}
             //return DemoResponse<List<BankFileDTO>>.GetResult(2, "Data still processing");
         }
+
         //
 
         //search for products
@@ -964,7 +966,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         }
 
-
         public async Task<List<ProductClausesWarrentiesExclusionsDTO>> CWEDetails(int LOBId, int CWETypeID, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1220,7 +1221,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             }
         }
 
-
         public async Task<ProductResponse> GetProductGWP(ProductDTO productDTO, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1266,8 +1266,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             return ddDTOs;
         }
-
-
 
         public async Task<ProductRiskDetailsDTO> GetInsurableRiskDetails(decimal ProductId, string type, ApiContext apiContext)
         {
@@ -1404,6 +1402,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return DTO;
 
         }
+
         public async Task<List<LeadInfoDTO>> BulkSMS(ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1679,6 +1678,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 return new ProductResponse() { Status = BusinessStatus.NotFound, ResponseMessage = $"PromoCode is not valid" };
             }
         }
+
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<dynamic> GetProductRateConfig(int productid, ApiContext apiContext)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -1718,8 +1718,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return null;
         }
 
-
-
         public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1727,6 +1725,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             return val;
         }
+
         public async Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
@@ -1778,51 +1777,59 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return result;
         }
 
-        public async Task<DynamicEntityDTO> SaveEntities(DynamicEntityDTO dynamicEntity, ApiContext apiContext)
+        public async Task<EntityDetailsDTO> SaveEntities(EntityDetailsDTO entityDetails, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _mapper.Map<TblDynamicEntity>(dynamicEntity);
-            _context.TblDynamicEntity.Add(data);
+            var data = _mapper.Map<TblEntityDetails>(entityDetails);
+            _context.TblEntityDetails.Add(data);
             _context.SaveChanges();
 
-            var _result = _mapper.Map<DynamicEntityDTO>(data);
+            var _result = _mapper.Map<EntityDetailsDTO>(data);
             return _result;
         }
 
-        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntities(string type, ApiContext apiContext)
+        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntities(string type, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblDynamicEntity.Select(a => a).ToList();
+            var data = _context.TblEntityDetails.Select(a => a)
+                .Include(a => a.TblEntityAttributes)
+                .ToList();
 
             if (!string.IsNullOrEmpty(type))
             {
                 data = data.Where(a => a.Type == type).Select(a => a).ToList();
             }
 
-            var result = _mapper.Map<List<DynamicEntityDTO>>(data);
-            var componenttype = _context.TblmasDynamic.Select(a => a);
+            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
+            var componentType = _context.TblmasDynamic.Select(a => a);
+
             foreach (var item in result)
             {
-                item.ComponentType = componenttype.FirstOrDefault(a => a.Id == item.FieldType).Value;
+                foreach (var item1 in item.EntityAttributes)
+                {
+                    item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                }
             }
+
             return result;
         }
 
-        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
+        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblDynamicEntity.Where(a => a.Type == type).Select(a => a).ToList();
+            var data = _context.TblEntityAttributes.Where(a => a.Type == type).Select(a => a).ToList();
 
-
+            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             var componentType = _context.TblmasDynamic.Select(a => a);
-
-            var result = _mapper.Map<List<DynamicEntityDTO>>(data);
             foreach (var item in result)
             {
-                item.ComponentType = componentType.FirstOrDefault(a => a.Id == item.FieldType).Value;
+                foreach (var item1 in item.EntityAttributes)
+                {
+                    item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                }
             }
 
             return result;

@@ -581,17 +581,17 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<DynamicEntityDTO> SaveEntities(DynamicEntityDTO dynamicEntity, ApiContext apiContext)
+        public async Task<EntityDetailsDTO> SaveEntities(EntityDetailsDTO entityDetails, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntities(string type, ApiContext apiContext)
+        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntities(string type, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
+        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

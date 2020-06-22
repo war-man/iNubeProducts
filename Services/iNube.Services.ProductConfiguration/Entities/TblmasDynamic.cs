@@ -7,13 +7,13 @@ namespace iNube.Services.ProductConfiguration.Entities
     {
         public TblmasDynamic()
         {
-            TblDynamicEntity = new HashSet<TblDynamicEntity>();
+            TblEntityAttributes = new HashSet<TblEntityAttributes>();
         }
 
         public decimal Id { get; set; }
         public string FieldType { get; set; }
         public string Value { get; set; }
 
-        public virtual ICollection<TblDynamicEntity> TblDynamicEntity { get; set; }
+        public virtual ICollection<TblEntityAttributes> TblEntityAttributes { get; set; }
     }
 }

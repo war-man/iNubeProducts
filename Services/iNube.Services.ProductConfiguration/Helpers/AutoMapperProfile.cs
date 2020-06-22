@@ -96,7 +96,11 @@ namespace iNube.Services.ProductConfiguration.Helpers
 
             CreateMap<DynamicProduct, TblDynamicProduct>().ReverseMap();
 
-            CreateMap<DynamicEntityDTO, TblDynamicEntity>().ReverseMap();
+            CreateMap<EntityDetailsDTO, TblEntityDetails>().ReverseMap();
+            CreateMap<EntityAttributesDTO, TblEntityAttributes>().ReverseMap();
+
+            CreateMap<EntityDetailsDTO, TblEntityDetails>()
+            .ForMember(dest => dest.TblEntityAttributes, opt => opt.MapFrom(src => src.EntityAttributes)).ReverseMap();
 
             CreateMap<MasDynamicDTO, TblmasDynamic>().ReverseMap();
         }

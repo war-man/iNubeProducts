@@ -1088,9 +1088,28 @@ namespace iNube.Services.ProductConfiguration.Models
         public string Value { get; set; }
     }
 
-    public partial class DynamicEntityDTO
+    public partial class EntityDetailsDTO
+    {
+        public EntityDetailsDTO()
+        {
+            EntityAttributes = new HashSet<EntityAttributesDTO>();
+        }
+
+        public decimal EntityId { get; set; }
+        public string EnitityName { get; set; }
+        public string EntityLevel { get; set; }
+        public string ParentId { get; set; }
+        public string Type { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+
+        public virtual ICollection<EntityAttributesDTO> EntityAttributes { get; set; }
+    }
+
+    public partial class EntityAttributesDTO
     {
         public decimal Id { get; set; }
+        public decimal EntityId { get; set; }
         public decimal? FieldType { get; set; }
         public string ComponentType { get; set; }
         public string EntityLevel { get; set; }
@@ -1103,8 +1122,5 @@ namespace iNube.Services.ProductConfiguration.Models
         public bool? FutureDate { get; set; }
         public string Checked { get; set; }
         public string ParentId { get; set; }
-        public string Type { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
     }
 }

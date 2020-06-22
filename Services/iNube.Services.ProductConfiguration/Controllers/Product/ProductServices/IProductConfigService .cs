@@ -52,9 +52,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<MasDTO>> GetRiskParam(string lMasterlist, ApiContext apiContext);
         Task<List<MappingDto>> CreateMapping(MappingListDto MapDto, ApiContext apiContext);
         Task<IEnumerable<MasDTO>> GetPSDMasterData(string masterlist, ApiContext apiContext);
-        Task<DynamicEntityDTO> SaveEntities(DynamicEntityDTO dynamicEntity, ApiContext apiContext);
-        Task<IEnumerable<DynamicEntityDTO>> SearchEntities(string type, ApiContext apiContext);
-        Task<IEnumerable<DynamicEntityDTO>> SearchEntitiesByType(string type, ApiContext apiContext);
+        Task<EntityDetailsDTO> SaveEntities(EntityDetailsDTO entityDetails, ApiContext apiContext);
+        Task<IEnumerable<EntityDetailsDTO>> SearchEntities(string type, ApiContext apiContext);
+        Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext);
         Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext);
     }
 }
