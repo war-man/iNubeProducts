@@ -1,5 +1,6 @@
 ﻿using iNube.Services.Dispatcher.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,17 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService
     {
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
-        readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+        //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+
+        private IConfiguration _configuration;
+        readonly string UsermanangementUrl;
+        private static readonly HttpClient _httpClient = new HttpClient();
+        public IntegrationService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            UsermanangementUrl = _configuration["Integration_Url:User:UserUrl"];
+        }
+
 
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {

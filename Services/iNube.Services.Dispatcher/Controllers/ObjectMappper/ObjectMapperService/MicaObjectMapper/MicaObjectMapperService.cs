@@ -17,6 +17,8 @@ using System.Dynamic;
 using iNube.Services.Dispatcher.Entities;
 using iNube.Services.Dispatcher.Helpers;
 using iNube.Services.Dispatcher.Models;
+using Microsoft.Extensions.Configuration;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService.MicaObjectMapper
 {
@@ -25,16 +27,23 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService
         private MICADTContext _context;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
+        private IConfiguration _configuration;
         private readonly Func<string, IObjectMapperService> _ratingService;
+        private ILoggerManager _logger;
 
-        public MicaObjectMapperService(Func<string, IObjectMapperService> ratingService, IMapper mapper, MICADTContext context,
+
+        public MicaObjectMapperService(Func<string, IObjectMapperService> ratingService, ILoggerManager logger, IMapper mapper, MICADTContext context, IConfiguration configuration,
             IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
             _appSettings = appSettings.Value;
+            _configuration = configuration;
             _context = context;
             _ratingService = ratingService;
+            _logger = logger;
         }
+
+       
 
         //Service COde Dynamic Mapper Check
         //public async Task<object> DynamicMapper(dynamic inputModel, string mappingname, ApiContext apiContext)
@@ -49,7 +58,7 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService
         //    }
         //    var tbl_mapper = _context.TblMapper.FirstOrDefault(x => x.MapperName == mappingname);
         //    var mapperid = tbl_mapper.MapperId;
-            
+
         //    IEnumerable<MappingDetailsDTO> riskparmeters = null;
         //    riskparmeters = _context.TblMapperDetails.Where(s => s.MapperId == mapperid)
         //                      .Select(c => new MappingDetailsDTO
@@ -172,10 +181,9 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService
         //    return parent;
         //}
 
-
         public async Task<dynamic> DynamicMapper(dynamic Obj, string mapName, ApiContext apiContext)
         {
-            _context = (MICADTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
+            _context = (MICADTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             //IEnumerable<TblObjMapDetails> MapDetails = _context.TblObjMapDetails.Where(x => x.ObjMapCode == mapName).Select(x => x);// Contains the source and target from database
             var MapDetails = from tblMapper in _context.TblMapper

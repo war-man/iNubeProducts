@@ -3,6 +3,7 @@
 using iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService.IntegrationServices;
 using iNube.Services.Dispatcher.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -73,10 +74,10 @@ namespace iNube.Services.Dispatcher.Helpers
             return dbConnectionString;
         }
 
-        public static async Task<DbContext> GetContextAsync(string product, string connectionKey)
+        public static async Task<DbContext> GetContextAsync(string product, string connectionKey, IConfiguration configuration)
         {
             DbContext context = null;
-            DbHelper dbHelper = new DbHelper(new IntegrationService());
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
 

@@ -19,6 +19,7 @@ using iNube.Services.Dispatcher.Helpers;
 using iNube.Services.Dispatcher.Models;
 using iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.IntegrationServices;
 using iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService.MicaObjectMapper;
+using Microsoft.Extensions.Configuration;
 
 namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.MicaDispatcher
 {
@@ -29,9 +30,10 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
         private MICADTContext _context;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
+        private IConfiguration _configuration;
         private readonly Func<string, IDispatcherService> _ratingService;
 
-        public MicaDispatcherService(Func<string, IDispatcherService> ratingService, IMapper mapper, MICADTContext context, IIntegrationService integrationService, MicaObjectMapperService micaService,
+        public MicaDispatcherService(Func<string, IDispatcherService> ratingService, IMapper mapper, MICADTContext context, IIntegrationService integrationService, MicaObjectMapperService micaService, IConfiguration configuration,
         IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
@@ -40,6 +42,7 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
             _ratingService = ratingService;
             _integrationService = integrationService;
             _micaService = micaService;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<DispatcherParamListDTO>> GetParameterByEvent(string DisptcherName, string Object, string Event, ApiContext Context)
@@ -56,8 +59,9 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
             return null;
         }
 
-        public async Task<object> DispatcherEvent(dynamic DispatcherEventObject,string EventType,ApiContext Context)
+        public async Task<object> DispatcherEvent(dynamic DispatcherEventObject,string EventType,ApiContext apiContext)
         {
+            _context = (MICADTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             //var dispatcherTaskList = _context.TblDispatcher.Include(add => add.TblDispatcherTask).Include("TblDispatcherTask.TblDispatcherTaskDetails");
             var dispatcherTaskList = _context.TblDispatcher.Where(it => it.DispatcherTaskName == EventType).Include(add => add.TblDispatcherTask);
 
@@ -70,7 +74,7 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
                 {
                     if (it.InputObject == item.InputObject)
                     {
-                        var apiCall = await _integrationService.DipatcherApiCall(DispatcherEventObject.TxnObject, it.Api, Context);
+                        var apiCall = await _integrationService.DipatcherApiCall(DispatcherEventObject.TxnObject, it.Api, apiContext);
                         if (it.OutputTypeObject == "JSONObj")
                         {
                             Type mType = apiCall.GetType();
@@ -96,7 +100,7 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Mic
                     }
                     else
                     {
-                        var apiCall = await _integrationService.DipatcherApiCall(dict[it.InputObject], it.Api, Context);
+                        var apiCall = await _integrationService.DipatcherApiCall(dict[it.InputObject], it.Api, apiContext);
                         if (it.OutputTypeObject == "JSONObj")
                         {
                             Type mType = apiCall.GetType();

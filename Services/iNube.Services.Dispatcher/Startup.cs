@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation.AspNetCore;
+using HealthChecks.UI.Client;
 using iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService;
 using iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.AvoDispatcher;
 using iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.IntegrationServices;
@@ -16,10 +17,13 @@ using iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService.Mot
 using iNube.Services.Dispatcher.Entities;
 using iNube.Services.Dispatcher.Helpers;
 using iNube.Utility.Framework.Extensions;
+using iNube.Utility.Framework.Extensions.DefaultSecurityHeader;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Notification;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,14 +67,45 @@ namespace iNube.Services.Dispatcher
             
             services.AddHealthChecks().AddSqlServer(micaconnectionstring);
             services.AddAutoMapper(typeof(Startup));
+
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                //options.HttpsPort = 5001;
+            });
         }
 
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.InitializedCommonConfiguration(env, Configuration);
-            // app.ConfigureExceptionHandler(new LoggerManager(Configuration));
-            app.ConfigureCustomExceptionMiddleware(new LoggerManager(Configuration));
+            //app.InitializedCommonConfiguration(env, Configuration);
+            // global cors policy
+            app.UseCors(x => x
+             .AllowAnyOrigin()
+             .AllowAnyMethod()
+             .AllowAnyHeader()
+             .AllowCredentials());
+            app.UseHealthChecks("/hc", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = Configuration["Swagger:Url"].ToString() + "/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/" + Configuration["Swagger:Url"].ToString() + "/" + Configuration["Swagger:Version"].ToString() + "/swagger.json", Configuration["Swagger:Name"].ToString());
+                c.RoutePrefix = Configuration["Swagger:Url"].ToString();
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -80,8 +115,14 @@ namespace iNube.Services.Dispatcher
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.ConfigureExceptionHandler(new LoggerManager(Configuration));
             app.UseAuthentication();
             app.UseHttpsRedirection();
+            app.UseSecurityHeadersMiddleware(new SecurityHeadersBuilder()
+              .AddFrameOptionsSameOrigin()
+              .AddXssProtectionEnabled()
+              .AddContentTypeOptionsNoSniff()
+            );
             app.UseMvc();
         }
         private void ConfigureModuleService(IServiceCollection services)

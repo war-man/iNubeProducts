@@ -1,5 +1,6 @@
 ﻿using iNube.Services.Dispatcher.Models;
 using iNube.Utility.Framework.Model;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,11 +23,21 @@ namespace iNube.Services.Dispatcher.Controllers.Dispatcher.DispatcherService.Int
     {
 
         //readonly string UsermanangementUrl = "https://localhost:44367";
-        readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+        //readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+        private IConfiguration _configuration;
+        readonly string UsermanangementUrl;
+        readonly string Billing;
+        private static readonly HttpClient _httpClient = new HttpClient();
+        public IntegrationService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            UsermanangementUrl = _configuration["Integration_Url:User:UserUrl"];
+            Billing = _configuration["Integration_Url:Billing:BillingUrl"];
 
+        }
         public async Task<List<string>> GetObjectEventDetailsAsync(int Object, int Event, ApiContext apiContext)
         {
-            var uri = "https://inubeservicesbilling.azurewebsites.net/api/Billing/GetObjectEvent?obj="+ Object+ "&"+ "eve="+ Event;
+            var uri = Billing + "/api/Billing/GetObjectEvent?obj="+ Object+ "&"+ "eve="+ Event;
             var data = await GetApiInvoke<List<string>>(uri, apiContext);
             return data;
         }

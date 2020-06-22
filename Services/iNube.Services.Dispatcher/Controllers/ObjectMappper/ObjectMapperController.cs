@@ -7,6 +7,7 @@ using AutoMapper;
 using iNube.Services.Dispatcher.Controllers.ObjectMapper.ObjectMapperService;
 using iNube.Services.Dispatcher.Helpers;
 using iNube.Utility.Framework;
+using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,6 +53,12 @@ namespace iNube.Services.Dispatcher.Controllers.ObjectMapper
         //    var response = await _objectService.DynamicMapperCheck(Obj, mapName, Context);
         //    return Ok(response);
         //}
-
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HC()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
     }
 }
