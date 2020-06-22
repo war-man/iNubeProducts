@@ -4462,10 +4462,150 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                     return engineResponse1;
 
-                // case "EndorsementAdd":
+                case "EndorsementAdd":
+                    List<RuleEngineResponse> engineResponse2 = new List<RuleEngineResponse>();
+                    RuleEngineResponse ruleEngine1 = new RuleEngineResponse();
+                    try
+                    {
+                        var VehicleRiskItem = SourceObject["InsurableItem"][0]["RiskItems"];
+                        string PayRefNo = SourceObject["PaymentInfo"][0]["RefrenceNumber"].ToString();
+                        JArray vehicleItems = (JArray)VehicleRiskItem;
+                        int vehicleCount = vehicleItems.Count();
+                        string Year = DateTime.Today.Year.ToString();
+                        //string PolicyNumber = SourceObject["PolicyNumber"].ToString();
+                        //var policydata = await _integrationService.GetPolicyDetails(PolicyNumber, context);
 
-                //    case "EndorsementDel":
+                        //var policyRiskData = policydata["InsurableItem"][1]["RiskItems"];
 
+
+                        if (!String.IsNullOrWhiteSpace(PayRefNo))
+                        {
+                            ruleEngine1 = new RuleEngineResponse();
+                            ruleEngine1.ValidatorName = "RefrenceNumber";
+                            ruleEngine1.Outcome = "Success";
+                            ruleEngine1.Message = "Validation done for Payment Refrence number";
+                            ruleEngine1.Code = "EXEA005";
+                            engineResponse2.Add(ruleEngine1);
+                            successcount++;
+                        }
+                        else
+                        {
+                            ruleEngine1 = new RuleEngineResponse();
+                            ruleEngine1.ValidatorName = "RefrenceNumber";
+                            ruleEngine1.Outcome = "Fail";
+                            ruleEngine1.Message = "RefrenceNumber - Mandatory input parameter missing.";
+                            ruleEngine1.Code = "EXEA005";
+                            engineResponse2.Add(ruleEngine1);
+                            failcount++;
+                        }
+                        foreach (var item in VehicleRiskItem)
+                        {
+                            var vehicleType = item["Vehicle Type"];
+                            string YearOfRegistration = item["Year of Registration"].ToString();
+                            if (vehicleType == "PC" || vehicleType == "TW")
+                            {
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "Vehicle Type";
+                                ruleEngine1.Outcome = "Success";
+                                ruleEngine1.Message = "Validation done for vehicle type mismatch";
+                                ruleEngine1.Code = "EXEA006";
+                                engineResponse2.Add(ruleEngine1);
+                                successcount++;
+
+                            }
+                            else
+                            {
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "Vehicle Type";
+                                ruleEngine1.Outcome = "Fail";
+                                ruleEngine1.Message = "Vehicle type mismatch";
+                                ruleEngine1.Code = "EXEA006";
+                                engineResponse2.Add(ruleEngine1);
+                                failcount++;
+
+                            }
+
+                        }
+
+                        if (failcount > 0)
+                        {
+                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                            res4obj.ValidatorName = "Final Result";
+                            res4obj.Outcome = "Fail";
+                            res4obj.Message = "One or More conditions failed";
+                            res4obj.Code = "EXEA009";
+                            engineResponse2.Add(res4obj);
+                        }
+                        else
+                        {
+                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                            res4obj.ValidatorName = "Final Result";
+                            res4obj.Outcome = "Success";
+                            res4obj.Message = "Conditions Successful";
+                            res4obj.Code = "EXEA010";
+                            engineResponse2.Add(res4obj);
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                    return engineResponse2;
+
+                case "EndorsementDel":
+                    List<RuleEngineResponse> engineResponse4 = new List<RuleEngineResponse>();
+                    RuleEngineResponse ruleEngine2 = new RuleEngineResponse();
+                    try
+                    {
+                        var EndorsementType = SourceObject["EndorsementType"];
+
+                        if (EndorsementType == "Deletion of vehicle")
+                        {
+                            ruleEngine2 = new RuleEngineResponse();
+                            ruleEngine2.ValidatorName = "Endorsement Type";
+                            ruleEngine2.Outcome = "Success";
+                            ruleEngine2.Message = "Validation done for endorsement type mismatch";
+                            ruleEngine2.Code = "EXED001";
+                            engineResponse4.Add(ruleEngine2);
+                            successcount++;
+                        }
+                        else
+                        {
+                            ruleEngine2 = new RuleEngineResponse();
+                            ruleEngine2.ValidatorName = "Endorsement Type";
+                            ruleEngine2.Outcome = "Fail";
+                            ruleEngine2.Message = "Endorsement Type mismatch";
+                            ruleEngine2.Code = "EXED001";
+                            engineResponse4.Add(ruleEngine2);
+                            failcount++;
+                        }
+                        if (failcount > 0)
+                        {
+                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                            res4obj.ValidatorName = "Final Result";
+                            res4obj.Outcome = "Fail";
+                            res4obj.Message = "One or More conditions failed";
+                            res4obj.Code = "EXED002";
+                            engineResponse4.Add(res4obj);
+                        }
+                        else
+                        {
+                            RuleEngineResponse res4obj = new RuleEngineResponse();
+                            res4obj.ValidatorName = "Final Result";
+                            res4obj.Outcome = "Success";
+                            res4obj.Message = "Conditions Successful";
+                            res4obj.Code = "EXED003";
+                            engineResponse4.Add(res4obj);
+
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                    return engineResponse4;
 
                 //   return CdModel;
 
@@ -7208,29 +7348,19 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 }
 
-                if (NoOfVehicles > 0 && NoOfVehicles <= 3)
+                if (NoOfVehicles > 3)
                 {
-                    if (NoOfPC >= 1)
-                    {
-                        ruleEngine = new RuleEngineResponse();
-                        ruleEngine.ValidatorName = "noOfPC";
-                        ruleEngine.Outcome = "Success";
-                        ruleEngine.Message = "Validation done for minimum one PC required";
-                        ruleEngine.Code = "GEPO010";
-                        engineResponse.Add(ruleEngine);
-                        successcount++;
-                    }
-                    else
-                    {
-                        ruleEngine = new RuleEngineResponse();
-                        ruleEngine.ValidatorName = "noOfPC";
-                        ruleEngine.Outcome = "Fail";
-                        ruleEngine.Message = "Minimum One PC required";
-                        ruleEngine.Code = "GEPO010";
-                        engineResponse.Add(ruleEngine);
-                        failcount++;
-                    }
 
+                    ruleEngine = new RuleEngineResponse();
+                    ruleEngine.ValidatorName = "noOfVehicles";
+                    ruleEngine.Outcome = "Fail";
+                    ruleEngine.Message = "Number of vehicles is exceeding the limit defined";
+                    ruleEngine.Code = "GEPO009";
+                    engineResponse.Add(ruleEngine);
+                    failcount++;
+                }
+                else
+                {
                     ruleEngine = new RuleEngineResponse();
                     ruleEngine.ValidatorName = "noOfVehicles";
                     ruleEngine.Outcome = "Success";
@@ -7240,15 +7370,29 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     successcount++;
 
                 }
-                else
+
+                if (NoOfVehicles >= 0 && NoOfVehicles <= 3)
                 {
-                    ruleEngine = new RuleEngineResponse();
-                    ruleEngine.ValidatorName = "noOfVehicles";
-                    ruleEngine.Outcome = "Fail";
-                    ruleEngine.Message = "Number of vehicles is exceeding the limit defined";
-                    ruleEngine.Code = "GEPO009";
-                    engineResponse.Add(ruleEngine);
-                    failcount++;
+                    if (NoOfPC == 0)
+                    {
+                        ruleEngine = new RuleEngineResponse();
+                        ruleEngine.ValidatorName = "noOfPC";
+                        ruleEngine.Outcome = "Fail";
+                        ruleEngine.Message = "Minimum One PC required";
+                        ruleEngine.Code = "GEPO010";
+                        engineResponse.Add(ruleEngine);
+                        failcount++;
+                    }
+                    else
+                    {
+                        ruleEngine = new RuleEngineResponse();
+                        ruleEngine.ValidatorName = "noOfPC";
+                        ruleEngine.Outcome = "Success";
+                        ruleEngine.Message = "Validation done for minimum One PC required";
+                        ruleEngine.Code = "GEPO010";
+                        engineResponse.Add(ruleEngine);
+                        successcount++;
+                    }
 
                 }
 
