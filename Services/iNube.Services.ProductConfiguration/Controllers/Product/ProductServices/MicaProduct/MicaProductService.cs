@@ -1802,15 +1802,29 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             }
 
             var result = _mapper.Map<List<DynamicEntityDTO>>(data);
+            var componenttype = _context.TblmasDynamic.Select(a => a);
+            foreach (var item in result)
+            {
+                item.ComponentType = componenttype.FirstOrDefault(a => a.Id == item.FieldType).Value;
+            }
             return result;
         }
 
-        public async Task<DynamicEntityDTO> SearchEntitiesByType(string type, ApiContext apiContext)
+        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblDynamicEntity.Where(a => a.Type == type).Select(a => a);
-            var result = _mapper.Map<DynamicEntityDTO>(data);
+            var data = _context.TblDynamicEntity.Where(a => a.Type == type).Select(a => a).ToList();
+
+
+            var componentType = _context.TblmasDynamic.Select(a => a);
+
+            var result = _mapper.Map<List<DynamicEntityDTO>>(data);
+            foreach (var item in result)
+            {
+                item.ComponentType = componentType.FirstOrDefault(a => a.Id == item.FieldType).Value;
+            }
+
             return result;
         }
 

@@ -591,7 +591,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<DynamicEntityDTO> SearchEntitiesByType(string type, ApiContext apiContext)
+        public async Task<IEnumerable<DynamicEntityDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

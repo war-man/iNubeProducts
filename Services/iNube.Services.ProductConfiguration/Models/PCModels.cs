@@ -1092,6 +1092,7 @@ namespace iNube.Services.ProductConfiguration.Models
     {
         public decimal Id { get; set; }
         public decimal? FieldType { get; set; }
+        public string ComponentType { get; set; }
         public string EntityLevel { get; set; }
         public string LabelText { get; set; }
         public string Name { get; set; }

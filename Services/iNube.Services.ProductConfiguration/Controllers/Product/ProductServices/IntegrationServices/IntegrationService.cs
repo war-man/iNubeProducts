@@ -15,23 +15,23 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
     public interface IIntegrationService
     {
         Task<string> GetEnvironmentConnection(string product, decimal EnvId);
-        Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID,ApiContext apiContext);
-        Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext);
+        Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID, ApiContext apiContext);
+        Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string  PartnerUrl, UserUrl, RatingUrl;
+        readonly string PartnerUrl, UserUrl, RatingUrl;
 
-       // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
-       ////readonly string partnerUrl = "https://localhost:44315";
-        
-        
-       // //readonly string UsermanangementUrl = "https://localhost:44367";
-       // readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
-       // //readonly string RatingUrl = "http://localhost:58593";
-       // readonly string RatingUrl = "https://inubeservicesrating.azurewebsites.net";
+        // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
+        ////readonly string partnerUrl = "https://localhost:44315";
+
+
+        // //readonly string UsermanangementUrl = "https://localhost:44367";
+        // readonly string UsermanangementUrl = "https://inubeservicesusermanagement.azurewebsites.net";
+        // //readonly string RatingUrl = "http://localhost:58593";
+        // readonly string RatingUrl = "https://inubeservicesrating.azurewebsites.net";
 
 
 
@@ -41,8 +41,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             _configuration = configuration;
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
             PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
-            UserUrl = _configuration["Integration_Url:User:UserUrl"];
-          
+            //UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            UserUrl = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
+
 
         }
 
@@ -54,13 +55,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             var result = await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
             return result.Dbconnection;
         }
-        public async Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID,ApiContext apiContext)
+        public async Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID, ApiContext apiContext)
         {
             var uri = PartnerUrl + "/api/Partner/GetMasterDataAsync?sMasterlist=Product&partnerId=" + pID;
             return await GetListApiInvoke<AssignProductList>(uri, apiContext);
         }
 
-        public async Task<TResponse> GetApiInvoke<TResponse>(string url,ApiContext apiContext) where TResponse : new()
+        public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();
             if (!string.IsNullOrEmpty(apiContext.Token))
@@ -82,13 +83,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             }
             return new TResponse();
         }
-        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url , ApiContext apiContext) where TResponse : new()
+        public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             try
             {
 
-           
-            HttpClient client = new HttpClient();
+
+                HttpClient client = new HttpClient();
                 //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 //client.BaseAddress = new Uri(url);
@@ -98,17 +99,17 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                     client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
                 using (var response = await client.GetAsync(url))
-            using (var content = response.Content)
-            {
-                if (response.IsSuccessStatusCode)
+                using (var content = response.Content)
                 {
-                    var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
-                    if (serviceResponse != null)
+                    if (response.IsSuccessStatusCode)
                     {
-                        return serviceResponse;
+                        var serviceResponse = await content.ReadAsAsync<IEnumerable<TResponse>>();
+                        if (serviceResponse != null)
+                        {
+                            return serviceResponse;
+                        }
                     }
                 }
-            }
 
 
             }
@@ -127,7 +128,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             return await GetApiInvoke<CustomerSettingsDTO>(uri, apiContext);
 
         }
-        private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri,ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        private async Task<TResponse> PostApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
         {
             try
             {
@@ -150,7 +151,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                 {
                     using (var content = response.Content)
                     {
-                            return await content.ReadAsAsync<TResponse>();
+                        return await content.ReadAsAsync<TResponse>();
                     }
                 }
             }
@@ -159,10 +160,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
 
                 return new TResponse();
             }
-           
+
         }
 
-        private async Task<IEnumerable<TResponse>> PostListApiInvoke<TRequest, TResponse>(string requestUri,ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
+        private async Task<IEnumerable<TResponse>> PostListApiInvoke<TRequest, TResponse>(string requestUri, ApiContext apiContext, TRequest request) where TRequest : new() where TResponse : new()
         {
             try
             {
@@ -203,9 +204,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         //    //return await PostApiInvoke<ProductDTO>(uri, apiContext);
         //    return await PostApiInvoke<PolicyBilingDataDTO,ProductBilingDataDTO>(uri, apiContext, pDTO);
         //}
-        
-        
-        public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist,ApiContext apiContext)
+
+
+        public async Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext)
         {
             var uri = RatingUrl + "/api/RatingConfig/GetHandleEventsMaster?lMasterlist=" + lMasterlist;
 
