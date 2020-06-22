@@ -147,7 +147,9 @@ namespace iNube.Services.ProductConfiguration.Entities
             {
                 entity.ToTable("tblDynamicEntity", "PC");
 
-                entity.Property(e => e.Id).HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.Id)
+                    .HasColumnType("numeric(18, 0)")
+                    .ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Checked).HasMaxLength(250);
 
