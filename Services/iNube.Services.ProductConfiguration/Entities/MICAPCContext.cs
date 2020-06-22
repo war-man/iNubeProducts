@@ -171,7 +171,7 @@ namespace iNube.Services.ProductConfiguration.Entities
 
                 entity.Property(e => e.ParentId).HasMaxLength(40);
 
-                entity.Property(e => e.Type).HasMaxLength(1);
+                entity.Property(e => e.Type).HasMaxLength(250);
 
                 entity.Property(e => e.Value).HasMaxLength(250);
 
