@@ -41,8 +41,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             _configuration = configuration;
             RatingUrl = _configuration["Integration_Url:Rating:RatingUrl"];
             PartnerUrl = _configuration["Integration_Url:Partner:PartnerUrl"];
-            //UserUrl = _configuration["Integration_Url:User:UserUrl"];
-            UserUrl = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
+            UserUrl = _configuration["Integration_Url:User:UserUrl"];
+            //UserUrl = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
 
 
         }
