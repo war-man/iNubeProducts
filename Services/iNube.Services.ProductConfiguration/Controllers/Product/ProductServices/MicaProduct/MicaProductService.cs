@@ -1854,7 +1854,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.EntityId == Convert.ToDecimal(id)).Select(a => a).ToList();
+            var data = _context.TblEntityDetails.Where(a => a.EntityId == Convert.ToDecimal(id))
+                .Include(a => a.TblEntityAttributes)
+                .Select(a => a).ToList();
 
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             var componentType = _context.TblmasDynamic.Select(a => a);
