@@ -525,9 +525,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchEntitiesByType(string type)
+        public async Task<IActionResult> SearchEntitiesByEntityId(int id)
         {
-            var response = await _productService.SearchEntitiesByType(type, Context);
+            var response = await _productService.SearchEntitiesByEntityId(id, Context);
             return Ok(response);
         }
 
@@ -539,9 +539,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetParentid()
+        public async Task<IActionResult> GetAllEntities()
         {
-            var response = await _productService.GetParentid(Context);
+            var response = await _productService.GetAllEntities(Context);
             return Ok(response);
         }
 

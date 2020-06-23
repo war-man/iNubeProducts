@@ -54,8 +54,8 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<MasDTO>> GetPSDMasterData(string masterlist, ApiContext apiContext);
         Task<EntityDetailsDTO> SaveEntities(EntityDetailsDTO entityDetails, ApiContext apiContext);
         Task<IEnumerable<EntityDetailsDTO>> SearchEntities(string type, ApiContext apiContext);
-        Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext);
+        Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByEntityId(int id, ApiContext apiContext);
         Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext);
-        Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext);
+        Task<IEnumerable<ddDTOs>> GetAllEntities(ApiContext apiContext);
     }
 }

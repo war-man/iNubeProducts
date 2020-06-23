@@ -1850,11 +1850,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return result;
         }
 
-        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
+        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByEntityId(int id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.Type == type).Select(a => a).ToList();
+            var data = _context.TblEntityDetails.Where(a => a.EntityId == Convert.ToDecimal(id)).Select(a => a).ToList();
 
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             var componentType = _context.TblmasDynamic.Select(a => a);
@@ -1878,7 +1878,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return result;
         }
 
-        public async Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext)
+        public async Task<IEnumerable<ddDTOs>> GetAllEntities(ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 

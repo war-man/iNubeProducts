@@ -1003,7 +1003,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
+        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByEntityId(int id, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
@@ -1013,7 +1013,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext)
+        public async Task<IEnumerable<ddDTOs>> GetAllEntities(ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
