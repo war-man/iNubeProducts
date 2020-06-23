@@ -376,7 +376,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
         public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByEntityId(int id, ApiContext apiContext)
         {
-            return await _productConfigService(apiContext.ProductType).SearchEntitiesByEntityId(int id, apiContext);
+            return await _productConfigService(apiContext.ProductType).SearchEntitiesByEntityId(id, apiContext);
         }
 
         public async Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext)
