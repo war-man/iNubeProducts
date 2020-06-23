@@ -725,5 +725,20 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return NotFound(response);
             }
         }
+       
+        [HttpPut]
+        public async Task<IActionResult> UpdateCardDetails(string PolicyNumber, decimal MobileNumber, decimal RefrenceNumber)
+        {
+            var response = await _policyService.UpdateCardDetails(PolicyNumber, MobileNumber, RefrenceNumber, Context);
+            switch (response.Status)
+            {
+                case BusinessStatus.Ok:
+                    return Ok(response);
+                case BusinessStatus.NotFound:
+                    return Ok(response);
+                default:
+                    return NotFound(response);
+            }
+        }
     }
 }

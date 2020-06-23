@@ -7333,6 +7333,35 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             
         }
 
+        public async Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, decimal MobileNumber, decimal RefrenceNumber, ApiContext apiContext)
+        {
+            //  _context = (MICAPOContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
+
+            // var connectionString = _configuration.GetConnectionString("PCConnection");
+            var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
+            var connectionString = dbConnectionString.Dbconnection;
+           
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand("[PO].[usp_PaymentRefUpdate]", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                //command.Parameters.AddWithValue("@Action", "Update");
+                command.Parameters.AddWithValue("@PolicyNumber", PolicyNumber);
+                command.Parameters.AddWithValue("@MobileNumber", MobileNumber);
+                command.Parameters.AddWithValue("@RefrenceNumber", RefrenceNumber);
+
+                command.CommandTimeout = 3600;
+                command.ExecuteNonQuery();
+
+                connection.Close();
+
+            }
+
+
+            return new ResponseStatus { Status = BusinessStatus.Ok, ResponseMessage = "Card Details updated successfully" };
+        }
+
     }
 
 

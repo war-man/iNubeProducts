@@ -79,5 +79,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<bool> ProposalCancellationScheduler(ApiContext apiContext);
         Task<bool> SmsScheduler(ApiContext apiContext);
         Task<ResponseStatus> PolicyActivate(ApiContext apiContext);
+        Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, decimal MobileNumber, decimal RefrenceNumber, ApiContext apiContext);
     }
 }

@@ -349,5 +349,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+        public Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, decimal MobileNumber, decimal RefrenceNumber, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
