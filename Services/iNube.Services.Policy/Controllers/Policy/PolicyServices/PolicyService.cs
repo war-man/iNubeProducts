@@ -89,6 +89,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         Task<bool> ProposalCancellationScheduler(ApiContext apiContext);
         Task<bool> SmsScheduler(ApiContext apiContext);
         Task<ResponseStatus> PolicyActivate(ApiContext apiContext);
+        Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, decimal MobileNumber, decimal RefrenceNumber, ApiContext apiContext);
 
     }
     public class PolicyService : IPolicyService
@@ -806,6 +807,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             return await _policyProductService(apiContext.ProductType).PolicyActivate(apiContext);
         }
-
+        public async Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, decimal MobileNumber, decimal RefrenceNumber, ApiContext apiContext)
+        {
+            return await _policyProductService(apiContext.ProductType).UpdateCardDetails(PolicyNumber, MobileNumber, RefrenceNumber, apiContext);
+        }
     }
 }
