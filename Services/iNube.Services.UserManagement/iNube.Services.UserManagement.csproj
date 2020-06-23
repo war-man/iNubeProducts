@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <AspNetCoreHostingModel>OutProcess</AspNetCoreHostingModel>
     <UserSecretsId>e07518df-6d62-494d-9080-d0111a6382f7</UserSecretsId>
   </PropertyGroup>
 

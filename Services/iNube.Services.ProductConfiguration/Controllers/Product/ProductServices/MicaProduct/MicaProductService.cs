@@ -1781,11 +1781,45 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _mapper.Map<TblEntityDetails>(entityDetails);
-            _context.TblEntityDetails.Add(data);
+            //var data = _mapper.Map<TblEntityDetails>(entityDetails);
+            TblEntityDetails tblEntity = _mapper.Map<TblEntityDetails>(entityDetails);
+
+            TblEntityAttributes tblEntityAttributes = new TblEntityAttributes();
+            foreach (var item in entityDetails.EntityAttributes)
+            {
+                tblEntityAttributes.FieldType = item.FieldType;
+                tblEntityAttributes.EntityLevel = entityDetails.EntityLevel;
+                tblEntityAttributes.LabelText = item.LabelText;
+                tblEntityAttributes.Name = item.Name;
+                tblEntityAttributes.Value = item.Value;
+                tblEntityAttributes.FilterName = item.FilterName;
+                tblEntityAttributes.ListObject = item.ListObject;
+                if ((item.Required).ToString() == "")
+                {
+                    tblEntityAttributes.Required = false;
+                }
+                else
+                {
+                    tblEntityAttributes.Required = item.Required;
+                }
+                if ((item.FutureDate).ToString() == "")
+                {
+                    tblEntityAttributes.FutureDate = false;
+                }
+                else
+                {
+                    tblEntityAttributes.FutureDate = item.FutureDate;
+                }
+                tblEntityAttributes.Checked = item.Checked;
+                tblEntityAttributes.ParentId = item.ParentId;
+                tblEntity.TblEntityAttributes.Add(tblEntityAttributes);
+            }
+
+            _context.TblEntityDetails.Add(tblEntity);
+
             _context.SaveChanges();
 
-            var _result = _mapper.Map<EntityDetailsDTO>(data);
+            var _result = _mapper.Map<EntityDetailsDTO>(tblEntity);
             return _result;
         }
 

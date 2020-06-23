@@ -56,6 +56,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<EntityDetailsDTO>> SearchEntities(string type, ApiContext apiContext);
         Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext);
         Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext);
-        Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext)
+        Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext);
     }
 }
