@@ -37,6 +37,7 @@ import ReinsuranceConfig from "modules/Reinsurance/ReinsuranceConfig.js";
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
 import validationPage from "modules/Accounts/views/ValidationPage.jsx";
 import { object } from "prop-types";
+
 const searchClose = {
     float: "right",
     position: 'relative',
@@ -70,8 +71,11 @@ class CreateTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            total:0,
+            addeddata:"",
             surplusmaslist: [],
             Treatyflag: false,
+            Brokerageflag:false,
             Treatymassage: "",
             higherlowerflag:false,
             allocationbasisflag: false,
@@ -91,7 +95,7 @@ class CreateTreaty extends React.Component {
             brodreuxfreq: "",
             ddllist:[],
             newdata: [],
-            reinsurername: "",
+            //reinsurername: "",
             flag: true,
             treatyCodeState: false,
             treatyDescriptionState: false,
@@ -133,7 +137,8 @@ class CreateTreaty extends React.Component {
             },
             participant: {
                 "reInsurerId": "",
-                "brokername":"",
+                "brokername": "",
+                "reinsurername":"",
                 "reInsurerBranchId": "",
                 "brokerId": "",
                 "brokerBranchId": "",
@@ -620,7 +625,8 @@ class CreateTreaty extends React.Component {
         this.state.treatyDTO.tblParticipant.push(this.state.participant);
         this.state.participant = {
             "reInsurerId": "",
-            "brokername":"",
+            "brokername": "",
+            "reinsurername":"",
             "reInsurerBranchId": "",
             "brokerId": "",
             "brokerBranchId": "",
@@ -798,7 +804,7 @@ class CreateTreaty extends React.Component {
                 .then(data => {
                     console.log("dataList: ", data);
                     if (data!=null) {
-                        this.state.reinsurername = data[0].participantName;
+                        this.state.participant.reinsurername = data[0].participantName;
                     }
                     this.setState({});
                 });
@@ -807,7 +813,7 @@ class CreateTreaty extends React.Component {
     onddlChange = (evt, name) => {
         const Data = this.state.participant;
         Data[evt.target.name] = evt.target.value;
-        this.setState({ Data });
+        this.setState({ Data, Brokerageflag:true });
         console.log("Data2:", this.state.treatyDTO)
         if (evt.target.name == 'brokerId') {
             this.state.brokerCode = this.state.bkmasterList[0].mdata.filter(x => x.mID == evt.target.value)[0].mValue;
@@ -855,6 +861,7 @@ class CreateTreaty extends React.Component {
         console.log("this.state.brokername", this.state.participant.brokername);
     }
     handleSaveTreaty = () => {
+       
         for (var i = 0; i <= this.state.datename.length - 1; i++) {
 
             this.state.treatyDTO[this.state.datename[i]] = this.state.datetime[i];
@@ -862,24 +869,49 @@ class CreateTreaty extends React.Component {
         console.log("finalconverteddt", this.state.treatyDTO);
         this.state.treatyDTO.tblTreatyGroup = [... this.state.treatyDTO.tblTreatyGroup, ...this.state.treatydata];
         console.log("Treatydto", this.state.treatyDTO);
-        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveTreatyData`, {
-            method: 'Post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-            body: JSON.stringify(this.state.treatyDTO)
-        }).then(response => response.json())
-            .then(data => {
-                if (data.status == 2) {
-                    swal({
-                        text: data.responseMessage,
-                        icon: "success"
-                    });
-                }
-                console.log("dataresp", data);
-            })
+        //console.log(this.state.treatyDTO.tblParticipant[1].sharePercentage, 'vithal');
+        var previos = parseInt(this.state.treatyDTO.tblParticipant[0].sharePercentage);
+        //this.state.addeddata = parseInt(this.state.treatyDTO.tblParticipant[0].sharePercentage) + parseInt(this.state.treatyDTO.tblParticipant[1].sharePercentage);
+        //console.log("addeddata", this.state.addeddata);
+        if (this.state.treatyDTO.tblParticipant.length-1 < 1) {
+            this.state.total=parseInt(this.state.treatyDTO.tblParticipant[0].sharePercentage)
+        }
+        for (let j = 0; j < this.state.treatyDTO.tblParticipant.length-1; j++) {
+            debugger;
+            var current = parseInt(this.state.treatyDTO.tblParticipant[j].sharePercentage);
+            var data = previos + parseInt(this.state.treatyDTO.tblParticipant[j + 1].sharePercentage);
+            previos = data;
+            console.log(data, "data1");
+            this.state.total= data;
+            console.log(this.state.total, 'total1')
+        }
+        console.log(this.state.total,'total1')
+        if (this.state.total == 100) {
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveTreatyData`, {
+                method: 'Post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(this.state.treatyDTO)
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.status == 2) {
+                        swal({
+                            text: data.responseMessage,
+                            icon: "success"
+                        });
+                    }
+                    console.log("dataresp", data);
+                })
+        }
+        else {
+            swal({
+                text: "Share% should be 100",
+                icon: "error"
+            });
+        }
     }
     dataTable = () => {
         let ParticipantList = this.state.treatyDTO.tblParticipant;
@@ -887,10 +919,10 @@ class CreateTreaty extends React.Component {
             newdata: ParticipantList.map((prop, key) => {
                 console.log("trtprop", prop, ParticipantList, this.state.ddllist, this.state.reinsurername);
                 return {
-                    id: key,
+                    id: key + 1,
                     reinsurercodeId: prop.reInsurerId,
                     //this.state.ddllist.filter(x => x.reinsurercodeId == ParticipantList[key].reinsurercodeId)[0].mValue,
-                    reinsurername: this.state.reinsurername,
+                    reinsurername: prop.reinsurername,
                     brokername: prop.brokername,
                     //this.state.reinsurername,
                     ribranchcodeId: prop.reInsurerBranchId,
@@ -908,7 +940,7 @@ class CreateTreaty extends React.Component {
                 };
             })
         });
-      
+       
 
     }
     onBlur = () => {
@@ -944,7 +976,7 @@ class CreateTreaty extends React.Component {
                             treatyCodeState={this.state.treatyCodeState} Treatyflag={this.state.Treatyflag} Treatymassage={this.state.Treatymassage} treatyDescriptionState={this.state.treatyDescriptionState} allocationmasList={this.state.allocationmasList}
                             handleRadioChange={this.handleRadioChange} treatyDTO={this.state.treatyDTO} masterList={this.state.masterList} onInputChange={this.onInputChange} onInputChange1={this.onInputChange1} onBlur={this.onBlur} tblArrangement={this.state.tblArrangement} onddChange={this.onddChange} yearmasterList={this.state.yearmasterList} onDateChange={this.onDateChange} />
                         {this.state.showTreatyGrp && <TPDetails TreatytableData={this.state.TreatytableData} participantstableData={this.state.participantstableData} participantdata={this.state.participantdata} bkmasterList={this.state.bkmasterList} masterList={this.state.masterList} onddlChange={this.onddlChange} participant={this.state.participant} newdata={this.state.newdata}
-                            onddChange={this.onddChange} onparticipantInputChange={this.onparticipantInputChange} AddParticipant={this.AddParticipant} showparticipantgrid={this.state.showparticipantgrid} treatyDTO={this.state.treatyDTO} rimasterList={this.state.rimasterList} bcmasterList={this.state.bcmasterList} bkbcmasterList={this.state.bkbcmasterList} reinsurername={this.state.reinsurername} />
+                            onddChange={this.onddChange} onparticipantInputChange={this.onparticipantInputChange} AddParticipant={this.AddParticipant} Brokerageflag={this.state.Brokerageflag} showparticipantgrid={this.state.showparticipantgrid} treatyDTO={this.state.treatyDTO} rimasterList={this.state.rimasterList} bcmasterList={this.state.bcmasterList} bkbcmasterList={this.state.bkbcmasterList} reinsurername={this.state.reinsurername} />
 
                         }
 

@@ -18,7 +18,7 @@ let DashboardConfigUrl = Baseurl;
 let dynamicPagesConfigUrl = Baseurl;
 let RDLCConfigUrl = Baseurl;
 let ReinsuranceConfigUrl = Baseurl;
-let ExtensionUrl = Baseurl;
+let ExtensionUrl = Baseurl; 
 let NotificationUrl = Baseurl;
 if (env === "EdelweissProd") {
     Baseurl = 'https://egiswitchapi.edelweissinsurance.com';

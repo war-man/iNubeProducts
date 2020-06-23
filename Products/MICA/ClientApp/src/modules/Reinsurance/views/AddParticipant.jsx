@@ -94,7 +94,7 @@ const AddParticipant = (props) => {
                         <MasterDropdown
                             labelText="ReinsurerCode"
                                 id="ddlstatus"
-                                required={true}
+                                //required={true}
                              lstObject={props.componentData.rimasterList}
                              filterName='Reinsurer'
                              value={treatyDto.reInsurerId}
@@ -108,7 +108,7 @@ const AddParticipant = (props) => {
                             <CustomInput
                                 labelText="ReinsurerName"
                                 id="ReinsurerName"
-                                value={props.componentData.reinsurername}
+                                value={treatyDto.reinsurername}
                                 name='reinsurername'
                                 onChange={(e)=>prop.onparticipantInputChange(e)}
                                 formControlProps={{
@@ -177,6 +177,7 @@ const AddParticipant = (props) => {
                             <CustomInput
                                 labelText="Share"
                                 id="remarks"
+                                required={true}
                                 value={treatyDto.sharePercentage}
                                 name='sharePercentage'
                                 onChange={(e) => prop.onparticipantInputChange(e)}
@@ -185,20 +186,20 @@ const AddParticipant = (props) => {
                                 }}
                             />
                         </GridItem>
-
-                        <GridItem xs={12} sm={12} md={4}>
-                            <CustomInput
-                                labelText="Brokage"
-                                id="remarks"
-                                value={treatyDto.brokeragePercentage}
-                                name='brokeragePercentage'
-                                onChange={(e) => prop.onparticipantInputChange(e)}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                        </GridItem>
-
+                        {prop.Brokerageflag &&
+                            <GridItem xs={12} sm={12} md={4}>
+                                <CustomInput
+                                    labelText="Brokage"
+                                    id="remarks"
+                                    value={treatyDto.brokeragePercentage}
+                                    name='brokeragePercentage'
+                                    onChange={(e) => prop.onparticipantInputChange(e)}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }}
+                                />
+                            </GridItem>
+                        }
                         <GridItem xs={12} sm={12} md={4}>
                             <CustomInput
                                 labelText="RICommision"

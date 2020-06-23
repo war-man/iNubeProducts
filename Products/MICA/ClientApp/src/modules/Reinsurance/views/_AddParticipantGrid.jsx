@@ -70,6 +70,12 @@ const ParticipantGrid = (props) => {
                         filterable
                         columns={[
                             {
+                                Header: "SNo",
+                                accessor: "id",
+                                minWidth: 40,
+                                headerClassName: 'react-table-center'
+                            },
+                            {
                                 Header: "Reinsurer Code",
                                 accessor: "reinsurercodeId",
                                 minWidth: 40,

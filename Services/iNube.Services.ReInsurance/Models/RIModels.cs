@@ -46,6 +46,7 @@ namespace iNube.Services.ReInsurance.Models
         public string AllocatedQS { get; set; }
         public string AllocationBasedOn { get; set; }
         public string NoofLines { get; set; }
+        public int Premium { get; set; }
 
     }
     public partial class TblArrangementDto
@@ -562,6 +563,7 @@ namespace iNube.Services.ReInsurance.Models
     public int NoOfLines { get; set; }
     public decimal AllocatedAmount { get; set; }
     public decimal AllocatedPremium { get; set; }
+   
     public List<Participant> participants { get; set; }
 
     }
@@ -601,8 +603,10 @@ namespace iNube.Services.ReInsurance.Models
         public string OAllocatedRetention { get; set; }
         public string OAllocatedQS { get; set; }
         public string OTotalAllocated { get; set; }
-       
-        
+        public string OPremium { get; set; }
+
+
+
 
 
     }
