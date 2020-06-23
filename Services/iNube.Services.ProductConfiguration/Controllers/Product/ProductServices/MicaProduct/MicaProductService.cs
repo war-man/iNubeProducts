@@ -1820,7 +1820,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityAttributes.Where(a => a.Type == type).Select(a => a).ToList();
+            var data = _context.TblEntityDetails.Where(a => a.Type == type).Select(a => a).ToList();
 
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             var componentType = _context.TblmasDynamic.Select(a => a);
@@ -1842,6 +1842,19 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             var result = _mapper.Map<List<DynamicProduct>>(data);
             return result;
+        }
+
+        public async Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = _context.TblEntityDetails.Select(a => new ddDTOs
+            {
+                mID = Convert.ToInt32(a.EntityId),
+                mValue = a.EnitityName,
+            }).ToList();
+
+            return data;
         }
     }
 }

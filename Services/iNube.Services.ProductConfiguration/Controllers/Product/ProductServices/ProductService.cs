@@ -70,6 +70,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         Task<IEnumerable<EntityDetailsDTO>> SearchEntities(string type, ApiContext apiContext);
         Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext);
         Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext);
+        Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext);
     }
 
     public class ProductService : IProductService
@@ -381,6 +382,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         public async Task<List<DynamicProduct>> GetDynamicProduct(string type, ApiContext apiContext)
         {
             return await _productConfigService(apiContext.ProductType).GetDynamicProduct(type, apiContext);
+        }
+
+        public async Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext)
+        {
+            return await _productConfigService(apiContext.ProductType).GetParentid(apiContext);
         }
     }
 }

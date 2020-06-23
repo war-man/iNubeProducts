@@ -1012,5 +1012,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             throw new NotImplementedException();
         }
+
+        public async Task<IEnumerable<ddDTOs>> GetParentid(ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

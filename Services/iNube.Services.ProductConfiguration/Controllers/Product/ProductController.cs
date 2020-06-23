@@ -538,6 +538,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetParentid()
+        {
+            var response = await _productService.GetParentid(Context);
+            return Ok(response);
+        }
 
         [HttpGet]
         [AllowAnonymous]
