@@ -1784,36 +1784,36 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             //var data = _mapper.Map<TblEntityDetails>(entityDetails);
             TblEntityDetails tblEntity = _mapper.Map<TblEntityDetails>(entityDetails);
 
-            TblEntityAttributes tblEntityAttributes = new TblEntityAttributes();
-            foreach (var item in entityDetails.EntityAttributes)
-            {
-                tblEntityAttributes.FieldType = item.FieldType;
-                tblEntityAttributes.EntityLevel = entityDetails.EntityLevel;
-                tblEntityAttributes.LabelText = item.LabelText;
-                tblEntityAttributes.Name = item.Name;
-                tblEntityAttributes.Value = item.Value;
-                tblEntityAttributes.FilterName = item.FilterName;
-                tblEntityAttributes.ListObject = item.ListObject;
-                if ((item.Required).ToString() == "")
-                {
-                    tblEntityAttributes.Required = false;
-                }
-                else
-                {
-                    tblEntityAttributes.Required = item.Required;
-                }
-                if ((item.FutureDate).ToString() == "")
-                {
-                    tblEntityAttributes.FutureDate = false;
-                }
-                else
-                {
-                    tblEntityAttributes.FutureDate = item.FutureDate;
-                }
-                tblEntityAttributes.Checked = item.Checked;
-                tblEntityAttributes.ParentId = item.ParentId;
-                tblEntity.TblEntityAttributes.Add(tblEntityAttributes);
-            }
+            //foreach (var item in entityDetails.EntityAttributes)
+            //{
+            //    TblEntityAttributes tblEntityAttributes = new TblEntityAttributes();
+            //    tblEntityAttributes.FieldType = item.FieldType;
+            //    tblEntityAttributes.EntityLevel = entityDetails.EntityLevel;
+            //    tblEntityAttributes.LabelText = item.LabelText;
+            //    tblEntityAttributes.Name = item.Name;
+            //    tblEntityAttributes.Value = item.Value;
+            //    tblEntityAttributes.FilterName = item.FilterName;
+            //    tblEntityAttributes.ListObject = item.ListObject;
+            //    if (item.Required == null)
+            //    {
+            //        tblEntityAttributes.Required = false;
+            //    }
+            //    else
+            //    {
+            //        tblEntityAttributes.Required = item.Required;
+            //    }
+            //    if (item.FutureDate == null)
+            //    {
+            //        tblEntityAttributes.FutureDate = false;
+            //    }
+            //    else
+            //    {
+            //        tblEntityAttributes.FutureDate = item.FutureDate;
+            //    }
+            //    tblEntityAttributes.Checked = item.Checked;
+            //    tblEntityAttributes.ParentId = item.ParentId;
+            //    tblEntity.TblEntityAttributes.Add(tblEntityAttributes);
+            //}
 
             _context.TblEntityDetails.Add(tblEntity);
 
