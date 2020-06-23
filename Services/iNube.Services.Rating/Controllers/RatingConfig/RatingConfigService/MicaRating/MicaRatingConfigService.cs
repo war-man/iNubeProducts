@@ -362,14 +362,20 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             {
                 _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             }
+            //Get rateObjFOr particular and IN main_rule Where condition is added
+            var ruleObj = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
+                          join tblParamset in _context.TblParameterSet on tblrate.RateObj equals tblParamset.ParameterSetName
+                          select new
+                          {
+                              ObjID = tblParamset.ParameterSetId
+                          }).FirstOrDefault();
             string[] words = RuleId.Split(',');
             var main_rule = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
                              join tblratingcondition in _context.TblRatingRules on tblrate.RatingId equals tblratingcondition.RatingId
                              join tblrulecondition in _context.TblRatingRuleConditions on tblratingcondition.RatingRuleId equals tblrulecondition.RatingRuleId
                              join tblparameter in _context.TblRatingParameters on tblrulecondition.RatingParameters equals tblparameter.ParametersId
-                             join tblparamsetdetails in _context.TblParameterSetDetails on tblparameter.ParametersId equals tblparamsetdetails.ParametersId  
-                             //where tblrules.RuleName == RuleName
-                             // where words.Contains(tblrate.RatingId.ToString())
+                             join tblparamsetdetails in _context.TblParameterSetDetails.Where(it => it.ParameterSetId == ruleObj.ObjID)
+                             on tblparameter.ParametersId equals tblparamsetdetails.ParametersId  
                              select new
                              {
                                  rulecondition_id = tblrulecondition.RatingRuleConditionId,
