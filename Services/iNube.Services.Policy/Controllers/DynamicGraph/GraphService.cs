@@ -24,7 +24,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         Task<IEnumerable<DashboardConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext);
         void DeleteParameter(int ReportConfigParamId, ApiContext apiContext);
         Task<DashboardConfigDTO> UpdateDashboard(DashboardConfigDTO reportConfigDTO, ApiContext apiContext);
-        Task<labelsDTO> GetLabels(int DashboardConfigParamId, ApiContext apiContext);
+        Task<object> GetLabels(int DashboardConfigParamId, ApiContext apiContext);
 
     }
 
@@ -85,7 +85,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         {
             return await _productService(apiContext.ProductType).UpdateDashboard(reportConfigDTO, apiContext);
         }
-        public async Task<labelsDTO> GetLabels(int DashboardConfigParamId, ApiContext apiContext)
+        public async Task<object> GetLabels(int DashboardConfigParamId, ApiContext apiContext)
         {
             return await _productService(apiContext.ProductType).GetLabels(DashboardConfigParamId, apiContext);
         }

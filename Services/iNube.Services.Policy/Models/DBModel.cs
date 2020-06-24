@@ -23,6 +23,7 @@ namespace iNube.Services.DynamicGraph.model
         public DashboardConfigDTO()
         {
             DashboardConfigParamDTO = new HashSet<DashboardConfigParamDTO>();
+           // AxisDetailsDTO = new AxisDetailsDTO();
         }
 
         public int DashboardConfigId { get; set; }
@@ -32,8 +33,14 @@ namespace iNube.Services.DynamicGraph.model
         public DateTime? CreatedDate { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? ModifiedDate { get; set; }
-
+        //public string AxisDetails { get; set; }
+        //public string XAxisLable { get; set; }
+        //public string YAxisLable { get; set; }
+        //public string ChartType { get; set; }
+        //public string Title { get; set; }
+        public AxisDetailsDTO AxisDetailsDTO { get; set; }
         public virtual ICollection<DashboardConfigParamDTO> DashboardConfigParamDTO { get; set; }
+        //public ICollection<AxisDetailsDTO> AxisDetailsDTO { get; set; }
     }
 
     public partial class DashboardConfigParamDTO
@@ -88,5 +95,13 @@ namespace iNube.Services.DynamicGraph.model
     public class EnvironmentsResponse : ResponseStatus
     {
         public string Dbconnection { get; set; }
+    }
+
+    public class AxisDetailsDTO
+    {
+        public string XAxisLable { get; set; }
+        public string YAxisLable { get; set; }
+        public string ChartType { get; set; }
+        public string Title { get; set; }
     }
 }

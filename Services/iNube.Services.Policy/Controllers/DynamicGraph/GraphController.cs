@@ -120,9 +120,9 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
 
         }
         [HttpGet]
-        public async Task<IActionResult> GetLabels(int DashboardConfigParamId)
+        public async Task<IActionResult> GetLabels(int DashboardConfigId)
         {
-            var axeslabels = await _graphService.GetLabels(DashboardConfigParamId,Context);
+            var axeslabels = await _graphService.GetLabels(DashboardConfigId,Context);
             return Ok(axeslabels);
 
         }

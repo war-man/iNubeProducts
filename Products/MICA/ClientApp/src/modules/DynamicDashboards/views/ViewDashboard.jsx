@@ -45,7 +45,9 @@ class ViewDashboard extends React.Component {
         this.state = {
             labels: {
                 xaxis: "",
-                yaxis: ""
+                yaxis: "",
+                chartType: "",
+                title:"",
             },
             title: "",
             showgraph: false,
@@ -81,13 +83,13 @@ class ViewDashboard extends React.Component {
                 paramList: [],
             },
             displayparameter: {},
-            SpecificData: [['Task', 'Hours per Day'],
-            ['A', 13,],
-            ['B', 2],
-            ['C', 2],
-            ['D', 2],
-            ['E', 7],
-            ['F', 7]
+            SpecificData: [['Task', 'Hours per Day','test'],
+            ['A', 13, 21],
+            ['B', 2,33],
+            ['C', 2,12],
+            ['D', 2,33],
+            ['E', 7,12],
+            ['F', 7,22]
             ],
             fields: {
                 ChartType: "ColumnChart",
@@ -274,7 +276,7 @@ class ViewDashboard extends React.Component {
                 this.setState({ otFlag: true });
             });
         console.log("ReportName", this.state.ReportConfigDto.ReportName);
-        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetLabels?DashboardConfigParamId=` + event.target.value, {
+        fetch(`${DashboardConfig.DashboardConfigUrl}/api/Graph/GetLabels?DashboardConfigId=` + event.target.value, {
             //fetch(`https://localhost:44351/api/Graph/GetLabels?DashboardConfigParamId=` + event.target.value, {
             method: 'GET',
             headers: {
@@ -285,8 +287,11 @@ class ViewDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                this.state.labels.xaxis = data.xaxis;
-                this.state.labels.yaxis = data.yaxis;
+                this.state.labels.xaxis = data.XAxisLable;
+                this.state.labels.yaxis = data.YAxisLable;
+                this.state.labels.chartType = data.ChartType;
+                this.state.labels.title = data.Title;
+                console.log("label data", data);
                 //console.log("labels: ", this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1));
             });
 
@@ -408,7 +413,7 @@ class ViewDashboard extends React.Component {
             .then(data => {
                 debugger;
                 this.state.graphData = [];
-                if (this.state.labels.xaxis != null && this.state.labels.xaxis != null) {
+                if (this.state.labels.xaxis != null && this.state.labels.yaxis != null) {
                     let strLength = this.state.labels.xaxis.length;
                     if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
                         this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
@@ -452,14 +457,17 @@ class ViewDashboard extends React.Component {
                     //    arr.push(m.column2);
                     //    arr.push(m.column1);
                     //}
-                    let splitdate = m.column2.toString().split('-');
-                    if (splitdate.length >= 2) {
-                        if (m.column2 != undefined) {
-                            m.column2 = new Date(m.column2).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
-                        }
-                    } 
+
+                    //Date change
+                    //let splitdate = m.column2.split('-');
+                    //if (splitdate.length >= 2) {
+                    //    if (m.column2 != undefined) {
+                    //        m.column2 = new Date(m.column2).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
+                    //    }
+                    //} 
                     arr.push(m.column2);
                     arr.push(m.column1);
+                    //arr.push(m.column3);
                     this.state.graphData.push(arr);
                     console.log("graphdata", this.state.graphData, arr);
                 });
@@ -720,7 +728,7 @@ class ViewDashboard extends React.Component {
                                     hAxis: {title: this.state.labels.xaxis},
                                     vAxis: { title: this.state.labels.yaxis },//This is for Y axis Labeling
                                     bar: { groupWidth: "95%" },
-                                    isStacked: true,
+                                    //isStacked: true,
                                     is3D: true,
                                     showRowNumber: true,
                                     allowHtml: true,

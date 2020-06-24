@@ -17,6 +17,7 @@ namespace iNube.Services.Policy.Entities.DynamicGraphEntities
         public DateTime? CreatedDate { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string AxisDetails { get; set; }
 
         public virtual ICollection<TblDashboardConfigParam> TblDashboardConfigParam { get; set; }
     }

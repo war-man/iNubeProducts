@@ -56,6 +56,8 @@ class DashboardConfiguration extends React.Component {
                 RangeTypeId: "",
                 DataTypeId: "",
                 ParameterName: "",
+                XAxisLable: "",
+                YAxisLable:"",
             },
             QueryDto: {
                 //Select: "Select",
@@ -218,6 +220,12 @@ class DashboardConfiguration extends React.Component {
         console.log(sendArray, 'Sending Array');
         if (this.state.ReportObjParam.length > 0) {
             let isActive = 1;
+            var axisDetailsJson = {
+                'xAxisLable': this.state.ReportConfigDto.XAxisLable,
+                'yAxisLable': this.state.ReportConfigDto.YAxisLable,
+                'chartType': null,
+                'title': this.state.ReportConfigDto.ReportName
+            };
             var data = {
                 'dashboardConfigName': this.state.ReportConfigDto.ReportName,
                 'dbschema': this.state.ReportConfigDto.DBSchemaId,
@@ -226,6 +234,7 @@ class DashboardConfiguration extends React.Component {
                 // 'query': this.state.QueryDto.Select +" "+ this.state.QueryDto.Parameter +" "+ this.state.QueryDto.From +" "+ this.state.QueryDto.Table,
                 'query': this.state.QueryDto.Query,
                 'DashboardConfigParamDTO': sendArray,
+                'AxisDetailsDTO': axisDetailsJson
             };
           fetch (`${DashboardConfig.DashboardConfigUrl}/api/Graph/SaveConfigParameters`, {
              //fetch(`https://localhost:44351/api/Graph/SaveConfigParameters`, {
@@ -293,7 +302,7 @@ class DashboardConfiguration extends React.Component {
                                                 formControlProps={{ fullWidth: true }} />
                                         </GridItem>
 
-                                        <GridItem xs={12} sm={12} md={4}>
+                                        <GridItem xs={12} sm={12} md={3}>
                                             <MasterDropdown
                                                 labelText="DBSchema"
                                                 id="ReportConfig.DBSchemaId"
@@ -319,7 +328,7 @@ class DashboardConfiguration extends React.Component {
                                                 formControlProps={{ fullWidth: true }} />
                                         </GridItem>
 
-                                        <GridItem xs={12} sm={12} md={4}>
+                                        <GridItem xs={12} sm={12} md={3}>
                                             <MasterDropdown
                                                 labelText="RangeType"
                                                 id="ReportConfig.RangeTypeId"
@@ -335,7 +344,7 @@ class DashboardConfiguration extends React.Component {
                                             />
                                         </GridItem>
 
-                                        <GridItem xs={12} sm={12} md={4}>
+                                        <GridItem xs={12} sm={12} md={3}>
                                             <MasterDropdown
                                                 labelText="DataType"
                                                 id="ReportConfig.DataTypeId"
@@ -351,6 +360,26 @@ class DashboardConfiguration extends React.Component {
                                             />
                                         </GridItem>
 
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <CustomInput
+                                                labelText="X Axis Lable"
+                                                required={true}
+                                                value={this.state.ReportConfigDto.XAxisLable}
+                                                name='XAxisLable'
+                                                onChange={(e) => this.onInputChange("string", e)}
+                                                formControlProps={{ fullWidth: true }} />
+                                        </GridItem>
+
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <CustomInput
+                                                labelText="Y Axis Lable"
+                                                required={true}
+                                                value={this.state.ReportConfigDto.YAxisLable}
+                                                name='YAxisLable'
+                                                onChange={(e) => this.onInputChange("string", e)}
+                                                formControlProps={{ fullWidth: true }} />
+                                        </GridItem>
+
                                         <GridItem>
                                             <Button id="round" style={{ marginTop: '25px' }} color="info" onClick={() => this.addConfigParameter()}> <TranslationContainer translationKey="AddParameter" />  </Button>
                                         </GridItem>
@@ -358,7 +387,7 @@ class DashboardConfiguration extends React.Component {
                                     </GridContainer>
                                 </div>
                             </CardBody>
-                        </Animated>
+                        </Animated> 
                     </Card>
                     : <PageContentLoader />}
 

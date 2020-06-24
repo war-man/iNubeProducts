@@ -16,6 +16,10 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Data.Common;
 using iNube.Services.DynamicGraph.model;
+using Newtonsoft.Json;
+using System.Reflection;
+using iNube.Utility.Framework.Core.Helpers;
+using System.Collections;
 
 namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
 {
@@ -56,6 +60,17 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
                 _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
                 var dto = _mapper.Map<TblDashboardConfig>(dashboardConfigDTO);
+               
+                //To store as Json
+                AxisDetailsDTO axisDetailsDTO = new AxisDetailsDTO();
+                axisDetailsDTO.XAxisLable = dashboardConfigDTO.AxisDetailsDTO.XAxisLable;
+                axisDetailsDTO.YAxisLable = dashboardConfigDTO.AxisDetailsDTO.YAxisLable;
+                axisDetailsDTO.ChartType = dashboardConfigDTO.AxisDetailsDTO.ChartType;
+                axisDetailsDTO.Title = dashboardConfigDTO.AxisDetailsDTO.Title;
+
+                string output = JsonConvert.SerializeObject(axisDetailsDTO);
+                dto.AxisDetails = output;
+
                 _context.TblDashboardConfig.Add(dto);
                 _context.SaveChanges();
                 var paramDto = _mapper.Map<DashboardConfigDTO>(dto);
@@ -241,16 +256,45 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
                 throw ex;
             }
         }
-        public async Task<labelsDTO> GetLabels(int dashboardConfigId, ApiContext apiContext)
+
+        public PropertyInfo[] GetProperties(object obj)
+        {
+            return obj.GetType().GetProperties();
+        }
+
+        public async Task<object> GetLabels(int dashboardConfigId, ApiContext apiContext)
         {
             _context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-           
-            var axeslabels = _context.TblDashboardConfigParam.Where(a => a.DashboardConfigId == dashboardConfigId).FirstOrDefault();
-            labelsDTO labelsDTO = new labelsDTO();
-            labelsDTO.Xaxis = axeslabels.XaxisLable;
-            labelsDTO.Yaxis = axeslabels.YaxisLable;
-            var labels = _mapper.Map<labelsDTO>(labelsDTO);
-            return labels;
+
+            // var axeslabels = _context.TblDashboardConfig.Where(a => a.DashboardConfigId == dashboardConfigId).FirstOrDefault();
+            //labelsDTO labelsDTO = new labelsDTO();
+            //labelsDTO.Xaxis = axeslabels.XaxisLable;
+            //labelsDTO.Yaxis = axeslabels.YaxisLable;
+            // var labels = _mapper.Map<DashboardConfigDTO>(axeslabels);
+
+            // var data = labels.axis;
+            //return labels;
+
+            // var axeslabels = _context.TblDashboardConfig.FirstOrDefault(a => a.DashboardConfigId == dashboardConfigId);
+            var data = _context.TblDashboardConfig.Where(a => a.DashboardConfigId == dashboardConfigId).Select(add => add.AxisDetails).ToList();
+            // var data = _context.TblDashboardConfig.FirstOrDefault(a => a.DashboardConfigId == dashboardConfigId).AxisDetails;
+            // var labels = _mapper.Map<DashboardConfigDTO>(axeslabels);
+            //  data.Select(a=>)
+           // List<object> Obj1AsObjects = data[0].Cast<object>().ToList();
+
+            //string output = JsonConvert.SerializeObject(Obj1AsObjects[0]);
+            //var json = JsonConvert.DeserializeObject<object>(axeslabels.AxisDetails.ToString());
+            
+
+
+            //var info =  json.GetType().GetProperty("XAxisLable");
+            //var c = info.GetValue(json, null);
+
+            var axisLabel = _context.TblDashboardConfig.Where(a => a.DashboardConfigId == dashboardConfigId).FirstOrDefault();
+            var json = JsonConvert.DeserializeObject<object>(axisLabel.AxisDetails.ToString());
+            return json;
+            
+
         }
     }
 }
