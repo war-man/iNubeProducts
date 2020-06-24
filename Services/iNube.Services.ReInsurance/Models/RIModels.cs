@@ -267,6 +267,32 @@ namespace iNube.Services.ReInsurance.Models
 
         public virtual ICollection<TblRimappingDetailDto> TblRimappingDetail { get; set; }
     }
+
+
+    public partial class TblRimappingDto1
+    {
+        public TblRimappingDto1()
+        {
+            TblRimappingDetail = new HashSet<TblRimappingDetailDto>();
+        }
+        public decimal RimappingId { get; set; }
+        public int? Year { get; set; }
+      
+
+        public string Level { get; set; }
+        public string LobProductCover { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public Guid? ModifiedBy { get; set; }
+        public string IsActive { get; set; }
+        public int? RetentionGroupId { get; set; }
+
+        public virtual ICollection<TblRimappingDetailDto> TblRimappingDetail { get; set; }
+    }
+
+
+
     public partial class TblRimappingDetailDto
     {
         public decimal RimappingDetailId { get; set; }

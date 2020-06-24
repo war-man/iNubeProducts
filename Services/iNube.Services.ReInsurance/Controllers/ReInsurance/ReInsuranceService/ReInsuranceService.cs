@@ -800,33 +800,33 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             tblRimappingDto.CreatedDate = DateTime.Now;
             //taking id 20 for retention group and 21 for treaty
-            foreach (var d in tblRimappingDto.TblRimappingDetail)
-            {
-                if(d.RetentionGroupId!=null)
-                {
-                    d.SequenceNo = 01;
-                    d.RimappingTypeId = 31;
-                    tblRimappingDto.TblRimappingDetail.Add(d);
-                }
-                else
-                {
-                    d.RimappingTypeId = 32;
-                    tblRimappingDto.TblRimappingDetail.Add(d);
-                }
-            }
-              var data = _mapper.Map<TblRimapping>(tblRimappingDto);
+            //foreach (var d in tblRimappingDto.TblRimappingDetail)
+            //{
+            //    if(d.RetentionGroupId!=null)
+            //    {
+            //        d.SequenceNo = 01;
+            //        d.RimappingTypeId = 31;
+            //        tblRimappingDto.TblRimappingDetail.Add(d);
+            //    }
+            //    else
+            //    {
+            //        d.RimappingTypeId = 32;
+            //        tblRimappingDto.TblRimappingDetail.Add(d);
+            //    }
+            //}
+            //  var data = _mapper.Map<TblRimapping>(tblRimappingDto);
           
             
-            try
-            {
-                _context.TblRimapping.Add(data);
-                _context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
+            //try
+            //{
+            //    _context.TblRimapping.Add(data);
+            //    _context.SaveChanges();
+            //}
+            //catch (Exception ex)
+            //{
 
-                // throw;
-            }
+            //    // throw;
+            //}
             return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Details Saved sucessfully" };
         }
 
@@ -838,7 +838,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
             var yeardata = await MasterYearData(apiContext);
-
+            var year = 0;
 
             try
             {
@@ -848,6 +848,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                               {
                                   RimappingId=c.RimappingId,
                                   Year1 = c.Year,
+                                  
                                   Level = c.Level,
                                   Year = yeardata.FirstOrDefault(p => p.mID == c.Year).mValue,
                                   LobProductCover = c.LobProductCover,
@@ -892,7 +893,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var tbl_Rimaping = _mapper.Map<TblRimapping>(tblParticipantMasterDto);
             _context.TblRimapping.Update(tbl_Rimaping);
             _context.SaveChanges();
-            return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"Treaty updated  sucessfully ", RimappingDto = tblParticipantMasterDto };
+            return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"RI Mapping updated  sucessfully ", RimappingDto = tblParticipantMasterDto };
 
         }
 
@@ -1035,7 +1036,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             var tblAllocationDto = _mapper.Map<RiallocationDto>(riallocationDto);
-            var tblAllocation = _context.TblRiallocation.Where(a => a.AllocationId == riallocationDto.AllocationId).
+            var tblAllocation = _context.TblRiallocation.Where(a => a.MappingId == riallocationDto.MappingId).
                 FirstOrDefault();
 
             if (tblAllocation == null)
@@ -1146,7 +1147,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             map.AllocationBasis = calulationDto.SumInsured.ToString();
             map.Balance = calulationDto.SumInsured.ToString();
 
-            map.AllocatedRetention = "0";
+            map.AllocatedRetention = calulationDto.SumInsured.ToString();
             map.AllocatedQS = "0";
             map.TotalAllocation = "0";
             map.AllocationBasedOn = "";
@@ -1171,16 +1172,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var retLimit = Convert.ToInt32(map.Limit);
             var retAllocationBasis = map.AllocationBasis;
             var retNoOfLines = Convert.ToInt32(map.NoofLines);
-            var retAllocatedAmount = 0;
-            var retAllocatedPremium = 0; 
+            var retAllocatedAmount = map.AllocatedRetention;
+            var reAllocatedPremium = map.Premium; 
 
             mapDetails.Type = retType;
             mapDetails.Percentage = retPercentage;
             mapDetails.Limit = retLimit;
             mapDetails.AllocationBasis = retAllocationBasis;
             mapDetails.NoOfLines = retNoOfLines;
-            mapDetails.AllocatedAmount = retAllocatedAmount;//need to get it from integration call value
-            mapDetails.AllocatedPremium = retAllocatedPremium;////need to get it from integration call value
+            mapDetails.AllocatedAmount = Convert.ToDecimal(retAllocatedAmount);//need to get it from integration call value
+            mapDetails.AllocatedPremium = reAllocatedPremium;////need to get it from integration call value
             mapDetails1.Add(mapDetails);
             // Treaty data need to be filled
 
@@ -1319,13 +1320,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
                             {
                                 map.AllocationMethod = "Limit";
-                                map.Limit = arrangementsvalue.Amount.ToString();
+                                map.Limit = arrangementsvalue.MaxCeidingLimit.ToString();
                             }
                             else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
                             {
                                 map.AllocationMethod = "PercentageWithLimit";
                                 map.Percentage = arrangementsvalue.Percentage.ToString();
-                                map.Limit = arrangementsvalue.Amount.ToString();
+                                map.Limit = arrangementsvalue.MaxCeidingLimit.ToString();
                             }
                             else
                             {
