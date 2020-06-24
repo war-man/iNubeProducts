@@ -1781,11 +1781,45 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _mapper.Map<TblEntityDetails>(entityDetails);
-            _context.TblEntityDetails.Add(data);
+            //var data = _mapper.Map<TblEntityDetails>(entityDetails);
+            TblEntityDetails tblEntity = _mapper.Map<TblEntityDetails>(entityDetails);
+
+            //foreach (var item in entityDetails.EntityAttributes)
+            //{
+            //    TblEntityAttributes tblEntityAttributes = new TblEntityAttributes();
+            //    tblEntityAttributes.FieldType = item.FieldType;
+            //    tblEntityAttributes.EntityLevel = entityDetails.EntityLevel;
+            //    tblEntityAttributes.LabelText = item.LabelText;
+            //    tblEntityAttributes.Name = item.Name;
+            //    tblEntityAttributes.Value = item.Value;
+            //    tblEntityAttributes.FilterName = item.FilterName;
+            //    tblEntityAttributes.ListObject = item.ListObject;
+            //    if (item.Required == null)
+            //    {
+            //        tblEntityAttributes.Required = false;
+            //    }
+            //    else
+            //    {
+            //        tblEntityAttributes.Required = item.Required;
+            //    }
+            //    if (item.FutureDate == null)
+            //    {
+            //        tblEntityAttributes.FutureDate = false;
+            //    }
+            //    else
+            //    {
+            //        tblEntityAttributes.FutureDate = item.FutureDate;
+            //    }
+            //    tblEntityAttributes.Checked = item.Checked;
+            //    tblEntityAttributes.ParentId = item.ParentId;
+            //    tblEntity.TblEntityAttributes.Add(tblEntityAttributes);
+            //}
+
+            _context.TblEntityDetails.Add(tblEntity);
+
             _context.SaveChanges();
 
-            var _result = _mapper.Map<EntityDetailsDTO>(data);
+            var _result = _mapper.Map<EntityDetailsDTO>(tblEntity);
             return _result;
         }
 
@@ -1816,11 +1850,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return result;
         }
 
-        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByType(string type, ApiContext apiContext)
+        public async Task<IEnumerable<EntityDetailsDTO>> SearchEntitiesByEntityId(int id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityAttributes.Where(a => a.Type == type).Select(a => a).ToList();
+            var data = _context.TblEntityDetails.Where(a => a.EntityId == Convert.ToDecimal(id))
+                .Include(a => a.TblEntityAttributes)
+                .Select(a => a).ToList();
 
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             var componentType = _context.TblmasDynamic.Select(a => a);
@@ -1842,6 +1878,19 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             var result = _mapper.Map<List<DynamicProduct>>(data);
             return result;
+        }
+
+        public async Task<IEnumerable<ddDTOs>> GetAllEntities(ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = _context.TblEntityDetails.Select(a => new ddDTOs
+            {
+                mID = Convert.ToInt32(a.EntityId),
+                mValue = a.EnitityName,
+            }).ToList();
+
+            return data;
         }
     }
 }

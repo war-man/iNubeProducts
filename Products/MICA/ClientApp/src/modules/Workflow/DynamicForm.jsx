@@ -19,6 +19,7 @@ import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import UserConfig from 'modules/Users/UserConfig.js';
 import Dropdown from "components/Dropdown/Dropdown.jsx";
+import { Animated } from "react-animated-css";
 import { fade } from "@material-ui/core/styles";
 import swal from 'sweetalert';
 import GridContainer from "../../components/Grid/GridContainer";
@@ -35,6 +36,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Visibility from "@material-ui/icons/Visibility";
 import Edit from "@material-ui/icons/Edit";
 import IconButton from '@material-ui/core/IconButton';
+import productConfig from 'modules/Products/Micro/ProductConfig.js';
+import DynamicEntity from 'modules/Workflow/DynamicEntity';
 
 const style = {
     infoText: {
@@ -64,239 +67,462 @@ class DynamicForm extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            data: [
+            ProductType: [
+                { mID: 'Product', mType: "Product", mValue: "Product" },
+                { mID: 'User', mType: "User", mValue: "User" },
+                { mID: 'Claims', mType: "Claims", mValue: "Claims" },
+            ],
+            type: "",
+            empty: [
                 {
-                    id: 1,
-                    name: "a",
-                    age: 29,
-                    qualification: "B.Com",
-                    rating: 3,
-                    gender: "male",
-                    city: "Kerala",
-                    skills: ["reactjs", "angular", "vuejs"]
-                },
-                {
-                    id: 2,
-                    name: "b",
-                    age: 35,
-                    qualification: "B.Sc",
-                    rating: 5,
-                    gender: "female",
-                    city: "Mumbai",
-                    skills: ["reactjs", "angular"]
-                },
-                {
-                    id: 3,
-                    name: "c",
-                    age: 42,
-                    qualification: "B.E",
-                    rating: 3,
-                    gender: "female",
-                    city: "Bangalore",
-                    skills: ["reactjs"]
+                    "mType": "mddfilter",
+                    "mdata": [
+                        {
+                            "mID": 'mdd1',
+                            "mValue": "Master Dropdown1",
+                            "mType": "isActive"
+                        },
+                        {
+                            "mID": 'mdd1',
+                            "mValue": "Master Dropdown2",
+                            "mType": "isActive"
+                        },
+                        {
+                            "mID": 'mdd1',
+                            "mValue": "Master Dropdown3",
+                            "mType": "isActive"
+                        }
+                    ]
                 }
             ],
-            tabledata: [],
-            tablelist: [
-                { Header: "Id", accessor: "id" },
-                { Header: "Name", accessor: "name" },
-                { Header: "Qualification", accessor: "qualification" },
-                { Header: "Rating", accessor: "rating" },
-                { Header: "Gender", accessor: "gender" },
-                { Header: "City", accessor: "city" },
-                { Header: "Skills", accessor: "uskills" },
-                { Header: "Action", accessor: "action" },
+            dropdown: [
+                { mID: 'dd1', mType: "Product", mValue: "Dropdown1" },
+                { mID: 'dd2', mType: "User", mValue: "Dropdown2" },
+                { mID: 'dd3', mType: "Claims", mValue: "Dropdown3" },
             ],
-            current: {}
+            Dynamicdata: {},
+            radiovalue: "",
+            screendata: [],
+            emptyarray: [],
+            showtable: false,
+            data: [],
+            showComponents: false,
         };
     }
 
-    onSubmit = model => {
-        console.log("hitting", model);
-        let data = [];
-        if (model.id) {
-            data = this.state.data.filter(d => {
-                return d.id != model.id;
-            });
-            console.log("response data", data);
-        } else {
-            model.id = +new Date();
-            data = this.state.data.slice();
-        }
+    SetValue = (e) => {
 
-        this.setState({
-            data: [model, ...data],
-            current: {} // todo
-        });
-        console.log("response data", data);
-        //this.tabledatalist(data);
-    };
+        let data = this.state.Dynamicdata;
+        let name = e.target.name;
+        let value = e.target.value;
 
-    componentDidMount() {
-        this.tabledatalist(this.state.data);
+        let screendata = this.state.screendata;
+        screendata = screendata.filter(e => e.name === name)[0] === undefined
+            ? []
+            : screendata.filter((e) => e.name === name)[0]
+            ;
+        screendata.value = value;
+
+        data[name] = value;
+
+        this.setState({ data });
+        console.log("selected: ", data);
     }
 
-    SetValue = (type, tname, event) => {
-        if (type == 'date') {
-            var today = event.toDate();
-            var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    onDateChange = (name, event) => {
+        var today = event.toDate();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        let data = this.state.Dynamicdata;
 
-            let data = this.state.dynamicdata;
-            data[tname] = date;
-            this.setState({ data });
-        } else {
-            let data = this.state.dynamicdata;
-            let name = event.target.name;
-            let value = event.target.value;
-            let check = event.target.checked;
+        data[name] = date;
 
+        let screendata = this.state.screendata;
+        screendata = screendata.filter(e => e.name === name)[0] === undefined
+            ? []
+            : screendata.filter((e) => e.name === name)[0]
+            ;
+        screendata.value = date;
+
+        this.setState({ data });
+        console.log("selected: ", data);
+    };
+
+    handleRadioChange = (name, e) => {
+        let value = e.target.value;
+        this.setState({ radiovalue: e.target.value })
+        let data = this.state.Dynamicdata;
+
+        data[name] = value;
+        this.setState({ data });
+        console.log("selected: ", data);
+    }
+
+    SetCheckValue = (name, e) => {
+        let data = this.state.Dynamicdata;
+        let value = e.target.checked;
+        if (value == true) {
             data[name] = value;
-            this.setState({ data });
-
-            if (type == 'checkbox') {
-                data[name] = check;
-                this.setState({ data });
-                console.log("data: ", event.target.checked);
-            }
-            if (type == 'radio') {
-                data[name] = value;
-                this.setState({ data, selectedValue: value });
-            }
-            //this.setState({ [event.target.name]: event.target.value })
-            console.log("data: ", event.target.value);
+        } else if (value == false) {
+            data[name] = value;
         }
-        console.log("dynamic", this.state.dynamic)
-        this.state.dynamic[0].props.value = event.target.value;
-        console.log("dynamic", this.state.dynamic)
-        //this.renderFun();
+        this.setState({ data });
+        console.log("selected: ", data);
     }
 
-    tabledatalist = (data) => {
-        this.setState({
-            tabledata: data.map((prop, key) => {
-                const { classes } = this.props;
-                return {
-                    id: prop.id,
-                    name: prop.name,
-                    age: prop.age,
-                    qualification: prop.qualification,
-                    gender: prop.gender,
-                    rating: prop.rating,
-                    city: prop.city,
-                    uskills: prop.skills && prop.skills.join(","),
-                    action: <Tooltip title={< TranslationContainer translationKey="Edit" />} placement="bottom" arrow>
-                        <IconButton color="info" justIcon round simple className="edit" onClick={() => { this.onEdit(prop.id); }} ><Edit /></IconButton>
-                    </Tooltip >
-                    //<div><Button round color="info" onClick={() => { this.onEdit(prop.id); }}> edit </Button></div>
-                };
-            })
-        })
-    }
+    handleRenderScreen = (prop) => {
 
-    onEdit = id => {
-        let record = this.state.data.find(d => {
-            return d.id == id;
-        });
-        //alert(JSON.stringify(record));
-        this.setState({
-            current: record
-        });
-    };
-
-    onNewClick = e => {
-        this.setState({
-            current: {}
-        });
-    };
-
-    render() {
-        let data = this.state.data.map(d => {
-
+        if (prop.componentType == "String") {
             return (
-                <tr key={d.id}>
-                    <td>{d.name}</td>
-                    <td>{d.age}</td>
-                    <td>{d.qualification}</td>
-                    <td>{d.gender}</td>
-                    <td>{d.rating}</td>
-                    <td>{d.city}</td>
-                    <td>{d.skills && d.skills.join(",")}</td>
-                    <td>
-                        <Button
-                            onClick={() => {
-                                this.onEdit(d.id);
-                            }}
-                        >
-                            edit
-            </Button>
-                    </td>
-                </tr>
+                <CustomInput
+                    //success={this.state.firstNameState == "success"}
+                    //error={this.state.firstNameState == "error"}
+                    //error={this.state.firstNameState}
+                    labelText={prop.labelText}
+                    name={prop.name}
+                    value={prop.value}
+                    required={prop.required}
+                    onChange={(e) => this.SetValue(e)}
+                    formControlProps={{ fullWidth: true }}
+                />
             );
-        });
-        return (
-            <div className="App">
-                <div className="form-actions">
-                    <Button round color="success" onClick={this.onNewClick} type="submit">NEW</Button>
-                </div>
-                <DynamicFormTesting
-                    key={this.state.current.id}
-                    className="form"
-                    title="Registration"
-                    defaultValues={this.state.current}
-                    model={[
-                        { key: "name", label: "Name", type: "text", props: { required: true } },
-                        { key: "age", label: "Age", type: "number" },
-                        { key: "rating", label: "Rating", type: "number", props: { min: 0, max: 10 } },
-                        {
-                            key: "gender", label: "Gender", type: "radio",
-                            options: [
-                                { key: "male", label: "Male", selectedValue: "", mID: 1, mValue: "Male", name: "gender", value: "male" },
-                                { key: "female", label: "Female", selectedValue: "", mID: 2, mValue: "Female", name: "gender", value: "female" }
-                            ]
-                        },
-                        { key: "MaritalStatus", label: "Marital Status", type: "masterdropdown", value: "" },
-                        { key: "DOB", label: "Date of Birth", type: "date", value: "" },
-                        { key: "qualification", label: "Qualification", type: "text" },
-                        {
-                            key: "city", label: "City", type: "select", value: "Kerala",
-                            options: [
-                                //{ key: "mumbai", label: "Mumbai", value: "Mumbai" },
-                                //{ key: "bangalore", label: "Bangalore", value: "Bangalore" },
-                                //{ key: "kerala", label: "Kerala", value: "Kerala" }
-                                { key: "mumbai", label: "Mumbai", mID: "mumbai", mValue: "Mumbai", value: "Mumbai" },
-                                { key: "bangalore", label: "Bangalore", mID: "bangalore", mValue: "Bangalore", value: "Bangalore" },
-                                { key: "kerala", label: "Kerala", mID: "kerala", mValue: "Kerala", value: "Kerala" }
-                            ]
-                        },
-                        {
-                            key: "skills", label: "Skills", type: "checkbox",
-                            options: [
-                                { key: "reactjs", label: "ReactJS", value: "reactjs" },
-                                { key: "angular", label: "Angular", value: "angular" },
-                                { key: "vuejs", label: "VueJS", value: "vuejs" }
-                            ]
-                        },
-
-                    ]}
-                    onSubmit={model => {
-                        this.onSubmit(model);
+        }
+        if (prop.componentType == "Number") {
+            return (
+                <CustomInput
+                    //success={this.state.firstNameState == "success"}
+                    //error={this.state.firstNameState == "error"}
+                    //error={this.state.firstNameState}
+                    labelText={prop.labelText}
+                    name={prop.name}
+                    value={prop.value}
+                    inputType="number"
+                    required={prop.required}
+                    onChange={(e) => this.SetValue(e)}
+                    formControlProps={{ fullWidth: true }}
+                />
+            );
+        }
+        if (prop.componentType == "Currency") {
+            return (
+                <CustomInput
+                    //success={this.state.firstNameState == "success"}
+                    //error={this.state.firstNameState == "error"}
+                    //error={this.state.firstNameState}
+                    labelText={prop.labelText}
+                    name={prop.name}
+                    value={prop.value}
+                    type="Rupee"
+                    required={prop.required}
+                    onChange={(e) => this.SetValue(e)}
+                    formControlProps={{ fullWidth: true }}
+                />
+            );
+        }
+        if (prop.componentType == "Dropdown") {
+            return (
+                <Dropdown
+                    required={prop.required}
+                    labelText={prop.labelText}
+                    lstObject={this.state.dropdown}
+                    value={prop.value}
+                    name={prop.name}
+                    onChange={(e) => this.SetValue(e)}
+                    formControlProps={{ fullWidth: true }} />
+            );
+        }
+        if (prop.componentType == "Master Dropdown") {
+            return (
+                <MasterDropdown
+                    labelText={prop.labelText}
+                    name={prop.name}
+                    value={prop.value}
+                    id={prop.name}
+                    lstObject={this.state.empty}
+                    required={prop.required}
+                    filterName={prop.filterName}
+                    onChange={(e) => this.SetValue(e)}
+                    formControlProps={{ fullWidth: true }}
+                />
+            );
+        }
+        if (prop.componentType == "Date") {
+            return (
+                <CustomDatetime
+                    labelText={prop.labelText}
+                    name={prop.name}
+                    value={prop.value}
+                    id={prop.name}
+                    Futuredatevalidate={prop.futureDate}
+                    required={prop.required}
+                    onChange={(e) => this.onDateChange(prop.name, e)}
+                    formControlProps={{ fullWidth: true }} />
+            );
+        }
+        if (prop.componentType == "Radio") {
+            const { classes } = this.props;
+            return (
+                <FormControlLabel
+                    control={
+                        <Radio
+                            checked={this.state.radiovalue == prop.value}
+                            onChange={(e) => this.handleRadioChange(prop.name, e)}
+                            value={prop.value}
+                            name={prop.name}
+                            aria-label="B"
+                            icon={
+                                <FiberManualRecord
+                                    className={classes.radioUnchecked}
+                                />
+                            }
+                            checkedIcon={
+                                <FiberManualRecord
+                                    className={classes.radioChecked}
+                                />
+                            }
+                            classes={{
+                                checked: classes.radio,
+                                root: classes.radioRoot
+                            }}
+                        />
+                    }
+                    classes={{
+                        label: classes.label
+                    }}
+                    label={prop.labelText}
+                />
+            );
+        }
+        if (prop.componentType == "Check") {
+            return (
+                <CustomCheckbox
+                    labelText={prop.labelText}
+                    name={prop.name}
+                    value={prop.checked}
+                    onChange={(e) => this.SetCheckValue(prop.name, e)}
+                    formControlProps={{
+                        fullWidth: true
                     }}
                 />
-                <ReactTable
-                    data={this.state.tabledata}
-                    filterable
-                    columns={this.state.tablelist}
+            );
+        }
+        if (prop.componentType == "Button") {
+            return (
+                <Button color='primary' round onClick={this.handlesubmit} >{prop.labelText}</Button>
+            )
+        }
+    }
 
-                    defaultPageSize={5}
-                    showPaginationTop={false}
-                    showPaginationBottom
-                    className="-striped -highlight discription-tab"
-                /> {/**/}
-                <table border="1">
+    handleProductType = (e) => {
+        this.state.screendata = [];
+        this.state.showComponents = false;
+        this.setState({ [e.target.name]: e.target.value });
 
-                    <tbody>{data}</tbody>
-                </table>
 
+        fetch(`${productConfig.productConfigUrl}/api/Product/SearchEntitiesByType?type=` + e.target.value + ``,
+            {
+                method: 'Get',
+                //body: JSON.stringify(this.state.searchOrg),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            }
+        ).then(response => response.json())
+            .then(data => {
+                this.setState({ screendata: data });
+                console.log("dataCheck: ", data);
+                if (data.length == 0) {
+                    this.setState({ showComponents: true });
+                }
+            });
+
+        //fetch(`${productConfig.productConfigUrl}/api/Product/GetDynamicProduct?type=` + e.target.value + ``,
+        //    {
+        //        method: 'Get',
+        //        //body: JSON.stringify(this.state.searchOrg),
+        //        headers: {
+        //            'Accept': 'application/json',
+        //            'Content-Type': 'application/json',
+        //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+        //        },
+        //    }
+        //).then(response => response.json())
+        //    .then(data => {
+        //        this.setState({ screendata: data });
+        //        console.log("dataCheck: ", data);
+        //    });
+    }
+
+    handlesubmit = () => {
+        console.log("selected: ", this.state.Dynamicdata)
+        if (this.state.Dynamicdata != {}) {
+            this.state.emptyarray.push(this.state.Dynamicdata);
+            this.tabledata();
+        }
+
+        //Object.assign(this.state.Dynamicdata, {});
+        this.state.Dynamicdata = {};
+        for (let i = 0; i < this.state.screendata.length; i++) {
+            let screendata = this.state.screendata;
+            if (screendata[i].componentType != "Radio") {
+                screendata[i].value = "";
+            }
+            this.setState({ radiovalue: "" });
+        }
+        console.log("Select ", this.state.Dynamicdata);
+    }
+
+    tabledata = () => {
+        this.setState({ showtable: true });
+
+        this.setState({
+            data: Object.keys(this.state.emptyarray[0]).map((prop) => {
+                return {
+                    Header: prop.charAt(0).toUpperCase() + prop.slice(1),
+                    accessor: prop,
+                };
+                this.setState({});
+            })
+        });
+        console.log("Selected: ", this.state.data)
+        console.log("Select ", this.state.Dynamicdata);
+    }
+
+    resetobject = () => {
+        this.setState({ Dynamicdata: {} });
+
+    }
+
+    componentDidMount() {
+        //fetch(`${productConfig.productConfigUrl}/api/Product/GetDynamicProduct?type=Product`,
+        //    {
+        //        method: 'Get',
+        //        //body: JSON.stringify(this.state.searchRequest),
+        //        headers: {
+        //            'Content-Type': 'application/json; charset=utf-8',
+        //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+        //        },
+        //    }
+        //).then(response => response.json())
+        //    .then(data => {
+        //        this.setState({ screendata: data });
+        //        console.log("dataCheck: ", data);
+        //    });
+    }
+
+    render() {
+        const { classes } = this.props;
+        return (
+            <div>
+                <GridContainer justify="center">
+                    <GridItem xs={12} sm={12} md={12}>
+                        <DynamicEntity />
+
+                        <Card>
+                            <CardHeader color="rose" icon>
+                                <CardIcon color="rose">
+                                    { /*  <FilterNone /> */}
+
+                                    <Icon><img id="icon" src={role} /></Icon>
+
+                                </CardIcon>
+                                <h4>
+                                    <small>{/*<TranslationContainer translationKey="SearchOrganization" />*/}Dynamic Product </small>
+                                </h4>
+                            </CardHeader>
+                            <CardBody>
+                                <GridContainer>
+                                    <GridItem xs={12} sm={4} md={3}>
+                                        <Dropdown
+                                            required={true}
+                                            labelText="Select Product Type"
+                                            lstObject={this.state.ProductType}
+                                            value={this.state.type}
+                                            name='type'
+                                            onChange={(e) => this.handleProductType(e)}
+                                            formControlProps={{ fullWidth: true }} />
+                                    </GridItem>
+                                </GridContainer>
+                            </CardBody>
+                        </Card>
+                        {(this.state.screendata.length > 0) ?
+                            <Card>
+                                <CardHeader color="rose" icon>
+                                    <CardIcon color="rose">
+                                        { /*  <FilterNone /> */}
+
+                                        <Icon><img id="icon" src={role} /></Icon>
+
+                                    </CardIcon>
+                                    <h4>
+                                        <small>{/*<TranslationContainer translationKey="SearchOrganization" />*/}{this.state.type} </small>
+                                    </h4>
+                                </CardHeader>
+                                <CardBody>
+                                    <GridContainer>
+                                        {
+                                            this.state.screendata.map(item => {
+                                                if (item.componentType != "Button") {
+                                                    return (
+                                                        <GridItem xs={12} sm={4} md={3}>
+                                                            {this.handleRenderScreen(item)}
+                                                        </GridItem>
+                                                    );
+                                                }
+                                                else {
+                                                    return (
+                                                        <GridContainer justify="center">
+                                                            {this.handleRenderScreen(item)}
+                                                        </GridContainer>
+                                                    );
+                                                }
+                                            })
+                                        }
+                                    </GridContainer>
+                                </CardBody>
+                            </Card>
+                            : null}
+                        {this.state.showComponents ?
+                            <Card>
+                                <CardHeader color="rose" icon>
+                                    <CardIcon color="rose">
+                                        { /*  <FilterNone /> */}
+
+                                        <Icon><img id="icon" src={role} /></Icon>
+
+                                    </CardIcon>
+                                    <h4>
+                                        <small>{/*<TranslationContainer translationKey="SearchOrganization" />*/}{this.state.type} </small>
+                                    </h4>
+                                </CardHeader>
+                                <CardBody>
+                                    <h4>There are no Entities available for the selected Product Type</h4>
+                                </CardBody>
+                            </Card>
+                            : null
+                        }
+                        {this.state.showtable ?
+                            <GridContainer xl={12}>
+                                <GridItem lg={12}>
+                                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                                        <ReactTable
+                                            //title={"Users"}
+                                            data={this.state.emptyarray}
+                                            filterable
+                                            columns={this.state.data}
+                                            defaultPageSize={5}
+                                            showPaginationTop={false}
+                                            //pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                            showPaginationBottom={true}
+                                            className="-striped -highlight"
+                                        />
+                                    </Animated>
+                                </GridItem>
+                            </GridContainer>
+                            : null}
+                    </GridItem>
+                </GridContainer>
             </div>
         );
     }

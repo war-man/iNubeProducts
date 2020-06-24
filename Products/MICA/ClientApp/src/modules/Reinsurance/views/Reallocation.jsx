@@ -53,94 +53,124 @@ class Reallocation extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            dynamicList: [],
+            indexList:[],
+            qoutaflag:false,
             yearmasterlist: [],
             newdata: [],
-            rimapId:"",
-            showMapping:false,
+            masterList: [],
+            rimapId: "",
+            showMapping: false,
             showRetentionflag: false,
             SelectedId: "",
+            QuotaShare: false,
+            surplus: false,
             rimappingId: "",
             Policydto: {
-                policynumber:""
+                policynumber: ""
             },
             CalculationDTO: {
                 //policynumber: "",
                 policystartdate: "",
                 policyenddate: "",
-                productname:"",
-                basis: "",
+                Name: "",
+                Level: "",
                 type: "",
-                riallocationDetails: [{
-                    suminsured: null,
-                    premium: null,
-                    ricalculation: [
+                PremiumAmount: "",
+                AllocationAmount: "",
+                MapDetails: [
 
                     {
-                            retention: "",
-                            adjustment: "",
-                            limit1: "",
-                            amount: "",
-                            retentionallocationsi: "",
-                            retentionadded: "",
-                            deallocatedretention: "",
-                        },
-                        {
-                            treatyname: "",
-                            treatyshare: "",
-                            limit2: "",
-                            allocationsi: "",
-                            allocationpremium: "",
-                        },
-                        {
-                            treatyname1: "",
-                            treatyshare1: "",
-                            limit3: "",
-                            allocationsi1: "",
-                            allocationpremium1: ""
-                        }
-                    ]
-                }],
-                //retention: "",
-                //adjustment: "",
-                //limit: "",
-                //amount: "",
-                //retentionallocationsi: "",
-                //retentionadded: "",
-                //deallocatedretention: "",
-                //treatyname: "",
-                //treatyshare: "",
-                //limit: "",
-                //allocationsi: "",
-                //allocationpremium: "",
-                //treatyname1: "",
-                //treatyshare1: "",
-                //limit1: "",
-                //allocationsi1: "",
-                //allocationpremium1: ""
+                        Type: "",
+                        Percentage: "",
+                        Limit: "",
+                        AllocationBasis: "",
+                        NoOfLines: "",
+                        AllocatedAmount: "",
+                        AllocatedPremium: "",
+                        Participant: [
+                            {
+                                ParticipantId: "",
+                                Branch: "",
+                                Share: "",
+                                CommissionRate: "",
+                                BrokerageRate: "",
+                                Commission: "",
+                                Brokerage: "",
+                                AllocatedAmount: "",
+                                AllocatedPremium: ""
+                            }
+                        ]
+                    },
+                    {
+                        Type1: "",
+                        Percentage: "",
+                        Limit: "",
+                        AllocationBasis: "",
+                        NoOfLines: "",
+                        AllocatedAmount: "",
+                        AllocatedPremium: "",
+                        Participant: [
+                            {
+                                ParticipantId: "",
+                                Branch: "",
+                                Share: "",
+                                CommissionRate: "",
+                                BrokerageRate: "",
+                                Commission: "",
+                                Brokerage: "",
+                                AllocatedAmount: "",
+                                AllocatedPremium: ""
+                            }
+                        ]
+                    },
+                    {
+                        Type2: "",
+                        Percentage: "",
+                        Limit: "",
+                        AllocationBasis: "",
+                        NoOfLines: "",
+                        AllocatedAmount: "",
+                        AllocatedPremium: "",
+                        Participant: [
+                            {
+                                ParticipantId: "",
+                                Branch: "",
+                                Share: "",
+                                CommissionRate: "",
+                                BrokerageRate: "",
+                                Commission: "",
+                                Brokerage: "",
+                                AllocatedAmount: "",
+                                AllocatedPremium: ""
+                            }
+                        ]
+                    }
+                ]
             }
         };
-        
+
     }
     onInputChange = (evt) => {
         debugger;
         const Data = this.state.CalculationDTO;
         Data[evt.target.name] = evt.target.value;
         this.setState({ Data });
-        const Data2 = this.state.CalculationDTO.riallocationDetails[0].ricalculation[0];
+        const Data2 = this.state.CalculationDTO
         Data2[evt.target.name] = evt.target.value;
         this.setState({ Data2 });
-        const Data3 = this.state.CalculationDTO.riallocationDetails[0].ricalculation[1];
+        const Data3 = this.state.CalculationDTO.MapDetails[0];
         Data3[evt.target.name] = evt.target.value;
         this.setState({ Data3 });
-        const Data4 = this.state.CalculationDTO.riallocationDetails[0].ricalculation[2];
+        const Data4 = this.state.CalculationDTO.MapDetails[1];
         Data4[evt.target.name] = evt.target.value;
         this.setState({ Data4 });
         const Data1 = this.state.Policydto;
         Data1[evt.target.name] = evt.target.value;
         this.setState({ Data1 });
         console.log("Data", this.state.CalculationDTO)
-        console.log("Data1", this.state.Policydto)
-    } 
+        //console.log("Data1", this.state.Policydto)
+    }
 
     onDateChange = (formate, name, event) => {
 
@@ -159,7 +189,7 @@ class Reallocation extends React.Component {
         else {
             var mm = (today.getMonth() + 1);
         }
-         
+
 
         //var date = today.getFullYear() + '-' + (today.getMonth() + 1)+ '-' + today.getDate();
         var date = dt + '/' + mm + '/' + today.getFullYear();
@@ -172,7 +202,7 @@ class Reallocation extends React.Component {
     }
     onFormSubmit = () => {
         debugger;
-       
+      
         console.log("submit", this.state.SearchPeople);
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetAllocationByPolicyNo?PolicyNo=` + this.state.Policydto.policynumber, {
             method: 'GET',
@@ -184,34 +214,43 @@ class Reallocation extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                this.state.CalculationDTO.productname = data.productName;
-                this.state.CalculationDTO.riallocationDetails.suminsured = data.riallocationDetails[0].sumInsured;
-                this.state.CalculationDTO.riallocationDetails.premium= data.riallocationDetails[0].premium;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].retention = data.riallocationDetails[0].ricalculation[0].type;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].amount = data.riallocationDetails[0].ricalculation[0].premium;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].retentionallocationsi = data.riallocationDetails[0].ricalculation[0].sumInsured;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyname = data.riallocationDetails[0].ricalculation[1].type;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].allocationsi = data.riallocationDetails[0].ricalculation[1].sumInsured;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].allocationpremium = data.riallocationDetails[0].ricalculation[1].premium;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[2].treatyname1 = data.riallocationDetails[0].ricalculation[2].type;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[2].allocationsi1 = data.riallocationDetails[0].ricalculation[2].sumInsured;
-                this.state.CalculationDTO.riallocationDetails[0].ricalculation[2].allocationpremium1 = data.riallocationDetails[0].ricalculation[2].premium;
-                //this.state.CalculationDTO.productname = data.productName;
-                    
+                this.state.CalculationDTO.Name = data.Name;
+                this.state.CalculationDTO.Level = data.Level;
+                this.state.CalculationDTO.AllocationAmount = data.AllocationAmount;
+                this.state.CalculationDTO.PremiumAmount = data.PremiumAmount;
                 
-                console.log("masterdata", data);
-                this.setState({ masterList: data });
+                 //datalist = data.MapDetails;                
+                //console.log("masterdata", data);
+                //this.state.masterList = data.MapDetails;
+                this.setState({ masterList: data.mapDetails, qoutaflag:true});
+
+                console.log("masterdata", this.state.masterList);
+               // console.log(datalist, 'new1');
+                
             });
-        console.log(this.state.newdata, 'New Data');
+        //console.log(datalist, 'new');
+        //this.setState({ masterList });
+        console.log("masterdata1", this.state.masterList);
     }
     
+    onChangeTreaty = (index) => {
+        let indexlist = this.state.indexList;
+        indexlist.push(index);
+        this.setState({ indexlist });
+
+        console.log("indexList", this.state.indexList);
+       
+    }
+    onChangeTreaty1 = () => {
+        this.setState({ surplus: true });
+    }
     render() {
         const { classes } = this.props;
         return (
             <div>
                 <Card >
                     <CardHeader>
-                     
+
                         {
                             <h4 >
                                 <small> <TranslationContainer translationKey="Policy Details" /> </small>
@@ -240,46 +279,15 @@ class Reallocation extends React.Component {
                             </GridItem>
                         </GridContainer>
                         <GridContainer>
-                            <GridItem xs={12} sm={12} md={3}>
-                                <CustomDatetime
-                                    //  success={this.state.billingStartDateState === "success"}
-                                    //  error={this.state.billingStartDateState === "error"}
-                                    //  required={true}
-                                    //onFocus={this.state.onClick}
-
-                                    labelText="PolicyStartDate"
-                                    id='EndDate'
-                                    name='policystartdate'
-                                    onChange={(event) => this.onDateChange('datetime', 'effectiveFrom', event)}
-                                    value={this.state.CalculationDTO.policystartdate}
-                                    //required={true}
-                                    formControlProps={{ fullWidth: true }}
-                                />
-
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}>
-                                <CustomDatetime
-                                    //  success={this.state.billingStartDateState === "success"}
-                                    //  error={this.state.billingStartDateState === "error"}
-                                    // required={true}
-                                    //onFocus={this.state.onClick}
-                                    labelText="PolicyEndDate"
-                                    id='EndDate'
-                                    name='policyenddate'
-                                    onChange={(event) => this.onDateChange('datetime', 'effectiveTo', event)}
-                                    value={this.state.CalculationDTO.policyenddate}
-                                    //required={true}
-                                    formControlProps={{ fullWidth: true }} />
-
-                            </GridItem>
+                            
                             <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
                                     labelText="Product Name"
                                     id="ContactNo"
                                     //required={true}
                                     //error={this.state.percentageState}
-                                    value={this.state.CalculationDTO.productname}
-                                    name='productname'
+                                    value={this.state.CalculationDTO.Name}
+                                    name='Name'
                                     onChange={this.onInputChange}
                                     formControlProps={{
                                         fullWidth: true
@@ -292,15 +300,15 @@ class Reallocation extends React.Component {
                                     id="ContactNo"
                                     //required={true}
                                     //error={this.state.percentageState}
-                                    value={this.state.CalculationDTO.basis}
-                                    name='basis'
+                                    value={this.state.CalculationDTO.Level}
+                                    name='Level'
                                     onChange={this.onInputChange}
                                     formControlProps={{
                                         fullWidth: true
                                     }}
                                 />
                             </GridItem>
-                            <GridItem xs={12} sm={12} md={3}>
+                            {/* <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
                                     labelText="Type"
                                     id="ContactNo"
@@ -314,15 +322,15 @@ class Reallocation extends React.Component {
                                     }}
                                 />
 
-                            </GridItem>
+                            </GridItem> */}
                             <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
                                     labelText="SumInsured"
                                     id="ContactNo"
                                     //required={true}
                                     //error={this.state.percentageState}
-                                    value={this.state.CalculationDTO.riallocationDetails.suminsured}
-                                    name='suminsure'
+                                    value={this.state.CalculationDTO.AllocationAmount}
+                                    name='AllocationAmount'
                                     onChange={this.onInputChange}
                                     formControlProps={{
                                         fullWidth: true
@@ -335,8 +343,8 @@ class Reallocation extends React.Component {
                                     id="ContactNo"
                                     //required={true}
                                     //error={this.state.percentageState}
-                                    value={this.state.CalculationDTO.riallocationDetails.premium}
-                                    name='premium'
+                                    value={this.state.CalculationDTO.PremiumAmount}
+                                    name='PremiumAmount'
                                     onChange={this.onInputChange}
                                     formControlProps={{
                                         fullWidth: true
@@ -344,302 +352,463 @@ class Reallocation extends React.Component {
                                 />
                             </GridItem>
                         </GridContainer>
-                        
-                        </CardBody>
-                    </Card>
-                <Card>
-                    <CardHeader color="rose" icon>
-
-                        <h4 className={this.props.cardIconTitle}>
-                            <small> Retention </small>
-                        </h4>
-                    </CardHeader>
-                    <CardBody>
-                        <GridContainer>
-
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Retention %"
-                                name="retention"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].retention}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Adjustment %"
-                                name="adjustment"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].adjustment}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Limit"
-                                name="limit1"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].limit1}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                           
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Retention Allocation SI"
-                                name="retentionallocationsi"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].retentionallocationsi}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Amount"
-                                name="amount"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].amount}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Retention Added"
-                                name="retentionadded"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].retentionadded}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Deallocated Retention"
-                                name="deallocatedretention"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].deallocatedretention}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                          
-                        </GridContainer>
-
-
-                        {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
 
                     </CardBody>
                 </Card>
-                <Card>
-                    <CardHeader color="rose" icon>
+                
+               
+                {this.state.qoutaflag && this.state.masterList.map(item => {
 
-                        <h4 className={this.props.cardIconTitle}>
-                            <small> QuotaShare/Obligatory </small>
-                        </h4>
-                    </CardHeader>
-                    <CardBody>
-                        <GridContainer>
+                    return (<div>
+                        {item.Type == "Retention" &&
 
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Treaty Name"
-                                name="treatyname"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyname}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
+                            <Card>
+
+                                <CardHeader color="rose" icon>
+
+                                    <h4 className={this.props.cardIconTitle}>
+                                        <small> {item.Type} </small>
+                                    </h4>
+                                </CardHeader>
+                                <CardBody>
+                                <GridContainer>
+
+                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                        labelText="Retention %"
+                                        name="Type"
+                                        value={item.Percentage}
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                        labelText="Retention Allocation SI"
+                                        name="AllocatedAmount"
+                                        value={item.AllocatedAmount}
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                        labelText="Limit"
+                                        name="Limit"
+                                        value={item.Limit}
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                    </GridItem>
+
+                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                        labelText="Premium Amount"
+                                        name="AllocatedPremium"
+                                        value={item.AllocatedPremium}
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                        labelText="Adjustment %"
+                                        //name="amount"
+                                        //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].amount}
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                        labelText="Reallocated SI"
+                                        name="retentionadded"
+                                        //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].retentionadded}
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                        labelText="Reallocated Limit"
+                                        name="deallocatedretention"
+                                        //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].deallocatedretention}
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                        labelText="Reallocated Amount"
+                                        name="deallocatedretention"
+                                        //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].deallocatedretention}
+                                        onChange={this.onInputChange}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                    </GridItem>
+
+                                </GridContainer>
+
+
+                                </CardBody>
+
+
+                            </Card>
+                        }
+
+                    
+                    </div>);
+
+
+                })}
+                
+                {this.state.qoutaflag && this.state.masterList.map((item,key) => {
+                 
+                    return (<div>
+                        {item.Type == "QS" &&
+                            <Card>
+
+                                <CardHeader color="rose" icon>
+
+                                    <h4 className={this.props.cardIconTitle}>
+                                    <small> QuotaShare/Obligatory </small>
+                                    </h4>
+                                </CardHeader>
+                               
+                                <CardBody>
+
+                                    <GridContainer>
+
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Type"
+                                            name="Type1"
+                                            value={item.Type}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Treaty Group Name"
+                                            name="treatyshare"
+                                            //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyshare}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Allocation SI"
+                                            name="AllocationAmount"
+                                        value={item.AllocatedAmount}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Allocation Premium"
+                                            name="AllocatedPremium"
+                                        value={item.AllocatedPremium}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Treaty Share"
+                                            name="limit2"
+                                            value={item.Percentage}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Limit"
+                                            name="Limit"
+                                            value={item.Limit}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+
+
+                                    </GridContainer>
+
+                                    <GridContainer justify="center">
+                                        <GridItem xs={3} sm={3} md={3}>
+                                        <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.onChangeTreaty(key)}>TreatyDetails</Button>
+
+                                        </GridItem>
+
+                                    </GridContainer>
+
+                                    {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
+
+                                </CardBody>
+                               
+
+
+                            </Card>
+                        }
+                        {item.Type == "QS"
+                            && (this.state.indexList.findIndex(s=>s==key)!=-1?true:false) &&
+                        <GridContainer xl={12}>
+                            <GridItem lg={12}>
+
+
+
+                                <ReactTable
+                                    title={"QuotaShare/Obligatory"}
+                                    data={item.participants}
+                                    filterable
+                                    columns={[
+                                        {
+                                            Header: "Participant",
+                                            accessor: "ParticipantId",
+                                            Width: "20px"
+
+                                        },
+                                        {
+                                            Header: "Share",
+                                            accessor: "Share",
+
+                                        },
+                                        {
+                                            Header: "Amount",
+                                            accessor: "AllocatedAmount",
+                                            //Width: "10px"
+                                        },
+                                        {
+                                            Header: "Premium",
+                                            accessor: "AllocatedPremium",
+                                            //Width: "20px"
+                                        },
+                                        {
+                                            Header: "Brokerage",
+                                            accessor: "Brokerage",
+                                            //Width: "10px"
+                                        },
+                                        {
+                                            Header: "Commission",
+                                            accessor: "Commission",
+                                            //Width: "10px"
+                                        }
+
+                                    ]}
+                                    defaultPageSize={5}
+                                    showPaginationTop={false}
+                                    showPaginationBottom
+                                    //pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                    //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                    className="-striped -highlight"
+                                />
+
+
                             </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Treaty Share"
-                                name="treatyshare"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyshare}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Limit"
-                                name="limit2"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].limit2}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Allocation SI"
-                                name="allocationsi"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].allocationsi}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Allocation Premium"
-                                name="allocationpremium"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].allocationpremium}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
+
+
+                            <Paper className={classes.root} style={{ marginLeft: '75px', marginRight: '75px' }} >
+
+
+                            </Paper>
+
+
+
+
+
+                        </GridContainer>}
+                       </div> );
+                    
+
+                })}
+                {this.state.qoutaflag && this.state.masterList.map((item,key) => {
+
+                    return (<div>
+                        {item.Type == "Surplus" &&
+
+                        <Card>
+
+                            <CardHeader color="rose" icon>
+
+                                <h4 className={this.props.cardIconTitle}>
+                                    <small> {item.Type} </small>
+                                </h4>
+                            </CardHeader>
+                                <CardBody>
+
+                                    <GridContainer>
+
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Type"
+                                            name="Type1"
+                                            value={item.Type}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Treaty Group Name"
+                                            name="treatyshare"
+                                            //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyshare}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Allocation SI"
+                                            name="AllocationAmount"
+                                        value={item.AllocatedAmount}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Allocation Premium"
+                                            name="AllocatedPremium"
+                                        value={item.AllocatedPremium}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Treaty Share"
+                                            name="TreatyShare"
+                                            value={item.Percentage}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Lines"
+                                            name="Lines"
+                                            value={item.NoOfLines}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+
+
+                                    </GridContainer>
+
+                                    <GridContainer justify="center">
+                                        <GridItem xs={3} sm={3} md={3}>
+                                            <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.onChangeTreaty(key)}>TreatyDetails</Button>
+
+                                        </GridItem>
+
+                                    </GridContainer>
+
+                                    {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
+
+                                </CardBody>
                             
 
-                        </GridContainer>
-                        {/*<GridContainer justify="center">
-                            <GridItem xs={3} sm={3} md={3}>
-                                <Button id="round" style={{ marginTop: '25px' }} color="info"  > <TranslationContainer translationKey="Treaty Details" />  </Button>
+                            </Card>
+                        }
 
-                            </GridItem>
-
-                        </GridContainer>*/}
-
-                        {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
-
-                    </CardBody>
-                </Card>  
-                <Card>
-                    <CardHeader color="rose" icon>
-
-                        <h4 className={this.props.cardIconTitle}>
-                            <small> Surplus </small>
-                        </h4>
-                    </CardHeader>
-                    <CardBody>
-                        <GridContainer>
-
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Treaty Name"
-                                name="treatyname1"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[2].treatyname1}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Treaty Share"
-                                name="treatyshare1"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[2].treatyshare1}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Limit"
-                                name="limit1"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[2].limit3}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Allocation SI"
-                                name="allocationsi1"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[2].allocationsi1}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                labelText="Allocation Premium"
-                                name="allocationpremium1"
-                                value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[2].allocationpremium1}
-                                onChange={this.onInputChange}
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                            />
-                            </GridItem>
-
-
-                        </GridContainer>
-                        {/* <GridContainer justify="center">
-                            <GridItem xs={3} sm={3} md={3}>
-                                <Button id="round" style={{ marginTop: '25px' }} color="info"  > <TranslationContainer translationKey="Treaty Details" />  </Button>
-
-                            </GridItem>
-
-                        </GridContainer>*/}
-
-                        {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
-
-                    </CardBody>
-                </Card>  
-                {/*  <GridContainer xl={12}>
-                    <GridItem lg={12}>
+                        {
+                            item.Type == "Surplus" &&
+                            (this.state.indexList.findIndex(s => s == key) != -1 ? true : false)  &&
+                            <GridContainer xl={12}>
+                                <GridItem lg={12}>
 
 
 
-                        <ReactTable
-                            //data={this.state.newdata}
-                            filterable
-                            columns={[
-                                {
-                                    Header: "Participant",
-                                    accessor: "recruitmentNo",
-                                    Width: "20px"
+                                    <ReactTable
+                                        title={"Surplus"}
+                                        data={item.participants}
+                                        filterable
+                                        columns={[
+                                            {
+                                                Header: "Participant",
+                                                accessor: "ParticipantId",
+                                                Width: "20px"
 
-                                },
-                                {
-                                    Header: "Share%",
-                                    accessor: "name",
+                                            },
+                                            {
+                                                Header: "Share",
+                                                accessor: "Share",
 
-                                },
-                                {
-                                    Header: "Amount",
-                                    accessor: "channel",
-                                    //Width: "10px"
-                                },
-                                {
-                                    Header: "Premium",
-                                    accessor: "subChannel",
-                                    //Width: "20px"
-                                }
+                                            },
+                                            {
+                                                Header: "Amount",
+                                                accessor: "AllocatedAmount",
+                                                //Width: "10px"
+                                            },
+                                            {
+                                                Header: "Premium",
+                                                accessor: "AllocatedPremium",
+                                                //Width: "20px"
+                                            },
+                                            {
+                                                Header: "Brokerage",
+                                                accessor: "Brokerage",
+                                                //Width: "10px"
+                                            },
+                                            {
+                                                Header: "Commission",
+                                                accessor: "Commission",
+                                                //Width: "10px"
+                                            }
 
-                            ]}
-                            defaultPageSize={5}
-                            showPaginationTop={false}
-                            showPaginationBottom
-                            //pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
-                            //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
-                            className="-striped -highlight"
-                        />
+                                        ]}
+                                        defaultPageSize={5}
+                                        showPaginationTop={false}
+                                        showPaginationBottom
+                                        //pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                        //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                        className="-striped -highlight"
+                                    />
 
 
-                    </GridItem>
+                                </GridItem>
 
 
-                    <Paper className={classes.root} style={{ marginLeft: '75px', marginRight: '75px' }} >
+                                <Paper className={classes.root} style={{ marginLeft: '75px', marginRight: '75px' }} >
 
 
-                    </Paper>
+                                </Paper>
 
 
 
 
 
-                </GridContainer>*/}
+                            </GridContainer>}
+                    </div>);
+
+
+                })}
+
+
             </div>
         );
     }

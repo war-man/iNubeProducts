@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace iNube.Services.Rating.Helpers
 {
-    public class DbHelper
+    public class DbHelper 
     {
         private IIntegrationService _integrationService;
         public string _TimeZone { get; set; }

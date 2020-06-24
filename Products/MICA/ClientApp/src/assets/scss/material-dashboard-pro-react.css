@@ -4777,6 +4777,21 @@ img {
   color: #231ffb;
   padding-right: 1rem; }
 
+#Entitymodal {
+  position: absolute;
+  top: 24%;
+  left: 21%;
+  /* right: 10rem; */
+  padding: 10px;
+  background-color: white;
+  width: 60%;
+  height: 40%;
+  border-radius: 8px;
+  padding-bottom: 5px;
+  padding-right: 2px;
+  overflow: auto;
+  overflow-x: hidden; }
+
 #modal {
   position: absolute;
   top: 4%;
