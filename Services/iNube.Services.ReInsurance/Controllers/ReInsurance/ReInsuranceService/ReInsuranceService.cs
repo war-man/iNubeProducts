@@ -1156,7 +1156,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
 
             //This is Extra only for testing Purpuse
-            map.Percentage = "0";
+          //  map.Percentage = "0";
 
 
 
@@ -1167,7 +1167,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
 
             var retType = map.Type;
-            var retPercentage= Convert.ToInt32(map.Percentage);
+            var retPercentage= Convert.ToInt32(Convert.ToDecimal(map.Percentage));
             var retLimit = Convert.ToInt32(map.Limit);
             var retAllocationBasis = map.AllocationBasis;
             var retNoOfLines = Convert.ToInt32(map.NoofLines);

@@ -27,20 +27,20 @@ namespace iNube.Services.ReInsurance.Helpers
             CreateMap<TblTreaty, TblTreatyDto>();
             CreateMap<TblTreatyDto, TblTreaty>();
 
-            CreateMap<TblTreatyDto, TblTreaty>()
-                 .ForMember(dest => dest.TblTreatyGroup, opt => opt.MapFrom(src => src.TblTreatyGroup)).ReverseMap();
+            //CreateMap<TblTreatyDto, TblTreaty>()
+            //     .ForMember(dest => dest.TblTreatyGroup, opt => opt.MapFrom(src => src.TblTreatyGroup)).ReverseMap();
 
-            CreateMap<TblTreatyDto, TblTreaty>()
-                .ForMember(dest => dest.TblParticipant, opt => opt.MapFrom(src => src.TblParticipant)).ReverseMap();
+            //CreateMap<TblTreatyDto, TblTreaty>()
+            //    .ForMember(dest => dest.TblParticipant, opt => opt.MapFrom(src => src.TblParticipant)).ReverseMap();
 
             CreateMap<TblTreatyGroup, TblTreatyGroupDto>();
             CreateMap<TblTreatyGroupDto, TblTreatyGroup>();
 
             CreateMap<TblArrangement, TblArrangementDto>();
-            CreateMap<TblArrangement, TblArrangementDto>();
+            CreateMap<TblArrangementDto, TblArrangement>();
 
-            CreateMap<TblTreatyGroupDto, TblTreatyGroup>()
-                .ForMember(dest => dest.TblArrangement, opt => opt.MapFrom(src => src.TblArrangement)).ReverseMap();
+            //CreateMap<TblTreatyGroupDto, TblTreatyGroup>()
+            //    .ForMember(dest => dest.TblArrangement, opt => opt.MapFrom(src => src.TblArrangement)).ReverseMap();
 
 
 
