@@ -221,8 +221,15 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
         public List<CustomerSettingsDTO> GetCustomerTypeSettings(int customerid, string type, int envid, ApiContext apiContext)
         {
             _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
-            var data = _cpcontext.TblCustomerSettings.Where(a => a.CustomerId == customerid && a.Type == type);
-
+            IQueryable<TblCustomerSettings> data = null;
+            if (string.IsNullOrEmpty(type))
+            {
+                data = _cpcontext.TblCustomerSettings.Where(a => a.CustomerId == customerid);
+            }
+            else
+            {
+                data = _cpcontext.TblCustomerSettings.Where(a => a.CustomerId == customerid && a.Type == type);
+            }
             if (envid != 0)
             {
                 data = data.Where(a => a.EnvId == envid);

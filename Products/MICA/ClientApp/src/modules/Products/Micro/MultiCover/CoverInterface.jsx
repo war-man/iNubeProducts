@@ -189,8 +189,10 @@ class CoverInterface extends React.Component {
             if (filtertype.length > 0) {
                 this.GetRiskClaimMaster('Risk', filtertype[0].mID, event.target.value);
                 //this.GetRiskClaimMaster('Risk', "64", 1000);
-
+                
             }
+            //Risk Parmater based on CoverID
+            this.GetRiskClaimMaster('Risk', 64, event.target.value);
         }
         if (name === "insurableItemTypeId" || name === "insurableCategoryId") {
             const reg = this.props.ProductDTO[addType][Iindex];
