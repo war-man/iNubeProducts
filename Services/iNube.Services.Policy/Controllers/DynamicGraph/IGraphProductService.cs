@@ -15,7 +15,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph
         Task<IEnumerable<ddlDTOs>> GetGraphConfigName(string lMasterlist, ApiContext apiContext);
         Task<IEnumerable<DashboardParamsDTO>> GetParameters(int ReportConfigId, ApiContext apiContext);
         Task<string> GetQueryById(int ReportConfigId, ApiContext apiContext);
-        Task<DataTable> QueryExecution(QueryDTOs queryDTO, ApiContext apiContext);
+        Task<List<object>> QueryExecution(QueryDTOs queryDTO, ApiContext apiContext);
         Task<IEnumerable<ddlDTOs>> GetGraphNameForPermissions(ApiContext apiContext);
         Task<IEnumerable<DashboardConfigParamDTO>> GetParameterDetails(int ReportConfigId, ApiContext apiContext);
         void DeleteParameter(int ReportConfigParamId, ApiContext apiContext);
