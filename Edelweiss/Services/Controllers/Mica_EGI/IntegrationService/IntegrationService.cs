@@ -59,6 +59,9 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
         Task<MobileAlertResponseDTO> MobileNotification(MobileAlertRequestDTO alertRequestDTO);
 
+        //PB Monthly-SI Adjustment Amount
+        Task<IEnumerable<CustomerSettingsDTO>> GetCustomerSettings(string Type, ApiContext apiContext);
+
     }
     public class IntegrationService : IIntegrationService
     {
@@ -253,6 +256,12 @@ namespace iNube.Services.Controllers.EGI.IntegrationServices
 
 
             return await ExternalPostApiInvoke<MobileAlertRequestDTO, MobileAlertResponseDTO>(uri, apiContext, alertRequestDTO);
+        }
+
+        public async Task<IEnumerable<CustomerSettingsDTO>> GetCustomerSettings(string Type, ApiContext apiContext)
+        {
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerTypeSettings?customerid=" + apiContext.OrgId + "&type=" + Type + "&envid=" + apiContext.ServerType;
+            return await GetListApiInvoke<CustomerSettingsDTO>(uri, apiContext);
         }
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()

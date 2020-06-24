@@ -6014,24 +6014,24 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                             dynamic LatestAction = JsonConvert.DeserializeObject(CDDetails.Select(x => x).OrderByDescending(x => x.EndorsementEffectivedate).FirstOrDefault().UpdatedResponse);
 
-                            dynamic PolicyData = JsonConvert.DeserializeObject(CDDetails.FirstOrDefault(x => x.Action == "Issue Policy").UpdatedResponse);
+                            //dynamic PolicyData = JsonConvert.DeserializeObject(CDDetails.FirstOrDefault(x => x.Action == "Issue Policy").UpdatedResponse);
 
-                            var Source = PolicyData["Source"];
+                            var Source = LatestAction["Source"];
 
                             if (Source != null)
                             {
                                 monthlySiDTO.Source = Source;
                             }
 
-                            string StateCode = PolicyData["stateCode"];
+                            string StateCode = LatestAction["stateCode"];
                             TaxTypeDTO TaxType = await TaxTypeForStateCode(StateCode, context);
 
                             monthlySiDTO.PolicyNo = policy;
                             //PolicyData
-                            monthlySiDTO.PolicyStatus = PolicyData["PolicyStatus"];
-                            monthlySiDTO.InsuredName = PolicyData["Name"];
-                            monthlySiDTO.Phone = PolicyData["Mobile Number"];
-                            monthlySiDTO.AuthPayUid = PolicyData["PaymentInfo"][0]["RefrenceNumber"];
+                            monthlySiDTO.PolicyStatus = LatestAction["PolicyStatus"];
+                            monthlySiDTO.InsuredName = LatestAction["Name"];
+                            monthlySiDTO.Phone = LatestAction["Mobile Number"];
+                            monthlySiDTO.AuthPayUid = LatestAction["PaymentInfo"][0]["RefrenceNumber"];
 
                             //Total Usage Method
                             monthlySiDTO.NumberOfDaysChargeable = DaysChargeable;
@@ -7086,6 +7086,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             ErrorInfo errorInfo = new ErrorInfo();
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            decimal Minimum = -1;
+            decimal Maximum = 1;
+
 
             if (String.IsNullOrEmpty(monthlySIDTO.PolicyNumber))
             {
@@ -7131,10 +7134,28 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     return response;
                 }
 
+                var CustomerData = await _integrationService.GetCustomerSettings("Adjustment",context);
+                               
+                if (CustomerData.Count() > 0)
+                {
+                    Minimum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Minimum").KeyValue);
+                    Maximum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Maximum").KeyValue);
+                }
+                else
+                {
+                    response.ResponseMessage = "MICA CustomerSettings Not Found";
+                    response.Id = monthlySIDTO.PolicyNumber;
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "CustomerSettings Not Found";
+                    errorInfo.ErrorCode = "MSI006";
+                    errorInfo.PropertyName = "CustomerSettings Not Found";
+                    response.Errors.Add(errorInfo);
+                }
 
-                var DifferenceAmount = monthlySIDTO.PaidAmount - MonthlySIData.TotalAmountChargeable;
 
-                if (DifferenceAmount >= -1 && DifferenceAmount<=1)
+                decimal DifferenceAmount = Convert.ToDecimal(monthlySIDTO.PaidAmount - MonthlySIData.TotalAmountChargeable);
+
+                if (DifferenceAmount >= Minimum && DifferenceAmount<= Maximum)
                 {                 
 
                     var CdDTO = JsonConvert.DeserializeObject<ExtCDDTO>(MonthlySIData.PremiumDetails);
