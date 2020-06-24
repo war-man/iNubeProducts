@@ -74,6 +74,9 @@ class Provision extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            trailflag: false,
+            productionflag: false,
+            testflag:false,
             Insurancecertificate: "Policy",
             apikit: "ApiKit",
             invoice: "Invoice",
@@ -150,7 +153,8 @@ class Provision extends React.Component {
 
 
     componentDidMount() {
-        fetch(`${UserConfig.UserConfigUrl}/api/CustomerProvisioning/GetMaster?lMasterlist=qwer&isFilter=true`, {
+        //fetch(`${UserConfig.UserConfigUrl}/api/CustomerProvisioning/GetMaster?lMasterlist=qwer&isFilter=true`, {
+        fetch(`https://localhost:44351/api/CustomerProvisioning/GetMaster?isFilter=true`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -260,6 +264,7 @@ class Provision extends React.Component {
             }
 
             fetch(`${UserConfig.UserConfigUrl}/api/CustomerProvisioning/CreateCustomerProvision`, {
+            //fetch(`https://localhost:44351/api/CustomerProvisioning/CreateCustomerProvision`, {
                 method: 'POST',
                 body: JSON.stringify(this.state.CustomerProvisioningDTO),
                 headers: {
@@ -327,15 +332,17 @@ class Provision extends React.Component {
     });
 
     SetProvisionValue = (event) => {
-
+        debugger;
         let Provision = this.state.Provision;
-        let name = event.target.name;
+        if (event.target.checked != undefined) {
+            let name = event.target.name;
 
-        let checked = event.target.checked;
-        Provision[name] = checked;
+            let checked = event.target.checked;
+            Provision[name] = checked;
 
-        this.setState({ Provision });
-        console.log("Provision: ", this.state.Provision);
+            this.setState({ Provision });
+            console.log("Provision: ", this.state.Provision);
+        }
         //if (checked == true) {
         //    this.state.customerSettings.isActive = true;
         //}
@@ -345,28 +352,50 @@ class Provision extends React.Component {
     }
 
     SetEnvProvisionValue = (event) => {
+        debugger;
         let EnvProvision = Object.assign({}, this.state.customerEnvironmentDTOs);
-        let name = event.target.name;
-        let value = event.target.checked;
-        EnvProvision['envName'] = name;
+        //let EnvProvision = this.state.customerEnvironmentDTOs;
+        if (event.target.checked !== undefined) {
+            let name = event.target.name;
+            let value = event.target.checked;
+            EnvProvision['envName'] = name;
+            if (name == "trail" && value == true) {
+                this.setState({ trailflag: true });
+            }
+            else if (name == "trail" && value == false) {
+                this.setState({ trailflag: false });
+            }
+            else if (name == "production" && value == true) {
+                this.setState({ productionflag: true });
+            }
+            else if (name == "production" && value == false) {
+                this.setState({ productionflag: false });
+            }
+            else if (name == "test" && value == true) {
+                this.setState({ testflag: true });
+            }
+            else if (name == "test" && value == false) {
+                this.setState({ testflag: false });
+            }
+            console.log(", this.state.Provision.trail", this.state.Provision.trail);
 
+            if (this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.filter(s => s.envName == name).length > 0) {
+                //if value is already selected 
+                const sp = this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.findIndex(p => p.envName == name);
+                this.state.CustomerProvisioningDTO.customerEnvironmentDTOs[sp].envName = name;
+            } else {
 
-        if (this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.filter(s => s.envName == name).length > 0) {
-            //if value is already selected 
-            const sp = this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.findIndex(p => p.envName == name);
-            this.state.CustomerProvisioningDTO.customerEnvironmentDTOs[sp].envName = name;
-        } else {
+                this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.push(EnvProvision);
+            }
 
-            this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.push(EnvProvision);
+            if (value == false) {
+
+                const sp = this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.findIndex(p => p.envName == name);
+                this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.splice(sp, 1);
+            }
+            this.setState({ EnvProvision });
+            console.log("EnvProvision: ", this.state.CustomerProvisioningDTO.customerEnvironmentDTOs);
         }
-
-        if (value == false) {
-
-            const sp = this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.findIndex(p => p.envName == name);
-            this.state.CustomerProvisioningDTO.customerEnvironmentDTOs.splice(sp, 1);
-        }
-        this.setState({ EnvProvision });
-        console.log("EnvProvision: ", this.state.CustomerProvisioningDTO.customerEnvironmentDTOs);
     }
 
 
@@ -497,32 +526,7 @@ class Provision extends React.Component {
                                             </GridItem>
 
                                         </GridContainer>
-                                        <GridContainer>
-                                            <GridItem xs={12} sm={12} md={3} className="uplevel">
-                                                <CustomCheckbox
-                                                    labelText="Database"
-                                                    name="database"
-                                                    value={this.state.Provision.database}
-                                                    onChange={(e) => this.SetProvisionValue(e)}
-                                                    formControlProps={{
-                                                        fullWidth: true
-                                                    }}
-                                                />
-                                            </GridItem>
-                                            <GridItem xs={12} sm={12} md={3} className="uplevel">
-                                                {this.state.Provision.database ?
-                                                    <CustomInput
-                                                        labelText="Database Name"
-                                                        id="dbName"
-                                                        name="dbName"
-                                                        value={this.state.CustomerProvisioningDTO.customerSettings.dbName}
-                                                        onChange={(event) => this.onInputChange("Database", event)}
-                                                        formControlProps={{
-                                                            fullWidth: true
-                                                        }}
-                                                    /> : null}
-                                            </GridItem>
-                                        </GridContainer>
+                                        
                                         <GridContainer>
                                             <GridItem xs={12} sm={12} md={3} className="uplevel">
                                                 <CustomCheckbox
@@ -574,8 +578,59 @@ class Provision extends React.Component {
                                                     }}
                                                 />
                                             </GridItem> : null}
+                                        {this.state.Provision.environment ?
+                                            <GridContainer>
+                                                {this.state.trailflag ?
+                                                    <GridItem xs={12} sm={12} md={3}>
+                                                        <MasterDropdown
+                                                            labelText="Database Name"
+                                                            id="dbName"
+                                                            lstObject={this.state.masterList}
+                                                            required={true}
+                                                            filterName='DBName'
+                                                            name="traildbName"
+                                                            value={this.state.CustomerProvisioningDTO.customerSettings.traildbName}
+                                                            onChange={(event) => this.onInputChange("Database", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>:null}
+                                                {this.state.productionflag ?
+                                                    <GridItem xs={12} sm={12} md={3}>
+                                                        <MasterDropdown
+                                                            labelText="Database Name"
+                                                            id="dbName"
+                                                            lstObject={this.state.masterList}
+                                                            required={true}
+                                                            filterName='DBName'
+                                                            name="proddbName"
+                                                            value={this.state.CustomerProvisioningDTO.customerSettings.proddbName}
+                                                            onChange={(event) => this.onInputChange("Database", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>:null}
+                                                {this.state.testflag ?
+                                                <GridItem xs={12} sm={12} md={3}>
+                                                    <MasterDropdown
+                                                        labelText="Database Name"
+                                                        id="dbName"
+                                                        lstObject={this.state.masterList}
+                                                        required={true}
+                                                        filterName='DBName'
+                                                        name="testdbName"
+                                                        value={this.state.CustomerProvisioningDTO.customerSettings.testdbName}
+                                                        onChange={(event) => this.onInputChange("Database", event)}
+                                                        formControlProps={{
+                                                            fullWidth: true
+                                                        }}
+                                                    />
+                                                    </GridItem>:null}
 
-                                        <GridContainer>
+                                            </GridContainer> : null}
+                                        {/* <GridContainer>
                                             <GridItem xs={12} sm={12} md={3} className="uplevel">
                                                 <CustomCheckbox
                                                     labelText="Services"
@@ -604,70 +659,8 @@ class Provision extends React.Component {
 
                                                 />
                                             </GridItem>
+                                        </GridContainer>*/}
 
-
-                                        </GridContainer>
-
-                                        <GridContainer>
-                                            <GridItem xs={12} sm={12} md={3} className="uplevel">
-                                                <CustomCheckbox
-                                                    labelText="Notification Template"
-                                                    name="notificationTemplate"
-                                                    value={this.state.Provision.notificationTemplate}
-                                                    onChange={(e) => this.SetProvisionValue(e)}
-                                                    formControlProps={{
-                                                        fullWidth: true
-                                                    }}
-
-                                                />
-                                            </GridItem>
-                                            {this.state.Provision.notificationTemplate ?
-                                                <GridContainer xs={12} sm={12} md={8} className="uplevel">
-                                                    <GridItem xs={12} sm={12} md={3}>
-
-                                                        <CustomInput
-                                                            labelText="Policy Scheduler"
-                                                            id="Certificate"
-                                                            name="Insurancecertificate"
-                                                            value={this.state.Insurancecertificate}
-                                                            //{this.state.CustomerProvisioningDTO.customerSettings.Insurancecertificate}
-                                                            onChange={(event) => this.onInputChange("certificate", event)}
-                                                            formControlProps={{
-                                                                fullWidth: true
-                                                            }}
-                                                        />
-                                                    </GridItem>
-                                                    <GridItem xs={12} sm={12} md={3}>
-
-                                                        <CustomInput
-                                                            labelText="Apikit"
-                                                            id="apikit"
-                                                            name="apikit"
-                                                            value={this.state.apikit}
-                                                            //{this.state.CustomerProvisioningDTO.customerSettings.apikit}
-                                                            onChange={(event) => this.onInputChange("certificate", event)}
-                                                            formControlProps={{
-                                                                fullWidth: true
-                                                            }}
-                                                        />
-                                                    </GridItem>
-                                                    <GridItem xs={12} sm={12} md={3}>
-
-                                                        <CustomInput
-                                                            labelText="Invoice"
-                                                            id="Invoice"
-                                                            name="invoice"
-                                                            value={this.state.invoice}
-                                                            //{this.state.CustomerProvisioningDTO.customerSettings.invoice}
-                                                            onChange={(event) => this.onInputChange("certificate", event)}
-                                                            formControlProps={{
-                                                                fullWidth: true
-                                                            }}
-                                                        />
-                                                    </GridItem>
-                                                </GridContainer> : null}
-
-                                        </GridContainer>
 
                                         <GridContainer>
                                             <GridItem xs={12} sm={12} md={3} className="uplevel">
@@ -684,14 +677,26 @@ class Provision extends React.Component {
                                             </GridItem>
                                             {this.state.Provision.mailconfiguration ?
                                                 <GridContainer xs={12} sm={12} md={8} className="uplevel">
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="Host"
+                                                            id="Host"
+                                                            name="Host"
+                                                            value={this.state.Provision.Host}
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
 
                                                     <GridItem xs={12} sm={12} md={4}>
                                                         <CustomInput
-                                                            labelText="email"
-                                                            id="email"
-                                                            name="email"
-                                                            value={this.state.Provision.email}
-                                                            onChange={(event) => this.onInputChange("Email", event)}
+                                                            labelText="UserName"
+                                                            id="UserName"
+                                                            name="UserName"
+                                                            value={this.state.Provision.UserName}
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
                                                             formControlProps={{
                                                                 fullWidth: true
                                                             }}
@@ -704,7 +709,19 @@ class Provision extends React.Component {
                                                             id="Password"
                                                             name="Password"
                                                             value={this.state.Provision.Password}
-                                                            onChange={(event) => this.onInputChange("Password", event)}
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem> 
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="APIKey"
+                                                            id="APIKey"
+                                                            name="APIKey"
+                                                            value={this.state.Provision.APIKey}
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
                                                             formControlProps={{
                                                                 fullWidth: true
                                                             }}
@@ -713,11 +730,11 @@ class Provision extends React.Component {
 
                                                     <GridItem xs={12} sm={12} md={4}>
                                                         <CustomInput
-                                                            labelText="Host"
-                                                            id="Host"
-                                                            name="Host"
-                                                            value={this.state.Provision.Host}
-                                                            onChange={(event) => this.onInputChange("Host", event)}
+                                                            labelText="Server"
+                                                            id="Server"
+                                                            name="Server"
+                                                            value={this.state.Provision.Server}
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
                                                             formControlProps={{
                                                                 fullWidth: true
                                                             }}
@@ -730,7 +747,7 @@ class Provision extends React.Component {
                                                             id="Port"
                                                             name="Port"
                                                             value={this.state.Provision.Port}
-                                                            onChange={(event) => this.onInputChange("Port", event)}
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
                                                             formControlProps={{
                                                                 fullWidth: true
                                                             }}
@@ -739,11 +756,43 @@ class Provision extends React.Component {
 
                                                     <GridItem xs={12} sm={12} md={4}>
                                                         <CustomInput
-                                                            labelText="EmailDomain"
-                                                            id="EmailDomain"
-                                                            name="EmailDomain"
-                                                            value={this.state.Provision.EmailDomain}
-                                                            onChange={(event) => this.onInputChange("EmailDomain", event)}
+                                                            labelText="SenderName"
+                                                            id="SenderName"
+                                                            name="SenderName"
+                                                            value={this.state.Provision.SenderName}
+
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="SenderEmail"
+                                                            id="email"
+                                                            name="SenderEmail"
+                                                            value={this.state.Provision.SenderEmail}
+
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+                                                                                                      
+
+                                                  
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="Domain"
+                                                            id="Domain"
+                                                            name="Domain"
+                                                            value={this.state.Provision.Domain}
+                                                            onChange={(event) => this.onInputChange("SMTP", event)}
                                                             formControlProps={{
                                                                 fullWidth: true
                                                             }}
@@ -751,6 +800,231 @@ class Provision extends React.Component {
                                                     </GridItem>
                                                 </GridContainer> : null}
                                         </GridContainer>
+                                        <GridContainer>
+                                            <GridItem xs={12} sm={12} md={3} className="uplevel">
+                                                <CustomCheckbox
+                                                    labelText="SMS Configuration"
+                                                    name="smsconfiguration"
+                                                    value={this.state.CustomerProvisioningDTO.customerSettings.smsconfiguration}
+                                                    onChange={(e) => this.SetProvisionValue(e)}
+                                                    formControlProps={{
+                                                        fullWidth: true
+                                                    }}
+
+                                                />
+                                            </GridItem>
+                                            {this.state.Provision.smsconfiguration ?
+                                                <GridContainer xs={12} sm={12} md={8} className="uplevel">
+                                                    <GridItem xs={12} sm={12} md={8}>
+                                                        <CustomInput
+                                                            labelText="URL"
+                                                            id="url"
+                                                            name="URL"
+                                                            value={this.state.Provision.URL}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="UserName"
+                                                            id="UserName"
+                                                            name="UserName"
+                                                            value={this.state.Provision.UserName}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="Password"
+                                                            id="Password"
+                                                            name="Password"
+                                                            value={this.state.Provision.Password}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="APIKey"
+                                                            id="APIKey"
+                                                            name="APIKey"
+                                                            value={this.state.Provision.APIKey}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="SenderId"
+                                                            id="SenderId"
+                                                            name="SenderId"
+                                                            value={this.state.Provision.SenderId}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="Channel"
+                                                            id="Channel"
+                                                            name="Channel"
+                                                            value={this.state.Provision.Channel}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="DCS"
+                                                            id="dcs"
+                                                            name="DCS"
+                                                            value={this.state.Provision.DCS}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="Flash SMS"
+                                                            id="flashsms"
+                                                            name="FlashSMS"
+                                                            value={this.state.Provision.FlashSMS}
+
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+
+
+
+
+
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="Country Code"
+                                                            id="CountryCode"
+                                                            name="CountryCode"
+                                                            value={this.state.Provision.CountryCode}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+                                                    <GridItem xs={12} sm={12} md={4}>
+                                                        <CustomInput
+                                                            labelText="Short"
+                                                            id="Short"
+                                                            name="Short"
+                                                            value={this.state.Provision.Short}
+                                                            onChange={(event) => this.onInputChange("SMS", event)}
+                                                            formControlProps={{
+                                                                fullWidth: true
+                                                            }}
+                                                        />
+                                                    </GridItem>
+                                                </GridContainer> : null}
+                                        </GridContainer>
+                                        <GridContainer>
+                                            <GridItem xs={12} sm={12} md={3} className="uplevel">
+                                                <CustomCheckbox
+                                                    labelText="TimeZone"
+                                                    name="TimeZone"
+                                                    value={this.state.Provision.TimeZone}
+                                                    onChange={(e) => this.SetProvisionValue(e)}
+                                                    formControlProps={{
+                                                        fullWidth: true
+                                                    }}
+                                                />
+                                            </GridItem>
+                                        </GridContainer>
+                                        {this.state.Provision.TimeZone &&
+                                        <GridContainer>
+                                        <GridItem xs={12} sm={12} md={3}>
+
+                                            <CustomInput
+                                                labelText="Time Zone"
+                                                id="timezone"
+                                                name="TimeZone"
+                                                value={this.state.CustomerProvisioningDTO.customerSettings.TimeZone}
+                                                //{this.state.CustomerProvisioningDTO.customerSettings.Insurancecertificate}
+                                                    onChange={(event) => this.onInputChange("TimeZone", event)}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+                                            />
+                                        </GridItem>
+                                            </GridContainer>}
+                                        <GridContainer>
+                                            <GridItem xs={12} sm={12} md={3} className="uplevel">
+                                                <CustomCheckbox
+                                                    labelText="Adjustment"
+                                                    name="Adjustment"
+                                                    value={this.state.Provision.Adjustment}
+                                                    onChange={(e) => this.SetProvisionValue(e)}
+                                                    formControlProps={{
+                                                        fullWidth: true
+                                                    }}
+                                                />
+                                            </GridItem>
+                                        </GridContainer>
+                                        {this.state.Provision.Adjustment &&
+                                            <GridContainer>
+                                                <GridItem xs={12} sm={12} md={3}>
+
+                                                    <CustomInput
+                                                    labelText="Maximum"
+                                                    id="Maximum"
+                                                        inputType="number"
+                                                    name="Maximum"
+                                                    value={this.state.CustomerProvisioningDTO.customerSettings.Maximum}
+                                                        //{this.state.CustomerProvisioningDTO.customerSettings.Insurancecertificate}
+                                                    onChange={(event) => this.onInputChange("Maximum", event)}
+                                                        formControlProps={{
+                                                            fullWidth: true
+                                                        }}
+                                                    />
+                                            </GridItem>
+                                            <GridItem xs={12} sm={12} md={3}>
+
+                                                <CustomInput
+                                                    labelText="Minimum"
+                                                    id="positive"
+                                                    inputType="number"
+                                                    name="Minimum"
+                                                    value={this.state.CustomerProvisioningDTO.customerSettings.NegetiveTxn}
+                                                    //{this.state.CustomerProvisioningDTO.customerSettings.Insurancecertificate}
+                                                    onChange={(event) => this.onInputChange("NegetiveTxn", event)}
+                                                    formControlProps={{
+                                                        fullWidth: true
+                                                    }}
+                                                />
+                                            </GridItem>
+                                            </GridContainer>}
                                         <GridContainer justify="center">
                                             <GridItem xs={12} sm={12} md={4}  >
                                                 <DocumentUpload configId={this.state.configId} />

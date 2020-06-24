@@ -79,22 +79,29 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             {
                 item.CreatedDate = DateTimeNow;
                 item.CustomerId = customerProvisioningDTO.CustomerId;
-
+                item.EnvId = Convert.ToDecimal(apiContext.ServerType);
                 if (item.Type == "Database")
                 {
+                    var databaselist = customerProvisioningDTO.customerSettings.Where(a => a.Type == "Database").ToList();
                     if (count == 0)
                     {
-                        foreach (var i in customerProvisioningDTO.customerEnvironmentDTOs)
+                        for (var i = 0; i < customerProvisioningDTO.customerEnvironmentDTOs.Count; i++)
                         {
-                            i.Product = apiContext.ProductType;
-                            i.CustomerId = customerProvisioningDTO.CustomerId;
-                            i.CreatedDate = DateTimeNow;
-                            i.IsActive = true;
-                            // i.Dbconnection = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433; Initial Catalog =" + item.KeyValue + "; User Id=admin; Password=micaadmin";
-                            if (item.KeyValue == "EdelweissTest")
+                            customerProvisioningDTO.customerEnvironmentDTOs[i].Product = apiContext.ProductType;
+                            customerProvisioningDTO.customerEnvironmentDTOs[i].CustomerId = customerProvisioningDTO.CustomerId;
+                            customerProvisioningDTO.customerEnvironmentDTOs[i].CreatedDate = DateTimeNow;
+                            customerProvisioningDTO.customerEnvironmentDTOs[i].IsActive = true;
+                            if (databaselist.Count > 0)
                             {
-                                i.Dbconnection = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433; Initial Catalog =" + item.KeyValue + "; User Id=admin; Password=micaadmin";
+                                var data = _cpcontext.TblmasCpcommonTypes.Where(a => a.CommonTypeId.ToString() == databaselist[i].KeyValue).Select(a => a.TypeCode).FirstOrDefault();
+                                customerProvisioningDTO.customerEnvironmentDTOs[i].Dbconnection = data;
                             }
+
+
+                            //if (item.KeyValue == "EdelweissTest")
+                            //{
+                            //    i.Dbconnection = "Data Source=edelweissdb1.coow0ess1gft.ap-south-1.rds.amazonaws.com,1433; Initial Catalog =" + item.KeyValue + "; User Id=admin; Password=micaadmin";
+                            //}
                             //else if (item.KeyValue == "MicaDev")
                             //{
                             //    i.Dbconnection = "Data Source=inubepeg.database.windows.net; Initial Catalog =" + item.KeyValue + "; User Id=MICAUSER; Password=MICA*user123";
@@ -111,11 +118,15 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             try
             {
                 var customer = _mapper.Map<List<TblCustomerEnvironment>>(customerProvisioningDTO.customerEnvironmentDTOs);
+                var custdata = _cpcontext.TblCustomerSettings.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).FirstOrDefault();
+                if (custdata == null)
+                {
+                    _cpcontext.TblCustomerSettings.AddRange(customers);
+                    _cpcontext.TblCustomerEnvironment.AddRange(customer);
 
-                _cpcontext.TblCustomerSettings.AddRange(customers);
-                _cpcontext.TblCustomerEnvironment.AddRange(customer);
+                    _cpcontext.SaveChanges();
+                }
 
-                _cpcontext.SaveChanges();
 
             }
             catch (Exception ex)
@@ -125,12 +136,12 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             var _spocdetails = await _integrationService.GetCustProvisioningDetailsAsync(customerProvisioningDTO.CustomerId, apiContext);
             var userdetails = _spocdetails.CustSpocDetails.FirstOrDefault();
             var useradress = _spocdetails.CustAddress.FirstOrDefault();
-            var envid = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).FirstOrDefault();
+            var envidList = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).ToList();
 
 
 
             UserDTO userDTO = new UserDTO();
-            userDTO.EnvId = envid.Id;
+            //userDTO.EnvId = envid.Id;
             //userDTO.EnvId = cpdata;
             UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
             userDetailsDTO.FirstName = userdetails.FirstName;
@@ -146,7 +157,8 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
             userDetailsDTO.Email = userdetails.EmailId;
             userDetailsDTO.PanNo = userdetails.PanNo;
             userDetailsDTO.BranchName = userdetails.BranchName;
-            userDetailsDTO.RoleId = "efffe944-6a34-433b-964f-9311c90192eb"; //Role Customer Admin
+            var roleid = _cpcontext.TblmasCpcommonTypes.Where(a => a.MasterType == "Role").Select(a => a.Value).FirstOrDefault();
+            userDetailsDTO.RoleId = roleid.ToString();  //Role Customer Admin
             userDetailsDTO.PartnerId = 0;
             userDetailsDTO.OrganizationId = customerProvisioningDTO.CustomerId;
             userDTO.UserDetails.Add(userDetailsDTO);
@@ -165,23 +177,26 @@ namespace iNube.Services.UserManagement.Controllers.CustomerProvisioning.CPServi
 
             try
             {
-
-                var result = await _userService.CreateProfileUser(userDTO, apiContext);
-                //var envids = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).Select(x=>x);
-                if (Convert.ToInt32(result.Status) == 7)
+                foreach (var item in envidList)
                 {
-                    return new CustomerResponse { Status = BusinessStatus.Error, ResponseMessage = $"Customer user already exists" };
-                }
-                else
-                {
-                    UserRoleMapDTO userRoles = new UserRoleMapDTO();
-                    //userRoles.UserId = result.users.Id;
-                    userRoles.EnvId = envid.Id;
-                    userRoles.UserId = result.users.Id;
-                    //string[] roleid = { "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020" };
-                    string[] roleid = { "df7b49c8-8cf5-48c0-ba3b-2042f077a55a" };
-                    userRoles.RoleId = roleid;
-                    var roles = _roleService.AssignRole(userRoles, apiContext);
+                    userDTO.EnvId = item.Id;
+                    var result = await _userService.CreateProfileUser(userDTO, apiContext);
+                    //var envids = _cpcontext.TblCustomerEnvironment.Where(a => a.CustomerId == customerProvisioningDTO.CustomerId).Select(x=>x);
+                    if (Convert.ToInt32(result.Status) == 7)
+                    {
+                        return new CustomerResponse { Status = BusinessStatus.Error, ResponseMessage = $"Customer user already exists" };
+                    }
+                    else
+                    {
+                        UserRoleMapDTO userRoles = new UserRoleMapDTO();
+                        //userRoles.UserId = result.users.Id;
+                        userRoles.EnvId = item.Id;
+                        userRoles.UserId = result.users.Id;
+                        //string[] roleid = { "6EAE7D39-D9DB-41EF-A4B1-12E07F1E5020" };
+                        string[] roleId = { roleid };
+                        userRoles.RoleId = roleId;
+                        var roles = _roleService.AssignRole(userRoles, apiContext);
+                    }
                 }
             }
             catch (Exception ex)

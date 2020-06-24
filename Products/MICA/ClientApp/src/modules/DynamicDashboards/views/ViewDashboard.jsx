@@ -68,7 +68,9 @@ class ViewDashboard extends React.Component {
             graphData: [
                 ['Task', '']
             ],
-            result: [],
+            result: [
+                ['Task', '','']
+            ],
             flagParam: false,
             fields: [],
             TableDataList: [],
@@ -83,7 +85,8 @@ class ViewDashboard extends React.Component {
                 paramList: [],
             },
             displayparameter: {},
-            SpecificData: [['Task', 'Hours per Day','test'],
+            SpecificData: [
+            ['Task', 'Hours per Day', 'test'],
             ['A', 13, 21],
             ['B', 2,33],
             ['C', 2,12],
@@ -228,7 +231,7 @@ class ViewDashboard extends React.Component {
     };
 
     handleParameterCheck = event => {
-        debugger;
+       
         this.state.title = this.state.reportName.filter(a => a.mID == event.target.value)[0].mValue;
         console.log("title", this.state.title);
         let param = this.state.paramList;
@@ -341,13 +344,7 @@ class ViewDashboard extends React.Component {
                 Final.push(CountArray);
                 console.log("FinalArray", Final.length);
                 this.setState({ NEWSTACKDATA: Final });
-
-
-
-
             }
-
-
         }
 
         if (Final.length <= 0) {
@@ -355,19 +352,12 @@ class ViewDashboard extends React.Component {
                 text: "There are No Records for selected Month: " + month,
                 icon: "error"
             });
-
         }
-
         console.log("MonthWiseData", Final);
-
-
-
     }
-
-
-
+    
     queryExecution = event => {
-        debugger;
+      
         let check = this.state.CheckCondition;
         this.setState({ paramList: [] });
         let param = this.state.paramList;
@@ -411,68 +401,65 @@ class ViewDashboard extends React.Component {
             body: JSON.stringify(request)
         }).then(response => response.json())
             .then(data => {
-                debugger;
                 this.state.graphData = [];
                 if (this.state.labels.xaxis != null && this.state.labels.yaxis != null) {
                     let strLength = this.state.labels.xaxis.length;
-                    if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
-                        this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
-                    } else {
-                        this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                    }
-                } else {
-                    if (this.state.labels.yaxis != null && this.state.labels.xaxis != null) {
-                        this.state.graphData[0] = ['Task', this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                    } else {
-                        this.state.graphData[0] = ['Task', ''];
+                    let multilabel = this.state.labels.yaxis.split(",");
+
+                    if (multilabel[1] == undefined) {
+                        if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
+                            //  this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
+                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0]];
+
+                        } else {
+                            // this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0]];
+
+                        }
                     }
 
+                    else {
+                        if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
+                            //  this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
+                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1]];
+
+                        } else {
+                            // this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1]];
+                        }
+                    }
                 }
+                    else {
+                        if (this.state.labels.yaxis != null && this.state.labels.xaxis != null) {
+                            this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+                        } else {
+                            this.state.graphData[0] = [''];
+                        }
+
+                    }
+                
                 this.setState({ result: data });
                 console.log(this.state.result, 'Result');
 
-                this.state.result.map(m => {
+              //  this.state.result.map(m => {
                     let arr = [];
-                    //let date= this.datechange(m.column1);
-                    //var today = new Date(m.column2);
-                    //if (today.getDate() < 10) {
-                    //    var dt = '0' + today.getDate();
-                    //}
-                    //else {
-                    //    var dt = today.getDate();
-                    //}
-                    //if (today.getMonth() < 10) {
-                    //    var mm = '0' + (today.getMonth() + 1)
-                    //}
-                    //else {
-                    //    var mm = (today.getMonth() + 1);
-                    //}
-                    //var date = today.getFullYear() + '-' + mm + '-' + dt;
-                    //debugger;
-                    //if (date != "NaN-NaN-NaN") {
-                    //    var formatteddate = this.datechange1(date);
-                    //    arr.push(formatteddate);
-                    //    arr.push(m.column1);
-                    //} else {
-                    //    arr.push(m.column2);
-                    //    arr.push(m.column1);
-                    //}
-
                     //Date change
-                    //let splitdate = m.column2.split('-');
+                    //let splitdate = m.column2.toString().split('-');
                     //if (splitdate.length >= 2) {
                     //    if (m.column2 != undefined) {
                     //        m.column2 = new Date(m.column2).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
                     //    }
                     //} 
-                    arr.push(m.column2);
-                    arr.push(m.column1);
+                   
                     //arr.push(m.column3);
-                    this.state.graphData.push(arr);
+                    //arr.push(m.column2);
+
+                for (var i = 0; i < this.state.result.length; i++) {
+                    this.state.graphData.push(this.state.result[i]);
+                }
                     console.log("graphdata", this.state.graphData, arr);
-                });
+               // });
                 this.setState({ showgraph: false, showdd:true })
-                //this.setState({ CheckCondition: Object.assign(this.state.CheckCondition, emptyarray) });
                 if (this.state.result.length > 0) {
                     this.setState({ tableFlag: false, flagParam: false, loader: false });
                     this.tabledata();
@@ -489,23 +476,6 @@ class ViewDashboard extends React.Component {
             });
     }
 
-
-    /*onDateChange = (name, event) => {
-        var today = event.toDate();
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-
-        var fields = this.state.CheckCondition;
-        fields[name] = date;
-        this.setState({ fields });
-
-        var temp = event.toDate();
-        var tempDate = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear() + ' ' + today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-
-        var dparam = this.state.displayparameter;
-        dparam[name] = tempDate;
-        this.setState({ dparam });
-        console.log("fields", fields);
-    };*/
 
     reset = () => {
         let resetField = this.state.ReportConfigDto;
@@ -533,7 +503,7 @@ class ViewDashboard extends React.Component {
         window.scrollTo(0, 0);
     }
     datechange1 = (date) => {
-        debugger;
+       
         if (date != undefined) {
             const _date = date.split('-');
             const dateObj = { month: _date[1], year: _date[0], day: _date[2] };
@@ -542,7 +512,7 @@ class ViewDashboard extends React.Component {
         }
     }
     datechange = (date) => {
-        debugger;
+     
         if (date != undefined) {
             const _date = date.split('-');
             const dateObj = { month: _date[1], year: _date[0], day: _date[2] };

@@ -46,7 +46,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MotorGrap
             throw new NotImplementedException();
         }
 
-        public Task<DataTable> QueryExecution(QueryDTOs queryDTO, ApiContext apiContext)
+        public Task<List<object>> QueryExecution(QueryDTOs queryDTO, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }

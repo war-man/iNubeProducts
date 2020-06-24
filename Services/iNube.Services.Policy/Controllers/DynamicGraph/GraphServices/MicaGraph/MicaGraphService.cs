@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using System.Reflection;
 using iNube.Utility.Framework.Core.Helpers;
 using System.Collections;
+using iNube.Services.Policy.Helpers;
 
 namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
 {
@@ -146,7 +147,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             return queryData;
         }
 
-        public async Task<DataTable> QueryExecution(QueryDTOs queryDTO, ApiContext apiContext)
+        public async Task<List<object>> QueryExecution(QueryDTOs queryDTO, ApiContext apiContext)
         {
             //_context = (MICADBContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType,_configuration));
 
@@ -154,8 +155,6 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
             var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
             var connectionString = dbConnectionString.Dbconnection;
             var query = await GetQueryById(queryDTO.dashboardConfigId, apiContext);
-            //var query = "select * from [CM].[tblClaimInsurable] where ClaimId=@ClaimId and Name=@Name";
-            // var query = "select * from [CM].[tblClaimInsurable] where ClaimId='335' ";
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -172,14 +171,24 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
                     SqlDataAdapter adapter = new SqlDataAdapter(command);
                     adapter.Fill(ds, "Query");
                     connection.Close();
-                    var data= ds.Tables[0];
+                    var data = ds.Tables[0];
+                  
                     List<object> ReturnData = new List<object>();
-                    return data;
+                    List<object> finalData = new List<object>();
+
+                    foreach (DataRow row in data.Rows)
+                    {
+                        ReturnData = row.ItemArray.ToList();
+                        finalData.Add(ReturnData);
+                    }
+                    
+                    return finalData;
                 }
             }
             catch (Exception ex)
             {
-                return new DataTable();
+                //return new DataTable();
+                return null;
             }
         }
 
