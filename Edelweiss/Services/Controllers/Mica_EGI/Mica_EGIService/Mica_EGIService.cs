@@ -4636,20 +4636,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         int PCCount = 0;
                         int TWCount = 0;
-                        var VehicleRiskItem = SourceObject["InsurableItem"][0]["RiskItems"];
-                        string PayRefNo = SourceObject["PaymentInfo"][0]["RefrenceNumber"].ToString();
+                        var VehicleRiskItem = SourceObject[1]["Data"]["InsurableItem"][0]["RiskItems"];
+                        string PayRefNo = SourceObject[1]["Data"]["PaymentInfo"][0]["RefrenceNumber"].ToString();
                         JArray vehicleItems = (JArray)VehicleRiskItem;
                         int vehicleCount = vehicleItems.Count();
                         var Year = DateTime.Today.Year;
-                        string PolicyNumber = SourceObject["PolicyNumber"].ToString();
+                        string PolicyNumber = SourceObject[1]["Data"]["PolicyNumber"].ToString();
                         var policydata = await _integrationService.GetPolicyDetails(PolicyNumber, context);
                         var policyRiskData = policydata["InsurableItem"][1]["RiskItems"];
                         int NoOfVehicles = Convert.ToInt32(policydata["noOfPC"]) + Convert.ToInt32(policydata["noOfTW"]);
                         var NoOfPC = policydata["noOfPC"];
                         var NoOfTW = policydata["noOfTW"];
-                        int SI = Convert.ToInt32(SourceObject["si"]);
+                        int SI = Convert.ToInt32(SourceObject[1]["Data"]["si"]);
 
-                        var EndorsementType = SourceObject["EndorsementType"];
+                        var EndorsementType = SourceObject[1]["Data"]["EndorsementType"];
 
                         if (EndorsementType == "Addition of vehicle")
                         {
@@ -4998,12 +4998,13 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     RuleEngineResponse ruleEngine2 = new RuleEngineResponse();
                     try
                     {
-                        var EndorsementType = SourceObject["EndorsementType"];
-                        var VehicleRiskItem = SourceObject["InsurableItem"][0]["RiskItems"];
-                        string PolicyNumber = SourceObject["PolicyNumber"].ToString();
-                        var policydata = await _integrationService.GetPolicyByNumber(PolicyNumber, context);
-                        var policyNo = policydata.PolicyNo;
-                        var policydetails = await _integrationService.GetPolicyDetails(PolicyNumber, context);
+                        var EndorsementType = SourceObject[1]["Data"]["EndorsementType"];
+                        var VehicleRiskItem = SourceObject[1]["Data"]["InsurableItem"][0]["RiskItems"];
+                        string PolPolicyNumber = SourceObject[0]["Data"]["PolicyNumber"].ToString();
+                        string EndPolicyNumber = SourceObject[1]["Data"]["PolicyNumber"].ToString();
+                        //var policydata = await _integrationService.GetPolicyByNumber(PolicyNumber, context);
+                       // var policyNo = policydata.PolicyNo;
+                        var policydetails = await _integrationService.GetPolicyDetails(PolPolicyNumber, context);
                         int PCCount = 0;
                         foreach (var item in VehicleRiskItem)
                         {
@@ -5034,7 +5035,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             }
                         }
 
-                        if (policyNo == null)
+                        if (PolPolicyNumber != EndPolicyNumber)
                         {
                             ruleEngine2 = new RuleEngineResponse();
                             ruleEngine2.ValidatorName = "Policy Number";
