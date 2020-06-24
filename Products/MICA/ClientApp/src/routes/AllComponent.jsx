@@ -134,6 +134,7 @@ const TransactionMapping = AsyncComponent(() => { return import("modules/Account
 /*Dynamic Page Module*/
 const DynamicLayout = AsyncComponent(() => { return import("modules/DynamicPage/views/MasterLayout.jsx"); });
 const DynamicForm = AsyncComponent(() => { return import("modules/Workflow/DynamicForm.jsx"); });
+const DynamicEntity = AsyncComponent(() => { return import("modules/Workflow/DynamicEntity.jsx"); });
 const Attributes = AsyncComponent(() => { return import("modules/Products/Dynamic/Attributes.jsx"); });
 const Entities = AsyncComponent(() => { return import("modules/Products/Dynamic/Entities.jsx"); });
 const SearchAttributes = AsyncComponent(() => { return import("modules/Products/Dynamic/SearchAttribute.jsx"); });
@@ -351,6 +352,7 @@ export const ComponentsList = {
     Reallocation: Reallocation,
     CalculationDisplay: CalculationDisplay,
     DynamicProd: DynamicProduct,
+    DynamicEntity: DynamicEntity,
     UserDashboard: UserDashboard,
     ReportConfig: ReportConfiguration,
     ReportExecution: ReportExecution,

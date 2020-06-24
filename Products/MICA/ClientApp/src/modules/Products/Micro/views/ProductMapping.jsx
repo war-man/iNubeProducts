@@ -243,7 +243,7 @@ class ProductMapping extends React.Component {
 
     GetMasterData = (type, event) => {
         this.SetValue(type, event);
-
+        this.setState({ parentId: event.target.value });
         console.log("type: ", type);
         var regex = /^[A-Za-z]+$/;
         var isvalid = regex.test(type);
@@ -275,6 +275,7 @@ class ProductMapping extends React.Component {
             this.GetMasterService(type, event.target.value);
         }
         console.log("Table: ", this.state.tabledata)
+
     };
 
     GetLevelMasterData = (type, event) => {
@@ -414,31 +415,31 @@ class ProductMapping extends React.Component {
         return this.state.MasterDTO[type];
     }
 
-    GetParentId = (type) => {
-        let field = this.state.fields;
-        switch (type) {
-            case 'LOB':
-                return 0;
-            case 'COB':
-                return field.LOB;
-            case 'InsurableCategory':
-                return field.COB;
-            case 'InsuranceType':
-                return field.InsurableCategory;
-            case 'Cover':
-                return field.InsuranceType;
-            case 'CoverEvent':
-                return field.COB;
-            case 'CoverEventFactor':
-                return field.CoverEvent;
-            case 'CoverEventFactorValue':
-                return field.CoverEventFactor;
-            case 'BenefitCriteria':
-                return field.CoverEvent;
-            default:
-                return 0;
-        }
-    }
+    //GetParentId = (type) => {
+    //    let field = this.state.fields;
+    //    switch (type) {
+    //        case 'LOB':
+    //            return 0;
+    //        case 'COB':
+    //            return field.LOB;
+    //        case 'InsurableCategory':
+    //            return field.COB;
+    //        case 'InsuranceType':
+    //            return field.InsurableCategory;
+    //        case 'Cover':
+    //            return field.InsuranceType;
+    //        case 'CoverEvent':
+    //            return field.COB;
+    //        case 'CoverEventFactor':
+    //            return field.CoverEvent;
+    //        case 'CoverEventFactorValue':
+    //            return field.CoverEventFactor;
+    //        case 'BenefitCriteria':
+    //            return field.CoverEvent;
+    //        default:
+    //            return 0;
+    //    }
+    //}
 
     sortDescending = () => {
         const { dropdowns } = this.state;

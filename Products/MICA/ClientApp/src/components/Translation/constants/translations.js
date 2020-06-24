@@ -159,6 +159,7 @@ export const TRANSLATIONS = {
         ModifyMapping: 'Modify Mapping',
         DynamicProduct: 'Dynamic Product',
         DynamicProd: 'Dynamic Product',
+        DynamicEntity: 'Entity Creation',
 
         //Dynamic Reports
 

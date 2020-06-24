@@ -70,7 +70,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
             EmailTest emailTest = new EmailTest();
             if (string.IsNullOrEmpty(userDetails.UserId))
             {
-                var aspNet = _context.AspNetUsers.SingleOrDefault(x => x.UserName == userDetails.Email);
+                var aspNet = _context.AspNetUsers.FirstOrDefault(x => x.UserName == userDetails.Email);
                 if (aspNet == null)
                 {
                     userDetails.UserName = userDetails.Email;
@@ -105,29 +105,31 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
 
                     _cpcontext = (MICACPContext)DbManager.GetCPContext(apiContext.ProductType);
 
-                    var cpdata = _cpcontext.TblCustomerUsers.SingleOrDefault(a => a.UserName == userDetails.Email);
-                    TblCustomerUsers customerUsers = new TblCustomerUsers();
-
-                    if (userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
+                    var cpdata = _cpcontext.TblCustomerUsers.FirstOrDefault(a => a.UserName == userDetails.Email);
+                    if (cpdata == null)
                     {
-                        customerUsers.CustomerId = userDetails.OrganizationId;
-                    }
-                    else
-                    {
-                        customerUsers.CustomerId = apiContext.OrgId;
-                    }
-                    customerUsers.UserName = userDetails.Email;
-                    customerUsers.Email = userDetails.Email;
-                    customerUsers.CreatedDate = DateTimeNow;
-                    customerUsers.ContactNumber = userDetails.ContactNumber;
-                    customerUsers.UserId = _users.Id;
-                    customerUsers.IsActive = true;
-                    customerUsers.LoginProvider = "Form";
-                    customerUsers.IsFirstTimeLogin = 1;
+                        TblCustomerUsers customerUsers = new TblCustomerUsers();
 
-                    _cpcontext.TblCustomerUsers.Add(customerUsers);
-                    _cpcontext.SaveChanges();
+                        if (userDetails.OrganizationId != null && userDetails.OrganizationId > 0)
+                        {
+                            customerUsers.CustomerId = userDetails.OrganizationId;
+                        }
+                        else
+                        {
+                            customerUsers.CustomerId = apiContext.OrgId;
+                        }
+                        customerUsers.UserName = userDetails.Email;
+                        customerUsers.Email = userDetails.Email;
+                        customerUsers.CreatedDate = DateTimeNow;
+                        customerUsers.ContactNumber = userDetails.ContactNumber;
+                        customerUsers.UserId = _users.Id;
+                        customerUsers.IsActive = true;
+                        customerUsers.LoginProvider = "Form";
+                        customerUsers.IsFirstTimeLogin = 1;
 
+                        _cpcontext.TblCustomerUsers.Add(customerUsers);
+                        _cpcontext.SaveChanges();
+                    }
                     SendEmailAsync(emailTest);
                     return new UserResponse { Status = BusinessStatus.Created, users = _usersDTOs, Id = _usersDTOs.Id, ResponseMessage = $"User created successfully! \n for user: {_usersDTOs.Email}" };
                 }
