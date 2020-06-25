@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Remotion.Linq.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //RI Functions
 
-        Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto, ApiContext apiContext);
+        Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto1 tblRimappingDto, ApiContext apiContext);
 
         Task<IEnumerable<RIMappingDTO>> GetDescriptionRIGrid(decimal treatyid, ApiContext apiContext);
 
@@ -796,39 +797,40 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return null;
         }
 
-        public async Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto,ApiContext apiContext)
+        public async Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto1 tblRimappingDto,ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             tblRimappingDto.CreatedDate = DateTime.Now;
-            //taking id 20 for retention group and 21 for treaty
-            //foreach (var d in tblRimappingDto.TblRimappingDetail)
-            //{
-            //    if(d.RetentionGroupId!=null)
-            //    {
-            //        d.SequenceNo = 01;
-            //        d.RimappingTypeId = 31;
-            //        tblRimappingDto.TblRimappingDetail.Add(d);
-            //    }
-            //    else
-            //    {
-            //        d.RimappingTypeId = 32;
-            //        tblRimappingDto.TblRimappingDetail.Add(d);
-            //    }
-            //}
-            //  var data = _mapper.Map<TblRimapping>(tblRimappingDto);
-          
-            
-            //try
-            //{
-            //    _context.TblRimapping.Add(data);
-            //    _context.SaveChanges();
-            //}
-            //catch (Exception ex)
-            //{
-
-            //    // throw;
-            //}
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Details Saved sucessfully" };
+            if (tblRimappingDto.RetentionGroupId == null)
+            {
+                foreach(var item in tblRimappingDto.TblRimappingDetail)
+                {
+                    item.SequenceNo = 01;
+                    item.RimappingTypeId = 31;
+                }
+            }
+            else
+            {
+                foreach (var item in tblRimappingDto.TblRimappingDetail)
+                {
+                   
+                    item.RimappingTypeId = 31;
+                }
+            }
+      
+                var datavalue = tblRimappingDto;
+                var data = _mapper.Map<TblRimapping>(datavalue);
+            try
+            {
+                _context.TblRimapping.Add(data);
+                _context.SaveChanges();
+                return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Details Saved sucessfully" };
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+           
         }
 
         //search RI mapping
@@ -891,10 +893,17 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TblRimappingResponse> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var tbl_Rimaping = _mapper.Map<TblRimapping>(tblParticipantMasterDto);
-            _context.TblRimapping.Update(tbl_Rimaping);
-            _context.SaveChanges();
-            return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"RI Mapping updated  sucessfully ", RimappingDto = tblParticipantMasterDto };
+            try
+            {
+                var tbl_Rimaping = _mapper.Map<TblRimapping>(tblParticipantMasterDto);
+                _context.TblRimapping.Update(tbl_Rimaping);
+                _context.SaveChanges();
+                return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"RI Mapping updated  sucessfully ", RimappingDto = tblParticipantMasterDto };
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
 
         }
 
@@ -906,17 +915,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             try
             {
                 var delete_caoMap = _context.TblRimapping.Find(RimappingId);
-                if (delete_caoMap != null)
-                {
-                    _context.TblRimapping.Remove(delete_caoMap);
+                  _context.TblRimapping.Remove(delete_caoMap);
                     _context.SaveChanges();
-                }
+                    return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Deleted sucessfully " };
+                
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Deleted sucessfully " };
+          
         }
 
         //GetElements by id

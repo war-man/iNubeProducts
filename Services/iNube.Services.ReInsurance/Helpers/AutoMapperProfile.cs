@@ -44,7 +44,7 @@ namespace iNube.Services.ReInsurance.Helpers
 
 
 
-
+            //TblRimappingDto1
 
             CreateMap<TblRimapping, TblRimappingDto>();
             CreateMap<TblRimappingDto, TblRimapping>();
