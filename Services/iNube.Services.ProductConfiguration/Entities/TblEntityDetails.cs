@@ -13,7 +13,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public decimal EntityId { get; set; }
         public string EnitityName { get; set; }
         public string EntityLevel { get; set; }
-        public string ParentId { get; set; }
+        public decimal? ParentId { get; set; }
         public string Type { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }

@@ -225,7 +225,7 @@ namespace iNube.Services.ProductConfiguration.Entities
 
                 entity.Property(e => e.EntityLevel).HasMaxLength(50);
 
-                entity.Property(e => e.ParentId).HasMaxLength(40);
+                entity.Property(e => e.ParentId).HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.Type).HasMaxLength(250);
             });

@@ -1880,11 +1880,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return result;
         }
 
-        public async Task<IEnumerable<ddDTOs>> GetAllEntities(ApiContext apiContext)
+        public async Task<IEnumerable<ddDTOs>> GetEntities(int parentid, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Select(a => new ddDTOs
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == parentid).Select(a => new ddDTOs
             {
                 mID = Convert.ToInt32(a.EntityId),
                 mValue = a.EnitityName,

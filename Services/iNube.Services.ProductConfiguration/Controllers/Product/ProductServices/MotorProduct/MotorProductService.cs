@@ -601,7 +601,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ddDTOs>> GetAllEntities(ApiContext apiContext)
+        public async Task<IEnumerable<ddDTOs>> GetEntities(int parentid, ApiContext apiContext)
         {
             throw new NotImplementedException();
         }
