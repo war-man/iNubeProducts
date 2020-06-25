@@ -1546,7 +1546,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lsttreatyCode = _context.TblTreaty.Select(s => s.TreatyCode).ToList();
                 if(lsttreatyCode.Contains(codeName)==true)
                 {
-                    validationResponse.ResponseMessage = $"Treaty Code " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Treaty Code " + codeName + " can not be duplicated";
                     //ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty Code " + codeName +" can not be dublicated" };
                     // Errors.Add(errorInfo);
                 }
@@ -1556,7 +1556,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstTratyGroupName = _context.TblTreatyGroup.Select(s => s.TreatyGroupName).ToList();
                 if (lstTratyGroupName.Contains(codeName) == true)
                 {
-                    validationResponse.ResponseMessage = $"Treaty GroupName " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Treaty GroupName " + codeName + " can not be duplicated";
 
                     //ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty GroupName " + codeName + " can not be dublicated" };
                     // Errors.Add(errorInfo);
@@ -1567,7 +1567,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstParticipanctCode = _context.TblParticipantMaster.Select(s => s.ParticipantCode).ToList();
                 if (lstParticipanctCode.Contains(codeName) == true)
                 {
-                    validationResponse.ResponseMessage = $"Participant Code " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Participant Code " + codeName + " can not be duplicated";
 
                     //    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant Code " + codeName + " can not be dublicated" };
                     //  Errors.Add(errorInfo);
@@ -1578,7 +1578,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstParticipanctBranchCode = _context.TblParticipantBranch.Select(s => s.BranchCode).ToList();
                 if (lstParticipanctBranchCode.Contains(codeName) == true)
                 {
-                    validationResponse.ResponseMessage = $"Participant BranchCode " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Participant BranchCode " + codeName + " can not be duplicated";
 
                     // ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant BranchCode " + codeName + " can not be dublicated" };
                     //Errors.Add(errorInfo);
@@ -1589,7 +1589,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstRetentionGroupName = _context.TblRetentionGroup.Select(s => s.RetentionGroupName).ToList();
                 if (lstRetentionGroupName.Contains(codeName) == true)
                 {
-                    validationResponse.ResponseMessage = $"Retention GroupName " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Retention GroupName " + codeName + " can not be duplicated";
 
                     // ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Retention GroupName " + codeName + " can not be dublicated" };
                     // Errors.Add(errorInfo);
