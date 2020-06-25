@@ -194,6 +194,8 @@ namespace iNube.Components.RuleEngine.Entities
 
                 entity.Property(e => e.FromDate).HasColumnType("date");
 
+                entity.Property(e => e.RuleGroupName).IsUnicode(false);
+
                 entity.Property(e => e.RuleId)
                     .HasColumnName("RuleID")
                     .HasColumnType("numeric(18, 0)");
@@ -300,6 +302,10 @@ namespace iNube.Components.RuleEngine.Entities
                 entity.Property(e => e.RuleName).IsUnicode(false);
 
                 entity.Property(e => e.RuleObj).IsUnicode(false);
+
+                entity.Property(e => e.RuleType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
             });

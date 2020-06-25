@@ -64,6 +64,7 @@ namespace iNube.Components.RuleEngine.Models
         public string FailureMsg { get; set; }
         public string SuccessCode { get; set; }
         public string FailureCode { get; set; }
+        public string RuleGroupName { get; set; }
 
         public RulesDto Rule { get; set; }
     }
@@ -94,6 +95,7 @@ namespace iNube.Components.RuleEngine.Models
         public DateTime? CreatedDate { get; set; }
         public bool? IsActive { get; set; }
         public string RuleObj { get; set; }
+        public string RuleType { get; set; }
 
         public ICollection<RuleConditionsDto> TblRuleConditions { get; set; }
         public ICollection<RuleParamSetMappingDto> TblRuleParamSetMapping { get; set; }
@@ -129,6 +131,10 @@ namespace iNube.Components.RuleEngine.Models
         public string Outcome { get; set; }
         public string Message { get; set; }
         public string Code { get; set; }
+    }
+    public class HandleRuleDTO
+    {
+        public string ParamName { get; set; }
     }
 
 }

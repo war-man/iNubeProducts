@@ -5,6 +5,7 @@ using iNube.Components.RuleEngine.Entities;
 using iNube.Components.RuleEngine.Helpers;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework;
+using iNube.Components.RuleEngine.Models;
 
 namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
 {
@@ -40,6 +41,8 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
         TblRuleParamSetMapping CreateRuleSetMapping(TblRuleParamSetMapping tblrulesetmap);
 
         IEnumerable<TblRuleMapping> GetAllRuleMapping(int ruleid, string mastermodel, string action, string modelName);
+        //HandleEvent
+        IEnumerable<HandleRuleDTO> HandleRuleState(decimal RuleId);
 
 
     }
@@ -248,6 +251,75 @@ namespace iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService
                 // throw;
             }
             return tblrulesetmap;
+        }
+
+        // HandleState
+        public IEnumerable<HandleRuleDTO> HandleRuleState(decimal RuleId)
+        {
+
+            var rule = from tblRuleCondition in _context.TblRuleConditions
+                       join tblRules in _context.TblRules on tblRuleCondition.RuleId equals tblRules.RuleId
+                       join tblParameters in _context.TblParameters on tblRuleCondition.ConditionAttribute equals tblParameters.ParamId
+                       select new
+                       {
+                           rule_id = tblRules.RuleId,
+                           ruleName = tblRules.RuleName,
+                           startDate = tblRules.StartDate,
+                           endDate = tblRules.EndDate,
+                           conditionAttributes = tblRuleCondition.ConditionAttribute,
+                           paramId = tblParameters.ParamId,
+                           paramName = tblParameters.ParamName,
+                           conditionOperator = tblRuleCondition.ConditionOperator,
+                           conditionValue = tblRuleCondition.ConditionValueFrom,
+                           ruleObj = tblRules.RuleObj,
+                           ruleType = tblRules.RuleType,
+                           ruleGroup = tblRuleCondition.RuleGroupName
+                       };
+            var ruleGropList = from tblRuleCondition in _context.TblRuleConditions
+                               join tblRules in _context.TblRules on tblRuleCondition.RuleId equals tblRules.RuleId
+                               where tblRules.RuleId == RuleId
+                               where tblRules.RuleId == RuleId
+                               select new
+                               {
+                                   rule_id = tblRules.RuleId,
+                                   ruleName = tblRules.RuleName,
+                                   startDate = tblRules.StartDate,
+                                   endDate = tblRules.EndDate,
+                                   conditionAttributes = tblRuleCondition.ConditionAttribute,
+                                   conditionOperator = tblRuleCondition.ConditionOperator,
+                                   conditionValue = tblRuleCondition.ConditionValueFrom,
+                                   ruleObj = tblRules.RuleObj,
+                                   ruleType = tblRules.RuleType,
+                                   ruleGroup = tblRuleCondition.RuleGroupName
+                               };
+            var ruleList = rule;
+            List<HandleRuleDTO> ltObj = new List<HandleRuleDTO>();
+            foreach (var rl in ruleGropList)
+            {
+                if (rl.ruleType == "RuleGroup" || rl.ruleObj == "NULL")
+                {
+                    foreach (var rlList in ruleList)
+                    {
+                        if (rlList.rule_id == Convert.ToDecimal(rl.ruleGroup))
+                        {
+                            HandleRuleDTO obj = new HandleRuleDTO();
+                            obj.ParamName = rlList.paramName;
+                            ltObj.Add(obj);
+                        }
+                    }
+                }
+            }
+            foreach (var rl in rule)
+            {
+                if (rl.rule_id == RuleId)
+                {
+                    HandleRuleDTO obj = new HandleRuleDTO();
+                    obj.ParamName = rl.paramName;
+                    ltObj.Add(obj);
+                }
+            }
+
+            return ltObj;
         }
 
     }

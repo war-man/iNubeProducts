@@ -18,6 +18,7 @@ namespace iNube.Components.RuleEngine.Entities
         public DateTime? CreatedDate { get; set; }
         public bool? IsActive { get; set; }
         public string RuleObj { get; set; }
+        public string RuleType { get; set; }
 
         public virtual ICollection<TblRuleConditions> TblRuleConditions { get; set; }
         public virtual ICollection<TblRuleParamSetMapping> TblRuleParamSetMapping { get; set; }

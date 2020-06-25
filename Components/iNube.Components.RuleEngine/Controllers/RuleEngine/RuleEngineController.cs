@@ -23,6 +23,7 @@ using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework;
+using Newtonsoft.Json;
 
 namespace iNube.Components.RuleEngine.Controllers
 {
@@ -75,7 +76,102 @@ namespace iNube.Components.RuleEngine.Controllers
             }
         }
 
-        
+        //For Execution of RuleGroup
+        private List<ErrorDetailsData> RuleGroupExecution(string RuleId, dynamic dictionary_rule)
+        {
+            List<ErrorDetailsData> result = new List<ErrorDetailsData>();
+            List<ErrorDetailsData> stepResult = new List<ErrorDetailsData>();
+            var ruleDetails = from tblrules in _context_rule.TblRules
+                              where tblrules.RuleId == Convert.ToDecimal(RuleId)
+                              join tblCondition in _context_rule.TblRuleConditions on tblrules.RuleId equals tblCondition.RuleId
+                              select new
+                              {
+                                  rule_id = tblrules.RuleId,
+                                  rule_name = tblrules.RuleName,
+                                  rule_Type = tblrules.RuleType,
+                                  rule_Obj = tblrules.RuleObj,
+                                  rule_Group = tblCondition.RuleGroupName,
+                                  condition_Operator = tblCondition.ConditionLogicalOperator,
+                                  validatorName = tblCondition.ValidatorName,
+                                  successMsg = tblCondition.SuccessMsg,
+                                  successCode = tblCondition.SuccessCode,
+                                  failureMsg = tblCondition.FailureMsg,
+                                  failureCode = tblCondition.FailureCode
+                              };
+
+            foreach (var it in ruleDetails)
+            {
+                var main_rule = from tblrules in _context_rule.TblRules
+                                where (tblrules.RuleId == Convert.ToDecimal(it.rule_Group))
+                                join tblrulecondition in _context_rule.TblRuleConditions on tblrules.RuleId equals tblrulecondition.RuleId
+                                join tblparameter in _context_rule.TblParameters on tblrulecondition.ConditionAttribute equals tblparameter.ParamId
+                                select new
+                                {
+                                    rulecondition_id = tblrulecondition.RuleConditionId,
+                                    rule_id = tblrules.RuleId,
+                                    rule_name = tblrules.RuleName,
+                                    condition_attributes = tblparameter.ParamName,
+                                    param_type = tblparameter.ParamType,
+                                };
+                dynamic sendRule = new ExpandoObject();
+                var RuleName = "";
+                int count = 0;
+                foreach (var itm in main_rule)
+                {
+                    string paramvalue = (string)dictionary_rule[itm.condition_attributes];
+                    RuleName = itm.rule_id.ToString();
+                    if (count == 0)
+                    {
+                        AddProperty(sendRule, "RuleName", RuleName);
+                    }
+                    AddProperty(sendRule, itm.condition_attributes, paramvalue.ToString());
+                    count++;
+                }
+                var exptempobj = JsonConvert.SerializeObject(sendRule);
+                dynamic json = JsonConvert.DeserializeObject<dynamic>(exptempobj.ToString());
+                stepResult = CheckRuleSets(RuleName, json);
+                foreach (var res in stepResult)
+                {
+                    ErrorDetailsData obj = new ErrorDetailsData();
+                    obj.ValidatorName = res.ValidatorName;
+                    obj.Message = res.Message;
+                    obj.Code = res.Code;
+                    obj.Outcome = res.Outcome;
+                    result.Add(obj);
+
+                    if (res.ValidatorName == "Final Result" && res.Outcome == "Success")
+                    {
+                        ErrorDetailsData obj1 = new ErrorDetailsData();
+                        obj1.ValidatorName = it.validatorName;
+                        obj1.Message = it.successMsg;
+                        obj1.Code = it.successCode;
+                        obj1.Outcome = "Success";
+                        result.Add(obj1);
+                    }
+                    if (res.ValidatorName == "Final Result" && res.Outcome == "Fail")
+                    {
+                        ErrorDetailsData obj1 = new ErrorDetailsData();
+                        obj1.ValidatorName = it.validatorName;
+                        obj1.Message = it.failureMsg;
+                        obj1.Code = it.failureCode;
+                        obj1.Outcome = "Fail";
+                        result.Add(obj1);
+                    }
+                }
+
+            }
+            return result;
+        }
+
+        private void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
+        {
+            // ExpandoObject supports IDictionary so we can extend it like this
+            var expandoDict = expando as IDictionary<string, object>;
+            if (expandoDict.ContainsKey(propertyName))
+                expandoDict[propertyName] = propertyValue;
+            else
+                expandoDict.Add(propertyName, propertyValue);
+        }
 
         // Generic Rule Conditions
         //RuleConfigCondition/Check_Rule_Condition/Veh_mm
@@ -86,6 +182,23 @@ namespace iNube.Components.RuleEngine.Controllers
             List<ErrorInfo> errorMsg = new List<ErrorInfo>();
             //List for Error and Response Value
             List<ErrorDetailsData> errorList = new List<ErrorDetailsData>();
+
+            //For Checking Weather RuleGroup or RuleCondition
+            var ruleDetails = (from tblrules in _context_rule.TblRules
+                               where tblrules.RuleId == Convert.ToDecimal(RuleId)
+                               select new
+                               {
+                                   rule_id = tblrules.RuleId,
+                                   rule_name = tblrules.RuleName,
+                                   rule_Type = tblrules.RuleType,
+                                   rule_Obj = tblrules.RuleObj
+                               }).FirstOrDefault();
+
+            if (ruleDetails.rule_Type == "RuleGroup" && ruleDetails.rule_Obj == "NULL")
+            {
+                errorList = RuleGroupExecution(RuleId, dictionary_rule);
+                return errorList;
+            }
 
             string[] words = RuleId.Split(',');
             var main_rule = from tblrules in _context_rule.TblRules

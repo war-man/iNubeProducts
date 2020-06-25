@@ -274,6 +274,16 @@ namespace iNube.Components.RuleEngine.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        //For Handle State 
+        [AllowAnonymous]
+        [HttpGet("HandleRuleState")]
+        public IActionResult HandleRuleState(decimal RuleId)
+        {
+            var tblrulesetmap = _userService.HandleRuleState(RuleId);
+            return Ok(tblrulesetmap);
+        }
+
         [HttpGet("HC")]
         [AllowAnonymous]
         public IActionResult HC()
