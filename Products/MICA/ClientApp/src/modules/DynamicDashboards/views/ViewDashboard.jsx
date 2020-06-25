@@ -442,8 +442,8 @@ class ViewDashboard extends React.Component {
                 }
                     else {
                         if (this.state.labels.yaxis != null && this.state.labels.xaxis != null) {
-                           // this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                            this.state.graphData[0] =this.state.labels.xaxis, multilabel[0], multilabel[1], multilabel[2]
+                            this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
+                           // this.state.graphData[0] =this.state.labels.xaxis, multilabel[0], multilabel[1], multilabel[2]
                         } else {
                             this.state.graphData[0] = [''];
                         }
