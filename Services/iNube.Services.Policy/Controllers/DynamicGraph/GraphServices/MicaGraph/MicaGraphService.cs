@@ -181,6 +181,7 @@ namespace iNube.Services.Policy.Controllers.DynamicGraph.GraphServices.MicaGraph
                         ReturnData = row.ItemArray.ToList();
                         finalData.Add(ReturnData);
                     }
+
                     
                     return finalData;
                 }
