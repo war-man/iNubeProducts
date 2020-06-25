@@ -5254,15 +5254,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                     //Add insurable item and updating json of Polic Request 
                     var data = await AddInsurableItem(endoresementDto, apiContext);
-
-                    //Updating json of policyRequest
-
-                    proposalResponse.Status = data.Status;
-                    proposalResponse.Errors.AddRange(data.Errors);
-                    proposalResponse.ResponseMessage = data.ResponseMessage;
-                    proposalResponse.Id = data.Id;
+                    
                     //return proposalResponse;
-                    return new ProposalResponse { Status = data.Status, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage,Errors= proposalResponse.Errors };
+                    return new ProposalResponse { Status = data.Status, Id = data.Id, ResponseMessage = data.ResponseMessage,Errors= data.Errors };
 
                 }
 
@@ -5272,14 +5266,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     //Add insurable item and updating json of Polic Request 
                     var data = await AddInsurableItem(endoresementDto, apiContext);
 
-                    //Updating json of policyRequest
-
-                    proposalResponse.Status = data.Status;
-                    proposalResponse.Errors.AddRange(data.Errors);
-                    proposalResponse.ResponseMessage = data.ResponseMessage;
-                    proposalResponse.Id = data.Id;
                     //return proposalResponse;
-                    return new ProposalResponse { Status = data.Status, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage, Errors = proposalResponse.Errors };
+                    return new ProposalResponse { Status = data.Status, Id = data.Id, ResponseMessage = data.ResponseMessage, Errors = data.Errors };
 
                 }
 
@@ -5290,7 +5278,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                     var data = await RemoveInsurableItem(endoresementDto, apiContext);
 
-                    return new ProposalResponse { Status = data.Status, ResponseMessage = data.ResponseMessage, Id = proposalResponse.Id, Errors = proposalResponse.Errors };
+                    return new ProposalResponse { Status = data.Status, ResponseMessage = data.ResponseMessage, Id = data.Id, Errors = data.Errors };
 
                     //return data;
                 }
