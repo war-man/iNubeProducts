@@ -630,6 +630,7 @@ class RateRules extends React.Component {
             })
         });
         console.log("table data", this.state.resultDetails);
+        this.state.IsParameterGrid = false;
         this.setState({ searchTableSec: true, loader: true });
     }
 
@@ -647,7 +648,7 @@ class RateRules extends React.Component {
                                     <PermIdentity />
                                 </CardIcon>
                                 <h4 className={this.props.cardIconTitle}>
-                                    <small> Rate Rules </small>
+                                    <small> Rate Table </small>
                                 </h4>
                             </CardHeader>
                             <CardBody>
@@ -658,7 +659,7 @@ class RateRules extends React.Component {
                                         success={this.state.rateNameState === "success"}
                                         error={this.state.rateNameState === "error"}
                                           required={true}
-                                        labelText=" Rate Rule Name"
+                                        labelText=" Rate Table Name"
                                         id="rateName"
                                         value={this.state.fields[0].rateName}
                                         name='rateName'

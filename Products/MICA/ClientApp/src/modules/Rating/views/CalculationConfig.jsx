@@ -119,7 +119,7 @@ class CalculationConfig extends React.Component {
 
             typeList: [{ "mID": 1, "mValue": "Rate", "mType": "RateConfig" },
                 { "mID": 2, "mValue": "Parameter", "mType": "RateConfig" },
-                { "mID": 3, "mValue": "ConditionalParameter", "mType": "RateConfig" }],
+                { "mID": 3, "mValue": "ConditionalValues", "mType": "RateConfig" }],
         };
 
     }
@@ -180,6 +180,9 @@ class CalculationConfig extends React.Component {
             debugger
             //Removing Space
             this.state.fields.CalConfigParam = this.state.fields.CalConfigParam.split(' ').join('');
+            //Removing Wild Card Character
+            this.state.fields.CalConfigParam = this.state.fields.CalConfigParam.replace(/[^a-zA-Z0-9 ]/g, "");
+
             var isActive = 1;
             let pCalParameterArray = this.state.CalParameterArray;
             this.setState({ CalParameterArray: pCalParameterArray });
@@ -220,6 +223,9 @@ class CalculationConfig extends React.Component {
             debugger
             //Removing Space
             this.state.fields.ConditionalParam = this.state.fields.ConditionalParam.split(' ').join('');
+            //Removing Wild Card Character
+            this.state.fields.ConditionalParam = this.state.fields.ConditionalParam.replace(/[^a-zA-Z0-9 ]/g, "");
+
             let pConditionalParameterAr = this.state.ConditionalParameterAr;
             this.setState({ ConditionalParameterAr: pConditionalParameterAr });
             pConditionalParameterAr.push({
@@ -255,6 +261,9 @@ class CalculationConfig extends React.Component {
             //For Steps
             // Remove Space
             this.state.fields.ExpressionResult = this.state.fields.ExpressionResult.split(' ').join('');
+            //Removing Wild Card Character
+            this.state.fields.ExpressionResult = this.state.fields.ExpressionResult.replace(/[^a-zA-Z0-9 ]/g, "");
+            
             this.state.fields.Steps = this.state.fields.Steps + 1;
             //Showing Grid
             this.setState({ displayExpressionGrid: true });
@@ -603,7 +612,7 @@ class CalculationConfig extends React.Component {
                                     {this.state.condnflag ?
                                         <GridItem xs={12} sm={12} md={3}>
                                             <CustomInput
-                                                labelText="Conditional Param"
+                                                labelText="Conditional Values"
                                                 id="ConditionalParam"
                                                 required={true}
                                                 value={this.state.fields.ConditionalParam}
@@ -845,7 +854,7 @@ class CalculationConfig extends React.Component {
 
                                         <GridItem xs={12} sm={4} md={6}>
                                             <h4>
-                                                <small> Conditional Parameter </small>
+                                                <small> Conditional Values </small>
                                             </h4>
                                             <div className="rates-parameter-bg">
                                                 {this.state.ConditionalParameterAr.map((item, i) => (
