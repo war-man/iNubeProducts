@@ -210,9 +210,11 @@ class RateObject extends React.Component {
     reset = () => {
         //Array Reset
         this.state.fields.RateObjectName = "";
+        this.state.fields.MasterList = "";
         this.setState({
             RateParameterArray: [],
             newParamData: [],
+            RatingObjParam: [],
             displayRateObejectGrid: false
         })
 
@@ -231,12 +233,12 @@ class RateObject extends React.Component {
                             <CardIcon color="rose">
                                 <Assignment />
                             </CardIcon>
-                            <h4><small>Rate Object</small></h4>
+                            <h4><small>Parameter Group</small></h4>
                         </CardHeader>
                         <CardBody>
                             <GridContainer>
                                 <GridItem xs={12} sm={12} md={3}>
-                                    <CustomInput labelText="Rate Object Name"
+                                    <CustomInput labelText="Parameter Group Name"
                                         value={this.state.fields.RateObjectName}
                                         name='RateObjectName'
                                         onChange={this.onInputChange}
@@ -253,7 +255,7 @@ class RateObject extends React.Component {
                                             htmlFor="simple-select"
                                             className={classes.selectLabel}
                                         >
-                                            Rate Object Parameter
+                                             Parameters
                           </InputLabel>
                                         <Select
                                             value={this.state.fields.RateObjectParameter}
