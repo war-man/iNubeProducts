@@ -7340,7 +7340,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             // var connectionString = _configuration.GetConnectionString("PCConnection");
             var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
             var connectionString = dbConnectionString.Dbconnection;
-           
+            var result = false;
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
@@ -7349,17 +7349,24 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 //command.Parameters.AddWithValue("@Action", "Update");
                 command.Parameters.AddWithValue("@PolicyNumber", PolicyNumber);
                 command.Parameters.AddWithValue("@MobileNumber", MobileNumber);
-                command.Parameters.AddWithValue("@RefrenceNumber", RefrenceNumber);
-
+                command.Parameters.AddWithValue("@NewPaymentRefNo", RefrenceNumber);
+              
+                command.Parameters.Add("@Result", SqlDbType.Bit);
+                command.Parameters["@Result"].Direction = ParameterDirection.Output;
                 command.CommandTimeout = 3600;
                 command.ExecuteNonQuery();
-
+                result = (bool)command.Parameters["@Result"].Value;
                 connection.Close();
-
+            }
+            if (result)
+            {
+                return new ResponseStatus { Status = BusinessStatus.Ok, ResponseMessage = "Card Details updated successfully" };
+            }
+            else {
+                return new ResponseStatus { Status = BusinessStatus.Error, ResponseMessage = "Failed to update Card Details" };
             }
 
-
-            return new ResponseStatus { Status = BusinessStatus.Ok, ResponseMessage = "Card Details updated successfully" };
+         
         }
 
     }
