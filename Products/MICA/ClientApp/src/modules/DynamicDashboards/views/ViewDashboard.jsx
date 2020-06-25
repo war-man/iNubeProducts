@@ -95,7 +95,7 @@ class ViewDashboard extends React.Component {
             ['F', 7,22]
             ],
             fields: {
-                ChartType: "ColumnChart",
+                ChartType: "",
             },
             typeList: [{ "mID": 1, "mValue": "ScatterChart", "mType": "ChartType" },
                 { "mID": 2, "mValue": "LineChart", "mType": "ChartType" },
@@ -121,7 +121,8 @@ class ViewDashboard extends React.Component {
     }
 
     componentDidMount() {
-
+        this.state.fields.ChartType = this.state.typeList.filter(m => m.mValue == "ColumnChart")[0].mID;
+        this.state.ChartName = this.state.typeList.filter(m => m.mID == 3)[0].mValue;
         /////////////////From UserManagement //////////////////////////
         let userid = "";
         let roleid = "";
@@ -231,7 +232,8 @@ class ViewDashboard extends React.Component {
     };
 
     handleParameterCheck = event => {
-       
+        this.state.fields.ChartType = this.state.typeList.filter(m => m.mValue == "ColumnChart")[0].mID;
+        this.state.ChartName = this.state.typeList.filter(m => m.mID == 3)[0].mValue;
         this.state.title = this.state.reportName.filter(a => a.mID == event.target.value)[0].mValue;
         console.log("title", this.state.title);
         let param = this.state.paramList;
@@ -460,7 +462,7 @@ class ViewDashboard extends React.Component {
                 }
                     console.log("graphdata", this.state.graphData, arr);
                // });
-                this.setState({ showgraph: false, showdd:true })
+                this.setState({ showgraph: true, showdd:true })
                 if (this.state.result.length > 0) {
                     this.setState({ tableFlag: false, flagParam: false, loader: false });
                     this.tabledata();
