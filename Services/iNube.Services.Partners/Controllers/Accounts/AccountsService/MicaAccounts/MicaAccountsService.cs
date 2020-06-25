@@ -1247,7 +1247,6 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
             CdTransactionsMasterDTO cdTransactionsmasterDTO = new CdTransactionsMasterDTO();
             //Map With Object CD
 
-
             cDDTO.AccountNo = micaCD.AccountNo;
             cDDTO.Description = micaCD.Description;
             cDDTO.Frequency = micaCD.Frequency;
@@ -1281,43 +1280,8 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 cdTransactionsmasterDTO.TotalGSTAmount = Data.TaxAmount;
                 cdTransactionsmasterDTO.PremiumDetails = RatingConfig;
                 cdTransactionsmasterList.Add(cdTransactionsmasterDTO);
-
-
             }
-
             cDDTO.cdTransactionsMasterDTO = cdTransactionsmasterList;
-          
-
-            //return null;
-
-            //CdTransactionsMasterDTO cdTransactionsmasterDTO = new CdTransactionsMasterDTO();
-            //cdTransactionsmasterDTO.CDType = micaCDDTO.Type;
-            //cdTransactionsmasterDTO.AccountNo = micaCDDTO.AccountNo;
-            //cdTransactionsmasterDTO.TotalAmount = micaCDDTO.TotalAmount;
-
-
-            //Dictionary<string, TxnParameterDTO> RatingConfig = new Dictionary<string, TxnParameterDTO>();
-
-            //TxnParameterDTO txnParameterDTO = new TxnParameterDTO();
-
-            //foreach (var item in micaCDDTO.PremiumDTO)
-            //{
-            //    txnParameterDTO = new TxnParameterDTO();
-
-            //    txnParameterDTO.Amount = item.TxnAmount;
-            //    txnParameterDTO.TaxAmount = item.TaxAmount.TaxAmount;
-            //    txnParameterDTO.Total = item.TotalAmount;
-            //    RatingConfig.Add(item.Type, txnParameterDTO);
-            //}
-
-            //cdTransactionsmasterDTO.TxnType = micaCDDTO.TxnType;
-            //cdTransactionsmasterDTO.TotalAmount = micaCDDTO.TxnAmount;
-            //cdTransactionsmasterDTO.TotalGSTAmount = micaCDDTO.TaxAmount;
-            //cdTransactionsmasterDTO.PremiumDetails = RatingConfig;
-
-
-
-
             var Response = await CDCommonTransaction(cDDTO, apiContext);
             return Response;
 
@@ -1377,7 +1341,6 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                 tblCdtransaction.TxnType = CDData.TxnType;
 
                                 tblCdtransaction.InitialBalance = initalAmount;
-                                //  tblCdtransaction.TxnAmount = CdTransactionsDTO.TotalAmount - CdTransactionsDTO.TotalGSTAmount;
                                 tblCdtransaction.TotalAmount = CDData.TotalAmount + CDData.TotalGSTAmount;
                                 tblCdtransaction.FinalBalance = initalAmount + (CDData.TotalAmount + CDData.TotalGSTAmount);
                                 tblCdtransaction.Description = cDDTO.Description;
@@ -1464,16 +1427,9 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
                                 //Step-1:Check CD Account, update Balance and update CD account Details:
 
-
-
                                 if (cdaccount != null)
                                 {
-
-
                                     var initalAmount = cdaccount.AvailableBalance;
-                                    // var cdaccountDetails = _context.TblCdaccountDetails.LastOrDefault(p => p.AccountNo == CdTransactionsDTO.AccountNo);
-
-
                                     /*CD Account table */
                                     cdaccount.AvailableBalance = cdaccount.AvailableBalance - (CDData.TotalAmount + CDData.TotalGSTAmount);
                                     cdaccount.LedgerBalance = cdaccount.LedgerBalance - (CDData.TotalAmount + CDData.TotalGSTAmount);
@@ -1484,7 +1440,6 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
                                     foreach (var data in CDData.PremiumDetails)
                                     {
-
 
                                         /*CD AccountDetails Debit*/
                                         var CDAccData = _context.TblCdaccountDetails.Where(s => s.AccountNo == cdaccount.AccountNo).ToList();
@@ -1505,19 +1460,11 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                                         }
                                         tblCdaccountDetails = CDAccData;
 
-
-
-
                                     }
 
-
-
                                     /*CD Transaction Debit*/
-
-
                                     List<TblCdtransactionDetails> tblCdtransactionDetails = new List<TblCdtransactionDetails>();
                                     TblCdtransactionDetails cdtransactionDetails = new TblCdtransactionDetails();
-
 
                                     TblCdtransaction tblCdtransaction = new TblCdtransaction();
                                     tblCdtransaction.AccountNo = cdaccount.AccountNo;
@@ -1553,66 +1500,41 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
 
                                     _context.TblCdaccounts.Update(cdaccount);
 
-                                    //   _context.SaveChanges();
-
-
-
                                 }
-
-
-
-
                             }
 
                             /*Daily Txn Table*/
                             foreach (var data in CDData.PremiumDetails)
                             {
-
                                 var tblDailyCdtransaction = DaliyTransaction(data.Value, data.Key, CDData, CDData.TxnType, cdaccount.AccountNo, cDDTO.Description, DateTimeNow);
-
                             }
 
                             _context.SaveChanges();
-                            
-
                         }
                         catch (Exception ex)
                         {
                             Errors.Add(new ErrorInfo { ErrorMessage = ex.InnerException.ToString() });
 
                             return new MasterCDDTO { Status = BusinessStatus.Error, ErrorInfo = Errors, AccountNo = cdaccount.AccountNo };
-
-
-
-
                         }
                     }
                     return new MasterCDDTO { Status = BusinessStatus.Created, ResponseMessage = $"Account updated Successfully for this Account Number: {cdaccount.AccountNo}", AccountNo = cdaccount.AccountNo };
-
-
                 }
                 else {
                     return new MasterCDDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"No Record Found for this Account Number: {cDDTO.AccountNo}", AccountNo = cdaccount.AccountNo };
-
                 }
             }
             else
             {
                 return new MasterCDDTO { Status = BusinessStatus.NotFound, ResponseMessage = $"Input Data is not Valid", AccountNo = cdaccount.AccountNo};
-
             }
 
         }
 
-
-
-
         private TblDailyCdtransaction DaliyTransaction(TxnParameterDTO data, string key, CdTransactionsMasterDTO masterCDDTO, string type,string accountno, string frequency,DateTime DateTimeNow)
         {
-         
             TblDailyCdtransaction tblDailyCdtransaction = new TblDailyCdtransaction();
             var DailyTanscation = _context.TblDailyCdtransaction.LastOrDefault(s => s.AccountNo == accountno && s.TxnEventType == key);
-            // var LastCDTanscation = _context.TblDailyCdtransaction.LastOrDefault(s => s.AccountNo == masterCDDTO.AccountNo);
 
             //check Daily Tranx
             if (DailyTanscation == null)
@@ -1629,7 +1551,6 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 tblDailyCdtransaction.AvailableBalance = data.Amount + data.TaxAmount;
                 tblDailyCdtransaction.Frequency = frequency;
                 _context.TblDailyCdtransaction.Add(tblDailyCdtransaction);
-                //  _context.SaveChanges();
 
             }
             else if (DailyTanscation != null)
@@ -1639,8 +1560,6 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                 if (date.Value.Date == DateTimeNow.Date)
                 {
 
-                    //foreach (var temp in DailyTanscation)
-                    //{
 
                     if (DailyTanscation.TxnEventType == key)
                     {
@@ -1657,7 +1576,6 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                             DailyTanscation.TransactionDateTime = DateTimeNow;
                             DailyTanscation.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
                             DailyTanscation.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
-                            //   DailyTanscation.LedgerBalance = DailyTanscation.LedgerBalance - (masterCDDTO.TotalAmount + masterCDDTO.TotalGSTAmount);
                         }
                         _context.TblDailyCdtransaction.Update(DailyTanscation);
                     }
@@ -1671,16 +1589,20 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                         tblDailyCdtransaction.TransactionDateTime = DateTimeNow;
                         tblDailyCdtransaction.TxnEventType = key;
                         tblDailyCdtransaction.Frequency = frequency;
-                        tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
-                        tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
-                        // cdaccountDetails.TaxAmount = cdaccountDetails.TaxAmount + data.Amount;
+                        if (type == "Credit")
+                        {
+                            tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance + data.Total;
+                            tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance + data.Total;
+                        }
+                        else if (type == "Debit")
+                        {
+                            tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
+                            tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
+                        }
+                     
                         _context.TblDailyCdtransaction.Add(tblDailyCdtransaction);
 
                     }
-                    // _context.SaveChanges();
-                    // }
-
-
 
                 }
 
@@ -1691,15 +1613,19 @@ namespace iNube.Services.Partners.Controllers.Accounts.AccountsService
                     tblDailyCdtransaction.AccountNo = accountno;
                     tblDailyCdtransaction.TransactionDateTime = DateTimeNow;
                     tblDailyCdtransaction.TxnEventType = key;
-                    tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
-                    tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
-
-                    // tblDailyCdtransaction.AvailableBalance = tblDailyCdtransaction.AvailableBalance + data.Amount;
-                    _context.TblDailyCdtransaction.Add(tblDailyCdtransaction);
-                    //  _context.SaveChanges();
+                    if (type == "Credit")
+                    {
+                        tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance + data.Total;
+                        tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance + data.Total;
+                    }
+                    else if (type == "Debit")
+                    {
+                        tblDailyCdtransaction.AvailableBalance = DailyTanscation.AvailableBalance - data.Total;
+                        tblDailyCdtransaction.LedgerBalance = DailyTanscation.LedgerBalance - data.Total;
+                    }
+                        _context.TblDailyCdtransaction.Add(tblDailyCdtransaction);
                 }
             }
-
             return tblDailyCdtransaction;
         }
 
