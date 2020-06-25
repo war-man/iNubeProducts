@@ -9061,6 +9061,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     continue;
                 }
 
+                if(SIData.TotalAmountChargeable == 0)
+                {
+                    continue;
+                }
+
                 var FifthDay = SIData.DueDate.Value.AddDays(5).Date;
 
                 var DateDiff = (CurrentDate - FifthDay).TotalDays;
