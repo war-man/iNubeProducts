@@ -832,8 +832,8 @@ class Provision extends React.Component {
                                                         <CustomInput
                                                             labelText="UserName"
                                                             id="UserName"
-                                                            name="UserName"
-                                                            value={this.state.Provision.UserName}
+                                                            name="Username"
+                                                            value={this.state.Provision.Username}
                                                             onChange={(event) => this.onInputChange("SMS", event)}
                                                             formControlProps={{
                                                                 fullWidth: true
@@ -845,8 +845,8 @@ class Provision extends React.Component {
                                                         <CustomInput
                                                             labelText="Password"
                                                             id="Password"
-                                                            name="Password"
-                                                            value={this.state.Provision.Password}
+                                                            name="password"
+                                                            value={this.state.Provision.password}
                                                             onChange={(event) => this.onInputChange("SMS", event)}
                                                             formControlProps={{
                                                                 fullWidth: true
@@ -856,8 +856,8 @@ class Provision extends React.Component {
                                                     <GridItem xs={12} sm={12} md={4}>
                                                         <CustomInput
                                                             labelText="APIKey"
-                                                            id="APIKey"
-                                                            name="APIKey"
+                                                            id="APIkey"
+                                                            name="APIkey"
                                                             value={this.state.Provision.APIKey}
                                                             onChange={(event) => this.onInputChange("SMS", event)}
                                                             formControlProps={{
