@@ -2,7 +2,7 @@
 
 //ReportConfigUrl = 'https://inubeservicespolicy.azurewebsites.net';
 let DashboardConfigUrl = config.DashboardConfigUrl;
-//let ReportConfigUrl ='https://localhost:44351'
+//let DashboardConfigUrl ='https://localhost:44351'
 
 export const DashboardConfig = {
     DashboardConfigUrl,
