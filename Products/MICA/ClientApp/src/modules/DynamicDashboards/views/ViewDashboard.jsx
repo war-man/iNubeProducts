@@ -406,7 +406,7 @@ class ViewDashboard extends React.Component {
                     let strLength = this.state.labels.xaxis.length;
                     let multilabel = this.state.labels.yaxis.split(",");
 
-                    if (multilabel[1] == undefined && multilabel[2]==undefined) {
+                    if (multilabel[1] == undefined) {
                         if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
                             //  this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
                             this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0]];
@@ -415,28 +415,17 @@ class ViewDashboard extends React.Component {
                             // this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
                             this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0]];
 
-                        }
-                    }
-
-                    else if (multilabel[1] == undefined) {
-                        if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
-                            //  this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
-                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1]];
-
-                        } else {
-                            // this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1]];
                         }
                     }
 
                     else {
                         if (this.state.labels.xaxis.charAt(strLength - 1) == 's') {
                             //  this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis.slice(0, -1)];
-                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1], multilabel[2]];
+                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1]];
 
                         } else {
                             // this.state.graphData[0] = [this.state.labels.yaxis + " " + "per" + " " + this.state.labels.xaxis];
-                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1], multilabel[2]];
+                            this.state.graphData[0] = [this.state.labels.xaxis, multilabel[0], multilabel[1]];
                         }
                     }
                 }
