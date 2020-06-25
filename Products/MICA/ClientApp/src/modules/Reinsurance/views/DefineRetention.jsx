@@ -49,7 +49,9 @@ class DefineRetentions extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            editflag:false,
+            editflag: false,
+            retcodeflag: false,
+            branchCodemassage:"",
             masterList: [],
             yearmasterlist: [],
             flag: true,
@@ -86,6 +88,29 @@ class DefineRetentions extends React.Component {
             },
         };
        
+    }
+    onBlur = () => {
+
+        debugger
+        //fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph",
+        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + this.state.Retention.retentionGroupName + '&type=' + "RetentionGroupName", {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status == 9) {
+                    this.setState({ retcodeflag: true, branchCodemassage: data.responseMessage });
+                } else {
+                    this.setState({ retcodeflag: false, branchCodemassage: "" });
+                }
+              
+            });
+        console.log("data", this.state.masterList);
     }
     onInputChange = (type, evt) => {
         let name = evt.target.name;
@@ -252,8 +277,8 @@ class DefineRetentions extends React.Component {
 
                             //   title: "Perfect",
 
-                            //text: data.responseMessage,
-                            text: "Retention Successfully Created",
+                            text: data.responseMessage,
+                            //text: "Retention Successfully Created",
                             icon: "success"
                         });
                         this.setState({ errormessage: false });
@@ -484,12 +509,14 @@ class DefineRetentions extends React.Component {
                                     required={true}
                                     error={this.state.retentionGroupNameState}
                                     value={this.state.Retention.retentionGroupName}
+                                    onBlur={() => this.onBlur()}
                                     name='retentionGroupName'
                                     onChange={(evt) => this.onInputChange("alphaNumeric", evt)}
                                     formControlProps={{
                                         fullWidth: true
                                     }}
                                 />
+                                {this.state.retcodeflag && (<p className="error">{this.state.branchCodemassage} </p>)}
                             </GridItem>
                             <GridItem xs={12} sm={12} md={3}>
                                 <MasterDropdown

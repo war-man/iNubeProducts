@@ -29,6 +29,7 @@ import Delete from "@material-ui/icons/Delete";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
 import swal from 'sweetalert';
 import TranslationContainer from "components/Translation/TranslationContainer.jsx";
+import validationPage from "modules/Accounts/views/ValidationPage.jsx";
 const style = {
     infoText: {
         fontWeight: "300",
@@ -52,6 +53,7 @@ class DefineMapping extends React.Component {
         super(props);
         this.state = {
             DefineDTOTableData: [],
+            sequenceNoState:false,
             flag: true,
             flagUpdate: false,
             DefineDTOData: [{
@@ -62,7 +64,9 @@ class DefineMapping extends React.Component {
                 "sequenceNo": ""
             }],
             treatymasterlist: [],
+            array:[],
             treatycodemasterlist: [],
+            trtygrpmasList:[],
             tretyMasterData:[],
             treatydata: [],
             masterList: [],
@@ -88,6 +92,8 @@ class DefineMapping extends React.Component {
 
 
     settreatyGroupId = (event, index) => {
+        debugger
+       
         console.log(index, 'Index');
         let name = event.target.name;
         let value = event.target.value;
@@ -96,6 +102,7 @@ class DefineMapping extends React.Component {
         treatyGridData[index][name] = value;
 
         this.setState({ treatyGridData });
+
         let SendValue = parseInt(value);
         console.log(value,'value')
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetDescriptionRIGrid?treatyid=` + SendValue, {
@@ -107,11 +114,12 @@ class DefineMapping extends React.Component {
             },
         }).then(response => response.json())
             .then(data => {
-                
-                this.setState({ treatydata: data });
-                console.log("treatydata: ", this.state.treatydata);
-                this.state.DefineDTOData[index].treatydescription = data[0].treatyDescription;
-
+                console.log('data1', data);
+                //this.setState({ treatydata: data });
+                //console.log("treatydata: ", this.state.treatydata);
+                for (let i = 0; i < data.length; i++) {
+                    this.state.DefineDTOData[index].treatydescription = data[i].treatyDescription;
+                }
 
                 this.setState({});
 
@@ -131,15 +139,29 @@ class DefineMapping extends React.Component {
             .then(response => response.json())
             .then(data => {
                 console.log("masterList: ", data);
+                
 
-                this.setState({ treatycodemasterlist: data });
+                //this.state.treatycodemasterlist = data;
+                //this.state.array = data;
+                //let arr = [];
+                //arr.push(data);
+                let trtygrpmaslist = this.state.trtygrpmasList;
+                trtygrpmaslist.push(data);
+
+                this.setState({ trtygrpmaslist });
+                //this.state.trtygrpmasList = [];
+                //this.state.trtygrpmasList.push(this.state.treatycodemasterlist[index]);
+                //this.state.trtygrpmasList.push(this.state.treatycodemasterlist);
+                
+                //this.setState({ treatycodemasterlist: data });
                 this.AddTreatyTable();
-                console.log("treatycodemasterlist", this.state.treatycodemasterlist)
+                console.log("treatycodemasterlist", this.state.treatycodemasterlist, this.state.trtygrpmasList)
 
             });
         //this.state.DefineDTOData[index].treatydescription = this.state.treatydata.treatyDescription;
         //console.log("Descripion ", this.state.treatydata);
-        console.log("Descripion1 ", this.state.treatydata, this.state.DefineDTOData);
+
+        console.log("    ", this.state.treatydata, this.state.DefineDTOData);
     }
     
 
@@ -172,8 +194,9 @@ class DefineMapping extends React.Component {
         }).then(response => response.json())
             .then(data => {
 
-                this.setState({ treatydata: data });
-                console.log("treatydata: ", this.state.treatydata);
+                //this.setState({ treatydata: data });
+                console.log('data2', data);
+                //console.log("treatydata: ", this.state.treatydata);
                 this.state.DefineDTOData[index].treatyType = data[0].treatyType;
 
 
@@ -189,7 +212,8 @@ class DefineMapping extends React.Component {
 
     }
 
-    handletreatygrid = (event, index) => {
+    handletreatygrid = (type,event, index) => {
+        debugger
         let name = event.target.name;
         let value = event.target.value;
         let treatyGridData = this.state.DefineDTOData;
@@ -197,8 +221,50 @@ class DefineMapping extends React.Component {
         treatyGridData[index][name] = value;
 
         this.setState({ treatyGridData });
+        this.AddTreatyTable();
+        this.change(event, name, type);
     }
-
+    change(evt, stateName, type, stateNameEqualTo, maxValue) {
+        switch (type) {
+            case "range":
+                if (validationPage.verifyAcCode(evt.target.value)) {
+                    this.setState({ [stateName + "State"]: false });
+                } else {
+                    this.setState({ [stateName + "State"]: true });
+                }
+                break;
+            case "string":
+                if (validationPage.verifyName(evt.target.value)) {
+                    this.setState({ [stateName + "State"]: false });
+                } else {
+                    this.setState({ [stateName + "State"]: true });
+                }
+                break;
+            case "numeric":
+                if (validationPage.verifyAccountCode(evt.target.value)) {
+                    this.setState({ [stateName + "State"]: false });
+                } else {
+                    this.setState({ [stateName + "State"]: true });
+                }
+                break;
+            case "alphaNumeric":
+                if (validationPage.verifyAlphaNumeric(evt.target.value)) {
+                    this.setState({ [stateName + "State"]: false });
+                } else {
+                    this.setState({ [stateName + "State"]: true });
+                }
+                break;
+            case "phoneno":
+                if (validationPage.verifyPhoneNum(evt.target.value)) {
+                    this.setState({ [stateName + "State"]: false });
+                } else {
+                    this.setState({ [stateName + "State"]: true });
+                }
+                break;
+            default:
+                break;
+        }
+    }
     componentDidMount() {
         const props = this.props;
         console.log("porpsdat", props)
@@ -387,21 +453,26 @@ class DefineMapping extends React.Component {
             });
     } 
     AddTreatyRecord = (event, index) => {
-
+        this.state.array = this.state.trtygrpmasList[index];
         //if (this.state.treatydata[index].treatyGroup !== "" && this.state.treatydata[index].businessTypeId !== "" ) {
-        let TreatyDetails = this.state;
-        TreatyDetails['DefineDTOTableData'] = this.state.DefineDTOTableData.concat({ treatyGroup: "", businessTypeId: "" });
-        TreatyDetails['DefineDTOData'] = this.state.DefineDTOData.concat({ treatyGroup: "", businessTypeId: "" });
+        //let TreatyDetails = this.state;
+        //TreatyDetails['DefineDTOTableData'] = this.state.DefineDTOTableData.concat({ treatyGroup: "", businessTypeId: "" });
+        //TreatyDetails['DefineDTOData'] = this.state.DefineDTOData.concat({ treatyGroup: "", businessTypeId: "" });
 
-        this.setState({ TreatyDetails });
+        //this.setState({ TreatyDetails });
+        debugger
         let mappingdeatils = this.state;
         mappingdeatils['DefineDTOData'] = this.state.DefineDTOData.concat({
+            "treatyCode": "",
+            "treatydescription": "",
             "treatyGroupId": "",
-            "sequenceNo":""
+            "treatyType": "",
+            "sequenceNo": ""
         });
         this.setState({ mappingdeatils });
         //console.log("treatydata", this.state.treatydata[index].treatyGroup, this.state.treatydata);
         console.log("add defination", this.state.DefineDTOData);
+
         this.AddTreatyTable();
 
         // }
@@ -442,9 +513,9 @@ class DefineMapping extends React.Component {
                     SNo: key + 1,
                     Treatycode: <MasterDropdown labelText="TreatyCode" id="MaritalStatus" lstObject={this.state.treatymasterlist} filterName='TratyGroup' value={this.state.DefineDTOData[key].treatyCode} name='treatyCode' onChange={(e) => this.settreatyGroupId(e, key)} formControlProps={{ fullWidth: true }} />,
                     TreatyDescription: <CustomInput labelText="TreatyDescription" value={this.state.DefineDTOData[key].treatydescription} name="treatydescription" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
-                    Treatygroup: <MasterDropdown labelText="TreatyGroup" filterName='TreatyGroupName' lstObject={this.state.treatycodemasterlist} value={this.state.DefineDTOData[key].treatyGroupId} name='treatyGroupId' formControlProps={{ fullWidth: true }} onChange={(e) => this.settreatygroup(e, key)} />,
+                    Treatygroup: <MasterDropdown labelText="TreatyGroup" filterName='TreatyGroupName' lstObject={(this.state.trtygrpmasList.length > 0) ? ((this.state.trtygrpmasList[key]!=undefined)?this.state.trtygrpmasList[key]:[]):[]} value={this.state.DefineDTOData[key].treatyGroupId} name='treatyGroupId' formControlProps={{ fullWidth: true }} onChange={(e) => this.settreatygroup(e, key)} />,
                     Treatytype: <CustomInput labelText="TreatyType" value={this.state.DefineDTOData[key].treatyType} name="treatyType" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
-                    Sequence: <CustomInput labelText="Sequence" value={this.state.DefineDTOData[key].sequenceNo} name="sequenceNo" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
+                    SequenceNo: <CustomInput labelText="Sequence" value={this.state.DefineDTOData[key].sequenceNo} name="sequenceNo" onChange={(e) => this.handletreatygrid("numeric", e, key)} error={this.state.sequenceNoState} formControlProps={{ fullWidth: true }} />,
                     Actions: < div > <Button justIcon round simple color="info" className="add" onClick={(e) => this.AddTreatyRecord(e, key)} ><Add /> </Button >
                         <Button justIcon round simple color="danger" className="remove" onClick={(e) => this.deleteTreatyRecord(e, key)} ><Delete /> </Button >
                     </div >
@@ -662,9 +733,9 @@ class DefineMapping extends React.Component {
                                             },
                                             {
 
-                                                Header: "Sequence",
+                                                Header: "SequenceNo",
 
-                                                accessor: "Sequence",
+                                                accessor: "SequenceNo",
 
                                                 minWidth: 40,
 

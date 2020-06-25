@@ -59,6 +59,7 @@ class Reallocation extends React.Component {
             yearmasterlist: [],
             newdata: [],
             masterList: [],
+            reallocationlist: {},
             rimapId: "",
             showMapping: false,
             showRetentionflag: false,
@@ -66,6 +67,16 @@ class Reallocation extends React.Component {
             QuotaShare: false,
             surplus: false,
             rimappingId: "",
+            Modifydto: {
+                allocationAmount: "",
+                Level: "",
+                Name: "",
+                mappingId: "",
+                policyNo: "",
+                premium: "",
+                allocationDetails:""
+
+            },
             Policydto: {
                 policynumber: ""
             },
@@ -88,6 +99,9 @@ class Reallocation extends React.Component {
                         NoOfLines: "",
                         AllocatedAmount: "",
                         AllocatedPremium: "",
+                        Adjustment: "",
+                        retentionadded: "",
+                        Reallocatedpremium:"",
                         Participant: [
                             {
                                 ParticipantId: "",
@@ -152,24 +166,84 @@ class Reallocation extends React.Component {
 
     }
     onInputChange = (evt) => {
-        debugger;
-        const Data = this.state.CalculationDTO;
-        Data[evt.target.name] = evt.target.value;
-        this.setState({ Data });
-        const Data2 = this.state.CalculationDTO
-        Data2[evt.target.name] = evt.target.value;
-        this.setState({ Data2 });
-        const Data3 = this.state.CalculationDTO.MapDetails[0];
-        Data3[evt.target.name] = evt.target.value;
-        this.setState({ Data3 });
-        const Data4 = this.state.CalculationDTO.MapDetails[1];
-        Data4[evt.target.name] = evt.target.value;
-        this.setState({ Data4 });
+
+        //const Data = this.state.CalculationDTO;
+        //Data[evt.target.name] = evt.target.value;
+        //this.setState({ Data });
+        //const Data2 = this.state.CalculationDTO
+        //Data2[evt.target.name] = evt.target.value;
+        //this.setState({ Data2 });
+        //const Data3 = this.state.CalculationDTO.MapDetails[0];
+        //Data3[evt.target.name] = evt.target.value;
+        //this.setState({ Data3 });
+        //const Data4 = this.state.CalculationDTO.MapDetails[1];
+        //Data4[evt.target.name] = evt.target.value;
+        //this.setState({ Data4 });
         const Data1 = this.state.Policydto;
         Data1[evt.target.name] = evt.target.value;
         this.setState({ Data1 });
         console.log("Data", this.state.CalculationDTO)
-        //console.log("Data1", this.state.Policydto)
+        //const Data5 = this.state.masterList
+        //Data5[evt.target.name] = evt.target.value;
+        //this.setState({ Data5 });
+
+        
+        //var d = this.state.masterList;
+        
+       // console.log("c", c);
+
+        //if (this.state.masterList.Type == "Retention") {
+        //    this.state.CalculationDTO.MapDetails[0].retentionadded = ((this.state.masterList.AllocatedAmount * this.state.CalculationDTO.MapDetails[0].Adjustment) / 100);
+        //    console.log("Data1", this.state.CalculationDTO.MapDetails[0].retentionadded)
+        //    this.state.CalculationDTO.MapDetails[0].Reallocatedpremium = ((this.state.masterList.AllocatedPremium * this.state.CalculationDTO.MapDetails[0].Adjustment) / 100);
+        //    console.log("Data1", this.state.CalculationDTO.MapDetails[0].retentionadded)
+        //}
+    }
+    onInputChange1 = (evt) => {
+        //this.state.reallocationlist = this.state.masterList;
+        const Data = this.state.reallocationlist;
+        Data[evt.target.name] = evt.target.value;
+        //const Data1 = this.state.reallocationlist.mapDetails[index];
+        //Data1[evt.target.name] = evt.target.value;
+        this.setState({ Data });
+        //this.setState({ Data1 });
+       
+      
+    }
+    onInputChange2 = (evt, index) => {
+        debugger
+        //this.state.reallocationlist = this.state.masterList;
+
+        
+
+        console.log("calculatedValue1", this.state.CalculationDTO.MapDetails[0].retentionadded);
+        const Data = this.state.reallocationlist.mapDetails;
+        Data[index][evt.target.name] = evt.target.value;
+        //const Data1 = this.state.reallocationlist.mapDetails[index];
+        //Data1[evt.target.name] = evt.target.value;
+        this.setState({ Data });
+        //this.setState({ Data1 });
+        console.log("reallocationlist", this.state.reallocationlist.mapDetails, this.state.masterList);
+        let caldata;
+        let calpremium;
+        //console.log("d", d);
+        this.state.masterList.map((item,key) => {
+            let type = item.Type;
+            if (type == "Retention") {
+                caldata = ((item.AllocatedAmount * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
+                calpremium = ((item.AllocatedPremium * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
+                //
+            }
+            this.state.reallocationlist.mapDetails[key].AllocatedAmount = caldata;
+            this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
+
+        });
+        console.log("calculatedValue", caldata, this.state.masterList);
+        //this.state.reallocationlist.mapDetails[key].AllocatedAmount = caldata;
+        //this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
+        // set = caldata;
+        this.setState({ caldata, calpremium });
+
     }
 
     onDateChange = (formate, name, event) => {
@@ -214,17 +288,36 @@ class Reallocation extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                this.state.CalculationDTO.Name = data.Name;
-                this.state.CalculationDTO.Level = data.Level;
-                this.state.CalculationDTO.AllocationAmount = data.AllocationAmount;
-                this.state.CalculationDTO.PremiumAmount = data.PremiumAmount;
+                this.state.reallocationlist.Name = data.Name;
+                this.state.reallocationlist.Level = data.Level;
+                this.state.reallocationlist.AllocationAmount = data.AllocationAmount;
+                this.state.reallocationlist.PremiumAmount = data.PremiumAmount;
                 
                  //datalist = data.MapDetails;                
-                //console.log("masterdata", data);
+                console.log("masterdata123", data);
                 //this.state.masterList = data.MapDetails;
-                this.setState({ masterList: data.mapDetails, qoutaflag:true});
+                let temp = JSON.parse(JSON.stringify(data));
+                let list = Object.assign([], data.mapDetails);
+
+                //reset
+                temp.mapDetails.map(item => {
+                    if (item.Type == "Retention") {
+                        item.Percentage = "";
+                        item.AllocatedAmount = "";
+                        item.Limit = "";
+                        item.AllocatedPremium = "";
+                    }
+                    //if (item.Type == "Surplus") {
+                    //    item.NoOfLines = "";
+                       
+                    //}
+                });
+
+                this.setState({
+                    masterList: list, reallocationlist: temp , qoutaflag: true });
 
                 console.log("masterdata", this.state.masterList);
+                console.log("reallocation", this.state.reallocationlist);
                // console.log(datalist, 'new1');
                 
             });
@@ -232,7 +325,34 @@ class Reallocation extends React.Component {
         //this.setState({ masterList });
         console.log("masterdata1", this.state.masterList);
     }
-    
+    onFormUpdate = () => {
+        debugger;
+        this.state.Modifydto.allocationAmount = this.state.reallocationlist.AllocationAmount;
+        this.state.Modifydto.premium = this.state.reallocationlist.PremiumAmount;
+        this.state.Modifydto.policyNo = this.state.reallocationlist.PolicyNumber;
+        this.state.Modifydto.Level = this.state.reallocationlist.Level;
+        this.state.Modifydto.allocationDetails = JSON.stringify(this.state.reallocationlist);
+        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyReAllocation?MappingId=` + this.state.reallocationlist.MappingId, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(this.state.Modifydto)
+        }).then(response => response.json())
+            .then(data => {
+                swal({
+                    text: data.responseMessage,
+                    //text: "data saved successfully",
+                    icon: "success"
+                });
+                this.setState({ Retention: data });
+                console.log(data, 'Mydata')
+                console.log("Accountss data: ", data);
+
+            });
+    }
     onChangeTreaty = (index) => {
         let indexlist = this.state.indexList;
         indexlist.push(index);
@@ -277,38 +397,43 @@ class Reallocation extends React.Component {
                                 <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.onFormSubmit()}>Search</Button>
 
                             </GridItem>
+                            <GridItem xs={12} sm={12} md={4}>
+                                <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.onFormUpdate()}>Update</Button>
+
+                            </GridItem>
                         </GridContainer>
-                        <GridContainer>
-                            
-                            <GridItem xs={12} sm={12} md={3}>
-                                <CustomInput
-                                    labelText="Product Name"
-                                    id="ContactNo"
-                                    //required={true}
-                                    //error={this.state.percentageState}
-                                    value={this.state.CalculationDTO.Name}
-                                    name='Name'
-                                    onChange={this.onInputChange}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}>
-                                <CustomInput
-                                    labelText="Basis"
-                                    id="ContactNo"
-                                    //required={true}
-                                    //error={this.state.percentageState}
-                                    value={this.state.CalculationDTO.Level}
-                                    name='Level'
-                                    onChange={this.onInputChange}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                            {/* <GridItem xs={12} sm={12} md={3}>
+                        {this.state.qoutaflag &&
+                            <GridContainer>
+
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <CustomInput
+                                        labelText="Product Name"
+                                        id="ContactNo"
+                                        disabled={true}
+                                        //error={this.state.percentageState}
+                                        value={this.state.reallocationlist.Name}
+                                        name='Name'
+                                        onChange={(e) => this.onInputChange1(e)}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <CustomInput
+                                        labelText="Basis"
+                                        id="ContactNo"
+                                        disabled={true}
+                                        //error={this.state.percentageState}
+                                        value={this.state.reallocationlist.Level}
+                                        name='Level'
+                                        onChange={(e) => this.onInputChange1(e)}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </GridItem>
+                                {/* <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
                                     labelText="Type"
                                     id="ContactNo"
@@ -323,44 +448,49 @@ class Reallocation extends React.Component {
                                 />
 
                             </GridItem> */}
-                            <GridItem xs={12} sm={12} md={3}>
-                                <CustomInput
-                                    labelText="SumInsured"
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <CustomInput
+                                        labelText="SumInsured"
                                     id="ContactNo"
-                                    //required={true}
-                                    //error={this.state.percentageState}
-                                    value={this.state.CalculationDTO.AllocationAmount}
-                                    name='AllocationAmount'
-                                    onChange={this.onInputChange}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                            <GridItem xs={12} sm={12} md={3}>
-                                <CustomInput
-                                    labelText="Premium"
+                                    disabled={true}
+                                        //required={true}
+                                        //error={this.state.percentageState}
+                                        value={this.state.reallocationlist.AllocationAmount}
+                                        name='AllocationAmount'
+                                        onChange={(e) => this.onInputChange1(e)}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={3}>
+                                    <CustomInput
+                                        labelText="Premium"
                                     id="ContactNo"
-                                    //required={true}
-                                    //error={this.state.percentageState}
-                                    value={this.state.CalculationDTO.PremiumAmount}
-                                    name='PremiumAmount'
-                                    onChange={this.onInputChange}
-                                    formControlProps={{
-                                        fullWidth: true
-                                    }}
-                                />
-                            </GridItem>
-                        </GridContainer>
-
+                                    disabled={true}
+                                        //required={true}
+                                        //error={this.state.percentageState}
+                                        value={this.state.reallocationlist.PremiumAmount}
+                                        name='PremiumAmount'
+                                        onChange={(e) => this.onInputChange1(e)}
+                                        formControlProps={{
+                                            fullWidth: true
+                                        }}
+                                    />
+                                </GridItem>
+                            </GridContainer>
+                        }
                     </CardBody>
                 </Card>
                 
                
-                {this.state.qoutaflag && this.state.masterList.map(item => {
+                {this.state.qoutaflag && this.state.masterList.map((item,key) => {
 
                     return (<div>
                         {item.Type == "Retention" &&
+
+
+
 
                             <Card>
 
@@ -375,9 +505,10 @@ class Reallocation extends React.Component {
 
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Retention %"
-                                        name="Type"
-                                        value={item.Percentage}
-                                        onChange={this.onInputChange}
+                                        name="Percentage"
+                                        disabled={true}
+                                        value={item.Percentage} 
+                                        onChange={(e) => this.onInputChange2(e,key)}
                                         formControlProps={{
                                             fullWidth: true
                                         }}
@@ -386,6 +517,7 @@ class Reallocation extends React.Component {
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Retention Allocation SI"
                                         name="AllocatedAmount"
+                                        disabled={true}
                                         value={item.AllocatedAmount}
                                         onChange={this.onInputChange}
                                         formControlProps={{
@@ -396,6 +528,7 @@ class Reallocation extends React.Component {
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Limit"
                                         name="Limit"
+                                        disabled={true}
                                         value={item.Limit}
                                         onChange={this.onInputChange}
                                         formControlProps={{
@@ -407,6 +540,7 @@ class Reallocation extends React.Component {
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Premium Amount"
                                         name="AllocatedPremium"
+                                        disabled={true}
                                         value={item.AllocatedPremium}
                                         onChange={this.onInputChange}
                                         formControlProps={{
@@ -416,9 +550,9 @@ class Reallocation extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Adjustment %"
-                                        //name="amount"
-                                        //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].amount}
-                                        onChange={this.onInputChange}
+                                        name="Percentage"
+                                        value={this.state.reallocationlist.mapDetails[key].Percentage}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                         formControlProps={{
                                             fullWidth: true
                                         }}
@@ -426,9 +560,10 @@ class Reallocation extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Reallocated SI"
-                                        name="retentionadded"
-                                        //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].retentionadded}
-                                        onChange={this.onInputChange}
+                                        name="AllocatedAmount"
+                                        //disabled={true}
+                                        value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                         formControlProps={{
                                             fullWidth: true
                                         }}
@@ -436,9 +571,9 @@ class Reallocation extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Reallocated Limit"
-                                        name="deallocatedretention"
-                                        //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].deallocatedretention}
-                                        onChange={this.onInputChange}
+                                        name="Limit"                                       
+                                        value={this.state.reallocationlist.mapDetails[key].Limit}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                         formControlProps={{
                                             fullWidth: true
                                         }}
@@ -446,9 +581,9 @@ class Reallocation extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Reallocated Amount"
-                                        name="deallocatedretention"
-                                        //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[0].deallocatedretention}
-                                        onChange={this.onInputChange}
+                                        name="AllocatedPremium"                                       
+                                        value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                         formControlProps={{
                                             fullWidth: true
                                         }}
@@ -462,6 +597,7 @@ class Reallocation extends React.Component {
 
 
                             </Card>
+
                         }
 
                     
@@ -490,7 +626,8 @@ class Reallocation extends React.Component {
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Type"
                                             name="Type1"
-                                            value={item.Type}
+                                        value={item.Type}
+                                        disabled={true}
                                             onChange={this.onInputChange}
                                             formControlProps={{
                                                 fullWidth: true
@@ -499,7 +636,8 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Treaty Group Name"
-                                            name="treatyshare"
+                                        name="treatyshare"
+                                        disabled={true}
                                             //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyshare}
                                             onChange={this.onInputChange}
                                             formControlProps={{
@@ -511,6 +649,7 @@ class Reallocation extends React.Component {
                                             labelText="Allocation SI"
                                             name="AllocationAmount"
                                         value={item.AllocatedAmount}
+                                        disabled={true}
                                             onChange={this.onInputChange}
                                             formControlProps={{
                                                 fullWidth: true
@@ -519,7 +658,8 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Allocation Premium"
-                                            name="AllocatedPremium"
+                                        name="AllocatedPremium"
+                                        disabled={true}
                                         value={item.AllocatedPremium}
                                             onChange={this.onInputChange}
                                             formControlProps={{
@@ -530,7 +670,8 @@ class Reallocation extends React.Component {
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Treaty Share"
                                             name="limit2"
-                                            value={item.Percentage}
+                                        value={item.Percentage}
+                                        disabled={true}
                                             onChange={this.onInputChange}
                                             formControlProps={{
                                                 fullWidth: true
@@ -539,7 +680,8 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Limit"
-                                            name="Limit"
+                                        name="Limit"
+                                        disabled={true}
                                             value={item.Limit}
                                             onChange={this.onInputChange}
                                             formControlProps={{
@@ -657,9 +799,10 @@ class Reallocation extends React.Component {
 
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Type"
-                                            name="Type1"
+                                        name="Type1"
+                                        disabled={true}
                                             value={item.Type}
-                                            onChange={this.onInputChange}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}
@@ -667,9 +810,10 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Treaty Group Name"
-                                            name="treatyshare"
+                                        name="treatyshare"
+                                        disabled={true}
                                             //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyshare}
-                                            onChange={this.onInputChange}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}
@@ -679,7 +823,8 @@ class Reallocation extends React.Component {
                                             labelText="Allocation SI"
                                             name="AllocationAmount"
                                         value={item.AllocatedAmount}
-                                            onChange={this.onInputChange}
+                                        disabled={true}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}
@@ -687,9 +832,10 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Allocation Premium"
-                                            name="AllocatedPremium"
+                                        name="AllocatedPremium"
+                                        disabled={true}
                                         value={item.AllocatedPremium}
-                                            onChange={this.onInputChange}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}
@@ -697,9 +843,10 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Treaty Share"
-                                            name="TreatyShare"
+                                        name="TreatyShare"
+                                        //disabled={true}
                                             value={item.Percentage}
-                                            onChange={this.onInputChange}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}
@@ -707,9 +854,10 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Lines"
-                                            name="Lines"
-                                            value={item.NoOfLines}
-                                            onChange={this.onInputChange}
+                                        name="NoOfLines"
+                                        //disabled={true}
+                                        value={this.state.reallocationlist.mapDetails[key].NoOfLines}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}

@@ -70,6 +70,8 @@ class ParticipantMaster extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            RICodeflag: false,
+            RiCodemassage:"",
             branchCodeflag: false,
             branchCodemassage: "",
             flag: true,
@@ -238,7 +240,30 @@ class ParticipantMaster extends React.Component {
                     this.AddTreatyTable();
                 });
             console.log("data", this.state.masterList);
-        }
+    }
+    onBlur1 = () => {
+
+        debugger
+        //fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph",
+        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + this.state.ParticipantMaster.participantCode + '&type=' + "ParticipantCode", {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status == 9) {
+                    this.setState({ RICodeflag: true, RiCodemassage: data.responseMessage });
+                } else {
+                    this.setState({ RICodeflag: false, RiCodemassage: "" });
+                }
+                this.AddTreatyTable();
+            });
+        console.log("data", this.state.masterList);
+    }
     
     onInputBranchesChange = (type, event, index) => {
         debugger
@@ -689,12 +714,15 @@ class ParticipantMaster extends React.Component {
                                         error={this.state.participantCodeState}
                                         value={this.state.ParticipantMaster.participantCode}
                                         name='participantCode'
+                                        onBlur={() => this.onBlur1()}
                                         onChange={(evt) => this.onInputChange("alphaNumeric", evt)}
                                         //onChange={this.onInputChange}
                                         formControlProps={{
                                             fullWidth: true
                                         }}
                                     />
+                                    {this.state.RICodeflag && (<p className="error">{this.state.RiCodemassage} </p>)}
+
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
@@ -1051,12 +1079,15 @@ class ParticipantMaster extends React.Component {
                                         required={true}
                                         error={this.state.participantCodeState}
                                         value={this.state.ParticipantMaster.participantCode}
+                                        onBlur={() => this.onBlur1()}
                                         name='participantCode'
                                         onChange={(evt) => this.onInputChange("alphaNumeric", evt)}
                                         formControlProps={{
                                             fullWidth: true
                                         }}
                                     />
+                                    {this.state.RICodeflag && (<p className="error">{this.state.RiCodemassage} </p>)}
+
                                 </GridItem>
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
