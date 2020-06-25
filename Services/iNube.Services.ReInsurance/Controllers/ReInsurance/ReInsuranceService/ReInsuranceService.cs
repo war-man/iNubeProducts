@@ -341,17 +341,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             try
             {
                 var delete_caoMap = _context.TblParticipantMaster.Find(participantMasterId);
-                if (delete_caoMap != null)
-                {
+              
                     _context.TblParticipantMaster.Remove(delete_caoMap);
                     _context.SaveChanges();
-                }
+                return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Participant Master deleted sucessfully " };
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Participant Master deleted sucessfully " };
+            
         }
 
         //modifyParticipant
@@ -564,17 +563,17 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             try
             {
                 var delete_caoMap = _context.TblRetentionGroup.Find(retentionGroupId);
-                if (delete_caoMap != null)
-                {
+              
                     _context.TblRetentionGroup.Remove(delete_caoMap);
                     _context.SaveChanges();
-                }
+                return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Retention deleted sucessfully " };
+
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Retention deleted sucessfully " };
+           
         }
 
         //modifyRetention
@@ -691,17 +690,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             {
                 
                 var delete_caoMap = _context.TblTreaty.Find(tratyId);
-                if (delete_caoMap != null)
-                {
-                    _context.TblTreaty.Remove(delete_caoMap);
+                 _context.TblTreaty.Remove(delete_caoMap);
                     _context.SaveChanges();
-                }
+                    return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Treaty deleted sucessfully " };
+               
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Treaty deleted sucessfully " };
+          
         }
 
         //modify TreatyData
