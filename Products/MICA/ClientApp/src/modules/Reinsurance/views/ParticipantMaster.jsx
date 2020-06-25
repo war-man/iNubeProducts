@@ -92,6 +92,8 @@ class ParticipantMaster extends React.Component {
             branchNameState: false,
             BranchSpocEmailIDState: false,
             address3State: false,
+            flagDuplicate: false,
+            branchDuplicate:false,
             Branchesdto: [{
                 branchCode: " ",
                 branchName: " ",
@@ -191,7 +193,7 @@ class ParticipantMaster extends React.Component {
         Data[evt.target.name] = evt.target.value;
         this.setState({ Data });
         console.log("Data", this.state.ParticipantMaster)
-        this.change(evt, name, type);
+        this.change(evt, name, type)
     }
     reset = () => {
         //Setting States After Saving
@@ -234,6 +236,12 @@ class ParticipantMaster extends React.Component {
                 .then(data => {
                     if (data.status == 9) {
                         this.setState({ branchCodeflag: true, branchCodemassage: data.responseMessage });
+                        if (data.responseMessage != null) {
+                            this.state.branchDuplicate = true;
+                        }
+                        else {
+                            this.state.branchDuplicate = false;
+                        }
                     } else {
                         this.setState({ branchCodeflag: false, branchCodemassage: "" });
                     }
@@ -257,6 +265,14 @@ class ParticipantMaster extends React.Component {
             .then(data => {
                 if (data.status == 9) {
                     this.setState({ RICodeflag: true, RiCodemassage: data.responseMessage });
+                    if (data.responseMessage != null) {
+                        this.state.flagDuplicate = true;
+                    }
+                    else {
+                        this.state.flagDuplicate = false;
+                    }
+                    console.log(this.state.flagDuplicate, 'onBlur');
+                    
                 } else {
                     this.setState({ RICodeflag: false, RiCodemassage: "" });
                 }
@@ -305,7 +321,9 @@ class ParticipantMaster extends React.Component {
         };
         //this.state.ParticipantMaster.branches = [... this.state.ParticipantMaster, ...this.state.Branchesdto]
         console.log("Participantdata", this.state.ParticipantMaster)
-        if (this.state.ParticipantMaster.participantCode != "" && this.state.ParticipantMaster.participantName != "" && this.state.ParticipantMaster.contactNo != "" && this.state.ParticipantMaster.address1 != "" && this.state.addressDTO.CountryId != "" && this.state.addressDTO.StateId != "" && this.state.addressDTO.CityId != "" && this.state.addressDTO.DistrictId != "") {
+        debugger
+        console.log(this.state.flagDuplicate, 'Flag');
+        if (this.state.ParticipantMaster.participantTypeId != "" && this.state.ParticipantMaster.participantCode != "" && this.state.ParticipantMaster.participantName != "" && this.state.ParticipantMaster.contactNo != "" && this.state.ParticipantMaster.address1 != "" && this.state.addressDTO.CountryId != "" && this.state.addressDTO.StateId != "" && this.state.addressDTO.CityId != "" && this.state.addressDTO.DistrictId != "" && this.state.flagDuplicate != true && this.state.branchDuplicate!= true) {
             fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveParticipentData`, {
                 method: 'POST',
                 headers: {
@@ -347,8 +365,14 @@ class ParticipantMaster extends React.Component {
                 });
         }
         else {
-            swal("", "Some fields are missing", "error");
-            this.setState({ errormessage: true });
+            if (this.state.flagDuplicate == true) {
+                swal("", "Participant Code can't be duplicate", "error");
+                this.setState({ errormessage: true });
+            }
+            else {
+                swal("", "Some fields are missing", "error");
+                this.setState({ errormessage: true });
+            }
         }
 
     }
@@ -367,15 +391,18 @@ class ParticipantMaster extends React.Component {
         this.AddTreatyTable();
         // }
     }
-
+    
     deleteTreatyRecord = (event, index) => {
         debugger;
-        let deldata = this.state.Branchesdto.splice(index, 1);
-        //let deldata = this.state.treatydata.filter(item => item.treatyGroup !== index);
-        this.setState({ deldata })
-        console.log("deldata", this.state.deldata);
-        this.AddTreatyTable();
+        if (index != "0") {
+            let deldata = this.state.Branchesdto.splice(index, 1);
+            //let deldata = this.state.treatydata.filter(item => item.treatyGroup !== index);
+            this.setState({ deldata })
+            console.log("deldata", this.state.deldata);
+            this.AddTreatyTable();
+        }
     }
+
     AddTreatyTable = () => {
 
         // if (this.state.newmasterlist.length > 0) {
@@ -415,7 +442,7 @@ class ParticipantMaster extends React.Component {
                         error={this.state.BranchSpocEmailIDState}
                         value={this.state.Branchesdto[key].BranchSpocEmailID}
                         name='BranchSpocEmailID'
-                        onChange={(event) => this.onInputBranchesChange("alphaNumeric", event, key)}
+                        onChange={(event) => this.onInputBranchesChange("email", event, key)}
                         formControlProps={{ fullWidth: true }
                         } />,
 
@@ -484,6 +511,13 @@ class ParticipantMaster extends React.Component {
                 break;
             case "alphaNumeric":
                 if (validationPage.verifyAlphaNumeric(evt.target.value)) {
+                    this.setState({ [stateName + "State"]: false });
+                } else {
+                    this.setState({ [stateName + "State"]: true });
+                }
+                break;
+            case "email":
+                if (validationPage.verifyEmail(evt.target.value)) {
                     this.setState({ [stateName + "State"]: false });
                 } else {
                     this.setState({ [stateName + "State"]: true });

@@ -259,47 +259,53 @@ class DefineRetentions extends React.Component {
        
 
         console.log("submit", this.state.Retention);
-        if (this.state.Retention.year != "" && this.state.Retention.businessTypeId != "" && this.state.Retention.retentionGroupName != "" && this.state.Retention.retentionLogicId != "" &&  this.state.Retention.effectiveFrom != "" && this.state.Retention.effectiveTo != "") {
-        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveRetentionData`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-            body: JSON.stringify(this.state.Retention)
-            }).then(response => response.json())
-                .then(data => {
-                    if (data.status == 2) {
-                        debugger;
-                        this.reset();
-                        swal({
+        if (this.state.Retention.year != "" && this.state.Retention.businessTypeId != "" && this.state.Retention.retentionGroupName != "" && this.state.Retention.retentionLogicId != "" && this.state.Retention.effectiveFrom != "" && this.state.Retention.effectiveTo != "") {
+            if (this.state.Retention.effectiveTo >= this.state.Retention.effectiveFrom) {
+                fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveRetentionData`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                    body: JSON.stringify(this.state.Retention)
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.status == 2) {
+                            debugger;
+                            this.reset();
+                            swal({
 
-                            //   title: "Perfect",
+                                //   title: "Perfect",
 
-                            text: data.responseMessage,
-                            //text: "Retention Successfully Created",
-                            icon: "success"
-                        });
-                        this.setState({ errormessage: false });
-                        //this.HandleApi();
-                        //this.setState({ redirect: true });
-                        //this.renderRedirect();
-                    } else if (data.status == 8) {
+                                text: data.responseMessage,
+                                //text: "Retention Successfully Created",
+                                icon: "success"
+                            });
+                            this.setState({ errormessage: false });
+                            //this.HandleApi();
+                            //this.setState({ redirect: true });
+                            //this.renderRedirect();
+                        } else if (data.status == 8) {
 
-                        swal({
-                            text: data.errors[0].errorMessage,
-                            icon: "error"
-                        });
-                    } else if (data.status == 4) {
+                            swal({
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        } else if (data.status == 4) {
 
-                        swal({
-                            text: data.errors[0].errorMessage,
-                            icon: "error"
-                        });
-                    }
-                });
-        }
+                            swal({
+                                text: data.errors[0].errorMessage,
+                                icon: "error"
+                            });
+                        }
+                    });
+               
+            }
+            else {
+                swal("", "Date is not correct", "error");
+                this.setState({ errormessage: true });
+            }}
         else {
             swal("", "Some fields are missing", "error");
             this.setState({ errormessage: true });

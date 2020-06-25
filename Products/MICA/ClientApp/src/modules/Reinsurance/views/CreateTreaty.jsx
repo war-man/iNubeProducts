@@ -283,10 +283,31 @@ class CreateTreaty extends React.Component {
                 console.log("data456", data);
                 this.setState({ treatyDTO: data });
                 console.log("Treaty data:", this.state.treatyDTO);
+                this.reset();
 
             });
         //let flageUpdate = this.state.flagUpdate
         //this.setState({ flageUpdate:true})
+    }
+    reset = () => {
+        //Setting States After Saving
+        let resetDto = this.state.treatyDTO;
+        resetDto['treatyCode'] = "";
+        resetDto['treatyDescription'] = "";
+        resetDto['remarks'] = "";
+        //resetDto['retentionGroupName'] = "";
+        //resetDto['percentage'] = "";
+        //resetDto['limit'] = "";
+        //resetDto['effectiveFrom'] = "";
+        //resetDto['effectiveTo'] = "";
+
+
+        this.setState({ resetDto });
+
+        //let status = this.state;
+        //status['accountNameState'] = "";
+        //status['accountDescState'] = "";
+        //this.setState({ status });
     }
     AddTreatyRecord = (event, index) => {
         //let arr = Object.assign([], this.state.Arrangement);
@@ -375,6 +396,14 @@ class CreateTreaty extends React.Component {
         this.setState({ deldata })
         console.log("deldata", this.state.deldata);
         this.AddTreatyTable();
+    }
+    deleteParticipantRecord = (index) => {
+        debugger
+        let deldata = this.state.treatyDTO.tblParticipant.splice(index, 1);
+        //let deldata = this.state.treatydata.filter(item => item.treatyGroup !== index);
+        this.setState({ deldata })
+        console.log("deldata", this.state.deldata);
+        this.dataTable();
     }
     SetTreatyDetailsValue = (type, event, index) => {
         event.preventDefault();
@@ -887,24 +916,33 @@ class CreateTreaty extends React.Component {
         }
         console.log(this.state.total,'total1')
         if (this.state.total == 100) {
-            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveTreatyData`, {
-                method: 'Post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-                },
-                body: JSON.stringify(this.state.treatyDTO)
-            }).then(response => response.json())
-                .then(data => {
-                    if (data.status == 2) {
-                        swal({
-                            text: data.responseMessage,
-                            icon: "success"
-                        });
-                    }
-                    console.log("dataresp", data);
-                })
+            debugger
+            if (this.state.treatyDTO.startDate >= this.state.treatyDTO.endDate) {
+                fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveTreatyData`, {
+                    method: 'Post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                    body: JSON.stringify(this.state.treatyDTO)
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.status == 2) {
+                            swal({
+                                text: data.responseMessage,
+                                icon: "success"
+                            });
+                        }
+                        console.log("dataresp", data);
+                    })
+            }
+            else {
+                swal({
+                    text: "Date is not Correct",
+                    icon: "error"
+                });
+            }
         }
         else {
             swal({
@@ -935,6 +973,8 @@ class CreateTreaty extends React.Component {
                     brokagepercent: prop.brokeragePercentage,
                     riCommissionpercent: prop.ricommissionPercentage,
                     bordereauxfrequencyId: prop.bordereauxFreqId,
+                    btn: <div><Button color="danger" justIcon round simple className="edit" onClick={() => this.deleteParticipantRecord(key)} ><Delete /></Button>
+                    </div>
                         //this.state.brodreuxfreq,
 
                 };
@@ -980,7 +1020,7 @@ class CreateTreaty extends React.Component {
 
                         }
 
-                        {this.state.showparticipantgrid ? <ParticipantGrid participantdata={this.state.participantdata} participantstableData={this.state.participantstableData} newdata={this.state.newdata}/> : null}
+                        {this.state.showparticipantgrid ? <ParticipantGrid deleteParticipantRecord={this.deleteParticipantRecord} participantdata={this.state.participantdata} participantstableData={this.state.participantstableData} newdata={this.state.newdata}/> : null}
                         {this.state.flag &&
                             <center>
                                 <Button round color="rose" onClick={this.handleSaveTreaty}><TranslationContainer translationKey="Submit" /></Button>

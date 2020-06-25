@@ -144,6 +144,17 @@ const ParticipantGrid = (props) => {
                                 style: { textAlign: "center" },
                                 headerClassName: 'react-table-center'
                             },
+                            {
+                                Header: "Action",
+                                accessor: "btn",
+
+                                ///style: { textAlign: "center" },
+                                ///headerClassName: 'react-table-center'
+                                style: { textAlign: "center" },
+                                headerClassName: 'react-table-center',
+                                minWidth: 50,
+                                //resizable: false,
+                            }
                         ]}
                         defaultPageSize={5}
                         //pageSize={([this.state.tabledata.length + 1] < 5) ? [this.state.tabledata.length + 1] : 5}
