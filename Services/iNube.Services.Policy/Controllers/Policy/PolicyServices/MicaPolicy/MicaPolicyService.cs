@@ -3094,9 +3094,31 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                     var paymentinfo = insurableItemRequest["PaymentInfo"];
                                     if (paymentinfo != null)
                                     {
+                                        decimal Minimum = -1;
+                                        decimal Maximum = 1;
+                                        var CustomerData = await _integrationService.GetAdjustmentCustomerSettings("Adjustment", apiContext);
+
+                                        if (CustomerData.Count() > 0)
+                                        {
+                                            Minimum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Minimum").KeyValue);
+                                            Maximum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Maximum").KeyValue);
+                                        }
+                                        else
+                                        {
+                                            EndorsmentDTO response = new EndorsmentDTO();
+                                            ErrorInfo errorInfo = new ErrorInfo();
+                                            response.ResponseMessage = "MICA CustomerSettings Not Found";
+                                            response.Id = "";
+                                            response.Status = BusinessStatus.Error;
+                                            errorInfo.ErrorMessage = "CustomerSettings Not Found";
+                                            errorInfo.ErrorCode = "END001";
+                                            errorInfo.PropertyName = "CustomerSettings Not Found";
+                                            response.Errors.Add(errorInfo);
+                                        }
+
                                         var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
                                         var paymentdiff = (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount);
-                                        if (paymentdiff <= 1 && paymentdiff >= -1)
+                                        if (paymentdiff <= Maximum && paymentdiff >= Minimum)
                                         {
 
                                             MicaCD micaCD = new MicaCD();
@@ -3188,7 +3210,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                             //Endorsement Details data saving for the addition of vehicle
 
-                                            //  PolicyEndoresemenet policyEndoresemenet=new 
 
                                             EndorsementDetailsDTO endorsementDetailsDTO = new EndorsementDetailsDTO();
                                             endorsementDetailsDTO.Action = EndorsmentType;
@@ -3340,9 +3361,31 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                 var paymentinfo = insurableItemRequest["PaymentInfo"];
                                 if (paymentinfo != null)
                                 {
+                                    decimal Minimum = -1;
+                                    decimal Maximum = 1;
+                                    var CustomerData = await _integrationService.GetAdjustmentCustomerSettings("Adjustment", apiContext);
+
+                                    if (CustomerData.Count() > 0)
+                                    {
+                                        Minimum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Minimum").KeyValue);
+                                        Maximum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Maximum").KeyValue);
+                                    }
+                                    else
+                                    {
+                                        EndorsmentDTO response = new EndorsmentDTO();
+                                        ErrorInfo errorInfo = new ErrorInfo();
+                                        response.ResponseMessage = "MICA CustomerSettings Not Found";
+                                        response.Id = "";
+                                        response.Status = BusinessStatus.Error;
+                                        errorInfo.ErrorMessage = "CustomerSettings Not Found";
+                                        errorInfo.ErrorCode = "END001";
+                                        errorInfo.PropertyName = "CustomerSettings Not Found";
+                                        response.Errors.Add(errorInfo);
+                                    }
+
                                     var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
 
-                                    if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 || (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                                    if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= Maximum && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= Minimum)
                                     {
 
 
@@ -4354,9 +4397,31 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     var paymentinfo = ProposalDetail["PaymentInfo"];
                     if (paymentinfo != null)
                     {
-                        var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
+                                decimal Minimum = -1;
+                                decimal Maximum = 1;
+                                var CustomerData = await _integrationService.GetAdjustmentCustomerSettings("Adjustment", apiContext);
 
-                        if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= 1 && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1)
+                                if (CustomerData.Count() > 0)
+                                {
+                                    Minimum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Minimum").KeyValue);
+                                    Maximum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Maximum").KeyValue);
+                                }
+                                else
+                                {
+                                    ProposalResponse response = new ProposalResponse();
+                                    ErrorInfo errorInfo = new ErrorInfo();
+                                    response.ResponseMessage = "MICA CustomerSettings Not Found";
+                                    response.Id = "";
+                                    response.Status = BusinessStatus.Error;
+                                    errorInfo.ErrorMessage = "CustomerSettings Not Found";
+                                    errorInfo.ErrorCode = "PO001";
+                                    errorInfo.PropertyName = "CustomerSettings Not Found";
+                                    response.Errors.Add(errorInfo);
+                                }
+
+                                var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
+
+                        if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= Maximum && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= Minimum)
                         {
                             var expObj = JsonConvert.DeserializeObject<ExpandoObject>(ProposalDetail.ToString());
 
@@ -5197,7 +5262,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     proposalResponse.ResponseMessage = data.ResponseMessage;
                     proposalResponse.Id = data.Id;
                     //return proposalResponse;
-                    return new ProposalResponse { Status = data.Status, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
+                    return new ProposalResponse { Status = data.Status, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage,Errors= proposalResponse.Errors };
 
                 }
 
@@ -5214,7 +5279,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     proposalResponse.ResponseMessage = data.ResponseMessage;
                     proposalResponse.Id = data.Id;
                     //return proposalResponse;
-                    return new ProposalResponse { Status = data.Status, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage };
+                    return new ProposalResponse { Status = data.Status, Id = proposalResponse.Id, ResponseMessage = proposalResponse.ResponseMessage, Errors = proposalResponse.Errors };
 
                 }
 
@@ -5225,7 +5290,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 {
                     var data = await RemoveInsurableItem(endoresementDto, apiContext);
 
-                    return new ProposalResponse { Status = data.Status, ResponseMessage = data.ResponseMessage };
+                    return new ProposalResponse { Status = data.Status, ResponseMessage = data.ResponseMessage, Id = proposalResponse.Id, Errors = proposalResponse.Errors };
 
                     //return data;
                 }
@@ -6483,6 +6548,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         public async Task<PolicyResponse> GeneratePolicy(dynamic policyDTO, ApiContext apiContext)
         {
             //Step1:Validate of Request Object
+         
 
             List<ErrorInfo> Errors = new List<ErrorInfo>();
             try
@@ -6548,9 +6614,31 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             var paymentinfo = policyDTO["PaymentInfo"];
                             if (paymentinfo != null)
                             {
+                                var CustomerData = await _integrationService.GetAdjustmentCustomerSettings("Adjustment", apiContext);
+                                decimal Minimum = -1;
+                                decimal Maximum = 1;
+
+                                if (CustomerData.Count() > 0)
+                                {
+                                    Minimum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Minimum").KeyValue);
+                                    Maximum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Maximum").KeyValue);
+                                }
+                                else
+                                {
+                                    PolicyResponse response = new PolicyResponse();
+                                    ErrorInfo errorInfo = new ErrorInfo();
+                                    response.ResponseMessage = "MICA CustomerSettings Not Found";
+                                    response.Id = PolicyNo;
+                                    response.Status = BusinessStatus.Error;
+                                    errorInfo.ErrorMessage = "CustomerSettings Not Found";
+                                    errorInfo.ErrorCode = "PO001";
+                                    errorInfo.PropertyName = "CustomerSettings Not Found";
+                                    response.Errors.Add(errorInfo);
+                                }
+
                                 var paymentinfoRequest = JsonConvert.DeserializeObject<List<PaymentInfo>>(paymentinfo.ToString());
 
-                                if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= -1 && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <=1)
+                                if ((paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) >= Minimum && (paymentinfoRequest[0].Amount - CalculatePremiumResponse.TotalAmount) <= Maximum)
                                 {
 
                                     var expObj = JsonConvert.DeserializeObject<ExpandoObject>(policyDTO.ToString());
@@ -7248,8 +7336,34 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             PolicyRefundDetails.PaymentDate = errorInfoDetailsInfo.DateofPayment;
                             PolicyRefundDetails.ModifiedDate = DatetimeNow;
 
+                            decimal Minimum = -1;
+                            decimal Maximum = 1;
+                            var CustomerData = await _integrationService.GetAdjustmentCustomerSettings("Adjustment", apiContext);
 
-                            if ((PolicyRefundDetails.DifferenceAmount - errorInfoDetailsInfo.AmountPaid) >= -1 && (PolicyRefundDetails.DifferenceAmount - errorInfoDetailsInfo.AmountPaid) <= 1)
+                            if (CustomerData.Count() > 0)
+                            {
+                                Minimum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Minimum").KeyValue);
+                                Maximum = Convert.ToDecimal(CustomerData.FirstOrDefault(x => x.Key == "Maximum").KeyValue);
+                            }
+                            else
+                            {
+                                // response = new EndorsmentDTO();
+                                //ErrorInfo errorInfo = new ErrorInfo();
+                                //response.ResponseMessage = "MICA CustomerSettings Not Found";
+                                //response.Id = "";
+                                //response.Status = BusinessStatus.Error;
+                                //errorInfo.ErrorMessage = "CustomerSettings Not Found";
+                                //errorInfo.ErrorCode = "PB001";
+                                //errorInfo.PropertyName = "CustomerSettings Not Found";
+                                //response.Errors.Add(errorInfo);
+                                var dict = new Dictionary<string, string>();
+                                dict.Add("Header", "Error");
+                                dict.Add("Details", $"MICA CustomerSettings Not Found");
+                                dict1.Add(dict);
+                                errorflag = true;
+
+                            }
+                            if ((PolicyRefundDetails.DifferenceAmount - errorInfoDetailsInfo.AmountPaid) >= Minimum && (PolicyRefundDetails.DifferenceAmount - errorInfoDetailsInfo.AmountPaid) <= Maximum)
                             {
                                 //  PolicyRefundDetails.DifferenceAmount = errorInfoDetailsInfo.AmountPaid-PolicyRefundDetails.DifferenceAmount;
                                 var RequestObj = JsonConvert.DeserializeObject<dynamic>(PolicyRefundDetails.RequestObject.ToString());
