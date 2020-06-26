@@ -4838,7 +4838,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                         if (NoOfPC == 1 && NoOfTW == 0 && PCCount == 0 && TWCount == 1)
                         {
-                            if (SI <= 2000000)
+                            if (SI >= 300000 && SI <= 2000000)
                             {
 
                                 ruleEngine1 = new RuleEngineResponse();
@@ -4863,7 +4863,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
                         if (NoOfPC == 1 && NoOfTW == 0 && PCCount == 1 && TWCount == 0)
                         {
-                            if (SI <= 4000000)
+                            if (SI >= 300000 && SI <= 4000000)
                             {
 
                                 ruleEngine1 = new RuleEngineResponse();
@@ -4888,7 +4888,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
                         if (NoOfPC == 1 && NoOfTW == 1 && PCCount == 1 && TWCount == 0)
                         {
-                            if (SI <= 4000000)
+                            if (SI >= 300000 && SI <= 4000000)
                             {
 
                                 ruleEngine1 = new RuleEngineResponse();
@@ -4913,7 +4913,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
                         if (NoOfPC == 1 && NoOfTW == 1 && PCCount == 0 && TWCount == 1)
                         {
-                            if (SI <= 2000000)
+                            if (SI >= 300000 && SI <= 2000000)
                             {
 
                                 ruleEngine1 = new RuleEngineResponse();
@@ -4938,7 +4938,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
                         if (NoOfPC == 2 && NoOfTW == 0 && PCCount == 1 && TWCount == 0)
                         {
-                            if (SI <= 6000000)
+                            if (SI >= 300000 && SI <= 6000000)
                             {
 
                                 ruleEngine1 = new RuleEngineResponse();
@@ -4963,7 +4963,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         }
                         if (NoOfPC == 2 && NoOfTW == 0 && PCCount == 0 && TWCount == 1)
                         {
-                            if (SI <= 4000000)
+                            if (SI >= 300000 && SI <= 4000000)
                             {
 
                                 ruleEngine1 = new RuleEngineResponse();
@@ -5085,6 +5085,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         int TWCount = 0;
                         int TotalPCCount = 0;
                         int SI = Convert.ToInt32(SourceObject[1]["Data"]["si"]);
+                        var NoOfPC = policydetails["noOfPC"];
+                        var NoOfTW = policydetails["noOfTW"];
                         foreach (var item in VehicleRiskItem)
                         {
                             if (item["Vehicle Type"] == "PC")
@@ -5168,7 +5170,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             }
                         }
 
-                        if(PCCount == 1)
+                        if (NoOfPC == 1 && NoOfTW == 1 && PCCount == 0 && TWCount == 1)
                         {
                             if (SI >= 300000 && SI <= 2000000)
                             {
@@ -5177,7 +5179,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 ruleEngine1.ValidatorName = "SI";
                                 ruleEngine1.Outcome = "Success";
                                 ruleEngine1.Message = "Validation done for sum insured";
-                                ruleEngine1.Code = "EXEA006";
+                                ruleEngine1.Code = "EXED004";
                                 engineResponse4.Add(ruleEngine1);
                                 successcount++;
                             }
@@ -5187,12 +5189,12 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 ruleEngine1.ValidatorName = "SI";
                                 ruleEngine1.Outcome = "Fail";
                                 ruleEngine1.Message = "Sum Insured is exceeding the limit defined";
-                                ruleEngine1.Code = "EXEA006";
+                                ruleEngine1.Code = "EXEA004";
                                 engineResponse4.Add(ruleEngine1);
                                 failcount++;
                             }
                         }
-                        if (TWCount == 1)
+                        if (NoOfPC == 2 && NoOfTW == 0 && PCCount == 1 && TWCount == 0)
                         {
                             if (SI >= 300000 && SI <= 2000000)
                             {
@@ -5201,7 +5203,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 ruleEngine1.ValidatorName = "SI";
                                 ruleEngine1.Outcome = "Success";
                                 ruleEngine1.Message = "Validation done for sum insured";
-                                ruleEngine1.Code = "EXEA006";
+                                ruleEngine1.Code = "EXED004";
                                 engineResponse4.Add(ruleEngine1);
                                 successcount++;
                             }
@@ -5211,11 +5213,84 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 ruleEngine1.ValidatorName = "SI";
                                 ruleEngine1.Outcome = "Fail";
                                 ruleEngine1.Message = "Sum Insured is exceeding the limit defined";
-                                ruleEngine1.Code = "EXEA006";
+                                ruleEngine1.Code = "EXEA004";
                                 engineResponse4.Add(ruleEngine1);
                                 failcount++;
                             }
                         }
+                        if (NoOfPC == 2 && NoOfTW == 1 && PCCount == 0 && TWCount == 1)
+                        {
+                            if (SI >= 300000 && SI <= 4000000)
+                            {
+
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Success";
+                                ruleEngine1.Message = "Validation done for sum insured";
+                                ruleEngine1.Code = "EXED004";
+                                engineResponse4.Add(ruleEngine1);
+                                successcount++;
+                            }
+                            else
+                            {
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Fail";
+                                ruleEngine1.Message = "Sum Insured is exceeding the limit defined";
+                                ruleEngine1.Code = "EXEA004";
+                                engineResponse4.Add(ruleEngine1);
+                                failcount++;
+                            }
+                        }
+                        if (NoOfPC == 2 && NoOfTW == 1 && PCCount == 1 && TWCount == 0)
+                        {
+                            if (SI >= 300000 && SI <= 2000000)
+                            {
+
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Success";
+                                ruleEngine1.Message = "Validation done for sum insured";
+                                ruleEngine1.Code = "EXED004";
+                                engineResponse4.Add(ruleEngine1);
+                                successcount++;
+                            }
+                            else
+                            {
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Fail";
+                                ruleEngine1.Message = "Sum Insured is exceeding the limit defined";
+                                ruleEngine1.Code = "EXEA004";
+                                engineResponse4.Add(ruleEngine1);
+                                failcount++;
+                            }
+                        }
+                        if (NoOfPC == 3 && NoOfTW == 0 && PCCount == 1 && TWCount == 0)
+                        {
+                            if (SI >= 300000 && SI <= 4000000)
+                            {
+
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Success";
+                                ruleEngine1.Message = "Validation done for sum insured";
+                                ruleEngine1.Code = "EXED004";
+                                engineResponse4.Add(ruleEngine1);
+                                successcount++;
+                            }
+                            else
+                            {
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Fail";
+                                ruleEngine1.Message = "Sum Insured is exceeding the limit defined";
+                                ruleEngine1.Code = "EXEA004";
+                                engineResponse4.Add(ruleEngine1);
+                                failcount++;
+                            }
+                        }
+
 
                         if (failcount > 0)
                         {
