@@ -139,7 +139,7 @@ class ViewRateTable extends React.Component {
                 }
                 else {
                     swal({
-                        text: "Please Select Other RateName ,Rates are Without Parameters",
+                        text: "Please Select Other Rate ,Rates are Without Parameters or Rates is not saved Correctly",
                         icon: "success"
                     });
                 }
@@ -157,7 +157,6 @@ class ViewRateTable extends React.Component {
                     Header: prop.charAt(0).toUpperCase() + prop.slice(1),
                     accessor: prop,
                 };
-
             })
         });
         console.log("table data", this.state.resultDetails);
