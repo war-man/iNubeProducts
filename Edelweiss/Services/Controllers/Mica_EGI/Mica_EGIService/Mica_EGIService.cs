@@ -4162,34 +4162,40 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     {
                         var DriverRiskItem = SourceObject["InsurableItem"][0]["RiskItems"];
                         var VehicleRiskItem = SourceObject["InsurableItem"][1]["RiskItems"];
-                        int TotalDrivers = Convert.ToInt32(SourceObject["additionalDriver"]) + 1;
                         JArray driverItems = (JArray)DriverRiskItem;
                         int driverCount = driverItems.Count();
                         JArray vehicleItems = (JArray)VehicleRiskItem;
                         int vehicleCount = vehicleItems.Count();
+                        string additionalDriver = SourceObject["additionalDriver"].ToString();
 
                         int PCCount = 0;
                         int TWCount = 0;
 
-                        if (TotalDrivers == driverCount)
+                        if (additionalDriver != "")
                         {
-                            RuleEngineResponse ruleEngine = new RuleEngineResponse();
-                            ruleEngine.ValidatorName = "Total Drivers";
-                            ruleEngine.Outcome = "Success";
-                            ruleEngine.Message = "Validation done for total drivers";
-                            ruleEngine.Code = "EXPB001";
-                            engineResponse1.Add(ruleEngine);
-                            successcount++;
-                        }
-                        else
-                        {
-                            RuleEngineResponse ruleEngine = new RuleEngineResponse();
-                            ruleEngine.ValidatorName = "Total Drivers";
-                            ruleEngine.Outcome = "Fail";
-                            ruleEngine.Message = "The user has to add all driver details ( Primary driver + Additional drivers)";
-                            ruleEngine.Code = "EXPB001";
-                            engineResponse1.Add(ruleEngine);
-                            failcount++;
+
+                            int TotalDrivers = Convert.ToInt32(additionalDriver) + 1;
+
+                            if (TotalDrivers == driverCount)
+                            {
+                                RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                ruleEngine.ValidatorName = "Total Drivers";
+                                ruleEngine.Outcome = "Success";
+                                ruleEngine.Message = "Validation done for total drivers";
+                                ruleEngine.Code = "EXPB001";
+                                engineResponse1.Add(ruleEngine);
+                                successcount++;
+                            }
+                            else
+                            {
+                                RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                ruleEngine.ValidatorName = "Total Drivers";
+                                ruleEngine.Outcome = "Fail";
+                                ruleEngine.Message = "The user has to add all driver details ( Primary driver + Additional drivers)";
+                                ruleEngine.Code = "EXPB001";
+                                engineResponse1.Add(ruleEngine);
+                                failcount++;
+                            }
                         }
 
                         if (driverCount == 2)
@@ -7852,7 +7858,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 int NoOfVehicles = Convert.ToInt32(SourceObject["noOfPC"]) + Convert.ToInt32(SourceObject["noOfTW"]);
                 int NoOfPC = Convert.ToInt32(SourceObject["noOfPC"]);
                 int NoOfTW = Convert.ToInt32(SourceObject["noOfTW"]);
-                int AdditionalDriver = Convert.ToInt32(SourceObject["additionalDriver"]);
                 int PrimaryDriverAge = Convert.ToInt32(SourceObject["driverAge"]);
                 int PrimaryDriverExp = Convert.ToInt32(SourceObject["driverExp"]);
                 int SI = Convert.ToInt32(SourceObject["si"]);
@@ -7861,6 +7866,9 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 int DriverRiskCount = Convert.ToInt32(SourceObject["InsurableItem"][0]["RiskCount"]);
                 int VehicleRiskCount = Convert.ToInt32(SourceObject["InsurableItem"][1]["RiskCount"]);
                 string Name = SourceObject["Name"].ToString();
+                string MobileNo = SourceObject["Mobile Number"].ToString();
+                var MobileNoLength = MobileNo.Length;
+                string additionalDriver = SourceObject["additionalDriver"].ToString();
                 //AGE 
                 if (PrimaryDriverAge >= 18)
                 {
@@ -8076,28 +8084,6 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         failcount++;
 
                     }
-                }
-
-                //Driver
-                if (AdditionalDriver >= 3)
-                {
-                    ruleEngine = new RuleEngineResponse();
-                    ruleEngine.ValidatorName = "additionalDriver";
-                    ruleEngine.Outcome = "Fail";
-                    ruleEngine.Message = "Number of additional drivers cannot be more than 2.";
-                    ruleEngine.Code = "GEPO011";
-                    engineResponse.Add(ruleEngine);
-                    failcount++;
-                }
-                else
-                {
-                    ruleEngine = new RuleEngineResponse();
-                    ruleEngine.ValidatorName = "additionalDriver";
-                    ruleEngine.Outcome = "Success";
-                    ruleEngine.Message = "Validation done for number of additional drivers.";
-                    ruleEngine.Code = "GEPO011";
-                    engineResponse.Add(ruleEngine);
-                    successcount++;
                 }
 
                 //Payment 
@@ -8400,6 +8386,78 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     ruleEngine.Code = "GEPO027";
                     engineResponse.Add(ruleEngine);
                     failcount++;
+                }
+
+                //To check whether mobile number field is blank-- MobileNo
+                //To check MobileNumber length
+                if (SourceObject["Mobile Number"] == "")
+                {
+                    ruleEngine = new RuleEngineResponse();
+                    ruleEngine.ValidatorName = "Mobile Number";
+                    ruleEngine.Outcome = "Fail";
+                    ruleEngine.Message = "MobileNo - Mandatory input parameter missing.";
+                    ruleEngine.Code = "GEPO028";
+                    engineResponse.Add(ruleEngine);
+                    failcount++;
+
+                }
+                else
+                {
+                    if (MobileNoLength >= 7 && MobileNoLength <= 15)
+                    {
+                        ruleEngine = new RuleEngineResponse();
+                        ruleEngine.ValidatorName = "Mobile Number";
+                        ruleEngine.Outcome = "Success";
+                        ruleEngine.Message = "Validation done for Mobile number length";
+                        ruleEngine.Code = "GEPO029";
+                        engineResponse.Add(ruleEngine);
+                        successcount++;
+                    }
+                    else
+                    {
+                        ruleEngine = new RuleEngineResponse();
+                        ruleEngine.ValidatorName = "Mobile Number";
+                        ruleEngine.Outcome = "Fail";
+                        ruleEngine.Message = "Mobile Number is invalid";
+                        ruleEngine.Code = "GEPO029";
+                        engineResponse.Add(ruleEngine);
+                        failcount++;
+                    }
+                }
+                //To check whether the additional driver field left blank -- additionalDriver and count
+                if (additionalDriver == "")
+                {
+                    ruleEngine = new RuleEngineResponse();
+                    ruleEngine.ValidatorName = "Additional Driver Blank";
+                    ruleEngine.Outcome = "Fail";
+                    ruleEngine.Message = "Additional Driver - Mandatory input parameter missing.";
+                    ruleEngine.Code = "GEPO030";
+                    engineResponse.Add(ruleEngine);
+                    failcount++;
+                }
+                else
+                {
+                    int AdditionalDriver = Convert.ToInt32(additionalDriver);
+                    if (AdditionalDriver >= 3)
+                    {
+                        ruleEngine = new RuleEngineResponse();
+                        ruleEngine.ValidatorName = "additionalDriver";
+                        ruleEngine.Outcome = "Fail";
+                        ruleEngine.Message = "Number of additional drivers cannot be more than 2.";
+                        ruleEngine.Code = "GEPO011";
+                        engineResponse.Add(ruleEngine);
+                        failcount++;
+                    }
+                    else
+                    {
+                        ruleEngine = new RuleEngineResponse();
+                        ruleEngine.ValidatorName = "additionalDriver";
+                        ruleEngine.Outcome = "Success";
+                        ruleEngine.Message = "Validation done for number of additional drivers.";
+                        ruleEngine.Code = "GEPO011";
+                        engineResponse.Add(ruleEngine);
+                        successcount++;
+                    }
                 }
                 if (failcount > 0)
                 {
