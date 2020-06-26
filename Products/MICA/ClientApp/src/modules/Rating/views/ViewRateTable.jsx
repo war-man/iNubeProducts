@@ -125,15 +125,23 @@ class ViewRateTable extends React.Component {
             .then(data => {
                 console.log(data.ltObj, data, 'DATA');
                 this.setState({ displayData: data.ltObj });
-                if (this.state.displayData.length > 0) {
-                    this.setState({ searchTableSec: false, loader: false });
-                    this.tabledata(data.ltObj);
-                } else {
-                    setTimeout(
-                        function () {
-                            this.setState({ loader: true, searchTableSec: false, nodata: true });
-                        }.bind(this), 2000
-                    );
+                if (this.state.displayData != null) {
+                    if (this.state.displayData.length > 0) {
+                        this.setState({ searchTableSec: false, loader: false });
+                        this.tabledata(data.ltObj);
+                    } else {
+                        setTimeout(
+                            function () {
+                                this.setState({ loader: true, searchTableSec: false, nodata: true });
+                            }.bind(this), 2000
+                        );
+                    }
+                }
+                else {
+                    swal({
+                        text: "Please Select Other RateName ,Rates are Without Parameters",
+                        icon: "success"
+                    });
                 }
                 console.log("Search calculation display data:", data);
 
