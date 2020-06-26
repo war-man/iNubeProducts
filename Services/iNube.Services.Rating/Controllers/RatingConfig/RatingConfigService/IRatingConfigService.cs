@@ -49,6 +49,6 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService
         Task<object> CheckCalculationRatingMapping(String CalculationConfigId, DynamicData dynamic, ApiContext apiContext);
         //Rate Rules
         Task<FileUploadResponse> RateUpload(HttpRequest httpRequest, CancellationToken cancellationToken, string RateName, string RateObj, string StartDate, string Enddate, ApiContext apiContext);
-        Task<RatingGridDTO> GetRateRulesGrid(ApiContext apiContext);
+        Task<RatingGridDTO> GetRateRulesGrid(string RuleId, ApiContext apiContext);
     }
 }

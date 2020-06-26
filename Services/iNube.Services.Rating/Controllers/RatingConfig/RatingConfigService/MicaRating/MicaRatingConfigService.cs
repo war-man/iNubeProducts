@@ -364,18 +364,18 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             }
             //Get rateObjFOr particular and IN main_rule Where condition is added
             var ruleObj = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
-                          join tblParamset in _context.TblParameterSet on tblrate.RateObj equals tblParamset.ParameterSetName
-                          select new
-                          {
-                              ObjID = tblParamset.ParameterSetId
-                          }).FirstOrDefault();
+                           join tblParamset in _context.TblParameterSet on tblrate.RateObj equals tblParamset.ParameterSetName
+                           select new
+                           {
+                               ObjID = tblParamset.ParameterSetId
+                           }).FirstOrDefault();
             string[] words = RuleId.Split(',');
             var main_rule = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
                              join tblratingcondition in _context.TblRatingRules on tblrate.RatingId equals tblratingcondition.RatingId
                              join tblrulecondition in _context.TblRatingRuleConditions on tblratingcondition.RatingRuleId equals tblrulecondition.RatingRuleId
                              join tblparameter in _context.TblRatingParameters on tblrulecondition.RatingParameters equals tblparameter.ParametersId
                              join tblparamsetdetails in _context.TblParameterSetDetails.Where(it => it.ParameterSetId == ruleObj.ObjID)
-                             on tblparameter.ParametersId equals tblparamsetdetails.ParametersId  
+                             on tblparameter.ParametersId equals tblparamsetdetails.ParametersId
                              select new
                              {
                                  rulecondition_id = tblrulecondition.RatingRuleConditionId,
@@ -2008,7 +2008,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
                     //For Display Grid
                     List<Dictionary<string, dynamic>> dictObj = new List<Dictionary<string, dynamic>>();
-                    
+
 
                     if (fileExt.Equals(".xlsx", StringComparison.OrdinalIgnoreCase) || fileExt.Equals(".csv", StringComparison.OrdinalIgnoreCase))
                     {
@@ -2046,7 +2046,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                                   .Column;
                                             dictExParam.Add(itemdataFrom, dataFrom);
                                         }
-                                        else 
+                                        else
                                         {
                                             var itemdata = item.RatingParamName;
                                             var data = worksheet
@@ -2125,8 +2125,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                     _context.TblRating.Add(dto);
                                     _context.SaveChanges();
                                     var acntDTO = _mapper.Map<RatingDTO>(dto);
-                                    
-                                    return new FileUploadResponse { Status = BusinessStatus.Created,gridList=dictObj, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
+
+                                    return new FileUploadResponse { Status = BusinessStatus.Created, gridList = dictObj, ResponseMessage = $"Rules Conditions Succesfully Done! \n Rating Config Name: {acntDTO.RatingId}" };
                                 }
                             }
                             catch (Exception ex)
@@ -2152,21 +2152,111 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             return new FileUploadResponse { Status = BusinessStatus.Error, ResponseMessage = $"Document upload successfully! for Rating Config Name: {RateName}" };
         }
 
-        public async Task<RatingGridDTO> GetRateRulesGrid(ApiContext apiContext)
+        public async Task<RatingGridDTO> GetRateRulesGrid(string RuleId, ApiContext apiContext)
         {
             if (_context == null)
             {
                 _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             }
-            //_context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
-
             try
             {
-                var data = _context.TblRating.Include(add => add.TblRatingRules).Include("TblRatingRules.TblRatingRuleConditions").LastOrDefault();
-                
-                //foreach(var item in data)
-                //{ }
-                return null;
+                //var data = _context.TblRating.Include(add => add.TblRatingRules).Include("TblRatingRules.TblRatingRuleConditions").LastOrDefault();
+
+                //Get rateObjFOr particular and IN main_rule Where condition is added
+                RatingGridDTO ratinggridObj = new RatingGridDTO();
+                var ruleObj = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
+                               join tblParamset in _context.TblParameterSet on tblrate.RateObj equals tblParamset.ParameterSetName
+                               select new
+                               {
+                                   ObjID = tblParamset.ParameterSetId
+                               }).FirstOrDefault();
+
+                var ruleObjParameter = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
+                                        join tblParamset in _context.TblParameterSet on tblrate.RateObj equals tblParamset.ParameterSetName
+                                        join tblParamSetDetails in _context.TblParameterSetDetails on tblParamset.ParameterSetId equals tblParamSetDetails.ParameterSetId
+                                        join tblParameter in _context.TblRatingParameters on tblParamSetDetails.ParametersId equals tblParameter.ParametersId
+                                        select new
+                                        {
+                                            ObjID = tblParamset.ParameterSetId,
+                                            ParameterId = tblParamSetDetails.ParametersId,
+                                            RangeType = tblParamSetDetails.RangeType,
+                                            Parameter = tblParameter.ParameterName
+                                        });
+                int count = 0;
+                foreach(var item in ruleObjParameter)
+                {
+                    if(item.RangeType == "Yes")
+                    {
+                        count = count + 2;
+                    }
+                    else
+                    {
+                        count = count + 1;
+                    }
+                }
+
+                var main_rule = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
+                                 join tblratingcondition in _context.TblRatingRules on tblrate.RatingId equals tblratingcondition.RatingId
+                                 join tblrulecondition in _context.TblRatingRuleConditions on tblratingcondition.RatingRuleId equals tblrulecondition.RatingRuleId
+                                 join tblparameter in _context.TblRatingParameters on tblrulecondition.RatingParameters equals tblparameter.ParametersId
+                                 join tblparamsetdetails in _context.TblParameterSetDetails.Where(it => it.ParameterSetId == ruleObj.ObjID)
+                                 on tblparameter.ParametersId equals tblparamsetdetails.ParametersId
+                                 select new
+                                 {
+                                     rulecondition_id = tblrulecondition.RatingRuleConditionId,
+                                     rule_id = tblrate.RatingId,
+                                     rule_name = tblrate.RateName,
+                                     ParamSetObj = tblrate.RateObj,
+                                     Rate = tblratingcondition.Rate,
+                                     RatingParameter = tblparameter.ParameterName,
+                                     param_type = tblparameter.ParameterType,
+                                     condition_valuefrom = tblrulecondition.ConditionValueFrom,
+                                     condition_valueto = tblrulecondition.ConditionValueTo,
+                                     IsParameter = tblrate.IsParameter,
+                                     ParameterId = tblparameter.ParametersId,
+                                     ParamName = tblparameter.ParameterName,
+                                     IsRange = tblparamsetdetails.RangeType
+                                 }).ToList();
+                if(main_rule.Count == 0)
+                {
+                    return ratinggridObj;
+                }
+
+                List<Dictionary<string, string>> ltObj = new List<Dictionary<string, string>>();
+                Dictionary<string, string> dtObj = new Dictionary<string, string>();
+                int countData = 0;
+                foreach (var item in main_rule)
+                {
+                    countData = countData + 1;
+                    if(item.IsRange =="No")
+                    {
+                        dtObj.Add(item.RatingParameter, item.condition_valuefrom);
+                    }
+                    else
+                    {
+                        if (item.condition_valuefrom != null)
+                        {
+                            var parameter = item.RatingParameter + "From";
+                            dtObj.Add(parameter, item.condition_valuefrom);
+                        }
+                        else
+                        {
+                            var parameter = item.RatingParameter + "To";
+                            dtObj.Add(parameter, item.condition_valueto);
+                        }
+                    }
+                    if(countData == 5)
+                    {
+                        var rate = "Rate";
+                        dtObj.Add(rate, item.Rate);
+                        countData = 0;
+                        ltObj.Add(dtObj);
+                        dtObj = new Dictionary<string, string>();
+                    }
+                    
+                }
+                ratinggridObj.ltObj = ltObj;
+                return ratinggridObj;
             }
             catch (Exception ex)
             {

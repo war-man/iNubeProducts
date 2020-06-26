@@ -336,9 +336,9 @@ namespace iNube.Services.Rating.Controllers.RatingConfig
             return Ok(response);
         }
         [HttpGet]
-        public async Task<IActionResult> GetRateRulesGrid()
+        public async Task<IActionResult> GetRateRulesGrid(string RuleId)
         {
-            var response = await _rateService.GetRateRulesGrid(Context);
+            var response = await _rateService.GetRateRulesGrid(RuleId,Context);
             return Ok(response);
         }
         [HttpGet]
