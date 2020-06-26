@@ -45,7 +45,7 @@ namespace iNube.Services.ReInsurance.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<TblArrangement>(entity =>
             {
@@ -93,7 +93,6 @@ namespace iNube.Services.ReInsurance.Entities
                 entity.HasOne(d => d.TreatyGroup)
                     .WithMany(p => p.TblArrangement)
                     .HasForeignKey(d => d.TreatyGroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_TreatyGroupArrangement");
             });
 
@@ -419,7 +418,6 @@ namespace iNube.Services.ReInsurance.Entities
                 entity.HasOne(d => d.ParticipantMaster)
                     .WithMany(p => p.TblParticipantBranch)
                     .HasForeignKey(d => d.ParticipantMasterId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ParticipantBranch");
             });
 
@@ -568,8 +566,6 @@ namespace iNube.Services.ReInsurance.Entities
                 entity.Property(e => e.AllocationLevel)
                     .HasMaxLength(250)
                     .IsUnicode(false);
-
-                entity.Property(e => e.AloocationDetails).HasMaxLength(1);
 
                 entity.Property(e => e.ItemName)
                     .HasMaxLength(250)
@@ -757,7 +753,6 @@ namespace iNube.Services.ReInsurance.Entities
                 entity.HasOne(d => d.Treaty)
                     .WithMany(p => p.TblTreatyGroup)
                     .HasForeignKey(d => d.TreatyId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_TreatyGroup");
             });
         }

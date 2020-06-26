@@ -13,8 +13,8 @@ namespace iNube.Services.ReInsurance.Entities
         public string ItemName { get; set; }
         public decimal? AllocationAmount { get; set; }
         public decimal? Premium { get; set; }
-        public string AloocationDetails { get; set; }
         public DateTime? TransectionDate { get; set; }
+        public string AllocationDetails { get; set; }
 
         public virtual TblRiallocation Allocation { get; set; }
     }
