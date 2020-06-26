@@ -9062,7 +9062,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             foreach (var policy in PolicyNumberList)
             {
                
-                var ScheduleData = _context.TblSchedule.Where(x => x.PolicyNo == policy).ToList();
+                var ScheduleData = _context.TblSchedule.Where(x => x.PolicyNo == policy && x.IsActive == true).ToList();
 
                 MobileAlertRequestDTO MobileRequestDTO = new MobileAlertRequestDTO();
 
