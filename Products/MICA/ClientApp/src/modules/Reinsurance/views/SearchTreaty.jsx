@@ -285,7 +285,7 @@ class SearchTreaty extends React.Component {
                 };
             })
         });
-
+         
     }
     render() {
         const { classes } = this.props;

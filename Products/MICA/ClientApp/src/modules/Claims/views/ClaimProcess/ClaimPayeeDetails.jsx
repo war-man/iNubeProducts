@@ -18,6 +18,7 @@ class ClaimPayeeDetails extends React.Component {
         super(props);
         console.log("BankDetails coming",this.props);
         this.state = {
+            responseflag: this.props.claimDetailsprops.responseflag,
             claimManagerRemarksState:"",
             fields: this.props.claimDetailsprops.fields,
           
@@ -55,6 +56,8 @@ class ClaimPayeeDetails extends React.Component {
     };
 
     componentDidMount() {
+        console.log("response flag", this.props.claimDetailsprops.responseflag);
+      
         let accounttype = "Account Type";
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + accounttype + ``, {
             method: 'get',
@@ -418,7 +421,7 @@ class ClaimPayeeDetails extends React.Component {
        // this.change(evt, name, type);
     };
     onInternalFormSubmit = () => {
-      
+        this.state.response = true;
         this.props.claimDetailsFun.internalCallFormSubmit(this.state.fields);
     }
 
@@ -584,7 +587,7 @@ class ClaimPayeeDetails extends React.Component {
 
                                 <GridContainer lg={12} justify="center">
                                     <GridItem xs={5} sm={3} md={3} lg={1}>
-                                        <Button color="info" round onClick={() => this.onInternalFormSubmit()}>
+                                    <Button color="info" round disabled={this.state.responseflag} onClick={() => this.onInternalFormSubmit()}>
                                             <TranslationContainer translationKey="Submit" />
                                         </Button>
                                     </GridItem>

@@ -123,6 +123,7 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            responseflag:false,
             ValidIFSCCode:false,
             renderpage: false,
             PerformerFlag: true,
@@ -433,6 +434,7 @@ class InboxClaimProcess extends React.Component {
     }
 
     internalCallFormSubmit = (data) => {
+      
         let field = this.state.fields;
         field.claimManagerRemarks = data.claimManagerRemarks;
         field.claimStatusId = data.claimStatusId;
@@ -442,6 +444,8 @@ class InboxClaimProcess extends React.Component {
 
 
     onFormSubmit = () => {
+
+   
         this.state.ValidationUI = true;
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
@@ -503,6 +507,7 @@ class InboxClaimProcess extends React.Component {
                             body: JSON.stringify(field)
                         }).then(response => response.json())
                             .then(data => {
+                                this.setState({ responseflag:false});
                                 console.log("response: ", data)
                                 //      if (data.status == 200) {
                                 //  this.state.claimId = data.claimId;
@@ -512,11 +517,13 @@ class InboxClaimProcess extends React.Component {
                                         text: data.responseMessage,
                                         icon: "success",
                                         buttons: [false, "OK"],
-                                    }).then((willDelete) => {
+                                    })
+                                    .then((willDelete) => {
                                         if (willDelete) {
-                                            this.handlepagereload();
+                                         //   this.handlepagereload();
                                         }
-                                    });
+                                        });
+                                    this.handlepagereload();
                                 } else if (data.status == 7) {
 
                                     if (data.errors.length > 0) {
@@ -557,6 +564,7 @@ class InboxClaimProcess extends React.Component {
                         });
 
                 } else {
+                    this.setState({ responseflag: false });
                     //this.setState({ errormessage: true });
                     if (this.state.fields.claimStatusId == "") {
                         this.setState({ errormessage: true });
@@ -572,9 +580,11 @@ class InboxClaimProcess extends React.Component {
                     }
                 }
             else {
+                this.setState({ responseflag: false });
                 swal("", "IFSC Code should be in correct format (eg: CNBK1234567)", "error");
             }
         } else {
+            this.setState({ responseflag: false });
             swal("", "Approved amount cannot be greater than balance sum insured", "error");
         }
 

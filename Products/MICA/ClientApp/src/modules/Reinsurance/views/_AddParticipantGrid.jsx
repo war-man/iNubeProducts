@@ -57,8 +57,8 @@ const style = {
 const ParticipantGrid = (props) => {
     console.log("ppp", props);
     let list = [];
-
-
+     
+     
     return (
 
         <GridContainer xl={12}>

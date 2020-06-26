@@ -65,7 +65,7 @@ const AddTreaty = (props) => {
     console.log("props componentData: ", props.componentData);
 
     console.log("channel masterList: ", props.componentData.masterList);
-
+     
     //console.log("mvalue: ", channels);
 
 

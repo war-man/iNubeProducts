@@ -253,7 +253,7 @@ class DefineMapping extends React.Component {
                 } else {
                     this.setState({ [stateName + "State"]: true });
                 }
-                break;
+                break; 
             case "Number":
                 if (validationPage.verifyNum(evt.target.value)) {
                     this.setState({ [stateName + "State"]: false });

@@ -257,7 +257,7 @@ class DefineRetentions extends React.Component {
         let effTo = this.state.Retention.effectiveTo;
         this.state.Retention.effectiveTo= this.datechange(this.state.Retention.effectiveTo);
        
-
+         
         console.log("submit", this.state.Retention);
         if (this.state.Retention.year != "" && this.state.Retention.businessTypeId != "" && this.state.Retention.retentionGroupName != "" && this.state.Retention.retentionLogicId != "" && this.state.Retention.effectiveFrom != "" && this.state.Retention.effectiveTo != "") {
             if (this.state.Retention.effectiveTo >= this.state.Retention.effectiveFrom) {
@@ -350,7 +350,7 @@ class DefineRetentions extends React.Component {
                 },
                 body: JSON.stringify(this.state.SearchParticipant)
             }).then(response => response.json())
-                .then(data => {
+                .then(data => { 
                     this.setState({ Retention: data });
                     this.state.Retention.effectiveFrom = new Date(data.effectiveFrom).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });
                     this.state.Retention.effectiveTo = new Date(data.effectiveTo).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', });

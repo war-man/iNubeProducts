@@ -283,8 +283,8 @@ class CreateTreaty extends React.Component {
                 console.log("data456", data);
                 this.setState({ treatyDTO: data });
                 console.log("Treaty data:", this.state.treatyDTO);
-                this.reset();
-
+                this.reset(); 
+                 
             });
         //let flageUpdate = this.state.flagUpdate
         //this.setState({ flageUpdate:true})
