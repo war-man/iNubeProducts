@@ -18,6 +18,7 @@ class ClaimPayeeDetails extends React.Component {
         super(props);
         console.log("BankDetails coming",this.props);
         this.state = {
+            response: this.props.claimDetailsprops.response,
             claimManagerRemarksState:"",
             fields: this.props.claimDetailsprops.fields,
           
@@ -418,7 +419,7 @@ class ClaimPayeeDetails extends React.Component {
        // this.change(evt, name, type);
     };
     onInternalFormSubmit = () => {
-      
+        this.state.response = true;
         this.props.claimDetailsFun.internalCallFormSubmit(this.state.fields);
     }
 
@@ -584,7 +585,7 @@ class ClaimPayeeDetails extends React.Component {
 
                                 <GridContainer lg={12} justify="center">
                                     <GridItem xs={5} sm={3} md={3} lg={1}>
-                                        <Button color="info" round onClick={() => this.onInternalFormSubmit()}>
+                                    <Button color="info" round disabled={this.state.response} onClick={() => this.onInternalFormSubmit()}>
                                             <TranslationContainer translationKey="Submit" />
                                         </Button>
                                     </GridItem>

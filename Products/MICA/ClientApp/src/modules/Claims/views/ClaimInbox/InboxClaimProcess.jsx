@@ -123,6 +123,7 @@ class InboxClaimProcess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            response:false,
             ValidIFSCCode:false,
             renderpage: false,
             PerformerFlag: true,
@@ -433,6 +434,7 @@ class InboxClaimProcess extends React.Component {
     }
 
     internalCallFormSubmit = (data) => {
+      
         let field = this.state.fields;
         field.claimManagerRemarks = data.claimManagerRemarks;
         field.claimStatusId = data.claimStatusId;
@@ -442,6 +444,8 @@ class InboxClaimProcess extends React.Component {
 
 
     onFormSubmit = () => {
+
+   
         this.state.ValidationUI = true;
         this.state.approveamtvalidation = false;
         this.IsValidProductDetails();
@@ -503,6 +507,7 @@ class InboxClaimProcess extends React.Component {
                             body: JSON.stringify(field)
                         }).then(response => response.json())
                             .then(data => {
+                                this.setState({ response:false});
                                 console.log("response: ", data)
                                 //      if (data.status == 200) {
                                 //  this.state.claimId = data.claimId;
@@ -511,12 +516,14 @@ class InboxClaimProcess extends React.Component {
                                     swal({
                                         text: data.responseMessage,
                                         icon: "success",
-                                        buttons: [false, "OK"],
-                                    }).then((willDelete) => {
-                                        if (willDelete) {
-                                            this.handlepagereload();
-                                        }
+                                        // buttons: [false, "OK"],
                                     });
+                                    //.then((willDelete) => {
+                                    //    if (willDelete) {
+                                    //        this.handlepagereload();
+                                    //    }
+                                    //    });
+                                    this.handlepagereload();
                                 } else if (data.status == 7) {
 
                                     if (data.errors.length > 0) {

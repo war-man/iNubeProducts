@@ -127,6 +127,7 @@ class ClaimIntimate extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            response:false,
             benAmtFlag: true,
             riskFlag: false,
             policyflag: false,
@@ -393,6 +394,7 @@ class ClaimIntimate extends React.Component {
     onFormSubmit = (evt) => {
         this.state.validateUI = false;
         this.state.ValidationUI = true;
+        this.state.response = true;
         this.state.datevalidationflag = false;
         evt.preventDefault();
         this.UIValidation();
@@ -439,7 +441,7 @@ class ClaimIntimate extends React.Component {
                     }).then(response => response.json())
                         .then(data => {
                             console.log("responseData", data);
-
+                            this.setState({ response:false});
                             if (data.status == 2) {
                                 this.state.claimId = data.claimId;
                                 this.setState({ docpage: true, claimnumber: data.claimNumber });
@@ -1647,7 +1649,7 @@ class ClaimIntimate extends React.Component {
                                 <br />
                                 <GridContainer justify="center">
                                     <GridItem xs={5} sm={3} md={3} lg={2}>
-                                        <Button color="info" round className={classes.marginRight} onClick={(e) => this.onFormSubmit(e)}><TranslationContainer translationKey="IntimateClaim" /></Button>
+                                        <Button color="info" round className={classes.marginRight} disabled={this.state.response} onClick={(e) => this.onFormSubmit(e)}><TranslationContainer translationKey="IntimateClaim" /></Button>
                                     </GridItem>
                                     {this.renderRedirect()}
                                     <br />
