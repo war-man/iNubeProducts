@@ -1,4 +1,5 @@
-﻿using iNube.Utility.Framework.Model;
+﻿using iNube.Services.ReInsurance.Entities;
+using iNube.Utility.Framework.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -235,6 +236,11 @@ namespace iNube.Services.ReInsurance.Models
     public partial class ParticpantResponse : ResponseStatus
     {
         public TblParticipantMasterDto participantMasterDto { get; set; }
+    }
+
+    public partial class ReAllocationResponse : ResponseStatus
+    {
+        public RiallocationDto tblRiallocation { get; set; }
     }
     public partial class TreatyResponse : ResponseStatus
     {
@@ -554,10 +560,10 @@ namespace iNube.Services.ReInsurance.Models
         public string ItemName { get; set; }
         public decimal? AllocationAmount { get; set; }
         public decimal? Premium { get; set; }
-        public string AloocationDetails { get; set; }
         public DateTime? TransectionDate { get; set; }
+        public string AllocationDetails { get; set; }
 
-       // public virtual TblRiallocation Allocation { get; set; }
+        // public virtual TblRiallocation Allocation { get; set; }
     }
     public class ReallocatedDTO
     {
