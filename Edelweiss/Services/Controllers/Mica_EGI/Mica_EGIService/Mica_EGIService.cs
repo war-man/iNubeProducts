@@ -4601,13 +4601,65 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             engineResponse1.Add(ruleEngine);
                             failcount++;
                         }
+
+                        foreach (var item in DriverRiskItem)
+                        {
+                            var IsPrimaryDriver = item["IsPrimaryDriver"];
+                            var DriverAge = item["Age"];
+                            var DriverExp = item["Driving Experience"];
+                            if (IsPrimaryDriver == "No")
+                            {
+                                if (DriverAge >= 18)
+                                {
+
+                                    RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                    ruleEngine.ValidatorName = "Driver Age";
+                                    ruleEngine.Outcome = "Success";
+                                    ruleEngine.Message = "Validation done for driver age";
+                                    ruleEngine.Code = "EXPB009";
+                                    engineResponse1.Add(ruleEngine);
+                                    successcount++;
+                                }
+                                else
+                                {
+                                    RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                    ruleEngine.ValidatorName = "Driver Age";
+                                    ruleEngine.Outcome = "Fail";
+                                    ruleEngine.Message = "Age of the driver cannot be less than 18 years";
+                                    ruleEngine.Code = "EXPB009";
+                                    engineResponse1.Add(ruleEngine);
+                                    failcount++;
+                                }
+
+                                if(DriverExp > DriverAge - 18)
+                                {
+                                    RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                    ruleEngine.ValidatorName = "DriverExp";
+                                    ruleEngine.Outcome = "Fail";
+                                    ruleEngine.Message = "Years of driving experience cannot be greater than the difference in current age and 18";
+                                    ruleEngine.Code = "EXPB010";
+                                    engineResponse1.Add(ruleEngine);
+                                    failcount++;
+                                }
+                                else
+                                {
+                                    RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                                    ruleEngine.ValidatorName = "DriverExp";
+                                    ruleEngine.Outcome = "Success";
+                                    ruleEngine.Message = "Validation done for driver experience";
+                                    ruleEngine.Code = "EXPB010";
+                                    engineResponse1.Add(ruleEngine);
+                                    successcount++;
+                                }
+                            }
+                        }
                         if (failcount > 0)
                         {
                             RuleEngineResponse res4obj = new RuleEngineResponse();
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Fail";
                             res4obj.Message = "One or More conditions failed";
-                            res4obj.Code = "EXPB009";
+                            res4obj.Code = "EXPB010";
                             engineResponse1.Add(res4obj);
                         }
                         else
@@ -4616,7 +4668,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Success";
                             res4obj.Message = "Conditions Successful";
-                            res4obj.Code = "EXPB010";
+                            res4obj.Code = "EXPB011";
                             engineResponse1.Add(res4obj);
 
                         }
@@ -4966,6 +5018,24 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 }
                             }
                         }
+                        foreach (var itema in policyRiskData)
+                        {
+                            var PolVehNum = itema["Vehicle Number"];
+                            foreach (var itemb in VehicleRiskItem)
+                            {
+                                var EndorseVehNum = itemb["Vehicle Number"];
+                                if (PolVehNum == EndorseVehNum)
+                                {
+                                    ruleEngine1 = new RuleEngineResponse();
+                                    ruleEngine1.ValidatorName = "Vehicle Number";
+                                    ruleEngine1.Outcome = "Fail";
+                                    ruleEngine1.Message = "Vehicle number cannot be same for multiple vehicle's";
+                                    ruleEngine1.Code = "EXEA009";
+                                    engineResponse2.Add(ruleEngine1);
+                                    failcount++;
+                                }
+                            }
+                        }
 
                         if (failcount > 0)
                         {
@@ -4973,7 +5043,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Fail";
                             res4obj.Message = "One or More conditions failed";
-                            res4obj.Code = "EXEA009";
+                            res4obj.Code = "EXEA010";
                             engineResponse2.Add(res4obj);
                         }
                         else
@@ -4982,7 +5052,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Success";
                             res4obj.Message = "Conditions Successful";
-                            res4obj.Code = "EXEA010";
+                            res4obj.Code = "EXEA011";
                             engineResponse2.Add(res4obj);
 
                         }
@@ -5006,13 +5076,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                        // var policyNo = policydata.PolicyNo;
                         var policydetails = await _integrationService.GetPolicyDetails(PolPolicyNumber, context);
                         int PCCount = 0;
+                        int TWCount = 0;
+                        int TotalPCCount = 0;
+                        int SI = Convert.ToInt32(SourceObject[1]["Data"]["si"]);
                         foreach (var item in VehicleRiskItem)
                         {
                             if (item["Vehicle Type"] == "PC")
                             {
-                                PCCount++;
+                                TotalPCCount++;
 
-                                if (policydetails["noOfPC"] == PCCount)
+                                if (policydetails["noOfPC"] == TotalPCCount)
                                 {
                                     ruleEngine2 = new RuleEngineResponse();
                                     ruleEngine2.ValidatorName = "Number of PC";
@@ -5076,6 +5149,68 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             engineResponse4.Add(ruleEngine2);
                             failcount++;
                         }
+
+                        foreach (var item in VehicleRiskItem)
+                        {
+                            if (item["Vehicle Type"] == "PC")
+                            {
+                                PCCount++;
+                            }
+                            if (item["Vehicle Type"] == "TW")
+                            {
+                                TWCount++;
+                            }
+                        }
+
+                        if(PCCount == 1)
+                        {
+                            if (SI >= 300000 && SI <= 2000000)
+                            {
+
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Success";
+                                ruleEngine1.Message = "Validation done for sum insured";
+                                ruleEngine1.Code = "EXEA006";
+                                engineResponse4.Add(ruleEngine1);
+                                successcount++;
+                            }
+                            else
+                            {
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Fail";
+                                ruleEngine1.Message = "Sum Insured is exceeding the limit defined";
+                                ruleEngine1.Code = "EXEA006";
+                                engineResponse4.Add(ruleEngine1);
+                                failcount++;
+                            }
+                        }
+                        if (TWCount == 1)
+                        {
+                            if (SI >= 300000 && SI <= 2000000)
+                            {
+
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Success";
+                                ruleEngine1.Message = "Validation done for sum insured";
+                                ruleEngine1.Code = "EXEA006";
+                                engineResponse4.Add(ruleEngine1);
+                                successcount++;
+                            }
+                            else
+                            {
+                                ruleEngine1 = new RuleEngineResponse();
+                                ruleEngine1.ValidatorName = "SI";
+                                ruleEngine1.Outcome = "Fail";
+                                ruleEngine1.Message = "Sum Insured is exceeding the limit defined";
+                                ruleEngine1.Code = "EXEA006";
+                                engineResponse4.Add(ruleEngine1);
+                                failcount++;
+                            }
+                        }
+
                         if (failcount > 0)
                         {
                             RuleEngineResponse res4obj = new RuleEngineResponse();
@@ -7725,6 +7860,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 string BillingFrequency = SourceObject["billingFrequency"].ToString();
                 int DriverRiskCount = Convert.ToInt32(SourceObject["InsurableItem"][0]["RiskCount"]);
                 int VehicleRiskCount = Convert.ToInt32(SourceObject["InsurableItem"][1]["RiskCount"]);
+                string Name = SourceObject["Name"].ToString();
                 //AGE 
                 if (PrimaryDriverAge >= 18)
                 {
@@ -8244,7 +8380,27 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     failcount++;
                 }
 
-
+                //Check Name field whether left blank
+                if (!String.IsNullOrWhiteSpace(Name))
+                {
+                    ruleEngine = new RuleEngineResponse();
+                    ruleEngine.ValidatorName = "Name";
+                    ruleEngine.Outcome = "Success";
+                    ruleEngine.Message = "Validation done for Name";
+                    ruleEngine.Code = "GEPO027";
+                    engineResponse.Add(ruleEngine);
+                    successcount++;
+                }
+                else
+                {
+                    ruleEngine = new RuleEngineResponse();
+                    ruleEngine.ValidatorName = "Name";
+                    ruleEngine.Outcome = "Fail";
+                    ruleEngine.Message = "Name - Mandatory input parameter missing.";
+                    ruleEngine.Code = "GEPO027";
+                    engineResponse.Add(ruleEngine);
+                    failcount++;
+                }
                 if (failcount > 0)
                 {
                     ruleEngine = new RuleEngineResponse();
