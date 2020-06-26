@@ -16,7 +16,7 @@ import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import { Animated } from "react-animated-css";
 import Card from "components/Card/Card.jsx";
 import CardBody from "components/Card/CardBody.jsx";
-import CardHeader from "components/Card/CardHeader.jsx";
+import CardHeader from "components/Card/CardHeader.jsx"; 
 import CardIcon from "components/Card/CardIcon.jsx";
 import Icon from "@material-ui/core/Icon";
 import participant from "assets/img/participant-master.png";
@@ -114,7 +114,7 @@ class ParticipantMaster extends React.Component {
                 stateId: "",
                 countryId: "",
                 districtId: "",
-                cityId: "",
+                cityId: "", 
                 pincode: "",
                 isActive: "",
                 disabled: false,
