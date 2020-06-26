@@ -6812,11 +6812,11 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
                                             _context.SaveChanges();
 
-                                            Models.SMSRequest request = new Models.SMSRequest();
-                                            request.SMSMessage = "Welcome to your Edelweiss Switch (Driver Based Insurance) policy! To get it started, all you have to do is download the Edelweiss Switch app at : https://switch.edelweissinsurance.com/welcome and add your vehicle(s) on it. Please do this within 15 days, or your application will have to be cancelled, and your premium will be refunded to your original payment mode. Already downloaded and activated the app? Ignore this message! For Help, call 1800 12000";
-                                            request.RecipientNumber = mappedPolicy.MobileNumber;
+                                            //Models.SMSRequest request = new Models.SMSRequest();
+                                            //request.SMSMessage = "Welcome to your Edelweiss Switch (Driver Based Insurance) policy! To get it started, all you have to do is download the Edelweiss Switch app at : https://switch.edelweissinsurance.com/welcome and add your vehicle(s) on it. Please do this within 15 days, or your application will have to be cancelled, and your premium will be refunded to your original payment mode. Already downloaded and activated the app? Ignore this message! For Help, call 1800 12000";
+                                            //request.RecipientNumber = mappedPolicy.MobileNumber;
 
-                                            var callNotification = await _integrationService.SendSMSAsync(request, apiContext);
+                                            //var callNotification = await _integrationService.SendSMSAsync(request, apiContext);
 
 
 
@@ -7435,10 +7435,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             
         }
 
-        public async Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, decimal MobileNumber, decimal RefrenceNumber, ApiContext apiContext)
+        public async Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, string MobileNumber, string RefrenceNumber, ApiContext apiContext)
         {
             //  _context = (MICAPOContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-
+            if (string.IsNullOrEmpty(RefrenceNumber))
+            {
+                return new ResponseStatus { Status = BusinessStatus.Error, ResponseMessage = "Reference Number is required to update Card Details." };
+            }
             // var connectionString = _configuration.GetConnectionString("PCConnection");
             var dbConnectionString = await _integrationService.GetEnvironmentConnection(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType));
             var connectionString = dbConnectionString.Dbconnection;
@@ -7446,17 +7449,17 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                SqlCommand command = new SqlCommand("[PO].[usp_PaymentRefUpdate]", connection);
+                SqlCommand command = new SqlCommand("[dbo].[usp_PaymentRefUpdate]", connection);
                 command.CommandType = CommandType.StoredProcedure;
                 //command.Parameters.AddWithValue("@Action", "Update");
-                command.Parameters.AddWithValue("@PolicyNumber", PolicyNumber);
-                command.Parameters.AddWithValue("@MobileNumber", MobileNumber);
+                command.Parameters.AddWithValue("@PolicyNumber", string.IsNullOrEmpty(PolicyNumber) ? "" : PolicyNumber);
+                command.Parameters.AddWithValue("@MobileNumber", string.IsNullOrEmpty(MobileNumber) ? "" : MobileNumber);
                 command.Parameters.AddWithValue("@NewPaymentRefNo", RefrenceNumber);
-              
+
                 command.Parameters.Add("@Result", SqlDbType.Bit);
                 command.Parameters["@Result"].Direction = ParameterDirection.Output;
                 command.CommandTimeout = 3600;
-                command.ExecuteNonQuery();
+                int res = command.ExecuteNonQuery();
                 result = (bool)command.Parameters["@Result"].Value;
                 connection.Close();
             }
@@ -7464,13 +7467,13 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             {
                 return new ResponseStatus { Status = BusinessStatus.Ok, ResponseMessage = "Card Details updated successfully" };
             }
-            else {
+            else
+            {
                 return new ResponseStatus { Status = BusinessStatus.Error, ResponseMessage = "Failed to update Card Details" };
             }
 
-         
-        }
 
+        }
     }
 
 

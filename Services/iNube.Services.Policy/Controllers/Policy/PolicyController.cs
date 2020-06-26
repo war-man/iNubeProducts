@@ -727,7 +727,7 @@ namespace iNube.Services.Policy.Controllers.Policy
         }
        
         [HttpPut]
-        public async Task<IActionResult> UpdateCardDetails(string PolicyNumber, decimal MobileNumber, decimal RefrenceNumber)
+        public async Task<IActionResult> UpdateCardDetails(string PolicyNumber, string MobileNumber, string RefrenceNumber)
         {
             var response = await _policyService.UpdateCardDetails(PolicyNumber, MobileNumber, RefrenceNumber, Context);
             switch (response.Status)
