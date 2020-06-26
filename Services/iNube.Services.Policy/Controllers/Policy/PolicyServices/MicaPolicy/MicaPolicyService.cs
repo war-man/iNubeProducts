@@ -5486,7 +5486,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                     }
                 }
 
-                return new ProposalResponse { Status = BusinessStatus.NotFound };
+                return new ProposalResponse { Status = BusinessStatus.NotFound,ResponseMessage=$"{endorsementType} is invalid" };
             }
 
             catch (Exception ex)
