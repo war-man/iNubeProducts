@@ -198,7 +198,7 @@ const AddParticipant = (props) => {
                                         fullWidth: true
                                     }}
                                 />
-                            </GridItem> 
+                            </GridItem>  
                         }
                         <GridItem xs={12} sm={12} md={4}>
                             <CustomInput
