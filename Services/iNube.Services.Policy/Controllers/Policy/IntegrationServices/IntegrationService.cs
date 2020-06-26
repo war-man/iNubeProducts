@@ -65,6 +65,8 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
 
         Task<ResponseStatus> SendSMSAsync(Models.SMSRequest SmsRequest, ApiContext apiContext);
         Task<ResponseStatus> SendEmailAsync(EmailRequest EmailRequest, ApiContext apiContext);
+        //Adjustment Amount
+        Task<IEnumerable<CustomerSettingsDTO>> GetAdjustmentCustomerSettings(string Type, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
@@ -422,7 +424,11 @@ namespace iNube.Services.Policy.Controllers.Policy.IntegrationServices
             return await PostApiInvoke<dynamic, PolicyExceptionDTO>(uri, apiContext, SourceRequest);
 
         }
-
+        public async Task<IEnumerable<CustomerSettingsDTO>> GetAdjustmentCustomerSettings(string Type, ApiContext apiContext)
+        {
+            var uri = UserUrl + "/api/CustomerProvisioning/GetCustomerTypeSettings?customerid=" + apiContext.OrgId + "&type=" + Type + "&envid=" + apiContext.ServerType;
+            return await GetListApiInvoke<CustomerSettingsDTO>(uri, apiContext);
+        }
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
             HttpClient client = new HttpClient();
