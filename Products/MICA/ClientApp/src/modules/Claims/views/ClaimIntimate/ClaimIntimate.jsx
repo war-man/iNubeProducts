@@ -473,7 +473,7 @@ class ClaimIntimate extends React.Component {
 
                 }
                 else {
-
+                    this.setState({ response: false});
                     if (this.state.DetailsDTO.lossDateTime == null) {
                         this.setState({ errormessage: true });
                         this.setState({ lossdateflag: true });
@@ -521,16 +521,17 @@ class ClaimIntimate extends React.Component {
 
                 }
             } else {
-
+               
                 this.setState({ errorifsccode: true });
                 this.setState({ errorbankName: true });
                 this.setState({ erroraccName: true });
-                this.setState({ errorlossloc: true });
+                this.setState({ errorlossloc: true, response: false });
                 //this.setState({ erroraccno: true });
 
             }
         } else {
             //this.setState({ errordate: true });
+            this.setState({ response: false });
             swal("", "Loss date time must be within Policy Tenure", "error");
         }
 
