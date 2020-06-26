@@ -3334,7 +3334,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ad60days + Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
-                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount),2);
 
                             FinalDto.Add(CdModel);
 
@@ -3351,7 +3351,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
-                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount), 2);
                             FinalDto.Add(CdModel);
                             return FinalDto;
 
@@ -3369,7 +3369,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ad60days + Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
-                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount), 2);
 
                             //FT & AD CREDIT OBJECT
                             FinalDto.Add(CdModel);
@@ -3386,8 +3386,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
-                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
-                            
+                            CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount), 2);
+
                             //FT DEBIT OBJECT
                             FinalDto.Add(CdModel);
 
@@ -3414,7 +3414,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ad365days + Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
-                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount), 2);
                             FinalDto.Add(CdModel);
                             return FinalDto;
 
@@ -3430,7 +3430,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
-                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount), 2);
                             FinalDto.Add(CdModel);
                             return FinalDto;
 
@@ -3450,7 +3450,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ad365days + Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
-                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount), 2);
 
                             //FT & AD CREDIT OBJECT
                             FinalDto.Add(CdModel);
@@ -3467,7 +3467,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             CdModel.AdPerDay = AdPerDay;
                             CdModel.TxnAmount = Ft365days;
                             CdModel.TaxAmount = FinalTaxTotal;
-                            CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                            CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount), 2);
 
                             //FT DEBIT OBJECT
                             FinalDto.Add(CdModel);
@@ -3691,7 +3691,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //AD
                 ADPremiumDTO.Type = "AD";
                 ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
-                ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                ADPremiumDTO.TotalAmount = Math.Round((ADPremiumDTO.TxnAmount + TotalTax),2);
                 ADPremiumDTO.TaxAmount = taxAmountDTO;
 
 
@@ -3760,7 +3760,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = ADPremiumDTO.TxnAmount + FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FinalTaxTotal;
-                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount),2);
                 FinalDto.Add(CdModel);
 
                 //FT-DebitObject
@@ -3774,7 +3774,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FTPremiumDTO.TaxAmount.TaxAmount;
-                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount),2);
                 FinalDto.Add(CdModel);
             }
 
@@ -3825,7 +3825,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //AD
                 ADPremiumDTO.Type = "AD";
                 ADPremiumDTO.TxnAmount = Convert.ToDecimal(EndoRatingObject.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
-                ADPremiumDTO.TotalAmount = ADPremiumDTO.TxnAmount + TotalTax;
+                ADPremiumDTO.TotalAmount = Math.Round((ADPremiumDTO.TxnAmount + TotalTax),2);
                 ADPremiumDTO.TaxAmount = taxAmountDTO;
 
 
@@ -3840,7 +3840,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = ADPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = taxAmountDTO.TaxAmount;
-                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount),2);
                 FinalDto.Add(CdModel);
 
 
@@ -3895,7 +3895,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 CdModel.CumAdPerDay = CumAdPerDay;
                 CdModel.TxnAmount = FTPremiumDTO.TxnAmount;
                 CdModel.TaxAmount = FinalTaxTotal;
-                CdModel.TotalAmount = CdModel.TxnAmount + CdModel.TaxAmount;
+                CdModel.TotalAmount = Math.Round((CdModel.TxnAmount + CdModel.TaxAmount),2);
                 FinalDto.Add(CdModel);
 
                 return FinalDto;
