@@ -2197,7 +2197,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
 
                 var main_rule = (from tblrate in _context.TblRating.Where(r => r.RatingId == Convert.ToDecimal(RuleId))
                                  join tblratingcondition in _context.TblRatingRules on tblrate.RatingId equals tblratingcondition.RatingId
-                                 join tblrulecondition in _context.TblRatingRuleConditions on tblratingcondition.RatingRuleId equals tblrulecondition.RatingRuleId
+                                 join tblrulecondition in _context.TblRatingRuleConditions.OrderBy(it => it.RatingRuleId) on tblratingcondition.RatingRuleId equals tblrulecondition.RatingRuleId
                                  join tblparameter in _context.TblRatingParameters on tblrulecondition.RatingParameters equals tblparameter.ParametersId
                                  join tblparamsetdetails in _context.TblParameterSetDetails.Where(it => it.ParameterSetId == ruleObj.ObjID)
                                  on tblparameter.ParametersId equals tblparamsetdetails.ParametersId
@@ -2215,7 +2215,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                                      IsParameter = tblrate.IsParameter,
                                      ParameterId = tblparameter.ParametersId,
                                      ParamName = tblparameter.ParameterName,
-                                     IsRange = tblparamsetdetails.RangeType
+                                     IsRange = tblparamsetdetails.RangeType,
+                                     RatingRuleId = tblrulecondition.RatingRuleId
                                  }).ToList();
                 if(main_rule.Count == 0)
                 {
