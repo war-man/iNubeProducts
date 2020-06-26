@@ -11,10 +11,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Remotion.Linq.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 {
@@ -71,7 +73,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
         //RI Functions
 
-        Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto, ApiContext apiContext);
+        Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto1 tblRimappingDto, ApiContext apiContext);
 
         Task<IEnumerable<RIMappingDTO>> GetDescriptionRIGrid(decimal treatyid, ApiContext apiContext);
 
@@ -339,17 +341,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             try
             {
                 var delete_caoMap = _context.TblParticipantMaster.Find(participantMasterId);
-                if (delete_caoMap != null)
-                {
+              
                     _context.TblParticipantMaster.Remove(delete_caoMap);
                     _context.SaveChanges();
-                }
+                return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Participant Master deleted sucessfully " };
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Participant Master deleted sucessfully " };
+            
         }
 
         //modifyParticipant
@@ -562,17 +563,17 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             try
             {
                 var delete_caoMap = _context.TblRetentionGroup.Find(retentionGroupId);
-                if (delete_caoMap != null)
-                {
+              
                     _context.TblRetentionGroup.Remove(delete_caoMap);
                     _context.SaveChanges();
-                }
+                return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Retention deleted sucessfully " };
+
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Retention deleted sucessfully " };
+           
         }
 
         //modifyRetention
@@ -689,17 +690,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             {
                 
                 var delete_caoMap = _context.TblTreaty.Find(tratyId);
-                if (delete_caoMap != null)
-                {
-                    _context.TblTreaty.Remove(delete_caoMap);
+                 _context.TblTreaty.Remove(delete_caoMap);
                     _context.SaveChanges();
-                }
+                    return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Treaty deleted sucessfully " };
+               
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"Treaty deleted sucessfully " };
+          
         }
 
         //modify TreatyData
@@ -795,39 +795,40 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return null;
         }
 
-        public async Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto tblRimappingDto,ApiContext apiContext)
+        public async Task<TransactionMapResponse> SaveRIMapping(TblRimappingDto1 tblRimappingDto,ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
             tblRimappingDto.CreatedDate = DateTime.Now;
-            //taking id 20 for retention group and 21 for treaty
-            //foreach (var d in tblRimappingDto.TblRimappingDetail)
-            //{
-            //    if(d.RetentionGroupId!=null)
-            //    {
-            //        d.SequenceNo = 01;
-            //        d.RimappingTypeId = 31;
-            //        tblRimappingDto.TblRimappingDetail.Add(d);
-            //    }
-            //    else
-            //    {
-            //        d.RimappingTypeId = 32;
-            //        tblRimappingDto.TblRimappingDetail.Add(d);
-            //    }
-            //}
-            //  var data = _mapper.Map<TblRimapping>(tblRimappingDto);
-          
-            
-            //try
-            //{
-            //    _context.TblRimapping.Add(data);
-            //    _context.SaveChanges();
-            //}
-            //catch (Exception ex)
-            //{
-
-            //    // throw;
-            //}
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Details Saved sucessfully" };
+            if (tblRimappingDto.RetentionGroupId == null)
+            {
+                foreach(var item in tblRimappingDto.TblRimappingDetail)
+                {
+                    item.SequenceNo = 01;
+                    item.RimappingTypeId = 31;
+                }
+            }
+            else
+            {
+                foreach (var item in tblRimappingDto.TblRimappingDetail)
+                {
+                   
+                    item.RimappingTypeId = 31;
+                }
+            }
+      
+                var datavalue = tblRimappingDto;
+                var data = _mapper.Map<TblRimapping>(datavalue);
+            try
+            {
+                _context.TblRimapping.Add(data);
+                _context.SaveChanges();
+                return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Details Saved sucessfully" };
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+           
         }
 
         //search RI mapping
@@ -890,10 +891,17 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         public async Task<TblRimappingResponse> ModifyRImapping(TblRimappingDto tblParticipantMasterDto, ApiContext apiContext)
         {
             _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
-            var tbl_Rimaping = _mapper.Map<TblRimapping>(tblParticipantMasterDto);
-            _context.TblRimapping.Update(tbl_Rimaping);
-            _context.SaveChanges();
-            return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"RI Mapping updated  sucessfully ", RimappingDto = tblParticipantMasterDto };
+            try
+            {
+                var tbl_Rimaping = _mapper.Map<TblRimapping>(tblParticipantMasterDto);
+                _context.TblRimapping.Update(tbl_Rimaping);
+                _context.SaveChanges();
+                return new TblRimappingResponse { Status = BusinessStatus.Updated, ResponseMessage = $"RI Mapping updated  sucessfully ", RimappingDto = tblParticipantMasterDto };
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
 
         }
 
@@ -905,17 +913,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             try
             {
                 var delete_caoMap = _context.TblRimapping.Find(RimappingId);
-                if (delete_caoMap != null)
-                {
-                    _context.TblRimapping.Remove(delete_caoMap);
+                  _context.TblRimapping.Remove(delete_caoMap);
                     _context.SaveChanges();
-                }
+                    return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Deleted sucessfully " };
+                
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return new TransactionMapResponse { Status = BusinessStatus.Created, ResponseMessage = $"RI Mapping Deleted sucessfully " };
+          
         }
 
         //GetElements by id
@@ -1537,7 +1544,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lsttreatyCode = _context.TblTreaty.Select(s => s.TreatyCode).ToList();
                 if(lsttreatyCode.Contains(codeName)==true)
                 {
-                    validationResponse.ResponseMessage = $"Treaty Code " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Treaty Code " + codeName + " can not be duplicated";
                     //ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty Code " + codeName +" can not be dublicated" };
                     // Errors.Add(errorInfo);
                 }
@@ -1547,7 +1554,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstTratyGroupName = _context.TblTreatyGroup.Select(s => s.TreatyGroupName).ToList();
                 if (lstTratyGroupName.Contains(codeName) == true)
                 {
-                    validationResponse.ResponseMessage = $"Treaty GroupName " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Treaty GroupName " + codeName + " can not be duplicated";
 
                     //ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Treaty GroupName " + codeName + " can not be dublicated" };
                     // Errors.Add(errorInfo);
@@ -1558,7 +1565,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstParticipanctCode = _context.TblParticipantMaster.Select(s => s.ParticipantCode).ToList();
                 if (lstParticipanctCode.Contains(codeName) == true)
                 {
-                    validationResponse.ResponseMessage = $"Participant Code " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Participant Code " + codeName + " can not be duplicated";
 
                     //    ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant Code " + codeName + " can not be dublicated" };
                     //  Errors.Add(errorInfo);
@@ -1569,7 +1576,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstParticipanctBranchCode = _context.TblParticipantBranch.Select(s => s.BranchCode).ToList();
                 if (lstParticipanctBranchCode.Contains(codeName) == true)
                 {
-                    validationResponse.ResponseMessage = $"Participant BranchCode " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Participant BranchCode " + codeName + " can not be duplicated";
 
                     // ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Participant BranchCode " + codeName + " can not be dublicated" };
                     //Errors.Add(errorInfo);
@@ -1580,7 +1587,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 var lstRetentionGroupName = _context.TblRetentionGroup.Select(s => s.RetentionGroupName).ToList();
                 if (lstRetentionGroupName.Contains(codeName) == true)
                 {
-                    validationResponse.ResponseMessage = $"Retention GroupName " + codeName + " can not be dublicated";
+                    validationResponse.ResponseMessage = $"Retention GroupName " + codeName + " can not be duplicated";
 
                     // ErrorInfo errorInfo = new ErrorInfo { ErrorMessage = "Retention GroupName " + codeName + " can not be dublicated" };
                     // Errors.Add(errorInfo);

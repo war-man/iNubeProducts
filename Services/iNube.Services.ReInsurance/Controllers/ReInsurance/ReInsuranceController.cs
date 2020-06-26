@@ -446,7 +446,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
 
        
         [HttpPost]
-        public async Task<IActionResult> SaveRIMapping(TblRimappingDto tblRimappingDto)
+        public async Task<IActionResult> SaveRIMapping(TblRimappingDto1 tblRimappingDto)
         {
 
             var response = await _reInsuranceService.SaveRIMapping(tblRimappingDto,Context);

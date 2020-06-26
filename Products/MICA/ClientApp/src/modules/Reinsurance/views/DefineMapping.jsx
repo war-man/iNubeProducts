@@ -254,6 +254,13 @@ class DefineMapping extends React.Component {
                     this.setState({ [stateName + "State"]: true });
                 }
                 break;
+            case "Number":
+                if (validationPage.verifyNum(evt.target.value)) {
+                    this.setState({ [stateName + "State"]: false });
+                } else {
+                    this.setState({ [stateName + "State"]: true });
+                }
+                break;
             case "phoneno":
                 if (validationPage.verifyPhoneNum(evt.target.value)) {
                     this.setState({ [stateName + "State"]: false });
@@ -515,7 +522,7 @@ class DefineMapping extends React.Component {
                     TreatyDescription: <CustomInput labelText="TreatyDescription" value={this.state.DefineDTOData[key].treatydescription} name="treatydescription" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
                     Treatygroup: <MasterDropdown labelText="TreatyGroup" filterName='TreatyGroupName' lstObject={(this.state.trtygrpmasList.length > 0) ? ((this.state.trtygrpmasList[key]!=undefined)?this.state.trtygrpmasList[key]:[]):[]} value={this.state.DefineDTOData[key].treatyGroupId} name='treatyGroupId' formControlProps={{ fullWidth: true }} onChange={(e) => this.settreatygroup(e, key)} />,
                     Treatytype: <CustomInput labelText="TreatyType" value={this.state.DefineDTOData[key].treatyType} name="treatyType" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
-                    SequenceNo: <CustomInput labelText="Sequence" value={this.state.DefineDTOData[key].sequenceNo} name="sequenceNo" onChange={(e) => this.handletreatygrid("numeric", e, key)} error={this.state.sequenceNoState} formControlProps={{ fullWidth: true }} />,
+                    SequenceNo: <CustomInput labelText="Sequence" value={this.state.DefineDTOData[key].sequenceNo} name="sequenceNo" onChange={(e) => this.handletreatygrid("Number", e, key)} error={this.state.sequenceNoState} formControlProps={{ fullWidth: true }} />,
                     Actions: < div > <Button justIcon round simple color="info" className="add" onClick={(e) => this.AddTreatyRecord(e, key)} ><Add /> </Button >
                         <Button justIcon round simple color="danger" className="remove" onClick={(e) => this.deleteTreatyRecord(e, key)} ><Delete /> </Button >
                     </div >
