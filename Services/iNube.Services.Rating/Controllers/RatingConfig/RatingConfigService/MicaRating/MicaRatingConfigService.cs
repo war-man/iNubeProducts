@@ -2245,7 +2245,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                             dtObj.Add(parameter, item.condition_valueto);
                         }
                     }
-                    if(countData == 5)
+                    if(countData == count)
                     {
                         var rate = "Rate";
                         dtObj.Add(rate, item.Rate);

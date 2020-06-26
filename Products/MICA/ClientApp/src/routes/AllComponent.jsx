@@ -156,6 +156,8 @@ const CalculationDisplay = AsyncComponent(() => { return import("modules/Rating/
 const EditCalculationConfig = AsyncComponent(() => { return import("modules/Rating/views/SearchCalculationConfig.jsx"); });
 const EllustrationConfig = AsyncComponent(() => { return import("modules/Rating/views/EllustrationConfig.jsx"); });
 const IllustrationResult = AsyncComponent(() => { return import("modules/Rating/views/IllustrationResult.jsx"); });
+const ViewRateTable = AsyncComponent(() => { return import("modules/Rating/views/ViewRateTable.jsx"); });
+
 
 
 /* DMS module*/
@@ -330,6 +332,7 @@ export const ComponentsList = {
     CalculationResult: CalculationResult,
     EllustrationConfig: EllustrationConfig,
     IllustrationResult: IllustrationResult,
+    ViewRateTable: ViewRateTable,
     DmsDocument: DmsDocument,
     RDLCReports: RDLCReports,
     Attributes: Attributes,

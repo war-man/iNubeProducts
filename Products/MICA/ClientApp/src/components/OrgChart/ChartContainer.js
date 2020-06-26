@@ -7,9 +7,9 @@ import React, {
 } from "react";
 import PropTypes from "prop-types";
 import { selectNodeService } from "./service";
-import JSONDigger from "json-digger";
+//import JSONDigger from "json-digger";
 import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+//import jsPDF from "jspdf";
 import ChartNode from "./ChartNode";
 import "./ChartContainer.css";
 
@@ -89,7 +89,7 @@ const ChartContainer = forwardRef(
       setDS(datasource);
     }, [datasource]);
 
-    const dsDigger = new JSONDigger(datasource, "id", "children");
+    //const dsDigger = new JSONDigger(datasource, "id", "children");
 
     const clickChartHandler = event => {
       if (!event.target.closest(".oc-node")) {
@@ -207,17 +207,17 @@ const ChartContainer = forwardRef(
       const canvasWidth = Math.floor(canvas.width);
       const canvasHeight = Math.floor(canvas.height);
       const doc =
-        canvasWidth > canvasHeight
-          ? new jsPDF({
-              orientation: "landscape",
-              unit: "px",
-              format: [canvasWidth, canvasHeight]
-            })
-          : new jsPDF({
-              orientation: "portrait",
-              unit: "px",
-              format: [canvasHeight, canvasWidth]
-            });
+        //canvasWidth > canvasHeight
+        //  ? new jsPDF({
+        //      orientation: "landscape",
+        //      unit: "px",
+        //      format: [canvasWidth, canvasHeight]
+        //    })
+        //  : new jsPDF({
+        //      orientation: "portrait",
+        //      unit: "px",
+        //      format: [canvasHeight, canvasWidth]
+        //    });
       doc.addImage(canvas.toDataURL("image/jpeg", 1.0), "JPEG", 0, 0);
       doc.save(exportFilename + ".pdf");
     };
@@ -240,9 +240,9 @@ const ChartContainer = forwardRef(
     };
 
     const changeHierarchy = async (draggedItemData, dropTargetId) => {
-      await dsDigger.removeNode(draggedItemData.id);
-      await dsDigger.addChildren(dropTargetId, draggedItemData);
-      setDS({ ...dsDigger.ds });
+      //await dsDigger.removeNode(draggedItemData.id);
+      //await dsDigger.addChildren(dropTargetId, draggedItemData);
+      //setDS({ ...dsDigger.ds });
     };
 
     useImperativeHandle(ref, () => ({
