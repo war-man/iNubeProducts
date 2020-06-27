@@ -1068,7 +1068,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             TblRiallocationHistory tblRiallocationHistory = new TblRiallocationHistory();
             tblRiallocationHistory.Premium = allocationPremium;
-            tblRiallocationHistory.AloocationDetails = allocationHistorydata;
+            tblRiallocationHistory.AllocationDetails = allocationHistorydata;
             tblRiallocationHistory.MaapingId = mappingId;
             tblRiallocationHistory.AllocationLevel = allocatioinLevel;
             tblRiallocationHistory.AllocationLevel = allocatioinLevel;
@@ -1596,7 +1596,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             if (type == "SequenceNo")
             {
                 var value = Convert.ToInt32(codeName);
-                if(value<0)
+                if(value<=0)
                 {
                     validationResponse.ResponseMessage = $" Value can not be " + value;
                 }
