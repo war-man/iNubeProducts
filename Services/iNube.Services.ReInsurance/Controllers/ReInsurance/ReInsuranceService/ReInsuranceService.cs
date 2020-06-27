@@ -1593,6 +1593,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     // Errors.Add(errorInfo);
                 }
             }
+            if (type == "SequenceNo")
+            {
+                var value = Convert.ToInt32(codeName);
+                if(value<0)
+                {
+                    validationResponse.ResponseMessage = $" Value can not be " + value;
+                }
+            }
 
             return new ValidationResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage=validationResponse.ResponseMessage};
         }
