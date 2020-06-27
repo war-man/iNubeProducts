@@ -914,10 +914,22 @@ class CreateTreaty extends React.Component {
             this.state.total= data;
             console.log(this.state.total, 'total1')
         }
+
+        //console.log("Startdate", this.state.treatyDTO.startDate);
+        //console.log("enddate", this.state.treatyDTO.endDate);
+
+        
+
+        //if (startdate.getTime() >= endDate.getTime()) {
+        //    console.log("datavalidation","")
+        //}
+        //for the time we can get use the getTime() function
         console.log(this.state.total,'total1')
         if (this.state.total == 100) {
+            let startdate = new Date(this.state.treatyDTO.startDate);
+            let endDate = new Date(this.state.treatyDTO.endDate);
             debugger
-            if (this.state.treatyDTO.startDate >= this.state.treatyDTO.endDate) {
+            if ((startdate) <= (endDate)) {
                 fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveTreatyData`, {
                     method: 'Post',
                     headers: {
