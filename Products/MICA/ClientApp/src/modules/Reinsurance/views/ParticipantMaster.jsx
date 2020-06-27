@@ -97,7 +97,7 @@ class ParticipantMaster extends React.Component {
             Branchesdto: [{
                 branchCode: " ",
                 branchName: " ",
-                BranchSpocEmailID: " "
+                branchSpocemailId: " "
             }],
             //Active: " ",
             //Inactive: " ",
@@ -185,6 +185,7 @@ class ParticipantMaster extends React.Component {
         this.setState({ open: false });
     }
     ViewPDFFun = () => {
+        this.AddTreatyTable();
         this.setState({ open: true });
     }
     onInputChange = (type, evt) => {
@@ -383,7 +384,7 @@ class ParticipantMaster extends React.Component {
         TreatyDetails['Branchesdto'] = this.state.Branchesdto.concat({
             branchCode: "",
             branchName: "",
-            BranchSpocEmailID: ""
+            branchSpocemailId: ""
         });
         this.setState({ TreatyDetails });
         console.log("treatydataindex", index);
@@ -440,8 +441,8 @@ class ParticipantMaster extends React.Component {
                     BranchSpocEmailID: <CustomInput labelText="EmailDetails" id="BusinessTypeText"
                         required={true}
                         error={this.state.BranchSpocEmailIDState}
-                        value={this.state.Branchesdto[key].BranchSpocEmailID}
-                        name='BranchSpocEmailID'
+                        value={this.state.Branchesdto[key].branchSpocemailId}
+                        name='branchSpocemailId'
                         onChange={(event) => this.onInputBranchesChange("email", event, key)}
                         formControlProps={{ fullWidth: true }
                         } />,
@@ -536,7 +537,7 @@ class ParticipantMaster extends React.Component {
     }
     componentDidMount() {
         this.GetLocationService('Country', 0);
-        this.AddTreatyTable();
+     
         const props = this.props;
         console.log("porpsdat", props)
         console.log(props.participantMasterId, 'DataID');
@@ -586,7 +587,8 @@ class ParticipantMaster extends React.Component {
                     let gid = pid.toString();
                     data.participantTypeId=gid
 
-
+                    this.state.Branchesdto = [...data.tblParticipantBranch];
+                    //this.AddTreatyTable();
                     console.log('gid1',gid)
                     //var num = Number(this.state.ParticipantMaster.participantTypeId);
                     // num = this.state.ParticipantMaster.participantTypeId
@@ -594,6 +596,7 @@ class ParticipantMaster extends React.Component {
                     this.setState({ ParticipantMaster: data });
                     console.log(data, 'MyData2');
                     console.log(this.state.ParticipantMaster, 'Data1');
+                    
                 });
             this.setState({ editflag: true });
         }

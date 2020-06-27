@@ -54,8 +54,8 @@ class Reallocation extends React.Component {
         super(props);
         this.state = {
             dynamicList: [],
-            indexList:[],
-            qoutaflag:false,
+            indexList: [],
+            qoutaflag: false,
             yearmasterlist: [],
             newdata: [],
             masterList: [],
@@ -74,7 +74,7 @@ class Reallocation extends React.Component {
                 mappingId: "",
                 policyNo: "",
                 premium: "",
-                allocationDetails:""
+                allocationDetails: ""
 
             },
             Policydto: {
@@ -101,7 +101,7 @@ class Reallocation extends React.Component {
                         AllocatedPremium: "",
                         Adjustment: "",
                         retentionadded: "",
-                        Reallocatedpremium:"",
+                        Reallocatedpremium: "",
                         Participant: [
                             {
                                 ParticipantId: "",
@@ -187,10 +187,10 @@ class Reallocation extends React.Component {
         //Data5[evt.target.name] = evt.target.value;
         //this.setState({ Data5 });
 
-        
+
         //var d = this.state.masterList;
-        
-       // console.log("c", c);
+
+        // console.log("c", c);
 
         //if (this.state.masterList.Type == "Retention") {
         //    this.state.CalculationDTO.MapDetails[0].retentionadded = ((this.state.masterList.AllocatedAmount * this.state.CalculationDTO.MapDetails[0].Adjustment) / 100);
@@ -207,14 +207,14 @@ class Reallocation extends React.Component {
         //Data1[evt.target.name] = evt.target.value;
         this.setState({ Data });
         //this.setState({ Data1 });
-       
-      
+
+
     }
     onInputChange2 = (evt, index) => {
         debugger
         //this.state.reallocationlist = this.state.masterList;
 
-        
+
 
         console.log("calculatedValue1", this.state.CalculationDTO.MapDetails[0].retentionadded);
         const Data = this.state.reallocationlist.mapDetails;
@@ -226,18 +226,40 @@ class Reallocation extends React.Component {
         console.log("reallocationlist", this.state.reallocationlist.mapDetails, this.state.masterList);
         let caldata;
         let calpremium;
+        let splist=this.state.masterList.filter(s => s.Type == "Surplus");
+        let SPcount = splist.length;
+        let deductionAmount = 0;
+        let deductionPremiumAmount = 0;
+        let TSTotal= 100;
         //console.log("d", d);
-        this.state.masterList.map((item,key) => {
+        let QSTotal = this.state.masterList.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.AllocatedAmount) } else { return (sum+0)} }, 0 );
+        let QSPremiumTotal = this.state.masterList.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.AllocatedPremium) } else { return (sum+0)} }, 0 );
+        let QSTSTotal = this.state.masterList.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.Percentage) } else { return (sum+0)} }, 0 );
+        console.log("calorieTotal", QSTotal, QSPremiumTotal, QSTSTotal)
+
+        let spParcentage = 0;
+        this.state.masterList.map((item, key) => {
             let type = item.Type;
             if (type == "Retention") {
-                caldata = ((item.AllocatedAmount * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
-                calpremium = ((item.AllocatedPremium * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
-                //
+                spParcentage = TSTotal - ((Number(QSTSTotal)) + Number(this.state.reallocationlist.mapDetails[key].Percentage));
+                console.log("spParcentage", this.state.reallocationlist.mapDetails[key].Percentage, spParcentage);
+                caldata = ((this.state.reallocationlist.AllocationAmount * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
+                calpremium = ((this.state.reallocationlist.PremiumAmount * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
+                this.state.reallocationlist.mapDetails[key].AllocatedAmount = caldata;
+                this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
             }
-            this.state.reallocationlist.mapDetails[key].AllocatedAmount = caldata;
-            this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
-
+            if (this.state.reallocationlist.mapDetails[key].Type == "Surplus") {
+                deductionAmount= this.state.reallocationlist.AllocationAmount - (QSTotal + caldata);
+                this.state.reallocationlist.mapDetails[key].AllocatedAmount = deductionAmount / SPcount;
+                deductionPremiumAmount = this.state.reallocationlist.PremiumAmount - (QSPremiumTotal + calpremium);
+                this.state.reallocationlist.mapDetails[key].AllocatedPremium = deductionPremiumAmount / SPcount;
+                this.state.reallocationlist.mapDetails[key].Percentage = spParcentage / SPcount;
+                console.log("deductionAmount", deductionAmount, deductionPremiumAmount, spParcentage,this.state.reallocationlist.mapDetails[key].AllocatedAmount)
+            }
+           
+           
         });
+        console.log("deductionAmount", deductionAmount, this.state.reallocationlist.mapDetails)
         console.log("calculatedValue", caldata, this.state.masterList);
         //this.state.reallocationlist.mapDetails[key].AllocatedAmount = caldata;
         //this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
@@ -276,7 +298,7 @@ class Reallocation extends React.Component {
     }
     onFormSubmit = () => {
         debugger;
-      
+
         console.log("submit", this.state.SearchPeople);
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetAllocationByPolicyNo?PolicyNo=` + this.state.Policydto.policynumber, {
             method: 'GET',
@@ -288,12 +310,13 @@ class Reallocation extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
+
                 this.state.reallocationlist.Name = data.Name;
                 this.state.reallocationlist.Level = data.Level;
                 this.state.reallocationlist.AllocationAmount = data.AllocationAmount;
                 this.state.reallocationlist.PremiumAmount = data.PremiumAmount;
-                
-                 //datalist = data.MapDetails;                
+
+                //datalist = data.MapDetails;                
                 console.log("masterdata123", data);
                 //this.state.masterList = data.MapDetails;
                 let temp = JSON.parse(JSON.stringify(data));
@@ -309,17 +332,18 @@ class Reallocation extends React.Component {
                     }
                     //if (item.Type == "Surplus") {
                     //    item.NoOfLines = "";
-                       
+
                     //}
                 });
 
                 this.setState({
-                    masterList: list, reallocationlist: temp , qoutaflag: true });
+                    masterList: list, reallocationlist: temp, qoutaflag: true
+                });
 
                 console.log("masterdata", this.state.masterList);
                 console.log("reallocation", this.state.reallocationlist);
-               // console.log(datalist, 'new1');
-                
+                // console.log(datalist, 'new1');
+
             });
         //console.log(datalist, 'new');
         //this.setState({ masterList });
@@ -327,6 +351,7 @@ class Reallocation extends React.Component {
     }
     onFormUpdate = () => {
         debugger;
+        this.state.Modifydto.mappingId = this.state.reallocationlist.MappingId;
         this.state.Modifydto.allocationAmount = this.state.reallocationlist.AllocationAmount;
         this.state.Modifydto.premium = this.state.reallocationlist.PremiumAmount;
         this.state.Modifydto.policyNo = this.state.reallocationlist.PolicyNumber;
@@ -359,7 +384,7 @@ class Reallocation extends React.Component {
         this.setState({ indexlist });
 
         console.log("indexList", this.state.indexList);
-       
+
     }
     onChangeTreaty1 = () => {
         this.setState({ surplus: true });
@@ -451,8 +476,8 @@ class Reallocation extends React.Component {
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
                                         labelText="SumInsured"
-                                    id="ContactNo"
-                                    disabled={true}
+                                        id="ContactNo"
+                                        disabled={true}
                                         //required={true}
                                         //error={this.state.percentageState}
                                         value={this.state.reallocationlist.AllocationAmount}
@@ -466,8 +491,8 @@ class Reallocation extends React.Component {
                                 <GridItem xs={12} sm={12} md={3}>
                                     <CustomInput
                                         labelText="Premium"
-                                    id="ContactNo"
-                                    disabled={true}
+                                        id="ContactNo"
+                                        disabled={true}
                                         //required={true}
                                         //error={this.state.percentageState}
                                         value={this.state.reallocationlist.PremiumAmount}
@@ -482,9 +507,9 @@ class Reallocation extends React.Component {
                         }
                     </CardBody>
                 </Card>
-                
-               
-                {this.state.qoutaflag && this.state.masterList.map((item,key) => {
+
+
+                {this.state.qoutaflag && this.state.masterList.map((item, key) => {
 
                     return (<div>
                         {item.Type == "Retention" &&
@@ -501,96 +526,96 @@ class Reallocation extends React.Component {
                                     </h4>
                                 </CardHeader>
                                 <CardBody>
-                                <GridContainer>
+                                    <GridContainer>
 
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Retention %"
-                                        name="Percentage"
-                                        disabled={true}
-                                        value={item.Percentage} 
-                                        onChange={(e) => this.onInputChange2(e,key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Retention Allocation SI"
-                                        name="AllocatedAmount"
-                                        disabled={true}
-                                        value={item.AllocatedAmount}
-                                        onChange={this.onInputChange}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Limit"
-                                        name="Limit"
-                                        disabled={true}
-                                        value={item.Limit}
-                                        onChange={this.onInputChange}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Retention %"
+                                            name="Percentage"
+                                            disabled={true}
+                                            value={item.Percentage}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Retention Allocation SI"
+                                            name="AllocatedAmount"
+                                            disabled={true}
+                                            value={item.AllocatedAmount}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Limit"
+                                            name="Limit"
+                                            disabled={true}
+                                            value={item.Limit}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
 
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Premium Amount"
-                                        name="AllocatedPremium"
-                                        disabled={true}
-                                        value={item.AllocatedPremium}
-                                        onChange={this.onInputChange}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Adjustment %"
-                                        name="Percentage"
-                                        value={this.state.reallocationlist.mapDetails[key].Percentage}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Reallocated SI"
-                                        name="AllocatedAmount"
-                                        //disabled={true}
-                                        value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Reallocated Limit"
-                                        name="Limit"                                       
-                                        value={this.state.reallocationlist.mapDetails[key].Limit}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                        labelText="Reallocated Amount"
-                                        name="AllocatedPremium"                                       
-                                        value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                        formControlProps={{
-                                            fullWidth: true
-                                        }}
-                                    />
-                                    </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Premium Amount"
+                                            name="AllocatedPremium"
+                                            disabled={true}
+                                            value={item.AllocatedPremium}
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Adjustment %"
+                                            name="Percentage"
+                                            value={this.state.reallocationlist.mapDetails[key].Percentage}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Reallocated SI"
+                                            name="AllocatedAmount"
+                                            //disabled={true}
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Reallocated Limit"
+                                            name="Limit"
+                                            value={this.state.reallocationlist.mapDetails[key].Limit}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Reallocated Amount"
+                                            name="AllocatedPremium"
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
 
-                                </GridContainer>
+                                    </GridContainer>
 
 
                                 </CardBody>
@@ -600,14 +625,14 @@ class Reallocation extends React.Component {
 
                         }
 
-                    
+
                     </div>);
 
 
                 })}
-                
-                {this.state.qoutaflag && this.state.masterList.map((item,key) => {
-                 
+
+                {this.state.qoutaflag && this.state.masterList.map((item, key) => {
+
                     return (<div>
                         {item.Type == "QS" &&
                             <Card>
@@ -615,10 +640,10 @@ class Reallocation extends React.Component {
                                 <CardHeader color="rose" icon>
 
                                     <h4 className={this.props.cardIconTitle}>
-                                    <small> QuotaShare/Obligatory </small>
+                                        <small> QuotaShare/Obligatory </small>
                                     </h4>
                                 </CardHeader>
-                               
+
                                 <CardBody>
 
                                     <GridContainer>
@@ -626,8 +651,8 @@ class Reallocation extends React.Component {
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Type"
                                             name="Type1"
-                                        value={item.Type}
-                                        disabled={true}
+                                            value={item.Type}
+                                            disabled={true}
                                             onChange={this.onInputChange}
                                             formControlProps={{
                                                 fullWidth: true
@@ -636,8 +661,8 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Treaty Group Name"
-                                        name="treatyshare"
-                                        disabled={true}
+                                            name="treatyshare"
+                                            disabled={true}
                                             //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyshare}
                                             onChange={this.onInputChange}
                                             formControlProps={{
@@ -648,8 +673,8 @@ class Reallocation extends React.Component {
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Allocation SI"
                                             name="AllocationAmount"
-                                        value={item.AllocatedAmount}
-                                        disabled={true}
+                                            value={item.AllocatedAmount}
+                                            disabled={true}
                                             onChange={this.onInputChange}
                                             formControlProps={{
                                                 fullWidth: true
@@ -658,9 +683,9 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Allocation Premium"
-                                        name="AllocatedPremium"
-                                        disabled={true}
-                                        value={item.AllocatedPremium}
+                                            name="AllocatedPremium"
+                                            disabled={true}
+                                            value={item.AllocatedPremium}
                                             onChange={this.onInputChange}
                                             formControlProps={{
                                                 fullWidth: true
@@ -670,8 +695,8 @@ class Reallocation extends React.Component {
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Treaty Share"
                                             name="limit2"
-                                        value={item.Percentage}
-                                        disabled={true}
+                                            value={item.Percentage}
+                                            disabled={true}
                                             onChange={this.onInputChange}
                                             formControlProps={{
                                                 fullWidth: true
@@ -680,184 +705,10 @@ class Reallocation extends React.Component {
                                         </GridItem>
                                         <GridItem xs={12} sm={12} md={3}> <CustomInput
                                             labelText="Limit"
-                                        name="Limit"
-                                        disabled={true}
+                                            name="Limit"
+                                            disabled={true}
                                             value={item.Limit}
                                             onChange={this.onInputChange}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                        </GridItem>
-
-
-                                    </GridContainer>
-
-                                    <GridContainer justify="center">
-                                        <GridItem xs={3} sm={3} md={3}>
-                                        <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.onChangeTreaty(key)}>TreatyDetails</Button>
-
-                                        </GridItem>
-
-                                    </GridContainer>
-
-                                    {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
-
-                                </CardBody>
-                               
-
-
-                            </Card>
-                        }
-                        {item.Type == "QS"
-                            && (this.state.indexList.findIndex(s=>s==key)!=-1?true:false) &&
-                        <GridContainer xl={12}>
-                            <GridItem lg={12}>
-
-
-
-                                <ReactTable
-                                    title={"QuotaShare/Obligatory"}
-                                    data={item.participants}
-                                    filterable
-                                    columns={[
-                                        {
-                                            Header: "Participant",
-                                            accessor: "ParticipantId",
-                                            Width: "20px"
-
-                                        },
-                                        {
-                                            Header: "Share",
-                                            accessor: "Share",
-
-                                        },
-                                        {
-                                            Header: "Amount",
-                                            accessor: "AllocatedAmount",
-                                            //Width: "10px"
-                                        },
-                                        {
-                                            Header: "Premium",
-                                            accessor: "AllocatedPremium",
-                                            //Width: "20px"
-                                        },
-                                        {
-                                            Header: "Brokerage",
-                                            accessor: "Brokerage",
-                                            //Width: "10px"
-                                        },
-                                        {
-                                            Header: "Commission",
-                                            accessor: "Commission",
-                                            //Width: "10px"
-                                        }
-
-                                    ]}
-                                    defaultPageSize={5}
-                                    showPaginationTop={false}
-                                    showPaginationBottom
-                                    //pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
-                                    //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
-                                    className="-striped -highlight"
-                                />
-
-
-                            </GridItem>
-
-
-                            <Paper className={classes.root} style={{ marginLeft: '75px', marginRight: '75px' }} >
-
-
-                            </Paper>
-
-
-
-
-
-                        </GridContainer>}
-                       </div> );
-                    
-
-                })}
-                {this.state.qoutaflag && this.state.masterList.map((item,key) => {
-
-                    return (<div>
-                        {item.Type == "Surplus" &&
-
-                        <Card>
-
-                            <CardHeader color="rose" icon>
-
-                                <h4 className={this.props.cardIconTitle}>
-                                    <small> {item.Type} </small>
-                                </h4>
-                            </CardHeader>
-                                <CardBody>
-
-                                    <GridContainer>
-
-                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Type"
-                                        name="Type1"
-                                        disabled={true}
-                                            value={item.Type}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                        </GridItem>
-                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Treaty Group Name"
-                                        name="treatyshare"
-                                        disabled={true}
-                                            //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyshare}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                        </GridItem>
-                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Allocation SI"
-                                            name="AllocationAmount"
-                                        value={item.AllocatedAmount}
-                                        disabled={true}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                        </GridItem>
-                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Allocation Premium"
-                                        name="AllocatedPremium"
-                                        disabled={true}
-                                        value={item.AllocatedPremium}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                        </GridItem>
-                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Treaty Share"
-                                        name="TreatyShare"
-                                        //disabled={true}
-                                            value={item.Percentage}
-                                        onChange={(e) => this.onInputChange2(e, key)}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                        </GridItem>
-                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
-                                            labelText="Lines"
-                                        name="NoOfLines"
-                                        //disabled={true}
-                                        value={this.state.reallocationlist.mapDetails[key].NoOfLines}
-                                        onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}
@@ -878,14 +729,188 @@ class Reallocation extends React.Component {
                                     {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
 
                                 </CardBody>
-                            
+
+
+
+                            </Card>
+                        }
+                        {item.Type == "QS"
+                            && (this.state.indexList.findIndex(s => s == key) != -1 ? true : false) &&
+                            <GridContainer xl={12}>
+                                <GridItem lg={12}>
+
+
+
+                                    <ReactTable
+                                        title={"QuotaShare/Obligatory"}
+                                        data={item.participants}
+                                        filterable
+                                        columns={[
+                                            {
+                                                Header: "Participant",
+                                                accessor: "ParticipantId",
+                                                Width: "20px"
+
+                                            },
+                                            {
+                                                Header: "Share",
+                                                accessor: "Share",
+
+                                            },
+                                            {
+                                                Header: "Amount",
+                                                accessor: "AllocatedAmount",
+                                                //Width: "10px"
+                                            },
+                                            {
+                                                Header: "Premium",
+                                                accessor: "AllocatedPremium",
+                                                //Width: "20px"
+                                            },
+                                            {
+                                                Header: "Brokerage",
+                                                accessor: "Brokerage",
+                                                //Width: "10px"
+                                            },
+                                            {
+                                                Header: "Commission",
+                                                accessor: "Commission",
+                                                //Width: "10px"
+                                            }
+
+                                        ]}
+                                        defaultPageSize={5}
+                                        showPaginationTop={false}
+                                        showPaginationBottom
+                                        //pageSize={([this.state.data.length + 1] < 5) ? [this.state.data.length + 1] : 5}
+                                        //showPaginationBottom={([this.state.data.length + 1] <= 5) ? false : true}
+                                        className="-striped -highlight"
+                                    />
+
+
+                                </GridItem>
+
+
+                                <Paper className={classes.root} style={{ marginLeft: '75px', marginRight: '75px' }} >
+
+
+                                </Paper>
+
+
+
+
+
+                            </GridContainer>}
+                    </div>);
+
+
+                })}
+                {this.state.qoutaflag && this.state.masterList.map((item, key) => {
+
+                    return (<div>
+                        {item.Type == "Surplus" &&
+
+                            <Card>
+
+                                <CardHeader color="rose" icon>
+
+                                    <h4 className={this.props.cardIconTitle}>
+                                        <small> {item.Type} </small>
+                                    </h4>
+                                </CardHeader>
+                                <CardBody>
+
+                                    <GridContainer>
+
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Type"
+                                            name="Type1"
+                                            disabled={true}
+                                            value={item.Type}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Treaty Group Name"
+                                            name="treatyshare"
+                                            disabled={true}
+                                            //value={this.state.CalculationDTO.riallocationDetails[0].ricalculation[1].treatyshare}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Allocation SI"
+                                            name="AllocationAmount"
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
+                                            disabled={true}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Allocation Premium"
+                                            name="AllocatedPremium"
+                                            disabled={true}
+                                            value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Treaty Share"
+                                            name="TreatyShare"
+                                            disabled={true}
+                                            value={this.state.reallocationlist.mapDetails[key].Percentage}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+                                        <GridItem xs={12} sm={12} md={3}> <CustomInput
+                                            labelText="Lines"
+                                            name="NoOfLines"
+                                            //disabled={true}
+                                            value={this.state.reallocationlist.mapDetails[key].NoOfLines}
+                                            onChange={(e) => this.onInputChange2(e, key)}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                        </GridItem>
+
+
+                                    </GridContainer>
+
+                                    <GridContainer justify="center">
+                                        <GridItem xs={3} sm={3} md={3}>
+                                            <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.onChangeTreaty(key)}>TreatyDetails</Button>
+
+                                        </GridItem>
+
+                                    </GridContainer>
+
+                                    {/*     {this.state.react && <ReactTables officelist={this.state.officelist} editFunction={this.editFunction} />} */}
+
+                                </CardBody>
+
 
                             </Card>
                         }
 
                         {
                             item.Type == "Surplus" &&
-                            (this.state.indexList.findIndex(s => s == key) != -1 ? true : false)  &&
+                            (this.state.indexList.findIndex(s => s == key) != -1 ? true : false) &&
                             <GridContainer xl={12}>
                                 <GridItem lg={12}>
 
