@@ -623,6 +623,32 @@ namespace iNube.Services.ReInsurance.Models
         //  public virtual ICollection<ShowErrorInfoDetails> ErrorDetails { get; set; }
     }
 
+    public class GridRiMappingGrid
+    {
+        public GridRiMappingGrid()
+        {
+            gridDtos = new List<GridDto>();
+        }
+        public List<GridDto> gridDtos { get; set; }
+    }
+
+
+    public class GridDto 
+    {
+        //public GridDto()
+        //{
+        //    // ErrorDetails = new HashSet<ShowErrorInfoDetails>();
+        //}
+        public int SequenceNo { get; set; }
+        public decimal TreatyCode { get; set; }
+        public string Treatydescription { get; set; }
+        public decimal TreatyGroupId { get; set; }
+        public int TreatyType { get; set; }
+        
+
+        //  public virtual ICollection<ShowErrorInfoDetails> ErrorDetails { get; set; }
+    }
+
     public class RatingResponse
     {
         public int Period { get; set; }

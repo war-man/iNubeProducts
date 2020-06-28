@@ -102,6 +102,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         Task<IActionResult> Calulationddata(CalulationDto calulationDto, ApiContext apiContext);
         Task<IEnumerable<TblParticipantMasterDto>> GetParticipantNameByCode(string participantcode, ApiContext apiContext);
         Task<ValidationResponse> TreatyCodeAndGroupValidation(string codeName, string type, ApiContext apiContext);
+        Task<GridRiMappingGrid> mappingGridByTGId(int RiMappingId,ApiContext apiContext);
 
 
     }
@@ -1604,7 +1605,30 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             return new ValidationResponse { Status = BusinessStatus.InputValidationFailed, ResponseMessage=validationResponse.ResponseMessage};
         }
-    }
 
+
+        public async Task<GridRiMappingGrid> mappingGridByTGId(int RiMappingId,ApiContext apiContext)
+        {
+            _context = (MICARIContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            GridDto gridDto = new GridDto();
+            GridRiMappingGrid gridRiMappingGrid = new GridRiMappingGrid();
+            List<GridDto> gridDtos = new List<GridDto>();
+            var GroupIds = _context.TblRimappingDetail.Where(a => a.RimappingId == RiMappingId).Select(s => s.TreatyGroupId).ToList();
+            foreach(var ids in GroupIds)
+            {
+                var TGroupdata = _context.TblTreatyGroup.Where(a => a.TreatyGroupId == ids).FirstOrDefault();
+                gridDto.TreatyGroupId= TGroupdata.TreatyGroupId;
+                var TreatyData = _context.TblTreaty.Where(a => a.TreatyId == TGroupdata.TreatyId).FirstOrDefault();
+                gridDto.TreatyCode = TreatyData.TreatyId;
+                gridDto.Treatydescription = TreatyData.TreatyDescription;
+                gridDto.SequenceNo =Convert.ToInt32( _context.TblRimappingDetail.Where(a => a.TreatyGroupId == ids).Select(a => a.SequenceNo).FirstOrDefault());
+                gridDto.TreatyType = Convert.ToInt32(TreatyData.TreatyTypeId);//_context.TblMasRicommonTypes.Where(a => a.CommonTypeId == TreatyData.TreatyTypeId).Select(a => a.Value).FirstOrDefault();
+                gridDtos.Add(gridDto);
+            }
+            gridRiMappingGrid.gridDtos = gridDtos;
+            return gridRiMappingGrid;
+        }
+    }
+    
 }
 

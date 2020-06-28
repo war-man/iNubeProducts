@@ -634,5 +634,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance
            
         }
 
+
+        //GetGridData of GridMapping By TreatyGroupId
+
+        [HttpGet]
+        public async Task<IActionResult> mappingGridByTGId(int RiMappingId)
+        {
+            var response = await _reInsuranceService.mappingGridByTGId(RiMappingId, Context);
+            return Ok(response);
+
+        }
+
     }
 }
