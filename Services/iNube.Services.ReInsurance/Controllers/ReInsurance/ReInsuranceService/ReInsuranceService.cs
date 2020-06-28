@@ -1616,6 +1616,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var GroupIds = _context.TblRimappingDetail.Where(a => a.RimappingId == RiMappingId).Select(s => s.TreatyGroupId).ToList();
             foreach(var ids in GroupIds)
             {
+                gridDto = new GridDto();
                 var TGroupdata = _context.TblTreatyGroup.Where(a => a.TreatyGroupId == ids).FirstOrDefault();
                 gridDto.TreatyGroupId= TGroupdata.TreatyGroupId;
                 var TreatyData = _context.TblTreaty.Where(a => a.TreatyId == TGroupdata.TreatyId).FirstOrDefault();
