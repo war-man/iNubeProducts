@@ -580,6 +580,7 @@ namespace iNube.Services.Policy.Models
         public DateTime? Date { get; set; }
         public EmailRequest EmailTest { get; set; }
         public string PolicyNumber { get; set; }
+
     }
     public class Organization
     {
@@ -607,6 +608,7 @@ namespace iNube.Services.Policy.Models
         public string BillingFrequency { get; set; }
         public string CDAccountNumber { get; set; }
         public string MobileNumber { get; set; }
+        public string Source { get; set; }
     }
     public class ProductsModel
     {
