@@ -4167,7 +4167,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         JArray vehicleItems = (JArray)VehicleRiskItem;
                         int vehicleCount = vehicleItems.Count();
                         string additionalDriver = SourceObject["additionalDriver"].ToString();
-
+                        DateTime Startdate = Convert.ToDateTime(SourceObject["Policy Start Date"]);
+                        DateTime Enddate = Convert.ToDateTime(SourceObject["Policy End Date"]);
                         int PCCount = 0;
                         int TWCount = 0;
 
@@ -4659,13 +4660,56 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                                 }
                             }
                         }
+
+                        if (Enddate.Date == Startdate.Date.AddDays(364))
+                        {
+                            RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                            ruleEngine.ValidatorName = "Policy End Date";
+                            ruleEngine.Outcome = "Success";
+                            ruleEngine.Message = "Validation done for Policy End Date";
+                            ruleEngine.Code = "EXPB011";
+                            engineResponse1.Add(ruleEngine);
+                            successcount++;
+                        }
+                        else
+                        {
+                            RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                            ruleEngine.ValidatorName = "Policy End Date";
+                            ruleEngine.Outcome = "Fail";
+                            ruleEngine.Message = "End date is not equal to 364 days from Start date";
+                            ruleEngine.Code = "EXPB011";
+                            engineResponse1.Add(ruleEngine);
+                            failcount++;
+                        }
+                        var Endtime = Enddate.ToString("HH:mm:ss");
+                        string tm = "23:59:00";
+                        if (Endtime == tm)
+                        {
+                            RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                            ruleEngine.ValidatorName = "Policy End Time";
+                            ruleEngine.Outcome = "Success";
+                            ruleEngine.Message = "Validation done for Policy End Date";
+                            ruleEngine.Code = "EXPB012";
+                            engineResponse1.Add(ruleEngine);
+                            successcount++;
+                        }
+                        else
+                        {
+                            RuleEngineResponse ruleEngine = new RuleEngineResponse();
+                            ruleEngine.ValidatorName = "Policy End Time";
+                            ruleEngine.Outcome = "Fail";
+                            ruleEngine.Message = "Policy End time is not valid";
+                            ruleEngine.Code = "EXPB012";
+                            engineResponse1.Add(ruleEngine);
+                            failcount++;
+                        }
                         if (failcount > 0)
                         {
                             RuleEngineResponse res4obj = new RuleEngineResponse();
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Fail";
                             res4obj.Message = "One or More conditions failed";
-                            res4obj.Code = "EXPB010";
+                            res4obj.Code = "EXPB013";
                             engineResponse1.Add(res4obj);
                         }
                         else
@@ -4674,7 +4718,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             res4obj.ValidatorName = "Final Result";
                             res4obj.Outcome = "Success";
                             res4obj.Message = "Conditions Successful";
-                            res4obj.Code = "EXPB011";
+                            res4obj.Code = "EXPB014";
                             engineResponse1.Add(res4obj);
 
                         }
