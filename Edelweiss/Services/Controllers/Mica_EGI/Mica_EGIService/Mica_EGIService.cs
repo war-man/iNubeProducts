@@ -9194,7 +9194,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             foreach (var policy in PolicyNumberList)
             {
-               
+
+                var Source = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).Source;
+                
+                ///Normal EGI Flow Will Be Null
+                ///To Skip Any Other Source like PolicyBazaar this continue is return.
+                if(Source !=null)
+                {
+                    continue;
+                }
+
                 var ScheduleData = _context.TblSchedule.Where(x => x.PolicyNo == policy && x.IsActive == true).ToList();
 
                 MobileAlertRequestDTO MobileRequestDTO = new MobileAlertRequestDTO();
@@ -9335,6 +9344,16 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             foreach (var policy in PolicyNumberList)
             {
+
+                var Source = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).Source;
+
+                ///Normal EGI Flow Will Be Null
+                ///To Skip Any Other Source like PolicyBazaar this continue is return.
+                if (Source != null)
+                {
+                    continue;
+                }
+
                 var SIData = _context.TblPolicyMonthlySi.LastOrDefault(x => x.PolicyNo == policy);
 
                 if(SIData == null)
@@ -9450,6 +9469,15 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             foreach (var policy in PolicyNumberList)
             {
+                var Source = PolicyDetails.FirstOrDefault(x => x.PolicyNumber == policy).Source;
+
+                ///Normal EGI Flow Will Be Null
+                ///To Skip Any Other Source like PolicyBazaar this continue is return.
+                if (Source != null)
+                {
+                    continue;
+                }
+
                 var AccountNumber = PolicyDetails.FirstOrDefault(x=>x.PolicyNumber == policy).CDAccountNumber;
 
                 var AccountCall = await _integrationService.GetCDAccountDetails(AccountNumber,"AD",context);

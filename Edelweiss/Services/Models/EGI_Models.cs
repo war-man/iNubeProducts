@@ -187,6 +187,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string BillingFrequency { get; set; }
         public string CDAccountNumber { get; set; }
         public string MobileNumber { get; set; }
+        public string Source { get; set; }
     }
 
     public partial class PremiumRequestDTO
