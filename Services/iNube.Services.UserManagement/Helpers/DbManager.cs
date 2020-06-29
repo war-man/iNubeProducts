@@ -125,7 +125,7 @@ namespace iNube.Services.UserManagement.Helpers
         public static DbContext GetCPContext(string product)
         {
             DbContext context = null;
-            string dbConnectionString = "Data Source=micaprod.coow0ess1gft.ap-south-1.rds.amazonaws.com;Initial Catalog=iNubeCommon;User Id=admin;Password=micaadmin";
+            string dbConnectionString = "Data Source=micadev.coow0ess1gft.ap-south-1.rds.amazonaws.com;Initial Catalog=iNubeCommon;User Id=admin;Password=micaadmin";
             //string dbConnectionString = "Data Source=inubepeg.database.windows.net;Initial Catalog=MICADev;User Id=MICAUSER;Password=MICA*user123";
 
             var optionsCPBuilder = new DbContextOptionsBuilder<MICACPContext>();
