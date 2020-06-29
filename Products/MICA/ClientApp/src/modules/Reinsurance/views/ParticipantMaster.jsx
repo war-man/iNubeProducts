@@ -90,7 +90,7 @@ class ParticipantMaster extends React.Component {
             address2State: false,
             branchCodeState: false,
             branchNameState: false,
-            BranchSpocEmailIDState: false,
+            branchSpocemailIdState: false,
             address3State: false,
             flagDuplicate: false,
             branchDuplicate:false,
@@ -440,7 +440,7 @@ class ParticipantMaster extends React.Component {
                         } />,
                     BranchSpocEmailID: <CustomInput labelText="EmailDetails" id="BusinessTypeText"
                         required={true}
-                        error={this.state.BranchSpocEmailIDState}
+                        error={this.state.branchSpocemailIdState}
                         value={this.state.Branchesdto[key].branchSpocemailId}
                         name='branchSpocemailId'
                         onChange={(event) => this.onInputBranchesChange("email", event, key)}
