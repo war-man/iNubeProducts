@@ -6,7 +6,7 @@ EXPOSE 443
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
 COPY ["iNube.Services.Dispatcher.csproj", "iNube.Services.Dispatcher/"]
-RUN dotnet restore "iNube.Services.Rating/iNube.Services.Dispatcher.csproj"
+RUN dotnet restore "iNube.Services.Dispatcher/iNube.Services.Dispatcher.csproj"
 COPY . "iNube.Services.Dispatcher/"
 WORKDIR "/src/iNube.Services.Dispatcher"
 RUN dotnet build "iNube.Services.Dispatcher.csproj" -c Release -o /app
