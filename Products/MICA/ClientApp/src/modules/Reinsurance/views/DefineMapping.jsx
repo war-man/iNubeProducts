@@ -52,6 +52,12 @@ class DefineMapping extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+
+            modifyflag:false,
+            GridData: {},
+
+            dublicatSequenceIndex:[],
+            sequnceNoflag: false,
             DefineDTOTableData: [],
             sequenceNoState:false,
             flag: true,
@@ -87,12 +93,13 @@ class DefineMapping extends React.Component {
                 TblRimappingDetail: []
                 
             }
+
         };
     }
 
 
     settreatyGroupId = (event, index) => {
-        debugger
+         
        
         console.log(index, 'Index');
         let name = event.target.name;
@@ -126,8 +133,18 @@ class DefineMapping extends React.Component {
                 this.AddTreatyTable();
                 console.log("Descripion1 ", this.state.treatydata, this.state.DefineDTOData);
             });
+         ;
         let c = this.state.DefineDTOData[index].treatyCode;
-        debugger;
+        //this.state.DefineDTOData[index].treatydescription = this.state.treatydata.treatyDescription;
+        //console.log("Descripion ", this.state.treatydata);
+        this.commonTreatyGroup(c, index);
+        console.log("List checking", this.state.trtygrpmasList, this.state.DefineDTOData);
+        
+    }
+    
+    commonTreatyGroup = (c,index) => {
+
+
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/TreatyCode?treatyId=` + c, {
             method: 'get',
             headers: {
@@ -139,32 +156,34 @@ class DefineMapping extends React.Component {
             .then(response => response.json())
             .then(data => {
                 console.log("masterList: ", data);
-                
+
 
                 //this.state.treatycodemasterlist = data;
                 //this.state.array = data;
                 //let arr = [];
                 //arr.push(data);
+                
                 let trtygrpmaslist = this.state.trtygrpmasList;
-                trtygrpmaslist.push(data);
-
+                if (this.state.trtygrpmasList[index] == undefined) {
+                    trtygrpmaslist.push(data);
+                } else {
+                    this.state.trtygrpmasList[index] = data;
+                    this.state.DefineDTOData[index].treatyGroupId = "";
+                    this.state.DefineDTOData[index].treatyType = "";
+                }
                 this.setState({ trtygrpmaslist });
                 //this.state.trtygrpmasList = [];
                 //this.state.trtygrpmasList.push(this.state.treatycodemasterlist[index]);
                 //this.state.trtygrpmasList.push(this.state.treatycodemasterlist);
-                
+
                 //this.setState({ treatycodemasterlist: data });
                 this.AddTreatyTable();
                 console.log("treatycodemasterlist", this.state.treatycodemasterlist, this.state.trtygrpmasList)
 
+
             });
-        //this.state.DefineDTOData[index].treatydescription = this.state.treatydata.treatyDescription;
-        //console.log("Descripion ", this.state.treatydata);
 
-        console.log("    ", this.state.treatydata, this.state.DefineDTOData);
     }
-    
-
     settreatygroup = (event, index) => {
         //let name = event.target.name;
         //let value = event.target.value;
@@ -172,7 +191,7 @@ class DefineMapping extends React.Component {
         //let treatyGridData = this.state.DefineDTOData;
 
         //treatyGridData[index][name] = value;
-        debugger
+         
         //this.setState({ treatyGridData });
         console.log(index, 'Index');
         let name = event.target.name;
@@ -182,6 +201,13 @@ class DefineMapping extends React.Component {
         treatyGridData[index][name] = value;
 
         this.setState({ treatyGridData });
+
+        if (this.state.modifyflag == true) {
+            debugger
+            let tbltreatydata = this.state.Mapping.tblRimappingDetail;
+                tbltreatydata[index][name] = value;
+                this.setState({ tbltreatydata });
+        }
         let SendValue = parseInt(value);
         console.log(value, 'value')
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetDescriptionRIGrid?treatyid=` + this.state.DefineDTOData[0].treatyCode, {
@@ -211,18 +237,78 @@ class DefineMapping extends React.Component {
         console.log("Descripion1 ", this.state.treatydata, this.state.DefineDTOData);
 
     }
+    onSequenceBlur = (index, e) => {
+        if (e.target.value != "") {
+            let check = this.state.dublicatSequenceIndex.filter(s => s == index);
 
-    handletreatygrid = (type,event, index) => {
-        debugger
+            if (Number(e.target.value) > 0) {
+
+                let key = this.state.dublicatSequenceIndex.findIndex(s => s == index);
+                if (key != -1) {
+                    this.state.dublicatSequenceIndex.splice(key, 1);
+                }
+            } else {
+                if (check.length == 0) {
+                    this.state.sequnceNoflag = true;
+                    this.state.dublicatSequenceIndex.push(index);
+                    this.setState({});
+                }
+
+            }
+            this.AddTreatyTable();
+        }
+       // console.log("  this.state.dublicatSequenceIndex", this.state.dublicatSequenceIndex)
+        
+}
+
+    onBlur = (key,event) => {
+
+        var c = event.target.value.toString();
+             
+            //fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph",
+        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + c + '&type=' + "SequenceNo", {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status == 9) {
+                        this.setState({ branchCodeflag: true, branchCodemassage: data.responseMessage });
+                        if (data.responseMessage != null) {
+                            this.state.sequnceNoflag = true;
+                        }
+                        else {
+                            this.state.sequnceNoflag = false;
+                        }
+                    } else {
+                        this.setState({ sequnceNoflag: false, branchCodemassage: "" });
+                    }
+                  //  this.AddTreatyTable();
+            });
+        console.log("flagTest", this.state.sequnceNoflag);
+    }
+
+    handletreatygrid = (event, index) => {
+     
         let name = event.target.name;
         let value = event.target.value;
         let treatyGridData = this.state.DefineDTOData;
-
+       
         treatyGridData[index][name] = value;
 
+        console.log("List checking", this.state.trtygrpmasList, this.state.DefineDTOData);
+        if (this.state.modifyflag == true) {
+            let tblGridData = this.state.Mapping.tblRimappingDetail;
+             tblGridData[index][name] = value;
+            this.setState({ tblGridData });
+        }
         this.setState({ treatyGridData });
         this.AddTreatyTable();
-        this.change(event, name, type);
+        //this.change(event, name, type);
     }
     change(evt, stateName, type, stateNameEqualTo, maxValue) {
         switch (type) {
@@ -277,8 +363,9 @@ class DefineMapping extends React.Component {
         console.log("porpsdat", props)
         console.log(props.rimappingId, 'DataID');
         if (props.rimappingId != undefined) {
+
             console.log(this.props.flagEdit, 'FlagEditProps');
-            this.setState({ flag: false, flagUpdate: this.props.flagUpdate });
+            this.setState({ flag: false, flagUpdate: this.props.flagUpdate, modifyflag:true });
             //fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyRImapping?rimappingId=` + this.props.rimappingId, {
             //    method: 'PUT',
             //    headers: {
@@ -293,6 +380,43 @@ class DefineMapping extends React.Component {
             //        console.log(data, 'Mydata')
             //        console.log("Accountss data: ", data);
             //    });
+
+            //Written By Brajesh for Define Grid Data
+
+
+
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/mappingGridByTGId?RiMappingId=` + this.props.rimappingId, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                //  body: JSON.stringify(this.state.SearchParticipant)
+            }).then(response => response.json())
+                .then(data => {
+                    this.setState({ GridData: data });
+                    console.log(data, 'brajesh');
+                    console.log(this.state.GridData, 'brajesh1');
+                    this.state.DefineDTOData = [...data.gridDtos];
+                    for (var i = 0; i < data.gridDtos.length; i++) {
+                        this.commonTreatyGroup(data.gridDtos[i].treatyCode,i);
+
+                    }
+
+
+                    this.AddTreatyTable();
+                });
+        
+
+
+
+
+
+
+
+
+
             fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/GetRImappingBYId?RImappingById=` + this.props.rimappingId, {
                 method: 'GET',
                 headers: {
@@ -304,8 +428,10 @@ class DefineMapping extends React.Component {
             }).then(response => response.json())
                 .then(data => {
                     this.setState({ Mapping: data });
+                    this.state.Mapping.retensionGroupId = data.retentionGroupId;
                     console.log(data, 'MyData1');
-                    console.log(this.state.Mapping, 'Data1');
+                 //   console.log(this.state.Mapping, 'Data1');
+                   // this.state.DefineDTOData = [...data.tblRimappingDetail];
                 });
         }
 
@@ -339,7 +465,7 @@ class DefineMapping extends React.Component {
             });
         console.log("data", this.state.masterList);
         //let c = this.state.DefineDTOData[0].treatyCode;
-        //debugger;
+        // ;
         //fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/TreatyCode?treatyId=` + c, {
         //    method: 'get',
         //    headers: {
@@ -369,7 +495,7 @@ class DefineMapping extends React.Component {
             .then(data => {
                 console.log("masterList: ", data);
                 this.setState({ masterList: data });
-                this.AddTreatyTable();
+               // this.AddTreatyTable();
             });
         console.log("data", this.state.masterList);
 
@@ -414,50 +540,51 @@ class DefineMapping extends React.Component {
         //this.setState({ status });
     }
     onFormSubmit = (evt) => {
+        if (this.state.dublicatSequenceIndex.length == 0) {
+            this.state.Mapping.TblRimappingDetail = this.state.DefineDTOData;
+            this.setState({});
+            console.log("submit", this.state.Mapping);
 
-        this.state.Mapping.TblRimappingDetail = this.state.DefineDTOData;
-        this.setState({});
-        console.log("submit", this.state.Mapping);
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveRIMapping`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(this.state.Mapping)
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.status == 2) {
+                         ;
+                        this.reset();
+                        swal({
 
-        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/SaveRIMapping`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-            body: JSON.stringify(this.state.Mapping)
-        }).then(response => response.json()) 
-            .then(data => {
-                if (data.status == 2) {
-                    debugger;
-                    this.reset();
-                    swal({
+                            //   title: "Perfect",
 
-                        //   title: "Perfect",
+                            //text: data.responseMessage,
+                            text: "Data Saved Successfully",
+                            icon: "success"
+                        });
+                        this.setState({ errormessage: false });
+                        //this.HandleApi();
+                        //this.setState({ redirect: true });
+                        //this.renderRedirect();
+                    } else if (data.status == 8) {
 
-                        //text: data.responseMessage,
-                        text: "Data Saved Successfully",
-                        icon: "success"
-                    });
-                    this.setState({ errormessage: false });
-                    //this.HandleApi();
-                    //this.setState({ redirect: true });
-                    //this.renderRedirect();
-                } else if (data.status == 8) {
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    } else if (data.status == 4) {
 
-                    swal({
-                        text: data.errors[0].errorMessage,
-                        icon: "error"
-                    });
-                } else if (data.status == 4) {
-
-                    swal({
-                        text: data.errors[0].errorMessage,
-                        icon: "error"
-                    });
-                }
-            });
+                        swal({
+                            text: data.errors[0].errorMessage,
+                            icon: "error"
+                        });
+                    }
+                });
+        }
     } 
     AddTreatyRecord = (event, index) => {
         this.state.array = this.state.trtygrpmasList[index];
@@ -467,7 +594,7 @@ class DefineMapping extends React.Component {
         //TreatyDetails['DefineDTOData'] = this.state.DefineDTOData.concat({ treatyGroup: "", businessTypeId: "" });
 
         //this.setState({ TreatyDetails });
-        debugger
+         
         let mappingdeatils = this.state;
         mappingdeatils['DefineDTOData'] = this.state.DefineDTOData.concat({
             "treatyCode": "",
@@ -476,6 +603,17 @@ class DefineMapping extends React.Component {
             "treatyType": "",
             "sequenceNo": ""
         });
+      
+        if (this.state.modifyflag == true) {
+            let maptbldeatils = this.state.Mapping;
+            maptbldeatils['tblRimappingDetail'] = this.state.Mapping.tblRimappingDetail.concat({
+               
+                "treatyGroupId": 0,
+                "sequenceNo": 0,
+
+            });
+            this.setState({ maptbldeatils });
+        }
         this.setState({ mappingdeatils });
         //console.log("treatydata", this.state.treatydata[index].treatyGroup, this.state.treatydata);
         console.log("add defination", this.state.DefineDTOData);
@@ -502,6 +640,9 @@ class DefineMapping extends React.Component {
     deleteTreatyRecord = (event, index) => {
 
         let deldata = this.state.DefineDTOTableData.splice(index, 1);
+        if (this.state.modifyflag == true) {
+            this.state.Mapping.tblRimappingDetail.splice(index, 1);
+        }
         this.state.DefineDTOData.splice(index, 1);
         //let deldata = this.state.treatydata.filter(item => item.treatyGroup !== index);
         this.setState({ deldata })
@@ -522,7 +663,7 @@ class DefineMapping extends React.Component {
                     TreatyDescription: <CustomInput labelText="TreatyDescription" value={this.state.DefineDTOData[key].treatydescription} name="treatydescription" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
                     Treatygroup: <MasterDropdown labelText="TreatyGroup" filterName='TreatyGroupName' lstObject={(this.state.trtygrpmasList.length > 0) ? ((this.state.trtygrpmasList[key]!=undefined)?this.state.trtygrpmasList[key]:[]):[]} value={this.state.DefineDTOData[key].treatyGroupId} name='treatyGroupId' formControlProps={{ fullWidth: true }} onChange={(e) => this.settreatygroup(e, key)} />,
                     Treatytype: <CustomInput labelText="TreatyType" value={this.state.DefineDTOData[key].treatyType} name="treatyType" onChange={(e) => this.handletreatygrid(e, key)} formControlProps={{ fullWidth: true }} />,
-                    SequenceNo: <CustomInput labelText="Sequence" value={this.state.DefineDTOData[key].sequenceNo} name="sequenceNo" onChange={(e) => this.handletreatygrid("Number", e, key)} error={this.state.sequenceNoState} formControlProps={{ fullWidth: true }} />,
+                    SequenceNo: <div><CustomInput labelText="Sequence" onBlur={(event) => this.onSequenceBlur(key, event)} type="numeric" inputType="number" value={this.state.DefineDTOData[key].sequenceNo} name="sequenceNo" onChange={(e) => this.handletreatygrid(e, key)} error={(this.state.dublicatSequenceIndex.findIndex(s => s == key) != -1)?true:false} formControlProps={{ fullWidth: true }} />{(this.state.dublicatSequenceIndex.findIndex(s => s == key) != -1) ? <p className="error">This Field is can not be less then 1</p>:null}</div>,
                     Actions: < div > <Button justIcon round simple color="info" className="add" onClick={(e) => this.AddTreatyRecord(e, key)} ><Add /> </Button >
                         <Button justIcon round simple color="danger" className="remove" onClick={(e) => this.deleteTreatyRecord(e, key)} ><Delete /> </Button >
                     </div >
@@ -532,27 +673,32 @@ class DefineMapping extends React.Component {
         //}
     }
     onFormModify = (id) => {
-        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyRImapping?rimappingId=` + this.props.rimappingId, {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            },
-            body: JSON.stringify(this.state.Mapping)
-        }) //.then(response => response.json())
-            .then(data => {
-                console.log("data456", data);
-                this.setState({ treatyDTO: data });
-                swal({
+        if (this.state.dublicatSequenceIndex.length == 0) {
+            console.log("ssss", this.state.DefineDTOData);
+           
+            
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/ModifyRImapping?rimappingId=` + this.props.rimappingId, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+                body: JSON.stringify(this.state.Mapping)
+            }) //.then(response => response.json())
+                .then(data => {
+                    console.log("data456", data);
+                    this.setState({ treatyDTO: data });
+                    swal({
 
-                    text: "Data Updated Successfully",
-                    icon: "success"
+                        text: "Data Updated Successfully",
+                        icon: "success"
+                    });
+                    console.log("Treaty data:", this.state.Mapping);
                 });
-                console.log("Treaty data:", this.state.Mapping);
-            });
-        //let flageUpdate = this.state.flagUpdate
-        //this.setState({ flageUpdate:true})
+            //let flageUpdate = this.state.flagUpdate
+            //this.setState({ flageUpdate:true})
+      }
     }
 
     render() {

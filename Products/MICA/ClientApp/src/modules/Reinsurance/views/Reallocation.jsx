@@ -365,11 +365,11 @@ class Reallocation extends React.Component {
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
             body: JSON.stringify(this.state.Modifydto)
-        }).then(response => response.json())
+        })//.then(response => response.json())
             .then(data => {
                 swal({
-                    text: data.responseMessage,
-                    //text: "data saved successfully",
+                    //text: data.responseMessage,
+                    text: "data Reallocated successfully",
                     icon: "success"
                 });
                 this.setState({ Retention: data });
