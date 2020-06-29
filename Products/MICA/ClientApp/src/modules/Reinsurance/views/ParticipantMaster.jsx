@@ -223,9 +223,12 @@ class ParticipantMaster extends React.Component {
     }
     onBlur = (index) => {
         
-            debugger
+        debugger
+
+        console.log("bkm", this.state.Branchesdto[index].branchCode);
             //fetch(`${UserConfig.UserConfigUrl}/api/Role/GetDynamicGraphPermissions?Userid=` + userid + `&Roleid=` + roleid + `&itemType=` + "Graph",
-        fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + this.state.Branchesdto[index].branchCode + '&type=' + "ParticipantBranchCode", {
+        if (this.state.Branchesdto[index].branchCode != "    ") {
+            fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/RIValidations?codeName=` + this.state.Branchesdto[index].branchCode + '&type=' + "ParticipantBranchCode", {
                 method: 'get',
                 headers: {
                     'Accept': 'application/json',
@@ -249,6 +252,7 @@ class ParticipantMaster extends React.Component {
                     this.AddTreatyTable();
                 });
             console.log("data", this.state.masterList);
+        }
     }
     onBlur1 = () => {
 
@@ -428,7 +432,8 @@ class ParticipantMaster extends React.Component {
                         onBlur={()=>this.onBlur(key)}
                         //onChange={(evt)=>this.onInputBranchesChange(evt,key)}
                         formControlProps={{ fullWidth: true }
-                        } />{this.state.branchCodeflag &&( <p className="error">{this.state.branchCodemassage} </p>)}</div>,
+                        } />
+                        {this.state.branchCodeflag && (<p className="error">{this.state.branchCodemassage} </p>)}</div>,
                     BranchName: <CustomInput labelText="BranchName" id="BusinessTypeText"
                         required={true}
                         error={this.state.branchNameState}
@@ -676,10 +681,11 @@ class ParticipantMaster extends React.Component {
 
                                 <div style={{ marginTop: "24px" }}>
                                     <label style={{ marginRight: "1rem" }}> <TranslationContainer translationKey="ReinsurerType" /></label>
+                                   
                                     <FormControlLabel
                                         control={
                                             <Radio
-
+                                                
                                                 checked={this.state.ParticipantMaster.participantTypeId === "8"}
                                                 onChange={this.handleRadioChange}
                                                 //disabled={this.props.viewdisable}
@@ -713,6 +719,7 @@ class ParticipantMaster extends React.Component {
                                             <Radio
                                                 checked={this.state.ParticipantMaster.participantTypeId === "9"}
                                                 onChange={this.handleRadioChange}
+                                                
                                                 //disabled={this.props.viewdisable}
                                                 value={9}
                                                 name="radio button demo"
