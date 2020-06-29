@@ -13,6 +13,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public int? LevelId { get; set; }
         public int? SubLevelId { get; set; }
         public int? RefId { get; set; }
+        public decimal? RatingId { get; set; }
 
         public virtual TblmasPccommonTypes Currency { get; set; }
         public virtual TblmasPccommonTypes Level { get; set; }

@@ -532,6 +532,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public bool IsActive { get; set; }
         public int SortOrder { get; set; }
         public string UserInputType { get; set; }
+
     }
     public partial class ProductDTO
     {
@@ -542,7 +543,7 @@ namespace iNube.Services.ProductConfiguration.Models
             ProductBasicConfiguration = new List<ProductBasicConfigurationDTO>();
         }
         public int ProductId { get; set; }
-        public decimal RateingId { get; set; }
+        public decimal RatingId { get; set; }
         public int? Lobid { get; set; }
         public int? Cobid { get; set; }
         public int? ProductStatusId { get; set; }
@@ -909,7 +910,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public string CurrencyName { get; set; }
         public string Description { get; set; }
         public int? RefId { get; set; }
-
+        public decimal? RatingId { get; set; }
     }
 
     /// <summary>
