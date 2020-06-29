@@ -190,7 +190,7 @@ namespace iNube.Services.Policy.Models
             ProductBasicConfiguration = new List<ProductBasicConfigurationDTO>();
         }
         public int ProductId { get; set; }
-        public decimal RateingId { get; set; }
+        public decimal RatingId { get; set; }
         public int? Lobid { get; set; }
         public int? Cobid { get; set; }
         public int? ProductStatusId { get; set; }
@@ -497,6 +497,7 @@ namespace iNube.Services.Policy.Models
         public string LevelName { get; set; }
         public string SubLevelName { get; set; }
         public string CurrencyName { get; set; }
+        public decimal RatingId { get; set; }
     }
     public class PolicyBookingTransaction
     {

@@ -57,7 +57,7 @@ namespace iNube.Services.ProductConfiguration.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblBenifitRangeDetails>(entity =>
             {
@@ -600,6 +600,8 @@ namespace iNube.Services.ProductConfiguration.Entities
                 entity.Property(e => e.PremiumAmount).HasColumnType("numeric(10, 2)");
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.RatingId).HasColumnType("numeric(18, 0)");
 
                 entity.Property(e => e.RefId).HasColumnName("RefID");
 
