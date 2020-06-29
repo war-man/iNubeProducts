@@ -6,4 +6,4 @@ Resources:
         TaskDefinition: <TASK_DEFINITION>
         LoadBalancerInfo:
           ContainerName: "dev2-mica-dispatcher"
-          ContainerPort: 9013
+          ContainerPort: 9013 
