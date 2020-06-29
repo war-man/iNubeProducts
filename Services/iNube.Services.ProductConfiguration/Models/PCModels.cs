@@ -532,6 +532,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public bool IsActive { get; set; }
         public int SortOrder { get; set; }
         public string UserInputType { get; set; }
+
     }
     public partial class ProductDTO
     {
