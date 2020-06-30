@@ -32,7 +32,7 @@ phases:
       - cat imageDetail.json
     
   
-artifacts:
+artifacts: 
     files:
     - Services/iNube.Services.ReInsurance/appspec.yml
     - Services/iNube.Services.ReInsurance/taskdef.json

@@ -182,7 +182,7 @@ class PolicyBooking extends React.Component {
         console.log("submittested", this.state.fields);
      //   console.log("submitJSON", this.state.fields.JSON());
           //fetch(`https://localhost:44351/api/Policy/CreateMultiCoverPolicy  `, {
-        fetch(`${policyConfig.policyConfigUrl}/api/Policy/CreateMultiCoverPolicy`, {
+        fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/CreateMultiCoverPolicy`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

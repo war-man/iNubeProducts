@@ -220,8 +220,8 @@ class PolicyBookingDemo extends React.Component {
         //    this.state.fields['Policy End Date'] = this.datechange(this.state.fields['Policy End Date']);
         //}
 
-        //fetch(`https://localhost:44351/api/Policy/CreateMultiCoverPolicy  `, {
-        fetch(`${policyConfig.policyConfigUrl}/api/Policy/CreateMultiCoverPolicy`, {
+        //fetch(`http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com/api/Policy/CreateMultiCoverPolicy  `, {
+            fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/CreateMultiCoverPolicy`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

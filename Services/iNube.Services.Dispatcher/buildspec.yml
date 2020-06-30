@@ -38,4 +38,4 @@ artifacts:
     - Services/iNube.Services.Dispatcher/taskdef.json
     - imagedefinitions.json
     - productionimagedefinition.json
-    - imageDetail.json      
+    - imageDetail.json       

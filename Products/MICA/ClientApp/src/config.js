@@ -19,7 +19,7 @@ let DashboardConfigUrl = Baseurl;
 let dynamicPagesConfigUrl = Baseurl;
 let RDLCConfigUrl = Baseurl;
 let ReinsuranceConfigUrl = Baseurl;
-let ExtensionUrl = Baseurl;  
+let ExtensionUrl = Baseurl;    
 let NotificationUrl = Baseurl;
 
 if (env === "EdelweissProd") {
@@ -121,7 +121,6 @@ export const config = {
     product: 'Mica',
     isTest: false,
     Baseurl: Baseurl,
-
     partnerconfigUrl: partnerconfigUrl,
     productConfigUrl: productConfigUrl,
     UserConfigUrl: UserConfigUrl,

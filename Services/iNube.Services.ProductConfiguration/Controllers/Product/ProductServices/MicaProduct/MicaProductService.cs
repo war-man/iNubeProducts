@@ -891,10 +891,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             if (tblProduct.TblProductRatingMapping.Count() > 0)
             {
-                productDTO.RateingId = tblProduct.TblProductRatingMapping.FirstOrDefault(s => s.ProductId == productDTO.ProductId).MappingId;
-
+                //productDTO.RatingId = tblProduct.TblProductRatingMapping.FirstOrDefault(s => s.ProductId == productDTO.ProductId).MappingId;
 
             }
+            productDTO.RatingId = Convert.ToDecimal(tblProduct.TblProductPremium.FirstOrDefault(s => s.ProductId == productDTO.ProductId).RatingId);
 
 
             return productDTO;
