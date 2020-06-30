@@ -1916,7 +1916,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 Finalentity.Add(attributelist);
                 var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, apiContext);
             }
-
             return Finalentity;
         }
 
@@ -1945,8 +1944,6 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             {
                 return false;
             }
-
-            //return attributelist;
         }
     }
 }
