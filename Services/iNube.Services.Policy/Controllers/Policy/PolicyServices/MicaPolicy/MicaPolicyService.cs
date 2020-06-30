@@ -7499,6 +7499,73 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
 
         }
+
+
+         public async Task<PolicyResponse> LeadPolicy(LeadInfoDTO leadInfo, ApiContext apiContext)
+        {
+            _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+            List<ErrorInfo> Errors = new List<ErrorInfo>();
+            dynamic policyDetail = new ExpandoObject();
+            var productDetails = await _integrationService.GetProductDetailByCodeAsync(leadInfo.ProductCode, apiContext);
+            if (productDetails.ProductId <= 0)
+            {
+                ErrorInfo errorInfo = new ErrorInfo { ErrorCode = "ProductCode", PropertyName = "Product Code", ErrorMessage = $"ProdcutCode : {leadInfo.ProductCode} Not Found" };
+                Errors.Add(errorInfo);
+                return new PolicyResponse { Status = BusinessStatus.NotFound, Errors = Errors };
+            }
+            //Add Product Code
+            GetPolicyRequest(productDetails, leadInfo, policyDetail);
+            var policyObject = JsonConvert.SerializeObject(policyDetail, Formatting.Indented);
+            var policyRequest = JsonConvert.DeserializeObject(policyObject);
+
+            var response = await CreateMultiCoverPolicy(policyRequest, apiContext);
+
+            Dictionary<string, string> policydict = new Dictionary<string, string>();
+            policydict.Add("policyObject", policyObject);
+            var responseTest = new PolicyResponse() { Status = BusinessStatus.Ok };
+            responseTest.policy.Add("policyObject", policyObject);
+            return response;
+        }
+
+
+        private void GetPolicyRequest(ProductDTO product, LeadInfoDTO leadInfo, dynamic policyDetail)
+        {
+            AddProperty(policyDetail, "Product Code", leadInfo.ProductCode);
+            AddProperty(policyDetail, "Partner ID", leadInfo.PartnerId);
+            AddProperty(policyDetail, "Name", leadInfo.FirstName);
+            AddProperty(policyDetail, "Identification Number", leadInfo.Id);
+            AddProperty(policyDetail, "Policy Start Date", DateTime.Now);
+            AddProperty(policyDetail, "Policy End Date", DateTime.Now.AddDays(364));
+            AddProperty(policyDetail, "Email ID", leadInfo.EmailId);
+            AddProperty(policyDetail, "Mobile Number", leadInfo.MobileNumber);
+            //For Insurable 
+            dynamic insurableItems = new List<dynamic>();
+            foreach (var insItem in product.ProductInsurableItems)
+            {
+                dynamic insurableItem = new ExpandoObject();
+                dynamic InsurableFields = new List<dynamic>();
+                AddProperty(insurableItem, "RiskItems", InsurableFields);
+                AddProperty(insurableItem, "InsurableName", insItem.InsurableItem);
+                //Cover Details
+                dynamic Covers = new List<dynamic>();
+
+
+                foreach (var citem in insItem.ProductCovers)
+                {
+                    dynamic coverItem = new ExpandoObject();
+                    AddProperty(coverItem, "CoverName", citem.Cover);
+                    Covers.Add(coverItem);
+                }
+                AddProperty(insurableItem, "Covers", Covers);
+                insurableItems.Add(insurableItem);
+            }
+            AddProperty(policyDetail, "InsurableItem", insurableItems);
+        }
+
+
+
+
+
     }
 
 
