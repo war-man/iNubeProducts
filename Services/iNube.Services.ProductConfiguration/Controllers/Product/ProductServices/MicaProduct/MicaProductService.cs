@@ -1900,7 +1900,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             var data = _context.TblEntityDetails.Where(a => a.EntityId == Id)
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
-
+            var componentType = _context.TblmasDynamic.Select(a => a);
             List<object> Finalentity = new List<object>();
 
             foreach (var item in data)
@@ -1909,7 +1909,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
 
                 var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
-
+                foreach (var item1 in attributes)
+                {
+                    item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                }
                 list.AddRange(attributes);
 
                 attributelist.AddRange(list);
@@ -1927,12 +1930,20 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
            .Include(a => a.TblEntityAttributes)
            .Select(a => a).ToList();
 
+            var componentType = _context.TblmasDynamic.Select(a => a);
+
             if (data != null)
             {
                 foreach (var item in data)
                 {
                     List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
                     var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
+
+                    foreach (var item1 in attributes)
+                    {
+                        item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                    }
+
                     list.AddRange(attributes);
                     Finalentity.Add(list);
 
