@@ -19,5 +19,4 @@ export const policyConfig = {
     partnerconfigUrl,
     ExtensionUrl
 }
-
 export default policyConfig

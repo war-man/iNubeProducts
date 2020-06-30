@@ -121,7 +121,6 @@ export const config = {
     product: 'Mica',
     isTest: false,
     Baseurl: Baseurl,
-
     partnerconfigUrl: partnerconfigUrl,
     productConfigUrl: productConfigUrl,
     UserConfigUrl: UserConfigUrl,
