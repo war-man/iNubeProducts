@@ -357,7 +357,7 @@ class PolicyBooking extends React.Component {
                 for (var i = 0; i < len; i++) {
                     // Object for Cover
                     this.state.fields.InsurableItem= this.state.fields.InsurableItem.concat({
-                        InsurableName: "",
+                        InsurableName: this.state.PolicyData1[0].productRcbInsurableDetails[i].inputType,
                         InsurableFields: [{}],
                         Covers: [],
                     });
