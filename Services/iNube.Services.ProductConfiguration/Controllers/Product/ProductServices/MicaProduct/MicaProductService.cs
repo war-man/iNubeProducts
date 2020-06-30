@@ -1892,5 +1892,61 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             return data;
         }
+
+        public async Task<List<object>> GetAllEntitiesById(int Id, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id)
+                .Include(a => a.TblEntityAttributes)
+                .Select(a => a).ToList();
+
+            List<object> Finalentity = new List<object>();
+
+            foreach (var item in data)
+            {
+                List<object> attributelist = new List<object>();
+                List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
+
+                var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
+
+                list.AddRange(attributes);
+
+                attributelist.AddRange(list);
+                Finalentity.Add(attributelist);
+                var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, apiContext);
+            }
+
+            return Finalentity;
+        }
+
+        public async Task<bool> GetChildAttributeListAsync(decimal id, List<object> Finalentity, ApiContext apiContext)
+        {
+            _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
+
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == id)
+           .Include(a => a.TblEntityAttributes)
+           .Select(a => a).ToList();
+
+            if (data != null)
+            {
+                foreach (var item in data)
+                {
+                    List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
+                    var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
+                    list.AddRange(attributes);
+                    Finalentity.Add(list);
+
+                    var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, apiContext);
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+            //return attributelist;
+        }
     }
 }
