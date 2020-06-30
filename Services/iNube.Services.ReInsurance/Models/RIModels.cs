@@ -662,11 +662,6 @@ namespace iNube.Services.ReInsurance.Models
         public string OAllocatedQS { get; set; }
         public string OTotalAllocated { get; set; }
         public string OPremium { get; set; }
-
-
-
-
-
     }
 
 
