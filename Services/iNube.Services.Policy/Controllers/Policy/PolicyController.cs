@@ -742,5 +742,12 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return NotFound(response);
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> LeadPolicy([FromBody]LeadInfoDTO policyDTO)
+        {
+            var response = await _policyService.LeadPolicy(policyDTO, Context);
+            return ServiceResponse(response);
+        }
     }
 }

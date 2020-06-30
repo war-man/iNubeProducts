@@ -1124,4 +1124,13 @@ namespace iNube.Services.ProductConfiguration.Models
         public string Checked { get; set; }
         public string ParentId { get; set; }
     }
+
+    public class PolicyResponse : ResponseStatus
+    {
+        public PolicyResponse()
+        {
+            policy = new Dictionary<string, string>();
+        }
+        public Dictionary<string, string> policy { get; set; }
+    }
 }

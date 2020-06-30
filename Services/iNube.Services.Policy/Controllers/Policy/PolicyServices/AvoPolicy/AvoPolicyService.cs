@@ -373,5 +373,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<PolicyResponse> LeadPolicy(LeadInfoDTO leadInfo, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
