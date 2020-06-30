@@ -736,6 +736,8 @@ namespace iNube.Services.Policy.Controllers.Policy
                     return Ok(response);
                 case BusinessStatus.NotFound:
                     return Ok(response);
+                case BusinessStatus.Error:
+                    return BadRequest(response);
                 default:
                     return NotFound(response);
             }

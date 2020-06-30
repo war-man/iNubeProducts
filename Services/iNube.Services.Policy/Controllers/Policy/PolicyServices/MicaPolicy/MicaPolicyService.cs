@@ -6544,15 +6544,39 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 _context = (MICAPOContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
                 CustomerSettingsDTO UserDateTime = await _integrationService.GetCustomerSettings("TimeZone", apiContext);
                 dbHelper._TimeZone = UserDateTime.KeyValue;
+                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
 
                 SingleCover singleCover = new SingleCover();
                 decimal PolicyId = 0;
 
                 var PolicyRequest = policyDTO;
 
-                DateTime DatetimeNow = dbHelper.GetDateTimeByZone(dbHelper._TimeZone);
-           
+                DateTime PolicyStartDate = Convert.ToDateTime(policyDTO["Policy Start Date"]);
                 var PolicyObj = JsonConvert.DeserializeObject<ExpandoObject>(policyDTO.ToString());
+
+                if (PolicyStartDate.Date > DatetimeNow.Date)
+                {
+                    System.TimeSpan Stateduration = new System.TimeSpan(0, 0, 00, 00);
+                    DateTime startdateTime = Convert.ToDateTime(PolicyStartDate).Date;
+                    PolicyStartDate = startdateTime.Add(Stateduration);
+
+
+                }
+                else
+                {
+
+                    PolicyStartDate = DatetimeNow;
+
+                }
+                System.TimeSpan duration = new System.TimeSpan(364, 23, 59, 00);
+                DateTime dateTime = Convert.ToDateTime(PolicyStartDate).Date;
+
+                var PolicyEndDate = dateTime.Add(duration);
+
+
+                AddProperty(PolicyObj, "Policy Start Date", PolicyStartDate);
+                AddProperty(PolicyObj, "Policy End Date", PolicyEndDate);
+
 
                 var res = await _integrationService.RuleMapper(policyDTO, "PolicyCreation", apiContext);
 
