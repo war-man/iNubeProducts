@@ -6751,7 +6751,6 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                                         //AddProperty(expObj, "ProposalNumber", mappedPolicy.ProposalNo);
                                         AddProperty(expObj, "Balance SumInsured", policyDTO["si"]);
                                         AddProperty(expObj, "No. of Claim", 0);
-                                        AddProperty(expObj, "PolicyStatus", "InActive");
 
                                         var Proposaltempobj = JsonConvert.SerializeObject(expObj);
                                         policyDTO = JsonConvert.DeserializeObject<dynamic>(Proposaltempobj.ToString());
