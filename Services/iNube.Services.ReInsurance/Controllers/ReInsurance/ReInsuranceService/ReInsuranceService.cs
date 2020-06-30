@@ -1475,13 +1475,13 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     var Premiumdata1 = PreimunData[0].ToString();
                     item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
 
-                    foreach(var dist in item.participants)
-                    {
-                        dist.AllocatedAmount=((item.AllocatedAmount*dist.Share)/100);
-                        dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
-                        dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
-                        dist.Brokerage= ((item.AllocatedAmount * dist.BrokerageRate) / 100);
-                    }
+                    //foreach(var dist in item.participants)
+                    //{
+                    //    dist.AllocatedAmount=((item.AllocatedAmount*dist.Share)/100);
+                    //    dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
+                    //    dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
+                    //    dist.Brokerage= ((item.AllocatedAmount * dist.BrokerageRate) / 100);
+                    //}
 
 
 
