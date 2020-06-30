@@ -88,7 +88,7 @@ class DefineMapping extends React.Component {
                 year: "",
                 level: "",
                 lobProductCover: "",
-                retensionGroupId: "",
+                retentionGroupId: "",
                 //SequenceNumber:""
                 TblRimappingDetail: []
                 
@@ -428,7 +428,7 @@ class DefineMapping extends React.Component {
             }).then(response => response.json())
                 .then(data => {
                     this.setState({ Mapping: data });
-                    this.state.Mapping.retensionGroupId = data.retentionGroupId;
+                    this.state.Mapping.retentionGroupId = data.retentionGroupId;
                     console.log(data, 'MyData1');
                  //   console.log(this.state.Mapping, 'Data1');
                    // this.state.DefineDTOData = [...data.tblRimappingDetail];
@@ -779,8 +779,8 @@ class DefineMapping extends React.Component {
                                     id="ddlstatus"
                                     lstObject={this.state.masterList}
                                     filterName='TratyCode'
-                                    value={this.state.Mapping.retensionGroupId}
-                                    name='retensionGroupId'
+                                    value={this.state.Mapping.retentionGroupId}
+                                    name='retentionGroupId'
                                     onChange={this.onInputChange}
                                     formControlProps={{ fullWidth: true }} />
 

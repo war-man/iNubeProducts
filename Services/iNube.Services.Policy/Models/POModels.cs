@@ -47,9 +47,11 @@ namespace iNube.Services.Policy.Models
         public string MobileNumber { get; set; }
         public string EmailId { get; set; }
         public string ProductCode { get; set; }
-        public int? ProductId { get; set; }
-        public int? PartnerId { get; set; }
-        public bool? IsPayment { get; set; }
+        public int ProductId { get; set; }
+        public int PartnerId { get; set; }
+        public bool IsPayment { get; set; }
+        public bool Smsstatus { get; set; }
+        public bool Emailstatus { get; set; }        
     }
 
     public partial class EndorsementDetailsDTO
@@ -517,6 +519,10 @@ namespace iNube.Services.Policy.Models
     }
     public class PolicyResponse : ResponseStatus
     {
+        public PolicyResponse()
+        {
+            policy = new Dictionary<string, string>();
+        }
         public Dictionary<string, string> policy { get; set; }
     }
    
@@ -1806,6 +1812,7 @@ namespace iNube.Services.Policy.Models
         public bool? Status { get; set; }
         public decimal? DifferenceAmount { get; set; }
     }
+   
 }
 
 
