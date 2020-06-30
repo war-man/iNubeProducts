@@ -6578,6 +6578,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 AddProperty(PolicyObj, "Policy End Date", PolicyEndDate);
 
 
+                var policytempobj = JsonConvert.SerializeObject(PolicyObj);
+                policyDTO = JsonConvert.DeserializeObject<dynamic>(policytempobj.ToString());
                 var res = await _integrationService.RuleMapper(policyDTO, "PolicyCreation", apiContext);
 
                 var seriaizeListofres = JsonConvert.SerializeObject(res);
