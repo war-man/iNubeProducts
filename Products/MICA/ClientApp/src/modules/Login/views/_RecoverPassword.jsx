@@ -58,7 +58,7 @@ class RecoverPassword extends React.Component {
                 email: "",
                 userName: "",
                 envId: "",
-                productType: localStorage.getItem('ProductType')
+                productType: localStorage.getItem('ProductType'),
                 //productType: LoginConfig.ProductType
             },
             RetrievePassword: {
@@ -170,7 +170,7 @@ class RecoverPassword extends React.Component {
         //this.setState({ visibility: true });
     }
 
-    Sendresetlink(event) {
+    Sendresetlink = () => {
         //console.log("email id= " + this.state.RetrievePassword.emailid);
         if (this.timer == 0 && this.state.seconds > 0) {
             this.timer = setInterval(this.countDown, 1000);
@@ -235,7 +235,7 @@ class RecoverPassword extends React.Component {
 
     }
 
-    Sendotp(event) {
+    Sendotp = () => {
         //console.log("Phone Number= " + this.state.RetrievePassword.phonenum);
         if (this.timer == 0 && this.state.seconds > 0) {
             this.timer = setInterval(this.countDown, 1000);

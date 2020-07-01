@@ -57,7 +57,7 @@ namespace iNube.Services.ProductConfiguration.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<TblBenifitRangeDetails>(entity =>
             {
@@ -190,6 +190,10 @@ namespace iNube.Services.ProductConfiguration.Entities
                 entity.Property(e => e.ListObject).HasMaxLength(250);
 
                 entity.Property(e => e.Name).HasMaxLength(250);
+
+                entity.Property(e => e.Parameter).HasMaxLength(250);
+
+                entity.Property(e => e.Parameter1).HasMaxLength(250);
 
                 entity.Property(e => e.ParentId).HasMaxLength(40);
 

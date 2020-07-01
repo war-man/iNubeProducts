@@ -1124,6 +1124,8 @@ namespace iNube.Services.ProductConfiguration.Models
         public bool? FutureDate { get; set; }
         public string Checked { get; set; }
         public string ParentId { get; set; }
+        public string Parameter { get; set; }
+        public string Parameter1 { get; set; }
     }
 
     public class PolicyResponse : ResponseStatus

@@ -908,4 +908,42 @@ namespace iNube.Services.UserManagement.Models
     {
         public Unlockeduser unlock { get; set; }
     }
+
+
+    public class EmailRequest
+    {
+        public EmailRequest()
+        {
+            Attachments = new List<EmailAttachment>();
+            mailTo = new List<string>();
+            mailCc = new List<string>();
+            mailBcc = new List<string>();
+        }
+        public string To { get; set; }
+        public List<string> mailTo { get; set; }
+        public List<string> mailCc { get; set; }
+        public List<string> mailBcc { get; set; }
+        public string Subject { get; set; }
+        public string Message { get; set; }
+        public string PartnerEmail { get; set; }
+        public bool IsAttachment { get; set; }
+        public List<EmailAttachment> Attachments { get; set; }
+    }
+
+    public class EmailAttachment
+    {
+        public string FileName { get; set; }
+        public byte[] FileData { get; set; }
+    }
+
+    public class DefaultPasswordReset : ResponseStatus
+    {
+        public Userpasswordreset passwordreset { get; set; }
+    }
+
+    public class Userpasswordreset
+    {
+        public string Username { get; set; }
+        public decimal EnvId { get; set; }
+    }
 }

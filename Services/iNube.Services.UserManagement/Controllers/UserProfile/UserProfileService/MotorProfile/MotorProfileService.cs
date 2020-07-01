@@ -113,5 +113,10 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         {
             throw new NotImplementedException();
         }
+
+        public DefaultPasswordReset ResetDefaultPassword(Userpasswordreset userpasswordreset, ApiContext apiContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

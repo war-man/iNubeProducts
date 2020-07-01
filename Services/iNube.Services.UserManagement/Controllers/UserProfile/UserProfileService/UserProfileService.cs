@@ -35,6 +35,7 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         UserUploadImageResponse Uploadimage(ImageDTO image, ApiContext context);
         UserNameById GetUserNameById(string Id, ApiContext apiContext);
         UnlockResponse UnlockUser(string userid, ApiContext apiContext);
+        DefaultPasswordReset ResetDefaultPassword(Userpasswordreset userpasswordreset, ApiContext apiContext);
     }
 
     public class UserProfileService : IUserProfileService
@@ -179,6 +180,11 @@ namespace iNube.Services.UserManagement.Controllers.UserProfile.UserProfileServi
         public UnlockResponse UnlockUser(string userid, ApiContext apiContext)
         {
             return _userproductService(apiContext.ProductType).UnlockUser(userid, apiContext);
+        }
+
+        public DefaultPasswordReset ResetDefaultPassword(Userpasswordreset userpasswordreset, ApiContext apiContext)
+        {
+            return _userproductService(apiContext.ProductType).ResetDefaultPassword(userpasswordreset, apiContext);
         }
     }
 }
