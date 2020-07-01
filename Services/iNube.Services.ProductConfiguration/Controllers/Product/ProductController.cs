@@ -559,5 +559,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             var response = new ResponseStatus() { Status = BusinessStatus.Ok };
             return Ok(response);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HCTemp()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
     }
 }

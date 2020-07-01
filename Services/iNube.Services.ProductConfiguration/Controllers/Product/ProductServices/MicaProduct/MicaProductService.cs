@@ -436,6 +436,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             DataTable dt = new DataTable();
             bool IsPolicyIssue = false;
             List<LeadInfoDTO> lstLead = new List<LeadInfoDTO>();
+            int PolicyIssuanceCount = 0;
             foreach (var file in files)
             {
                 var filename = file.Name;
@@ -452,6 +453,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 bool email = true;
                 string FirstName = "", MobileNumber = "", EmailID = "";
                 bool IsPayment;
+               
                 //dt.Columns.Add("BankFileId", typeof(int));
                 // dt.Columns.Add("Id", typeof(string));
                 dt.Columns.Add("FirstName", typeof(string));
@@ -473,10 +475,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                             ExcelWorksheet worksheet = package.Workbook.Worksheets["User Details"];
                             if (worksheet != null)
                             {
-                                if (worksheet.Cells[2, 6].Value != null)
-                                {
-                                    IsPolicyIssue = (bool)worksheet.Cells[2, 6].Value;
-                                }
+                                
                                 var rowCount = worksheet.Dimension.Rows;
                                 LeadInfoDTO lead = null;
                                 for (int row = 2; row <= rowCount; row++)
@@ -520,6 +519,15 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                         dr["IsPayment"] = IsPayment;
                                         lead.IsPayment = IsPayment;
                                     }
+                                    if (worksheet.Cells[row, 6].Value != null)
+                                    {
+                                        IsPolicyIssue = (bool)worksheet.Cells[row, 6].Value;
+                                        if(IsPolicyIssue)
+                                        {
+                                            PolicyIssuanceCount++;
+                                        }
+                                        lead.IsPolicyIssuance = IsPolicyIssue;
+                                    }
                                     //if (worksheet.Cells[row, 6].Value != null)
                                     //{
                                     //    dr["IsPolicyIssue"] = (bool)worksheet.Cells[row, 6].Value;
@@ -562,10 +570,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 //return DemoResponse<List<BankFileDTO>>.GetResult(-1, error);
             }
             // Now try for policy booking
-            if (IsPolicyIssue)
+            if (PolicyIssuanceCount > 0)
             {
                 int count = 0;
-                foreach (var item in lstLead)
+                foreach (var item in lstLead.Where(p=> p.IsPolicyIssuance==true))
                 {
                     ++count;
                     item.Id = count;
@@ -1456,12 +1464,20 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 SMSDTO.RecipientNumber = item.MobileNumber;
 
                 SMSDTO.SMSMessage = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://micav0002.azurewebsites.net/pages/policy/" + item.Id;
+                try
+                {
+                    //SMS API
+                    var SMSAPI = "https://www.smsgatewayhub.com/api/mt/SendSMS?APIKey=6nnnnyhH4ECKDFC5n59Keg&senderid=SMSTST&channel=2&DCS=0&flashsms=0&number=91" + SMSDTO.RecipientNumber + "&text=" + SMSDTO.SMSMessage;
 
-                //SMS API
-                var SMSAPI = "https://www.smsgatewayhub.com/api/mt/SendSMS?APIKey=6nnnnyhH4ECKDFC5n59Keg&senderid=SMSTST&channel=2&DCS=0&flashsms=0&number=91" + SMSDTO.RecipientNumber + "&text=" + SMSDTO.SMSMessage;
+                    var client = new WebClient();
+                    var content = client.DownloadString(SMSAPI);
+                }
+                catch (Exception ex)
+                {
 
-                var client = new WebClient();
-                var content = client.DownloadString(SMSAPI);
+                    _logger.LogError(ex, "Lead BulkSMS", apiContext);
+                }
+               
 
 
                 //Email Service
@@ -1475,10 +1491,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     await _emailService.SendEmail(emailDTO.To, emailDTO.Subject, emailDTO.Message);
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
-                    throw;
+                    _logger.LogError(ex, "Lead Email", apiContext);
                 }
 
                 item.Smsstatus = false;

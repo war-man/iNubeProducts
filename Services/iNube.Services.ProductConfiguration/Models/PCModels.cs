@@ -977,6 +977,7 @@ namespace iNube.Services.ProductConfiguration.Models
         public bool? Smsstatus { get; set; }
         public bool? Emailstatus { get; set; }
         public bool? IsPayment { get; set; }
+        public bool? IsPolicyIssuance { get; set; }
     }
 
     public class SMSRequest
