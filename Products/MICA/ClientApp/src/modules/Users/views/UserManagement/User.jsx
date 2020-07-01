@@ -78,7 +78,7 @@ class User extends React.Component {
         this.state = {
             redirectTo: false,
             loader: false,
-            hideexternal: true,
+            hideexternal: false,
             btnload: false,
             btnload1: false,
             radioVal: "",
@@ -862,6 +862,7 @@ class User extends React.Component {
                 this.setState({
                     empFlag: true,
                     partFlag: false,
+                    hideexternal: true,
                     isUser: false,
                     visibility: false,
                     employeeid: "",
@@ -1106,8 +1107,9 @@ class User extends React.Component {
         //this.change(event, name, type);
     }
 
-    partnerChange(type, event) {
-        this.setState({
+    partnerChange = (type, event) => {
+        let that = this;
+        that.setState({
             [event.target.name]: event.target.value,
             partnerid: event.target.value,
         });
@@ -1117,8 +1119,8 @@ class User extends React.Component {
 
         UserData[name] = value;
 
-        this.setState({ UserData });
-        this.change(event, name, type);
+        that.setState({ UserData });
+        that.change(event, name, type);
     };
 
     getRadioButtonVal = event => {

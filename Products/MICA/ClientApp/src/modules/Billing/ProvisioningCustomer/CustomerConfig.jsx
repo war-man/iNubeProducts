@@ -153,8 +153,8 @@ class Provision extends React.Component {
 
 
     componentDidMount() {
-        //fetch(`${UserConfig.UserConfigUrl}/api/CustomerProvisioning/GetMaster?lMasterlist=qwer&isFilter=true`, {
-        fetch(`https://localhost:44351/api/CustomerProvisioning/GetMaster?isFilter=true`, {
+        fetch(`${UserConfig.UserConfigUrl}/api/CustomerProvisioning/GetMaster?lMasterlist=qwer&isFilter=true`, {
+        //fetch(`https://localhost:44351/api/CustomerProvisioning/GetMaster?isFilter=true`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

@@ -546,6 +546,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetAllEntitiesById(int Id)
+        {
+            var response = await _productService.GetAllEntitiesById(Id, Context);
+            return Ok(response);
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
         {
@@ -553,6 +560,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             return Ok(response);
         }
 
-
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult HCTemp()
+        {
+            var response = new ResponseStatus() { Status = BusinessStatus.Ok };
+            return Ok(response);
+        }
     }
 }

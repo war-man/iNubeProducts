@@ -25,13 +25,13 @@ namespace iNube.Services.UserManagement.Entities.MICACP
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;");
+                optionsBuilder.UseSqlServer("Server=micadev.coow0ess1gft.ap-south-1.rds.amazonaws.com;Database=iNubeCommon;User ID=admin;Password=micaadmin;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity<TblCustomerEnvironment>(entity =>
             {
@@ -130,7 +130,7 @@ namespace iNube.Services.UserManagement.Entities.MICACP
             modelBuilder.Entity<TblmasCpcommonTypes>(entity =>
             {
                 entity.HasKey(e => e.CommonTypeId)
-                    .HasName("PK__tblmasCP__4050837233C0275C");
+                    .HasName("PK__tblmasCP__405083722D74C8DD");
 
                 entity.ToTable("tblmasCPCommonTypes", "CP");
 
@@ -138,7 +138,9 @@ namespace iNube.Services.UserManagement.Entities.MICACP
 
                 entity.Property(e => e.MasterType).HasMaxLength(100);
 
-                entity.Property(e => e.TypeCode).HasMaxLength(50);
+                entity.Property(e => e.TypeCode)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Value).HasMaxLength(200);
             });

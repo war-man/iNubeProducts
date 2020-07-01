@@ -99,7 +99,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
         Task<TblRimappingDto> GetRImappingBYId(decimal RImappingID, ApiContext apiContext);
         Task<object> GetAllocationByPolicyNo(string policyNo, ApiContext apiContext);
         Task<RiallocationDto> ModifyReAllocation(RiallocationDto riallocationDto, ApiContext apiContext);
-        Task<IActionResult> Calulationddata(CalulationDto calulationDto, ApiContext apiContext);
+        Task<RiallocationDto> Calulationddata(CalulationDto calulationDto, ApiContext apiContext);
         Task<IEnumerable<TblParticipantMasterDto>> GetParticipantNameByCode(string participantcode, ApiContext apiContext);
         Task<ValidationResponse> TreatyCodeAndGroupValidation(string codeName, string type, ApiContext apiContext);
         Task<GridRiMappingGrid> mappingGridByTGId(int RiMappingId,ApiContext apiContext);
@@ -1082,7 +1082,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             return riallocation;
         }
 
-        public async Task<IActionResult> Calulationddata(CalulationDto calulationDto, ApiContext apiContext)
+        public async Task<RiallocationDto> Calulationddata(CalulationDto calulationDto, ApiContext apiContext)
         {
             //Year,Level,Product is used for pulling the data for treaty
             //use of Premium and SI
@@ -1128,14 +1128,18 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             {
                 map.AllocationMethod = "Percentage";
                 map.Percentage = retensionDto.Percentage.ToString();
+                map.Limit = "0";
             }
-            else if (Convert.ToInt32(retensionDto.RetentionLogicId) == 21)
+         
+            if (Convert.ToInt32(retensionDto.RetentionLogicId) == 21)
             {
                 map.AllocationMethod = "Limit";
                 map.Limit = retensionDto.Limit.ToString();
+                map.Percentage = "0";
 
             }
-            else if (Convert.ToInt32(retensionDto.RetentionLogicId) == 22)
+          
+            if (Convert.ToInt32(retensionDto.RetentionLogicId) == 22)
             {
                 map.AllocationMethod = "Percentage with Limit";
                 map.Limit = retensionDto.Limit.ToString();
@@ -1148,28 +1152,19 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     map.Percentage = "0";
                 }
             }
-            else
-            {
-                map.AllocationMethod = "Lines";
-            }
+         
             map.AllocationBasis = calulationDto.SumInsured.ToString();
             map.Balance = calulationDto.SumInsured.ToString();
-
-            map.AllocatedRetention = calulationDto.SumInsured.ToString();
+            map.Premium =Convert.ToInt32(calulationDto.PremiumAmount);
+            map.AllocatedRetention = "0";
             map.AllocatedQS = "0";
             map.TotalAllocation = "0";
             map.AllocationBasedOn = "";
             map.NoofLines = "0";
             map.HL = "";
-            map.Premium = Convert.ToInt32(calulationDto.PremiumAmount);
-
 
             //This is Extra only for testing Purpuse
           //  map.Percentage = "0";
-
-
-
-
 
             maps.Add(map);
             //doing for mapping
@@ -1189,7 +1184,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             mapDetails.AllocationBasis = retAllocationBasis;
             mapDetails.NoOfLines = retNoOfLines;
             mapDetails.AllocatedAmount = Convert.ToDecimal(retAllocatedAmount);//need to get it from integration call value
-            mapDetails.AllocatedPremium = reAllocatedPremium;////need to get it from integration call value
+          //  mapDetails.AllocatedPremium = reAllocatedPremium;////need to get it from integration call value
             mapDetails1.Add(mapDetails);
             // Treaty data need to be filled
 
@@ -1223,24 +1218,30 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                                 map.Percentage = arrangementsvalue.Percentage.ToString();
                                 map.Limit = "0";
                             }
-                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
+                           
+                            if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
                             {
                                 map.AllocationMethod = "Limit";
                                 map.Limit = arrangementsvalue.Amount.ToString();
                                 map.Percentage = "0";
                             }
-                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
+                          
+                            
+                             if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
                             {
                                 map.AllocationMethod = "PercentageWithLimit";
                                 map.Percentage = arrangementsvalue.Percentage.ToString();
                                 map.Limit = arrangementsvalue.Amount.ToString();
                             }
-                            else
+                          
+                           if(Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 33)
                             {
                                 map.AllocationMethod = "NoOfLines";
                                 map.Percentage = "0";
                                 map.Limit = "0";
+                                map.NoofLines = arrangementsvalue.NoOfLines.ToString();
                             }
+                         
 
                             map.AllocationBasis = calulationDto.SumInsured.ToString();
                             // Convert.ToDecimal(arrangementsvalue.Amount);
@@ -1253,7 +1254,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             {
                                 map.HL = "L";
                             }
-                            map.NoofLines = arrangementsvalue.NoOfLines.ToString();
+                          //  map.NoofLines = arrangementsvalue.NoOfLines.ToString();
                             if (arrangementsvalue.AllocationBasisId == 26)
                             {
                                 map.AllocationBasedOn = "Sum Insured";
@@ -1320,26 +1321,41 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             // surPlus.Percent = trtdata.pe;
                             map.Type = "QS";
                             map.Premium = Convert.ToInt32(calulationDto.PremiumAmount);
+                            // map.Percentage = Convert.ToInt32(arrangementsvalue.Percentage);
+                            // map.Limit= Convert.ToInt32(arrangementsvalue.li)
                             if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 20)
                             {
                                 map.AllocationMethod = "Percentage";
                                 map.Percentage = arrangementsvalue.Percentage.ToString();
+                                map.Limit = "0";
+                                map.NoofLines = "0";
                             }
-                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
+
+                            if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 21)
                             {
                                 map.AllocationMethod = "Limit";
-                                map.Limit = arrangementsvalue.MaxCeidingLimit.ToString();
+                                map.Limit = arrangementsvalue.Amount.ToString();
+                                map.Percentage = "0";
+                                map.NoofLines = "0";
                             }
-                            else if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
+
+
+                            if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 22)
                             {
                                 map.AllocationMethod = "PercentageWithLimit";
                                 map.Percentage = arrangementsvalue.Percentage.ToString();
-                                map.Limit = arrangementsvalue.MaxCeidingLimit.ToString();
+                                map.Limit = arrangementsvalue.Amount.ToString();
+                                map.NoofLines = "0";
                             }
-                            else
+
+                            if (Convert.ToInt32(arrangementsvalue.AllocationLogicId) == 33)
                             {
                                 map.AllocationMethod = "NoOfLines";
+                                map.Percentage = "0";
+                                map.Limit = "0";
+                                map.NoofLines = arrangementsvalue.NoOfLines.ToString();
                             }
+
 
                             map.AllocationBasis = calulationDto.SumInsured.ToString();
                             // Convert.ToDecimal(arrangementsvalue.Amount);
@@ -1352,7 +1368,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             {
                                 map.HL = "L";
                             }
-                            map.NoofLines = arrangementsvalue.NoOfLines.ToString();
+                            //  map.NoofLines = arrangementsvalue.NoOfLines.ToString();
                             if (arrangementsvalue.AllocationBasisId == 26)
                             {
                                 map.AllocationBasedOn = "Sum Insured";
@@ -1367,10 +1383,12 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                             {
                                 map.AllocationBasedOn = "Retention + QS";
                             }
+
                             map.AllocatedRetention = "0";
                             map.AllocatedQS = "0";
                             map.TotalAllocation = "0";
 
+                            // map.High
                             maps.Add(map);
 
 
@@ -1457,6 +1475,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     var Premiumdata1 = PreimunData[0].ToString();
                     item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
 
+                    //foreach(var dist in item.participants)
+                    //{
+                    //    dist.AllocatedAmount=((item.AllocatedAmount*dist.Share)/100);
+                    //    dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
+                    //    dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
+                    //    dist.Brokerage= ((item.AllocatedAmount * dist.BrokerageRate) / 100);
+                    //}
+
+
+
                 }
                 if (item.Type == "QS")
                 {
@@ -1470,6 +1498,17 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OPremium).ToList();
                     var Premiumdata1 = PreimunData[0].ToString();
                     item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
+
+
+
+                    foreach (var dist in item.participants)
+                    {
+                        dist.AllocatedAmount = ((item.AllocatedAmount * dist.Share) / 100);
+                        dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
+                        dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
+                        dist.Brokerage = ((item.AllocatedAmount * dist.BrokerageRate) / 100);
+                    }
+
                 }
                 if (item.Type == "Surplus")
                 {
@@ -1484,6 +1523,16 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OPremium).ToList();
                     var Premiumdata1 = PreimunData[0].ToString();
                     item.AllocatedPremium = Convert.ToDecimal(Premiumdata1);
+
+
+
+                    foreach (var dist in item.participants)
+                    {
+                        dist.AllocatedAmount = ((item.AllocatedAmount * dist.Share) / 100);
+                        dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
+                        dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
+                        dist.Brokerage = ((item.AllocatedAmount * dist.BrokerageRate) / 100);
+                    }
                 }
                 count++;
             }
@@ -1524,14 +1573,17 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
                 _context.TblRiallocation.Add(tblRiallocation);
 
+                var MappedData = _mapper.Map<RiallocationDto>(tblRiallocation);
+
                 _context.SaveChanges();
+                return MappedData;
             }
             catch(Exception e)
             {
-
+                return null;
             }
 
-            return null;
+           
         }
 
         public async Task<ValidationResponse> TreatyCodeAndGroupValidation(string codeName, string type, ApiContext apiContext)

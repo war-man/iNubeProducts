@@ -18,11 +18,12 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
         Task<IEnumerable<AssignProductList>> GetAssignProductByPartnerId(string pID, ApiContext apiContext);
         Task<IEnumerable<MasDTO>> GetHandleEventsMaster(string lMasterlist, ApiContext apiContext);
         Task<CustomerSettingsDTO> GetCustomerSettings(string TimeZone, ApiContext apiContext);
+        Task<PolicyResponse> LeadPolicyAsync(LeadInfoDTO lead, ApiContext apiContext);
     }
     public class IntegrationService : IIntegrationService
     {
         private IConfiguration _configuration;
-        readonly string PartnerUrl, UserUrl, RatingUrl;
+        readonly string PartnerUrl, UserUrl, RatingUrl, PolicyUrl;
 
         // readonly string partnerUrl = "https://inubeservicespartners.azurewebsites.net";
         ////readonly string partnerUrl = "https://localhost:44315";
@@ -44,7 +45,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             UserUrl = _configuration["Integration_Url:User:UserUrl"];
             //UserUrl = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
 
-
+            PolicyUrl = _configuration["Integration_Url:Policy:PolicyUrl"];
         }
 
 
@@ -155,7 +156,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 return new TResponse();
@@ -211,6 +212,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
             var uri = RatingUrl + "/api/RatingConfig/GetHandleEventsMaster?lMasterlist=" + lMasterlist;
 
             return await GetListApiInvoke<MasDTO>(uri, apiContext);
+        }
+
+        public async Task<PolicyResponse> LeadPolicyAsync(LeadInfoDTO lead, ApiContext apiContext)
+        {
+            var uri = PolicyUrl + "/api/Policy/LeadPolicy";
+
+            return await PostApiInvoke<LeadInfoDTO, PolicyResponse>(uri, apiContext, lead);
         }
     }
 }
