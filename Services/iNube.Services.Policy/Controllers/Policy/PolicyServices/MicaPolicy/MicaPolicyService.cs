@@ -7460,10 +7460,10 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             
         }
 
-        public async Task<ResponseStatus> UpdateCardDetails(string PolicyNumber, string MobileNumber, string RefrenceNumber, ApiContext apiContext)
+        public async Task<ResponseStatus> UpdateCardDetails(UpdateCardDetails updateCardDetails, ApiContext apiContext)
         {
             //  _context = (MICAPOContext)DbManager.GetContext(apiContext.ProductType, apiContext.ServerType);
-            if (string.IsNullOrEmpty(RefrenceNumber))
+            if (string.IsNullOrEmpty(updateCardDetails.RefrenceNumber))
             {
                 return new ResponseStatus { Status = BusinessStatus.Error, ResponseMessage = "Reference Number is required to update Card Details." };
             }
@@ -7477,9 +7477,9 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                 SqlCommand command = new SqlCommand("[dbo].[usp_PaymentRefUpdate]", connection);
                 command.CommandType = CommandType.StoredProcedure;
                 //command.Parameters.AddWithValue("@Action", "Update");
-                command.Parameters.AddWithValue("@PolicyNumber", string.IsNullOrEmpty(PolicyNumber) ? "" : PolicyNumber);
-                command.Parameters.AddWithValue("@MobileNumber", string.IsNullOrEmpty(MobileNumber) ? "" : MobileNumber);
-                command.Parameters.AddWithValue("@NewPaymentRefNo", RefrenceNumber);
+                command.Parameters.AddWithValue("@PolicyNumber", string.IsNullOrEmpty(updateCardDetails.PolicyNumber) ? "" : updateCardDetails.PolicyNumber);
+                command.Parameters.AddWithValue("@MobileNumber", string.IsNullOrEmpty(updateCardDetails.MobileNumber) ? "" : updateCardDetails.MobileNumber);
+                command.Parameters.AddWithValue("@NewPaymentRefNo", updateCardDetails.RefrenceNumber);
 
                 command.Parameters.Add("@Result", SqlDbType.Bit);
                 command.Parameters["@Result"].Direction = ParameterDirection.Output;

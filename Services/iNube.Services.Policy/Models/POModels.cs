@@ -1812,7 +1812,13 @@ namespace iNube.Services.Policy.Models
         public bool? Status { get; set; }
         public decimal? DifferenceAmount { get; set; }
     }
-   
+    public class UpdateCardDetails
+    {
+        public string PolicyNumber { get; set; }
+        public string MobileNumber { get; set; }
+        public string RefrenceNumber { get; set; }
+    }
+
 }
 
 

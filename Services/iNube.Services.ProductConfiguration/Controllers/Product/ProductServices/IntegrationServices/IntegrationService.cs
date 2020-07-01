@@ -156,7 +156,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.IntegrationSer
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 return new TResponse();
