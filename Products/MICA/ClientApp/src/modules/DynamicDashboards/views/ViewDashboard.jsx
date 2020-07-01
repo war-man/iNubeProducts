@@ -38,6 +38,7 @@ const paddingCard =
 {
     padding: "10px",
 }
+const colors = ['#6babac', '#e55253'];
 
 class ViewDashboard extends React.Component {
     constructor(props) {
@@ -116,8 +117,9 @@ class ViewDashboard extends React.Component {
                 ['Sleep', 7]
             ],
             ChartName: "",
-            showdd:false,
+            showdd: false,
         };
+        
     }
 
     componentDidMount() {
@@ -488,6 +490,7 @@ class ViewDashboard extends React.Component {
             return dateObj.day + '/' + dateObj.month + '/' + dateObj.year;
         }
     }
+
     render() {
         console.log(this.state.ChartName, "CName");
         return (
@@ -653,6 +656,43 @@ class ViewDashboard extends React.Component {
                                 loader={<div>Loading Chart</div>}
                                 data={this.state.graphData}
 
+                                chartEvents={[
+                                    {
+                                        eventName: 'select',
+                                        callback: ({ chartWrapper }) => {
+                                            const chart = chartWrapper.getChart()
+                                            const selection = chart.getSelection()
+                                            if (selection.length === 1) {
+                                                const [selectedItem] = selection
+                                                const dataTable = chartWrapper.getDataTable()
+                                                const { row, column } = selectedItem
+                                                //alert(
+                                                //    'You selected : ' +
+                                                //    JSON.stringify({
+                                                //        row,
+                                                //        column,
+                                                //        value: dataTable.getValue(row, column),
+                                                //    }),
+                                                //    null,
+                                                //    2,
+                                                //)
+                                                swal({
+                                                    text: 'You selected : ' +
+                                                        JSON.stringify({
+                                                        row,
+                                                        column,
+                                                        value: dataTable.getValue(row, column),
+                                                    }),
+                                                    //null,
+                                                    //2,
+                                                    icon: "info"
+                                                });
+                                            }
+                                            console.log(selection)
+                                        },
+                                    },
+                                ]}
+
                                 formatters={[
                                     {
                                         type: 'ArrowFormat',
@@ -685,7 +725,8 @@ class ViewDashboard extends React.Component {
                                 }}
                                 legendToggle
                                 rootProps={{ 'data-testid': '1' }}
-                            />}
+                                />}
+                          
                         </GridContainer>
                         </CardBody>
                     </Card>

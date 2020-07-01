@@ -572,6 +572,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             // Now try for policy booking
             if (PolicyIssuanceCount > 0)
             {
+
                 int count = 0;
                 foreach (var item in lstLead.Where(p=> p.IsPolicyIssuance==true))
                 {
