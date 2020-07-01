@@ -18,7 +18,6 @@ namespace iNube.Services.ProductConfiguration.Entities
         public bool? FutureDate { get; set; }
         public string Checked { get; set; }
         public string ParentId { get; set; }
-        public string Parameter1 { get; set; }
         public string Parameter { get; set; }
 
         public virtual TblEntityDetails Entity { get; set; }
