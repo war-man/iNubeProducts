@@ -35,6 +35,8 @@ namespace iNube.Services.ReInsurance.Models
     public class Map
     {
         public string AllocatedRetention { get; set; }
+        public string AllocatedSurplus { get; set; }
+        public string AllocatedQS { get; set; }
         public string Limit { get; set; }
         public string HL { get; set; }
         public string Type { get; set; }
@@ -43,9 +45,8 @@ namespace iNube.Services.ReInsurance.Models
         public string AllocationMethod { get; set; }
         public string Balance { get; set; }
         public string AllocationBasis { get; set; }
-        public string TotalAllocation { get; set; }
-        public string AllocatedQS { get; set; }
-        public string AllocationBasedOn { get; set; }
+       // public string TotalAllocation { get; set; }
+        public string AllocatedBasedOn { get; set; }
         public string NoofLines { get; set; }
         public int Premium { get; set; }
 
@@ -653,15 +654,19 @@ namespace iNube.Services.ReInsurance.Models
     {
         public int Period { get; set; }
         public string PercentageAmount { get;set;}
-        public string RetentionProvAmount { get; set; }
-        public string RetentionAmount { get; set; }
-        public string QSProvAmount { get; set; }
-        public string QSAmount { get; set; }
-        public string SurplusProvAmount { get; set; }
+        public string Higher { get; set; }
+        public string Lower { get; set; }
+        public string PercentageWithLimitAmount { get; set; }
+        public string ProvAllocatedAmount { get; set; }
+        public string AllocatedAmount { get; set; }
         public string OAllocatedRetention { get; set; }
         public string OAllocatedQS { get; set; }
-        public string OTotalAllocated { get; set; }
-        public string OPremium { get; set; }
+        public string NOLAmount { get; set; }
+        public string ProvSurplusAmount { get; set; }
+        public string OAllocatedSurplus { get; set; }
+
+        public string OBalance { get; set; }
+        public string OAllocatedPremium { get; set; }
     }
 
 
