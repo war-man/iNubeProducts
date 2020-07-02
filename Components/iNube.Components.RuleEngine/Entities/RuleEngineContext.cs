@@ -211,6 +211,10 @@ namespace iNube.Components.RuleEngine.Entities
 
                 entity.Property(e => e.ToDate).HasColumnType("date");
 
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ValidatorName).IsUnicode(false);
 
                 entity.HasOne(d => d.Rule)

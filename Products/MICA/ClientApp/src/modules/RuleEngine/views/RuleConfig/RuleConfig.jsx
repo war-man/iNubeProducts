@@ -1,7 +1,6 @@
 ﻿import React from "react";
 import PropTypes from "prop-types";
 import { connect } from 'react-redux';
-
 // @material-ui/core components
 
 // @material-ui/icons
@@ -11,7 +10,7 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import CustomInput from "components/CustomInput/CustomInput.jsx";
-
+import Dropdown from "components/Dropdown/Dropdown.jsx";
 import Card from "components/Card/Card.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
@@ -98,6 +97,7 @@ class RuleConfig extends React.Component {
             newdataGrid: [],
             Rules: [],
             ruleType: "",
+            RateList:[],
             fields: {
 
                 RuleName: "",
@@ -124,10 +124,16 @@ class RuleConfig extends React.Component {
                 conditionAttributesValueFrom: "",
                 conditionAttributesValueTo: "",
                 //RuleGroup
-                ruleGroupName:"",
+                ruleGroupName: "",
+                RateName:"",
                 
                 
             },
+            typeList: [{ "mID": "Parameter", "mValue": "Parameter", "mType": "Parameter" },
+                { "mID": "Rate", "mValue": "Rate", "mType": "Rate" },
+                { "mID": "Default", "mValue": "Default", "mType": "Default" }],
+            ConditionType: "",
+            rateFlag: false,
         };
         this.handleTags = this.handleTags.bind(this);
         this.reset = this.reset.bind(this);
@@ -163,38 +169,87 @@ class RuleConfig extends React.Component {
         this.setState({ fields });
         //this.setState({ [event.target.name]: event.target.value });     
     };
-    SetCheckBox = (e) => {
+
+    onInputConditionalParam = event => {
+        const state = this.state;
+        state[event.target.name] = event.target.value;
+        this.setState({ state });
         debugger
-        console.log("checkbox select", e.target.value)
-        console.log(e.target.checked, 'TargetChecked');
-        if (e.target.value != undefined) {
-            this.setState({ IsCheck: e.target.checked });
-            this.state.IsCheck = e.target.checked
-        }
-        if (this.state.IsCheck == true && this.state.checkEvent == "InBetween") {
+        if (this.state.ConditionType == "Parameter" && this.state.checkEvent == "InBetween") {
             this.setState({
                 showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false
             });
             this.setState({ conditionalParamFlagFrom: true, conditionalParamFlagTo: true });
         }
-        else if (this.state.IsCheck == false)
-        {
+        if (this.state.ConditionType == "Default") {
             this.setState({
-                showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false, conditionalParamFlagFrom: false
+                showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false, conditionalParamFlagFrom: false, rateFlag: false
             });
             let fields = this.state.fields;
             fields['conditionoperator'] = "";
+            fields['RateName'] = "";
             this.setState({ fields });
         }
-        else {
+        if (this.state.ConditionType == "Parameter") {
             this.setState({
-                showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false
+                showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false, conditionalParamFlagFrom: false, rateFlag: false
             });
             this.setState({ conditionalParamFlagFrom: true });
+            let fields = this.state.fields;
+            //fields['conditionoperator'] = "";
+            fields['RateName'] = "";
+            this.setState({ fields });
         }
-        console.log(this.state.IsCheck, 'Check');
-        //conditionalParamFlag
+        if (this.state.ConditionType == "Rate")
+        {
+            this.setState({
+                showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false, conditionalParamFlagFrom: false, rateFlag: true
+            });
+            let fields = this.state.fields;
+            //fields['conditionoperator'] = "";
+            this.setState({ fields });
+        }
+        //else {
+        //    this.setState({
+        //        showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false
+        //    });
+        //    this.setState({ conditionalParamFlagFrom: true });
+        //}
     }
+
+    //SetCheckBox = (e) => {
+    //    debugger
+    //    console.log("checkbox select", e.target.value)
+    //    console.log(e.target.checked, 'TargetChecked');
+    //    if (e.target.value != undefined) {
+    //        this.setState({ IsCheck: e.target.checked });
+    //        this.state.IsCheck = e.target.checked
+    //    }
+    //    if (this.state.IsCheck == true && this.state.checkEvent == "InBetween") {
+    //        this.setState({
+    //            showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false
+    //        });
+    //        this.setState({ conditionalParamFlagFrom: true, conditionalParamFlagTo: true });
+    //    }
+    //    else if (this.state.IsCheck == false)
+    //    {
+    //        this.setState({
+    //            showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false, conditionalParamFlagFrom: false
+    //        });
+    //        let fields = this.state.fields;
+    //        fields['conditionoperator'] = "";
+    //        this.setState({ fields });
+    //    }
+    //    else {
+    //        this.setState({
+    //            showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false
+    //        });
+    //        this.setState({ conditionalParamFlagFrom: true });
+    //    }
+    //    console.log(this.state.IsCheck, 'Check');
+    //    //conditionalParamFlag
+    //}
+
     handleSimpleConditionOp = event => {
         debugger;
         this.state.checkEvent = event.target.value;
@@ -202,7 +257,7 @@ class RuleConfig extends React.Component {
         console.log(this.state, 'State of Value');
         const fields = this.state.fields;
         //fields[event.target.name] = event.target.value;
-
+        debugger
         if (event.target.value == "InBetween") {
             this.setState({
                 showTable: false, showColumn: false, showDateFrom: false, showDateTo: false, showDOBParameters: false, conditionalParamFlagFrom: false, conditionalParamFlagTo: false
@@ -244,19 +299,42 @@ class RuleConfig extends React.Component {
             });
             this.setState({ showConditionFrom: true, [event.target.name]: event.target.value });
         }
-        else if (event.target.value == "InBetween" && this.state.IsCheck == true)
-        {
+        //Use in case of IsCheckk
+        //else if (event.target.value == "InBetween" && this.state.IsCheck == true)
+        //{
+        //    this.setState({
+        //        showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false
+        //    });
+        //    this.setState({ conditionalParamFlagFrom: true, conditionalParamFlagTo: true});
+        //}
+        else if (event.target.value == "InBetween" && this.state.ConditionType != "") {
             this.setState({
                 showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false
             });
-            this.setState({ conditionalParamFlagFrom: true, conditionalParamFlagTo: true});
+            this.setState({ conditionalParamFlagFrom: true, conditionalParamFlagTo: true });
         }
-        else if (this.state.IsCheck == true)
-        {
-            this.setState({
-                showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false
-            });
-            this.setState({ conditionalParamFlagFrom: true });
+        //else if (this.state.IsCheck == true)
+        //{
+        //    this.setState({
+        //        showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false
+        //    });
+        //    this.setState({ conditionalParamFlagFrom: true });
+        //}
+        else if (this.state.ConditionType != "") {
+            if (this.state.ConditionType == "Rate") {
+                this.setState({
+                    showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false
+                });
+                this.setState({ conditionalParamFlagFrom: false });
+                this.setState({ rateFlag: true });
+            }
+            if (this.state.ConditionType == "Parameter") {
+                this.setState({
+                    showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false
+                });
+                this.setState({ conditionalParamFlagFrom: true });
+                this.setState({ rateFlag: false });
+            }
         }
         else {
             this.setState({
@@ -297,10 +375,21 @@ class RuleConfig extends React.Component {
         this.setState({ showTable: false, showColumn: false, showCondition: false, showConditionFrom: false, showDateFrom: false, showDateTo: false, showDOBParameters: false});        
     }
     addRow() {
-        if (this.state.IsCheck == true) {
+        //if (this.state.IsCheck == true) {
+        //    this.state.fields.conditionvaluefrom = this.state.fields.conditionAttributesValueFrom;
+        //    this.state.fields.conditionvalueto = this.state.fields.conditionAttributesValueTo;
+        //}
+        if (this.state.ConditionType = "Parameter") {
             this.state.fields.conditionvaluefrom = this.state.fields.conditionAttributesValueFrom;
             this.state.fields.conditionvalueto = this.state.fields.conditionAttributesValueTo;
         }
+        var Type = "";
+        if (this.state.ConditionType = "Rate") {
+            this.state.fields.conditionvaluefrom = this.state.fields.RateName;
+            this.state.fields.conditionvalueto = this.state.fields.conditionAttributesValueTo;
+            Type ="Rate";
+        }
+
         //Checking ALL Condition Attributes and RUle Group Name
         var flagCheckAttr = false;
         if (this.state.ruleType != "") {
@@ -356,7 +445,8 @@ class RuleConfig extends React.Component {
                 'failureMsg': this.state.fields.FailureMsg,
                 'successCode': this.state.fields.SuccessCode,
                 'failureCode': this.state.fields.FailureCode,
-                'ruleGroupName': this.state.fields.ruleGroupName
+                'ruleGroupName': this.state.fields.ruleGroupName,
+                'type': Type
             });
             //this.state.GridShowData = this.state.tblRuleConditionArray;
             debugger
@@ -451,6 +541,7 @@ class RuleConfig extends React.Component {
             fields['conditionAttributesValueFrom'] = "";
             fields['conditionAttributesValueTo'] = "";
             fields['ruleGroupName'] = "";
+            fields['RateName'] = "";
 
             this.setState({ fields });
             this.setState({ conditionalParamFlagFrom: false });
@@ -583,6 +674,20 @@ class RuleConfig extends React.Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({Rules: data});
+            });
+        let rateConfigUrl = "http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com";
+        fetch(`${rateConfigUrl}/api/RatingConfig/GetRules`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ RateList: data });
+                console.log(this.state.RateList, 'CheckData');
             });
 
     }
@@ -1034,21 +1139,37 @@ class RuleConfig extends React.Component {
                                             </FormControl>
                                         </GridItem>
                                     }
+                                    {
+                                        //this.state.isCheckFlag &&
+                                        //<GridItem xs={12} sm={12} md={3}>
+
+                                        //    <CustomCheckbox
+                                        //        name="IsCheck"
+                                        //        labelText="IsParameters"
+                                        //        value={this.state.IsCheck}
+                                        //        onChange={(e) => this.SetCheckBox(e)}
+                                        //        disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}
+                                        //        checked={this.state.IsCheck}
+
+                                        //        formControlProps={{
+                                        //            fullWidth: true
+                                        //        }}
+
+                                        //    />
+                                        //</GridItem>
+                                    }
                                     {this.state.isCheckFlag &&
                                         <GridItem xs={12} sm={12} md={3}>
-
-                                            <CustomCheckbox
-                                                name="IsCheck"
-                                                labelText="IsParameters"
-                                                value={this.state.IsCheck}
-                                                onChange={(e) => this.SetCheckBox(e)}
-                                                //disabled={(coversProductDetails.ProductDTO.ProductDTO.isCoverEvent === false) ? coversData.viewdisable : coversProductDetails.ProductDTO.ProductDTO.isCoverEvent}
-                                                checked={this.state.IsCheck}
-
+                                            <Dropdown
+                                                labelText="Condition Type"
+                                                id="ConditionType"
+                                                value={this.state.ConditionType}
+                                                lstObject={this.state.typeList}
+                                                name='ConditionType'
+                                                onChange={this.onInputConditionalParam}
                                                 formControlProps={{
                                                     fullWidth: true
                                                 }}
-
                                             />
                                         </GridItem>
                                     }
@@ -1291,6 +1412,49 @@ class RuleConfig extends React.Component {
                                                                 }}
                                                             >
                                                                 {item.ruleName}
+                                                            </MenuItem>
+                                                        )
+                                                    }
+                                                </Select>
+                                            </FormControl>
+                                        </GridItem>
+                                    }
+                                    {this.state.rateFlag &&
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <FormControl
+                                                fullWidth
+                                                className={classes.selectFormControl}
+                                            >
+                                                <InputLabel
+                                                    htmlFor="simple-select"
+                                                    className={classes.selectLabel}
+                                                >
+                                                    Rates
+                          </InputLabel>
+                                                <Select
+                                                    value={this.state.fields.RateList}
+                                                    onChange={this.onInputChange}
+                                                    MenuProps={{
+                                                        className: classes.selectMenu
+                                                    }}
+                                                    classes={{
+                                                        select: classes.select
+                                                    }}
+                                                    inputProps={{
+                                                        name: "RateName",
+                                                        id: "simple-select"
+                                                    }}
+                                                >
+                                                    {
+                                                    this.state.RateList.map(item =>
+                                                            <MenuItem
+                                                                value={item.ratingId}
+                                                                classes={{
+                                                                    root: classes.selectMenuItem,
+                                                                    selected: classes.selectMenuItemSelected
+                                                                }}
+                                                            >
+                                                                {item.rateName}
                                                             </MenuItem>
                                                         )
                                                     }

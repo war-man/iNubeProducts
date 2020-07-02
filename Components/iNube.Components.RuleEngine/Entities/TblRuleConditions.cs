@@ -31,6 +31,7 @@ namespace iNube.Components.RuleEngine.Entities
         public string SuccessCode { get; set; }
         public string FailureCode { get; set; }
         public string RuleGroupName { get; set; }
+        public string Type { get; set; }
 
         public virtual TblRules Rule { get; set; }
         public virtual ICollection<TblRuleConditionValues> TblRuleConditionValues { get; set; }

@@ -65,6 +65,7 @@ namespace iNube.Components.RuleEngine.Models
         public string SuccessCode { get; set; }
         public string FailureCode { get; set; }
         public string RuleGroupName { get; set; }
+        public string Type { get; set; }
 
         public RulesDto Rule { get; set; }
     }
