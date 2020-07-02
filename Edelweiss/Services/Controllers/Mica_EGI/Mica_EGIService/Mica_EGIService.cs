@@ -8509,7 +8509,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 //To check whether mobile number field is blank-- MobileNo
                 //To check MobileNumber length
-                if (SourceObject["Mobile Number"] == "")
+                if (MobileNo == "")
                 {
                     ruleEngine = new RuleEngineResponse();
                     ruleEngine.ValidatorName = "Mobile Number";
@@ -8600,7 +8600,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
             }
-            catch
+            catch 
             {
                 engineResponse = new List<RuleEngineResponse>();
                 ruleEngine = new RuleEngineResponse();
@@ -8610,6 +8610,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 ruleEngine.Code = "GEP";
                 engineResponse.Add(ruleEngine);
                 return engineResponse;
+
             }
 
             return engineResponse;
