@@ -453,7 +453,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 bool email = true;
                 string FirstName = "", MobileNumber = "", EmailID = "";
                 bool IsPayment;
-               
+
                 //dt.Columns.Add("BankFileId", typeof(int));
                 // dt.Columns.Add("Id", typeof(string));
                 dt.Columns.Add("FirstName", typeof(string));
@@ -475,7 +475,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                             ExcelWorksheet worksheet = package.Workbook.Worksheets["User Details"];
                             if (worksheet != null)
                             {
-                                
+
                                 var rowCount = worksheet.Dimension.Rows;
                                 LeadInfoDTO lead = null;
                                 for (int row = 2; row <= rowCount; row++)
@@ -522,7 +522,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                     if (worksheet.Cells[row, 6].Value != null)
                                     {
                                         IsPolicyIssue = (bool)worksheet.Cells[row, 6].Value;
-                                        if(IsPolicyIssue)
+                                        if (IsPolicyIssue)
                                         {
                                             PolicyIssuanceCount++;
                                         }
@@ -574,7 +574,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             {
 
                 int count = 0;
-                foreach (var item in lstLead.Where(p=> p.IsPolicyIssuance==true))
+                foreach (var item in lstLead.Where(p => p.IsPolicyIssuance == true))
                 {
                     ++count;
                     item.Id = count;
@@ -1478,7 +1478,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
                     _logger.LogError(ex, "Lead BulkSMS", apiContext);
                 }
-               
+
 
 
                 //Email Service
@@ -1937,7 +1937,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.ParentId == parentid).Select(a => new ddDTOs
+            var data = _context.TblEntityDetails.Select(a => new ddDTOs
             {
                 mID = Convert.ToInt32(a.EntityId),
                 mValue = a.EnitityName,
