@@ -38,6 +38,10 @@ import Edit from "@material-ui/icons/Edit";
 import IconButton from '@material-ui/core/IconButton';
 import productConfig from 'modules/Products/Micro/ProductConfig.js';
 import DynamicEntity from 'modules/Workflow/DynamicEntity';
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const style = {
     infoText: {
@@ -72,7 +76,9 @@ class DynamicForm extends React.Component {
                 { mID: 'User', mType: "User", mValue: "User" },
                 { mID: 'Claims', mType: "Claims", mValue: "Claims" },
             ],
-            type: "",
+            parent: "",
+            child: "",
+            masterList: [],
             empty: [
                 {
                     "mType": "mddfilter",
@@ -102,26 +108,71 @@ class DynamicForm extends React.Component {
             ],
             Dynamicdata: {},
             radiovalue: "",
-            screendata: [],
+            screendata: {
+                Parent: [],
+                Child: [],
+            },
             emptyarray: [],
             showtable: false,
             data: [],
+            entitylist: {
+                Parent: [],
+                Child: [],
+            },
+
+            MasterDTO: {
+                LOB: [],
+                COB: [],
+                Cover: [],
+                CoverEvent: [],
+                CoverEventFactor: [],
+                CoverEventFactorValue: [],
+                InsuranceType: [],
+                InsurableCategory: [],
+                Risk: [],
+                Claim: [],
+                channel: [],
+                BenefitCriteria: []
+            },
+
+            dynamicobject: [],
             showComponents: false,
+            entityname: "",
+            fields: {
+                selectedFields: [],
+            },
+            selectedfields: [],
         };
     }
 
-    SetValue = (e) => {
+    onInputChange = (evt) => {
+        let fields = this.state.fields;
+        fields[evt.target.name] = evt.target.value;
+        this.setState({ fields });
+        console.log("fields: ", fields)
+    };
+
+    SetValue = (e, entity) => {
 
         let data = this.state.Dynamicdata;
         let name = e.target.name;
         let value = e.target.value;
 
-        let screendata = this.state.screendata;
-        screendata = screendata.filter(e => e.name === name)[0] === undefined
-            ? []
-            : screendata.filter((e) => e.name === name)[0]
-            ;
-        screendata.value = value;
+        let objdata = this.state.dynamicobject
+        for (let i = 0; i < objdata.length; i++) {
+            let array = objdata[i];
+            for (let j = 0; j < array.length; j++) {
+                if (array[j].name == name && array[j].entityLevel == entity) {
+                    array[j].value = value;
+                }
+            }
+        }
+        //let screendata = this.state.screendata.Parent;
+        //screendata = screendata.filter(e => e.name === name)[0] === undefined
+        //    ? []
+        //    : screendata.filter((e) => e.name === name)[0]
+        //    ;
+        //screendata.value = value;
 
         data[name] = value;
 
@@ -129,25 +180,28 @@ class DynamicForm extends React.Component {
         console.log("selected: ", data);
     }
 
-    onDateChange = (name, event) => {
+    onDateChange = (name, event, entity) => {
         var today = event.toDate();
         var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         let data = this.state.Dynamicdata;
 
         data[name] = date;
 
-        let screendata = this.state.screendata;
-        screendata = screendata.filter(e => e.name === name)[0] === undefined
-            ? []
-            : screendata.filter((e) => e.name === name)[0]
-            ;
-        screendata.value = date;
+        let objdata = this.state.dynamicobject
+        for (let i = 0; i < objdata.length; i++) {
+            let array = objdata[i];
+            for (let j = 0; j < array.length; j++) {
+                if (array[j].name == name && array[j].entityLevel == entity) {
+                    array[j].value = date;
+                }
+            }
+        }
 
         this.setState({ data });
         console.log("selected: ", data);
     };
 
-    handleRadioChange = (name, e) => {
+    handleRadioChange = (name, e, entity) => {
         let value = e.target.value;
         this.setState({ radiovalue: e.target.value })
         let data = this.state.Dynamicdata;
@@ -157,7 +211,7 @@ class DynamicForm extends React.Component {
         console.log("selected: ", data);
     }
 
-    SetCheckValue = (name, e) => {
+    SetCheckValue = (name, e, entity) => {
         let data = this.state.Dynamicdata;
         let value = e.target.checked;
         if (value == true) {
@@ -169,8 +223,45 @@ class DynamicForm extends React.Component {
         console.log("selected: ", data);
     }
 
-    handleRenderScreen = (prop) => {
+    GetMasterData = (type, event, entity) => {
+        this.SetValue(event, entity);
+        console.log("event", event.target.name)
 
+        if (type != "") {
+            var regex = /^[A-Za-z]+$/;
+            var isvalid = regex.test(type);
+            console.log("isvalid: ", isvalid);
+            if (isvalid == false) {
+                const valuetype = type;
+                const splitstring = valuetype.split(",");
+                console.log("array1: ", splitstring[0]);
+                console.log("array1: ", splitstring[1]);
+                for (let i = 0; i < splitstring.length; i++) {
+                    this.GetMasterService(splitstring[i], event.target.value);
+                }
+            }
+            {
+                this.GetMasterService(type, event.target.value)
+            }
+            //this.GetMasterService(type, event.target.value);
+        }
+        //if (type === "COB") {
+        //    //COB based call
+        //    //this.GetMasterService('InsuranceType', 0);
+        //    this.GetMasterService('Cover', event.target.value);
+        //    this.GetMasterService('CoverEvent', event.target.value);
+        //}
+        //if (type === "CoverEventFactor") {
+        //    this.GetMasterService('BenefitCriteria', event.target.value);
+        //    this.GetMasterService('Risk', event.target.value);
+        //    this.GetMasterService('Claim', event.target.value);
+        //}
+        //if (type === "InsurableCategory") {
+        //    this.GetMasterService('CoverEvent', event.target.value);
+        //}
+    };
+
+    handleRenderScreen = (prop) => {
         if (prop.componentType == "String") {
             return (
                 <CustomInput
@@ -181,7 +272,7 @@ class DynamicForm extends React.Component {
                     name={prop.name}
                     value={prop.value}
                     required={prop.required}
-                    onChange={(e) => this.SetValue(e)}
+                    onChange={(e) => this.SetValue(e, prop.entityLevel)}
                     formControlProps={{ fullWidth: true }}
                 />
             );
@@ -197,7 +288,7 @@ class DynamicForm extends React.Component {
                     value={prop.value}
                     inputType="number"
                     required={prop.required}
-                    onChange={(e) => this.SetValue(e)}
+                    onChange={(e) => this.SetValue(e, prop.entityLevel)}
                     formControlProps={{ fullWidth: true }}
                 />
             );
@@ -213,7 +304,7 @@ class DynamicForm extends React.Component {
                     value={prop.value}
                     type="Rupee"
                     required={prop.required}
-                    onChange={(e) => this.SetValue(e)}
+                    onChange={(e) => this.SetValue(e, prop.entityLevel)}
                     formControlProps={{ fullWidth: true }}
                 />
             );
@@ -223,10 +314,10 @@ class DynamicForm extends React.Component {
                 <Dropdown
                     required={prop.required}
                     labelText={prop.labelText}
-                    lstObject={this.state.dropdown}
+                    lstObject={this.state.MasterDTO[prop.listObject]}
                     value={prop.value}
                     name={prop.name}
-                    onChange={(e) => this.SetValue(e)}
+                    onChange={(e) => this.GetMasterData(prop.parameter, e, prop.entityLevel)}
                     formControlProps={{ fullWidth: true }} />
             );
         }
@@ -237,10 +328,10 @@ class DynamicForm extends React.Component {
                     name={prop.name}
                     value={prop.value}
                     id={prop.name}
-                    lstObject={this.state.empty}
+                    lstObject={this.state.masterList}
                     required={prop.required}
                     filterName={prop.filterName}
-                    onChange={(e) => this.SetValue(e)}
+                    onChange={(e) => this.SetValue(e, prop.entityLevel)}
                     formControlProps={{ fullWidth: true }}
                 />
             );
@@ -254,7 +345,7 @@ class DynamicForm extends React.Component {
                     id={prop.name}
                     Futuredatevalidate={prop.futureDate}
                     required={prop.required}
-                    onChange={(e) => this.onDateChange(prop.name, e)}
+                    onChange={(e) => this.onDateChange(prop.name, e, prop.entityLevel)}
                     formControlProps={{ fullWidth: true }} />
             );
         }
@@ -265,7 +356,7 @@ class DynamicForm extends React.Component {
                     control={
                         <Radio
                             checked={this.state.radiovalue == prop.value}
-                            onChange={(e) => this.handleRadioChange(prop.name, e)}
+                            onChange={(e) => this.handleRadioChange(prop.name, e, prop.entityLevel)}
                             value={prop.value}
                             name={prop.name}
                             aria-label="B"
@@ -298,7 +389,7 @@ class DynamicForm extends React.Component {
                     labelText={prop.labelText}
                     name={prop.name}
                     value={prop.checked}
-                    onChange={(e) => this.SetCheckValue(prop.name, e)}
+                    onChange={(e) => this.SetCheckValue(prop.name, e, prop.entityLevel)}
                     formControlProps={{
                         fullWidth: true
                     }}
@@ -312,13 +403,30 @@ class DynamicForm extends React.Component {
         }
     }
 
-    handleProductType = (e) => {
-        this.state.screendata = [];
+    handleProductType = (e, type) => {
+        if (type == "Parent") {
+            this.state.dynamicobject = [];
+        }
         this.state.showComponents = false;
-        this.setState({ [e.target.name]: e.target.value });
+        let name = e.target.name;
+        let value = e.target.value;
+        this.setState({ [name]: value });
 
+        if (type == "Parent") {
+            this.state.entityname = this.state.entitylist.Parent.filter(a => a.mID == e.target.value)[0].mValue === undefined
+                ? [] :
+                this.state.entitylist.Parent.filter(a => a.mID == e.target.value)[0].mValue;
+        }
+        this.setState({});
 
-        fetch(`${productConfig.productConfigUrl}/api/Product/SearchEntitiesByType?type=` + e.target.value + ``,
+        this.SearchEntities(e.target.value);
+
+        console.log("Entitylist: ", this.state.screendata)
+        console.log("Entitylist: ", this.state.entitylist)
+    }
+
+    SearchEntities = (id) => {
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetAllEntitiesById?Id=` + id + ``,
             {
                 method: 'Get',
                 //body: JSON.stringify(this.state.searchOrg),
@@ -330,29 +438,45 @@ class DynamicForm extends React.Component {
             }
         ).then(response => response.json())
             .then(data => {
-                this.setState({ screendata: data });
+                const lData = data;
                 console.log("dataCheck: ", data);
+                this.setState({ dynamicobject: data })
+
+                //let screenDTO = this.state.screendata;
+                //this.state.dynamicobject.push(lData[0].entityAttributes);
+                //screenDTO[type] = lData[0].entityAttributes;
+
+                //this.setState({ screenDTO });
+
+                console.log("dataCheck: ", data);
+                console.log("dataCheck: ", this.state.dynamicobject);
+
                 if (data.length == 0) {
                     this.setState({ showComponents: true });
                 }
             });
-
-        //fetch(`${productConfig.productConfigUrl}/api/Product/GetDynamicProduct?type=` + e.target.value + ``,
-        //    {
-        //        method: 'Get',
-        //        //body: JSON.stringify(this.state.searchOrg),
-        //        headers: {
-        //            'Accept': 'application/json',
-        //            'Content-Type': 'application/json',
-        //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-        //        },
-        //    }
-        //).then(response => response.json())
-        //    .then(data => {
-        //        this.setState({ screendata: data });
-        //        console.log("dataCheck: ", data);
-        //    });
     }
+
+    GetMasterService = (type, pID) => {
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetProductMaster?masterType=` + type + `&parentID=` + pID, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                const lData = data;
+                //let locDTO = ;
+                this.state.MasterDTO[type] = lData;
+                this.setState({});
+                console.log("GetMasterService: ", data);
+                console.log("GetMasterService: ", this.state.MasterDTO);
+            });
+
+    };
 
     handlesubmit = () => {
         console.log("selected: ", this.state.Dynamicdata)
@@ -361,15 +485,28 @@ class DynamicForm extends React.Component {
             this.tabledata();
         }
 
-        //Object.assign(this.state.Dynamicdata, {});
-        this.state.Dynamicdata = {};
-        for (let i = 0; i < this.state.screendata.length; i++) {
-            let screendata = this.state.screendata;
-            if (screendata[i].componentType != "Radio") {
-                screendata[i].value = "";
+        let objdata = this.state.dynamicobject
+        for (let i = 0; i < objdata.length; i++) {
+            let array = objdata[i];
+            for (let j = 0; j < array.length; j++) {
+                if (array[j].componentType != "Radio") {
+                    array[j].value = "";
+                }
             }
             this.setState({ radiovalue: "" });
         }
+
+        //Object.assign(this.state.Dynamicdata, {});
+        this.state.Dynamicdata = {};
+
+        //for (let i = 0; i < this.state.screendata.length; i++) {
+        //    let screendata = this.state.screendata;
+        //    if (screendata[i].componentType != "Radio") {
+        //        screendata[i].value = "";
+        //    }
+        //    this.setState({ radiovalue: "" });
+        //}
+
         console.log("Select ", this.state.Dynamicdata);
     }
 
@@ -395,20 +532,58 @@ class DynamicForm extends React.Component {
     }
 
     componentDidMount() {
-        //fetch(`${productConfig.productConfigUrl}/api/Product/GetDynamicProduct?type=Product`,
-        //    {
-        //        method: 'Get',
-        //        //body: JSON.stringify(this.state.searchRequest),
-        //        headers: {
-        //            'Content-Type': 'application/json; charset=utf-8',
-        //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-        //        },
-        //    }
-        //).then(response => response.json())
-        //    .then(data => {
-        //        this.setState({ screendata: data });
-        //        console.log("dataCheck: ", data);
-        //    });
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetMasterData?sMasterlist=das`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ masterList: data });
+                console.log("masterlist", data);
+            });
+        this.GetEntity(0, 'Parent');
+        this.GetMasterService('LOB', 0);
+    }
+
+    GetEntity = (id, type) => {
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetEntities?parentid=` + id + ``,
+            {
+                method: 'Get',
+                //body: JSON.stringify(this.state.searchRequest),
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            }
+        ).then(response => response.json())
+            .then(data => {
+                const lData = data;
+                let EntityDTO = this.state.entitylist;
+                EntityDTO[type] = lData;
+                this.setState({ EntityDTO });
+                console.log("dataCheck: ", data);
+            });
+    }
+
+    addFields = () => {
+
+        let fields = this.state.fields.selectedFields;
+        var multiselectedarray = fields.split(",");
+        let finalfields = this.state.selectedfields;
+        let obj = this.state.screendata;
+        for (let i = 0; i < fields.length; i++) {
+            for (let j = 0; j < obj.length; j++) {
+                if (obj[i].id == fields[i]) {
+                    finalfields.push(obj[i]);
+                }
+            }
+        }
+        this.setState({ finalfields });
+        console.log("fields: ", finalfields)
     }
 
     render() {
@@ -417,8 +592,6 @@ class DynamicForm extends React.Component {
             <div>
                 <GridContainer justify="center">
                     <GridItem xs={12} sm={12} md={12}>
-                        <DynamicEntity />
-
                         <Card>
                             <CardHeader color="rose" icon>
                                 <CardIcon color="rose">
@@ -436,53 +609,93 @@ class DynamicForm extends React.Component {
                                     <GridItem xs={12} sm={4} md={3}>
                                         <Dropdown
                                             required={true}
-                                            labelText="Select Product Type"
-                                            lstObject={this.state.ProductType}
-                                            value={this.state.type}
-                                            name='type'
-                                            onChange={(e) => this.handleProductType(e)}
+                                            labelText="Select Entity"
+                                            lstObject={this.state.entitylist.Parent}
+                                            value={this.state.parent}
+                                            name='parent'
+                                            onChange={(e) => this.handleProductType(e, 'Parent')}
                                             formControlProps={{ fullWidth: true }} />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={4} md={3}>
+                                        <FormControl
+                                            fullWidth
+                                            className={classes.selectFormControl}
+                                        >
+                                            <InputLabel
+                                                htmlFor="multiple-select"
+                                                className={classes.selectLabel}
+                                            >
+                                                Attributes
+                          </InputLabel>
+                                            <Select
+                                                multiple
+                                                value={this.state.fields.selectedFields}
+                                                onChange={this.onInputChange}
+                                                MenuProps={{ className: classes.selectMenu }}
+                                                classes={{ select: classes.select }}
+                                                inputProps={{
+                                                    name: "selectedFields",
+                                                    id: "multiple-select"
+                                                }}
+                                            >
+                                                {
+                                                    this.state.screendata.Parent.map(item =>
+                                                        <MenuItem
+                                                            value={item.id}
+                                                            classes={{
+                                                                root: classes.selectMenuItem,
+                                                                selected: classes.selectMenuItemSelected
+                                                            }}
+                                                        > {item.labelText}
+                                                        </MenuItem>
+                                                    )
+                                                }
+                                            </Select>
+                                        </FormControl>
+                                    </GridItem>
+                                    <GridItem xs={12} sm={4} md={3}>
+                                        <Button color="primary" round onClick={() => this.addFields()}>Add Fields</Button>
                                     </GridItem>
                                 </GridContainer>
                             </CardBody>
                         </Card>
-                        {(this.state.screendata.length > 0) ?
-                            <Card>
-                                <CardHeader color="rose" icon>
-                                    <CardIcon color="rose">
-                                        { /*  <FilterNone /> */}
 
-                                        <Icon><img id="icon" src={role} /></Icon>
+                        {(this.state.dynamicobject.length > 0) ?
+                            <div>
+                                {this.state.dynamicobject.map((item, key) => {
+                                    return (
+                                        <Card>
+                                            {(key == 0) ?
+                                                <CardHeader color="rose" icon>
+                                                    <CardIcon color="rose">
+                                                        { /*  <FilterNone /> */}
 
-                                    </CardIcon>
-                                    <h4>
-                                        <small>{/*<TranslationContainer translationKey="SearchOrganization" />*/}{this.state.type} </small>
-                                    </h4>
-                                </CardHeader>
-                                <CardBody>
-                                    <GridContainer>
-                                        {
-                                            this.state.screendata.map(item => {
-                                                if (item.componentType != "Button") {
-                                                    return (
-                                                        <GridItem xs={12} sm={4} md={3}>
-                                                            {this.handleRenderScreen(item)}
-                                                        </GridItem>
-                                                    );
-                                                }
-                                                else {
-                                                    return (
-                                                        <GridContainer justify="center">
-                                                            {this.handleRenderScreen(item)}
-                                                        </GridContainer>
-                                                    );
-                                                }
-                                            })
-                                        }
-                                    </GridContainer>
-                                </CardBody>
-                            </Card>
+                                                        <Icon><img id="icon" src={role} /></Icon>
+
+                                                    </CardIcon>
+                                                    <h4>
+                                                        <small>{/*<TranslationContainer translationKey="SearchOrganization" />*/}{this.state.entityname} </small>
+                                                    </h4>
+                                                </CardHeader>
+                                                : null}
+                                            <CardBody>
+                                                <GridContainer>
+                                                    {item.map(item1 => {
+                                                        return (
+                                                            <GridItem xs={12} sm={4} md={3}>
+                                                                {this.handleRenderScreen(item1)}
+                                                            </GridItem>
+                                                        );
+                                                    })}
+                                                </GridContainer>
+                                            </CardBody>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
                             : null}
+                        {/* */}
+
                         {this.state.showComponents ?
                             <Card>
                                 <CardHeader color="rose" icon>
@@ -493,7 +706,7 @@ class DynamicForm extends React.Component {
 
                                     </CardIcon>
                                     <h4>
-                                        <small>{/*<TranslationContainer translationKey="SearchOrganization" />*/}{this.state.type} </small>
+                                        <small>{/*<TranslationContainer translationKey="SearchOrganization" />*/}{this.state.entityname} </small>
                                     </h4>
                                 </CardHeader>
                                 <CardBody>

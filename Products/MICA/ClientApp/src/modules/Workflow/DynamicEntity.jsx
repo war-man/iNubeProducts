@@ -81,14 +81,14 @@ class DynamicEntity extends React.Component {
             entities: {
                 "enitityName": "",
                 "entityLevel": "",
-                "parentId": "",
+                "parentId": 0,
                 "type": "",
                 "entityAttributes": []
             },
             resetentities: {
                 "enitityName": "",
                 "entityLevel": "",
-                "parentId": "",
+                "parentId": 0,
                 "type": "",
                 "entityAttributes": []
             },
@@ -104,7 +104,7 @@ class DynamicEntity extends React.Component {
                 "futureDate": "",
                 "checked": "",
                 "parentId": "",
-                "type": "",
+                "parameter": "",
             },
             resetentityAttributes: {
                 "fieldType": "",
@@ -118,12 +118,15 @@ class DynamicEntity extends React.Component {
                 "futureDate": "",
                 "checked": "",
                 "parentId": "",
-                "type": "",
+                "parameter": "",
             },
             tabledata: [],
+            entityparent: "",
             array: [],
             showtable: false,
-            showEntity: false,
+            showAttributes: false,
+            entitylist: [],
+            type: "",
         };
     }
 
@@ -131,6 +134,10 @@ class DynamicEntity extends React.Component {
         let entities = this.state.entities;
         let name = e.target.name;
         let value = e.target.value;
+
+        if (name == "entityparent") {
+            this.setState({ [e.target.name]: e.target.value });
+        }
 
         entities[name] = value;
         this.setState({ entities });
@@ -148,10 +155,12 @@ class DynamicEntity extends React.Component {
         if (name == "labelText") {
             entityAttributes.name = e.target.value.split(" ").join("");
         }
-
-        let type = this.state.componenttype.filter(a => a.mID === entityAttributes.fieldType)[0].mValue === undefined
-            ? []
-            : this.state.componenttype.filter(a => a.mID === entityAttributes.fieldType)[0].mValue;
+        let type;
+        if (name == "fieldType") {
+            type = this.state.componenttype.filter(a => a.mID === entityAttributes.fieldType)[0].mValue === undefined
+                ? []
+                : this.state.componenttype.filter(a => a.mID === entityAttributes.fieldType)[0].mValue;
+        }
 
         if (type == "Radio") {
             entityAttributes.name = e.target.name.split(" ").join("");
@@ -209,6 +218,7 @@ class DynamicEntity extends React.Component {
                 console.log("dataCheck: ", data);
             });
 
+        this.GetEntity(0);
         //fetch(`${productConfig.productConfigUrl}/api/Product/SaveEntities`,
         //fetch(`${productConfig.productConfigUrl}/api/Product/SearchEntities?type=s`,
         //fetch(`${productConfig.productConfigUrl}/api/Product/SearchEntitiesByType?type=Product`,
@@ -226,6 +236,23 @@ class DynamicEntity extends React.Component {
         //        this.setState({ screendata: data });
         //        console.log("dataCheck: ", data);
         //    });
+    }
+
+    GetEntity = (id) => {
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetEntities?parentid=` + id + ``,
+            {
+                method: 'Get',
+                //body: JSON.stringify(this.state.searchRequest),
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            }
+        ).then(response => response.json())
+            .then(data => {
+                this.setState({ entitylist: data });
+                console.log("dataCheck: ", data);
+            });
     }
 
     handleAdd = () => {
@@ -273,13 +300,19 @@ class DynamicEntity extends React.Component {
         console.log("final Object: ", this.state.entities);
         console.log("final Object: ", this.state.array);
 
-        let entity = this.state.entities
+        let entity = this.state.entities;
 
-        entity['entityAttributes'] = this.state.array;
+        entity.parentId = this.state.entityparent;
+        let array = this.state.array;
+        for (let i = 0; i < array.length; i++) {
+            array[i].entityLevel = this.state.entities.entityLevel;
+        }
+        entity['entityAttributes'] = array;
+        this.setState({ entity });
         console.log("final Object: ", entity);
 
-        //fetch(`${productConfig.productConfigUrl}/api/Product/SaveEntities`, {
-        fetch(`http://localhost:59968/api/Product/SaveEntities`, {
+        fetch(`${productConfig.productConfigUrl}/api/Product/SaveEntities`, {
+            //fetch(`http://localhost:59968/api/Product/SaveEntities`, {
             method: 'Post',
             headers: {
                 'Accept': 'application/json',
@@ -296,18 +329,15 @@ class DynamicEntity extends React.Component {
                 })
                 this.state.entities = this.state.resetentities;
                 this.state.array = [];
+                this.state.entityparent = "";
                 this.state.tabledata = [];
                 this.state.entityAttributes = this.state.resetentityAttributes;
-                this.setState({ dropdown: false, mdropdown: false, date: false, radio: false, showtable: false, showEntity: false });
+                this.setState({ dropdown: false, mdropdown: false, date: false, radio: false, showtable: false, showAttributes: false });
             });
     }
 
-    handleOpen = () => {
-        this.setState({ showEntity: true });
-    }
-
-    handleClose = () => {
-        this.setState({ showEntity: false });
+    handleAttributes = () => {
+        this.setState({ showAttributes: true });
     }
 
     render() {
@@ -330,29 +360,92 @@ class DynamicEntity extends React.Component {
                         <CardBody>
                             <GridContainer>
                                 <GridItem xs={12} sm={4} md={3}>
-                                    <Dropdown
+                                    <CustomInput
+                                        //success={this.state.firstNameState == "success"}
+                                        //error={this.state.firstNameState == "error"}
+                                        //error={this.state.firstNameState}
+                                        labelText="Entity Name"
+                                        name="enitityName"
+                                        value={this.state.entities.enitityName}
                                         required={true}
-                                        labelText="Component Type"
-                                        lstObject={this.state.componenttype}
-                                        value={this.state.entityAttributes.fieldType}
-                                        name="fieldType"
-                                        onChange={(e) => this.handleComponentType(e)}
-                                        formControlProps={{ fullWidth: true }} />
+                                        onChange={(e) => this.SetValue(e)}
+                                        formControlProps={{ fullWidth: true }}
+                                    />
                                 </GridItem>
                                 <GridItem xs={12} sm={4} md={3}>
                                     <CustomInput
                                         //success={this.state.firstNameState == "success"}
                                         //error={this.state.firstNameState == "error"}
                                         //error={this.state.firstNameState}
-                                        labelText="Field Name"
-                                        name="labelText"
-                                        value={this.state.entityAttributes.labelText}
+                                        labelText="Entity Level"
+                                        name="entityLevel"
+                                        value={this.state.entities.entityLevel}
                                         required={true}
-                                        onChange={(e) => this.handlechange(e)}
+                                        onChange={(e) => this.SetValue(e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>
-                                {/* <GridItem xs={12} sm={4} md={3}>
+                                <GridItem xs={12} sm={4} md={3}>
+                                    <CustomInput
+                                        //success={this.state.firstNameState == "success"}
+                                        //error={this.state.firstNameState == "error"}
+                                        //error={this.state.firstNameState}
+                                        labelText="Type"
+                                        name="type"
+                                        value={this.state.entities.type}
+                                        required={true}
+                                        onChange={(e) => this.SetValue(e)}
+                                        formControlProps={{ fullWidth: true }}
+                                    />
+                                </GridItem>
+                                <GridItem xs={12} sm={4} md={3}>
+                                    <Dropdown
+                                        //required={true}
+                                        labelText="Parent"
+                                        lstObject={this.state.entitylist}
+                                        value={this.state.entityparent}
+                                        name='entityparent'
+                                        onChange={(e) => this.SetValue(e)}
+                                        formControlProps={{ fullWidth: true }} />
+                                </GridItem>
+                            </GridContainer>
+                            <GridContainer justify="center">
+                                <GridItem>
+                                    <Button color="primary" round onClick={() => this.handleAttributes()}> Attribute Details </Button>
+
+                                </GridItem>
+                            </GridContainer>
+
+                        </CardBody>
+                    </Card>
+                    {this.state.showAttributes ?
+                        <Card>
+                            <CardBody>
+                                <GridContainer>
+                                    <GridItem xs={12} sm={4} md={3}>
+                                        <CustomInput
+                                            //success={this.state.firstNameState == "success"}
+                                            //error={this.state.firstNameState == "error"}
+                                            //error={this.state.firstNameState}
+                                            labelText="Field Name"
+                                            name="labelText"
+                                            value={this.state.entityAttributes.labelText}
+                                            required={true}
+                                            onChange={(e) => this.handlechange(e)}
+                                            formControlProps={{ fullWidth: true }}
+                                        />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={4} md={3}>
+                                        <Dropdown
+                                            required={true}
+                                            labelText="Field Type"
+                                            lstObject={this.state.componenttype}
+                                            value={this.state.entityAttributes.fieldType}
+                                            name="fieldType"
+                                            onChange={(e) => this.handleComponentType(e)}
+                                            formControlProps={{ fullWidth: true }} />
+                                    </GridItem>
+                                    {/* <GridItem xs={12} sm={4} md={3}>
                                     <CustomInput
                                         //success={this.state.firstNameState == "success"}
                                         //error={this.state.firstNameState == "error"}
@@ -379,83 +472,94 @@ class DynamicEntity extends React.Component {
                                         formControlProps={{ fullWidth: true }}
                                     />
                                 </GridItem>*/}
-                                {this.state.radio ?
-                                    <GridItem xs={12} sm={4} md={3}>
-                                        <CustomInput
-                                            //success={this.state.firstNameState == "success"}
-                                            //error={this.state.firstNameState == "error"}
-                                            //error={this.state.firstNameState}
-                                            //placeholder="eg. Product or User"
-                                            labelText="Radio Value"
-                                            name="value"
-                                            value={this.state.entityAttributes.value}
-                                            required={true}
-                                            onChange={(e) => this.handlechange(e)}
-                                            formControlProps={{ fullWidth: true }}
-                                        />
-                                    </GridItem>
-                                    : null}
-                                <GridItem xs={12} sm={4} md={3}>
-                                    <Dropdown
-                                        required={true}
-                                        labelText="Is Mandatory field"
-                                        lstObject={this.state.booleanvalues}
-                                        value={this.state.entityAttributes.required}
-                                        name="required"
-                                        onChange={(e) => this.handlechange(e)}
-                                        formControlProps={{ fullWidth: true }} />
-                                </GridItem>
-                                {this.state.mdropdown ?
-                                    <GridItem xs={12} sm={4} md={3}>
-                                        <CustomInput
-                                            //success={this.state.firstNameState == "success"}
-                                            //error={this.state.firstNameState == "error"}
-                                            //error={this.state.firstNameState}
-                                            labelText="Filter Name"
-                                            name="filterName"
-                                            value={this.state.entityAttributes.filterName}
-                                            required={true}
-                                            onChange={(e) => this.handlechange(e)}
-                                            formControlProps={{ fullWidth: true }}
-                                        />
-                                    </GridItem>
-                                    : null}
-                                {(this.state.dropdown || this.state.mdropdown) ?
-                                    <GridItem xs={12} sm={4} md={3}>
-                                        <CustomInput
-                                            //success={this.state.firstNameState == "success"}
-                                            //error={this.state.firstNameState == "error"}
-                                            //error={this.state.firstNameState}
-                                            labelText="List object for Dropdown"
-                                            name="listObject"
-                                            value={this.state.entityAttributes.listObject}
-                                            required={true}
-                                            onChange={(e) => this.handlechange(e)}
-                                            formControlProps={{ fullWidth: true }}
-                                        />
-                                    </GridItem>
-                                    : null}
-                                {this.state.date ?
+                                    {this.state.radio ?
+                                        <GridItem xs={12} sm={4} md={3}>
+                                            <CustomInput
+                                                //success={this.state.firstNameState == "success"}
+                                                //error={this.state.firstNameState == "error"}
+                                                //error={this.state.firstNameState}
+                                                //placeholder="eg. Product or User"
+                                                labelText="Radio Value"
+                                                name="value"
+                                                value={this.state.entityAttributes.value}
+                                                required={true}
+                                                onChange={(e) => this.handlechange(e)}
+                                                formControlProps={{ fullWidth: true }}
+                                            />
+                                        </GridItem>
+                                        : null}
                                     <GridItem xs={12} sm={4} md={3}>
                                         <Dropdown
                                             required={true}
-                                            labelText="Future date"
+                                            labelText="Is Mandatory field"
                                             lstObject={this.state.booleanvalues}
-                                            value={this.state.entityAttributes.futureDate}
-                                            name="futureDate"
+                                            value={this.state.entityAttributes.required}
+                                            name="required"
                                             onChange={(e) => this.handlechange(e)}
                                             formControlProps={{ fullWidth: true }} />
                                     </GridItem>
-                                    : null}
-                                <GridContainer justify="center">
-                                    <GridItem xs={12} sm={4} md={3}>
-                                        <Button color="primary" round onClick={() => this.handleAdd()}>Add</Button>
-                                    </GridItem>
-                                </GridContainer>
+                                    {this.state.mdropdown ?
+                                        <GridItem xs={12} sm={4} md={3}>
+                                            <CustomInput
+                                                //success={this.state.firstNameState == "success"}
+                                                //error={this.state.firstNameState == "error"}
+                                                //error={this.state.firstNameState}
+                                                labelText="Filter Name"
+                                                name="filterName"
+                                                value={this.state.entityAttributes.filterName}
+                                                required={true}
+                                                onChange={(e) => this.handlechange(e)}
+                                                formControlProps={{ fullWidth: true }}
+                                            />
+                                        </GridItem>
+                                        : null}
+                                    {(this.state.dropdown || this.state.mdropdown) ?
+                                        <GridItem xs={12} sm={4} md={3}>
+                                            <CustomInput
+                                                //error={this.state.firstNameState}
+                                                labelText="List object for Dropdown"
+                                                name="listObject"
+                                                value={this.state.entityAttributes.listObject}
+                                                required={true}
+                                                onChange={(e) => this.handlechange(e)}
+                                                formControlProps={{ fullWidth: true }}
+                                            />
+                                        </GridItem>
+                                        : null}
+                                    {(this.state.dropdown || this.state.mdropdown) ?
+                                        <GridItem xs={12} sm={4} md={3}>
+                                            <CustomInput
+                                                //error={this.state.firstNameState}
+                                                labelText="Parameters"
+                                                name="parameter"
+                                                value={this.state.entityAttributes.parameter}
+                                                //required={true}
+                                                onChange={(e) => this.handlechange(e)}
+                                                formControlProps={{ fullWidth: true }} />
+                                        </GridItem>
+                                        : null}
+                                    {this.state.date ?
+                                        <GridItem xs={12} sm={4} md={3}>
+                                            <Dropdown
+                                                required={true}
+                                                labelText="Future date"
+                                                lstObject={this.state.booleanvalues}
+                                                value={this.state.entityAttributes.futureDate}
+                                                name="futureDate"
+                                                onChange={(e) => this.handlechange(e)}
+                                                formControlProps={{ fullWidth: true }} />
+                                        </GridItem>
+                                        : null}
+                                    <GridContainer justify="center">
+                                        <GridItem xs={12} sm={4} md={3}>
+                                            <Button color="primary" round onClick={() => this.handleAdd()}>Add</Button>
+                                        </GridItem>
+                                    </GridContainer>
 
-                            </GridContainer>
-                        </CardBody>
-                    </Card>
+                                </GridContainer>
+                            </CardBody>
+                        </Card>
+                        : null}
                     <GridContainer >
                         {this.state.showtable ?
                             <GridItem lg={12}>
@@ -466,20 +570,19 @@ class DynamicEntity extends React.Component {
                                         filterable
                                         columns={[
                                             {
-                                                Header: "Field Type",
-                                                accessor: "fieldType",
-                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
-                                                headerClassName: 'react-table-center',
-                                                minWidth: 100,
-                                                resizable: false,
-
-                                            },
-                                            {
                                                 Header: "Field Name",
                                                 accessor: "labelText",
                                                 setCellProps: (value) => ({ style: { textAlign: "left" } }),
                                                 headerClassName: 'react-table-center',
                                                 minWidth: 70,
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "Field Type",
+                                                accessor: "fieldType",
+                                                setCellProps: (value) => ({ style: { textAlign: "left" } }),
+                                                headerClassName: 'react-table-center',
+                                                minWidth: 100,
                                                 resizable: false,
                                             },
                                             {
@@ -512,75 +615,7 @@ class DynamicEntity extends React.Component {
                     {this.state.showtable ?
                         <GridContainer justify="center">
                             <GridItem>
-                                <Button color="primary" round onClick={() => this.handleOpen()}> Entity Details </Button>
-                                <Modal
-                                    aria-labelledby="simple-modal-title"
-                                    aria-describedby="simple-modal-description"
-                                    open={this.state.showEntity}
-                                    onClose={this.handleClose}>
-
-                                    <div className={classes.paper} id="Entitymodal">
-                                        <h4>  <small className="center-text"> Entity Details </small> </h4>
-                                        <Button color="success"
-                                            round
-                                            className={classes.marginRight}
-                                            id="close-bnt"
-                                            onClick={this.handleClose}>
-                                            &times;
-                                                        </Button>
-                                        <div id="disp" >
-                                            <CardBody>
-                                                <GridContainer>
-                                                    <GridItem xs={12} sm={4}>
-                                                        <CustomInput
-                                                            //success={this.state.firstNameState == "success"}
-                                                            //error={this.state.firstNameState == "error"}
-                                                            //error={this.state.firstNameState}
-                                                            labelText="Entity Name"
-                                                            name="enitityName"
-                                                            value={this.state.entities.enitityName}
-                                                            required={true}
-                                                            onChange={(e) => this.SetValue(e)}
-                                                            formControlProps={{ fullWidth: true }}
-                                                        />
-                                                    </GridItem>
-                                                    <GridItem xs={12} sm={4}>
-                                                        <CustomInput
-                                                            //success={this.state.firstNameState == "success"}
-                                                            //error={this.state.firstNameState == "error"}
-                                                            //error={this.state.firstNameState}
-                                                            labelText="Entity Level"
-                                                            name="entityLevel"
-                                                            value={this.state.entities.entityLevel}
-                                                            required={true}
-                                                            onChange={(e) => this.SetValue(e)}
-                                                            formControlProps={{ fullWidth: true }}
-                                                        />
-                                                    </GridItem>
-                                                    <GridItem xs={12} sm={4}>
-                                                        <CustomInput
-                                                            //success={this.state.firstNameState == "success"}
-                                                            //error={this.state.firstNameState == "error"}
-                                                            //error={this.state.firstNameState}
-                                                            labelText="Type"
-                                                            name="type"
-                                                            value={this.state.entities.type}
-                                                            required={true}
-                                                            onChange={(e) => this.SetValue(e)}
-                                                            formControlProps={{ fullWidth: true }}
-                                                        />
-                                                    </GridItem>
-                                                </GridContainer>
-                                                <GridContainer justify="center">
-                                                    <GridItem>
-                                                        <Button color="primary" round onClick={() => this.handleSubmit()}>Save Entity</Button>
-                                                    </GridItem>
-                                                </GridContainer>
-                                            </CardBody>
-                                        </div>
-                                    </div>
-
-                                </Modal>
+                                <Button color="primary" round onClick={() => this.handleSubmit()}>Save Entity</Button>
                             </GridItem>
                         </GridContainer>
                         : null}
