@@ -1476,7 +1476,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             {
                 if(item.Type=="Retention")
                 {
-                    var filterData = listdata.Where(s => s.Period == count).Select(s => s.OAllocatedRetention).ToList();
+                    var filterData = listdata.Where(s => s.Period == count).Select(s => s.AllocatedAmount).ToList();
                     var data1 = filterData[0].ToString();
                     item.AllocatedAmount = Convert.ToDecimal(data1);
 
@@ -1488,7 +1488,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 }
                 if (item.Type == "QS")
                 {
-                    var qsdata= listdata.Where(s => s.Period == count).Select(s => s.OAllocatedQS).ToList();
+                    var qsdata= listdata.Where(s => s.Period == count).Select(s => s.AllocatedAmount).ToList();
                     var qsvalue = qsdata[0].ToString();
                     item.AllocatedAmount = Convert.ToDecimal(qsvalue);
                     var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OAllocatedPremium).ToList();
@@ -1498,14 +1498,14 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     {
                         dist.AllocatedAmount = ((item.AllocatedAmount * dist.Share) / 100);
                         dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
-                        dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
-                        dist.Brokerage = ((item.AllocatedAmount * dist.BrokerageRate) / 100);
+                        dist.Commission = ((item.AllocatedPremium * dist.CommissionRate) / 100);
+                        dist.Brokerage = ((item.AllocatedPremium * dist.BrokerageRate) / 100);
                     }
 
                 }
                 if (item.Type == "Surplus")
                 {
-                    var qsdata = listdata.Where(s => s.Period == count).Select(s => s.OAllocatedSurplus).ToList();
+                    var qsdata = listdata.Where(s => s.Period == count).Select(s => s.ProvSurplusAmount).ToList();
                     var qsvalue = qsdata[0].ToString();
                     item.AllocatedAmount = Convert.ToDecimal(qsvalue);
                     var PreimunData = listdata.Where(s => s.Period == count).Select(s => s.OAllocatedPremium).ToList();
@@ -1515,8 +1515,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     {
                         dist.AllocatedAmount = ((item.AllocatedAmount * dist.Share) / 100);
                         dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
-                        dist.Commission = ((item.AllocatedAmount * dist.CommissionRate) / 100);
-                        dist.Brokerage = ((item.AllocatedAmount * dist.BrokerageRate) / 100);
+                        dist.Commission = ((item.AllocatedPremium * dist.CommissionRate) / 100);
+                        dist.Brokerage = ((item.AllocatedPremium * dist.BrokerageRate) / 100);
                     }
                 }
                 count++;
