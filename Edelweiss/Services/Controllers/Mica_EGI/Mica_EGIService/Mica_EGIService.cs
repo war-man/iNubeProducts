@@ -149,6 +149,20 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     response.GetSchedule.Sat = scheduledata.Sat;
                     response.GetSchedule.Sun = scheduledata.Sun;
 
+                    //This Method will return bool type
+                    //True - AD Balance exsist to process switch on transaction
+                    //False - AD Balance is Less than the AD Per Day Value of this Policy
+                    var BalanceExist = await ADBalanceCheck(null,PolicyNo,context);
+
+                    if(BalanceExist == false)
+                    {
+                        response.GetSchedule.SwitchStatus = false;
+                        response.GetSchedule.SwitchEnabled = false;
+                        response.Status = BusinessStatus.Ok;
+                        response.ResponseMessage = "AD Balance is not sufficient";
+                        return response;
+                    }
+
                     var checkstatus = _context.TblSwitchLog.LastOrDefault(x => x.PolicyNo == PolicyNo
                                                                   && x.VehicleNumber == VehicleRegistrationNo
                                                                   && x.CreatedDate.Value.Date == IndianTime.Date);
@@ -879,7 +893,26 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         SuccessResponse.Status = BusinessStatus.Ok;
                         errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is not yet Started";
                         errorInfo.ErrorCode = "ExtCUS";
-                        errorInfo.PropertyName = "NotFound";
+                        errorInfo.PropertyName = "FutureDatedPolicy";
+                        SuccessResponse.Errors.Add(errorInfo);
+                        return SuccessResponse;
+                    }
+
+
+                    //This Method will return bool type
+                    //True - AD Balance exsist to process switch on transaction
+                    //False - AD Balance is Less than the AD Per Day Value of this Policy
+                    var BalanceExist = await ADBalanceCheck(PolicyData, PolicyNo, context);
+
+                    if (BalanceExist == false)
+                    {
+                        ErrorInfo errorInfo = new ErrorInfo();
+
+                        SuccessResponse.ResponseMessage = "AD Balance is not sufficient";
+                        SuccessResponse.Status = BusinessStatus.Ok;
+                        errorInfo.ErrorMessage = "Trasactions are not allowed.AD Balance is not sufficient";
+                        errorInfo.ErrorCode = "ExtCUS";
+                        errorInfo.PropertyName = "ADBalanceLow";
                         SuccessResponse.Errors.Add(errorInfo);
                         return SuccessResponse;
                     }
@@ -2265,7 +2298,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var PolicyNumberList = _context.TblDailyActiveVehicles.Where(x => x.TxnDate.Value.Date == CurrentDate).Select(x => x.PolicyNumber).Distinct().ToList();
 
-            if(PolicyNumberList.Count < 0)
+            if(PolicyNumberList.Count <= 0)
             {
                 return false;
             }
@@ -2310,8 +2343,62 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
                 var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(policy, context);
 
+                //This Method will return bool type
+                //True - AD Balance exsist to process switch on transaction
+                //False - AD Balance is Less than the AD Per Day Value of this Policy
+                var BalanceExist = await ADBalanceCheck(PolicyData, policy, context);
+
+                if (BalanceExist == false)
+                {
+                    //Making Active Vehicle Force Full Off Because No AD Balance
+                    var SwitchLog = _context.TblSwitchLog.Where(x=>x.PolicyNo == policy && x.SwitchStatus == true &&
+                                                                x.CreatedDate.Value.Date == CurrentDate).ToList();
+                    if (SwitchLog.Count > 0)
+                    {
+                        foreach (var vehicle in SwitchLog)
+                        {
+                            vehicle.SwitchType = "ForcefullSwitchOff";
+                            vehicle.SwitchStatus = false;                         
+                        }
+                        _context.TblSwitchLog.UpdateRange(SwitchLog);
+                    }
+
+                    bookingLog = new TblPremiumBookingLog();
+
+                    bookingLog.PolicyNo = policy;
+                    bookingLog.TxnAmount = 0;
+                    bookingLog.BasePremium = 0;
+                    bookingLog.FromTax = 0;
+                    bookingLog.ToTax = 0;
+                    bookingLog.TxnDateTime = IndianTime;
+                    bookingLog.TxnStatus = true;
+                    bookingLog.TxnDetails = "Auto - Forcefull SwitchOff for Policy - " + policy;
+
+                    _context.TblPremiumBookingLog.Add(bookingLog);
+
+                   
+
+                    var DailyActiveData = _context.TblDailyActiveVehicles.LastOrDefault(x => x.TxnDate.Value.Date == CurrentDate && x.PolicyNumber == policy);
+                    
+                    if (DailyActiveData == null)
+                    {
+                        continue;
+                    }
+
+                     DailyActiveData.ActivePc = 0;
+                     DailyActiveData.ActiveTw = 0;
+                    _context.TblDailyActiveVehicles.Update(DailyActiveData);
+
+                    schedulerLog.SchedulerStatus = policy + " - AD Balance Not Sufficient";
+                    _context.TblSchedulerLog.Update(schedulerLog);
+
+                    _context.SaveChanges();
+
+                    continue;
+                }
 
                 PolicyPremiumDetailsDTO detailsDTO = new PolicyPremiumDetailsDTO();
+
                 try
                 {
                     if (PolicyData != null)
@@ -2375,6 +2462,14 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
                 var ActivePCCount = getDailyStat.ActivePc;
                 var ActiveTWCount = getDailyStat.ActiveTw;
+
+
+                //If No Active Vehicles are their for the Policy 
+                //Then We need to Skip this Policy
+                if(ActivePCCount == 0 && ActiveTWCount==0)
+                {
+                    continue;
+                }
 
 
 
@@ -9685,6 +9780,121 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return response;
 
         }
+
+        private async Task<bool> ADBalanceCheck(dynamic PolicyObject,string PolicyNo,ApiContext context)
+        {
+            try
+            {
+                dynamic PolicyData = null;
+
+                if (PolicyObject == null)
+                {
+                    //Call the Policy Service to Get Policy Details.
+                    //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
+                    PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+
+                    //Policy Call Failed or data not found.
+                    if (PolicyData == null)
+                    {
+                        return false;
+                    }
+
+                }
+                else
+                {
+                    PolicyData = PolicyObject;
+                }
+
+
+
+                decimal ADRatePerDay = 0;                   
+
+                List<MicaCDDTO> PremiumDetails = JsonConvert.DeserializeObject<List<MicaCDDTO>>(PolicyData["PremiumDetails"].ToString());
+
+                var CheckEndorsement = PremiumDetails.Any(x => x.Type == "EndorsementAdd" || x.Type == "EndorsementDel");
+
+
+                string StateCode = PolicyData["stateCode"];
+                string AccountNumber = PolicyData["CDAccountNumber"];
+
+                TaxTypeDTO TaxType = await TaxTypeForStateCode(StateCode, context);
+                                
+                if (CheckEndorsement)
+                {
+                    var CumAdPerDay = PolicyData["PremiumDetails"][0]["CumAdPerDay"];
+                    if (CumAdPerDay != null)
+                        ADRatePerDay = Convert.ToDecimal(CumAdPerDay);
+                    else
+                        ADRatePerDay = 0;
+                }
+                else
+                {
+                    var AdPerDay = PolicyData["PremiumDetails"][0]["AdPerDay"];
+                    if (AdPerDay != null)
+                        ADRatePerDay = Convert.ToDecimal(AdPerDay);
+                    else
+                        ADRatePerDay = 0;
+                }
+
+                EndorsementCalDTO endorsementCalDTO = new EndorsementCalDTO();
+                //Rate
+                endorsementCalDTO.dictionary_rate.FSTTAX_TAXTYPE = TaxType.FSTTAX_TAXTYPE;
+                endorsementCalDTO.dictionary_rate.TSTTAX_TAXTYPE = TaxType.TSTTAX_TAXTYPE;
+
+                //Rule
+                endorsementCalDTO.dictionary_rule.AD = ADRatePerDay.ToString();
+                endorsementCalDTO.dictionary_rule.ADDAYS = "1";
+
+                //FT
+                endorsementCalDTO.dictionary_rule.FT = "0";
+                endorsementCalDTO.dictionary_rule.FTDAYS = "0";
+
+
+
+                var CalculatePremium = await EndorsementCalculator(endorsementCalDTO, context);
+
+                if (CalculatePremium.Count > 0)
+                {
+                    var ADPerDay = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADPREM").EValue);
+
+                    var ADFromTaxAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADFTTAX").EValue);
+
+                    var ADToTaxAmount = Convert.ToDecimal(CalculatePremium.FirstOrDefault(x => x.Entity == "ADTSTAX").EValue);
+
+                    var ADPerDayWithTax = ADPerDay + ADFromTaxAmount + ADToTaxAmount;
+
+                    var AccountData = await _integrationService.GetCDAccountDetails(AccountNumber, "AD", context);
+
+                    if (AccountData.Status != BusinessStatus.Ok)
+                    {
+                        return false;
+                    }
+
+                    if(AccountData.TotalAvailableBalance < ADPerDayWithTax)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+
+                }
+                else
+                {
+                    return false;
+                }
+
+
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
+
     }
 }
 
