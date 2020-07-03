@@ -94,11 +94,11 @@ function a11yProps(index) {
 
 const MyTab = withStyles(theme => ({
     root: {
-        backgroundColor: "#ccc",
+        backgroundColor: localStorage.getItem('primaryColor'),
         // borderRadius: theme.shape.borderRadius
     },
     wrapper: {
-        backgroundColor: "#ddd",
+        backgroundColor: localStorage.getItem('primaryColor'),
         //padding: theme.spacing(2),
         //borderRadius: theme.shape.borderRadius
     },
@@ -163,7 +163,8 @@ const ProductDetails = (props) => {
                                 aria-label="Vertical tabs example"
                             //className={classes.tabs}
                             >
-                                <MyTab label="CWE & Premium"
+                                <MyTab classname="color"
+                                    label="CWE & Premium"
                                     icon={<Cover />}
                                     {...a11yProps(0)}
                                 />
@@ -227,10 +228,10 @@ const ProductDetails = (props) => {
                                         { stepName: "Channels", stepComponent: Channels, stepId: "Channels", stepData: props },
                                         //{ stepName: "Payment", stepComponent: Payment, stepId: "Risk", stepData: props },
                                         //{ stepName: "Account", stepComponent: Account, stepId: "Risk", stepData: props },
-                                ]}
-                                title=""
-                                subtitle=""
-                            />
+                                    ]}
+                                    title=""
+                                    subtitle=""
+                                />
 
                             </TabPanel>
 

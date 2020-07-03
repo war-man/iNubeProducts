@@ -240,7 +240,7 @@ class DynamicForm extends React.Component {
                     this.GetMasterService(splitstring[i], event.target.value);
                 }
             }
-            {
+            if (isvalid == true) {
                 this.GetMasterService(type, event.target.value)
             }
             //this.GetMasterService(type, event.target.value);
