@@ -7490,7 +7490,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             if (result)
             {
-                return new ResponseStatus { Status = BusinessStatus.Ok, ResponseMessage = "Card Details updated successfully" };
+                return new ResponseStatus { Status = BusinessStatus.Updated, ResponseMessage = "Card Details updated successfully" };
             }
             else
             {
