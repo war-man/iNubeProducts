@@ -1114,7 +1114,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
             var RIMappingDTO = _mapper.Map<TblRimappingDto>(tblRiMapping);
 
             //step2
-            var RImappingDetails = _context.TblRimappingDetail.Where(a => a.RimappingId == RIMappingDTO.RimappingId).ToList();
+            var RImappingDetails = _context.TblRimappingDetail.Where(a => a.RimappingId == RIMappingDTO.RimappingId).OrderBy(s=>s.SequenceNo).ToList();
             var LstRImappingDetails = _mapper.Map<List<TblRimappingDetailDto>>(RImappingDetails);
 
             //step3
@@ -1458,14 +1458,6 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
 
 
-            //mapDetails.Type = "FAC";
-            //mapDetails.Percentage = 0;
-            //mapDetails.Limit = 0;
-            //mapDetails.AllocationBasis = "";
-            //mapDetails.NoOfLines = 0;
-            //mapDetails.AllocatedAmount = facAllocatedAmunt;
-            //mapDetails.AllocatedPremium = 0;
-            //mapDetails1.Add(mapDetails);
 
 
 
@@ -1522,6 +1514,23 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 count++;
             }
 
+
+
+            var facData = listdata.Where(s => s.Period == (count-1)).Select(s => s.OBalance).ToList();
+            var facAllocatedAmunt = Convert.ToDecimal(facData[0].ToString());
+            if (facAllocatedAmunt>0)
+            {
+
+                mapDetails = new MapDetails();
+                mapDetails.Type = "FAC";
+                mapDetails.Percentage = 0;
+                mapDetails.Limit = 0;
+                mapDetails.AllocationBasis = "";
+                mapDetails.NoOfLines = 0;
+                mapDetails.AllocatedAmount = facAllocatedAmunt;
+                mapDetails.AllocatedPremium = 0;
+                c.Add(mapDetails);
+            }
             var d = c;
 
             //Preparing Json 
