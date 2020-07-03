@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Http;
 using System.Web;
 using iNube.Utility.Framework;
 using Microsoft.AspNetCore.Authorization;
+using inube.Services.Notification.Helpers;
 //using AutoMapper.Configuration;
 //using System.Web.Script.Serialization;
 
@@ -34,13 +35,14 @@ namespace inube.Services.Notification.Controllers.DMS
         private readonly IDMSService _dMSService;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-
-        public DMSController(IDMSService dMSService, IEmailService emailService,
+        private readonly INEmailService _emailNService;
+        public DMSController(IDMSService dMSService, IEmailService emailService, INEmailService emailNService,
         IConfiguration configuration)
         {
             _dMSService = dMSService;
             _emailService = emailService;
             _configuration = configuration;
+            _emailNService = emailNService;
         }
         [HttpPost("[action]")]
         public IActionResult Documentupload(string tagName, string tagValue)
@@ -191,7 +193,7 @@ namespace inube.Services.Notification.Controllers.DMS
             emailTest.IsAttachment = false;
 
 
-            TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+            TemplateHelper templateHelper = new TemplateHelper(_emailService, _emailNService,_configuration);
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             templateHelper.SendEmailAsync(emailTest);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed

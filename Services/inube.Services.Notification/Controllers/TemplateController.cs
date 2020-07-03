@@ -33,14 +33,15 @@ namespace inube.Services.Notification.Template
         private ICompositeViewEngine _viewEngine;
        // private string number;
         private readonly IDMSService _iDMSService;
-
-        public TemplateController(IDMSService idMSService,IHostingEnvironment host, IEmailService emailService, IConfiguration configuration, ICompositeViewEngine viewEngine)
+        private readonly INEmailService _emailNService;
+        public TemplateController(IDMSService idMSService,IHostingEnvironment host, INEmailService emailNService, IEmailService emailService, IConfiguration configuration, ICompositeViewEngine viewEngine)
         {
             _viewEngine = viewEngine;
             _host = host;
             _emailService = emailService;
             _configuration = configuration;
             _iDMSService = idMSService;
+            _emailNService = emailNService;
         }
         public IActionResult Index()
         {
@@ -102,7 +103,7 @@ namespace inube.Services.Notification.Template
 
             };
             var binary = await content.BuildFile(ControllerContext);
-            TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+            TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
             //await templateHelper.ProcessNotificationAsync(binary);
             // File.WriteAllBytes(@"C:\testpdf.pdf", binary);
             return content;
@@ -235,7 +236,7 @@ namespace inube.Services.Notification.Template
             if (ControllerContext.ActionDescriptor != null)
             {
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 await templateHelper.ProcessNotificationAsync(model.PolicyNumber, binary, model.EmailTest);
             }
             else
@@ -243,7 +244,7 @@ namespace inube.Services.Notification.Template
                 //ControllerContext controllerContext = new ControllerContext(
                 //new ActionContext(ControllerContext.HttpContext, new RouteData(), new ControllerActionDescriptor()) );
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 await templateHelper.ProcessNotificationAsync(model.PolicyNumber, binary, model.EmailTest);
             }
             // File.WriteAllBytes(@"C:\testpdf.pdf", binary);
@@ -270,7 +271,7 @@ namespace inube.Services.Notification.Template
             if (ControllerContext.ActionDescriptor != null)
             {
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 if (model.IsAwsS3Save)
                 {
                     FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
@@ -283,7 +284,7 @@ namespace inube.Services.Notification.Template
                 //ControllerContext controllerContext = new ControllerContext(
                 //new ActionContext(ControllerContext.HttpContext, new RouteData(), new ControllerActionDescriptor()) );
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService ,_configuration);
                 if (model.IsAwsS3Save)
                 {
                     FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
@@ -312,7 +313,7 @@ namespace inube.Services.Notification.Template
             if (ControllerContext.ActionDescriptor != null)
             {
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 if (model.IsAwsS3Save)
                 {
                     FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
@@ -325,7 +326,7 @@ namespace inube.Services.Notification.Template
                 //ControllerContext controllerContext = new ControllerContext(
                 //new ActionContext(ControllerContext.HttpContext, new RouteData(), new ControllerActionDescriptor()) );
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 if (model.IsAwsS3Save)
                 {
                     FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
@@ -356,7 +357,7 @@ namespace inube.Services.Notification.Template
             if (ControllerContext.ActionDescriptor != null)
             {
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 await templateHelper.ProcessProductApiKitNotificationAsync(binary, model.EmailTest);
             }
             else
@@ -364,7 +365,7 @@ namespace inube.Services.Notification.Template
                 //ControllerContext controllerContext = new ControllerContext(
                 //new ActionContext(ControllerContext.HttpContext, new RouteData(), new ControllerActionDescriptor()) );
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 await templateHelper.ProcessProductApiKitNotificationAsync(binary, model.EmailTest);
             }
             // File.WriteAllBytes(@"C:\testpdf.pdf", binary);
@@ -388,7 +389,7 @@ namespace inube.Services.Notification.Template
             if (ControllerContext.ActionDescriptor != null)
             {
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 await templateHelper.ProcessMultiCoverNotificationAsync(binary, model.EmailTest);
             }
             else
@@ -396,7 +397,7 @@ namespace inube.Services.Notification.Template
                 //ControllerContext controllerContext = new ControllerContext(
                 //new ActionContext(ControllerContext.HttpContext, new RouteData(), new ControllerActionDescriptor()) );
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 await templateHelper.ProcessMultiCoverNotificationAsync(binary, model.EmailTest);
             }
             // File.WriteAllBytes(@"C:\testpdf.pdf", binary);
@@ -415,7 +416,7 @@ namespace inube.Services.Notification.Template
             return View(model);
         }
 
-        public async System.Threading.Tasks.Task<ResponseStatus> NotificationTemplate(dynamic model, TemplateModel templateModel)
+        public async System.Threading.Tasks.Task<ResponseStatus> NotificationTemplate(dynamic model, TemplateModel templateModel,ApiContext apiContext)
         {
             var content = new ViewAsPdf(templateModel.ViewUrl, model)
             {
@@ -427,7 +428,7 @@ namespace inube.Services.Notification.Template
             if (ControllerContext.ActionDescriptor != null)
             {
                 var binary = await content.BuildFile(ControllerContext);
-                TemplateHelper templateHelper = new TemplateHelper(_emailService, _configuration);
+                TemplateHelper templateHelper = new TemplateHelper(_emailService,_emailNService, _configuration);
                 if (templateModel.IsAwsS3Save)
                 {
                     FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
@@ -452,11 +453,12 @@ namespace inube.Services.Notification.Template
                 }
                 if (templateModel.ActionType == "ProductApi")
                 {
-                    await templateHelper.ProcessNotificationEmailAsync(templateModel.FileName, binary, model.EmailTest);
+                    await templateHelper.ProcessNotificationEmailAsync(templateModel.FileName, binary, model.EmailTest,apiContext);
                 }
                 if (templateModel.ActionType == "InsuranceCertificate")
                 {
-                    await templateHelper.ProcessNotificationEmailAsync(templateModel.FileName, binary, model.EmailTest);
+
+                    await templateHelper.ProcessNotificationEmailAsync(templateModel.FileName, binary, model.EmailTest, apiContext);
                     FileUploadDTO fileUploadDTO = new FileUploadDTO() { FileData = binary, FileExtension = "PDF", FileName = content.FileName, ContentType = MediaTypeNames.Application.Pdf };
                     ImageDTO imageDTO = new ImageDTO();
                     imageDTO.fileUploadDTOs.Add(fileUploadDTO);

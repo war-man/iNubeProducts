@@ -1,4 +1,6 @@
-﻿using inube.Services.Notification.Models;
+﻿using inube.Services.Notification.Helpers;
+using inube.Services.Notification.Models;
+using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -13,10 +15,12 @@ namespace inube.Services.Notification.Controllers
     {
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        public TemplateHelper(IEmailService emailService,IConfiguration configuration)
+        private readonly INEmailService _emailNService;
+        public TemplateHelper(IEmailService emailService, INEmailService emailNService,IConfiguration configuration)
         {
             _configuration = configuration;
             _emailService = emailService;
+            _emailNService = emailNService;
         }
         public async Task<bool> ProcessNotificationAsync()
         {
@@ -140,9 +144,10 @@ namespace inube.Services.Notification.Controllers
             return true;
         }
 
-        public async Task<bool> ProcessNotificationEmailAsync(string fileName, byte[] fileArray, EmailRequest emailTest)
+        public async Task<bool> ProcessNotificationEmailAsync(string fileName, byte[] fileArray, EmailRequest emailTest,ApiContext apiContext)
         {
-            await SendProcessEmail(fileName, emailTest, fileArray);
+
+            await SendProcessEmail(fileName, emailTest, fileArray, apiContext);
             return true;
         }
         public async Task<bool> ProcessQuotationNotificationAsync(byte[] fileArray, EmailRequest emailTest)
@@ -241,59 +246,67 @@ namespace inube.Services.Notification.Controllers
             }
             await Task.CompletedTask;
         }
-        public async Task SendProcessEmail(string fileName, EmailRequest emailTest, byte[] fileArray, bool IsPartner = false)
+        public async Task SendProcessEmail(string fileName, EmailRequest emailTest, byte[] fileArray,ApiContext apiContext, bool IsPartner = false)
         {
-            using (var client = new SmtpClient())
+            if (fileArray.Length > 0 && emailTest.IsAttachment)
             {
-                var credential = new NetworkCredential
-                {
-                    UserName = _configuration["Email:Email"],
-                    Password = _configuration["Email:Password"]
-                };
-
-                client.Credentials = credential;
-                client.Host = _configuration["Email:Host"];
-                client.Port = int.Parse(_configuration["Email:Port"]);
-                client.EnableSsl = true;
-
-                using (var emailMessage = new MailMessage())
-                {
-                    if (fileArray.Length > 0 && emailTest.IsAttachment)
-                    {
-                        var memStream = new MemoryStream(fileArray);
-                        memStream.Position = 0;
-                        var contentType = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Pdf);
-                        var reportAttachment = new Attachment(memStream, contentType);
-                        reportAttachment.ContentDisposition.FileName = $"{fileName}";
-                        emailMessage.Attachments.Add(reportAttachment);
-                    }
-                    if (IsPartner)
-                    {
-                        emailMessage.To.Add(new MailAddress(emailTest.PartnerEmail));
-                    }
-                    else
-                    {
-                        emailMessage.To.Add(new MailAddress(emailTest.To));
-                    }
-                    emailMessage.From = new MailAddress(_configuration["Email:Email"]);
-                    emailMessage.Subject = emailTest.Subject;
-                    emailMessage.Body = emailTest.Message;
-                    if (emailTest.Message.EndsWith("</html>"))
-                    {
-                        emailMessage.IsBodyHtml = true;
-                    }
-                    try
-                    {
-                        client.Send(emailMessage);
-                    }
-                    catch (Exception ex)
-                    {
-
-                        var error = ex.ToString();
-                    }
-
-                }
+                EmailAttachment emailAttachment = new EmailAttachment() { FileName = fileName, FileData = fileArray, FileExtension = ".Pdf" };
+                emailTest.Attachments.Add(emailAttachment);
             }
+            emailTest.mailTo.Add(emailTest.To);
+            var response = await _emailNService.SendEmail(emailTest, apiContext);
+            //using (var client = new SmtpClient())
+            //{
+            //    var credential = new NetworkCredential
+            //    {
+            //        UserName = _configuration["Email:Email"],
+            //        Password = _configuration["Email:Password"]
+            //    };
+
+            //    client.Credentials = credential;
+            //    client.Host = _configuration["Email:Host"];
+            //    client.Port = int.Parse(_configuration["Email:Port"]);
+            //    client.EnableSsl = true;
+
+            //    using (var emailMessage = new MailMessage())
+            //    {
+            //        if (fileArray.Length > 0 && emailTest.IsAttachment)
+            //        {
+            //            var memStream = new MemoryStream(fileArray);
+            //            memStream.Position = 0;
+            //            var contentType = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Pdf);
+            //            var reportAttachment = new Attachment(memStream, contentType);
+            //            reportAttachment.ContentDisposition.FileName = $"{fileName}";
+            //            emailMessage.Attachments.Add(reportAttachment);
+            //        }
+            //        if (IsPartner)
+            //        {
+            //            emailMessage.To.Add(new MailAddress(emailTest.PartnerEmail));
+            //        }
+            //        else
+            //        {
+            //            emailMessage.To.Add(new MailAddress(emailTest.To));
+            //        }
+            //        emailMessage.From = new MailAddress(_configuration["Email:Email"]);
+            //        emailMessage.Subject = emailTest.Subject;
+            //        emailMessage.Body = emailTest.Message;
+            //        if (emailTest.Message.EndsWith("</html>"))
+            //        {
+            //            emailMessage.IsBodyHtml = true;
+            //        }
+            //        try
+            //        {
+            //            client.Send(emailMessage);
+            //        }
+            //        catch (Exception ex)
+            //        {
+
+            //            var error = ex.ToString();
+            //        }
+
+            //    }
+            //}
+
             await Task.CompletedTask;
         }
 

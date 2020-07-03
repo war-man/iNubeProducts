@@ -509,10 +509,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                     lead.ProductId = Convert.ToInt32(productId);
                                     dr["PartnerId"] = apiContext.PartnerId;
                                     lead.PartnerId = Convert.ToInt32(apiContext.PartnerId);
-                                    dr["SMSstatus"] = sms;
-                                    lead.Smsstatus = sms;
-                                    dr["Emailstatus"] = email;
-                                    lead.Emailstatus = email;
+
                                     if (worksheet.Cells[row, 5].Value != null)
                                     {
                                         IsPayment = (bool)worksheet.Cells[row, 5].Value;
@@ -528,6 +525,10 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                                         }
                                         lead.IsPolicyIssuance = IsPolicyIssue;
                                     }
+                                    dr["SMSstatus"] = !IsPolicyIssue;
+                                    lead.Smsstatus = !IsPolicyIssue;
+                                    dr["Emailstatus"] = !IsPolicyIssue;
+                                    lead.Emailstatus = !IsPolicyIssue;
                                     //if (worksheet.Cells[row, 6].Value != null)
                                     //{
                                     //    dr["IsPolicyIssue"] = (bool)worksheet.Cells[row, 6].Value;
