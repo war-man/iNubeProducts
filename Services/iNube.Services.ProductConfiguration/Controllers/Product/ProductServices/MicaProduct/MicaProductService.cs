@@ -810,7 +810,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     {
                         foreach (var benefitItem in itemCover.ProductBenefits)
                         {
-                            benefitItem.BenefitCriterias = masProductMaster.FirstOrDefault(p => p.Key == benefitItem.BenefitCriteria).Value;
+                            benefitItem.BenefitCriterias = masProductMaster.FirstOrDefault(p => p.Key == benefitItem.BenefitTypeId).Value;
                         }
                     }
                 }

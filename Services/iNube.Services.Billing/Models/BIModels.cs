@@ -39,7 +39,7 @@ namespace iNube.Services.Billing.Models
         public DateTime? CreatedDate { get; set; }
         public string IsActive { get; set; }
 
-        public virtual TblContract Contract { get; set; }
+       // public virtual TblContract Contract { get; set; }
         public virtual ICollection<TblBillingItem> TblBillingItem { get; set; }
     }
 
@@ -321,6 +321,9 @@ namespace iNube.Services.Billing.Models
         public string AddressLine3 { get; set; }
         public int? PincodeId { get; set; }
 
+        public string City { get; set; }
+        public string State { get; set; }
+        public string Country { get; set; }
         //public virtual MasCityDTO City { get; set; }
         //public virtual MasCountryDTO Country { get; set; }
         ////public virtual TblCustomers Customer { get; set; }
