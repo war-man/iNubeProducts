@@ -2431,7 +2431,8 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
 
             if (ps != null && ps.CustAddress.Count > 0)
             {
-                model.insurerAddress = new InsurerAddress() { AddressLine1 = ps.CustAddress.FirstOrDefault().AddressLine1, AddressLine2 = ps.CustAddress.FirstOrDefault().AddressLine2, City = "BANGLORE", State = "KARNATAKA", PinCode = "560012" };
+                var addrs = ps.CustAddress.FirstOrDefault();
+                model.insurerAddress = new InsurerAddress() { AddressLine1 = addrs.AddressLine1, AddressLine2 = addrs.AddressLine2, City = addrs.City, State = addrs.State, PinCode = addrs.PincodeId?.ToString() };
             }
 
             //OFFICE ADDRESS
@@ -2455,7 +2456,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             }
             if (string.IsNullOrEmpty(model.insuredDetails.InsuredContactName))
             {
-                model.insuredDetails.InsuredContactName = policyDTO.CoverNoteNo;
+                model.insuredDetails.InsuredContactName = policyDTO.InsuredName;
             }
             model.insuredDetails.InsuredEmailAddress = policyDTO.Email;
             model.insuredDetails.InsuredPhoneNumber = policyDTO.MobileNumber;
