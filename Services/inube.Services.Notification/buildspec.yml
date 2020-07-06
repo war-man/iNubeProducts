@@ -15,6 +15,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
+      - docker network ls
       - docker build -t $REPOSITORY_URI:notificationlatest Services/inube.Services.Notification
       - docker tag $REPOSITORY_URI:notificationlatest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
