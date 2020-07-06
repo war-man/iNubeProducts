@@ -7,10 +7,13 @@ FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
 COPY ["iNube.Services.ProductConfiguration.csproj", "iNube.Services.ProductConfiguration/"]
 RUN apt-get update && apt-get install -y nuget
-RUN nuget help | head -1
+
 RUN apt-get update && apt-get install -y curl 
 RUN curl -Iv google.com ; 
 RUN curl -Iv https://api.nuget.org/v3-flatcontainer/inube.utility.framework/index.json
+
+RUN nuget help 
+
 RUN dotnet restore "iNube.Services.ProductConfiguration/iNube.Services.ProductConfiguration.csproj"
 COPY . "iNube.Services.ProductConfiguration/"
 WORKDIR "/src/iNube.Services.ProductConfiguration"
