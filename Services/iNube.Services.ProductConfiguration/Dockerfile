@@ -6,7 +6,8 @@ EXPOSE 443
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
 COPY ["iNube.Services.ProductConfiguration.csproj", "iNube.Services.ProductConfiguration/"]
-RUN dotnet restore "iNube.Services.ProductConfiguration/iNube.Services.ProductConfiguration.csproj"
+RUN apt-get update && apt-get install -y nuget
+RUN nuget.exe restore "iNube.Services.ProductConfiguration/iNube.Services.ProductConfiguration.csproj"
 COPY . "iNube.Services.ProductConfiguration/"
 WORKDIR "/src/iNube.Services.ProductConfiguration"
 RUN apt-get update && apt-get install -y nuget
