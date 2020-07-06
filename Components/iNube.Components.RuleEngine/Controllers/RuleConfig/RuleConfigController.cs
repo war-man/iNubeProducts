@@ -13,6 +13,7 @@ using iNube.Components.RuleEngine.Models;
 using iNube.Components.RuleEngine.Entities;
 using iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService;
 using iNube.Utility.Framework.Model;
+using System.Threading.Tasks;
 
 namespace iNube.Components.RuleEngine.Controllers
 {
@@ -278,9 +279,9 @@ namespace iNube.Components.RuleEngine.Controllers
         //For Handle State 
         [AllowAnonymous]
         [HttpGet("HandleRuleState")]
-        public IActionResult HandleRuleState(decimal RuleId)
+        public async Task<IActionResult> HandleRuleState(decimal RuleId)
         {
-            var tblrulesetmap = _userService.HandleRuleState(RuleId);
+            var tblrulesetmap = await _userService.HandleRuleState(RuleId);
             return Ok(tblrulesetmap);
         }
 

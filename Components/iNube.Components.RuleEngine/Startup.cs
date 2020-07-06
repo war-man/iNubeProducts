@@ -8,6 +8,7 @@ using HealthChecks.UI.Client;
 using iNube.Components.RuleEngine.Controllers.AllocationConfig.AllocationConfigService;
 using iNube.Components.RuleEngine.Controllers.RuleConfig.RuleConfigService;
 using iNube.Components.RuleEngine.Controllers.RuleConfig.RuleEngineService;
+using iNube.Components.RuleEngine.Controllers.RuleEngine.RuleEngineService.IntegrationServices;
 using iNube.Components.RuleEngine.Entities;
 using iNube.Components.RuleEngine.Entities.AllocationEntities;
 using iNube.Components.RuleEngine.Helpers;
@@ -80,6 +81,7 @@ namespace iNube.Components.RuleEngine
             services.AddScoped<IRuleConfigService, RuleConfigService>();
             services.AddScoped<IRuleEngineService, RuleEngineService>();
             services.AddScoped<IAllocationConfigService, AllocationConfigService>();
+            services.AddScoped<IIntegrationService, IntegrationService>();
         }
 
     }

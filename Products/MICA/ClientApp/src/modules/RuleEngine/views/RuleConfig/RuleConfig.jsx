@@ -134,6 +134,7 @@ class RuleConfig extends React.Component {
                 { "mID": "Default", "mValue": "Default", "mType": "Default" }],
             ConditionType: "",
             rateFlag: false,
+            ruleObjFlag: false,
         };
         this.handleTags = this.handleTags.bind(this);
         this.reset = this.reset.bind(this);
@@ -144,6 +145,7 @@ class RuleConfig extends React.Component {
         //    this.state.ruleGroupFlag = true;
         //}
         if (event.target.value == "RuleGroup") {
+            this.setState({ ruleObjFlag: false });
             this.setState({
                 showTable: false, showColumn: false, showDateFrom: false, showDateTo: false, showDOBParameters: false, conditionalParamFlagFrom: false, conditionalParamFlagTo: false, showCondition: false, showConditionFrom: false, conditionAttrFlag: false, conditionOprFlag: false, isCheckFlag: false
             });
@@ -151,6 +153,7 @@ class RuleConfig extends React.Component {
             
         }
         else {
+            this.setState({ ruleObjFlag: true });
             this.setState({
                 showTable: false, showColumn: false, showDateFrom: false, showDateTo: false, showDOBParameters: false, conditionalParamFlagFrom: false, conditionalParamFlagTo: false, showCondition: false, showConditionFrom: false, ruleGroupFlag: false,
             });
@@ -251,6 +254,7 @@ class RuleConfig extends React.Component {
     //}
 
     handleSimpleConditionOp = event => {
+        console.log(this.state.ConditionType,'ConditionType')
         debugger;
         this.state.checkEvent = event.target.value;
         console.log(this.state.IsCheck, 'CheckData');
@@ -335,6 +339,14 @@ class RuleConfig extends React.Component {
                 this.setState({ conditionalParamFlagFrom: true });
                 this.setState({ rateFlag: false });
             }
+            if (this.state.ConditionType == "Default") {
+                this.setState({
+                    showDateFrom: false, showDateTo: false, showTable: false, showConditionFrom: false, showColumn: false, showCondition: false, showDOBParameters: false, conditionalParamFlagTo: false
+                });
+                this.setState({ conditionalParamFlagFrom: false });
+                this.setState({ rateFlag: false });
+                this.setState({ showConditionFrom: true });
+            }
         }
         else {
             this.setState({
@@ -379,17 +391,21 @@ class RuleConfig extends React.Component {
         //    this.state.fields.conditionvaluefrom = this.state.fields.conditionAttributesValueFrom;
         //    this.state.fields.conditionvalueto = this.state.fields.conditionAttributesValueTo;
         //}
-        if (this.state.ConditionType = "Parameter") {
+        debugger
+        var Type = "";
+        if (this.state.ConditionType == "Parameter") {
             this.state.fields.conditionvaluefrom = this.state.fields.conditionAttributesValueFrom;
             this.state.fields.conditionvalueto = this.state.fields.conditionAttributesValueTo;
+            Type = null;
         }
-        var Type = "";
-        if (this.state.ConditionType = "Rate") {
+        if (this.state.ConditionType == "Rate") {
             this.state.fields.conditionvaluefrom = this.state.fields.RateName;
             this.state.fields.conditionvalueto = this.state.fields.conditionAttributesValueTo;
             Type ="Rate";
         }
-
+        if (this.state.ConditionType == "Default") {
+            Type = null;
+        }
         //Checking ALL Condition Attributes and RUle Group Name
         var flagCheckAttr = false;
         if (this.state.ruleType != "") {
@@ -728,66 +744,7 @@ class RuleConfig extends React.Component {
                             <CardBody>
 
                                 <GridContainer>
-                                    <GridItem xs={12} sm={12} md={3}>
-                                        <FormControl
-                                            fullWidth
-                                            className={classes.selectFormControl}
-                                        >
-                                            <InputLabel
-                                                htmlFor="simple-select"
-                                                className={classes.selectLabel}
-                                            >
-                                                Rule Object
-                          </InputLabel>
-                                            <Select
-                                                value={this.state.fields.RuleObj}
-                                                onChange={this.handleState}
-                                                MenuProps={{
-                                                    className: classes.selectMenu
-                                                }}
-                                                classes={{
-                                                    select: classes.select
-                                                }}
-                                                inputProps={{
-                                                    name: "RuleObj",
-                                                    id: "simple-select"
-                                                }}
-                                            >
-                                                {
-                                                    this.state.ParamSetName.map(item =>
-                                                        <MenuItem
-                                                            value={item.paramSetId}
-                                                            classes={{
-                                                                root: classes.selectMenuItem,
-                                                                selected: classes.selectMenuItemSelected
-                                                            }}
-                                                        >
-                                                            {item.paramSetName}
-                                                        </MenuItem>
-                                                    )
-                                                }
-                                            </Select>
-                                        </FormControl>
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}>
-                                        <CustomInput
-                                            labelText="Rule Name"
-                                            id="RuleName"
-                                            value={this.state.fields.RuleName}
-                                            name='RuleName'
-                                            onChange={this.onInputChange}
-                                            formControlProps={{
-                                                fullWidth: true
-                                            }}
-                                        />
-                                    </GridItem>
-                                    <GridItem xs={12} sm={12} md={3}>
-                                        <CustomDatetime labelText="Start Date" id='StartDate' name='StartDate' onChange={(evt) => this.onDateChange('StartDate', evt)} value={this.state.fields.StartDate} required={true} formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
-                                    
-                                    <GridItem xs={12} sm={12} md={3}>
-                                    <CustomDatetime labelText="End Date" id='EndDate' name='StartDate' onChange={(evt) => this.onDateChange('EndDate', evt)} value={this.state.fields.EndDate} required={true} formControlProps={{ fullWidth: true }} />
-                                    </GridItem>
+
                                     <GridItem xs={12} sm={12} md={3}>
                                         <FormControl
                                             fullWidth
@@ -843,6 +800,69 @@ class RuleConfig extends React.Component {
                                             </Select>
                                         </FormControl>
                                     </GridItem>
+                                    {this.state.ruleObjFlag &&
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <FormControl
+                                                fullWidth
+                                                className={classes.selectFormControl}
+                                            >
+                                                <InputLabel
+                                                    htmlFor="simple-select"
+                                                    className={classes.selectLabel}
+                                                >
+                                                    Rule Object
+                          </InputLabel>
+                                                <Select
+                                                    value={this.state.fields.RuleObj}
+                                                    onChange={this.handleState}
+                                                    MenuProps={{
+                                                        className: classes.selectMenu
+                                                    }}
+                                                    classes={{
+                                                        select: classes.select
+                                                    }}
+                                                    inputProps={{
+                                                        name: "RuleObj",
+                                                        id: "simple-select"
+                                                    }}
+                                                >
+                                                    {
+                                                        this.state.ParamSetName.map(item =>
+                                                            <MenuItem
+                                                                value={item.paramSetId}
+                                                                classes={{
+                                                                    root: classes.selectMenuItem,
+                                                                    selected: classes.selectMenuItemSelected
+                                                                }}
+                                                            >
+                                                                {item.paramSetName}
+                                                            </MenuItem>
+                                                        )
+                                                    }
+                                                </Select>
+                                            </FormControl>
+                                        </GridItem>
+                                    }
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <CustomInput
+                                            labelText="Rule Name"
+                                            id="RuleName"
+                                            value={this.state.fields.RuleName}
+                                            name='RuleName'
+                                            onChange={this.onInputChange}
+                                            formControlProps={{
+                                                fullWidth: true
+                                            }}
+                                        />
+                                    </GridItem>
+                                    <GridItem xs={12} sm={12} md={3}>
+                                        <CustomDatetime labelText="Start Date" id='StartDate' name='StartDate' onChange={(evt) => this.onDateChange('StartDate', evt)} value={this.state.fields.StartDate} required={true} formControlProps={{ fullWidth: true }} />
+                                    </GridItem>
+                                    
+                                    <GridItem xs={12} sm={12} md={3}>
+                                    <CustomDatetime labelText="End Date" id='EndDate' name='StartDate' onChange={(evt) => this.onDateChange('EndDate', evt)} value={this.state.fields.EndDate} required={true} formControlProps={{ fullWidth: true }} />
+                                    </GridItem>
+                                    
 
                                 </GridContainer>
                             </CardBody>
@@ -973,6 +993,21 @@ class RuleConfig extends React.Component {
                                                     }
                                                 </Select>
                                             </FormControl>
+                                        </GridItem>
+                                    }
+                                    {this.state.isCheckFlag &&
+                                        <GridItem xs={12} sm={12} md={3}>
+                                            <Dropdown
+                                                labelText="Condition Type"
+                                                id="ConditionType"
+                                                value={this.state.ConditionType}
+                                                lstObject={this.state.typeList}
+                                                name='ConditionType'
+                                                onChange={this.onInputConditionalParam}
+                                                formControlProps={{
+                                                    fullWidth: true
+                                                }}
+                                            />
                                         </GridItem>
                                     }
                                     {this.state.conditionOprFlag &&
@@ -1158,21 +1193,7 @@ class RuleConfig extends React.Component {
                                         //    />
                                         //</GridItem>
                                     }
-                                    {this.state.isCheckFlag &&
-                                        <GridItem xs={12} sm={12} md={3}>
-                                            <Dropdown
-                                                labelText="Condition Type"
-                                                id="ConditionType"
-                                                value={this.state.ConditionType}
-                                                lstObject={this.state.typeList}
-                                                name='ConditionType'
-                                                onChange={this.onInputConditionalParam}
-                                                formControlProps={{
-                                                    fullWidth: true
-                                                }}
-                                            />
-                                        </GridItem>
-                                    }
+                                    
                                     {this.state.conditionalParamFlagFrom &&
                                         <GridItem xs={12} sm={12} md={3}>
                                             <FormControl

@@ -35,25 +35,24 @@ import sweetAlertStyle from "assets/jss/material-dashboard-pro-react/views/sweet
 class RuleExecution extends React.Component {
     constructor(props) {
         super(props);
-
-        
-
         this.state = {
             checkedA: true,
             checkedB: false,
             RuleId: "",
-
+            formFlag: false,
             // Redirect to the next Page ((Useless))
             //redirectto: '',
-
             RuleConditionName: [],
-            Rules:[],
+            Rules: [],
+            Rates:[],
             tblRuleConditionArray: [],
             displayOutputGrid: false,
             newData: [],
             result:[],
             fields: {
                 RuleName: ""
+            },
+            rate: {
             },
             people: [],
         };
@@ -89,11 +88,16 @@ class RuleExecution extends React.Component {
         fetch(`${ruleconfig.ruleEngineUrl}/RuleConfig/HandleRuleState?RuleId=` + event.target.value)
             .then(response => response.json())
             .then(data => {
-                this.setState({ Rules: data });
+                this.setState({ Rules: data.paramObj });
+                this.setState({ Rates: data.rateObj });
+                this.setState({ formFlag: true });
                 console.log("Rule Rules Data");
                 console.log(this.state.Rules);
-                var checkParam = JSON.stringify(this.state.Rules);
-                console.log('Check' + checkParam);
+                //var checkParam = JSON.stringify(this.state.Rules);
+                //console.log('Check' + checkParam);
+
+                //var checkRate = JSON.stringify(this.state.Rules);
+                //console.log('Check' + checkRate);
                 // For State Change
                 const fields = this.state.fields;
                 fields[event.target.name] = event.target.value;
@@ -142,6 +146,9 @@ class RuleExecution extends React.Component {
     onFormSubmit = (evt) => {
         var rst;
         this.setState({ displayOutputGrid: true });
+        var data = {
+            'ruleParameter': this.state.fields, 'rateParameter': this.state.rate,
+        };
         fetch(`${ruleconfig.ruleEngineUrl}/RuleEngine/CheckRuleSets/` + this.state.fields.RuleName, {
 
             method: 'post',
@@ -149,29 +156,31 @@ class RuleExecution extends React.Component {
                 'Accept': 'application/json',
                 'Content-Type':'application/json',
             },    
-            body: JSON.stringify(this.state.fields)
+            body: JSON.stringify(data)
         }).then(response => response.json())
             .then(data => {
                 console.log(data,'Data')
                 //alert(data.responseMessage);
                 this.setState({ result: data });
                 console.log(this.state.result, 'Results');
-                if (this.state.result.length > 0) {
-                    this.setState({
-                        newData: this.state.result.map((prop, key) => {
-
-                            return {
-                                ValidatorName: prop.validatorName,
-                                Outcome: prop.outcome,
-                                Message: prop.message,
-                                Code: prop.code,
-                            };
-                        })
-                    });
-                }
+                this.tabledata();
             });
-        
+    }
+    tabledata = (e, index) => {
+        debugger;
+        if (this.state.result.length > 0) {
+            this.setState({
+                newData: this.state.result.map((prop, key) => {
 
+                    return {
+                        ValidatorName: prop.validatorName,
+                        Outcome: prop.outcome,
+                        Message: prop.message,
+                        Code: prop.code,
+                    };
+                })
+            });
+        }
     }
     // For Rendering To the New Page
     onRuleMap = () => {
@@ -190,6 +199,11 @@ class RuleExecution extends React.Component {
         fields[evt.target.name] = evt.target.value;
         this.setState({ fields });
     };
+    onInputRateChange = (evt) => {
+        let rate = this.state.rate;
+        rate[evt.target.name] = evt.target.value;
+        this.setState({ rate });
+    }
     render() {
         const { classes } = this.props;
         return (
@@ -261,108 +275,273 @@ class RuleExecution extends React.Component {
 
                     </GridItem>
                 </GridContainer>
-
-                <form id="frmRule">
+                {this.state.formFlag &&
                     <GridContainer>
 
                         <GridItem xs={12} sm={12} md={12}>
                             <Card>
+                                {/*  <h5><small>Parameters</small></h5> */}
+                                <CardHeader color="info" icon >
+
+                                    {
+                                        <h3 >
+                                            <small>Parameters</small>
+                                        </h3>
+                                    }
+                                </CardHeader>
                                 <CardBody>
-                                    
-                                        <GridContainer>
-                                            {this.state.Rules.map((item, index) =>
-                                                <GridItem xs={12} sm={12} md={4} key={index}>
-                                                    <CustomInput labelText={item.paramName}
-                                                        // value={item.paramName}
-                                                        name={item.paramName}
-                                                        onChange={this.onInputParamChange}
-                                                        inputProps={{
-                                                            //type: "number"
-                                                        }}
-                                                        formControlProps={{ fullWidth: true }} />
 
-                                                </GridItem>
+                                <GridContainer>
+                                    {this.state.Rules.map((item, index) =>
+                                        <GridItem xs={12} sm={12} md={4} key={index}>
+                                            <CustomInput labelText={item.ruleParameter}
+                                                // value={item.paramName}
+                                                name={item.ruleParameter}
+                                                onChange={this.onInputParamChange}
+                                                inputProps={{
+                                                    //type: "number"
+                                                }}
+                                                formControlProps={{ fullWidth: true }} />
+
+                                        </GridItem>
 
 
-                                            )}
-                                        </GridContainer>
-                                    
-                                    <Button onClick={() => this.onFormSubmit()}
-                                        color="info"
-                                        size="sm"
-                                    >
-                                        EXECUTE
-                </Button>
-                              {    //{this.renderRedirect()}
-                //                    <Button onClick={() => this.handlename()}
-                //                        color="info"
-                //                        size="sm"
-                //                    >
-                //                        Rule_Mapping
-                //</Button>
-                                }
+                                    )}
+                                </GridContainer>
                                 </CardBody>
                             </Card>
 
                         </GridItem>
                     </GridContainer>
-                    {this.state.displayOutputGrid &&
+                }
+                {this.state.formFlag &&
+                    <GridContainer>
 
-                        <GridContainer>
-                            <GridItem xs={4} sm={12} md={12}>
-                                <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-                                    <CardBody className="product-search-tab">
-                                        <ReactTable
+                        <GridItem xs={12} sm={12} md={12}>
+                            <Card>
+                                <CardHeader color="info" icon >
+
+                                    {
+                                        <h3 >
+                                            <small>Rate Parameters</small>
+                                        </h3>
+                                    }
+                                </CardHeader>
+                                <CardBody>
+
+                                <GridContainer>
+                                    {this.state.Rates.map((item, index) =>
+                                        <GridItem xs={12} sm={12} md={4} key={index}>
+                                            <CustomInput labelText={item.rateParameter}
+                                                // value={item.paramName}
+                                                name={item.rateParameter}
+                                                onChange={this.onInputRateChange}
+                                                inputProps={{
+                                                    //type: "number"
+                                                }}
+                                                formControlProps={{ fullWidth: true }} />
+
+                                        </GridItem>
+
+
+                                    )}
+                                </GridContainer>
+
+                                    <GridContainer lg={12} justify="center">
+                                        <GridItem xs={5} sm={3} md={3} lg={1}>
+                                        <Button onClick={() => this.onFormSubmit()}
+                                                color="info"
+                                                round
+                                            >
+                                                EXECUTE
+                </Button>
+                                        </GridItem>
+                                </GridContainer>
+
+                               
+                                </CardBody>
+                            </Card>
+
+                        </GridItem>
+                    </GridContainer>
+
+                }
+                {this.state.displayOutputGrid &&
+
+                    <GridContainer xl={12}>
+                    <GridItem lg={12}>
+                                    <ReactTable
                                         data={this.state.newData}
-                                            filterable
-                                            columns={[
-                                                {
-                                                    Header: "Validator Name",
-                                                    accessor: "ValidatorName",
-                                                    minWidth: 30,
-                                                    style: { textAlign: "center" },
-                                                    headerClassName: 'react-table-center',
-                                                    resizable: false,
-                                                },
-                                                {
-                                                    Header: "Outcome",
-                                                    accessor: "Outcome",
-                                                    minWidth: 30,
-                                                    style: { textAlign: "center" },
-                                                    headerClassName: 'react-table-center',
-                                                    resizable: false,
-                                                },
-                                                {
-                                                    Header: "Message",
-                                                    accessor: "Message",
-                                                    minWidth: 30,
-                                                    style: { textAlign: "center" },
-                                                    headerClassName: 'react-table-center',
-                                                    resizable: false,
-                                                },
-                                                {
-                                                    Header: "Code",
-                                                    accessor: "Code",
-                                                    minWidth: 30,
-                                                    style: { textAlign: "center" },
-                                                    headerClassName: 'react-table-center',
-                                                    resizable: false,
-                                                }
+                                        filterable
+                                        columns={[
+                                            {
+                                                Header: "Validator Name",
+                                                accessor: "ValidatorName",
+                                                minWidth: 30,
+                                                style: { textAlign: "center" },
+                                                headerClassName: 'react-table-center',
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "Outcome",
+                                                accessor: "Outcome",
+                                                minWidth: 30,
+                                                style: { textAlign: "center" },
+                                                headerClassName: 'react-table-center',
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "Message",
+                                                accessor: "Message",
+                                                minWidth: 30,
+                                                style: { textAlign: "center" },
+                                                headerClassName: 'react-table-center',
+                                                resizable: false,
+                                            },
+                                            {
+                                                Header: "Code",
+                                                accessor: "Code",
+                                                minWidth: 30,
+                                                style: { textAlign: "center" },
+                                                headerClassName: 'react-table-center',
+                                                resizable: false,
+                                            }
 
-                                            ]}
-                                            defaultPageSize={5}
+                                        ]}
+                                        defaultPageSize={5}
                                         showPaginationTop={false}
                                         //pageSize={([this.state.result.length + 1] < 5) ? [this.state.length.length + 1] : 5}
-                                            showPaginationBottom
-                                            className="-striped -highlight"
-                                        />
-                                    </CardBody>
-                                </Animated>
-                            </GridItem>
-                        </GridContainer>
-                    }
+                                        showPaginationBottom
+                                        className="-striped -highlight"
+                                    />
+                        </GridItem>
+                    </GridContainer>
+                }
+                {
+                //    this.state.formFlag &&
+                //    <form id="frmRule">
+                //        <GridContainer>
 
-                </form>
+                //            <GridItem xs={12} sm={12} md={12}>
+                //                <Card>
+                //                    <CardBody>
+                //                    <small><h1>Parameters</h1></small>
+
+                //                        <GridContainer>
+                //                            {this.state.Rules.map((item, index) =>
+                //                                <GridItem xs={12} sm={12} md={4} key={index}>
+                //                                    <CustomInput labelText={item.ruleParameter}
+                //                                        // value={item.paramName}
+                //                                        name={item.ruleParameter}
+                //                                        onChange={this.onInputParamChange}
+                //                                        inputProps={{
+                //                                            //type: "number"
+                //                                        }}
+                //                                        formControlProps={{ fullWidth: true }} />
+
+                //                                </GridItem>
+
+
+                //                            )}
+                //                        </GridContainer>
+                //                        <small><h1>Rate Parameters</h1></small>
+                //                        <GridContainer>
+                //                            {this.state.Rates.map((item, index) =>
+                //                                <GridItem xs={12} sm={12} md={4} key={index}>
+                //                                    <CustomInput labelText={item.rateParameter}
+                //                                        // value={item.paramName}
+                //                                        name={item.rateParameter}
+                //                                        onChange={this.onInputRateChange}
+                //                                        inputProps={{
+                //                                            //type: "number"
+                //                                        }}
+                //                                        formControlProps={{ fullWidth: true }} />
+
+                //                                </GridItem>
+
+
+                //                            )}
+                //                        </GridContainer>
+
+                //                        <Button onClick={() => this.onFormSubmit()}
+                //                            color="info"
+                //                            size="sm"
+                //                        >
+                //                            EXECUTE
+                //</Button>
+                //                        {    //{this.renderRedirect()}
+                //                            //                    <Button onClick={() => this.handlename()}
+                //                            //                        color="info"
+                //                            //                        size="sm"
+                //                            //                    >
+                //                            //                        Rule_Mapping
+                //                            //</Button>
+                //                        }
+                //                    </CardBody>
+                //                </Card>
+
+                //            </GridItem>
+                //        </GridContainer>
+
+                //        {this.state.displayOutputGrid &&
+
+                //            <GridContainer>
+                //                <GridItem xs={4} sm={12} md={12}>
+                //                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
+                //                        <CardBody className="product-search-tab">
+                //                            <ReactTable
+                //                                data={this.state.newData}
+                //                                filterable
+                //                                columns={[
+                //                                    {
+                //                                        Header: "Validator Name",
+                //                                        accessor: "ValidatorName",
+                //                                        minWidth: 30,
+                //                                        style: { textAlign: "center" },
+                //                                        headerClassName: 'react-table-center',
+                //                                        resizable: false,
+                //                                    },
+                //                                    {
+                //                                        Header: "Outcome",
+                //                                        accessor: "Outcome",
+                //                                        minWidth: 30,
+                //                                        style: { textAlign: "center" },
+                //                                        headerClassName: 'react-table-center',
+                //                                        resizable: false,
+                //                                    },
+                //                                    {
+                //                                        Header: "Message",
+                //                                        accessor: "Message",
+                //                                        minWidth: 30,
+                //                                        style: { textAlign: "center" },
+                //                                        headerClassName: 'react-table-center',
+                //                                        resizable: false,
+                //                                    },
+                //                                    {
+                //                                        Header: "Code",
+                //                                        accessor: "Code",
+                //                                        minWidth: 30,
+                //                                        style: { textAlign: "center" },
+                //                                        headerClassName: 'react-table-center',
+                //                                        resizable: false,
+                //                                    }
+
+                //                                ]}
+                //                                defaultPageSize={5}
+                //                                showPaginationTop={false}
+                //                                //pageSize={([this.state.result.length + 1] < 5) ? [this.state.length.length + 1] : 5}
+                //                                showPaginationBottom
+                //                                className="-striped -highlight"
+                //                            />
+                //                        </CardBody>
+                //                    </Animated>
+                //                </GridItem>
+                //            </GridContainer>
+                //        }
+
+                //    </form>
+                }
+
                 {//<h4>
                  //   Def{this.state.result}
                 //</h4>

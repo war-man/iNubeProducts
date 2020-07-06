@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework;
 using Newtonsoft.Json;
+using iNube.Components.RuleEngine.Controllers.RuleEngine.RuleEngineService.IntegrationServices;
 
 namespace iNube.Components.RuleEngine.Controllers
 {
@@ -35,6 +36,7 @@ namespace iNube.Components.RuleEngine.Controllers
         private IRuleEngineService _userServiceRule;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
+        public IIntegrationService _integrationService;
         // For Join
         private RuleEngineContext _context_rule;
 
@@ -42,6 +44,7 @@ namespace iNube.Components.RuleEngine.Controllers
             IRuleEngineService userServiceRule,
             IMapper mapper,
             IOptions<AppSettings> appSettings,
+            IIntegrationService integrationService,
             // For Join
             RuleEngineContext context_rule)
         {
@@ -49,6 +52,7 @@ namespace iNube.Components.RuleEngine.Controllers
             _mapper = mapper;
             _appSettings = appSettings.Value;
             _context_rule = context_rule;
+            _integrationService = integrationService;
         }
         // For InListOperation
         private bool CheckRecordExistInMaster(string tableName , string colName, string value )
@@ -176,8 +180,9 @@ namespace iNube.Components.RuleEngine.Controllers
         // Generic Rule Conditions
         //RuleConfigCondition/Check_Rule_Condition/Veh_mm
         [HttpPost("CheckRuleSets/{RuleId}")]
-        public List<ErrorDetailsData> CheckRuleSets(String RuleId, [FromBody]dynamic dictionary_rule)
+        public async Task<List<ErrorDetailsData>> CheckRuleSets(String RuleId, [FromBody]DynamicData dynamic)
         {
+            dynamic dictionary_rule = dynamic.ruleParameter;
             ResponseStatus response = new ResponseStatus();
             List<ErrorInfo> errorMsg = new List<ErrorInfo>();
             //List for Error and Response Value
@@ -207,7 +212,7 @@ namespace iNube.Components.RuleEngine.Controllers
                             join tblparameter in _context_rule.TblParameters on tblrulecondition.ConditionAttribute equals tblparameter.ParamId
                             //where tblrules.RuleName == RuleName
                             where words.Contains(tblrules.RuleId.ToString())
-                            select new
+                            select new RuleDetails
                             {
                                 rulecondition_id = tblrulecondition.RuleConditionId,
                                 rule_id = tblrules.RuleId,
@@ -227,9 +232,10 @@ namespace iNube.Components.RuleEngine.Controllers
                                 successMsg = tblrulecondition.SuccessMsg,
                                 successCode = tblrulecondition.SuccessCode,
                                 failureMsg = tblrulecondition.FailureMsg,
-                                failureCode = tblrulecondition.FailureCode
-
+                                failureCode = tblrulecondition.FailureCode,
+                                type = tblrulecondition.Type
                             };
+
             
             var result = false;
             var finalResult = false;
@@ -238,6 +244,27 @@ namespace iNube.Components.RuleEngine.Controllers
             int i = 0;
             foreach (var rule in main_rule)
             {
+                //Integeration call to get Rate for Type
+                if(rule.type == "Rate")
+                {
+                    ApiContext apiContext = new ApiContext();
+                    apiContext.ProductType = "Mica";
+                    apiContext.ServerType = "297";
+                    apiContext.Token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiI1Y2M0ZTFjZi04MzYxLTQwY2QtODVjMC1hMjE3YThiZGEwYTYiLCJFbWFpbCI6Im1vaGFuQGludWJlc29sdXRpb25zLmNvbSIsIk9yZ0lkIjoiMTEyIiwiUGFydG5lcklkIjoiMCIsIlJvbGUiOiJpTnViZSBBZG1pbiIsIk5hbWUiOiJJbnViZSIsIlVzZXJOYW1lIjoiZWludWJlYWRtaW4iLCJQcm9kdWN0VHlwZSI6Ik1pY2EiLCJTZXJ2ZXJUeXBlIjoiMjk3IiwiZXhwIjoxNjI1MzA0ODYxLCJpc3MiOiJJbnViZSIsImF1ZCI6IkludWJlTUlDQSJ9.zIEhDBPBDV-c389AUvl_kka4WPK1kHYa-Ew9ScB12pQ";
+                    apiContext.OrgId = 112;
+                    if (rule.condition_opr == "InBetween")
+                    {
+                        var rateValueFrom = await _integrationService.CheckRateExecution(Convert.ToInt32(rule.condition_valuefrom), dynamic.rateParameter, apiContext);
+                        var rateValueTo = await _integrationService.CheckRateExecution(Convert.ToInt32(rule.condition_valuefrom), dynamic.rateParameter, apiContext);
+                        rule.condition_valuefrom = rateValueFrom.ResponseMessage;
+                        rule.condition_valueto = rateValueTo.ResponseMessage;
+                    }
+                    else
+                    {
+                        var rateValueFrom = await _integrationService.CheckRateExecution(Convert.ToInt32(rule.condition_valuefrom), dynamic.rateParameter, apiContext);
+                        rule.condition_valuefrom = rateValueFrom.ResponseMessage;
+                    }
+                }
                 i++;
                 //var paramvalue =(string)dictionary_rule.GetType().GetProperty(rule.condition_attributes).GetValue(dictionary_rule);
                 
@@ -252,20 +279,20 @@ namespace iNube.Components.RuleEngine.Controllers
                     {
                         if (rule.condition_opr == "InBetween")
                         {
-                            int X=0, Y=0, Z=0;
+                            decimal X=0, Y=0, Z=0;
                             if (Regex.IsMatch(rule.condition_valuefrom, @"^\d+$") && Regex.IsMatch(rule.condition_valueto, @"^\d+$"))
                             {
-                                X = Convert.ToInt16(paramvalue);
-                                Y = Convert.ToInt16(rule.condition_valuefrom);
-                                Z = Convert.ToInt16(rule.condition_valueto);
+                                X = Convert.ToDecimal(paramvalue);
+                                Y = Convert.ToDecimal(rule.condition_valuefrom);
+                                Z = Convert.ToDecimal(rule.condition_valueto);
                             }
                             else
                             {
                                 var conditionValueFrom = Convert.ToInt16(dictionary_rule[rule.condition_valuefrom]);
                                 var conditionValueTo = Convert.ToInt16(dictionary_rule[rule.condition_valueto]);
-                                X = Convert.ToInt16(paramvalue);
-                                Y = Convert.ToInt16(conditionValueFrom);
-                                Z = Convert.ToInt16(conditionValueTo);
+                                X = Convert.ToDecimal(paramvalue);
+                                Y = Convert.ToDecimal(conditionValueFrom);
+                                Z = Convert.ToDecimal(conditionValueTo);
                             }
                             
 
@@ -302,12 +329,14 @@ namespace iNube.Components.RuleEngine.Controllers
 
                         }
                         else {
-                            
-                            if (Regex.IsMatch(rule.condition_valuefrom, @"^\d+$"))
+                            //To check all Numbers
+                            //if (Regex.IsMatch(rule.condition_valuefrom, @"^\d+$"))
+                            //To check Decimal To
+                            if(Regex.IsMatch(rule.condition_valuefrom, @"((\d+)((\.\d{1,2})?))$"))
                             {
-                                expandoObject.X = Convert.ToInt16(paramvalue);
+                                expandoObject.X = Convert.ToDecimal(paramvalue);
                                 expandoObject.Y = rule.condition_opr == "=" ? "==" : rule.condition_opr;
-                                expandoObject.Z = Convert.ToInt16(rule.condition_valuefrom);
+                                expandoObject.Z = Convert.ToDecimal(rule.condition_valuefrom);
                             }
                             else
                             {
