@@ -1966,6 +1966,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 foreach (var item1 in attributes)
                 {
                     item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                    item1.Relationship = item.Relationship;
                 }
                 list.AddRange(attributes);
 
@@ -1996,6 +1997,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     foreach (var item1 in attributes)
                     {
                         item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
+                        item1.Relationship = item.Relationship;
                     }
 
                     list.AddRange(attributes);

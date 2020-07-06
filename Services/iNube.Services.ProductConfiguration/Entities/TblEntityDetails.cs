@@ -15,6 +15,7 @@ namespace iNube.Services.ProductConfiguration.Entities
         public string EntityLevel { get; set; }
         public decimal? ParentId { get; set; }
         public string Type { get; set; }
+        public string Relationship { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
 
