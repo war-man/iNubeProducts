@@ -730,17 +730,7 @@ namespace iNube.Services.Policy.Controllers.Policy
         public async Task<IActionResult> UpdateCardDetails([FromBody]UpdateCardDetails updateCardDetails)
         {
             var response = await _policyService.UpdateCardDetails(updateCardDetails, Context);
-            switch (response.Status)
-            {
-                case BusinessStatus.Ok:
-                    return Ok(response);
-                case BusinessStatus.NotFound:
-                    return Ok(response);
-                case BusinessStatus.Error:
-                    return BadRequest(response);
-                default:
-                    return NotFound(response);
-            }
+            return ServiceResponse(response);
         }
 
         [HttpPost]
