@@ -398,7 +398,7 @@ class DynamicForm extends React.Component {
         }
         if (prop.componentType == "Button") {
             return (
-                <Button color='primary' round onClick={this.handlesubmit} >{prop.labelText}</Button>
+                <Button color='primary' round onClick={() => this.handlesubmit(prop.name)} >{prop.labelText}</Button>
             )
         }
     }
@@ -478,26 +478,31 @@ class DynamicForm extends React.Component {
 
     };
 
-    handlesubmit = () => {
-        console.log("selected: ", this.state.Dynamicdata)
-        if (this.state.Dynamicdata != {}) {
-            this.state.emptyarray.push(this.state.Dynamicdata);
-            this.tabledata();
+    handlesubmit = (name) => {
+        //console.log("selected: ", this.state.Dynamicdata)
+        //if (this.state.Dynamicdata != {}) {
+        //    this.state.emptyarray.push(this.state.Dynamicdata);
+        //    //this.tabledata();
+        //}
+        if (name == "Add") {
+            swal({
+                text: "This is Add button event",
+                icon: "success"
+            })
         }
-
-        let objdata = this.state.dynamicobject
-        for (let i = 0; i < objdata.length; i++) {
-            let array = objdata[i];
-            for (let j = 0; j < array.length; j++) {
-                if (array[j].componentType != "Radio") {
-                    array[j].value = "";
-                }
-            }
-            this.setState({ radiovalue: "" });
-        }
+        //let objdata = this.state.dynamicobject
+        //for (let i = 0; i < objdata.length; i++) {
+        //    let array = objdata[i];
+        //    for (let j = 0; j < array.length; j++) {
+        //        if (array[j].componentType != "Radio") {
+        //            array[j].value = "";
+        //        }
+        //    }
+        //    this.setState({ radiovalue: "" });
+        //}
 
         //Object.assign(this.state.Dynamicdata, {});
-        this.state.Dynamicdata = {};
+        //this.state.Dynamicdata = {};
 
         //for (let i = 0; i < this.state.screendata.length; i++) {
         //    let screendata = this.state.screendata;
@@ -674,13 +679,14 @@ class DynamicForm extends React.Component {
 
                                                     </CardIcon>
                                                     <h4>
-                                                        <small>{/*<TranslationContainer translationKey="SearchOrganization" />*/}{this.state.entityname} </small>
+                                                        <small>{/* <TranslationContainer translationKey="SearchOrganization" />*/}{this.state.entityname} </small>
+                                                        {/* <small><TranslationContainer translationKey="SearchOrganization" />{item[0].enitityName} </small>*/}
                                                     </h4>
                                                 </CardHeader>
                                                 : null}
                                             <CardBody>
                                                 <GridContainer>
-                                                    {item.map(item1 => {
+                                                    {item[0].entityAttributes.map(item1 => {
                                                         return (
                                                             <GridItem xs={12} sm={4} md={3}>
                                                                 {this.handleRenderScreen(item1)}
