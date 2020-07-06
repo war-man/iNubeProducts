@@ -9,6 +9,7 @@ COPY ["iNube.Services.ProductConfiguration.csproj", "iNube.Services.ProductConfi
 RUN dotnet restore "iNube.Services.ProductConfiguration/iNube.Services.ProductConfiguration.csproj"
 COPY . "iNube.Services.ProductConfiguration/"
 WORKDIR "/src/iNube.Services.ProductConfiguration"
+RUN apt-get update && apt-get install -y nuget
 RUN dotnet build "iNube.Services.ProductConfiguration.csproj" -c Release -o /app
 
 FROM build AS publish
