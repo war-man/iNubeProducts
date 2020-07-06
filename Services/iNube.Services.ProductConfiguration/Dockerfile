@@ -12,7 +12,6 @@ RUN apt-get update && apt-get install -y curl
 RUN curl -Iv google.com ; 
 RUN curl -Iv https://api.nuget.org/v3-flatcontainer/inube.utility.framework/index.json
 
-RUN nuget help 
 
 RUN dotnet restore "iNube.Services.ProductConfiguration/iNube.Services.ProductConfiguration.csproj"
 COPY . "iNube.Services.ProductConfiguration/"
