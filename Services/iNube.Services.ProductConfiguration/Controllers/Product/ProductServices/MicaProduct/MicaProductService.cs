@@ -1955,23 +1955,25 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
             var componentType = _context.TblmasDynamic.Select(a => a);
+
+            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             List<object> Finalentity = new List<object>();
 
-            foreach (var item in data)
+            foreach (var item in result)
             {
                 List<object> attributelist = new List<object>();
-                List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
+                //List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
 
-                var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
-                foreach (var item1 in attributes)
+                //var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.EntityAttributes);
+                foreach (var item1 in item.EntityAttributes)
                 {
                     item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
                     item1.Relationship = item.Relationship;
                 }
-                list.AddRange(attributes);
+                //list.AddRange(attributes);
 
-                attributelist.AddRange(list);
-                Finalentity.Add(attributelist);
+                //attributelist.AddRange(list);
+                Finalentity.Add(result);
                 var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, apiContext);
             }
             return Finalentity;
@@ -1984,24 +1986,24 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             var data = _context.TblEntityDetails.Where(a => a.ParentId == id)
            .Include(a => a.TblEntityAttributes)
            .Select(a => a).ToList();
-
+            var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             var componentType = _context.TblmasDynamic.Select(a => a);
 
             if (data != null)
             {
-                foreach (var item in data)
+                foreach (var item in result)
                 {
-                    List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
-                    var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
+                    //List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
+                    //var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.TblEntityAttributes);
 
-                    foreach (var item1 in attributes)
+                    foreach (var item1 in item.EntityAttributes)
                     {
                         item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
                         item1.Relationship = item.Relationship;
                     }
 
-                    list.AddRange(attributes);
-                    Finalentity.Add(list);
+                    //list.AddRange(attributes);
+                    Finalentity.Add(result);
 
                     var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, apiContext);
                 }
