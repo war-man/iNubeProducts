@@ -244,6 +244,12 @@ const ManageMaster = AsyncComponent(() => { return import("modules/Contracts/vie
 const RecruitmentUpload = AsyncComponent(() => { return import("modules/Contracts/views/RecruitmentUpload.jsx"); });
 const AVOSearchContract = AsyncComponent(() => { return import("modules/Contracts/views/AVOSearchContract.jsx"); });
 
+//Quotation
+const GetQuote = AsyncComponent(() => { return import("modules/NewBusiness/Quotation/GetQuote.jsx"); });
+const ViewQuote = AsyncComponent(() => { return import("modules/NewBusiness/Quotation/ViewQuote.jsx"); });
+
+
+
 export const ComponentsList = {
     Uwdashboard: Uwdashboard,
     AVODashboard: AVODashboard,
@@ -411,6 +417,9 @@ export const ComponentsList = {
     DashboardConfiguration: DashboardConfiguration,
     ViewDashboard: ViewDashboard,
     DashboardUpdate: DashboardUpdate,
-}
 
+    //Quotation
+    GetQuote: GetQuote,
+    ViewQuote: ViewQuote,
+}
 export default ComponentsList;

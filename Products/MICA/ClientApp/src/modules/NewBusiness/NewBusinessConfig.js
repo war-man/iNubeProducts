@@ -2,6 +2,7 @@
 let NewBusinessConfigUrl = 'https://localhost:44347';
 //let ProductConfig = 'https://inubeservicesproductconfiguration.azurewebsites.net';
 let ProductConfig = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
+
 ///Local---https://localhost:44347(Lead)
 let ProposalConfigUrl = 'https://localhost:44351';
 if (config.env === "dev") {
