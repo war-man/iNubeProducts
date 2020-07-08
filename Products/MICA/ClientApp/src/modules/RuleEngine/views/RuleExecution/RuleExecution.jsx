@@ -2,7 +2,7 @@
 import PropTypes from "prop-types";
 import { connect } from 'react-redux';
 // @material-ui/core components
-// @material-ui/icons
+// @material-ui/icons  
 import PermIdentity from "@material-ui/icons/PermIdentity";
 // @material-ui/icons
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -27,7 +27,7 @@ import $ from 'jquery';
 import ReactTable from 'components/MuiTable/MuiTable.jsx';
 import { Animated } from "react-animated-css";
 import { Redirect } from 'react-router-dom'
-// For RuleMapping
+// For RuleMapping   
 //import RuleMapping from 'modules/RuleEngine/views/RuleMapping';
 
 import sweetAlertStyle from "assets/jss/material-dashboard-pro-react/views/sweetAlertStyle.jsx";
@@ -92,7 +92,7 @@ class RuleExecution extends React.Component {
                 this.setState({ Rates: data.rateObj });
                 this.setState({ formFlag: true });
                 console.log("Rule Rules Data");
-                console.log(this.state.Rules);
+                console.log(this.state.Rules,'Rules');
                 //var checkParam = JSON.stringify(this.state.Rules);
                 //console.log('Check' + checkParam);
 
