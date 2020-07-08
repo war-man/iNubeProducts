@@ -1994,17 +1994,13 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             foreach (var item in result)
             {
                 List<object> attributelist = new List<object>();
-                //List<EntityAttributesDTO> list = new List<EntityAttributesDTO>();
 
-                //var attributes = _mapper.Map<List<EntityAttributesDTO>>(item.EntityAttributes);
                 foreach (var item1 in item.EntityAttributes)
                 {
                     item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
                     item1.Relationship = item.Relationship;
                 }
-                //list.AddRange(attributes);
 
-                //attributelist.AddRange(list);
                 Finalentity.Add(result);
                 var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, "Multiple", apiContext);
             }
