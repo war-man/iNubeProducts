@@ -72,8 +72,12 @@ class LoginPage extends React.Component {
         this.setState({ redirectto: true });
     }
 
-    componentDidMount() {
+    componentWillMount() {
         ThemeSwitch.resetTheme();
+    }
+
+    componentDidMount() {
+
         this.timeOutFunction = setTimeout(
             function () {
                 this.setState({ cardAnimaton: "" });

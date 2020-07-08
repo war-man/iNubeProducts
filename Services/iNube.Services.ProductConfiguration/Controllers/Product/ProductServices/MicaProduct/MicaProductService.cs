@@ -1992,6 +1992,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
 
             var result = _mapper.Map<List<EntityDetailsDTO>>(data);
             List<object> Finalentity = new List<object>();
+            List<object> entity = new List<object>();
 
             foreach (var item in result)
             {
@@ -2002,10 +2003,11 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                     item1.ComponentType = componentType.FirstOrDefault(a => a.Id == item1.FieldType).Value;
                     item1.Relationship = item.Relationship;
                 }
+                entity.Add(item);
 
-                Finalentity.Add(result);
-                var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, "Multiple", apiContext);
+                //var childattributes = await GetChildAttributeListAsync(item.EntityId, Finalentity, "Multiple", apiContext);
             }
+            Finalentity.Add(entity);
             return Finalentity;
         }
 
