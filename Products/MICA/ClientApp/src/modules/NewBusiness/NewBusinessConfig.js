@@ -9,6 +9,7 @@ if (config.env === "dev") {
     //productConfigUrl = 'https://localhost:44347';
     ProposalConfigUrl = 'https://localhost:44351';
 }
+
 else {
     // NewBusinessConfigUrl = 'https://localhost:44347';
     NewBusinessConfigUrl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';

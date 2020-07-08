@@ -375,7 +375,7 @@ class RegularForms extends React.Component {
 
 
     componentDidMount() {
-
+        debugger;
         this.state.BasePremiumDTO.lstIllustation = this.state.lstIllustation;
         this.state.BasePremiumDTO.objProspect = this.state.objProspect;
         this.state.BasePremiumDTO.objProductDetials.plan = this.state.ProductDTO.ProductId; //this.state.ProductDTO.ProductId as it is hardcoded
@@ -658,28 +658,33 @@ class RegularForms extends React.Component {
 
 
     handleQuoteChange(type, event) {
-
         const name = event.target.name;
         const obj = this.state.ProductDTO;
         obj[name] = event.target.value;
 
         ///https://inubeservicesproductconfiguration.azurewebsites.net/api/Product/GetProductMasterAvo?masterType=
 
-        fetch(`${NewBusinessConfig.ProductConfig}/api/Product/GetProductMasterAvo?masterType=` + type + `&parentID=` + event.target.value)
+        fetch(`${NewBusinessConfig.ProductConfig}/api/Product/GetProductMasterAvo?masterType=` + type + `&parentID=` + event.target.value +  `` ,{
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
             .then(response => response.json())
             .then(data => {
 
+                
+
                 if (type == "Plan") {
                     this.setState({ Plandata: data });
-
+                    console.log("Plandata", this.state.Plandata);
+                   
                 }
                 if (type == "Policy Term") {
-
                     this.setState({ Policydata: data });
-
                     const filterData = this.state.Plandata.filter(item => item.mID == event.target.value);
-
-
                     obj['planCode'] = filterData[0].planCode;
                     this.setState({ obj });
                 }
