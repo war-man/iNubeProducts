@@ -1749,7 +1749,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
 
             var Data = new List<MasterDto>();
             //Promotion
-            if (movementType == 29)
+            if (movementType == 44)
             {
                 var desg = _context.TblOrgStructure.FirstOrDefault(x => x.OrganizationId == orgid && x.OrgStructureId == des.DesignationId);
                 List<decimal> PositionIds = new List<decimal>();

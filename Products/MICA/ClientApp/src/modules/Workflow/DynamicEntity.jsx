@@ -86,7 +86,7 @@ class DynamicEntity extends React.Component {
                 },
                 {
                     "mID": "Multiple",
-                    "mValue": "Single",
+                    "mValue": "Multiple",
                     "mType": "ComponentType"
                 }
             ],
@@ -415,7 +415,7 @@ class DynamicEntity extends React.Component {
                                 <GridItem xs={12} sm={4} md={3}>
                                     <Dropdown
                                         //required={true}
-                                        labelText="Parent"
+                                        labelText="Relationship Type"
                                         lstObject={this.state.relation}
                                         value={this.state.entities.relationship}
                                         name='relationship'

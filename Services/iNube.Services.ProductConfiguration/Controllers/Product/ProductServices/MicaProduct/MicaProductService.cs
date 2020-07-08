@@ -1947,7 +1947,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             return data;
         }
 
-        public async Task<List<object>> GetAllEntitiesById(int Id, ApiContext apiContext)
+        public async Task<List<object>> GetSingleEntitiesById(int Id, ApiContext apiContext)
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
@@ -1983,7 +1983,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
         {
             _context = (MICAPCContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
 
-            var data = _context.TblEntityDetails.Where(a => a.EntityId == Id && a.Relationship == "Multiple")
+            var data = _context.TblEntityDetails.Where(a => a.ParentId == Id && a.Relationship == "Multiple")
                 .Include(a => a.TblEntityAttributes)
                 .Select(a => a).ToList();
             var componentType = _context.TblmasDynamic.Select(a => a);

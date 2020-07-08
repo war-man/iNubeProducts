@@ -19,6 +19,7 @@ import CustomDatetime from "components/CustomDatetime/CustomDatetime.jsx";
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import UserConfig from 'modules/Users/UserConfig.js';
 import Dropdown from "components/Dropdown/Dropdown.jsx";
+import Accordion from "components/Accordion/AccordianWithoutLoop.jsx";
 import { Animated } from "react-animated-css";
 import { fade } from "@material-ui/core/styles";
 import swal from 'sweetalert';
@@ -402,7 +403,33 @@ class DynamicForm extends React.Component {
                 <Button color='primary' round onClick={() => this.handlesubmit(prop.name)} >{prop.labelText}</Button>
             )
         }
+        if (prop.componentType == "Accordion") {
+            this.AccordianFunction();
+        }
+
     }
+
+    AccordianFunction = () => {
+        return (
+            <GridItem xs={12}>
+                {/*{this.state.AddCont.map((prop, key) => {
+                    return (
+                    */}
+                <Accordion
+                    collapses={
+                        [{
+                            title: "Coverages",
+                            content: ""
+                        }]
+                    }
+                />
+
+                {/*  );
+                })
+                }*/}
+            </GridItem>
+        )
+    };
 
     handleProductType = (e, type) => {
         if (type == "Parent") {
@@ -427,7 +454,7 @@ class DynamicForm extends React.Component {
     }
 
     SearchEntities = (id) => {
-        fetch(`${productConfig.productConfigUrl}/api/Product/GetAllEntitiesById?Id=` + id + ``,
+        fetch(`${productConfig.productConfigUrl}/api/Product/GetSingleEntitiesById?Id=` + id + ``,
             {
                 method: 'Get',
                 //body: JSON.stringify(this.state.searchOrg),
@@ -491,25 +518,25 @@ class DynamicForm extends React.Component {
                 icon: "success"
             })
 
-            //fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + this.state.parent + ``,
-            //    {
-            //        method: 'Get',
-            //        //body: JSON.stringify(this.state.searchOrg),
-            //        headers: {
-            //            'Accept': 'application/json',
-            //            'Content-Type': 'application/json',
-            //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-            //        },
-            //    }
-            //).then(response => response.json())
-            //    .then(data => {
-            //        const lData = data;
-            //        console.log("dataCheck: ", data);
-            //        this.setState({ multiple: data })
+            fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + this.state.parent + ``,
+                {
+                    method: 'Get',
+                    //body: JSON.stringify(this.state.searchOrg),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                    },
+                }
+            ).then(response => response.json())
+                .then(data => {
+                    const lData = data;
+                    console.log("Response ", data);
+                    this.setState({ multiple: data })
 
-            //        console.log("dataCheck: ", data);
-            //        console.log("dataCheck: ", this.state.multiple);
-            //    });
+                    console.log("response: ", data);
+                    console.log("response: ", this.state.multiple);
+                });
         }
 
         //let objdata = this.state.dynamicobject
@@ -684,6 +711,7 @@ class DynamicForm extends React.Component {
                                         <Button color="primary" round onClick={() => this.addFields()}>Add Fields</Button>
                                     </GridItem>
                                 </GridContainer>
+
                             </CardBody>
                         </Card>
 
@@ -710,6 +738,21 @@ class DynamicForm extends React.Component {
                                                         return (
                                                             <GridItem xs={12} sm={4} md={3}>
                                                                 {this.handleRenderScreen(item1)}
+                                                                {(this.state.multiple.length > 0) ?
+                                                                    <GridContainer>
+                                                                        <GridItem xs={12}>
+                                                                            <Accordion
+                                                                                collapses={
+                                                                                    [{
+                                                                                        title: "Contract",
+                                                                                        content: "",
+                                                                                    }]
+                                                                                }
+                                                                            />
+
+                                                                        </GridItem>
+                                                                    </GridContainer>
+                                                                    : null}
                                                             </GridItem>
                                                         );
                                                     })}

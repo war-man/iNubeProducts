@@ -546,9 +546,9 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllEntitiesById(int Id)
+        public async Task<IActionResult> GetSingleEntitiesById(int Id)
         {
-            var response = await _productService.GetAllEntitiesById(Id, Context);
+            var response = await _productService.GetSingleEntitiesById(Id, Context);
             return Ok(response);
         }
 
@@ -558,9 +558,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
             var response = await _productService.GetMultipleEntitiesById(Id, Context);
             return Ok(response);
         }
-
-
-
+        
         [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
