@@ -559,61 +559,69 @@ class RateRules extends React.Component {
 
      handleChangeStatus = ({ meta, file }, status) => { console.log(status, meta, file) }
 
-     handleSubmit = (files) => {
-        console.log("SubmitData", files.map(f => f.meta))
-        var data = new FormData();
-        if (files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                data.append(files[i].file.name, files[i].file);
+    handleSubmit = (files) => {
+        debugger
+        if (this.state.fields[0].startDate != "" && this.state.fields[0].endDate != "" && this.state.fields[0].rateName != "") {
+            console.log("SubmitData", files.map(f => f.meta))
+            var data = new FormData();
+            if (files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    data.append(files[i].file.name, files[i].file);
 
-            }
-         }
-
-         let that = this;
-         $.ajax({
-            type: "POST",
-            url: `${RateConfig.rateConfigUrl}/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
-            //url: `https://localhost:44364/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
-
-            contentType: false,
-            processData: false,
-
-            data: data,
-            beforeSend: function (xhr) {
-                /* Authorization header */
-                xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
-            },
-            success: function (response) {
-                console.log("response ", response.responseMessage);
-                swal({
-                    text: response.responseMessage,
-                    icon: "success"
-                });
-                that.setState({ result: response.gridList });
-
-                console.log(that.state.result, 'Result');
-                if (that.state.result.length > 0) {
-                    that.tabledata(response.gridList);
-                    //this.reset();
                 }
-                else {
-                    setTimeout(
-                        function () {
-                            that.setState({ loader: true, searchTableSec: false, nodata: true });
-                        }.bind(that), 2000
-                    );
-                }
-
-            },
-             error: function () {
-                 that.GridFun(false);
-                swal({
-                    text: "File uploading unsuccessful",
-                    icon: "error"
-                });
             }
-        });
 
+            let that = this;
+            $.ajax({
+                type: "POST",
+                url: `${RateConfig.rateConfigUrl}/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
+                //url: `https://localhost:44364/api/RatingConfig/RateUpload?RateName=` + this.state.fields[0].rateName + '&RateObj=' + this.state.fields[0].rateObj + '&StartDate=' + this.state.fields[0].startDate + '&Enddate=' + this.state.fields[0].endDate,
+
+                contentType: false,
+                processData: false,
+
+                data: data,
+                beforeSend: function (xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", 'Bearer ' + localStorage.getItem('userToken'));
+                },
+                success: function (response) {
+                    console.log("response ", response.responseMessage);
+                    swal({
+                        text: response.responseMessage,
+                        icon: "success"
+                    });
+                    that.setState({ result: response.gridList });
+
+                    console.log(that.state.result, 'Result');
+                    if (that.state.result.length > 0) {
+                        that.tabledata(response.gridList);
+                        //this.reset();
+                    }
+                    else {
+                        setTimeout(
+                            function () {
+                                that.setState({ loader: true, searchTableSec: false, nodata: true });
+                            }.bind(that), 2000
+                        );
+                    }
+
+                },
+                error: function () {
+                    that.GridFun(false);
+                    swal({
+                        text: "File uploading unsuccessful",
+                        icon: "error"
+                    });
+                }
+            });
+        }
+        else {
+            swal({
+                text: "Some Fields are missing",
+                icon: "error"
+            });
+        }
 
     }
 
