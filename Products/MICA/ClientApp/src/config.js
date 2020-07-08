@@ -115,7 +115,6 @@ if (env === "UAT") {
     ExtensionUrl = Baseurl;
     NotificationUrl = Baseurl;
 }
-
 export const config = {
     env: env,
     product: 'Mica',
