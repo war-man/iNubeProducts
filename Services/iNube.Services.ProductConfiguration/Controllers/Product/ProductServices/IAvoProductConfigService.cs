@@ -14,7 +14,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.AvoProductServ
 
         Task<MapQuoteDTO> CalculateQuotePremium(MapQuoteDTO objLifeQuote, ApiContext apiContext, bool AnnualMode = false);
 
-        Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote);
+        Task<MapQuoteDTO> GetRiderSumAssured(MapQuoteDTO objLifeQuote, ApiContext apiContext);
 
         Task<List<object>> GetRiders(int ProductId, int PlanId, ApiContext apiContext);
 

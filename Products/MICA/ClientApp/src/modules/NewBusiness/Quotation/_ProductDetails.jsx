@@ -1013,7 +1013,7 @@ class RegularForms extends React.Component {
                                 <div>
                                     <Button color="info"
                                         round className={this.props.classes.marginRight}
-                                        //onClick={props.handlepartnerdata}
+                                        onClick={this.GetRidersData}
                                         id="cancelBtn" >
                                         Get Risk Benifits
                                 </Button>
