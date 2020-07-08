@@ -78,10 +78,23 @@ class DynamicEntity extends React.Component {
                     "mType": "ComponentType"
                 }
             ],
+            relation: [
+                {
+                    "mID": "Single",
+                    "mValue": "Single",
+                    "mType": "ComponentType"
+                },
+                {
+                    "mID": "Multiple",
+                    "mValue": "Single",
+                    "mType": "ComponentType"
+                }
+            ],
             entities: {
                 "enitityName": "",
                 "entityLevel": "",
                 "parentId": 0,
+                "relationship": "",
                 "type": "",
                 "entityAttributes": []
             },
@@ -89,6 +102,7 @@ class DynamicEntity extends React.Component {
                 "enitityName": "",
                 "entityLevel": "",
                 "parentId": 0,
+                "relationship": "",
                 "type": "",
                 "entityAttributes": []
             },
@@ -397,6 +411,16 @@ class DynamicEntity extends React.Component {
                                         onChange={(e) => this.SetValue(e)}
                                         formControlProps={{ fullWidth: true }}
                                     />
+                                </GridItem>
+                                <GridItem xs={12} sm={4} md={3}>
+                                    <Dropdown
+                                        //required={true}
+                                        labelText="Parent"
+                                        lstObject={this.state.relation}
+                                        value={this.state.entities.relationship}
+                                        name='relationship'
+                                        onChange={(e) => this.SetValue(e)}
+                                        formControlProps={{ fullWidth: true }} />
                                 </GridItem>
                                 <GridItem xs={12} sm={4} md={3}>
                                     <Dropdown

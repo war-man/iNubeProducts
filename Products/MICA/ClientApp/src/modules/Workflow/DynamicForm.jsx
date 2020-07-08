@@ -119,7 +119,8 @@ class DynamicForm extends React.Component {
                 Parent: [],
                 Child: [],
             },
-
+            multiple: [],
+            Accordian: [],
             MasterDTO: {
                 LOB: [],
                 COB: [],
@@ -489,7 +490,28 @@ class DynamicForm extends React.Component {
                 text: "This is Add button event",
                 icon: "success"
             })
+
+            //fetch(`${productConfig.productConfigUrl}/api/Product/GetMultipleEntitiesById?Id=` + this.state.parent + ``,
+            //    {
+            //        method: 'Get',
+            //        //body: JSON.stringify(this.state.searchOrg),
+            //        headers: {
+            //            'Accept': 'application/json',
+            //            'Content-Type': 'application/json',
+            //            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            //        },
+            //    }
+            //).then(response => response.json())
+            //    .then(data => {
+            //        const lData = data;
+            //        console.log("dataCheck: ", data);
+            //        this.setState({ multiple: data })
+
+            //        console.log("dataCheck: ", data);
+            //        console.log("dataCheck: ", this.state.multiple);
+            //    });
         }
+
         //let objdata = this.state.dynamicobject
         //for (let i = 0; i < objdata.length; i++) {
         //    let array = objdata[i];
@@ -674,9 +696,7 @@ class DynamicForm extends React.Component {
                                                 <CardHeader color="rose" icon>
                                                     <CardIcon color="rose">
                                                         { /*  <FilterNone /> */}
-
                                                         <Icon><img id="icon" src={role} /></Icon>
-
                                                     </CardIcon>
                                                     <h4>
                                                         <small>{/* <TranslationContainer translationKey="SearchOrganization" />*/}{this.state.entityname} </small>
