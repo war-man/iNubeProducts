@@ -2918,15 +2918,8 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         }
 
         public async Task<List<ddDTO>> GetVehicleMaster(string lMasterlist, ApiContext context)
-        {
-            LoggerManager logger = new LoggerManager(_configuration);
-            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", "Testing", "1", context);
-
+        {          
             _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
-
-            logger.LogRequest("GetVehicleMaster", "GetVehicleMaster", "Testing", "4 - After Get Context Call Final", context);
-
-
             List<ddDTO> obj;
 
             obj = _context.TblVehicleDetails.Select(x => new ddDTO { mID = x.VehicleId, mValue = x.VehicleModel, mType = x.VehicleType }).ToList();
