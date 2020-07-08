@@ -553,6 +553,15 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetMultipleEntitiesById(int Id)
+        {
+            var response = await _productService.GetMultipleEntitiesById(Id, Context);
+            return Ok(response);
+        }
+
+
+
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult HC()
         {
