@@ -20,6 +20,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
         Task<IEnumerable<LeadDTO>> FetchTblContactsdata();
         IEnumerable<QuestionsListDTO> GetMasQuestions();
         Task<List<InboxDetailsDto>> ProposalPollAsync(ApiContext apiContext);
+        Task<PolicyOwnerDetailsDto> PolicyOwnerDetails(int PolicyID, ApiContext apiContext);
         List<MasCommonTypesDto> MastertypeData();
 
         ProposalResponce PartialFormDataSave(Models.ProposalModel.PolicyDto policyDto, ApiContext Context);
@@ -78,6 +79,41 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             return lstQues;
 
         }
+
+        public async Task<PolicyOwnerDetailsDto> PolicyOwnerDetails(int PolicyID, ApiContext apiContext)
+        {
+            var userId = "sahir";
+            PolicyOwnerDetailsDto policyOwnerDetails = new PolicyOwnerDetailsDto();
+            //var tblPolicy = _context.TblPolicy.Where(x => x.PolicyId == PolicyID).Select(x => x);
+            var tblPolicyMemberDetails = _context.TblPolicyMemberDetails.SingleOrDefault(x => x.PolicyId == PolicyID);
+            var tblPolicyMemberAddress = _context.TblPolicyMemberAddress.SingleOrDefault(x => x.AddressId == tblPolicyMemberDetails.AdressId);
+
+            policyOwnerDetails.Salutation = tblPolicyMemberDetails.Salutation;
+            policyOwnerDetails.NameWithInitial = tblPolicyMemberDetails.NameWithInitial;
+            policyOwnerDetails.Fullname = tblPolicyMemberDetails.Fullname;
+            policyOwnerDetails.Surname = tblPolicyMemberDetails.LastName;
+            policyOwnerDetails.Dob = tblPolicyMemberDetails.Dob;
+            policyOwnerDetails.Age = tblPolicyMemberDetails.Age;
+            policyOwnerDetails.Gender = tblPolicyMemberDetails.Gender;
+            policyOwnerDetails.MaritialStatus = tblPolicyMemberDetails.MaritialStatus;
+            policyOwnerDetails.PassportNumber = tblPolicyMemberDetails.PassportNumber;
+            policyOwnerDetails.Nationality = tblPolicyMemberDetails.Nationality;
+            policyOwnerDetails.Mobile = tblPolicyMemberDetails.Mobile;
+            policyOwnerDetails.Home = tblPolicyMemberDetails.Home;
+            policyOwnerDetails.Email = tblPolicyMemberDetails.Email;
+            policyOwnerDetails.AnnualIncome = tblPolicyMemberDetails.MonthlyIncome;
+            policyOwnerDetails.GivenName = tblPolicyMemberDetails.PreferredName;
+            policyOwnerDetails.Address1 = tblPolicyMemberAddress.Address1;
+            policyOwnerDetails.Address2 = tblPolicyMemberAddress.Address2;
+            policyOwnerDetails.Address3 = tblPolicyMemberAddress.Address3;
+            policyOwnerDetails.City = tblPolicyMemberAddress.City;
+            policyOwnerDetails.District = tblPolicyMemberAddress.District;
+
+            
+            var policyOwnerdata = _mapper.Map<PolicyOwnerDetailsDto>(policyOwnerDetails);
+            return policyOwnerdata;
+        }
+
         public async Task<List<InboxDetailsDto>> ProposalPollAsync(ApiContext apiContext)
         {
             var userId = "sahir";
@@ -254,6 +290,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             return Policydata;
 
         }
+
 
         public async Task<List<InboxDetailsDto>> FetchProposalSubmittedDetailsAsync(ApiContext apiContext)
         {
