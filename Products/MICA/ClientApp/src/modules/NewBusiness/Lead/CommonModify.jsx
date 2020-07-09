@@ -253,11 +253,16 @@ class CommonModify extends React.Component {
     };
 
     onDateChange = (format, name, event) => {
+        debugger
         var today = event.toDate();
-        var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      //  var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
         var date2 = new Date();
         var date1 = new Date(today);
+        let Lead = this.state.LeadDTO[0];
+        Lead[name] = date;
         if (name == "dateOfBirth") {
+           
             var ageDifMs = Date.now() - date1.getTime();
             var ageDate = new Date(ageDifMs);
             var age = Math.abs(ageDate.getUTCFullYear() - 1970);
@@ -266,6 +271,7 @@ class CommonModify extends React.Component {
             this.setState({ leaddto });
             console.log("datediff", age, ageDate);
         }
+        this.setState({ Lead });
 
     }
 
@@ -600,12 +606,20 @@ class CommonModify extends React.Component {
         console.log("leaddto", this.state.LeadDTO);
         console.log("DntShwFlag", this.state.isDontShow, this.state.errormessage);
         var data = {
-            'nicno': this.state.LeadDTO[0].nicno, 'emailID': this.state.LeadDTO[0].emailID, 'gender': this.state.LeadDTO[0].gender, 'maritalStatusID': this.state.LeadDTO[0].maritalStatusID, 'dateOfBirth': this.state.LeadDTO[0].dateOfBirth, 'age': this.state.LeadDTO[0].age,
-            'address1': this.state.addressDTO.address1, 'address2': this.state.addressDTO.address2, 'countryId': this.state.addressDTO.countryId, 'stateId': this.state.addressDTO.stateId, 'districtId': this.state.addressDTO.districtId, 'cityId': this.state.addressDTO.cityId, 'areaId': this.state.addressDTO.areaId
+            'nicno': this.state.LeadDTO[0].nicno,
+            'emailID': this.state.LeadDTO[0].emailID,
+            'gender': this.state.LeadDTO[0].gender,
+            'maritalStatusID': this.state.LeadDTO[0].maritalStatusID,
+            'dateOfBirth': this.state.LeadDTO[0].dateOfBirth,
+            'age': this.state.LeadDTO[0].age,
+            'address1': this.state.addressDTO.address1, 'address2': this.state.addressDTO.address2,
+            'countryId': this.state.addressDTO.countryId, 'stateId': this.state.addressDTO.stateId,
+            'districtId': this.state.addressDTO.districtId, 'cityId': this.state.addressDTO.cityId,
+            'areaId': this.state.addressDTO.areaId
         }; console.log("Check", this.state.addressDTO)
         if (this.state.LeadDTO[0].nicno != null && this.state.LeadDTO[0].emailID != null && this.state.LeadDTO[0].gender != null && this.state.LeadDTO[0].maritalStatusID != null && this.state.LeadDTO[0].dateOfBirth != null && this.state.LeadDTO[0].age != null &&
             this.state.addressDTO.address1 != null && this.state.addressDTO.address2 != null && this.state.addressDTO.countryId != null && this.state.addressDTO.stateId != null && this.state.addressDTO.districtId != null && this.state.addressDTO.cityId != null && this.state.addressDTO.areaId != null) {
-            debugger
+            
             fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/ModifySuspect`, {
                 method: 'POST',
                 body: JSON.stringify(this.state.LeadDTO[0]),
@@ -664,7 +678,10 @@ class CommonModify extends React.Component {
         console.log("Urlchecking", url);
         //   console.log("DntShwFlagCreat", this.state.isDontShow, this.state.errormessage);
         var data = {
-            'contactTypeId': this.state.LeadDTO[0].contactTypeId, 'salutation': this.state.LeadDTO[0].salutation, 'firstName': this.state.LeadDTO[0].firstName, 'lastName': this.state.LeadDTO[0].lastName, 'mobileNo': this.state.LeadDTO[0].mobileNo, 'place': this.state.LeadDTO[0].place
+            'contactTypeId': this.state.LeadDTO[0].contactTypeId,
+            'salutation': this.state.LeadDTO[0].salutation, 'firstName': this.state.LeadDTO[0].firstName,
+            'lastName': this.state.LeadDTO[0].lastName, 'mobileNo': this.state.LeadDTO[0].mobileNo,
+            'place': this.state.LeadDTO[0].place
         };
         if (this.state.LeadDTO[0].contactTypeId != "" && this.state.LeadDTO[0].salutation != "" && this.state.LeadDTO[0].firstName != "" && this.state.LeadDTO[0].lastName != "" && this.state.LeadDTO[0].mobileNo != "" && this.state.LeadDTO[0].place != "") {
 
@@ -982,7 +999,7 @@ class CommonModify extends React.Component {
                                         {this.state.errormessage && this.state.isDontShow && (this.state.LeadDTO[0].maritalStatusID == "") ? <p className="error">
                                             This Field is Required</p> : null}
                                     </GridItem>
-
+                           
                                     <GridItem xs={12} sm={12} md={3}>
                                         <CustomDatetime
                                             required={true}
@@ -1022,7 +1039,7 @@ class CommonModify extends React.Component {
                                             required={true}
                                             success={this.state.occupationIDState === "success"}
                                             error={this.state.occupationIDState === "error"}
-                                            labelText="Occupation"
+                                            labelText="Occupation ID"
                                             id="occupation"
                                             name="occupationID"
                                             value={this.state.LeadDTO[0].occupationID}

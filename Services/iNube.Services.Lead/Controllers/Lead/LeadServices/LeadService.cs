@@ -159,60 +159,69 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             return ddDTOs;
         }
         public async Task<LeadResponse> SaveSuspectAsync(LeadDTO leadDTO, ApiContext context)
+
         {
-            // RuleEngine Validation 
+
             try
+
             {
 
                 leadDTO.CreationDate = DateTime.Now;
+
                 var lead = _mapper.Map<TblContacts>(leadDTO);
-                //  var data = _mapper.Map<TblParticipantMaster>(participantMasterDto);
-
-                _context.TblContacts.Add(lead);
-                _context.SaveChanges();
-
-
 
                 lead.ContactType = _context.TblmasLdcommonTypes.First(c => c.CommonTypeId == lead.ContactTypeId).Value;
 
                 if (lead.ContactId == 0)
+
                 {
+
                     _context.TblContacts.Add(lead);
-                    //_context.SaveChanges();
+
                     TblOpportunity objOppurtunity = new TblOpportunity();
+
                     TblOpportunityHistory objOpportunityHistory = new TblOpportunityHistory();
+
                     objOppurtunity.ContactId = lead.ContactId;
+
                     objOppurtunity.StageId = 1; // Suspect
+
                     objOppurtunity.Createdby = context.UserId;
+
                     objOpportunityHistory.StageId = 1;
+
                     objOpportunityHistory.OpportunityId = objOppurtunity.OppurtunityId;
+
                     objOpportunityHistory.CreatedDate = DateTime.Now;
+
                     _context.TblOpportunity.Add(objOppurtunity);
-                    // _context.SaveChanges();
+
                     objOpportunityHistory.OpportunityId = objOppurtunity.OppurtunityId;
+
                     _context.TblOpportunityHistory.Add(objOpportunityHistory);
+
+                    _context.SaveChanges();
+
                 }
-                _context.SaveChanges();
+
+
+
                 leadDTO = _mapper.Map<LeadDTO>(lead);
-                //return leadDTO;
+
                 return new LeadResponse { Status = BusinessStatus.Created, product = leadDTO, ResponseMessage = $"Lead  Saved successfully ! \n Product ID: {leadDTO.ContactID}" };
 
             }
 
             catch (Exception ex)
+
             {
+
                 throw ex;
+
             }
 
-            // RuleEngine Validation 
-
-
-
         }
-
-        // RuleEngine Validation 
-        ////////////////
-
+  
         
         public async Task<IEnumerable<LeadDTO>> ContactPoolAsync(String type, ApiContext context)
         {
@@ -374,7 +383,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
             tbl_lead.Place = leadDTO.Place;
             tbl_lead.MobileNo = leadDTO.MobileNo;
             tbl_lead.PassportNo = leadDTO.PassportNo;
-
+            tbl_lead.Salutation = leadDTO.Salutation;
             tbl_lead.Currency = leadDTO.Currency;
             tbl_lead.Gender = leadDTO.Gender;
             tbl_lead.MaritalStatusId = leadDTO.MaritalStatusID;
