@@ -103,7 +103,7 @@ namespace iNube.Services.Lead.Controllers.Lead
         [HttpGet]
         public IActionResult LoadSuspectInformation(int ContactID)
         {
-            var suspects = _leadService.LoadSuspectInformation(ContactID, Context);
+            var suspects = _leadService.LoadSuspectInformation(ContactID, Context,"");
             return Ok(suspects);
 
         }
@@ -167,6 +167,14 @@ namespace iNube.Services.Lead.Controllers.Lead
         {
             var response = await _leadService.UpdateEmpSuspectData(eMPDistribute, Context);
             return Ok(response);
+        }
+
+        [HttpGet]
+        public IActionResult GetSuspectInformationByNicNo(string NicNo)
+        {
+            var suspects = _leadService.LoadSuspectInformation(0, Context, NicNo);
+            return Ok(suspects);
+
         }
     }
 }

@@ -24,7 +24,7 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
         Task<LeadResponse> SaveSuspectAsync(LeadDTO leadDTO, ApiContext context);
         Task<IEnumerable<LeadDTO>> ContactPoolAsync(String type, ApiContext context);
         Task<IEnumerable<LeadDTO>> SuspectPoolAsync(int incStageId, ApiContext context);
-        List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context);
+        List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context, string NicNo);
 
         LeadResponse ModifySuspect(LeadDTO leadDTO, ApiContext context);
         IEnumerable<ddDTO> GetLocation(string locationType, int parentID, ApiContext context);
@@ -325,12 +325,17 @@ namespace iNube.Services.Lead.Controllers.Lead.LeadService
 
         //}
 
-        public List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context)
+        public List<LeadDTO> LoadSuspectInformation(int ContactID, ApiContext context,string NicNo)
         {
-
-            var DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
-
-
+            List<TblContacts> DATA = new List<TblContacts>();
+            if (!string.IsNullOrEmpty(NicNo))
+            {
+                DATA = _context.TblContacts.Where(p => p.Nicno == NicNo).Include(x => x.Address).ToList();
+            }
+            else
+            {
+                DATA = _context.TblContacts.Where(p => p.ContactId == ContactID).Include(x => x.Address).ToList();
+            }
 
             var pooldata = _mapper.Map<List<LeadDTO>>(DATA);
             foreach (var item in pooldata)
