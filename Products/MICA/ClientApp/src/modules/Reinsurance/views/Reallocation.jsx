@@ -293,6 +293,12 @@ class Reallocation extends React.Component {
                         this.state.reallocationlist.mapDetails[key].AllocatedAmount = (this.state.reallocationlist.AllocationAmount - caldata);
                         this.state.reallocationlist.mapDetails[key].AllocatedPremium = (this.state.reallocationlist.PremiumAmount - calpremium);
                     }
+                    else {
+                        
+                        this.state.reallocationlist.mapDetails[key].AllocatedAmount = item.Limit;
+                        this.state.reallocationlist.mapDetails[key].AllocatedPremium = item.AllocatedPremium;
+                    }
+                   
                     qssuminsuared1 = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
                     qspremium1 = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                     //this.state.reallocationlist.mapDetails[key].AllocatedAmount
@@ -307,6 +313,10 @@ class Reallocation extends React.Component {
                         this.state.reallocationlist.mapDetails[key].AllocatedAmount = availblesuminsured;
                         this.state.reallocationlist.mapDetails[key].AllocatedPremium = availblepremium;
                     }
+                    else {
+                        this.state.reallocationlist.mapDetails[key].AllocatedAmount = item.Limit;
+                        //this.state.reallocationlist.mapDetails[key].AllocatedPremium = item.AllocatedPremium;
+                    }
                     qssuminsuared2 = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
                     qspremium2 = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                 }
@@ -319,6 +329,9 @@ class Reallocation extends React.Component {
                 //deductionPremiumAmount = this.state.reallocationlist.PremiumAmount - (QSPremiumTotal + calpremium);
                 //this.state.reallocationlist.mapDetails[key].AllocatedPremium = deductionPremiumAmount / SPcount;
                 //this.state.reallocationlist.mapDetails[key].Percentage = spParcentage / SPcount;
+                this.state.reallocationlist.mapDetails[key].AllocatedAmount = (( caldata * this.state.reallocationlist.mapDetails[key].NoOfLines) / 100);
+                this.state.reallocationlist.mapDetails[key].AllocatedPremium = ((calpremium * this.state.reallocationlist.mapDetails[key].NoOfLines) / 100);
+
                 console.log("deductionAmount", deductionAmount, deductionPremiumAmount, spParcentage,this.state.reallocationlist.mapDetails[key].AllocatedAmount)
             }
             //if (item.Type == "FAC") {
@@ -408,10 +421,12 @@ class Reallocation extends React.Component {
                         item.AllocatedAmount = "";
                         item.AllocatedPremium = "";
                         item.Percentage = "";
+                        item.NoOfLines = "";
                     }
                     if (item.Type == "QS") {
                         item.AllocatedAmount = "";
                         item.AllocatedPremium = "";
+                       
                     }
                     if (item.Type == "FAC") {
                         //item.AllocatedAmount = "";
@@ -985,7 +1000,7 @@ class Reallocation extends React.Component {
                                             labelText="Lines"
                                             name="NoOfLines"
                                             //disabled={true}
-                                            value={this.state.reallocationlist.mapDetails[key].NoOfLines}
+                                            value={item.NoOfLines}
                                             onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
@@ -994,8 +1009,8 @@ class Reallocation extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Adjustment %"
-                                        name="Percentage"
-                                        value={this.state.reallocationlist.mapDetails[key].Percentage}
+                                        name="NoOfLines"
+                                        value={this.state.reallocationlist.mapDetails[key].NoOfLines}
                                         onChange={(e) => this.onInputChange2(e, key)}
                                         formControlProps={{
                                             fullWidth: true
