@@ -75,7 +75,7 @@ const PartialProposalForm = (props) => {
                 <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
                                     labelText="Quotation No"
-                                    value={props.SaveProposalDto.quoteNo}
+                                    value={props.filterData.quoteNo}
                                     name="quoteNo"
                                     onChange={(e) => props.proposalSetValue(e)}
                                     id="QuoteNo"
@@ -87,7 +87,7 @@ const PartialProposalForm = (props) => {
                 <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
                                     labelText="Proposal No"
-                                    value={props.SaveProposalDto.proposalNo}
+                                    value={props.filterData.proposalNo}
                                     name="proposalNo"
                                     
                                     onChange={(e) => props.proposalSetValue(e)}
@@ -100,7 +100,7 @@ const PartialProposalForm = (props) => {
                 <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
                                     labelText="Plan Name"
-                                    value={props.SaveProposalDto.planId}
+                                    value={props.filterData.planId}
                                     name="planId"
                                     onChange={(e) => props.proposalSetValue(e)}
                                   
@@ -113,7 +113,7 @@ const PartialProposalForm = (props) => {
                 <GridItem xs={12} sm={12} md={3}>
                                 <CustomInput
                                     labelText="Payment Frequency"
-                                    value={props.SaveProposalDto.paymentFrequency}
+                                    value={props.filterData.paymentFrequency}
                                     name="paymentFrequency"
                                     onChange={(e) => props.proposalSetValue(e)}
                                     id="PaymentFrequency"
