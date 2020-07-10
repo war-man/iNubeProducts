@@ -161,7 +161,7 @@ class Lead extends React.Component {
                                                 <CountUp
                                                     className="account-balance"
                                                 start={0}
-                                                //end={10}
+                                                end={10}
                                                end={this.state.dataRows.length}
                                                     duration={3.75}
                                                     useEasing={true}

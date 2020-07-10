@@ -41,7 +41,7 @@ if (env === "EdelweissProd") {
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
-    NotificationUrl = Baseurl;
+    NotificationUrl = Baseurl; 
 }
 if (env === "Local") {
     partnerconfigUrl = 'https://localhost:44315';

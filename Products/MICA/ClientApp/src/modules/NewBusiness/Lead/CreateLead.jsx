@@ -173,94 +173,17 @@ class CreateLead extends React.Component {
                         }
                     </CardHeader>
               
-                   
-                    
-                    
-                        <GridContainer xl={12}>
-                            
-                                
-                            <GridItem xs={12} sm={6} style={radioAlign}>
-                                <div>
-                                    <h6> Do you know the Emirates Id </h6>
-                                    <FormControlLabel
-                                        control={
-                                            <Radio
-                                                checked={this.state.selectedValue === "1004"}
-                                                onChange={this.handleRadioChange}
-                                                value="1004"
-                                                name="radio button demo"
-                                                aria-label="B"
-                                                icon={
-                                                    <FiberManualRecord
-                                                        className={classes.radioUnchecked}
-                                                    />
-                                                }
-                                                checkedIcon={
-                                                    <FiberManualRecord
-                                                        className={classes.radioChecked}
-                                                    />
-                                                }
-                                                classes={{
-                                                    checked: classes.radio,
-                                                    root: classes.radioRoot
-                                                }}
-                                            />
-                                        }
-                                        classes={{
-                                            label: classes.label
-                                        }}
-                                        label="Yes"
-                                    />
-
-
-                                    <FormControlLabel
-                                        control={
-                                            <Radio
-                                                checked={this.state.selectedValue === "1003"}
-                                                onChange={this.handleRadioChange}
-                                                value="1003"
-                                                name="radio button demo"
-                                                aria-label="B"
-                                                icon={
-                                                    <FiberManualRecord
-                                                        className={classes.radioUnchecked}
-                                                    />
-                                                }
-                                                checkedIcon={
-                                                    <FiberManualRecord
-                                                        className={classes.radioChecked}
-                                                    />
-                                                }
-                                                classes={{
-                                                    checked: classes.radio,
-                                                    root: classes.radioRoot
-                                                }}
-                                            />
-                                        }
-                                        classes={{
-                                            label: classes.label
-                                        }}
-                                        label="No"
-                                    />
-                                </div>
-                            </GridItem>
-
-                        </GridContainer>
-                </Card>
+                </Card>  
+               
                 <Animated animationIn="fadeInDown" animationOut="fadeOut" isVisible={true}>
-                            {this.state.emrFlag ? 
-                                <CommonModify isShow={this.state.isShow} isShowCreateLead={true} /> : null}
+                          
 
-
-                                {
-                                    this.state.detFlag ?
-
-                                    <CommonModify isShow={this.state.isShow} isShowCreateLead={true} isDontShowCreateLeadBtn={true}/> : null}
+                                    <CommonModify isShow={this.state.isShow} isShowCreateLead={true} isDontShowCreateLeadBtn={true}/>
                
                                 
                 </Animated>    
                
-                
+               
             </div>
         );
     }

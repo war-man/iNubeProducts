@@ -231,7 +231,7 @@ class CommonModify extends React.Component {
 
 
     GetLocationService = (type, pID) => {
-        debugger;
+       
         fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/GetLocation?locationType=` + type + `&parentID=` + pID, {
             // fetch(`https://localhost:44347/api/Lead/GetLocation?locationType=` + type + `&parentID=` + pID, {
 
@@ -312,6 +312,7 @@ class CommonModify extends React.Component {
 
 
         this.GetLocationService('Country', 0);
+        
         console.log('mount-- ', this.props);
         if (this.props.type != undefined) {
             this.state.type = this.props.type;
@@ -343,9 +344,10 @@ class CommonModify extends React.Component {
                     console.log("suspectinfo", this.state.LeadDTO, data);
 
                     if (data[0] !== null) {
+                        debugger
                         this.setState({ addressDTO: data[0].address });
-                        this.GetLocationService('Country', 0);
-
+                      this.GetLocationService('Country', 0);
+                        
                     }
                     console.log("address", this.state.addressDTO);
                 });
@@ -472,14 +474,11 @@ class CommonModify extends React.Component {
         });
     }
     edittable = (contactid) => {
-
+        debugger
         let addressdto = [];
         this.setState({ open: true });
-
-        fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/LoadSuspectInformation?ContactID=` + contactid, {
-
-
-            //  fetch(`https://localhost:44347/api/Lead/LoadSuspectInformation?ContactID=` + contactid, {
+                fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/LoadSuspectInformation?ContactID=` + contactid, {
+                                    //  fetch(`https://localhost:44347/api/Lead/LoadSuspectInformation?ContactID=` + contactid, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -488,7 +487,6 @@ class CommonModify extends React.Component {
 
             },
         })
-
             .then(response => response.json())
             .then(data => {
                 this.setState({ LeadDTO: data });
@@ -496,10 +494,28 @@ class CommonModify extends React.Component {
 
                 if (data[0] !== null) {
                     this.setState({ addressDTO: data[0].address });
-                    this.GetLocationService('Country', 0);
+                   
+                 
+                    if (this.state.addressDTO.countryId != null) {
+                        let addr = this.state.addressDTO;
 
+
+                        this.GetLocationService('Country', 0);
+                        this.GetLocationService('State', data[0].address.countryId);
+                        this.GetLocationService('District', data[0].address.stateId);
+                        this.GetLocationService('City', data[0].address.districtId);
+                        this.GetLocationService('Pincode', data[0].address.cityId);
+
+                        addr.countryId = data[0].address.countryId;
+                        addr.stateId = data[0].address.stateId;
+                        addr.districtId = data[0].address.districtId;
+                        addr.cityId = data[0].address.cityId;
+                        addr.areaId = data[0].address.areaId;
+                        this.setState({ addr });
+                    }
                 }
                 console.log("address", this.state.addressDTO);
+                console.log("addressDTO1", this.state.addressDTO1);
             });
         this.setState({ isDontShowCreateLead: true, isDontShowGrid: false, isDontShow: true, isDontShowCreateLeadBtn: false });
 
@@ -634,6 +650,7 @@ class CommonModify extends React.Component {
                     if (data.status == 2) {
 
 
+
                         swal({
 
                             text: data.responseMessage,
@@ -751,9 +768,8 @@ class CommonModify extends React.Component {
                 {
                     this.state.isDontShowCreateLead &&
 
-
-                    <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>
-
+                    <Card>
+                   
                         <CardBody>
                             <GridContainer >
 
@@ -761,8 +777,8 @@ class CommonModify extends React.Component {
                                     <CustomInput
                                         success={this.state.nicnoState === "success"}
                                         error={this.state.nicnoState === "error"}
-
-                                        labelText="Emirates ID"
+                                       // labelText="Emirates ID"
+                                        labelText="Identification No"
                                         id="emiratesId"
                                         name="nicno"
                                         value={this.state.LeadDTO[0].nicno}
@@ -1341,12 +1357,11 @@ class CommonModify extends React.Component {
 
                         </CardBody>
 
-                    </Animated>
+                  
 
 
 
-
-
+                    </Card>
 
                 }  {this.renderRedirectL()}
                 {this.renderRedirect()}
