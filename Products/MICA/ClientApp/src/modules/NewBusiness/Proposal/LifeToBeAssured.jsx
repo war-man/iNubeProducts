@@ -39,6 +39,8 @@ import Edit from "@material-ui/icons/Edit";
 import Download from "@material-ui/icons/GetApp";
 import CloudUpload from "@material-ui/icons/CloudUpload";
 import Dropdown from "components/Dropdown/Dropdown.jsx";
+import NewBusinessConfig from 'modules/NewBusiness/NewBusinessConfig.js';
+
 const style = {
     infoText: {
         fontWeight: "300",
@@ -61,15 +63,15 @@ const submitBtn = {
     height: "35px",
     marginTop: "-10px"
 }
-const dataTable = {
-    headerRow: ["FirstName", "LastName", "Relationship", "AgeNextBirthday", "Gender", "Edit"],
-    // footerRow: ["Type", "Position", "Office", "Age", "Actions"],
-    dataRows: [
-        ["", "", "", "", "", ""],
-        ["", "", "", "", "", ""],
+//const dataTable = {
+//    headerRow: ["FirstName", "LastName", "Relationship", "AgeNextBirthday", "Gender", "Edit"],
+//    // footerRow: ["Type", "Position", "Office", "Age", "Actions"],
+//    dataRows: [
+//        ["", "", "", "", "", ""],
+//        ["", "", "", "", "", ""],
 
-    ]
-};
+//    ]
+//};
 class LifeToBeAssured extends React.Component {
 
     constructor(props) {
@@ -77,57 +79,114 @@ class LifeToBeAssured extends React.Component {
         this.state = {
             singleValueSelected: "0",
             singleValue: "0",
+            data: [],
+            sampledata: [],
+            gridValuedisable: true,
+            flag1: false,
+            flag2: true,
+            PolicyMemberDetails: {
 
-            data: dataTable.dataRows.map((prop, key) => {
-                return {
-                    id: key,
-                    FirstName: (<CustomInput
-                        //labelText="Name"
-                        value="DINESH"
-                        //value={props.ProductDTO.ProductName}
-                        name="Name"
-                        //onChange={props.SetValue}
-                        id="FirstName"
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                    />),
-                    LastName: (<CustomInput
-                        //labelText="Name"
-                        value="TIWARI"
-                        //value={props.ProductDTO.ProductName}
-                        name="LastName"
-                        //onChange={props.SetValue}
-                        id="LastName"
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                    />),
-                    Relationship: prop[2],
+                "salutation": "",
+                "fullname": "",
+                "givenName": "",
+                "nameWithInitial": "",
+                "preferredName": "",
+                "dob": "",
+                "age": 0,
+                "relationShipWithProposer": 0,
+                "occupationId": 0,
+                "oldnicno": "",
+                "newnicno": "",
+                "annualIncome": "",
+                "companyName": "",
+                "natureOfDuties": "",
+                "nationality": "",
+                "mobile": "",
+                "landline": "",
+                "email": "",
+                "isDeleted": true,
+                "firstName": "",
+                "surname": "",
+                "middleName": "",
+                "alternateMobileNo": "",
+                "home": "",
+                "work": "",
+                "adressId": 0,
+                "address1": "",
+                "address2": "",
+                "address3": "",
+                "city": "",
+                "district": "",
+                "isPermanentAddrSameasCommAddr": false,
+                "permanetAddressId": 0,
+                "quoteMemberid": 0,
+                "isSameasProposerAddress": true,
+                "citizenship1": "string",
+                "citizenship2": "string",
+                "residentialNationality": "string",
+                "residentialNationalityStatus": "string",
+                "occupationHazardousWork": true,
+                "passportNumber": "",
+                "countryOccupation": "string",
+                "specifyResidental": "string",
+                "specifyHazardousWork": "string",
+                "citizenShip": true,
+                "gender": "",
+                "maritialStatus": "",
 
-                    AgeNextBirthday: (<CustomInput
-                        //labelText="Name"
-                        value="33"
-                        //value={props.ProductDTO.ProductName}
-                        name="AgeNextBirthday"
-                        //onChange={props.SetValue}
-                        id="AgeNextBirthday"
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                    />),
-                    Gender: prop[4],
-                    Edit: prop[5],
-                    Edit: (
-                        <div className="actions-right">
-                            <Button color="info" justIcon round simple className="edit" onClick={() => this.edittable()}><Edit /></Button>
+            },
+            //data: dataTable.dataRows.map((prop, key) => {
+            //    return {
+            //        id: key,
+            //        FirstName: (<CustomInput
+            //            //labelText="Name"
+            //            //value="DINESH"
+            //            //value={}
+            //            name="Name"
+            //            //onChange={props.SetValue}
+            //            id="FirstName"
+            //            formControlProps={{
+            //                fullWidth: true
+            //            }}
+            //        />),
+            //        LastName: (<CustomInput
+            //            //labelText="Name"
+            //            value="TIWARI"
+            //            //value={props.ProductDTO.ProductName}
+            //            name="LastName"
+            //            //onChange={props.SetValue}
+            //            id="LastName"
+            //            formControlProps={{
+            //                fullWidth: true
+            //            }}
+            //        />),
+            //        Relationship: prop[2],
 
-                        </div>
-                    )
-                };
-            })
+            //        AgeNextBirthday: (<CustomInput
+            //            //labelText="Name"
+            //            value="33"
+            //            //value={props.ProductDTO.ProductName}
+            //            name="AgeNextBirthday"
+            //            //onChange={props.SetValue}
+            //            id="AgeNextBirthday"
+            //            formControlProps={{
+            //                fullWidth: true
+            //            }}
+            //        />),
+            //        Gender: prop[4],
+            //        Edit: prop[5],
+            //        Edit: (
+            //            <div className="actions-right">
+            //                <Button color="info" justIcon round simple className="edit" onClick={() => this.handlePolicyOwnerData()}><Edit /></Button>
+
+            //            </div>
+            //        )
+            //    };
+            //})
         };
     }
+
+    
     handleRadioChange = (event) => {
 
         let value = event.target.value;
@@ -137,6 +196,113 @@ class LifeToBeAssured extends React.Component {
         this.setState({ value });
         console.log("singleValueSelected", this.state.singleValueSelected);
     }
+
+    componentDidMount() {
+        debugger;
+        let PolicyID = this.props.filterData.policyID;
+        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/PolicyOwnerDetails/GePolicyOwnerDetails?PolicyID=` + PolicyID + ``, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+
+            .then(response => response.json())
+            .then(data => {
+                console.log("PolicyOwnerDetailsDto:", data);
+                this.state.sampledata.push(data);
+                this.setState({});
+                this.ProposerTable();
+                this.setState({ PolicyMemberDetails: data });
+                //this.state.tblPolicyMemberDetails.dob = new Date(this.state.tblPolicyMemberDetails.dob).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                //this.setState({});
+
+            });
+
+    }
+
+    ProposerTable = () => {
+        debugger;
+        console.log("incompletedata", this.state.sampledata);
+        this.setState({
+            data: this.state.sampledata.map((prop, key) => {
+                return {
+                    id: key,
+                    FirstName: (<CustomInput
+                        value={prop.fullname}
+                        disabled={this.state.gridValuedisable}
+                        //onChange={props.SetValue}
+                        id="FirstName"
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />),
+                    LastName: (<CustomInput
+                        value={prop.surname}
+                        disabled={this.state.gridValuedisable}
+                        //onChange={props.SetValue}
+                        id="LastName"
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />),
+                    Relationship: (
+
+                        <MasterDropdown
+                            //disabled={this.state.gridValuedisable}
+                            // value={props.singleValueSelectedProposer === "0" ? "" : props.tblPolicyMemberDetails.relationShipWithProposer}
+                            lstObject={this.props.MasterDataDto}
+                            filterName='RelationshipType'
+                            name='relationShipWithProposer'
+                            //onChange={(e) => props.MasterSetValue(e)}
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />),
+
+                    AgeNextBirthday: (<CustomInput
+                        value={prop.age}
+                        disabled={this.state.gridValuedisable}
+                        name="AgeNextBirthday"
+                        //onChange={props.SetValue}
+                        id="AgeNextBirthday"
+                        formControlProps={{
+                            fullWidth: true
+                        }}
+                    />),
+                    Gender: (
+                        <MasterDropdown
+                            //disabled={this.state.gridValuedisable}
+                            value={prop.gender}
+                            //onChange={(e) => props.MasterSetValue(e)}
+                            lstObject={this.props.MasterDataDto}
+                            filterName='Gender'
+                            name='gender'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
+                        />),
+                    //Edit: prop[5],
+                    Edit: (
+                        <div className="actions-right">
+                            <Button color="info" justIcon round simple className="edit" onClick={() => this.editable()}><Edit /></Button>
+
+                        </div>
+                    )
+                    
+                };
+            }
+            )
+        }
+        )
+    }
+
+    editable = () => {
+        this.setState({ flag1: true })
+    } 
+    
 
     render() {
         const array = [];
@@ -240,25 +406,14 @@ class LifeToBeAssured extends React.Component {
                 <GridContainer lg={12}>
                     <GridItem xs={12} sm={4} md={3}>
 
-                        <Dropdown
-                            required={true}
+                        <MasterDropdown
                             labelText="Relationship With Proposer"
-                            lstObject={array}
-                            // value={orgData.selectedlevel}
-                            //name='selectedlevel'
-                            //onChange={(e) => orgData.handlelevels(e)}
-                            formControlProps={{ fullWidth: true }}
-                        />
-                    </GridItem>
-                    <GridItem xs={12} sm={4} md={3}>
-                        <CustomInput
-                            success={this.Salutation === "success"}
-                            error={this.Salutation === "error"}
-                            labelText="Salutation "
-                            name="Salutation"
-                            required={true}
-                            onChange={(e) => this.detailsChange("string", e)}
-                            value={this.Salutation}
+                           // value={props.singleValueSelectedProposer === "0" ? "" : props.tblPolicyMemberDetails.relationShipWithProposer}
+                            disabled={ this.state.flag1 === true ? true : this.state.flag2 }
+                            lstObject={this.props.MasterDataDto}
+                            filterName='RelationshipType'
+                            name='relationShipWithProposer'
+                            //onChange={(e) => props.MasterSetValue(e)}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -266,8 +421,23 @@ class LifeToBeAssured extends React.Component {
                     </GridItem>
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
+                            success={this.Salutation === "success"}
+                            error={this.Salutation === "error"}
+                           
+                            labelText="Salutation "
+                            name="Salutation"
+                            required={true}
+                           // onChange={(e) => this.detailsChange("string", e)}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.salutation : ""}
+                            formControlProps={{
+                                fullWidth: true
+                            }} 
+                        />
+                    </GridItem>
+                    <GridItem xs={12} sm={4} md={3}>
+                        <CustomInput
                             labelText="Name With Initials"
-                            //value={props.ProductDTO.ProductName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.nameWithInitial : ""}
                             name="NameWithInitials"
                             //onChange={props.SetValue}
                             id="NameWithInitials"
@@ -284,7 +454,7 @@ class LifeToBeAssured extends React.Component {
                             name="GivenName"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.GivenName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.givenName : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -298,7 +468,7 @@ class LifeToBeAssured extends React.Component {
                             name="SurName"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.SurName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.surname : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -320,12 +490,22 @@ class LifeToBeAssured extends React.Component {
                     </GridItem>
 
                     <GridItem xs={12} sm={4} md={3}>
-                        <CustomDatetime required={true} onFocus={this.onClick} validdate={this.validdate} labelText="Date Of Birth" id='dob' name='dob' onChange={(evt) => this.onDateChange('datetime', 'ProductDTO', 'activeFrom', evt)} formControlProps={{ fullWidth: true }} />
+                        <CustomDatetime
+                            required={true}
+                            onFocus={this.onClick}
+                            validdate={this.validdate}
+                            labelText="Date Of Birth"
+                            id='dob'
+                            name='dob'
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.dob : ""}
+                            onChange={(evt) => this.onDateChange('datetime', 'ProductDTO', 'activeFrom', evt)}
+                            formControlProps={{ fullWidth: true }}
+                        />
                     </GridItem>
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Age"
-                            //value={props.ProductDTO.ProductName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.age : ""}
                             name="Age"
                             //onChange={props.SetValue}
                             id="Age"
@@ -336,26 +516,34 @@ class LifeToBeAssured extends React.Component {
                     </GridItem>
                     <GridItem xs={12} sm={4} md={3}>
 
-                        <Dropdown
-                            required={true}
+                        <MasterDropdown
                             labelText="Gender"
-                            lstObject={array}
-                            // value={orgData.selectedlevel}
-                            //name='selectedlevel'
-                            //onChange={(e) => orgData.handlelevels(e)}
-                            formControlProps={{ fullWidth: true }}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.gender : ""}
+                            //onChange={(e) => props.MasterSetValue(e)}
+                            lstObject={this.props.MasterDataDto}
+                            filterName='Gender'
+                            name='gender'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
                         />
                     </GridItem>
                     <GridItem xs={12} sm={4} md={3}>
 
-                        <Dropdown
-                            required={true}
-                            labelText="Maritial Status"
-                            lstObject={array}
-                            // value={orgData.selectedlevel}
-                            //name='selectedlevel'
-                            //onChange={(e) => orgData.handlelevels(e)}
-                            formControlProps={{ fullWidth: true }}
+                        <MasterDropdown
+                            labelText="Marital Status"
+                            
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.maritialStatus : ""}
+                            //onChange={(e) => props.MasterSetValue(e)}
+
+                            lstObject={this.props.MasterDataDto}
+                            filterName='MaritalStatus'
+
+                            name='maritialStatus'
+
+                            formControlProps={{
+                                fullWidth: true
+                            }}
                         />
                     </GridItem>
 
@@ -379,10 +567,10 @@ class LifeToBeAssured extends React.Component {
                             success={this.AnnualIncome === "success"}
                             error={this.AnnualIncome === "error"}
                             labelText="Annual Income "
-                            name="AnnualIncome"
+                            name="annualIncome"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.AnnualIncome}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.annualIncome : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -393,7 +581,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="PassportNumber"
-                            //value={props.ProductDTO.ProductName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.passportNumber : ""}
                             name="PassportNumber"
                             //onChange={props.SetValue}
                             id="PassportNumber"
@@ -430,25 +618,28 @@ class LifeToBeAssured extends React.Component {
 
                     <GridItem xs={12} sm={4} md={3}>
 
-                        <Dropdown
-                            required={true}
+                        <MasterDropdown
                             labelText="Nationality"
-                            lstObject={array}
-                            // value={orgData.selectedlevel}
-                            //name='selectedlevel'
-                            //onChange={(e) => orgData.handlelevels(e)}
-                            formControlProps={{ fullWidth: true }}
+                            value={this.state.PolicyMemberDetails.nationality}
+                            //onChange={(e) => props.MasterSetValue(e)}
+                            lstObject={this.props.MasterDataDto}
+                            filterName='Country'
+                            name='nationality'
+                            formControlProps={{
+                                fullWidth: true
+                            }}
                         />
                     </GridItem>
                     
                     <GridItem xs={12} sm={4} md={3}>
 
-                        <Dropdown
+                        <MasterDropdown
                             required={true}
                             labelText="Country Of Residence"
-                            lstObject={array}
-                            // value={orgData.selectedlevel}
-                            //name='selectedlevel'
+                            lstObject={this.props.MasterDataDto}
+                            filterName='Country'
+                            name='residentialNationality'
+                            value={this.state.PolicyMemberDetails.nationality}
                             //onChange={(e) => orgData.handlelevels(e)}
                             formControlProps={{ fullWidth: true }}
                         />
@@ -456,12 +647,12 @@ class LifeToBeAssured extends React.Component {
                    
                     <GridItem xs={12} sm={4} md={3}>
 
-                        <Dropdown
+                        <MasterDropdown
                             required={true}
                             labelText="Age Proof"
-                            lstObject={array}
-                            // value={orgData.selectedlevel}
-                            //name='selectedlevel'
+                            lstObject={this.props.MasterDataDto}
+                            filterName='AgeProofList'
+                            name='ageProof'
                             //onChange={(e) => orgData.handlelevels(e)}
                             formControlProps={{ fullWidth: true }}
                         />
@@ -489,13 +680,13 @@ class LifeToBeAssured extends React.Component {
 
                     <GridItem xs={12} sm={4} md={3}>
 
-                        <Dropdown
+                        <MasterDropdown
                             required={true}
                             labelText="Country Of Occupation"
-                            lstObject={array}
-                            // value={orgData.selectedlevel}
-                            //name='selectedlevel'
-                            //onChange={(e) => orgData.handlelevels(e)}
+                            lstObject={this.props.MasterDataDto}
+                            filterName='Country'
+                            name='residentialNationality'
+                            value={this.state.PolicyMemberDetails.nationality}
                             formControlProps={{ fullWidth: true }}
                         />
                     </GridItem>
@@ -597,7 +788,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Mobile No"
-                            //value={props.ProductDTO.ProductName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.mobile : ""}
                             name="MobileNo"
                             //onChange={props.SetValue}
                             id="MobileNo"
@@ -609,7 +800,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Home"
-                            //value={props.ProductDTO.ProductName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.email : ""}
                             name="Home"
                             //onChange={props.SetValue}
                             id="Home"
@@ -623,7 +814,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="OfficeNo"
-                            //value={props.ProductDTO.ProductName}
+                            //value={this.state.flag1 === true ? this.state.PolicyMemberDetails.work : ""}
                             name="Office No"
                             //onChange={props.SetValue}
                             id="OfficeNo"
@@ -639,7 +830,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="E-Mail"
-                            //value={props.ProductDTO.ProductName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.home : ""}
                             name="Email"
                             //onChange={props.SetValue}
                             id="Email"
@@ -682,7 +873,7 @@ class LifeToBeAssured extends React.Component {
                             name="Address1"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.Address1}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address1 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -696,7 +887,7 @@ class LifeToBeAssured extends React.Component {
                             name="Address2"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.Address2}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address2 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -706,7 +897,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Address 3"
-                            //value={props.ProductDTO.ProductName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address3 : ""}
                             name="Address3"
                             //onChange={props.SetValue}
                             id="Address3"
@@ -724,7 +915,7 @@ class LifeToBeAssured extends React.Component {
                             name="City"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.City}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.city : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -739,7 +930,7 @@ class LifeToBeAssured extends React.Component {
                             name="District"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.District}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.district : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -755,7 +946,7 @@ class LifeToBeAssured extends React.Component {
                             name="Province"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.Province}
+                            //value={this.state.flag1 === true ? this.state.PolicyMemberDetails.home : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -797,7 +988,7 @@ class LifeToBeAssured extends React.Component {
                             name="Address1"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.Address1}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address1 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -811,7 +1002,7 @@ class LifeToBeAssured extends React.Component {
                             name="Address2"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.Address2}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address2 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -821,7 +1012,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Address 3"
-                            //value={props.ProductDTO.ProductName}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address3 : ""}
                             name="Address3"
                             //onChange={props.SetValue}
                             id="Address3"
@@ -839,7 +1030,7 @@ class LifeToBeAssured extends React.Component {
                             name="City"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.City}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.city : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -854,7 +1045,7 @@ class LifeToBeAssured extends React.Component {
                             name="District"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.District}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.district : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -870,7 +1061,7 @@ class LifeToBeAssured extends React.Component {
                             name="Province"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.Province}
+                            //value={this.state.flag1 === true ? this.state.PolicyMemberDetails.district : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}

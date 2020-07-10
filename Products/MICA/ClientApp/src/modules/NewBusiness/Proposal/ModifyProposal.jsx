@@ -135,7 +135,7 @@ class ModifyProposal extends React.Component {
                                         },
                                         {
                                             title: "Life to be Assured",
-                                            content: <LifeToBeAssured SetValue={this.SetValue} />
+                                            content: <LifeToBeAssured SetValue={this.SetValue} filterData={this.props.filterData} MasterDataDto={this.props.MasterDataDto} />
 
                                         },
                                         {
