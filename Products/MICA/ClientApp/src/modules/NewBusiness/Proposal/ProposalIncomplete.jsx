@@ -505,6 +505,9 @@ class ProposalIncomplete extends React.Component {
         if (event.target.checked == true) {
             state.singleValueCheckboxSelected = true;
             this.setState({});
+        } else {
+            state.singleValueCheckboxSelected = false;
+            this.setState({});
         }
 
     }

@@ -749,7 +749,7 @@ const PartialMemberDetails = (props) => {
                             name="pAddress1"
                             required={true}
                             // onChange={props.PolicyOwnerDetailsSetValue}
-                            value={props.singleValueCheckboxSelected === true ? "" : props.tblPolicyMemberDetails.address1}
+                            value={props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address1 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -764,7 +764,7 @@ const PartialMemberDetails = (props) => {
                             required={true}
                             //onChange={props.PolicyOwnerDetailsSetValue}
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address2 : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].address2}
-                            value={props.singleValueCheckboxSelected === true ? "" : props.tblPolicyMemberDetails.address2}
+                            value={props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address2 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -775,7 +775,7 @@ const PartialMemberDetails = (props) => {
                         <CustomInput
                             labelText="Address 3"
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].address3 : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].address3}
-                            value={props.singleValueCheckboxSelected === true ? "" : props.tblPolicyMemberDetails.address3}
+                            value={props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.address3 : ""}
                             name="pAddress3"
                             //onChange={props.PolicyOwnerDetailsSetValue}
                             id="Address3"
@@ -794,7 +794,7 @@ const PartialMemberDetails = (props) => {
                             required={true}
                             //onChange={props.PolicyOwnerDetailsSetValue}
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].city : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].city}
-                            value={props.singleValueCheckboxSelected === true ? "" : props.tblPolicyMemberDetails.city}
+                            value={props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.city : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -811,7 +811,7 @@ const PartialMemberDetails = (props) => {
                             required={true}
                             //onChange={props.PolicyOwnerDetailsSetValue}
                             //value={props.singleValueSelectedProposer === "1" ? props.PolicyOwnerDetailsdataOnNoCondition[0].district : props.PolicyOwnerDetailsdataOnYesConditioinDto[0].district}
-                            value={props.singleValueCheckboxSelected === true ? "" : props.tblPolicyMemberDetails.district}
+                            value={props.singleValueCheckboxSelected === true ? props.tblPolicyMemberDetails.district : "" }
                             formControlProps={{
                                 fullWidth: true
                             }}
