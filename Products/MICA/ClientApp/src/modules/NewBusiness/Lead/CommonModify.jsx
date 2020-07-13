@@ -598,7 +598,43 @@ class CommonModify extends React.Component {
         LeadDTO[0][name] = value;
         this.setState({ LeadDTO });
         this.change(event, name, type);
+        if (name === "nicno") {
 
+            fetch(`${NewBusinessConfig.NewBusinessConfigUrl}/api/Lead/GetSuspectInformationByNicNo?NicNo=` + value, {
+
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("suspectinfo", this.state.LeadDTO, data);
+                    if (data.length > 0) {
+                        this.setState({ LeadDTO: data });
+                        console.log("suspectinfo", this.state.LeadDTO, data);
+                        this.setState({ addressDTO: data[0].address });
+                        let addr = this.state.addressDTO;
+
+
+                        this.GetLocationService('Country', 0);
+                        this.GetLocationService('State', data[0].address.countryId);
+                        this.GetLocationService('District', data[0].address.stateId);
+                        this.GetLocationService('City', data[0].address.districtId);
+                        this.GetLocationService('Pincode', data[0].address.cityId);
+
+                        addr.countryId = data[0].address.countryId;
+                        addr.stateId = data[0].address.stateId;
+                        addr.districtId = data[0].address.districtId;
+                        addr.cityId = data[0].address.cityId;
+                        addr.areaId = data[0].address.areaId;
+                        this.setState({ addr });
+                    }
+                    console.log("address", this.state.addressDTO);
+                });
+        }
     }
     SetaddressValue = ((type, event) => {
         let addressDTO = this.state.addressDTO;
