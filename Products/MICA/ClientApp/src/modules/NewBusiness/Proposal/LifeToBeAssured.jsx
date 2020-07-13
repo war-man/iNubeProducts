@@ -84,6 +84,8 @@ class LifeToBeAssured extends React.Component {
             gridValuedisable: true,
             flag1: false,
             flag2: true,
+            singleValueCheckboxSelected: false,
+            lifeToBeAssuredflag : false,
             PolicyMemberDetails: {
 
                 "salutation": "",
@@ -120,7 +122,9 @@ class LifeToBeAssured extends React.Component {
                 "isPermanentAddrSameasCommAddr": false,
                 "permanetAddressId": 0,
                 "quoteMemberid": 0,
-                "isSameasProposerAddress": true,
+                "isSameasProposerAddress": false,
+
+                "isSameProposerAdd": false,
                 "citizenship1": "string",
                 "citizenship2": "string",
                 "residentialNationality": "string",
@@ -252,7 +256,7 @@ class LifeToBeAssured extends React.Component {
 
                         <MasterDropdown
                             //disabled={this.state.gridValuedisable}
-                            // value={props.singleValueSelectedProposer === "0" ? "" : props.tblPolicyMemberDetails.relationShipWithProposer}
+                            value={prop.relationShipWithProposer}
                             lstObject={this.props.MasterDataDto}
                             filterName='RelationshipType'
                             name='relationShipWithProposer'
@@ -300,8 +304,44 @@ class LifeToBeAssured extends React.Component {
     }
 
     editable = () => {
-        this.setState({ flag1: true })
+        debugger;
+
+        this.state.flag1 = true;
+        this.setState({  });
+
+
+      
+        if (this.state.flag1 === true) {
+
+            this.state.lifeToBeAssuredflag = true;
+            this.setState({});
+
+            this.state.isSameProposerAdd = true;
+            this.setState({});
+
+
+        } else {
+            this.state.lifeToBeAssuredflag = false;
+            this.setState({});
+
+            this.state.isSameProposerAdd = false;
+            this.setState({});
+        }
     } 
+    SetSameProposerAddCheckBox = (event) => {
+         debugger;
+
+        let state = this.state;
+
+        if (event.target.checked == true) {
+            state.singleValueCheckboxSelected = true;
+            this.setState({});
+        } else {
+            state.singleValueCheckboxSelected = false;
+            this.setState({});
+        }
+
+    }
     
 
     render() {
@@ -423,7 +463,7 @@ class LifeToBeAssured extends React.Component {
                         <CustomInput
                             success={this.Salutation === "success"}
                             error={this.Salutation === "error"}
-                           
+                            disabled={this.state.lifeToBeAssuredflag}
                             labelText="Salutation "
                             name="Salutation"
                             required={true}
@@ -437,6 +477,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Name With Initials"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.nameWithInitial : ""}
                             name="NameWithInitials"
                             //onChange={props.SetValue}
@@ -451,6 +492,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.GivenName === "success"}
                             error={this.GivenName === "error"}
                             labelText="Given Name"
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="GivenName"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
@@ -465,6 +507,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.SurName === "success"}
                             error={this.SurName === "error"}
                             labelText="Sur Name"
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="SurName"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
@@ -479,6 +522,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.NIC === "success"}
                             error={this.NIC === "error"}
                             labelText="NIC"
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="NIC"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
@@ -495,6 +539,7 @@ class LifeToBeAssured extends React.Component {
                             onFocus={this.onClick}
                             validdate={this.validdate}
                             labelText="Date Of Birth"
+                            disabled={this.state.lifeToBeAssuredflag}
                             id='dob'
                             name='dob'
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.dob : ""}
@@ -505,6 +550,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Age"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.age : ""}
                             name="Age"
                             //onChange={props.SetValue}
@@ -518,6 +564,7 @@ class LifeToBeAssured extends React.Component {
 
                         <MasterDropdown
                             labelText="Gender"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.gender : ""}
                             //onChange={(e) => props.MasterSetValue(e)}
                             lstObject={this.props.MasterDataDto}
@@ -532,7 +579,7 @@ class LifeToBeAssured extends React.Component {
 
                         <MasterDropdown
                             labelText="Marital Status"
-                            
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.maritialStatus : ""}
                             //onChange={(e) => props.MasterSetValue(e)}
 
@@ -552,6 +599,7 @@ class LifeToBeAssured extends React.Component {
                         <Dropdown
                             required={true}
                             labelText="Occupation"
+                            disabled={this.state.lifeToBeAssuredflag}
                             lstObject={array}
                             // value={orgData.selectedlevel}
                             //name='selectedlevel'
@@ -567,6 +615,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.AnnualIncome === "success"}
                             error={this.AnnualIncome === "error"}
                             labelText="Annual Income "
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="annualIncome"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
@@ -581,6 +630,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="PassportNumber"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.passportNumber : ""}
                             name="PassportNumber"
                             //onChange={props.SetValue}
@@ -593,6 +643,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Name Of Employee"
+                            disabled={this.state.lifeToBeAssuredflag}
                             //value={props.ProductDTO.ProductName}
                             name="NameOfEmployee"
                             //onChange={props.SetValue}
@@ -620,6 +671,7 @@ class LifeToBeAssured extends React.Component {
 
                         <MasterDropdown
                             labelText="Nationality"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.PolicyMemberDetails.nationality}
                             //onChange={(e) => props.MasterSetValue(e)}
                             lstObject={this.props.MasterDataDto}
@@ -636,6 +688,7 @@ class LifeToBeAssured extends React.Component {
                         <MasterDropdown
                             required={true}
                             labelText="Country Of Residence"
+                            disabled={this.state.lifeToBeAssuredflag}
                             lstObject={this.props.MasterDataDto}
                             filterName='Country'
                             name='residentialNationality'
@@ -667,6 +720,7 @@ class LifeToBeAssured extends React.Component {
                                 success={this.SpecifyOccupationWork === "success"}
                                 error={this.SpecifyOccupationWork === "error"}
                                 labelText="Specify Occupation Work "
+                                disabled={this.state.lifeToBeAssuredflag}
                                 name="SpecifyOccupationWork"
                                 required={true}
                                 onChange={(e) => this.detailsChange("string", e)}
@@ -683,6 +737,7 @@ class LifeToBeAssured extends React.Component {
                         <MasterDropdown
                             required={true}
                             labelText="Country Of Occupation"
+                            disabled={this.state.lifeToBeAssuredflag}
                             lstObject={this.props.MasterDataDto}
                             filterName='Country'
                             name='residentialNationality'
@@ -757,7 +812,7 @@ class LifeToBeAssured extends React.Component {
                         </div>
                     </GridItem>
                     <GridItem xs={12} sm={12} md={12} className="downlevel">
-                        <CustomCheckbox
+                          <CustomCheckbox
                             name="checkbox"
 
                             formControlProps={{
@@ -765,6 +820,9 @@ class LifeToBeAssured extends React.Component {
                             }}
 
                         />
+
+                        
+
                                 Dual you Have Dual CitizenShip
                             </GridItem>
 
@@ -788,6 +846,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Mobile No"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.mobile : ""}
                             name="MobileNo"
                             //onChange={props.SetValue}
@@ -800,6 +859,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Home"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.email : ""}
                             name="Home"
                             //onChange={props.SetValue}
@@ -814,6 +874,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="OfficeNo"
+                            disabled={this.state.lifeToBeAssuredflag}
                             //value={this.state.flag1 === true ? this.state.PolicyMemberDetails.work : ""}
                             name="Office No"
                             //onChange={props.SetValue}
@@ -830,6 +891,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="E-Mail"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.home : ""}
                             name="Email"
                             //onChange={props.SetValue}
@@ -856,13 +918,18 @@ class LifeToBeAssured extends React.Component {
 
                     <GridItem xl={12} sm={12} md={12} className="downlevel">
                         <CustomCheckbox
-                            name="checkbox"
-
+                            
+                            name="isSameasProposerAddress"
+                            //isSameProposerAdd
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.isSameProposerAdd :  this.state.PolicyMemberDetails.isSameasProposerAddress }
+                            //checked={this.state.PolicyMemberDetails.isSameProposerAdd}
+                            onChange={(e) => this.SetSameProposerAddCheckBox(e)}
                             formControlProps={{
                                 fullWidth: true
                             }}
 
                         />
+
                                  Same As Prosper
                             </GridItem>
                     <GridItem xs={12} sm={4} md={3}>
@@ -870,10 +937,11 @@ class LifeToBeAssured extends React.Component {
                             success={this.Address1 === "success"}
                             error={this.Address1 === "error"}
                             labelText="Address 1"
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="Address1"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address1 : ""}
+                            value={this.state.singleValueCheckboxSelected === true ? this.state.PolicyMemberDetails.address1 : "" || this.state.flag1 === true ? this.state.PolicyMemberDetails.address1 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -884,10 +952,12 @@ class LifeToBeAssured extends React.Component {
                             success={this.Address2 === "success"}
                             error={this.Address2 === "error"}
                             labelText="Address 2"
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="Address2"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address2 : ""}
+                           // value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address2 : ""}
+                            value={this.state.singleValueCheckboxSelected === true ? this.state.PolicyMemberDetails.address2 : "" || this.state.flag1 === true ? this.state.PolicyMemberDetails.address2 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -897,7 +967,9 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Address 3"
-                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address3 : ""}
+                            disabled={this.state.lifeToBeAssuredflag}
+                            //value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address3 : ""}
+                            value={this.state.singleValueCheckboxSelected === true ? this.state.PolicyMemberDetails.address3 : "" || this.state.flag1 === true ? this.state.PolicyMemberDetails.address3 : ""}
                             name="Address3"
                             //onChange={props.SetValue}
                             id="Address3"
@@ -912,10 +984,12 @@ class LifeToBeAssured extends React.Component {
                             success={this.City === "success"}
                             error={this.City === "error"}
                             labelText="Postal Code|City "
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="City"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.city : ""}
+                           // value={this.state.flag1 === true ? this.state.PolicyMemberDetails.city : ""}
+                            value={this.state.singleValueCheckboxSelected === true ? this.state.PolicyMemberDetails.city : "" || this.state.flag1 === true ? this.state.PolicyMemberDetails.city : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -927,10 +1001,12 @@ class LifeToBeAssured extends React.Component {
                             success={this.District === "success"}
                             error={this.District === "error"}
                             labelText="District "
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="District"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
-                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.district : ""}
+                            //value={this.state.flag1 === true ? this.state.PolicyMemberDetails.district : ""}
+                            value={this.state.singleValueCheckboxSelected === true ? this.state.PolicyMemberDetails.district : "" || this.state.flag1 === true ? this.state.PolicyMemberDetails.district : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -943,10 +1019,12 @@ class LifeToBeAssured extends React.Component {
                             success={this.Province === "success"}
                             error={this.Province === "error"}
                             labelText="Province "
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="Province"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
                             //value={this.state.flag1 === true ? this.state.PolicyMemberDetails.home : ""}
+                            //value={this.state.singleValueCheckboxSelected === true ? this.state.PolicyMemberDetails.address1 : "" || this.state.flag1 === true ? this.state.PolicyMemberDetails.address1 : ""}
                             formControlProps={{
                                 fullWidth: true
                             }}
@@ -985,6 +1063,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.Address1 === "success"}
                             error={this.Address1 === "error"}
                             labelText="Address 1"
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="Address1"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
@@ -999,6 +1078,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.Address2 === "success"}
                             error={this.Address2 === "error"}
                             labelText="Address 2"
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="Address2"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
@@ -1012,6 +1092,7 @@ class LifeToBeAssured extends React.Component {
                     <GridItem xs={12} sm={4} md={3}>
                         <CustomInput
                             labelText="Address 3"
+                            disabled={this.state.lifeToBeAssuredflag}
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.address3 : ""}
                             name="Address3"
                             //onChange={props.SetValue}
@@ -1027,6 +1108,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.City === "success"}
                             error={this.City === "error"}
                             labelText="Postal Code|City "
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="City"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
@@ -1042,6 +1124,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.District === "success"}
                             error={this.District === "error"}
                             labelText="District "
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="District"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}
@@ -1058,6 +1141,7 @@ class LifeToBeAssured extends React.Component {
                             success={this.Province === "success"}
                             error={this.Province === "error"}
                             labelText="Province "
+                            disabled={this.state.lifeToBeAssuredflag}
                             name="Province"
                             required={true}
                             onChange={(e) => this.detailsChange("string", e)}

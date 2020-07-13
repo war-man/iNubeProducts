@@ -46,6 +46,8 @@ const styles = {
 class Panels extends React.Component {
     render() {
         const { classes } = this.props;
+
+        console.log("this.props", this.props);
         return (
             <div>
                 <GridContainer>
@@ -56,12 +58,12 @@ class Panels extends React.Component {
                                     collapses={[
                                         {
                                             title: "Premium Paying Details",
-                                            content: <PremiumPayingDetails />
+                                            content: <PremiumPayingDetails  MasterDataDto={this.props.MasterDataDto}/>
                                            
                                         },
                                         {
                                             title: "Preferred Communication Method",
-                                            content: <CommunicationMethod />
+                                            content: <CommunicationMethod MasterDataDto={this.props.MasterDataDto}/>
 
                                         },
                                         {

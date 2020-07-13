@@ -81,6 +81,7 @@ class ProposalIncomplete extends React.Component {
             singleValueSelected: "0",
             singleValueSelectedProposer: "0",
             singleValueCheckboxSelected: false,
+            citizenshipCheckboxSelected: false,
             singleValue: "0",
             singleValue1: "0",
 
@@ -115,7 +116,7 @@ class ProposalIncomplete extends React.Component {
                     "salutation": "",
                     "nameWithInitial": "",
                     "givenName": "",
-                    "surName": "",
+                    "surname": "",
                     "emiratesId": "",
                     "dateOfBirth": "",
                     "age": "",
@@ -233,8 +234,8 @@ class ProposalIncomplete extends React.Component {
                 "permanetAddressId": 0,
                 "quoteMemberid": 0,
                 "isSameasProposerAddress": true,
-                "citizenship1": "string",
-                "citizenship2": "string",
+                "citizenship1": "",
+                "citizenship2": "",
                 "residentialNationality": "string",
                 "residentialNationalityStatus": "string",
                 "occupationHazardousWork": true,
@@ -247,10 +248,6 @@ class ProposalIncomplete extends React.Component {
                 "maritialStatus": "",
 
             }
-
-
-
-
 
         }
 
@@ -512,6 +509,21 @@ class ProposalIncomplete extends React.Component {
 
     }
 
+    SetCitizenshipCheckBox = (event) => {
+        // debugger;
+
+        let state = this.state;
+
+        if (event.target.checked == true) {
+            state.citizenshipCheckboxSelected = true;
+            this.setState({});
+        } else {
+            state.citizenshipCheckboxSelected = false;
+            this.setState({});
+        }
+
+    }
+
     handleClose = () => {
 
         this.setState({ open: false });
@@ -677,7 +689,7 @@ class ProposalIncomplete extends React.Component {
                                                         </Button>
                                                         */}
                         {this.state.open &&
-                            <ModifyProposal handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails} SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer} singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue} PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} />
+                            <ModifyProposal handlePolicyOwnerData={this.handlePolicyOwnerData} DateChange={this.DateChange} MasterSetValue={this.MasterSetValue} proposalPolicyOwnerSetValue={this.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.state.tblPolicyMemberDetails} SubmitProposal={this.SubmitProposal} SaveProposalDto={this.state.SaveProposalDto} proposalSetValue={this.proposalSetValue} LifeStyleQA={this.state.LifeStyleQA} QuestionalDetailsSetValue={this.QuestionalDetailsSetValue} singleValue={this.state.singleValue} GetmasterData={this.GetmasterData} singleValueSelectedProposer={this.state.singleValueSelectedProposer} singleValueSelected={this.state.singleValueSelected} handleRadioChange={this.handleRadioChange} handleRadioOnChange={this.handleRadioOnChange} leadTable={this.leadTable} SetValue={this.SetValue} MasterDataDto={this.state.MasterDataDto} filterData={this.state.filterData} PolicyOwnerDetailsDto={this.state.PolicyOwnerDetailsDto} PolicyOwnerDetailsSetValue={this.PolicyOwnerDetailsSetValue} PolicyOwnerDetailsdataOnYesConditioinDto={this.state.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsdataOnNoCondition={this.state.PolicyOwnerDetailsdataOnNoCondition} handleClose={this.handleClose} SetPermanentAddCheckBox={this.SetPermanentAddCheckBox} singleValueCheckboxSelected={this.state.singleValueCheckboxSelected} citizenshipCheckboxSelected={this.state.citizenshipCheckboxSelected} SetCitizenshipCheckBox={this.SetCitizenshipCheckBox} />
                         }
                         {/*</div>
                     </Modal>*/}
