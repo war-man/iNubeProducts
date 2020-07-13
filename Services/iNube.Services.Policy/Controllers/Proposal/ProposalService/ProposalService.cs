@@ -87,6 +87,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             //var tblPolicy = _context.TblPolicy.Where(x => x.PolicyId == PolicyID).Select(x => x);
             var tblPolicyMemberDetails = _context.TblPolicyMemberDetails.SingleOrDefault(x => x.PolicyId == PolicyID);
             var tblPolicyMemberAddress = _context.TblPolicyMemberAddress.SingleOrDefault(x => x.AddressId == tblPolicyMemberDetails.AdressId);
+            var relationshipstatus = _context.TblMasCommonTypes.Select(x => x);
 
             policyOwnerDetails.Salutation = tblPolicyMemberDetails.Salutation;
             policyOwnerDetails.NameWithInitial = tblPolicyMemberDetails.NameWithInitial;
@@ -108,6 +109,7 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             policyOwnerDetails.Address3 = tblPolicyMemberAddress.Address3;
             policyOwnerDetails.City = tblPolicyMemberAddress.City;
             policyOwnerDetails.District = tblPolicyMemberAddress.District;
+            policyOwnerDetails.RelationShipWithProposer = relationshipstatus.FirstOrDefault(x=> x.CommonTypesId == tblPolicyMemberDetails.RelationShipWithProposer).Description;
 
             
             var policyOwnerdata = _mapper.Map<PolicyOwnerDetailsDto>(policyOwnerDetails);
