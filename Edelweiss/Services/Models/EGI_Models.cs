@@ -493,6 +493,7 @@ namespace iNube.Services.MicaExtension_EGI.Models
         public string AccountNo { get; set; }
         public string Description { get; set; }
         public string Frequency { get; set; }
+        public DateTime? UserDateTime { get; set; }
         public List<MicaCDDTO> micaCDDTO { get; set; }
     }
 

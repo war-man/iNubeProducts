@@ -2542,7 +2542,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Calculate Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2602,7 +2602,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Endorsement Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2619,7 +2619,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var Premium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Success";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     _context.SaveChanges();
@@ -2683,7 +2683,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblDailyActiveVehicles.Update(getDailyStat);
 
                         schedulerLog.SchedulerStatus = "CD Update Success";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2710,7 +2710,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblPremiumBookingLog.Add(bookingLog);
 
                         schedulerLog.SchedulerStatus = "CD Update Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2741,7 +2741,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Failed";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2760,7 +2760,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var Endreport = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
-            Endreport.ScheduleEndDate = System.DateTime.UtcNow.AddMinutes(330);
+            Endreport.ScheduleEndDate = IndianTime;
             Endreport.IsActive = false;
 
             _context.TblScheduleReport.Update(Endreport);
@@ -10264,7 +10264,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Calculate Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10324,7 +10324,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Endorsement Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10341,7 +10341,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var Premium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Success";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     _context.SaveChanges();
@@ -10372,6 +10372,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     ExtCdModel.AccountNo = AccountNumber;
                     ExtCdModel.Description = "Auto Schedule Premium for Policy - " + policy;
                     ExtCdModel.Frequency = BillingFrequency;
+                    ExtCdModel.UserDateTime = IndianTime;
 
                     var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, context);
 
@@ -10405,7 +10406,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblDailyActiveVehicles.Update(getDailyStat);
 
                         schedulerLog.SchedulerStatus = "CD Update Success";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10432,7 +10433,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblPremiumBookingLog.Add(bookingLog);
 
                         schedulerLog.SchedulerStatus = "CD Update Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10463,7 +10464,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Failed";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10482,7 +10483,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var Endreport = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
-            Endreport.ScheduleEndDate = System.DateTime.UtcNow.AddMinutes(330);
+            Endreport.ScheduleEndDate = IndianTime;
             Endreport.IsActive = false;
 
             _context.TblScheduleReport.Update(Endreport);
