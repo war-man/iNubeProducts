@@ -1181,13 +1181,15 @@ class Reallocation extends React.Component {
 
                                    
                                 
-                                    <GridItem xs={3} sm={3} md={3}>
-                                        <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.handleParticipant()}>AddParticipantMaster</Button>
+                                   
+
+                                </GridContainer>
+                                <GridContainer>
+                                <GridItem xs={3} sm={3} md={3}>
+                                    <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.handleParticipant()}>AddParticipant</Button>
 
                                     </GridItem>
-
-                                 </GridContainer>
-
+                                </GridContainer>
                                 </CardBody>
 
 

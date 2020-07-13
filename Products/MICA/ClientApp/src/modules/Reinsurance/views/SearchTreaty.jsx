@@ -57,6 +57,8 @@ class SearchTreaty extends React.Component {
             enddate:"",
             show: false,
             showG: false,
+            createtreatyflag: true,
+            modifytreatyflag: false,
             treatyId:"",
             IsParameterGrid: false,
             masterList: [],
@@ -130,7 +132,10 @@ class SearchTreaty extends React.Component {
         edit.open = true;
         edit.disabled = true;
         edit.flagUpdate = true;
+        //edit.createtreatyflag = false;
+        //edit.modifytreatyflag = true;
         this.setState({ edit, treatyGroupId: id });
+        this.setState({ createtreatyflag: false, modifytreatyflag: true})
 
         //let flageUpdate = this.state.flagUpdate;
         //this.setState({ flageUpdate: true })
@@ -486,18 +491,7 @@ class SearchTreaty extends React.Component {
                                 </GridContainer>
                         </GridContainer>
 
-                       <GridContainer>
-                            <GridItem xs={5} sm={3} md={3}>
-                                <Button 
-                                    id="round" 
-                                    color="info"
-                                    size="sm"
-                                    onClick={this.handleAddTreaty}
-                                >
-                                    <TranslationContainer translationKey="AddNewTreaty" />
-                            </Button>
-                            </GridItem>
-                        </GridContainer>
+                       
                        
                         <Modal
                             aria-labelledby="simple-modal-title"
@@ -516,13 +510,25 @@ class SearchTreaty extends React.Component {
                                     &times;
                                         </Button>
                                 <div id="disp" >
-                                    <CreateTreaty RetentionSelectedId={this.state.treatySelectedId} editModal={this.state.editModal} flagUpdate={this.state.flagUpdate} disable={this.state.disable} handleClose={this.handleClose} open={this.state.open} close={this.state.close} disabled={this.state.disabled} btnvisibility={this.state.btnvisibility} displaybtn={!this.state.disabled} visibility={this.state.visibility} treatyGroupId={this.state.treatyGroupId} showTreatyGrp={this.state.showTreatyGrp}/>
+                                    <CreateTreaty RetentionSelectedId={this.state.treatySelectedId} editModal={this.state.editModal} flagUpdate={this.state.flagUpdate} disable={this.state.disable} handleClose={this.handleClose} open={this.state.open} close={this.state.close} disabled={this.state.disabled} btnvisibility={this.state.btnvisibility} displaybtn={!this.state.disabled} visibility={this.state.visibility} treatyGroupId={this.state.treatyGroupId} showTreatyGrp={this.state.showTreatyGrp} createtreatyflag={this.state.createtreatyflag} modifytreatyflag={this.state.modifytreatyflag}/>
                                 </div>
                             </div>
                         </Modal>
 
                     </CardBody>
                 </Card>
+                <GridContainer>
+                    <GridItem xs={5} sm={3} md={3}>
+                        <Button
+                            id="round"
+                            color="info"
+                            size="sm"
+                            onClick={this.handleAddTreaty}
+                        >
+                            <TranslationContainer translationKey="AddNewTreaty" />
+                        </Button>
+                    </GridItem>
+                </GridContainer>
                 {this.state.showTreatyflag ? <GridContainer>
                     <GridItem xs={12}>
                         <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={true}>

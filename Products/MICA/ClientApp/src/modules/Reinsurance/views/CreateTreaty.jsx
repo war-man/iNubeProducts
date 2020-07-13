@@ -71,7 +71,10 @@ class CreateTreaty extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            total:0,
+            total: 0,
+            createtreatyflag: true,
+            modifytreatyflag:false,
+            flagDuplicate: false,
             addeddata:"",
             surplusmaslist: [],
             Treatyflag: false,
@@ -925,7 +928,7 @@ class CreateTreaty extends React.Component {
         //}
         //for the time we can get use the getTime() function
         console.log(this.state.total,'total1')
-        if (this.state.total == 100) {
+        if (this.state.total == 100 && this.state.flagDuplicate != true ) {
             let startdate = new Date(this.state.treatyDTO.startDate);
             let endDate = new Date(this.state.treatyDTO.endDate);
             debugger
@@ -957,10 +960,16 @@ class CreateTreaty extends React.Component {
             }
         }
         else {
-            swal({
-                text: "Share% should be 100",
-                icon: "error"
-            });
+            if (this.state.flagDuplicate == true) {
+                swal("", "Treaty Group can't be duplicate", "error");
+                this.setState({ errormessage: true });
+            }
+            else {
+                swal({
+                    text: "Share% should be 100",
+                    icon: "error"
+                });
+            }
         }
     }
     dataTable = () => {
@@ -1011,6 +1020,12 @@ class CreateTreaty extends React.Component {
             .then(data => {
                 if (data.status == 9) {
                     this.setState({ Treatyflag: true, Treatymassage: data.responseMessage });
+                    if (data.responseMessage != null) {
+                        this.state.flagDuplicate = true;
+                    }
+                    else {
+                        this.state.flagDuplicate = false;
+                    }
                 } else {
                     this.setState({ Treatyflag: false, Treatymassage: "" });
                 }
@@ -1025,8 +1040,8 @@ class CreateTreaty extends React.Component {
                 <GridContainer>
                     <GridItem xs={12} sm={12} md={12} >
                         <TreatyDetails
-                            treatyCodeState={this.state.treatyCodeState} Treatyflag={this.state.Treatyflag} Treatymassage={this.state.Treatymassage} treatyDescriptionState={this.state.treatyDescriptionState} allocationmasList={this.state.allocationmasList}
-                            handleRadioChange={this.handleRadioChange} treatyDTO={this.state.treatyDTO} masterList={this.state.masterList} onInputChange={this.onInputChange} onInputChange1={this.onInputChange1} onBlur={this.onBlur} tblArrangement={this.state.tblArrangement} onddChange={this.onddChange} yearmasterList={this.state.yearmasterList} onDateChange={this.onDateChange} />
+                            treatyCodeState={this.state.treatyCodeState} Treatyflag={this.state.Treatyflag} Treatymassage={this.state.Treatymassage} treatyDescriptionState={this.state.treatyDescriptionState} allocationmasList={this.state.allocationmasList} 
+                            handleRadioChange={this.handleRadioChange} treatyDTO={this.state.treatyDTO} masterList={this.state.masterList} onInputChange={this.onInputChange} onInputChange1={this.onInputChange1} onBlur={this.onBlur} tblArrangement={this.state.tblArrangement} onddChange={this.onddChange} yearmasterList={this.state.yearmasterList} onDateChange={this.onDateChange} createtreatyflag={this.state.createtreatyflag} modifytreatyflag={this.state.modifytreatyflag} />
                         {this.state.showTreatyGrp && <TPDetails TreatytableData={this.state.TreatytableData} participantstableData={this.state.participantstableData} participantdata={this.state.participantdata} bkmasterList={this.state.bkmasterList} masterList={this.state.masterList} onddlChange={this.onddlChange} participant={this.state.participant} newdata={this.state.newdata}
                             onddChange={this.onddChange} onparticipantInputChange={this.onparticipantInputChange} AddParticipant={this.AddParticipant} Brokerageflag={this.state.Brokerageflag} showparticipantgrid={this.state.showparticipantgrid} treatyDTO={this.state.treatyDTO} rimasterList={this.state.rimasterList} bcmasterList={this.state.bcmasterList} bkbcmasterList={this.state.bkbcmasterList} reinsurername={this.state.reinsurername} />
 
