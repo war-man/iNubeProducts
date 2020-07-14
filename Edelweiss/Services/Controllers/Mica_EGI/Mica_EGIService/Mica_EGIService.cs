@@ -5143,24 +5143,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             }
                         }
 
-                        foreach (var itema in policyRiskData)
+                        if (SourceObject[0]["Data"]["Source"] == "PolicyBazaar")
                         {
-                            var PolVehInspeId = itema["InspectionId"];
-                            foreach (var itemb in VehicleRiskItem)
+
+                            foreach (var itema in policyRiskData)
                             {
-                                var EndorseVehInspecId = itemb["InspectionId"];
-                                if (PolVehInspeId == EndorseVehInspecId)
+                                var PolVehInspeId = itema["InspectionId"];
+                                foreach (var itemb in VehicleRiskItem)
                                 {
-                                    ruleEngine1 = new RuleEngineResponse();
-                                    ruleEngine1.ValidatorName = "Inspection id of vehicle";
-                                    ruleEngine1.Outcome = "Fail";
-                                    ruleEngine1.Message = "Inspection Id is already exist for this policy";
-                                    ruleEngine1.Code = "EXEA008";
-                                    engineResponse2.Add(ruleEngine1);
-                                    failcount++;
+                                    var EndorseVehInspecId = itemb["InspectionId"];
+                                    if (PolVehInspeId == EndorseVehInspecId)
+                                    {
+                                        ruleEngine1 = new RuleEngineResponse();
+                                        ruleEngine1.ValidatorName = "Inspection id of vehicle";
+                                        ruleEngine1.Outcome = "Fail";
+                                        ruleEngine1.Message = "Inspection Id is already exist for this policy";
+                                        ruleEngine1.Code = "EXEA008";
+                                        engineResponse2.Add(ruleEngine1);
+                                        failcount++;
+                                    }
                                 }
                             }
+
                         }
+
                         foreach (var itema in policyRiskData)
                         {
                             var PolVehNum = itema["Vehicle Number"];
