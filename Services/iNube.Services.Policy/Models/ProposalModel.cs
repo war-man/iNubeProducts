@@ -802,7 +802,7 @@ namespace iNube.Services.Policy.Models
             public string AnnualIncome { get; set; }
             public string GivenName { get; set; }
             public string District { get; set; }
-            public string RelationShipWithProposer { get; set; }
+            public int RelationShipWithProposer { get; set; }
         }
 
         public class InboxDetailsDto

@@ -256,6 +256,7 @@ class LifeToBeAssured extends React.Component {
 
                         <MasterDropdown
                             //disabled={this.state.gridValuedisable}
+                            //relationShipWithProposer
                             value={prop.relationShipWithProposer}
                             lstObject={this.props.MasterDataDto}
                             filterName='RelationshipType'
@@ -448,7 +449,7 @@ class LifeToBeAssured extends React.Component {
 
                         <MasterDropdown
                             labelText="Relationship With Proposer"
-                           // value={props.singleValueSelectedProposer === "0" ? "" : props.tblPolicyMemberDetails.relationShipWithProposer}
+                            value={this.state.flag1 === true ? this.state.PolicyMemberDetails.relationShipWithProposer : ""}
                             disabled={ this.state.flag1 === true ? true : this.state.flag2 }
                             lstObject={this.props.MasterDataDto}
                             filterName='RelationshipType'

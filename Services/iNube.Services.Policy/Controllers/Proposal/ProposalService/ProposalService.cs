@@ -109,9 +109,9 @@ namespace iNube.Services.Policy.Controllers.Proposal.ProposalService
             policyOwnerDetails.Address3 = tblPolicyMemberAddress.Address3;
             policyOwnerDetails.City = tblPolicyMemberAddress.City;
             policyOwnerDetails.District = tblPolicyMemberAddress.District;
-            policyOwnerDetails.RelationShipWithProposer = relationshipstatus.FirstOrDefault(x=> x.CommonTypesId == tblPolicyMemberDetails.RelationShipWithProposer).Description;
+            //policyOwnerDetails.RelationShipWithProposer = relationshipstatus.FirstOrDefault(x=> x.CommonTypesId == tblPolicyMemberDetails.RelationShipWithProposer).Description;
+            policyOwnerDetails.RelationShipWithProposer = tblPolicyMemberDetails.RelationShipWithProposer;
 
-            
             var policyOwnerdata = _mapper.Map<PolicyOwnerDetailsDto>(policyOwnerDetails);
             return policyOwnerdata;
         }
