@@ -1,5 +1,6 @@
 ﻿using iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 
 namespace iNube.Services.Claims.Helpers
@@ -8,6 +9,7 @@ namespace iNube.Services.Claims.Helpers
     {
         private IIntegrationService _integrationService;
         public string _TimeZone { get; set; }
+        public static ConcurrentDictionary<decimal, string> lstDbCon = new ConcurrentDictionary<decimal, string>();
         public DbHelper(IIntegrationService integrationService)
         {
             _integrationService = integrationService;
@@ -15,8 +17,18 @@ namespace iNube.Services.Claims.Helpers
          
         public async System.Threading.Tasks.Task<string> GetEnvironmentConnectionAsync(string product,decimal EnvId)
         {
-            var constring = await _integrationService.GetEnvironmentConnection(product, EnvId);
-            return constring.Dbconnection;
+            string dbConnectionString = "";
+            if (lstDbCon.ContainsKey(EnvId))
+            {
+                dbConnectionString = lstDbCon[EnvId];
+            }
+            else
+            {
+                var constring = await _integrationService.GetEnvironmentConnection(product, EnvId);
+                dbConnectionString = constring.Dbconnection;
+                lstDbCon.TryAdd(EnvId, dbConnectionString);
+            }
+            return dbConnectionString;
         }
         public DateTime ConvertUTCToZone(string utcDateTime, string userTimeZone)
         {

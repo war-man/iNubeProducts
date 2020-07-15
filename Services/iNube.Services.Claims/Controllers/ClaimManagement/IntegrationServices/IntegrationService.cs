@@ -1,4 +1,5 @@
 ﻿using iNube.Services.Claims.Models;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static iNube.Services.Claims.Models.BankAccountsDTO;
@@ -50,8 +52,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
     {
         private IConfiguration _configuration;
         readonly string PolicyUrl, BillingUrl, ClaimUrl, NotificationUrl, PartnerUrl, ProductUrl, UserUrl, AccountingUrl, RuleEngineUrl,  ExtensionUrl,AllocRuleEngineUrl;
-
-        public IntegrationService(IConfiguration configuration)
+        private ILoggerManager _logger;
+        private static readonly HttpClient _httpClient = new HttpClient();
+        public IntegrationService(IConfiguration configuration, ILoggerManager logger)
         {
 
             _configuration = configuration;
@@ -67,7 +70,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
             RuleEngineUrl = _configuration["Integration_Url:RuleEngine:RuleEngineUrl"];
             ExtensionUrl = _configuration["Integration_Url:Extension:ExtensionUrl"];
             AllocRuleEngineUrl = _configuration["Integration_Url:AllocRuleEngine:AllocRuleEngineUrl"];
-
+            _logger = logger;
         }
 
         
@@ -226,14 +229,17 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         }
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-            HttpClient client = new HttpClient();
+            try
+            {
+
+            _httpClient.DefaultRequestHeaders.Clear();
             if (!string.IsNullOrEmpty(apiContext.Token))
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
 
-            using (var response = await client.GetAsync(url))
+            using (var response = await _httpClient.GetAsync(url))
             using (var content = response.Content)
             {
                 if (response.IsSuccessStatusCode)
@@ -245,17 +251,25 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Claimmanagement", MethodBase.GetCurrentMethod().Name, url, null, apiContext);
+            }
             return new TResponse();
         }
         public async Task<IEnumerable<TResponse>> GetListApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-            HttpClient client = new HttpClient();
-            if (!string.IsNullOrEmpty(apiContext.Token))
+            try
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+
+                _httpClient.DefaultRequestHeaders.Clear();
+             if (!string.IsNullOrEmpty(apiContext.Token))
+            {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
             }
-            using (var response = await client.GetAsync(url))
+            using (var response = await _httpClient.GetAsync(url))
             using (var content = response.Content)
             {
                 if (response.IsSuccessStatusCode)
@@ -267,6 +281,11 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Claimmanagement", MethodBase.GetCurrentMethod().Name, url, null, apiContext);
+            }
             return new List<TResponse>();
         }
 
@@ -275,16 +294,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         {
             try
             {
-                HttpClient client = new HttpClient();
+                _httpClient.DefaultRequestHeaders.Clear();
                 if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
                 HttpContent contentPost = null;
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     //client.BaseAddress = new Uri(baseUrl);
                     //client.DefaultRequestHeaders.Accept.Clear();
                     // client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken.auth_token);
@@ -292,7 +311,7 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -300,9 +319,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Claimmanagement", MethodBase.GetCurrentMethod().Name, requestUri+""+request, null, apiContext);
                 return new TResponse();
             }
 
@@ -312,21 +331,21 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         {
             try
             {
-                HttpClient client = new HttpClient();
-                HttpContent contentPost = null;
+                 HttpContent contentPost = null;
+                _httpClient.DefaultRequestHeaders.Clear();
                 if (!string.IsNullOrEmpty(apiContext.Token))
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
-                    client.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                    _httpClient.DefaultRequestHeaders.Add("X-CorrelationId", apiContext.CorrelationId);
                 }
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -334,9 +353,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Claimmanagement", MethodBase.GetCurrentMethod().Name, requestUri+": "+request, null, apiContext);
                 return new List<TResponse>();
             }
 
@@ -345,19 +364,18 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         {
             try
             {
-                HttpClient client = new HttpClient();
-
 
                 HttpContent contentPost = null;
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                 if (request != null)
                 {
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PutAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PutAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -365,9 +383,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Claimmanagement", MethodBase.GetCurrentMethod().Name, requestUri + " "+ request, null, apiContext);
                 return new TResponse();
             }
 
@@ -385,16 +403,16 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
         {
             try
             {
-                HttpClient client = new HttpClient();
                 HttpContent contentPost = null;
+                _httpClient.DefaultRequestHeaders.Clear();
                 if (request != null)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     string postBody = JsonConvert.SerializeObject(request);
                     var content = new StringContent(postBody, Encoding.UTF8, "application/json");
                     contentPost = content;
                 }
-                using (var response = await client.PostAsync(requestUri, contentPost))
+                using (var response = await _httpClient.PostAsync(requestUri, contentPost))
                 {
                     using (var content = response.Content)
                     {
@@ -402,9 +420,9 @@ namespace iNube.Services.Claims.Controllers.ClaimManagement.IntegrationServices
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Claimmanagement", MethodBase.GetCurrentMethod().Name,requestUri+":"+ request, null, new ApiContext() );
                 return new List<TResponse>();
             }
 

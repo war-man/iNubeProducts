@@ -10,6 +10,7 @@ using iNube.Services.Partners.Helpers;
 using iNube.Services.Partners.Models;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -1724,7 +1725,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
             // Get Emp Pos
             var empdetail = _context.TblOrgEmployee.FirstOrDefault(e => e.StaffCode == empcode);
             string connectionString = _context.Database.GetDbConnection().ConnectionString;
-            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration, new LoggerManager(_configuration)));
             string dbConnectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
             DataTable dt = new DataTable();
             //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
@@ -1853,7 +1854,7 @@ namespace iNube.Services.Partners.Controllers.Organization.OrganizationService
                 offdetail = _context.TblOrgOffice.FirstOrDefault(e => e.OfficeCode == keyValue && e.OrganizationId == OrgId);
             }
             string connectionString = _context.Database.GetDbConnection().ConnectionString;
-            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration, new LoggerManager(_configuration)));
             string dbConnectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
             DataTable dt = new DataTable();
             //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";

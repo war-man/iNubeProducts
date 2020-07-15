@@ -5,6 +5,7 @@ using iNube.Services.Policy.Entities;
 using iNube.Services.Policy.Helpers;
 using iNube.Services.Policy.Models;
 using iNube.Services.UserManagement.Helpers;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using iNube.Utility.Framework.Notification;
 using Microsoft.AspNetCore.Http;
@@ -46,7 +47,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
             _integrationService = integrationService;
             _configuration = configuration;
             _emailService = emailService;
-            dbHelper = new DbHelper(new IntegrationService(configuration));
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
            
         }
 

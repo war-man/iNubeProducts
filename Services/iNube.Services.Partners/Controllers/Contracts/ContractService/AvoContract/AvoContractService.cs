@@ -5,6 +5,7 @@ using iNube.Services.Partners.Helpers;
 using iNube.Services.Partners.Models;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
 using iNube.Services.UserManagement.Helpers;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using iNube.Utility.Framework.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -35,7 +36,7 @@ namespace iNube.Services.Partners.Controllers.Contracts.ContractService.AvoContr
             _integrationService = integrationService;
             _mapper = mapper;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration));
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
         }
 
         public async Task<bool> GetmasterData(ApiContext apiContext)

@@ -2,6 +2,7 @@
 using iNube.Services.Partners.Entities.AVO;
 using iNube.Services.Partners.Helpers;
 using iNube.Services.Policy.Controllers.Policy.IntegrationServices;
+using iNube.Utility.Framework.LogPrivider.LogService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -78,7 +79,7 @@ namespace iNube.Services.UserManagement.Helpers
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
             string dbConnectionString = dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey)).Result;
 
             switch (product)
