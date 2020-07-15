@@ -1726,6 +1726,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             var paramData = from t1 in _context.TblCalculationConfigParam.Where(x => x.CalculationConfigId == CalculationConfigId)
                             select new CalConfigParam
                             {
+                                CalculationConfigParamId = t1.CalculationConfigParamId,
                                 CalculationConfigParamName = t1.CalculationConfigParamName,
                                 Type = t1.Type,
                                 CreatedDate = t1.CreatedDate,
@@ -1743,8 +1744,8 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             //_context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType));
             try
             {
+                
                 //checking Configurationi parameter weather exists or not 
-
                 foreach (var item in calConfigDto.CalculationConfigExpression)
                 {
                     item.ExpressionValue = item.ExpressionValue.Replace("(", "{").Replace(")", "}");

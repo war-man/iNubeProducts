@@ -394,6 +394,7 @@ namespace iNube.Services.Rating.Models
     }
     public partial class CalConfigParam
     {
+        public decimal CalculationConfigParamId { get; set; }
         public string CalculationConfigParamName { get; set; }
         public string Type { get; set; }
         public DateTime? CreatedDate { get; set; }
