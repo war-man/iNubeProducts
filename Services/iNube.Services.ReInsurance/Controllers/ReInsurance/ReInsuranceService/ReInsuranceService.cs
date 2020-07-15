@@ -1491,8 +1491,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     {
                         dist.AllocatedAmount = ((item.AllocatedAmount * dist.Share) / 100);
                         dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
-                        dist.Commission = ((item.AllocatedPremium * dist.CommissionRate) / 100);
-                        dist.Brokerage = ((item.AllocatedPremium * dist.BrokerageRate) / 100);
+                        dist.Commission = ((dist.AllocatedPremium * dist.CommissionRate) / 100);
+                        dist.Brokerage = ((dist.AllocatedPremium * dist.BrokerageRate) / 100);
                     }
 
                 }
@@ -1508,8 +1508,8 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                     {
                         dist.AllocatedAmount = ((item.AllocatedAmount * dist.Share) / 100);
                         dist.AllocatedPremium = ((item.AllocatedPremium * dist.Share) / 100);
-                        dist.Commission = ((item.AllocatedPremium * dist.CommissionRate) / 100);
-                        dist.Brokerage = ((item.AllocatedPremium * dist.BrokerageRate) / 100);
+                        dist.Commission = ((dist.AllocatedPremium * dist.CommissionRate) / 100);
+                        dist.Brokerage = ((dist.AllocatedPremium * dist.BrokerageRate) / 100);
                     }
                 }
                 count++;
