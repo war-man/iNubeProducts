@@ -1069,6 +1069,7 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
 
             TblRiallocationHistory tblRiallocationHistory = new TblRiallocationHistory();
             tblRiallocationHistory.Premium = allocationPremium;
+            tblRiallocationHistory.AllocationId = tblAllocation.AllocationId;
             tblRiallocationHistory.AllocationDetails = allocationHistorydata;
             tblRiallocationHistory.MaapingId = mappingId;
             tblRiallocationHistory.AllocationLevel = allocatioinLevel;
@@ -1528,6 +1529,19 @@ namespace iNube.Services.ReInsurance.Controllers.ReInsurance.ReInsuranceService
                 mapDetails.AllocationBasis = "";
                 mapDetails.NoOfLines = 0;
                 mapDetails.AllocatedAmount = facAllocatedAmunt;
+                mapDetails.AllocatedPremium = 0;
+                c.Add(mapDetails);
+            }
+            else
+            {
+
+                mapDetails = new MapDetails();
+                mapDetails.Type = "FAC";
+                mapDetails.Percentage = 0;
+                mapDetails.Limit = 0;
+                mapDetails.AllocationBasis = "";
+                mapDetails.NoOfLines = 0;
+                mapDetails.AllocatedAmount = 0;
                 mapDetails.AllocatedPremium = 0;
                 c.Add(mapDetails);
             }
