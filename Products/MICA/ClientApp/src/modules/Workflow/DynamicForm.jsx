@@ -45,7 +45,7 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import DynamicAccordion from "./DynamicAccordion.jsx"
+//import DynamicAccordion from "./DynamicAccordion.jsx"
 import { array } from "prop-types";
 import Cover from "@material-ui/icons/VerifiedUser";
 import PropTypes from 'prop-types';
@@ -73,20 +73,18 @@ function TabPanel(props) {
     );
 }
 
-function a11yProps(index) {
-    return {
-        id: `vertical-tab-${index}`,
-        'aria-controls': `vertical-tabpanel-${index}`,
-    };
-}
-
-
 TabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.any.isRequired,
     value: PropTypes.any.isRequired,
 };
 
+function a11yProps(index) {
+    return {
+        id: `vertical-tab-${index}`,
+        'aria-controls': `vertical-tabpanel-${index}`,
+    };
+}
 
 const style = {
     infoText: {
@@ -679,28 +677,56 @@ class DynamicForm extends React.Component {
 
     ChildDynamicAccordion = (data) => {
         return (
-            data.map((item1) => {
-                return (
-                    <Accordion
-                        collapses={
-                            [{
-                                title: item1.enitityName,
-                                content: <CardBody>
-                                    <GridContainer lg={12}>
-                                        {item1.entityAttributes.map(item2 => {
-                                            return (
-                                                <GridItem xs={12} sm={4} >
-                                                    {this.handleRenderScreen(item2)}
-                                                </GridItem>
-                                            );
-                                        })}
-                                    </GridContainer>
-                                </CardBody>
-                            }]
+            <GridContainer>
+                <GridItem md={12}>
+                    {data.map((item1, key) => {
+                        if (key == 0) {
+                            return (
+                                <Accordion
+                                    collapses={
+                                        [{
+                                            title: item1.enitityName,
+                                            content: <CardBody>
+                                                <GridContainer lg={12}>
+                                                    {item1.entityAttributes.map(item2 => {
+                                                        return (
+                                                            <GridItem xs={12} sm={4} >
+                                                                {this.handleRenderScreen(item2)}
+                                                            </GridItem>
+                                                        );
+                                                    })}
+                                                </GridContainer>
+                                            </CardBody>
+                                        }]
+                                    }
+                                />
+                            );
                         }
-                    />
-                );
-            })
+                        if (key == 1) {
+                            return (
+                                <Accordion
+                                    collapses={
+                                        [{
+                                            title: item1.enitityName,
+                                            content: <CardBody>
+                                                <GridContainer>
+                                                    {item1.entityAttributes.map(item2 => {
+                                                        return (
+                                                            <GridItem xs={12} sm={4} >
+                                                                {this.handleRenderScreen(item2)}
+                                                            </GridItem>
+                                                        );
+                                                    })}
+                                                </GridContainer>
+                                            </CardBody>
+                                        }]
+                                    }
+                                />
+                            );
+                        }
+                    })}
+                </GridItem>
+            </GridContainer>
         );
     }
 
