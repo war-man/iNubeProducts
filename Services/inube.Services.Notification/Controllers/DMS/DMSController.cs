@@ -126,6 +126,21 @@ namespace inube.Services.Notification.Controllers.DMS
             var resp = await _dMSService.AddTags(id, tagName, tagvalue);
             return Ok(resp);
         }
+        //update document 
+
+
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateDocument(FileUpdateDTO updateImageDTO)
+        {
+           var res=await _dMSService.UpdateDocument(updateImageDTO);
+            return Ok(res);
+        }
+
+
+ 
+
+      
 
         [HttpGet]
         public Dictionary<string, string> PaytmPayment(decimal policyId, decimal Amount, string mobileNumber)

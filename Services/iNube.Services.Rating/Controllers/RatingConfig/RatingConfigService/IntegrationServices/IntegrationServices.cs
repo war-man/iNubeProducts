@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using iNube.Utility.Framework.LogPrivider.LogService;
+using System.Reflection;
 
 namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.IntegrationServices
 {
@@ -31,11 +32,13 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
         readonly string  UsermanangementUrl;
         readonly string Rating;
         private static readonly HttpClient _httpClient = new HttpClient();
-        public IntegrationService(IConfiguration configuration)
+        private ILoggerManager _logger;
+        public IntegrationService(IConfiguration configuration, ILoggerManager logger)
         {
             _configuration = configuration;
             UsermanangementUrl = _configuration["Integration_Url:User:UserUrl"];
             Rating = _configuration["Integration_Url:Rating:RatingUrl"];
+            _logger = logger;
         }
         public async Task<EnvironmentResponse> GetEnvironmentConnection(string product, decimal EnvId)
         {
@@ -43,7 +46,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
 
             var uri = UsermanangementUrl + "/api/Login/GetEnvironmentConnection?product=" + product + "&EnvId=" + EnvId;
             var result = await GetApiInvoke<EnvironmentResponse>(uri, new ApiContext());
-            logger.LogRequest("Rating", "Rating", result.Dbconnection, "Final Return in integration Call--DB Return", new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
+            logger.LogRequest("Rating", "Rating", result.Dbconnection, "Final Return in integration Call--DB Return",null, new ApiContext() { ProductType = product, ServerType = EnvId.ToString() });
             return result;
 
         }
@@ -56,9 +59,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
 
         public async Task<TResponse> GetApiInvoke<TResponse>(string url, ApiContext apiContext) where TResponse : new()
         {
-            LoggerManager logger = new LoggerManager(_configuration);
-
-            logger.LogRequest("Rating", "Rating", url , "GetApiInvoke---First--Url", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+            _logger.LogRequest("Rating", "Rating", url , "GetApiInvoke---First--Url",null, new ApiContext() { ProductType = "Mica", ServerType = "297" });
             
             // HttpClient client = new HttpClient();
             if (!string.IsNullOrEmpty(apiContext.Token))
@@ -107,9 +108,6 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
 
 
                 HttpClient client = new HttpClient();
-                //  client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                //client.BaseAddress = new Uri(url);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiContext.Token.Split(" ")[1]);
                 using (var response = await client.GetAsync(url))
                 using (var content = response.Content)
@@ -128,8 +126,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
             }
             catch (Exception ex)
             {
-
-                //throw;
+                _logger.LogError(ex, "Rating", MethodBase.GetCurrentMethod().Name, url, null, apiContext);
             }
             return new List<TResponse>();
         }
@@ -160,7 +157,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Rating", MethodBase.GetCurrentMethod().Name, requestUri+""+request, null, apiContext);
                 return new TResponse();
             }
 
@@ -190,7 +187,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Int
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Rating", MethodBase.GetCurrentMethod().Name,requestUri+ ""+ request, null, apiContext);
                 return new List<TResponse>();
             }
 

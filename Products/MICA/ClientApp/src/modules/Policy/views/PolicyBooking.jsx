@@ -31,6 +31,7 @@ import policyConfig from 'modules/Policy/PolicyConfig.js';
 import MasterDropdown from "components/MasterDropdown/MasterDropdown.jsx";
 import swal from 'sweetalert';
 import SearchPolicy from "./SearchPolicy.jsx";
+import RateConfig from "modules/Rating/RateConfig.js";
 const dateStyle = {
     width: "max-content",
     marginLeft: "170px",
@@ -45,6 +46,17 @@ class PolicyBooking extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            setflag:false,
+            finalPremiumFlag: false,
+            productCode:"",
+            RatingId:0,
+            searchTableSec: true, loader: true,
+            RatingDetails: {},
+            result: [],
+            productCode: "",
+            RatingJson: { "dictionary_rule": {}, "dictionary_rate": { "Tenure": "", "SumInsured": "" } },
+            Generateflag: false,
+            PremiumShow:false,
             show: false,
             productId: "",
             PartnerData: [],
@@ -170,6 +182,9 @@ class PolicyBooking extends React.Component {
                     this.setState({ ProductData });
                     console.log("ProductDatalist", this.state.ProductData);
                 });
+        }
+        if (evt.target.name == "ProductId") {
+            this.GetProductbyID(this.state.Policydata.ProductId)
         }
     };
     onFormSubmit = (evt) => {
@@ -300,6 +315,7 @@ class PolicyBooking extends React.Component {
         } else {
             swal("", "Some field are missing!", "error");
         }
+       
     }
     componentDidMount() {
         fetch(`${policyConfig.partnerconfigUrl}/api/Partner/GetMasterDataAsync?sMasterlist=Partner`, {
@@ -333,6 +349,7 @@ class PolicyBooking extends React.Component {
       
     }
     onGet1() {
+
         //fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/MastertypeData/GetMasterData`)
         // fetch(`${policyConfig.productConfigUrl}/api/Product/GetInsurableRiskDetails?ProductId=` + this.state.productId, {
         fetch(`${policyConfig.productConfigUrl}/api/Product/GetInsurableRiskDetails?ProductId=` + this.state.Policydata.ProductId, {
@@ -377,12 +394,50 @@ class PolicyBooking extends React.Component {
                     console.log("arraydataloop", arr, this.state.fields.InsurableItem);
 
                 }
-                this.setState({});
-                console.log("arraydata", arr, this.state.fields.InsurableItem);
+                let field = this.state.fields;
 
+                field["Partner ID"] = this.state.Policydata.PartnerId;
+
+                field["Product Code"] = this.state.productCode;
+
+                this.setState({ field, setflag: true});
+              
+                console.log("arraydata", arr, this.state.fields);
+               
             });
-    }
 
+       
+     
+    }
+    GetProductbyID = (id) =>  {
+
+    fetch(`${policyConfig.productConfigUrl}/api/Product/GetProductById?productId=` + this.state.Policydata.ProductId, {
+        //   fetch(`https://localhost:44347/api/Product/GetProductById?productId=` + this.props.sendproductid,{
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.productCode != undefined) {
+
+                this.state.productCode = data.productCode;
+                
+            }
+            if (data.ratingId > 0) {
+                this.setState({ PremiumShow: true, Generateflag: false, RatingId: data.ratingId });
+            } else {
+                this.setState({ PremiumShow: false, Generateflag: true, RatingId: 0 });
+            }
+
+
+            console.log("data search by id", data, this.state.productCode, this.state.fields)
+        });
+}
     onInputChange = (evt) => {
         const fields = this.state.fields;
         fields[evt.target.name] = evt.target.value;
@@ -393,6 +448,59 @@ class PolicyBooking extends React.Component {
         const dateObj = { month: _date[1], year: _date[2], day: _date[0] };
 
         return dateObj.year + '-' + dateObj.month + '-' + dateObj.day;
+    }
+
+    getPremiumCalculation = () => {
+        
+        if (this.state.fields["Policy Tenure"] != undefined) {
+            this.state.RatingJson.dictionary_rate.Tenure = this.state.fields["Policy Tenure"];
+        }
+        if (this.state.fields["Sum Insured"] != undefined) {
+            this.state.RatingJson.dictionary_rate.SumInsured = this.state.fields["Sum Insured"];
+        }
+        fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/` + this.state.RatingId, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+            body: JSON.stringify(this.state.RatingJson)
+        }).then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+
+                    this.setState({ result: data });
+                    this.setState({ loader: false });
+                   // this.tabledata();
+                    let finalpremium = data.filter(s => s.entity == "FinalPremium");
+                    if (finalpremium.length > 0) {
+                        let fields = this.state.fields;
+                        fields["Premium"] = finalpremium[0].eValue;
+                        this.setState({ fields });
+                        
+                        this.setState({ RatingDetails: finalpremium[0], finalPremiumFlag: true, Generateflag: true });
+
+                    }
+
+                    //swal({
+                    //    text: "Rate:" + data.responseMessage,
+                    //    icon: "success"
+                    //});
+
+                    //  this.reset();
+                }
+                else {
+                    this.setState({ loader: false, searchTableSec: false, nodata: false });
+                    swal({
+                        text: "Conditions are wrong",
+                        icon: "error"
+                    });
+                }
+
+                console.log(this.state.result, 'Results');
+            });
+       
     }
     render() {
         const { classes } = this.props;
@@ -446,7 +554,7 @@ class PolicyBooking extends React.Component {
 
                                 </GridContainer>
                               
-                                {this.state.show && <GridContainer>
+                                {this.state.show && this.state.setflag && <GridContainer>
                                      <GridContainer>
                                         <GridItem>
                                             <h4><small> Product Level </small></h4>
@@ -551,9 +659,13 @@ class PolicyBooking extends React.Component {
 
                                     
 
-                                    <GridItem xs={3} sm={3} md={3}>
-                                        <Button id="round" style={{ marginTop: '25px' }} onClick={() => this.onFormSubmit()} color="info" > Generate Policy  </Button>
-                                    </GridItem>
+                                    {this.state.PremiumShow ? <GridContainer> <GridItem xs={3} sm={3} md={3}>
+                                        <Button id="round" style={{ marginTop: '25px', 'left': '169%' }} onClick={() => this.getPremiumCalculation()} color="info" > Calculate Premium </Button>
+                                    </GridItem> </GridContainer>:null}
+                                    {this.state.finalPremiumFlag && <GridContainer><GridItem xs={3} sm={3} md={6}><h5><b>Final Premium: {this.state.RatingDetails.eValue}/-</b></h5></GridItem></GridContainer>}
+                                    {this.state.Generateflag && <GridContainer><GridItem xs={3} sm={3} md={3}>
+                                        <Button id="round" style={{ marginTop: '25px', 'left': '173%' }} onClick={() => this.onFormSubmit()} color="info" > Generate Policy  </Button>
+                                    </GridItem></GridContainer>}
                                 </GridContainer>
                                 }
                             </CardBody>

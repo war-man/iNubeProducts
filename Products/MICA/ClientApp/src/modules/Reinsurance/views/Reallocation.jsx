@@ -256,6 +256,8 @@ class Reallocation extends React.Component {
         let qspremium1;
         let qssuminsuared2;
         let qspremium2;
+        let surplusadjustsi;
+        let surplusadjustpremium;
         //console.log("d", d);
         let QSTotal = this.state.masterList.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.AllocatedAmount) } else { return (sum+0)} }, 0 );
         let QSPremiumTotal = this.state.masterList.reduce((sum, m) => { if (m.Type == "QS") { return (sum + m.AllocatedPremium) } else { return (sum+0)} }, 0 );
@@ -266,7 +268,7 @@ class Reallocation extends React.Component {
         this.state.masterList.map((item, key) => {
             let type = item.Type;
             if (type == "Retention") {
-                debugger;
+              
                 spParcentage = TSTotal - ((Number(QSTSTotal)) + Number(this.state.reallocationlist.mapDetails[key].Percentage));
                 console.log("spParcentage", this.state.reallocationlist.mapDetails[key].Percentage, spParcentage);
                 caldata = ((this.state.reallocationlist.AllocationAmount * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
@@ -275,11 +277,11 @@ class Reallocation extends React.Component {
                 this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
             }
             if (this.state.reallocationlist.mapDetails[key].Type == "QS") {
-                debugger;
+              
                 let limit = item.Limit;
                 let percentage = item.Percentage;
                 if (limit == 0) {
-                    debugger;
+                   
                     this.state.reallocationlist.mapDetails[key].AllocatedAmount = (((this.state.reallocationlist.AllocationAmount - caldata) * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
                     this.state.reallocationlist.mapDetails[key].AllocatedPremium = (((this.state.reallocationlist.PremiumAmount - calpremium) * this.state.reallocationlist.mapDetails[key].Percentage) / 100);
                     console.log(this.state.reallocationlist.mapDetails[key].AllocatedPremium, "qspremium");
@@ -287,14 +289,20 @@ class Reallocation extends React.Component {
                     qspremium = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                 }
                 if (percentage == 0) {
-                    debugger;
+                   
                     let qslimit = (this.state.reallocationlist.AllocationAmount - caldata);
                     if (qslimit <= item.Limit) {
                         this.state.reallocationlist.mapDetails[key].AllocatedAmount = (this.state.reallocationlist.AllocationAmount - caldata);
                         this.state.reallocationlist.mapDetails[key].AllocatedPremium = (this.state.reallocationlist.PremiumAmount - calpremium);
                     }
-                    qssuminsuared1 = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
-                    qspremium1 = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
+                    else {
+                        
+                        this.state.reallocationlist.mapDetails[key].AllocatedAmount = item.Limit;
+                        this.state.reallocationlist.mapDetails[key].AllocatedPremium = item.AllocatedPremium;
+                    }
+                   
+                    qssuminsuared = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
+                    qspremium = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                     //this.state.reallocationlist.mapDetails[key].AllocatedAmount
                     //this.state.reallocationlist.mapDetails[key].AllocatedAmount = this.state.reallocationlist.MapDetails[key].Limit
                     //this.state.reallocationlist.mapDetails[key].AllocatedPremium
@@ -307,8 +315,12 @@ class Reallocation extends React.Component {
                         this.state.reallocationlist.mapDetails[key].AllocatedAmount = availblesuminsured;
                         this.state.reallocationlist.mapDetails[key].AllocatedPremium = availblepremium;
                     }
-                    qssuminsuared2 = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
-                    qspremium2 = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
+                    else {
+                        this.state.reallocationlist.mapDetails[key].AllocatedAmount = item.Limit;
+                        //this.state.reallocationlist.mapDetails[key].AllocatedPremium = item.AllocatedPremium;
+                    }
+                    qssuminsuared= this.state.reallocationlist.mapDetails[key].AllocatedAmount;
+                    qspremium = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                 }
                 
             }
@@ -319,22 +331,31 @@ class Reallocation extends React.Component {
                 //deductionPremiumAmount = this.state.reallocationlist.PremiumAmount - (QSPremiumTotal + calpremium);
                 //this.state.reallocationlist.mapDetails[key].AllocatedPremium = deductionPremiumAmount / SPcount;
                 //this.state.reallocationlist.mapDetails[key].Percentage = spParcentage / SPcount;
+                this.state.reallocationlist.mapDetails[key].AllocatedAmount = (( caldata * this.state.reallocationlist.mapDetails[key].NoOfLines) / 100);
+                this.state.reallocationlist.mapDetails[key].AllocatedPremium = ((calpremium * this.state.reallocationlist.mapDetails[key].NoOfLines) / 100);
+                surplusadjustsi = this.state.reallocationlist.mapDetails[key].AllocatedAmount;
+                surplusadjustpremium = this.state.reallocationlist.mapDetails[key].AllocatedPremium;
                 console.log("deductionAmount", deductionAmount, deductionPremiumAmount, spParcentage,this.state.reallocationlist.mapDetails[key].AllocatedAmount)
             }
-            //if (item.Type == "FAC") {
+            //if (this.state.reallocationlist.mapDetails[key].Type == "FAC" && qssuminsuared != undefined && qspremium != undefined && surplusadjustsi != undefined && surplusadjustpremium!=undefined) {
             //    debugger;
-            //    facadjustamount = ((this.state.reallocationlist.AllocationAmount) - ((caldata) + (qssuminsuared) + (qssuminsuared2) + (qssuminsuared1)));
-            //    facpremium = (this.state.reallocationlist.PremiumAmount - (calpremium + qspremium));
-            //    this.state.reallocationlist.mapDetails[key].AllocatedAmount = facadjustamount;
-            //    this.state.reallocationlist.mapDetails[key].AllocatedPremium = facpremium;
-            //    console.log(facadjustamount, 'fac1');
-            //    console.log(facpremium, 'fac2');
+              
             //}
            
            
         });
-        console.log("deductionAmount", deductionAmount, this.state.reallocationlist.mapDetails)
-        console.log("calculatedValue", caldata, this.state.masterList);
+        let FACindex = this.state.reallocationlist.mapDetails.findIndex(s => s.Type == "FAC")
+        if (FACindex != -1) {
+            debugger
+            facadjustamount = ((this.state.reallocationlist.AllocationAmount) - ((caldata) + (qssuminsuared) + (surplusadjustsi)));
+            facpremium = (this.state.reallocationlist.PremiumAmount - (calpremium + qspremium + surplusadjustpremium));
+            this.state.reallocationlist.mapDetails[FACindex].AllocatedAmount = facadjustamount;
+            this.state.reallocationlist.mapDetails[FACindex].AllocatedPremium = facpremium;
+            console.log(facadjustamount, 'fac1');
+            console.log(facpremium, 'fac2');
+            console.log("deductionAmount", deductionAmount, this.state.reallocationlist.mapDetails)
+            console.log("calculatedValue", caldata, this.state.masterList);
+        }
         //this.state.reallocationlist.mapDetails[key].AllocatedAmount = caldata;
         //this.state.reallocationlist.mapDetails[key].AllocatedPremium = calpremium;
         // set = caldata;
@@ -408,10 +429,12 @@ class Reallocation extends React.Component {
                         item.AllocatedAmount = "";
                         item.AllocatedPremium = "";
                         item.Percentage = "";
+                        item.NoOfLines = "";
                     }
                     if (item.Type == "QS") {
                         item.AllocatedAmount = "";
                         item.AllocatedPremium = "";
+                       
                     }
                     if (item.Type == "FAC") {
                         //item.AllocatedAmount = "";
@@ -985,7 +1008,7 @@ class Reallocation extends React.Component {
                                             labelText="Lines"
                                             name="NoOfLines"
                                             //disabled={true}
-                                            value={this.state.reallocationlist.mapDetails[key].NoOfLines}
+                                            value={item.NoOfLines}
                                             onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
@@ -994,8 +1017,8 @@ class Reallocation extends React.Component {
                                     </GridItem>
                                     <GridItem xs={12} sm={12} md={3}> <CustomInput
                                         labelText="Adjustment %"
-                                        name="Percentage"
-                                        value={this.state.reallocationlist.mapDetails[key].Percentage}
+                                        name="NoOfLines"
+                                        value={this.state.reallocationlist.mapDetails[key].NoOfLines}
                                         onChange={(e) => this.onInputChange2(e, key)}
                                         formControlProps={{
                                             fullWidth: true
@@ -1140,8 +1163,8 @@ class Reallocation extends React.Component {
                                             name="AllocatedAmount"
                                         disabled={true}
 
-                                        value={item.AllocatedAmount}
-                                        //onChange={(e) => this.onInputChange2(e, key)}
+                                        value={this.state.reallocationlist.mapDetails[key].AllocatedAmount}
+                                        onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
                                             }}
@@ -1152,7 +1175,7 @@ class Reallocation extends React.Component {
                                             labelText="Premium Amount"
                                             name="AllocatedPremium"
                                             disabled={true}
-                                        value={item.AllocatedPremium}
+                                        value={this.state.reallocationlist.mapDetails[key].AllocatedPremium}
                                         onChange={(e) => this.onInputChange2(e, key)}
                                             formControlProps={{
                                                 fullWidth: true
@@ -1166,13 +1189,15 @@ class Reallocation extends React.Component {
 
                                    
                                 
-                                    <GridItem xs={3} sm={3} md={3}>
-                                        <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.handleParticipant()}>AddParticipantMaster</Button>
+                                   
+
+                                </GridContainer>
+                                <GridContainer>
+                                <GridItem xs={3} sm={3} md={3}>
+                                    <Button color="warning" style={{ 'top': '14px' }} round onClick={() => this.handleParticipant()}>AddParticipant</Button>
 
                                     </GridItem>
-
-                                 </GridContainer>
-
+                                </GridContainer>
                                 </CardBody>
 
 

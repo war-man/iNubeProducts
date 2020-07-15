@@ -25,6 +25,7 @@ using iNube.Services.Billing.Helpers;
 using OfficeOpenXml;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -89,10 +90,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         private readonly IEmailService _emailService;
         private IIntegrationService _integrationService;
         private IConfiguration _configuration;
+        private ILoggerManager _logger;
 
-
-        public MicaEGIService(IConfiguration configuration, IIntegrationService integrationService, IMapper mapper, MICAQMContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
+        public MicaEGIService(IConfiguration configuration, IIntegrationService integrationService, ILoggerManager logger, IMapper mapper, MICAQMContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
         {
+            _logger = logger;
             _mapper = mapper;
             _appSettings = appSettings.Value;
            // _context = context;
@@ -2542,7 +2544,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Calculate Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2602,7 +2604,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Endorsement Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2619,7 +2621,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var Premium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Success";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     _context.SaveChanges();
@@ -2683,7 +2685,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblDailyActiveVehicles.Update(getDailyStat);
 
                         schedulerLog.SchedulerStatus = "CD Update Success";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2710,7 +2712,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblPremiumBookingLog.Add(bookingLog);
 
                         schedulerLog.SchedulerStatus = "CD Update Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2741,7 +2743,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Failed";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -2760,7 +2762,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var Endreport = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
-            Endreport.ScheduleEndDate = System.DateTime.UtcNow.AddMinutes(330);
+            Endreport.ScheduleEndDate = IndianTime;
             Endreport.IsActive = false;
 
             _context.TblScheduleReport.Update(Endreport);
@@ -5143,24 +5145,30 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                             }
                         }
 
-                        foreach (var itema in policyRiskData)
+                        if (SourceObject[0]["Data"]["Source"] == "PolicyBazaar")
                         {
-                            var PolVehInspeId = itema["InspectionId"];
-                            foreach (var itemb in VehicleRiskItem)
+
+                            foreach (var itema in policyRiskData)
                             {
-                                var EndorseVehInspecId = itemb["InspectionId"];
-                                if (PolVehInspeId == EndorseVehInspecId)
+                                var PolVehInspeId = itema["InspectionId"];
+                                foreach (var itemb in VehicleRiskItem)
                                 {
-                                    ruleEngine1 = new RuleEngineResponse();
-                                    ruleEngine1.ValidatorName = "Inspection id of vehicle";
-                                    ruleEngine1.Outcome = "Fail";
-                                    ruleEngine1.Message = "Inspection Id is already exist for this policy";
-                                    ruleEngine1.Code = "EXEA008";
-                                    engineResponse2.Add(ruleEngine1);
-                                    failcount++;
+                                    var EndorseVehInspecId = itemb["InspectionId"];
+                                    if (PolVehInspeId == EndorseVehInspecId)
+                                    {
+                                        ruleEngine1 = new RuleEngineResponse();
+                                        ruleEngine1.ValidatorName = "Inspection id of vehicle";
+                                        ruleEngine1.Outcome = "Fail";
+                                        ruleEngine1.Message = "Inspection Id is already exist for this policy";
+                                        ruleEngine1.Code = "EXEA008";
+                                        engineResponse2.Add(ruleEngine1);
+                                        failcount++;
+                                    }
                                 }
                             }
+
                         }
+
                         foreach (var itema in policyRiskData)
                         {
                             var PolVehNum = itema["Vehicle Number"];
@@ -6542,7 +6550,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apicontext)
         {
-            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration, new LoggerManager(_configuration)));
 
 
             _context = (MICAQMContext)(await DbManager.GetContextAsync(apicontext.ProductType, apicontext.ServerType, _configuration));
@@ -7072,7 +7080,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex,"TotalUsage",apiContext);
+                    _logger.LogError(ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, PolicyNo + ":" + FromDate + ":" + ToDate, null, apiContext);
                     return 0;
                 }
 
@@ -10264,7 +10272,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Calculate Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10324,7 +10332,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                         schedulerLog.SchedulerStatus = "Deserialized Failed - Endorsement Premium Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10341,7 +10349,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     var Premium = ADPERDAY + ADFROMTAXPERDAY + ADTOTAXPERDAY;
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Success";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     _context.SaveChanges();
@@ -10372,6 +10380,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     ExtCdModel.AccountNo = AccountNumber;
                     ExtCdModel.Description = "Auto Schedule Premium for Policy - " + policy;
                     ExtCdModel.Frequency = BillingFrequency;
+                    ExtCdModel.UserDateTime = IndianTime;
 
                     var CallMicaCd = await _integrationService.MasterCDACC(ExtCdModel, context);
 
@@ -10405,7 +10414,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblDailyActiveVehicles.Update(getDailyStat);
 
                         schedulerLog.SchedulerStatus = "CD Update Success";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10432,7 +10441,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         _context.TblPremiumBookingLog.Add(bookingLog);
 
                         schedulerLog.SchedulerStatus = "CD Update Failed";
-                        schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                        schedulerLog.SchedulerEndDateTime = IndianTime;
                         _context.TblSchedulerLog.Update(schedulerLog);
 
                         var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10463,7 +10472,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                     schedulerLog.SchedulerStatus = "Calculate Premium Failed";
-                    schedulerLog.SchedulerEndDateTime = System.DateTime.UtcNow.AddMinutes(330);
+                    schedulerLog.SchedulerEndDateTime = IndianTime;
                     _context.TblSchedulerLog.Update(schedulerLog);
 
                     var report = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
@@ -10482,7 +10491,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             var Endreport = _context.TblScheduleReport.FirstOrDefault(x => x.ReportId == ReportID);
 
-            Endreport.ScheduleEndDate = System.DateTime.UtcNow.AddMinutes(330);
+            Endreport.ScheduleEndDate = IndianTime;
             Endreport.IsActive = false;
 
             _context.TblScheduleReport.Update(Endreport);

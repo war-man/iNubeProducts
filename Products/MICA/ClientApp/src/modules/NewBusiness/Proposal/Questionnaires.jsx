@@ -90,7 +90,14 @@ class Questionnaries extends React.Component {
     }
 
     componentDidMount() {
-        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/GetmasQuestions`)
+        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/GetmasQuestions` + ``, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
        // fetch(`https://localhost:44351/api/Proposal/GetmasQuestions`)
 
             .then(response => response.json())
@@ -101,7 +108,14 @@ class Questionnaries extends React.Component {
          });
 
 
-        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/MastertypeData/GetMasterData`)
+        fetch(`${NewBusinessConfig.ProposalConfigUrl}/api/Proposal/MastertypeData/GetMasterData` + ``, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
     // fetch(`https://localhost:44351/api/Proposal/MastertypeData/GetMasterData`)
 
          .then(response => response.json())

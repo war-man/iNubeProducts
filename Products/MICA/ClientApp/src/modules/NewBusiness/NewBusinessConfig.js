@@ -20,6 +20,7 @@ else {
     //'https://inubeservicespolicy.azurewebsites.net'
 }
 
+
 export const NewBusinessConfig = {
     NewBusinessConfigUrl, ProductConfig, ProposalConfigUrl
 }

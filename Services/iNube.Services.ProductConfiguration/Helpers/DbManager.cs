@@ -10,7 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.ProductConfiguration.Helpers
 {
@@ -80,7 +80,7 @@ namespace iNube.Services.ProductConfiguration.Helpers
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)

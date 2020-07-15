@@ -2,20 +2,24 @@
 //let env = "Production";
 let env = "Dev";               
 //let env = "Local";                      
-//let env = "UAT";      
- 
+//let env = "UAT"; 
+
+
+
+
+
 let Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
 let partnerconfigUrl = Baseurl;   
 let productConfigUrl = Baseurl;    
 let UserConfigUrl = Baseurl;
-let ruleEngineUrl = Baseurl;
+let ruleEngineUrl = Baseurl;   
 let accountConfigUrl = Baseurl; 
 let BillingConfigUrl = Baseurl;        
 let policyconfigUrl = Baseurl;     
 let claimConfigUrl = Baseurl;  
 let rateConfigUrl = Baseurl;  
 let ReportConfigUrl = Baseurl;
-let DashboardConfigUrl = Baseurl;   
+let DashboardConfigUrl = Baseurl;     
 let dynamicPagesConfigUrl = Baseurl;
 let RDLCConfigUrl = Baseurl;
 let ReinsuranceConfigUrl = Baseurl;
@@ -39,7 +43,7 @@ if (env === "EdelweissProd") {
     RDLCConfigUrl = Baseurl;
     ReinsuranceConfigUrl = Baseurl;
     ExtensionUrl = Baseurl;
-    NotificationUrl = Baseurl;
+    NotificationUrl = Baseurl; 
 }
 if (env === "Local") {
     partnerconfigUrl = 'https://localhost:44315';

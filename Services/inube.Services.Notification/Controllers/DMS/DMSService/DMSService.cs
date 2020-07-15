@@ -9,6 +9,7 @@ using MongoDB.Driver.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Razor.Language;
 
 namespace inube.Services.Notification.Controllers.DMS.DMSService
 {
@@ -23,6 +24,9 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
         void DeleteDocument(string id);
         Task<List<DMSDTO>> AddTags(string id, string tagName, string tagvalue);
         Task<DMSDTO> DownloadView(string id);
+
+
+        Task<FileUpdateDTO> UpdateDocument(FileUpdateDTO updateImageDTO);
     }
     public class DMSService1 : IDMSService
     {
@@ -328,6 +332,40 @@ namespace inube.Services.Notification.Controllers.DMS.DMSService
             collection.UpdateMany(filterDefinition, updateDefinition);
             return filter;
         }
+
+
+
+        public async Task<FileUpdateDTO> UpdateDocument(FileUpdateDTO updateImageDTO)
+        {
+            // var client = new MongoClient(_settings.ConnectionString);
+            var client = new MongoClient(mngsettings);
+            var database = client.GetDatabase(_settings.DatabaseName);
+            var collection = database.GetCollection<DMSDTO>(_settings.CollectionName);
+            List<TagDTO> tagDTOs = new List<TagDTO>();
+            TagDTO tagDTO = new TagDTO();
+            DMSDTO dMSDTO = new DMSDTO();
+            var filter = await collection.Find(x => x.docId == updateImageDTO.DocId).ToListAsync();
+            var Tagcount = filter[0].tagDTOs.Count;
+
+            var data = filter.Where(a => a.docId == updateImageDTO.DocId).FirstOrDefault();
+
+            //data.contentType = "/png";
+            var c = 0;// Tagcount++;
+            var filterDefinition = Builders<DMSDTO>.Filter.Where(w => w.docId == updateImageDTO.DocId);
+            var updateDefinition = Builders<DMSDTO>.Update
+             .Set(d => d.contentType, updateImageDTO.ContentType).
+              Set(d => d.fileName, updateImageDTO.FileName)
+             .Set(d => d.length, updateImageDTO.FileData.Length)
+             .Set(d => d.data, updateImageDTO.FileData)
+             .Set(d => d.uploadDate, DateTime.Now)
+             .Set(d => d.tagDTOs[c].tagName, updateImageDTO.tagdto[c].Tagname)
+             .Set(d => d.tagDTOs[c].tagValue, updateImageDTO.tagdto[c].TagValue);
+             await  collection.UpdateManyAsync(filterDefinition, updateDefinition);
+
+            return null;
+        }
+
+
 
     }
 

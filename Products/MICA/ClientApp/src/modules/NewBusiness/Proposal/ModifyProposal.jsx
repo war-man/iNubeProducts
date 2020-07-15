@@ -114,10 +114,10 @@ class ModifyProposal extends React.Component {
             <div>
                 <GridContainer lg={12}>
                     <GridItem xs={12} sm={12} md={12}>
-                        <Card>
-                            <CardHeader>
+                        {/*<Card>*/}
+                            {/* <CardHeader>
                                 <h3 className={classes.cardTitle}><small>Modify Proposal</small></h3>
-                            </CardHeader>
+                            </CardHeader>*/}
 
                             <CardBody>
                                 <Accordion
@@ -130,12 +130,12 @@ class ModifyProposal extends React.Component {
                                         },
                                          {
                                              title: "Policy Owner Details",
-                                             content: <PartialMemberDetails DateChange={this.props.DateChange} MasterSetValue={this.props.MasterSetValue} proposalPolicyOwnerSetValue={this.props.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.props.tblPolicyMemberDetails} SaveProposalDto={this.props.SaveProposalDto} proposalSetValue={this.props.proposalSetValue} singleValue1={this.props.singleValue1} singleValue={this.props.singleValue} singleValueSelectedProposer={this.props.singleValueSelectedProposer} singleValueSelected={this.props.singleValueSelected} handleRadioChange={this.props.handleRadioChange} handleRadioOnChange={this.props.handleRadioOnChange} SetValue={this.SetValue} FilterPolicyOwnerDetailsdata={this.props.FilterPolicyOwnerDetailsdata} MasterDataDto={this.props.MasterDataDto} PolicyOwnerDetailsdataOnNoCondition={this.props.PolicyOwnerDetailsdataOnNoCondition} PolicyOwnerDetailsdataOnYesConditioinDto={this.props.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsSetValue={this.props.PolicyOwnerDetailsSetValue} GetmasterData={this.props.GetmasterData} />
+                                             content: <PartialMemberDetails SetPermanentAddCheckBox={this.props.SetPermanentAddCheckBox} SetCitizenshipCheckBox={this.props.SetCitizenshipCheckBox} citizenshipCheckboxSelected={this.props.citizenshipCheckboxSelected} handlePolicyOwnerData={this.props.handlePolicyOwnerData} PolicyOwnerDetailsDto={this.props.PolicyOwnerDetailsDto} DateChange={this.props.DateChange} MasterSetValue={this.props.MasterSetValue} proposalPolicyOwnerSetValue={this.props.proposalPolicyOwnerSetValue} tblPolicyMemberDetails={this.props.tblPolicyMemberDetails} SaveProposalDto={this.props.SaveProposalDto} proposalSetValue={this.props.proposalSetValue} singleValue1={this.props.singleValue1} singleValue={this.props.singleValue} singleValueSelectedProposer={this.props.singleValueSelectedProposer} singleValueCheckboxSelected={this.props.singleValueCheckboxSelected} singleValueSelected={this.props.singleValueSelected} handleRadioChange={this.props.handleRadioChange} handleRadioOnChange={this.props.handleRadioOnChange} SetValue={this.SetValue} FilterPolicyOwnerDetailsdata={this.props.FilterPolicyOwnerDetailsdata} MasterDataDto={this.props.MasterDataDto} PolicyOwnerDetailsdataOnNoCondition={this.props.PolicyOwnerDetailsdataOnNoCondition} PolicyOwnerDetailsdataOnYesConditioinDto={this.props.PolicyOwnerDetailsdataOnYesConditioinDto} PolicyOwnerDetailsSetValue={this.props.PolicyOwnerDetailsSetValue} GetmasterData={this.props.GetmasterData} />
 
                                         },
                                         {
                                             title: "Life to be Assured",
-                                            content: <LifeToBeAssured SetValue={this.SetValue}/>
+                                            content: <LifeToBeAssured SetValue={this.SetValue} filterData={this.props.filterData} MasterDataDto={this.props.MasterDataDto} />
 
                                         },
                                         {
@@ -155,14 +155,14 @@ class ModifyProposal extends React.Component {
                                         },
                                         {
                                             title: "Declaration And Document",
-                                            content: <DeclarationAndDocument SetValue={this.SetValue}/>
+                                            content: <DeclarationAndDocument SetValue={this.SetValue} MasterDataDto={this.props.MasterDataDto}/>
 
                                         },
 
                                     ]}
                                 />
                             </CardBody>
-                        </Card>
+                        {/* </Card>*/}
                     </GridItem>
 
                 </GridContainer>

@@ -484,6 +484,10 @@ class User extends React.Component {
         //if (cust.customerid == 121 && cust.partnerid == 0 || cust.partnerid != 0) {
         //    this.setState({ hideexternal: true });
         //}
+        //let producttype = localStorage.getItem('ProductType');
+        //if (producttype == "Avo") {
+        //    this.setState({ hideexternal: false });
+        //}
 
         fetch(`${UserConfig.UserConfigUrl}/api/UserProfile/GetMasterData?sMasterlist=abc`, {
             method: 'GET',
@@ -862,7 +866,7 @@ class User extends React.Component {
                 this.setState({
                     empFlag: true,
                     partFlag: false,
-                    hideexternal: true,
+                    hideexternal: false,
                     isUser: false,
                     visibility: false,
                     employeeid: "",

@@ -413,7 +413,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     //string connectionString = _configuration.GetConnectionString("DefaultConnection");
                     //string connectionString = "Server=inubepeg.database.windows.net;Database=MICADev;User ID=MICAUSER;Password=MICA*user123;Trusted_Connection=False;";
 
-                    DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+                    DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration, new LoggerManager(_configuration)));
                     string connectionString = dbHelper.GetEnvironmentConnectionAsync(apiContext.ProductType, Convert.ToDecimal(apiContext.ServerType)).Result;
 
                     using (SqlConnection connection = new SqlConnection(connectionString))
@@ -577,7 +577,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             List<CalculationResult> calcultion = new List<CalculationResult>();
             try
             {
-                _logger.LogRequest("Rating", "Rating", response.ToString(), "_context---Before", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+                _logger.LogRequest("Rating", "Rating", response.ToString(), "_context---Before",null, new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
 
                 if (_context == null)
@@ -585,7 +585,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
                     _context = (MICARTContext)(await DbManager.GetContextAsync(apiContext.ProductType, apiContext.ServerType, _configuration));
                 }
 
-                _logger.LogRequest("Rating", "Rating", _context.ToString(), "_context---After", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+                _logger.LogRequest("Rating", "Rating", _context.ToString(), "_context---After", null,new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
 
                 var Expression = _context.TblCalculationConfigExpression.Where(item => item.CalculationConfigId == Convert.ToDecimal(CalculationConfigId)).OrderBy(it => it.Steps);
@@ -756,7 +756,7 @@ namespace iNube.Services.Rating.Controllers.RatingConfig.RatingConfigService.Mic
             catch (Exception ex)
             {
                 // _logger.LogError(ex, "RatingConfig", MethodBase.GetCurrentMethod().Name, null, null, apiContext);
-                _logger.LogRequest("Rating", "Rating", ex.ToString(), "CatchBlock-Rating-Final", new ApiContext() { ProductType = "Mica", ServerType = "297" });
+                _logger.LogRequest("Rating", "Rating", ex.ToString(), "CatchBlock-Rating-Final",null, new ApiContext() { ProductType = "Mica", ServerType = "297" });
 
                 errorResponse.ResponseMessage = "Incorrect Input Parameter";
                 return errorResponse;

@@ -777,6 +777,34 @@ namespace iNube.Services.Policy.Models
             public virtual LeadDTO Contact { get; set; }
 
         }
+
+        public class PolicyOwnerDetailsDto
+        {
+            public string Salutation { get; set; }
+            public string Fullname { get; set; }
+            public string NameWithInitial { get; set; }
+            public string Surname { get; set; }
+            public DateTime? Dob { get; set; }
+            public int? Age { get; set; }
+            public string Nationality { get; set; }
+            public string Mobile { get; set; }
+            public string Email { get; set; }
+            public string Gender { get; set; }
+            public string Home { get; set; }
+            public string PassportNumber { get; set; }
+            public string MaritialStatus { get; set; }
+            public decimal AddressId { get; set; }
+            public string Address1 { get; set; }
+            public string Address2 { get; set; }
+            public string Address3 { get; set; }
+            public string City { get; set; }
+            public string Pincode { get; set; }
+            public string AnnualIncome { get; set; }
+            public string GivenName { get; set; }
+            public string District { get; set; }
+            public int RelationShipWithProposer { get; set; }
+        }
+
         public class InboxDetailsDto
         {
             public string QuoteNo { get; set; }

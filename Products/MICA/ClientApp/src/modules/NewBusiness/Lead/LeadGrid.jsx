@@ -23,8 +23,8 @@ const LeadGrid = (props) => {
     return (
 
            
-                <CardBody>
 
+                <CardBody>
                     <ReactTable
 
                         data={props.newdata}

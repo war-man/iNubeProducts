@@ -74,12 +74,19 @@ const TreatyDetails = (props) => {
                     <Icon><img id="icon" src={Treaty} /></Icon>
                 </CardIcon>
                 {
+                    
                     <h4 >
-                        <small><TranslationContainer translationKey="CreateTreaty" /> </small>
+                        
+                        { props.createtreatyflag && 
+                            <small><TranslationContainer translationKey="CreateTreaty" /> </small>
+                        }
+                        { props.modifytreatyflag &&
+                            <small><TranslationContainer translationKey="ModifyTreaty" /> </small>
+                        }
                     </h4>
                 }
             </CardHeader>
-
+            
             <CardBody>
                 <GridContainer lg={12} justify="center">
                     <GridItem xs={12} sm={12} md={6} style={radioAlign}>

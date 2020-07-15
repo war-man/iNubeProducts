@@ -74,7 +74,7 @@ class ConfirmProspect extends React.Component {
         return (
             <GridContainer xl={12}>
                 <GridItem lg={12}>
-            <Card className="assignCard">
+            <Card >
                     
                 <CardHeader color="rose" icon>
                     <CardIcon color="rose">

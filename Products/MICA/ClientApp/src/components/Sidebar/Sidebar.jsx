@@ -25,6 +25,8 @@ import sidebarStyle from "assets/jss/material-dashboard-pro-react/components/sid
 
 //import avatar from "assets/img/faces/avatar.jpg";
 import DefaultPicture from "assets/img/faces/DefaultPicture.png";
+import inubeavo from "assets/img/inubeavo.png";
+import iNubeText from "assets/img/iNubeText.png";
 import IconsList from "routes/AllIcons.jsx";
 var ps;
 
@@ -73,6 +75,7 @@ class Sidebar extends React.Component {
             lastName: "",
             userName: "",
             defaultpic: false,
+            logo: false,
         };
         this.activeRoute.bind(this);
         this.handleclick = this.handleclick.bind(this);
@@ -84,6 +87,9 @@ class Sidebar extends React.Component {
 
     componentDidMount() {
         console.log("image: ", localStorage.getItem('profilepicture'));
+        if (localStorage.getItem('ProductType') == 'Mica') {
+            this.setState({ logo: true });
+        }
         //if (localStorage.getItem('profilepicture') == undefined || localStorage.getItem('profilepicture') == null || localStorage.getItem('profilepicture') == "") {
         //    this.setState({ defaultpic: true });
         //}
@@ -134,7 +140,7 @@ class Sidebar extends React.Component {
             color,
             logo,
             image,
-            logoText,
+            //logoText,
             routes,
             bgColor,
             rtlActive
@@ -465,19 +471,34 @@ class Sidebar extends React.Component {
                 [classes.whiteAfter]: bgColor === "white"
             });
         var brand = (
-            <div className={logoClasses}>
-                {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
-                <a /*href="https://micav0002.azurewebsites.net/dashboard/home" */ className={logoMini}>
-                    <img src={logo} alt="logo" className={classes.img} />
-                </a>
-                {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
-                <a /*href="https://micav0002.azurewebsites.net/dashboard/home"*/ className={logoNormal}>
-                    <img src={logoText} alt="logo" className={classes.imgNormal} />
-                </a >
-                {/* <a href="https://micav0002.azurewebsites.net/dashboard/home" className={logoNormal}>
+            this.state.logo ?
+                <div className={logoClasses}>
+                    {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
+                    <a /*href="https://micav0002.azurewebsites.net/dashboard/home" */ className={logoMini}>
+                        <img src={logo} alt="logo" className={classes.img} />
+                    </a>
+                    {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
+                    <a /*href="https://micav0002.azurewebsites.net/dashboard/home"*/ className={logoNormal}>
+                        <img src={iNubeText} alt="logo" className={classes.imgNormal} />
+                    </a >
+                    {/* <a href="https://micav0002.azurewebsites.net/dashboard/home" className={logoNormal}>
                     <img src={'data:image/png;base64,' + localStorage.getItem('CompanyLogo')} alt="logo" className={classes.imgNormal} />
                 </a >*/}
-            </div >
+                </div >
+                :
+                <div className={logoClasses}>
+                    {/*<a href="http://www.inubesolutions.com/" className={logoMini}>
+                    <a href="https://micav0002.azurewebsites.net/dashboard/home"  className={logoMini}>
+                        <img src={logo} alt="logo" className={classes.img} />
+                    </a>*/}
+                    {/*<a href="http://www.inubesolutions.com/" className={logoMini}>*/}
+                    <a /*href="https://micav0002.azurewebsites.net/dashboard/home"*/ className={logoNormal}>
+                        <img src={inubeavo} alt="logo" className={classes.imgNormal} />
+                    </a >
+                    {/* <a href="https://micav0002.azurewebsites.net/dashboard/home" className={logoNormal}>
+                    <img src={'data:image/png;base64,' + localStorage.getItem('CompanyLogo')} alt="logo" className={classes.imgNormal} />
+                </a >*/}
+                </div >
         );
         const drawerPaper =
             classes.drawerPaper +
@@ -576,7 +597,7 @@ Sidebar.propTypes = {
         "rose"
     ]),
     logo: PropTypes.string,
-    logoText: PropTypes.string,
+    //logoText: PropTypes.string,
     image: PropTypes.string,
     routes: PropTypes.arrayOf(PropTypes.object)
 };

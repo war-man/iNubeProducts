@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using iNube.Services.Policy.Entities.DynamicReportEntities;
+using iNube.Utility.Framework.LogPrivider.LogService;
 
 namespace iNube.Services.Policy.Helpers.WrapperAPIHelpers
 {
@@ -79,7 +80,7 @@ namespace iNube.Services.Policy.Helpers.WrapperAPIHelpers
             DbContext context = null;
             //string dbConnectionString = DbConnectionManager.GetConnectionString(connectionKey);
 
-            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
             string dbConnectionString = await dbHelper.GetEnvironmentConnectionAsync(product, Convert.ToDecimal(connectionKey));
 
             switch (product)

@@ -182,6 +182,8 @@ class ParticipantMaster extends React.Component {
         console.log("isActive1", this.state.ParticipantMaster.isActive);
     }
     handleClose = () => {
+        debugger
+        console.log(this.state.open, 'Open');
         this.setState({ open: false });
     }
     ViewPDFFun = () => {
@@ -627,9 +629,12 @@ class ParticipantMaster extends React.Component {
                     //text: "data saved successfully",
                     icon: "success"
                 });
+                this.setState({ open: false });
                 console.log("Accountss data1: ", data);
                 this.reset();
                 this.setState({ ParticipantMaster: data });
+                debugger;
+                
                
                 //console.log("Accountss data: ", data);
 

@@ -98,7 +98,7 @@ class LeadPool extends React.Component {
            
             <GridContainer xl={12}>
                 <GridItem lg={12}>
-                    <Card className="assignCard">
+                    <Card >
                         <CardHeader color="rose" icon>
                             <CardIcon color="rose">
                                 <Icon><img id="icon" src={leadPool} /></Icon>
