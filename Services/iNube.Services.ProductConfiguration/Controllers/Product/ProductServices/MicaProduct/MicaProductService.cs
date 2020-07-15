@@ -42,7 +42,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
             _emailService = emailService;
             _integrationService = integrationService;
             _configuration = configuration;
-            dbHelper = new DbHelper(new IntegrationService(configuration));
+            dbHelper = new DbHelper(new IntegrationService(configuration, new LoggerManager(configuration)));
         }
 
         public async Task<ProductResponse> Create(ProductDTO productDTO, ApiContext apiContext)
@@ -1476,8 +1476,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 }
                 catch (Exception ex)
                 {
-
-                    _logger.LogError(ex, "Lead BulkSMS", apiContext);
+                    _logger.LogError(ex,"Product", "Lead BulkSMS",null,null, apiContext);
                 }
 
 
@@ -1496,7 +1495,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 catch (Exception ex)
                 {
 
-                    _logger.LogError(ex, "Lead Email", apiContext);
+                    _logger.LogError(ex,"Product", "Lead Email", null,null,apiContext);
                 }
 
                 item.Smsstatus = false;
