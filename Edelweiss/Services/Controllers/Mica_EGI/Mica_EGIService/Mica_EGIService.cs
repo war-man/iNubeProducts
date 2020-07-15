@@ -25,6 +25,7 @@ using iNube.Services.Billing.Helpers;
 using OfficeOpenXml;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -89,10 +90,11 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         private readonly IEmailService _emailService;
         private IIntegrationService _integrationService;
         private IConfiguration _configuration;
+        private ILoggerManager _logger;
 
-
-        public MicaEGIService(IConfiguration configuration, IIntegrationService integrationService, IMapper mapper, MICAQMContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
+        public MicaEGIService(IConfiguration configuration, IIntegrationService integrationService, ILoggerManager logger, IMapper mapper, MICAQMContext context, IOptions<AppSettings> appSettings, IEmailService emailService)
         {
+            _logger = logger;
             _mapper = mapper;
             _appSettings = appSettings.Value;
            // _context = context;
@@ -6548,7 +6550,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         public async Task<PolicyCancelResponse> GetRefundDetails(PolicyCancelRequest policyRequest, ApiContext apicontext)
         {
-            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration));
+            DbHelper dbHelper = new DbHelper(new IntegrationService(_configuration, new LoggerManager(_configuration)));
 
 
             _context = (MICAQMContext)(await DbManager.GetContextAsync(apicontext.ProductType, apicontext.ServerType, _configuration));
@@ -7078,7 +7080,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex,"TotalUsage",apiContext);
+                    _logger.LogError(ex, "Mica_EGI", MethodBase.GetCurrentMethod().Name, PolicyNo + ":" + FromDate + ":" + ToDate, null, apiContext);
                     return 0;
                 }
 
