@@ -46,10 +46,10 @@ class PolicyBooking extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            setflag:false,
+            setflag: false,
             finalPremiumFlag: false,
-            productCode:"",
-            RatingId:0,
+            productCode: "",
+            RatingId: 0,
             searchTableSec: true, loader: true,
             RatingDetails: {},
             result: [],
@@ -58,7 +58,7 @@ class PolicyBooking extends React.Component {
             FloterJson: { "dictionary_rule": { "RiskType": "", "HospitalDailyCash": "", "SumInsured": "" }, "dictionary_rate": { "CSPFloaterRate1_Tenure": "", "CSPFloaterRate1_SumInsured": "" } },
             IndividualJson: { "dictionary_rule": { "RiskType": "", "HospitalDailyCash": "", "SumInsured": "" }, "dictionary_rate": { "IndividualRateTable_Tenure1": "", "IndividualRateTable_SumInsured1": "" } },
             Generateflag: false,
-            PremiumShow:false,
+            PremiumShow: false,
             show: false,
             productId: "",
             PartnerData: [],
@@ -82,7 +82,7 @@ class PolicyBooking extends React.Component {
             datetemp: [],
 
         };
-   
+
         this.handleTags = this.handleTags.bind(this);
         this.onGet = this.onGet.bind(this);
         this.onInputParamChangeInsurableFields = this.onInputParamChangeInsurableFields.bind(this);
@@ -111,10 +111,10 @@ class PolicyBooking extends React.Component {
         console.log("fieldsdata", field);
     };
 
-    onInputParamChangeInsurableFields = (evt,index,insIndex) => {
+    onInputParamChangeInsurableFields = (evt, index, insIndex) => {
         console.log('Event', evt);
-      //  debugger;
-        let field = this.state.fields.InsurableItem[index].InsurableFields[insIndex];
+        //  debugger;
+        let field = this.state.fields.InsurableItem[index].RiskItems[insIndex];
         field[evt.target.name] = evt.target.value;
         this.setState({ field });
         console.log("fieldsdata", field);
@@ -124,10 +124,10 @@ class PolicyBooking extends React.Component {
 
     InusurableName = (index) => {
         const name = this.state.PolicyData1[0].productRcbInsurableDetails[index].inputType;
-        
+
         console.log("InsurableItemnameData", this.state.PolicyData1[0].productRcbInsurableDetails[index]);
         let InsurableItems = this.state.fields.InsurableItem[index];
-        InsurableItems["InsurableName"] =name;
+        InsurableItems["InsurableName"] = name;
         this.setState({ InsurableItems });
         console.log("fieldsdata111", this.state.fields);
     }
@@ -147,7 +147,7 @@ class PolicyBooking extends React.Component {
 
     onInputParamChangeCover = (evt, index, coverIndex, CFindex) => {
         //debugger;
-         
+
         console.log('Event Cover', index, coverIndex);
         console.log("fulldata", this.state.fields.InsurableItem[index])
         let field = this.state.fields.InsurableItem[index].Covers[coverIndex].CoverFields[CFindex];
@@ -156,14 +156,14 @@ class PolicyBooking extends React.Component {
         this.setState({ field });
         console.log("fieldsdata", field);
         this.CoverName(index, coverIndex);
-       // coverIndex = coverIndex + 1;
+        // coverIndex = coverIndex + 1;
 
     };
 
     onInputPolicyChange = (evt) => {
-        const f= this.state.Policydata;
+        const f = this.state.Policydata;
         f[evt.target.name] = evt.target.value;
-        this.setState({ f});
+        this.setState({ f });
         if (evt.target.name == "PartnerId") {
 
 
@@ -195,23 +195,23 @@ class PolicyBooking extends React.Component {
         }
     };
     onFormSubmit = (evt) => {
-        
+
 
         for (var i = 0; i <= this.state.datename.length - 1; i++) {
 
             this.state.fields[this.state.datename[i]] = this.state.datetime[i];
         }
         console.log("submittested", this.state.fields);
-     //   console.log("submitJSON", this.state.fields.JSON());
-          //fetch(`https://localhost:44351/api/Policy/CreateMultiCoverPolicy  `, {
+        //   console.log("submitJSON", this.state.fields.JSON());
+        //fetch(`https://localhost:44351/api/Policy/CreateMultiCoverPolicy  `, {
         fetch(`${policyConfig.PolicyconfigUrl}/api/Policy/CreateMultiCoverPolicy`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-              },
-              
+            },
+
             body: JSON.stringify(this.state.fields)
         }).then(function (response) {
             return response.json();
@@ -284,10 +284,10 @@ class PolicyBooking extends React.Component {
 
     };
     onGet() {
-      
+
 
         if (this.state.fields.ProductId !== "" && this.state.fields.PartnerId !== "") {
-          
+
             // fetch(`https://localhost:5001/api/Product/GetInsurableRiskDetails?ProductId` + this.state.fields.ProductId,{
             fetch(`${policyConfig.productConfigUrl}/api/Product/GetInsurableRiskDetails?ProductId=` + this.state.Policydata.ProductId, {
                 method: 'GET',
@@ -299,10 +299,10 @@ class PolicyBooking extends React.Component {
             })
                 .then(response => response.json())
                 .then(data => {
-              
+
                     console.log("PolicyData", this.state.PolicyData);
                     debugger;
-                   
+
                     this.setState({ PolicyData: data, show: true });
                     console.log("PolicyData", this.state.PolicyData, this.state.fields);
                     const len = data.productRcbInsurableDetails.length;
@@ -310,19 +310,19 @@ class PolicyBooking extends React.Component {
                         // Object for Cover
                         this.state.fields.InsurableItem = this.state.fields.InsurableItem.concat({
                             InsurableName: "",
-                            InsurableFields: [{}],
+                            RiskItems: [{}],
                             Covers: [{}],
                         });
                     }
                     this.setState({});
-                    console.log("arraydata",  this.state.fields.InsurableItem);
+                    console.log("arraydata", this.state.fields.InsurableItem);
                     console.log("FieldTest", this.state.fields);
 
                 });
         } else {
             swal("", "Some field are missing!", "error");
         }
-       
+
     }
     componentDidMount() {
         fetch(`${policyConfig.partnerconfigUrl}/api/Partner/GetMasterDataAsync?sMasterlist=Partner`, {
@@ -353,7 +353,7 @@ class PolicyBooking extends React.Component {
 
             });
 
-      
+
     }
     onGet1() {
 
@@ -380,19 +380,19 @@ class PolicyBooking extends React.Component {
                 console.log("data1", this.state.PolicyData1[0].productRcbInsurableDetails)
                 for (var i = 0; i < len; i++) {
                     // Object for Cover
-                    this.state.fields.InsurableItem= this.state.fields.InsurableItem.concat({
+                    this.state.fields.InsurableItem = this.state.fields.InsurableItem.concat({
                         InsurableName: this.state.PolicyData1[0].productRcbInsurableDetails[i].inputType,
-                        InsurableFields: [{}],
+                        RiskItems: [{}],
                         Covers: [],
                     });
-                    
-                   
+
+
                 }
                 this.setState({});
                 for (var i = 0; i < len; i++) {
                     const Coverlen = this.state.PolicyData1[0].productRcbInsurableDetails[i].coverRcbdetails.length;
-                    for (var j=0; j < Coverlen; j++) {
-                    
+                    for (var j = 0; j < Coverlen; j++) {
+
                         this.state.fields.InsurableItem[i].Covers = this.state.fields.InsurableItem[i].Covers.concat({
                             CoverName: "",
                             CoverFields: [{}],
@@ -407,44 +407,44 @@ class PolicyBooking extends React.Component {
 
                 field["Product Code"] = this.state.productCode;
 
-                this.setState({ field, setflag: true});
-              
+                this.setState({ field, setflag: true });
+
                 console.log("arraydata", arr, this.state.fields);
-               
+
             });
 
-       
-     
+
+
     }
-    GetProductbyID = (id) =>  {
+    GetProductbyID = (id) => {
 
-    fetch(`${policyConfig.productConfigUrl}/api/Product/GetProductById?productId=` + this.state.Policydata.ProductId, {
-        //   fetch(`https://localhost:44347/api/Product/GetProductById?productId=` + this.props.sendproductid,{
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('userToken')
-        },
-    })
-        .then(response => response.json())
-        .then(data => {
+        fetch(`${policyConfig.productConfigUrl}/api/Product/GetProductById?productId=` + this.state.Policydata.ProductId, {
+            //   fetch(`https://localhost:44347/api/Product/GetProductById?productId=` + this.props.sendproductid,{
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('userToken')
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
 
-            if (data.productCode != undefined) {
+                if (data.productCode != undefined) {
 
-                this.state.productCode = data.productCode;
-                
-            }
-            if (data.ratingId > 0) {
-                this.setState({ PremiumShow: true, Generateflag: false, RatingId: data.ratingId });
-            } else {
-                this.setState({ PremiumShow: false, Generateflag: true, RatingId: 0 });
-            }
+                    this.state.productCode = data.productCode;
+
+                }
+                if (data.ratingId > 0) {
+                    this.setState({ PremiumShow: true, Generateflag: false, RatingId: data.ratingId });
+                } else {
+                    this.setState({ PremiumShow: false, Generateflag: true, RatingId: 0 });
+                }
 
 
-            console.log("data search by id", data, this.state.productCode, this.state.fields)
-        });
-}
+                console.log("data search by id", data, this.state.productCode, this.state.fields)
+            });
+    }
     onInputChange = (evt) => {
         const fields = this.state.fields;
         fields[evt.target.name] = evt.target.value;
@@ -458,7 +458,7 @@ class PolicyBooking extends React.Component {
     }
 
     getPremiumCalculation = () => {
-        
+
         if (this.state.fields["Policy Tenure"] != undefined) {
             this.state.RatingJson.dictionary_rate.Tenure = this.state.fields["Policy Tenure"];
             this.state.FloterJson.dictionary_rate.CSPFloaterRate1_Tenure = this.state.fields["Policy Tenure"];
@@ -487,7 +487,7 @@ class PolicyBooking extends React.Component {
         } else {
             data = this.state.RatingJson;
         }
-      
+
         fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/` + this.state.RatingId, {
             method: 'post',
             headers: {
@@ -502,13 +502,13 @@ class PolicyBooking extends React.Component {
 
                     this.setState({ result: data });
                     this.setState({ loader: false });
-                   // this.tabledata();
+                    // this.tabledata();
                     let finalpremium = data.filter(s => s.entity == "FinalPremium");
                     if (finalpremium.length > 0) {
                         let fields = this.state.fields;
                         fields["permiumamount"] = finalpremium[0].eValue;
                         this.setState({ fields });
-                        
+
                         this.setState({ RatingDetails: finalpremium[0], finalPremiumFlag: true, Generateflag: true });
 
                     }
@@ -530,7 +530,7 @@ class PolicyBooking extends React.Component {
 
                 console.log(this.state.result, 'Results');
             });
-       
+
     }
     render() {
         const { classes } = this.props;
@@ -583,16 +583,16 @@ class PolicyBooking extends React.Component {
                                     </GridItem>
 
                                 </GridContainer>
-                              
+
                                 {this.state.show && this.state.setflag && <GridContainer>
-                                     <GridContainer>
+                                    <GridContainer>
                                         <GridItem>
                                             <h4><small> Product Level </small></h4>
                                         </GridItem>
-                                      </GridContainer>
-                                    
+                                    </GridContainer>
+
                                     {this.state.PolicyData1[0].productRcbDetails.map((item, index) =>
-                                      
+
                                         <GridItem xs={12} sm={12} md={4} key={index}>
                                             {(item.userInputType != "datetime") ?
                                                 <CustomInput labelText={item.inputType}
@@ -608,90 +608,90 @@ class PolicyBooking extends React.Component {
                                         </GridItem>
                                     )}
 
-                                    
-                                        <GridContainer>
-                                            <GridItem>
-                                                <h4><small> Insurable Item Details </small></h4>
-                                            </GridItem>
-                                        </GridContainer>
 
-                                        {this.state.PolicyData1[0].productRcbInsurableDetails.map((item, index) =>
+                                    <GridContainer>
+                                        <GridItem>
+                                            <h4><small> Insurable Item Details </small></h4>
+                                        </GridItem>
+                                    </GridContainer>
+
+                                    {this.state.PolicyData1[0].productRcbInsurableDetails.map((item, index) =>
                                         <GridContainer>
-                                           
+
                                             <GridItem xs={12} sm={12} md={12}>
 
-                                                            <h5><b>{item.inputType}</b></h5>
+                                                <h5><b>{item.inputType}</b></h5>
 
-                                                        </GridItem>
-                                          
-                                                
-                                                    {item.insurableChildRcbdetail.map((prop, key) =>
+                                            </GridItem>
 
-                                                        <GridItem xs={12} sm={12} md={4} key={key}>
+
+                                            {item.insurableChildRcbdetail.map((prop, key) =>
+
+                                                <GridItem xs={12} sm={12} md={4} key={key}>
                                                     {(prop.userInputType != "datetime") ?
-                                                                <CustomInput labelText={prop.inputType}
-                                                                    // value={item.paramName}
-                                                                    name={prop.inputType}
-                                                                    onChange={(e) => this.onInputParamChangeInsurableFields(e, index, 0)}
-                                                                    inputProps={{
-                                                                        //type: "number"
-                                                                    }}
-                                                                    formControlProps={{ fullWidth: true }} /> :
-                                                                <CustomDatetime labelText={prop.inputType} name={prop.inputType} value={this.state.fields[prop.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} value={this.state.fields[prop.inputType]} formControlProps={{ fullWidth: true }} />
-                                                            }
+                                                        <CustomInput labelText={prop.inputType}
+                                                            // value={item.paramName}
+                                                            name={prop.inputType}
+                                                            onChange={(e) => this.onInputParamChangeInsurableFields(e, index, 0)}
+                                                            inputProps={{
+                                                                //type: "number"
+                                                            }}
+                                                            formControlProps={{ fullWidth: true }} /> :
+                                                        <CustomDatetime labelText={prop.inputType} name={prop.inputType} value={this.state.fields[prop.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} value={this.state.fields[prop.inputType]} formControlProps={{ fullWidth: true }} />
+                                                    }
 
-                                                        </GridItem>
+                                                </GridItem>
                                             )}
 
-                                        
 
 
-                                           
+
+
                                             <GridItem xs={12} sm={12} md={12}>
-                                                    <h4><small> Cover level details </small></h4>
-                                                </GridItem>
-                                          
+                                                <h4><small> Cover level details </small></h4>
+                                            </GridItem>
+
                                             {item.coverRcbdetails.map((prop1, key1) =>
-                                                
-                                          
+
+
 
                                                 <GridItem xs={12} sm={12} md={12}>
                                                     <GridItem xs={12} sm={12} md={12}>
-                                                                        <h5><b>{prop1.inputType}</b></h5>
+                                                        <h5><b>{prop1.inputType}</b></h5>
                                                     </GridItem>
-                                                    <GridContainer>      
-                                                        
-                                                        
-                                                                {prop1.coverChildRcbdetail.map((prop2, key2) =>
+                                                    <GridContainer>
 
-                                                                <GridItem xs={12} sm={12} md={4} key={key2}>
+
+                                                        {prop1.coverChildRcbdetail.map((prop2, key2) =>
+
+                                                            <GridItem xs={12} sm={12} md={4} key={key2}>
                                                                 {(prop1.userInputType != "datetime") ?
-                                                                        <CustomInput labelText={prop2.inputType}
-                                                                            // value={item.paramName}
-                                                                            name={prop2.inputType}
-                                                                            onChange={(e) => this.onInputParamChangeCover(e, index, key1,0)}
-                                                                            inputProps={{
-                                                                                //type: "number"
-                                                                            }}
-                                                                            formControlProps={{ fullWidth: true }} /> :
-                                                                        <CustomDatetime labelText={prop2.inputType} name={prop2.inputType} value={this.state.fields[prop2.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} value={this.state.fields[prop2.inputType]} formControlProps={{ fullWidth: true }} />
-                                                                    }
+                                                                    <CustomInput labelText={prop2.inputType}
+                                                                        // value={item.paramName}
+                                                                        name={prop2.inputType}
+                                                                        onChange={(e) => this.onInputParamChangeCover(e, index, key1, 0)}
+                                                                        inputProps={{
+                                                                            //type: "number"
+                                                                        }}
+                                                                        formControlProps={{ fullWidth: true }} /> :
+                                                                    <CustomDatetime labelText={prop2.inputType} name={prop2.inputType} value={this.state.fields[prop2.inputType]} onChange={(evt) => this.onDateChange('Datetime', item.inputType, evt)} value={this.state.fields[prop2.inputType]} formControlProps={{ fullWidth: true }} />
+                                                                }
 
-                                                                </GridItem>
+                                                            </GridItem>
                                                         )}
-                                                        </GridContainer>
+                                                    </GridContainer>
                                                 </GridItem>
-                                               
-                                                )}
-                                            </GridContainer>
-                                        
-                                        )}
 
-                                    
+                                            )}
+                                        </GridContainer>
+
+                                    )}
+
+
 
                                     {this.state.PremiumShow ? <GridContainer> <GridItem xs={3} sm={3} md={3}>
                                         <Button id="round" style={{ marginTop: '25px', 'left': '169%' }} onClick={() => this.getPremiumCalculation()} color="info" > Calculate Premium </Button>
-                                    </GridItem> </GridContainer>:null}
+                                    </GridItem> </GridContainer> : null}
                                     {this.state.finalPremiumFlag && <GridContainer><GridItem xs={3} sm={3} md={6}><h5><b>Final Premium: {this.state.RatingDetails.eValue}/-</b></h5></GridItem></GridContainer>}
                                     {this.state.Generateflag && <GridContainer><GridItem xs={3} sm={3} md={3}>
                                         <Button id="round" style={{ marginTop: '25px', 'left': '173%' }} onClick={() => this.onFormSubmit()} color="info" > Generate Policy  </Button>
