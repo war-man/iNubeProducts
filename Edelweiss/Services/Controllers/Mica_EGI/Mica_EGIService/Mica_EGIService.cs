@@ -26,6 +26,7 @@ using OfficeOpenXml;
 using iNube.Utility.Framework.LogPrivider.LogService;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
+using MicaExtension_EGI.Helpers;
 
 namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EGIService
 {
@@ -80,6 +81,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
         Task<bool> BalanceAlertScheduler(ApiContext context);
         Task<int> TotalUsage(string PolicyNo, DateTime FromDate, DateTime ToDate, ApiContext apiContext);
         Task<bool> RetryPremiumBookingScheduler(DateTime? dateTime, List<string> PolicyNoList, ApiContext context);
+        Task<GetScheduleResponse> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, ApiContext context);
     }
 
     public class MicaEGIService : IMicaEGIService
@@ -9907,7 +9909,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             ResponseStatus response = new ResponseStatus();
             ErrorInfo errorInfo;
             int FailCount = 0;
-
+      
             try
             {
                
@@ -9932,6 +9934,24 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                         response.Errors.Add(errorInfo);
 
                         return response;
+                    }
+                    else
+                    {
+                        int PolicyStatus = Convert.ToInt32(PolicyData["PolicyStageStatusId"]);
+
+                        if(PolicyStatus != ModuleConstants.PolicyStageStatusId)
+                        {
+                            errorInfo = new ErrorInfo();
+
+                            response.ResponseMessage = "Policy is not yet live";
+                            response.Status = BusinessStatus.Error;
+                            errorInfo.ErrorMessage = "Policy Not Started";
+                            errorInfo.ErrorCode = "ExpPolicy";
+                            errorInfo.PropertyName = "PolicyStageStatusId";
+                            response.Errors.Add(errorInfo);
+
+                            return response;
+                        }
                     }
 
                 }
@@ -10499,8 +10519,200 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
             return true;
         }
+        
+        public async Task<GetScheduleResponse> NewGetSchedule(string VehicleRegistrationNo, string PolicyNo, ApiContext context)
+        {
+            _context = (MICAQMContext)(await DbManager.GetContextAsync(context.ProductType, context.ServerType, _configuration));
+
+            GetScheduleResponse response = new GetScheduleResponse();
+
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentTimeHour = IndianTime.Hour;
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
 
 
+            if (!String.IsNullOrEmpty(VehicleRegistrationNo) && !String.IsNullOrEmpty(PolicyNo))
+            {
+                var checkdata = _context.TblSchedule.Any(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
+
+                if (checkdata)
+                {
+
+                    var scheduledata = _context.TblSchedule.FirstOrDefault(x => x.VehicleRegistrationNo == VehicleRegistrationNo && x.PolicyNo == PolicyNo);
+
+                    response.GetSchedule.PolicyNo = PolicyNo;
+                    response.GetSchedule.VehicleRegistrationNo = VehicleRegistrationNo;
+                    response.GetSchedule.VehicleType = scheduledata.VehicleType;
+                    response.GetSchedule.Mon = scheduledata.Mon;
+                    response.GetSchedule.Tue = scheduledata.Tue;
+                    response.GetSchedule.Wed = scheduledata.Wed;
+                    response.GetSchedule.Thu = scheduledata.Thu;
+                    response.GetSchedule.Fri = scheduledata.Fri;
+                    response.GetSchedule.Sat = scheduledata.Sat;
+                    response.GetSchedule.Sun = scheduledata.Sun;
+
+
+                    var SwitchLogData = _context.TblSwitchLog.Where(x => x.PolicyNo == PolicyNo
+                                                                   && x.VehicleNumber == VehicleRegistrationNo
+                                                                   && x.CreatedDate.Value.Date == IndianTime.Date).ToList();
+
+                    List<TblSwitchLog> ManualData = new List<TblSwitchLog>();
+
+                    if (CurrentTimeHour <  ModuleConstants.SchedulerRunTime)
+                    {
+                        if (SwitchLogData.Count() > 0)
+                        {
+
+                            ManualData = SwitchLogData.OrderByDescending(x => x.CreatedDate)
+                                                      .Where(x => x.SwitchType == "Manual").ToList();
+
+                            if (ManualData.Count() > 0)
+                            {
+                                //Taking First Record Bcz using Order By Descending.
+                                var finalRecord = ManualData.FirstOrDefault();
+
+                                response.GetSchedule.SwitchStatus = finalRecord.SwitchStatus;
+
+                                if (finalRecord.SwitchStatus == true)
+                                {
+                                    response.GetSchedule.SwitchEnabled = false;
+                                }
+                                else
+                                {
+                                    response.GetSchedule.SwitchEnabled = true;
+                                }
+                            }
+                            else
+                            {
+                                bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                                response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                                response.GetSchedule.SwitchEnabled = true;
+                            }
+
+                        }
+                        else
+                        {
+                            bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                            response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                            response.GetSchedule.SwitchEnabled = true;
+                        }
+
+                    }
+                    else
+                    {
+                        if (SwitchLogData.Count() > 0)
+                        {
+                            var LatestData = SwitchLogData.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
+
+                            response.GetSchedule.SwitchStatus = LatestData.SwitchStatus;
+
+                            if (LatestData.SwitchStatus == true)
+                            {
+                                response.GetSchedule.SwitchEnabled = false;
+                            }
+                            else
+                            {
+                                response.GetSchedule.SwitchEnabled = true;
+                            }
+
+                        }
+                        else
+                        {
+                            //PBS Has Not RAN ITS AN EXCEPTION 
+                            bool ScheduleSwitchStatus = CurrentDaySwitchStatus(scheduledata);
+                            response.GetSchedule.SwitchStatus = ScheduleSwitchStatus;
+                            response.GetSchedule.SwitchEnabled = false;
+                        }
+                    }
+
+                    response.Status = BusinessStatus.Ok;
+
+                    return response;
+
+                }
+                else
+                {
+                    //Return No Records Found 
+                    response.GetSchedule = null;
+                    ErrorInfo errorInfo = new ErrorInfo();
+                    response.ResponseMessage = "No Records Found";
+                    response.Status = BusinessStatus.NotFound;
+                    errorInfo.ErrorMessage = "No records found in the Schedule table for the sent input";
+                    errorInfo.ErrorCode = "GEN001";
+                    errorInfo.PropertyName = "NoRecords";
+                    response.Errors.Add(errorInfo);
+                    return response;
+
+                }
+
+
+            }
+            else
+            {
+                //Return Wrong NUll DATA 
+                response.GetSchedule = null;
+
+                ErrorInfo errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Null/Empty Inputs";
+                response.Status = BusinessStatus.PreConditionFailed;
+                errorInfo.ErrorMessage = "Either Policy Number or Vehicle Number is Null";
+                errorInfo.ErrorCode = "GEN002";
+                errorInfo.PropertyName = "MandatoryfieldsMissing";
+                response.Errors.Add(errorInfo);
+                return response;
+
+            }
+
+        }
+
+        private bool CurrentDaySwitchStatus(TblSchedule scheduledata)
+        {
+            DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
+            var CurrentDay = IndianTime.DayOfWeek.ToString();
+
+            bool CurrentDayStat = false;
+
+            switch (CurrentDay)
+            {
+                case "Monday":
+                    CurrentDayStat = scheduledata.Mon;
+                    break;
+
+                case "Tuesday":
+                    CurrentDayStat = scheduledata.Tue;
+                    break;
+
+
+                case "Wednesday":
+                    CurrentDayStat = scheduledata.Wed;
+                    break;
+
+
+                case "Thursday":
+                    CurrentDayStat = scheduledata.Thu;
+                    break;
+
+
+                case "Friday":
+                    CurrentDayStat = scheduledata.Fri;
+                    break;
+
+
+                case "Saturday":
+                    CurrentDayStat = scheduledata.Sat;
+                    break;
+
+
+
+                case "Sunday":
+                    CurrentDayStat = scheduledata.Sun;
+                    break;
+            }
+
+            return CurrentDayStat;
+
+        }
     }
 }
 
