@@ -16,17 +16,17 @@ import validationPage from "modules/Claims/views/ValidationPage.jsx";
 class ClaimPayeeDetails extends React.Component {
     constructor(props) {
         super(props);
-        console.log("BankDetails coming",this.props);
+        console.log("BankDetails coming", this.props);
         this.state = {
-            responseflag: this.props.claimDetailsprops.responseflag,
-            claimManagerRemarksState:"",
+
+            claimManagerRemarksState: "",
             fields: this.props.claimDetailsprops.fields,
-          
+
             claimid: this.props.claimDetailsprops.claimid,
-            AccountTypedata:[],
+            AccountTypedata: [],
             displaycust: false,
             BankDataModelDTO: this.props.claimDetailsprops.BankDataModelDTO,
-            Bankarray:this.props.claimDetailsprops.OtherClaimBankDetails,
+            Bankarray: this.props.claimDetailsprops.OtherClaimBankDetails,
             BankDetails: {},
             Bankdata: {
                 "Customer": {
@@ -57,7 +57,7 @@ class ClaimPayeeDetails extends React.Component {
 
     componentDidMount() {
         console.log("response flag", this.props.claimDetailsprops.responseflag);
-      
+
         let accounttype = "Account Type";
         fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/GetMasterData?sMasterlist=` + accounttype + ``, {
             method: 'get',
@@ -90,7 +90,7 @@ class ClaimPayeeDetails extends React.Component {
         console.log("Bankarray", this.state.Bankarray, this.props.claimDetailsprops.OtherClaimBankDetails);
     }
 
-  
+
     handleCheckbox = (event, name, i) => {
         this.props.claimDetailsFun.handleCheckboxUpdate(event, name, i);
         let element = this.state.Bankarray;
@@ -173,7 +173,7 @@ class ClaimPayeeDetails extends React.Component {
         });
     }
 
-      renderPage = (Bankfieldsmodel, name) => {
+    renderPage = (Bankfieldsmodel, name) => {
 
         if (Bankfieldsmodel.UIControl == "TextField") {
 
@@ -320,21 +320,21 @@ class ClaimPayeeDetails extends React.Component {
         let data = BankDataModelDTO[name];
         data.type = name;
         data[evt.target.name] = evt.target.value;
-     
+
         let bank = this.state.Bankarray;
         let index = bank.findIndex(e => e.name == name);
         let bankvalue = bank[index].BankDetails.filter(a => a.Name == evt.target.name)
         bankvalue[0].Value = evt.target.value;
-        bankvalue[0].Validation=this.Validation(evt,bankvalue[0].ValidationType);
+        bankvalue[0].Validation = this.Validation(evt, bankvalue[0].ValidationType);
         this.setState({ bank });
-      
-        this.setState({  data, BankDataModelDTO });
-       
+
+        this.setState({ data, BankDataModelDTO });
+
     };
     onDateChange = (formate, type, name, objname, event) => {
         const { validdate } = this.state;
         this.setState({ validdate: false });
-       
+
         //var today = event.toDate();
         //var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         var today = event.toDate();
@@ -359,7 +359,7 @@ class ClaimPayeeDetails extends React.Component {
 
         this.setState({ data });
 
-       // this.Validation(event, name, formate, date, type);
+        // this.Validation(event, name, formate, date, type);
 
     };
     //handleBankdetails = (id) => {
@@ -380,12 +380,12 @@ class ClaimPayeeDetails extends React.Component {
     //    });
     //}
 
-    Validation(event,type) {
+    Validation(event, type) {
 
         switch (type) {
-         
 
-           
+
+
             case "IFSC Code":
                 if (validationPage.verifyBankifsc(event.target.value)) {
 
@@ -402,7 +402,7 @@ class ClaimPayeeDetails extends React.Component {
                     return true;
                 }
                 break;
-            
+
             default:
                 break;
         }
@@ -418,7 +418,7 @@ class ClaimPayeeDetails extends React.Component {
 
         this.setState({ fields });
 
-       // this.change(evt, name, type);
+        // this.change(evt, name, type);
     };
     onInternalFormSubmit = () => {
         this.state.response = true;
@@ -426,95 +426,95 @@ class ClaimPayeeDetails extends React.Component {
     }
 
     render() {
-       
-       
+
+
         const { classes } = this.props;
         return (
             <div>
-         
 
-            <GridContainer>
-                <h4>Payment Details</h4>
-            </GridContainer>
-            <GridContainer>
+
                 <GridContainer>
-                    <h6 className="payeetxttransform">Select Payee</h6>
+                    <h4>Payment Details</h4>
                 </GridContainer>
+                <GridContainer>
                     <GridContainer>
-                        {this.props.claimDetailsprops.ProductClaimData.length>0?this.props.claimDetailsprops.ProductClaimData.map((item, i) =>
-                        <GridItem xs={12} sm={4} md={3} className="downlevel">
-                            <CustomCheckbox key={i}
-                                name={item.inputType}
-                                labelText={item.inputType}
-                                value={item.mIsRequired}
-                                checked={item.mIsRequired}
-                                // onChange={(e) => claimDetailsprops.SetRiskClaimsDetailsValue('Claim Process', e)}
-                                onChange={(e) => this.handleCheckbox(e, item.inputType, i)}
-                                disabled={(item.disable == true) ? true : null}
-                                formControlProps={{
-                                    fullWidth: true
-                                }} />
-                        </GridItem>
-                    ):null}
-                </GridContainer>
-            </GridContainer>
-            <div>
-                {this.state.Bankarray.length > 0 ?
-                    <GridContainer>
-                        {this.state.Bankarray.map((item, key) =>
-                            <GridContainer >
-                                {this.state.displaycust == true ?
-                                    <GridContainer lg={12}>
-                                        <GridContainer lg={12}>
-                                            <GridItem lg={12}>
-                                                <CardHeader color="info" icon >
-                                                    {
-                                                        <h3 >
-                                                            <small> {item.name}&nbsp;<TranslationContainer translationKey="BankDetails" /></small>
-                                                        </h3>
-                                                    }
-                                                </CardHeader>
-                                            </GridItem>
-                                        </GridContainer>
-
-                                        {
-                                            item.BankDetails.map(m =>
-                                                <GridItem xs={8} sm={5} md={3}>
-                                                    {this.renderPage1(m, item.name)}
-
-                                                </GridItem>
-                                            )
-                                        }
-                                    </GridContainer>
-                                    :
-                                    <GridContainer lg={12}>
-                                        <GridContainer lg={12}>
-                                            <GridItem lg={12}>
-                                                <CardHeader color="info" icon >
-                                                    {
-                                                        <h3 >
-                                                            <small> {item.name}&nbsp;<TranslationContainer translationKey="BankDetails" /></small>
-                                                        </h3>
-                                                    }
-                                                </CardHeader>
-                                            </GridItem>
-                                        </GridContainer>
-
-                                        {
-                                            item.BankDetails.map(m =>
-                                                <GridItem xs={8} sm={5} md={3}>
-                                                    {this.renderPage1(m, item.name)}
-
-                                                </GridItem>
-                                            )
-                                        }
-                                    </GridContainer>
-                                }
-
-                            </GridContainer>
-                        )}
+                        <h6 className="payeetxttransform">Select Payee</h6>
                     </GridContainer>
-                    : null}
+                    <GridContainer>
+                        {this.props.claimDetailsprops.ProductClaimData.length > 0 ? this.props.claimDetailsprops.ProductClaimData.map((item, i) =>
+                            <GridItem xs={12} sm={4} md={3} className="downlevel">
+                                <CustomCheckbox key={i}
+                                    name={item.inputType}
+                                    labelText={item.inputType}
+                                    value={item.mIsRequired}
+                                    checked={item.mIsRequired}
+                                    // onChange={(e) => claimDetailsprops.SetRiskClaimsDetailsValue('Claim Process', e)}
+                                    onChange={(e) => this.handleCheckbox(e, item.inputType, i)}
+                                    disabled={(item.disable == true) ? true : null}
+                                    formControlProps={{
+                                        fullWidth: true
+                                    }} />
+                            </GridItem>
+                        ) : null}
+                    </GridContainer>
+                </GridContainer>
+                <div>
+                    {this.state.Bankarray.length > 0 ?
+                        <GridContainer>
+                            {this.state.Bankarray.map((item, key) =>
+                                <GridContainer >
+                                    {this.state.displaycust == true ?
+                                        <GridContainer lg={12}>
+                                            <GridContainer lg={12}>
+                                                <GridItem lg={12}>
+                                                    <CardHeader color="info" icon >
+                                                        {
+                                                            <h3 >
+                                                                <small> {item.name}&nbsp;<TranslationContainer translationKey="BankDetails" /></small>
+                                                            </h3>
+                                                        }
+                                                    </CardHeader>
+                                                </GridItem>
+                                            </GridContainer>
+
+                                            {
+                                                item.BankDetails.map(m =>
+                                                    <GridItem xs={8} sm={5} md={3}>
+                                                        {this.renderPage1(m, item.name)}
+
+                                                    </GridItem>
+                                                )
+                                            }
+                                        </GridContainer>
+                                        :
+                                        <GridContainer lg={12}>
+                                            <GridContainer lg={12}>
+                                                <GridItem lg={12}>
+                                                    <CardHeader color="info" icon >
+                                                        {
+                                                            <h3 >
+                                                                <small> {item.name}&nbsp;<TranslationContainer translationKey="BankDetails" /></small>
+                                                            </h3>
+                                                        }
+                                                    </CardHeader>
+                                                </GridItem>
+                                            </GridContainer>
+
+                                            {
+                                                item.BankDetails.map(m =>
+                                                    <GridItem xs={8} sm={5} md={3}>
+                                                        {this.renderPage1(m, item.name)}
+
+                                                    </GridItem>
+                                                )
+                                            }
+                                        </GridContainer>
+                                    }
+
+                                </GridContainer>
+                            )}
+                        </GridContainer>
+                        : null}
 
 
                 </div >
@@ -544,9 +544,9 @@ class ClaimPayeeDetails extends React.Component {
                                         onChange={(evt) => this.onInputParamChange("claimStatusId", evt)}
                                         formControlProps={{ fullWidth: true }}
                                     />
-                                {this.props.claimDetailsprops.errormessage && (this.state.fields.claimStatusId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
+                                    {this.props.claimDetailsprops.errormessage && (this.state.fields.claimStatusId == "") ? <p className="error">*Required field cannot be left blank</p> : null}
 
-                                {this.props.claimDetailsprops.claimstatusflag && (this.state.fields.claimStatusId == "") ? <p className="error"> </p> : null}
+                                    {this.props.claimDetailsprops.claimstatusflag && (this.state.fields.claimStatusId == "") ? <p className="error"> </p> : null}
 
                                 </GridItem>
 
@@ -580,14 +580,14 @@ class ClaimPayeeDetails extends React.Component {
                                             //type: "number"
                                         }}
                                         formControlProps={{ fullWidth: true }} />
-                                {this.props.claimDetailsprops.errormessage && (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks ==null) ? <p className="error">*Required field cannot be left blank</p> : null}
+                                    {this.props.claimDetailsprops.errormessage && (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks == null) ? <p className="error">*Required field cannot be left blank</p> : null}
 
-                                {this.props.claimDetailsprops.claimsremarksflag && (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks == null) ? <p className="error"> </p> : null}
+                                    {this.props.claimDetailsprops.claimsremarksflag && (this.state.fields.claimManagerRemarks == "" || this.state.fields.claimManagerRemarks == null) ? <p className="error"> </p> : null}
                                 </GridItem>
 
                                 <GridContainer lg={12} justify="center">
                                     <GridItem xs={5} sm={3} md={3} lg={1}>
-                                    <Button color="info" round disabled={this.state.responseflag} onClick={() => this.onInternalFormSubmit()}>
+                                        <Button color="info" round disabled={this.props.claimDetailsprops.responseflag} onClick={() => this.onInternalFormSubmit()}>
                                             <TranslationContainer translationKey="Submit" />
                                         </Button>
                                     </GridItem>
@@ -598,9 +598,9 @@ class ClaimPayeeDetails extends React.Component {
                     }
 
                 </div>
-                </div>
-                              );
-}
+            </div>
+        );
+    }
 }
 
 export default ClaimPayeeDetails;
