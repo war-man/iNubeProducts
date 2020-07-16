@@ -1,8 +1,8 @@
 //let env = "EdelweissProd";
 //let env = "Production";
-let env = "Dev";
+//let env = "Dev";
 //let env = "Local";                      
-//let env = "UAT"; 
+let env = "UAT"; 
 
 let Baseurl = 'http://dev2-publi-3o0d27omfsvr-1156685715.ap-south-1.elb.amazonaws.com';
 let partnerconfigUrl = Baseurl;
