@@ -1888,7 +1888,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                             {
                                 PolicyNumber = policyNumber,
                                 RecipientNumber = policyUpdate.MobileNumber,
-                                SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/" + policyNumber,
+                                SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://mica.inubesolutions.com/pages/claim/" + policyNumber,
                             };
                             request.TemplateKey = "InsuranceCertificate";
                             request.AttachPDF = true;
@@ -2036,7 +2036,7 @@ namespace iNube.Services.Policy.Controllers.Policy.PolicyServices
                         {
                             PolicyNumber = policyNumber,
                             RecipientNumber = policyUpdate.MobileNumber,
-                            SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://micav0002.azurewebsites.net/pages/claim/" + policyNumber,
+                            SMSMessage = "Dear Customer, Your Insurance Policy transaction has been successful. Your Policy No " + policyNumber + " is generated and  for Claims Intimation use this link: http://mica.inubesolutions.com/pages/claim/" + policyNumber,
                         };
                         request.TemplateKey = "InsuranceCertificate";
                         request.AttachPDF = true;
