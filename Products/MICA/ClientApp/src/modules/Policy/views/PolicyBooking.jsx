@@ -55,6 +55,8 @@ class PolicyBooking extends React.Component {
             result: [],
             productCode: "",
             RatingJson: { "dictionary_rule": {}, "dictionary_rate": { "Tenure": "", "SumInsured": "" } },
+            FloterJson: { "dictionary_rule": { "RiskType": "", "HospitalDailyCash": "", "SumInsured": "" }, "dictionary_rate": { "CSPFloaterRate1_Tenure": "", "CSPFloaterRate1_SumInsured": "" } },
+            IndividualJson: { "dictionary_rule": { "RiskType": "", "HospitalDailyCash": "", "SumInsured": "" }, "dictionary_rate": { "IndividualRateTable_Tenure1": "", "IndividualRateTable_SumInsured1": "" } },
             Generateflag: false,
             PremiumShow:false,
             show: false,
@@ -94,6 +96,11 @@ class PolicyBooking extends React.Component {
         fields[evt.target.name] = evt.target.value;
         this.setState({ fields });
         console.log("fieldsdata", fields);
+        if (evt.target.name == "Cover Type") {
+            if (evt.target.value == "Individual") { this.setState({ RatingId: 85 }); }
+            else if (evt.target.value == "Floater") { this.setState({ RatingId: 82 }); }
+            else { this.setState({ RatingId: 80 }); }
+        }
     };
 
     onInputParamChangeInsurableItem = (evt) => {
@@ -454,10 +461,33 @@ class PolicyBooking extends React.Component {
         
         if (this.state.fields["Policy Tenure"] != undefined) {
             this.state.RatingJson.dictionary_rate.Tenure = this.state.fields["Policy Tenure"];
+            this.state.FloterJson.dictionary_rate.CSPFloaterRate1_Tenure = this.state.fields["Policy Tenure"];
+            this.state.IndividualJson.dictionary_rate.IndividualRateTable_Tenure1 = this.state.fields["Policy Tenure"];
         }
         if (this.state.fields["Sum Insured"] != undefined) {
             this.state.RatingJson.dictionary_rate.SumInsured = this.state.fields["Sum Insured"];
+            this.state.FloterJson.dictionary_rate.CSPFloaterRate1_SumInsured = this.state.fields["Sum Insured"];
+            this.state.IndividualJson.dictionary_rate.IndividualRateTable_SumInsured1 = this.state.fields["Sum Insured"];
+            this.state.IndividualJson.dictionary_rule.SumInsured = this.state.fields["Sum Insured"];
+            this.state.FloterJson.dictionary_rule.SumInsured = this.state.fields["Sum Insured"];
         }
+        if (this.state.fields["Risky Type"] != undefined) {
+            this.state.IndividualJson.dictionary_rule.RiskType = this.state.fields["Risky Type"];
+            this.state.FloterJson.dictionary_rule.RiskType = this.state.fields["Risky Type"];
+        }
+        if (this.state.fields["Hospital Daily Cash"] != undefined) {
+            this.state.IndividualJson.dictionary_rule.HospitalDailyCash = this.state.fields["Hospital Daily Cash"];
+            this.state.FloterJson.dictionary_rule.HospitalDailyCash = this.state.fields["Hospital Daily Cash"];
+        }
+        let data = {};
+        if (this.state.RatingId == 82) {
+            data = this.state.FloterJson;
+        } else if (this.state.RatingId == 85) {
+            data = this.state.IndividualJson;
+        } else {
+            data = this.state.RatingJson;
+        }
+      
         fetch(`${RateConfig.rateConfigUrl}/api/RatingConfig/CheckCalculationRate/CheckRateCalculation/` + this.state.RatingId, {
             method: 'post',
             headers: {
@@ -465,7 +495,7 @@ class PolicyBooking extends React.Component {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('userToken')
             },
-            body: JSON.stringify(this.state.RatingJson)
+            body: JSON.stringify(data)
         }).then(response => response.json())
             .then(data => {
                 if (data.length > 0) {
@@ -476,7 +506,7 @@ class PolicyBooking extends React.Component {
                     let finalpremium = data.filter(s => s.entity == "FinalPremium");
                     if (finalpremium.length > 0) {
                         let fields = this.state.fields;
-                        fields["Premium"] = finalpremium[0].eValue;
+                        fields["permiumamount"] = finalpremium[0].eValue;
                         this.setState({ fields });
                         
                         this.setState({ RatingDetails: finalpremium[0], finalPremiumFlag: true, Generateflag: true });
