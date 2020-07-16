@@ -1465,7 +1465,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 SMSDTO.Channel = "2";
                 SMSDTO.RecipientNumber = item.MobileNumber;
 
-                SMSDTO.SMSMessage = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://micav0002.azurewebsites.net/pages/policy/" + item.Id;
+                SMSDTO.SMSMessage = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://mica.inubesolutions.com/pages/policy/" + item.Id;
                 try
                 {
                     //SMS API
@@ -1485,7 +1485,7 @@ namespace iNube.Services.ProductConfiguration.Controllers.Product.ProductService
                 EmailRequest emailDTO = new EmailRequest();
                 emailDTO.To = item.EmailId;
                 emailDTO.Subject = "Policy Booking Link";
-                emailDTO.Message = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://micav0002.azurewebsites.net/pages/policy/" + item.Id;
+                emailDTO.Message = "Hello " + item.FirstName + ", For PolicyBooking click on the below Link http://mica.inubesolutions.com/pages/policy/" + item.Id;
 
                 try
                 {
