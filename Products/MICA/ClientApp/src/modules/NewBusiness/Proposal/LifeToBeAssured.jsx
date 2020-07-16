@@ -220,8 +220,8 @@ class LifeToBeAssured extends React.Component {
                 this.setState({});
                 this.ProposerTable();
                 this.setState({ PolicyMemberDetails: data });
-                //this.state.tblPolicyMemberDetails.dob = new Date(this.state.tblPolicyMemberDetails.dob).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                //this.setState({});
+                this.state.PolicyMemberDetails.dob = new Date(this.state.PolicyMemberDetails.dob).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                this.setState({});
 
             });
 
@@ -544,7 +544,7 @@ class LifeToBeAssured extends React.Component {
                             id='dob'
                             name='dob'
                             value={this.state.flag1 === true ? this.state.PolicyMemberDetails.dob : ""}
-                            onChange={(evt) => this.onDateChange('datetime', 'ProductDTO', 'activeFrom', evt)}
+                            //onChange={(evt) => this.onDateChange('datetime', 'ProductDTO', 'activeFrom', evt)}
                             formControlProps={{ fullWidth: true }}
                         />
                     </GridItem>
