@@ -497,7 +497,7 @@ class InboxClaimProcess extends React.Component {
                     this.setState({ detailsdto });
 
 
-                    fetch(`${ClaimConfig.claimConfigUrl}/api//ClaimManagement/ClaimProcess`, {
+                    fetch(`${ClaimConfig.claimConfigUrl}/api/ClaimManagement/ClaimProcess`, {
                         method: 'Post',
                         headers: {
                             'Accept': 'application/json',
