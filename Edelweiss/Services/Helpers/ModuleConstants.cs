@@ -7,7 +7,8 @@ namespace MicaExtension_EGI.Helpers
 {
     public static class ModuleConstants
     {
-        public const int PolicyStageStatusId = 22;
+        public const int PolicyStageStatusLive = 22;
+        public const int PolicyStageStatusCancelled = 21;
         public const int SchedulerRunTime = 9;
     }
 }

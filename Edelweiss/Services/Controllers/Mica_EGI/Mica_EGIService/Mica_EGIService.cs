@@ -9902,87 +9902,53 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
         }
 
-        private async Task<ResponseStatus> ExceptionCheck(dynamic PolicyObject, string PolicyNo,TblSchedule ScheduleData, ApiContext context)
+        private async Task<GetSwitchResponse> ExceptionCheck(dynamic PolicyObject, string PolicyNumber,TblSchedule ScheduleData, ApiContext context)
         {
 
             DateTime IndianTime = System.DateTime.UtcNow.AddMinutes(330);
-            ResponseStatus response = new ResponseStatus();
+            GetSwitchResponse response = new GetSwitchResponse();
             ErrorInfo errorInfo;
             int FailCount = 0;
       
             try
-            {
-               
-                dynamic PolicyData = null;
+            {   
 
                 if (PolicyObject == null)
                 {
-                    //Call the Policy Service to Get Policy Details.
-                    //An Integration Call to  be Made and Recive the Data as this Model PolicyPremiumDetailsDTO
-                    PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNo, context);
+                    var GetPolicyData = await GetPolicyDetails(PolicyNumber,context);
 
-                    //Policy Call Failed or data not found.
-                    if (PolicyData == null)
+                    if(GetPolicyData.Status != BusinessStatus.Ok)
                     {
-                        errorInfo = new ErrorInfo();
-
-                        response.ResponseMessage = "Policy data not found";
+                        response.ResponseMessage = GetPolicyData.ResponseMessage;
                         response.Status = BusinessStatus.Error;
-                        errorInfo.ErrorMessage = "Policy Record Not Found";
-                        errorInfo.ErrorCode = "ExpPolicy";
-                        errorInfo.PropertyName = "InternalGetPolicyDetailsByNumber";
-                        response.Errors.Add(errorInfo);
+                        response.Errors = GetPolicyData.Errors;
 
                         return response;
                     }
                     else
                     {
-                        int PolicyStatus = Convert.ToInt32(PolicyData["PolicyStageStatusId"]);
-
-                        if(PolicyStatus != ModuleConstants.PolicyStageStatusId)
-                        {
-                            errorInfo = new ErrorInfo();
-
-                            response.ResponseMessage = "Policy is not yet live";
-                            response.Status = BusinessStatus.Error;
-                            errorInfo.ErrorMessage = "Policy Not Started";
-                            errorInfo.ErrorCode = "ExpPolicy";
-                            errorInfo.PropertyName = "PolicyStageStatusId";
-                            response.Errors.Add(errorInfo);
-
-                            return response;
-                        }
+                        response.PolicyData = GetPolicyData.Data;
                     }
 
                 }
                 else
                 {
-                    PolicyData = PolicyObject;
-                }
-
-                DateTime PolicyStartDate = Convert.ToDateTime(PolicyData["Policy Start Date"]);
-
-                if (PolicyStartDate > IndianTime)
-                {
-                    FailCount++;
-                    errorInfo = new ErrorInfo();
-                    errorInfo.ErrorMessage = "Trasactions are not allowed.Policy is not yet Started";
-                    errorInfo.ErrorCode = "Exp001";
-                    errorInfo.PropertyName = "Future Dated Policy";
-                    response.Errors.Add(errorInfo);
-                }
-
-                //Policy Is Cancelled Check is pending
-
+                    response.PolicyData = PolicyObject;
+                }             
 
                 if (ScheduleData.IsActive == false)
                 {
-                    FailCount++;
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Trasactions are not allowed.Vehicle is Deleted";
+                    response.Status = BusinessStatus.Error;
                     errorInfo = new ErrorInfo();
                     errorInfo.ErrorMessage = "Trasactions are not allowed.Vehicle is Deleted";
                     errorInfo.ErrorCode = "Exp002";
                     errorInfo.PropertyName = "Vehicle Inactive";
                     response.Errors.Add(errorInfo);
+
+                    return response;                    
                 }
 
                 var checkJobRunning = _context.TblScheduleReport.LastOrDefault(x=>x.ScheduleStartDate.Value.Date == IndianTime.Date);
@@ -10002,7 +9968,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
 
 
                 var checkPBSStatus = _context.TblPremiumBookingLog.LastOrDefault(x=>x.TxnDateTime.Value.Date == IndianTime.Date
-                                                                                    && x.PolicyNo == PolicyNo);
+                                                                                    && x.PolicyNo == PolicyNumber);
 
                 if(checkPBSStatus !=null)
                 {
@@ -10017,7 +9983,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                     }
                 }
 
-                var CheckBalance = await ADBalanceCheck(PolicyObject,PolicyNo,context);
+                var CheckBalance = await ADBalanceCheck(PolicyObject, PolicyNumber, context);
 
                 if(CheckBalance==false)
                 {
@@ -10056,8 +10022,7 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
                 return response;
             }
 
-
-            return new ResponseStatus();
+            return response;
 
         }
 
@@ -10713,6 +10678,86 @@ namespace iNube.Services.MicaExtension_EGI.Controllers.MicaExtension_EGI.Mica_EG
             return CurrentDayStat;
 
         }
+
+        private async Task<GenericDTO> GetPolicyDetails(string PolicyNumber,ApiContext context)
+        {
+            GenericDTO response = new GenericDTO();
+            ErrorInfo errorInfo = new ErrorInfo();
+
+            try
+            {
+                //Call the Policy Service to Get Policy Details.
+                var PolicyData = await _integrationService.InternalGetPolicyDetailsByNumber(PolicyNumber, context);
+
+                if (PolicyData != BusinessStatus.Ok)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy data not found";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Record Not Found";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "InternalGetPolicyDetailsByNumber";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+
+                int PolicyStageStatusId = Convert.ToInt32(PolicyData["PolicyStageStatusId"]);
+
+                if (PolicyStageStatusId == ModuleConstants.PolicyStageStatusCancelled)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy is Cancelled";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Stage Status is Cancelled";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "PolicyCancelled";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+
+                if (PolicyStageStatusId != ModuleConstants.PolicyStageStatusLive)
+                {
+                    errorInfo = new ErrorInfo();
+
+                    response.ResponseMessage = "Policy is not yet live";
+                    response.Status = BusinessStatus.Error;
+                    errorInfo.ErrorMessage = "Policy Stage Status Not Live";
+                    errorInfo.ErrorCode = "ExpPolicy";
+                    errorInfo.PropertyName = "PolicyNotLive";
+                    response.Errors.Add(errorInfo);
+
+                    return response;
+                }
+
+                //Good Policy So Return it with Success
+                response.ResponseMessage = "Policy Data";
+                response.Status = BusinessStatus.Ok;
+                response.Data = PolicyData; 
+
+            }
+            catch
+            {
+                errorInfo = new ErrorInfo();
+
+                response.ResponseMessage = "Some Exception Occured";
+                response.Status = BusinessStatus.Error;
+                errorInfo.ErrorMessage = "Get Policy Details Call Failed due to some exception";
+                errorInfo.ErrorCode = "GetPolicyDetails";
+                errorInfo.PropertyName = "Exception";
+                response.Errors.Add(errorInfo);
+
+                return response;
+            }
+
+            return response;
+        }
+
     }
 }
 
