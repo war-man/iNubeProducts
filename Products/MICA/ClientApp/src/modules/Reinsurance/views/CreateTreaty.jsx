@@ -72,6 +72,21 @@ class CreateTreaty extends React.Component {
         super(props);
         this.state = {
             total: 0,
+            participantdto: [],
+            participantdetail: {
+                "reInsurerId": "",
+                "brokername": "",
+                "reinsurername": "",
+                "reInsurerBranchId": "",
+                "brokerId": "",
+                "brokerBranchId": "",
+                "sharePercentage": "",
+                "brokeragePercentage": "",
+                "ricommissionPercentage": "",
+                "bordereauxFreqId": "",
+                "status": "",
+                "isActive": "y"
+            },
             createtreatyflag: true,
             modifytreatyflag:false,
             flagDuplicate: false,
@@ -403,8 +418,9 @@ class CreateTreaty extends React.Component {
     deleteParticipantRecord = (index) => {
         debugger
         let deldata = this.state.treatyDTO.tblParticipant.splice(index, 1);
+        let deldatas = this.state.participantdto.splice(index, 1);
         //let deldata = this.state.treatydata.filter(item => item.treatyGroup !== index);
-        this.setState({ deldata })
+        this.setState({ deldata, deldatas})
         console.log("deldata", this.state.deldata);
         this.dataTable();
     }
@@ -503,6 +519,7 @@ class CreateTreaty extends React.Component {
 
                 console.log("yearmasterList", this.state.yearmasterList);
             });
+        debugger;
         fetch(`${ReinsuranceConfig.ReinsuranceConfigUrl}/api/ReInsurance/Reinsurer`, {
             method: 'get',
             headers: {
@@ -655,6 +672,8 @@ class CreateTreaty extends React.Component {
 
     AddParticipant = () => {
         this.state.treatyDTO.tblParticipant.push(this.state.participant);
+        this.state.participantdto.push(this.state.participantdetail);
+
         this.state.participant = {
             "reInsurerId": "",
             "brokername": "",
@@ -669,7 +688,20 @@ class CreateTreaty extends React.Component {
             "status": "",
             "isActive": "y"
         };
-       
+        this.state.participantdetail = {
+            "reInsurerId": "",
+            "brokername": "",
+            "reinsurername": "",
+            "reInsurerBranchId": "",
+            "brokerId": "",
+            "brokerBranchId": "",
+            "sharePercentage": "",
+            "brokeragePercentage": "",
+            "ricommissionPercentage": "",
+            "bordereauxFreqId": "",
+            "status": "",
+            "isActive": "y"
+        };
         //let participant = this.state.participant;
         this.dataTable();
         //this.state.reinsurername = "";
@@ -708,12 +740,19 @@ class CreateTreaty extends React.Component {
         this.change(evt, name, type);
     }
     onparticipantInputChange = (evt) => {
+        debugger
         let name = evt.target.name;
         let value = evt.target.value;
         let Data = this.state.participant;
         Data[name] = value;
         this.setState({ Data });
-        console.log("Data1:", this.state.treatyDTO)
+        let PData = this.state.participantdetail;
+        PData[evt.target.name] = evt.currentTarget.innerText;
+        this.state.participantdetail.ricommissionPercentage = this.state.participant.ricommissionPercentage;
+        this.state.participantdetail.sharePercentage = this.state.participant.sharePercentage;
+        this.state.participantdetail.brokeragePercentage = this.state.participant.brokeragePercentage;
+        this.setState({ PData });
+        console.log("Data1", this.state.treatyDTO, evt.currentTarget.innerText, this.state.participantdetail)
         //this.change(evt, name, type);
     }
     onInputChange1 = (evt) => {
@@ -837,10 +876,16 @@ class CreateTreaty extends React.Component {
                     console.log("dataList: ", data);
                     if (data!=null) {
                         this.state.participant.reinsurername = data[0].participantName;
+                        this.state.participantdetail.reinsurername = data[0].participantName;
                     }
                     this.setState({});
                 });
         }
+        let PData = this.state.participantdetail;
+        PData[evt.target.name] = evt.currentTarget.innerText;
+        this.setState({ PData });
+
+        console.log("innertxt", evt.currentTarget.innerText, this.state.participantdetail);
     }
     onddlChange = (evt, name) => {
         const Data = this.state.participant;
@@ -886,11 +931,15 @@ class CreateTreaty extends React.Component {
                     console.log("dataList: ", data);
                     if (data != null) {
                         this.state.participant.brokername = data[0].participantName;
+                        this.state.participantdetail.brokername = data[0].participantName;
                     }
                     this.setState({});
                 });
         }
-        console.log("this.state.brokername", this.state.participant.brokername);
+        let PData = this.state.participantdetail;
+        PData[evt.target.name] = evt.currentTarget.innerText;
+        this.setState({ PData });
+        console.log("this.state.brokername", this.state.participant.brokername, evt.currentTarget.innerText);
     }
     handleSaveTreaty = () => {
        
@@ -973,7 +1022,7 @@ class CreateTreaty extends React.Component {
         }
     }
     dataTable = () => {
-        let ParticipantList = this.state.treatyDTO.tblParticipant;
+        let ParticipantList = this.state.participantdto;
         this.setState({
             newdata: ParticipantList.map((prop, key) => {
                 console.log("trtprop", prop, ParticipantList, this.state.ddllist, this.state.reinsurername);

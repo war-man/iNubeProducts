@@ -61,9 +61,9 @@ const AddParticipant = (props) => {
 
     const prop = props.componentData;
 
-    console.log("props componentData: ", props.componentData);
+    //console.log("props componentData: ", props.componentData);
 
-    console.log("channel masterList: ", props.componentData.masterList);
+    //console.log("channel masterList: ", props.componentData.masterList);
 
     //console.log("mvalue: ", channels);
 
@@ -82,35 +82,49 @@ const AddParticipant = (props) => {
 
 
     //}
-    let treatyDto = props.componentData.participant;
+    let treatyDto;
+    let allocdto;
+    if (props.componentData == undefined) {
+        debugger;
+        treatyDto = props.participant;
+        allocdto = props;
+    }
+
+    else {
+        debugger;
+        treatyDto = props.componentData.participant;
+        allocdto = props.componentData;
+        console.log(props, 'prop1');
+    }
+
     return (
         <div>
             <Card className="no-shadow" >
-                
+
                 <CardBody>
-                   
-                        <GridContainer>
+
+                    <GridContainer>
                         <GridItem xs={12} sm={12} md={4}>
-                        <MasterDropdown
-                            labelText="ReinsurerCode"
+                            <MasterDropdown
+                                labelText="ReinsurerCode"
                                 id="ddlstatus"
                                 //required={true}
-                             lstObject={props.componentData.rimasterList}
-                             filterName='Reinsurer'
-                             value={treatyDto.reInsurerId}
+                                lstObject={allocdto.rimasterList}
+                                filterName='Reinsurer'
+                                value={treatyDto.reInsurerId}
                                 name='reInsurerId'
-                                onChange={(e) => prop.onddChange(e, treatyDto.reinsurercodeId,'reInsurerId')}
-                            formControlProps={{ fullWidth: true }} />
+                                onChange={(e) => allocdto.onddChange(e, treatyDto.reinsurercodeId, 'reInsurerId')}
+                                formControlProps={{ fullWidth: true }} />
 
-                    </GridItem>
-                  
+                        </GridItem>
+
                         <GridItem xs={12} sm={12} md={4}>
                             <CustomInput
                                 labelText="ReinsurerName"
                                 id="ReinsurerName"
                                 value={treatyDto.reinsurername}
                                 name='reinsurername'
-                                onChange={(e)=>prop.onparticipantInputChange(e)}
+                                onChange={(e) => allocdto.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -121,37 +135,37 @@ const AddParticipant = (props) => {
                             <MasterDropdown
                                 labelText="Branch Code"
                                 id="ddlstatus"
-                                lstObject={props.componentData.bcmasterList}
+                                lstObject={allocdto.bcmasterList}
                                 filterName='BrachCode'
                                 value={treatyDto.reInsurerBranchId}
                                 name='reInsurerBranchId'
-                                onChange={(e) => prop.onddChange(e, '', 'reInsurerBranchId')}
+                                onChange={(e) => allocdto.onddChange(e, '', 'reInsurerBranchId')}
                                 formControlProps={{ fullWidth: true }} />
 
                         </GridItem>
-                        </GridContainer>
-                        
-                        <GridContainer>
+                    </GridContainer>
+
+                    <GridContainer>
                         <GridItem xs={12} sm={12} md={4}>
                             <MasterDropdown
                                 labelText="BrokerCode"
                                 id="ddlstatus"
-                                lstObject={props.componentData.bkmasterList}
+                                lstObject={allocdto.bkmasterList}
                                 filterName='Broker'
                                 value={treatyDto.brokerId}
                                 name='brokerId'
-                                onChange={(e) => prop.onddlChange(e,'brokerId')}
+                                onChange={(e) => allocdto.onddlChange(e, 'brokerId')}
                                 formControlProps={{ fullWidth: true }} />
 
                         </GridItem>
-                
+
                         <GridItem xs={12} sm={12} md={4}>
                             <CustomInput
                                 labelText="BrokerName"
                                 id="remarks"
                                 value={treatyDto.brokername}
                                 name='brokername'
-                                onChange={(e) => prop.onparticipantInputChange(e)}
+                                onChange={(e) => allocdto.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -162,17 +176,17 @@ const AddParticipant = (props) => {
                             <MasterDropdown
                                 labelText="BranchCode"
                                 id="ddlstatus"
-                                lstObject={props.componentData.bkbcmasterList}
+                                lstObject={allocdto.bkbcmasterList}
                                 filterName='BrachCode'
                                 value={treatyDto.brokerBranchId}
                                 name='brokerBranchId'
-                                onChange={(e) => prop.onddlChange(e, 'brokerBranchId')}
+                                onChange={(e) => allocdto.onddlChange(e, 'brokerBranchId')}
                                 formControlProps={{ fullWidth: true }} />
 
-                            </GridItem>
-                        </GridContainer>
+                        </GridItem>
+                    </GridContainer>
 
-                        <GridContainer>
+                    <GridContainer>
                         <GridItem xs={12} sm={12} md={4}>
                             <CustomInput
                                 labelText="Share"
@@ -180,25 +194,25 @@ const AddParticipant = (props) => {
                                 required={true}
                                 value={treatyDto.sharePercentage}
                                 name='sharePercentage'
-                                onChange={(e) => prop.onparticipantInputChange(e)}
+                                onChange={(e) => allocdto.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
                             />
                         </GridItem>
-                        {prop.Brokerageflag &&
+                        {allocdto.Brokerageflag &&
                             <GridItem xs={12} sm={12} md={4}>
                                 <CustomInput
-                                labelText="Brokerage"
+                                    labelText="Brokerage"
                                     id="remarks"
                                     value={treatyDto.brokeragePercentage}
                                     name='brokeragePercentage'
-                                    onChange={(e) => prop.onparticipantInputChange(e)}
+                                onChange={(e) => allocdto.onparticipantInputChange(e)}
                                     formControlProps={{
                                         fullWidth: true
                                     }}
                                 />
-                            </GridItem>  
+                            </GridItem>
                         }
                         <GridItem xs={12} sm={12} md={4}>
                             <CustomInput
@@ -206,7 +220,7 @@ const AddParticipant = (props) => {
                                 id="remarks"
                                 value={treatyDto.ricommissionPercentage}
                                 name='ricommissionPercentage'
-                                onChange={(e) => prop.onparticipantInputChange(e)}
+                                onChange={(e) => allocdto.onparticipantInputChange(e)}
                                 formControlProps={{
                                     fullWidth: true
                                 }}
@@ -217,32 +231,32 @@ const AddParticipant = (props) => {
                             <MasterDropdown
                                 labelText="BordereauxFrequency"
                                 id="ddlstatus"
-                                lstObject={props.componentData.masterList}
+                                lstObject={allocdto.masterList}
                                 filterName='Bordereaux Frequency'
                                 value={treatyDto.bordereauxFreqId}
                                 name='bordereauxFreqId'
-                                onChange={(e) => prop.onddChange(e,'','bordereauxFreqId')}
+                                onChange={(e) => allocdto.onddChange(e, '', 'bordereauxFreqId')}
                                 formControlProps={{ fullWidth: true }} />
 
                         </GridItem>
-                        </GridContainer>
+                    </GridContainer>
 
-           
+
 
 
                     <GridContainer justify="center">
                         <GridItem>
                             <center>
-                                <Button round color="rose" onClick={prop.AddParticipant}>Add Participant</Button>
+                                <Button round color="rose" onClick={allocdto.AddParticipant}>Add Participant</Button>
                             </center>
                         </GridItem>
-                            </GridContainer>
-                   
-                
-                 </CardBody>
+                    </GridContainer>
+
+
+                </CardBody>
             </Card>
 
         </div>
-        )
+    )
 }
 export default AddParticipant;
